@@ -27,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -63,6 +64,8 @@ public class XWikiMessageToolBridgeTest
     {
         // Register a mock Environment since we're in a test and we don't want spurious logs in the console.
         this.oldcore.getMocker().registerMockComponent(Environment.class);
+        // We don't care about core extensions and we want to skip core extensions scanner
+        this.oldcore.getMocker().registerMockComponent(CoreExtensionRepository.class);
 
         Locale.setDefault(Locale.ROOT);
 

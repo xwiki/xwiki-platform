@@ -27,10 +27,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
-import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWikiException;
@@ -59,14 +60,18 @@ public class XWikiMessageToolBridgeTest
         this.oldcore.notifyDocumentDeletedEvent(true);
     }
 
-    @Before
-    public void before() throws Exception
+    @AfterComponent
+    public void afterComponent() throws Exception
     {
         // Register a mock Environment since we're in a test and we don't want spurious logs in the console.
         this.oldcore.getMocker().registerMockComponent(Environment.class);
-        // We don't care about core extensions and we want to skip core extensions scanner
-        this.oldcore.getMocker().registerMockComponent(CoreExtensionRepository.class);
+        // Skip core extension scanner
+        this.oldcore.getMocker().registerMockComponent(CoreExtensionScanner.class);
+    }
 
+    @Before
+    public void before() throws Exception
+    {
         Locale.setDefault(Locale.ROOT);
 
         // checking

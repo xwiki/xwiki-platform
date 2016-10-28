@@ -19,9 +19,6 @@
  */
 package org.xwiki.extension.script;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
@@ -39,6 +37,7 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -46,6 +45,9 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @AllComponents
 public class ExtensionManagerScriptServiceTest
@@ -64,6 +66,13 @@ public class ExtensionManagerScriptServiceTest
     private DocumentReference contextUser;
 
     private ExtensionManagerScriptService scriptService;
+
+    @AfterComponent
+    public void afterComponent() throws Exception
+    {
+        // Skip core extension scanner
+        this.mocker.registerMockComponent(CoreExtensionScanner.class);
+    }
 
     @Before
     public void before() throws Exception

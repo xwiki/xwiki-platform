@@ -116,12 +116,33 @@
             <id>copy-ckeditor-resources</id>
             <phase>prepare-package</phase>
           </execution>
+          <!-- Copy the WebJar resources (e.g. CKEditor overwrites) to the right path before packing the jar. -->
+          <execution>
+            <id>copy-webjar-resources</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <!-- Build the CKEditor. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <includes>
+            <!-- Include only the WebJar content -->
+            <include>META-INF/**</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -33,7 +33,7 @@
     },
 
     afterInit: function(editor) {
-      var form = editor.element.getAscendant('form');
+      var form = editor.element && editor.element.getAscendant('form');
       if (form) {
         var maximizedSelector = form.findOne('input[name="x-maximized"]');
         if (maximizedSelector && maximizedSelector.getValue().substr(0, 9) === 'ckeditor#' &&

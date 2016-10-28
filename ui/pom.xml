@@ -74,6 +74,20 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used by the configuration section. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-select</artifactId>
+      <version>1.11.2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
   </dependencies>
   <build>
     <!-- Needed to add support for the XAR packaging -->

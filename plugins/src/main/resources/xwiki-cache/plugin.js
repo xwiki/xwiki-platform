@@ -27,6 +27,8 @@
       return $(editor.element.$).closest('form').find('input.cache').filter(function() {
         return $(this).attr('name') === fieldName + '_cache';
       });
+    } else {
+      return $();
     }
   };
 

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="CKEditor.Translations" locale="">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1477319628000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1477570982000</date>
+  <contentUpdateDate>1477570979000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Disabled Plugins
+CKEditor.ConfigClass_removePlugins.hint=The list of plugins that have been disabled.
+CKEditor.ConfigClass_removeButtons=Disabled Toolbar Features
+CKEditor.ConfigClass_removeButtons.hint=The list of toolbar features that have been disabled.
+CKEditor.ConfigClass_linkShowAdvancedTab=Link: Show Advanced Tab
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Allows you to set link attributes such as id, name, class or style.
+CKEditor.ConfigClass_linkShowTargetTab=Link: Show Target Tab
+CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
+CKEditor.ConfigClass_advanced=Advanced Configuration
+CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
+
+ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
+ckeditor.admin.reset=Reset
+ckeditor.admin.reset.hint=Restore the default configuration
+ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.</content>
+  <object>
+    <name>CKEditor.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>de8e7437-7d08-414a-81ba-9dd339004ee3</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

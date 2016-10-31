@@ -436,11 +436,15 @@ if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
   }
 })();
 
-// Make sure the "Back To Edit" button from the Preview mode works as expected.
+// Make sure the "Back To Edit" button from the Preview mode works as expected on XWiki versions older than 8.2 (where
+// CKEditor is not the default editor).
 require(['jquery'], function($) {
-  $('form#inline').find('input[name="xcontinue"]').val(function(index, oldValue) {
-    return oldValue + '&amp;sheet=CKEditor.EditSheet';
-  });
+  if (/&amp;sheet=CKEditor.EditSheet\b/.test(window.location.href)) {
+    // Make sure the CKEditor.EditSheet is preserved when coming back from Preview mode.
+    $('form#inline').find('input[name="xcontinue"]').val(function(index, oldValue) {
+      return oldValue + '&amp;sheet=CKEditor.EditSheet';
+    });
+  }
 });
 
 // Polyfill for entityReference.js

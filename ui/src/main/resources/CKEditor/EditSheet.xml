@@ -233,22 +233,35 @@ define('xwiki-ckeditor', [
     form_token: $('meta[name="form_token"]').attr('content')
   };
 
-  // Extend the default CKEditor configuration with settings that depend on wiki pages.
-  ckeditor.tools.extend(ckeditor.config, {
-    filebrowserUploadUrl: XWiki.currentDocument.getURL('get', $.param({
-      sheet: 'CKEditor.FileUploader',
-      outputSyntax: 'plain',
-      form_token: xwikiMeta.form_token
-    })),
-    // This is used in CKEditor.FileUploader so we must keep them in sync.
-    fileTools_defaultFileName: '__fileCreatedFromDataURI__',
-    'xwiki-resource': {
-      dispatcher: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.ResourceDispatcher&amp;outputSyntax=plain')
-    },
-    'xwiki-source': {
-      htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
+  // Extend the default CKEditor configuration with settings that depend on the source document.
+  var getConfig = function(element) {
+    var sourceDocument = XWiki.currentDocument;
+    var sourceDocumentReference = $(element).attr('data-sourceDocumentReference');
+    if (sourceDocumentReference) {
+      sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
     }
-  }, true);
+    return {
+      filebrowserUploadUrl: sourceDocument.getURL('get', $.param({
+        sheet: 'CKEditor.FileUploader',
+        outputSyntax: 'plain',
+        form_token: xwikiMeta.form_token
+      })),
+      // This is used in CKEditor.FileUploader so we must keep them in sync.
+      fileTools_defaultFileName: '__fileCreatedFromDataURI__',
+      'xwiki-resource': {
+        dispatcher: sourceDocument.getURL('get', 'sheet=CKEditor.ResourceDispatcher&amp;outputSyntax=plain')
+      },
+      'xwiki-source': {
+        htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
+      }
+    };
+  };
+
+  var oldReplace = ckeditor.replace;
+  ckeditor.replace = function(element, config) {
+    // Take into account the configuration options specified on the target element.
+    return oldReplace.call(this, element, ckeditor.tools.extend(config || {}, getConfig(element)));
+  };
 
   // We cannot add these modules to the list of dependencies because they need the tree module to be configured first.
   require(['entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer'], function() {

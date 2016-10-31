@@ -131,6 +131,7 @@
 ## Requires XWiki 8.2RC1+
 #getTextArea
 #if ($services.wysiwyg.isSyntaxSupported($syntaxId))
+  #set ($discard = $textArea.attributes.put('data-sourceDocumentReference', $edit.parameters.sourceDocumentReference))
   #ckeditor($textArea)
 #else
   ## Fall back on a plain text area.

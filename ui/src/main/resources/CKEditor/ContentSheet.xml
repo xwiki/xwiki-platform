@@ -54,10 +54,12 @@
       ## Fix some issues caused by the fact that we put the content directly under the BODY element.
       &lt;link type="text/css" rel="stylesheet" href="$xwiki.getURL('CKEditor.ContentSheet', 'ssx')" /&gt;
     &lt;/head&gt;
-    &lt;body id="body" class="skin-flamingo wiki-${xcontext.database} space-${escapetool.xml($doc.space.replaceAll(' ', '_'))} viewbody main"&gt;
-      #if (!$source)
-        #set ($source = $tdoc)
-      #end
+    #if (!$source)
+      #set ($source = $tdoc)
+    #end
+    #set ($serializedSpaceReference = $services.model.serialize($source.documentReference.parent, 'local'))
+    &lt;body id="body" class="skin-flamingo viewbody main wiki-$xcontext.database
+        space-$escapetool.xml($serializedSpaceReference.replaceAll(' ', '_'))"&gt;
       #if ($source.html)
         $!services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString())
       #else

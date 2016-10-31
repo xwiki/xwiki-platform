@@ -107,14 +107,20 @@
 
 #macro (ckeditor $parameters)
   #importCKEditorResources
+  #set ($sourceDocument = $tdoc)
+  #if ($parameters.attributes.get('data-sourceDocumentReference'))
+    #set ($sourceDocument = $xwiki.getDocument($parameters.attributes.get('data-sourceDocumentReference')))
+  #end
   #set ($source = {
-    'syntax': $doc.syntax,
+    'documentReference': $sourceDocument.documentReference,
+    'syntax': $sourceDocument.syntax,
     'content': $parameters.content
   })
   #set ($content = "#renderContentSheet")
-  #set ($discard = $parameters.attributes.put('class',
-    "$!parameters.attributes.get('class') ckeditor-textarea loading"))
-  #set ($parameters.attributes.spellcheck = false)
+  #set ($discard = $parameters.attributes.putAll({
+    'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
+    'spellcheck': false
+  }))
   &lt;textarea
     #foreach ($entry in $parameters.attributes.entrySet())
       $entry.key="$!escapetool.xml($entry.value)"
@@ -122,7 +128,7 @@
   &gt;$!escapetool.xml($content)&lt;/textarea&gt;
   #set ($escapedName = $escapetool.xml($parameters.attributes.name))
   &lt;input value="$!escapedName" name="RequiresHTMLConversion" type="hidden"/&gt;
-  &lt;input value="$!escapetool.xml($doc.syntax.toIdString())" name="$!{escapedName}_syntax" type="hidden"/&gt;
+  &lt;input value="$!escapetool.xml($sourceDocument.syntax.toIdString())" name="$!{escapedName}_syntax" type="hidden"/&gt;
   ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
   ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
   ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.

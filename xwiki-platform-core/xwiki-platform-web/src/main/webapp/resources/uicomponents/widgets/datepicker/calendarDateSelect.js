@@ -192,9 +192,6 @@ Externals.CalendarDateSelect.prototype = {
     this.calendar_div.style.left = left_px;  this.calendar_div.style.top = top_px;
 
     this.calendar_div.setStyle({visibility:""});
-
-    // draw an iframe behind the calendar -- ugly hack to make IE 6 happy
-    if(navigator.appName=="Microsoft Internet Explorer") this.iframe = $(document.body).build("iframe", {src: "javascript:false", className: "ie6_blocker"}, { left: left_px, top: top_px, height: c_height.toString()+"px", width: c_width.toString()+"px", border: "0px"})
   },
   initCalendarDiv: function() {
     if (this.options.get("embedded")) {

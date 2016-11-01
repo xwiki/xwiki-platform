@@ -46,8 +46,6 @@ var XWiki = (function(XWiki){
      * Initialization hook for the rich UI.
      * We hijack clicks on package names links, to display the rich importer UI since javascript is available.
      * If javascript is not available, links remains true synchronous HTTP links and the less-rich UI is displayed.
-     *
-     * FIXME: right now disabled for IE6 - until the rich UI is fully debugged for this browser
      */
     var hookRichImporterUI = function() {
         $$("#packagelistcontainer a.package").invoke("observe", "click", function(event) {
@@ -76,22 +74,20 @@ var XWiki = (function(XWiki){
             );
         });
     }
-    if (!browser.isIE6x) {
-      document.observe("xwiki:dom:loaded", function() {
-        hookRichImporterUI();
-        /** Attach the HTML5 uploader, if available */
-        var form = $('AddAttachment');
-        if (form && typeof(XWiki.FileUploader) != 'undefined') {
-          var html5Uploader = new XWiki.FileUploader(form.down("input[type='file']"), {
-            'progressAutohide' : true,
-            'responseContainer' : $('packagelistcontainer'),
-            'responseURL' : window.docgeturl + '?xpage=packagelist&forceTestRights=1'
-          });
-          form.observe("xwiki:html5upload:done", hookRichImporterUI);
-          html5Uploader.hideFormButtons();
-        }
-      });
-    }
+    document.observe("xwiki:dom:loaded", function() {
+      hookRichImporterUI();
+      /** Attach the HTML5 uploader, if available */
+      var form = $('AddAttachment');
+      if (form && typeof(XWiki.FileUploader) != 'undefined') {
+        var html5Uploader = new XWiki.FileUploader(form.down("input[type='file']"), {
+          'progressAutohide' : true,
+          'responseContainer' : $('packagelistcontainer'),
+          'responseURL' : window.docgeturl + '?xpage=packagelist&forceTestRights=1'
+        });
+        form.observe("xwiki:html5upload:done", hookRichImporterUI);
+        html5Uploader.hideFormButtons();
+      }
+    });
 
     /**
      * Extend input elements with check and uncheck methods to be able to check/uncheck

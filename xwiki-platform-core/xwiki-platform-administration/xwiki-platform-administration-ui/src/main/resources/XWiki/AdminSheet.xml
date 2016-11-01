@@ -784,10 +784,6 @@ document.observe('xwiki:dom:loaded', function() {
 .skin-flamingo #change-context {
   padding-top: 55px;
 }
-/* IE6 is very sick... */
-#change-context div {
-  display: inline;
-}
 #goto-select optgroup {
   margin: 6px;
 }

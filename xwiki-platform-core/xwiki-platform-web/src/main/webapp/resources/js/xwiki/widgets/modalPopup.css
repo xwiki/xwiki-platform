@@ -10,10 +10,6 @@
   text-align: center;
   z-index: 1005;
 }
-/* For IE6, which doesn't understand position: fixed. */
-* html .xdialog-modal-container {
-  position: absolute;
-}
 /* Semi-transparent overlay screen that covers the entire page. */
 .xdialog-screen {
   position: absolute;

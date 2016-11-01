@@ -249,11 +249,6 @@ $xwiki.jsx.use($attachmentPickerDocName)
 
 {{velocity}}
 #if ($request.docname)
-  ###if ($request.xpage == 'plain')
-  ##  ## IE6 + XHR + gzip compression = BOOM!
-  ##  ## This disables the automatic gzip compression
-  ##  $response.setContentType('multipart/formdata')
-  ###end
   #set ($targetDocument = $xwiki.getDocument($request.docname))
   #if ($request.targetdocname)
     ## Use the target document if it exists.
@@ -671,11 +666,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       );
       dialog.shortcuts.close.keys = [];
       dialog.showDialog();
-      if (window.browser.isIE6x) {
-        dialog.dialog.down().setStyle({position: "absolute"});
-      } else {
-        dialog.dialog.down().setStyle({position: "fixed"});
-      }
+      dialog.dialog.down().setStyle({position: "fixed"});
       dialog.dialog.setStyle({top: document.viewport.getScrollOffsets().top + "px", position: "absolute"});
       dialog.dialogBox.setStyle({overflow: "hidden", width: "80%", margin: "0 10%"});
       new Ajax.Updater(loading.up(), url, {
@@ -967,18 +958,10 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   position: relative;
   width: ${boxSize}px;
 }
-/* Broken IE6 box model, add the border width to the total width. */
-* html .gallery_attachmentbox {
-  width: ${mathtool.add($boxSize, 2)}px;
-}
 .gallery .current {
   background-color: $theme.highlightColor;
   border-width: 3px;
   margin: 3px;
-}
-/* Broken IE6 box model, add the border width to the total width. */
-* html .gallery .current {
-  width: ${mathtool.add($boxSize, 6)}px;
 }
 .gallery .current .gallery_attachmenttitle {
   font-weight: bold;

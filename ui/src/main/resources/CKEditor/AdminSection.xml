@@ -56,7 +56,7 @@
 #set ($discard = $xwiki.ssx.use('CKEditor.AdminSection'))
 #set ($discard = $xwiki.jsx.use('CKEditor.AdminSection'))
 #set ($configDoc = $xwiki.getDocument('CKEditor.Config'))
-&lt;form id="$!formId" method="post" action="$configDoc.getURL('save')" class="xform"&gt;
+&lt;form #if ("$!formId" != '')id="$formId"#end method="post" action="$configDoc.getURL('save')" class="xform"&gt;
   &lt;fieldset&gt;
     #if ($configDoc.isNew())
       ## Copy the configuration object from the template.

@@ -15,25 +15,11 @@ Lightbox = Class.create({
     toggleClass($('lb-bg'), 'hidden');
     toggleClass($('lb-align'), 'hidden');
     this.resizeBackground();
-    if(browser.isIE6x) {
-      $$('select').each(function(item) {
-        if (item.up('#lb')) {
-          return;
-        }
-        item._x_originalVisibility = item.style['visibility'];
-        item.setStyle({visibility: 'hidden'});
-      });
-    }
   },
 
   lbHide: function() {
     toggleClass($('lb-bg'), 'hidden');
     toggleClass($('lb-align'), 'hidden');
-    if(browser.isIE6x) {
-      $$('select').each(function(item) {
-        item.setStyle({visibility: item._x_originalVisibility});
-      });
-    }
   },
 
   lbLoading: function() {
@@ -280,10 +266,6 @@ Lightbox = Class.create({
 
   resizeBackground: function() {
     var newHeight = document.body.parentNode.scrollHeight;
-    if (document.body.scrollHeight > newHeight) {
-      // IE6
-      newHeight = document.body.scrollHeight;
-    }
     if (document.body.parentNode.clientHeight > newHeight) {
       // IE7
       newHeight = document.body.parentNode.clientHeight;

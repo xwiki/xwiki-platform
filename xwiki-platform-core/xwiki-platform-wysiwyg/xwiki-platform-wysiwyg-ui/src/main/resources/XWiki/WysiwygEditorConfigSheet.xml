@@ -748,12 +748,7 @@ XWiki.ListBox = Class.create({
       return alice.label.localeCompare(bob.label);
     });
     for(var i = 0; i &lt; options.length; i++) {
-      // We can't assign the label to options[i].text because we get "Invalid index" in IE6..
-      if (options[i].textContent) {
-        options[i].textContent = data[i].label;
-      } else {
-        options[i].innerText = data[i].label;
-      }
+      options[i].textContent = data[i].label;
       options[i].value = data[i].value;
     }
   },

@@ -111,10 +111,6 @@ table.xwiki-livetable {
   border-collapse: collapse;
   width: 100%;
 }
-.xwiki-livetable-display td { /* IE6 tr border-bottom fix*/
-  border-color: $theme.pageContentBackgroundColor;
-  border-bottom-color: $theme.borderColor;
-}
 html>body .xwiki-livetable-display td {
   border: 0px;
 }
@@ -122,9 +118,6 @@ html>body .xwiki-livetable-display td {
 /* <Live Table Header> */
 table.xwiki-livetable table.xwiki-livetable-display thead.xwiki-livetable-display-header {
   border-bottom: 5px solid $theme.backgroundSecondaryColor;
-}
-thead.xwiki-livetable-display-header tr.xwiki-livetable-display-filters:hover , thead.xwiki-livetable-display-header tr.rowHover { /* for IE6 tr:hover fix*/
-  background-color: $theme.pageContentBackgroundColor;
 }
 thead.xwiki-livetable-display-header th.xwiki-livetable-display-header-text {
   background-color: $theme.backgroundSecondaryColor;
@@ -155,9 +148,6 @@ thead.xwiki-livetable-display-header th.selected {
   color: $theme.textColor;
   background-color: $theme.highlightColor;
 }
-thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter { /* IE6 padding fix */
-  padding: 1px;
-}
 html>body thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter {
   padding: 2px 5px 2px 0px;
   border-color: transparent;
@@ -179,13 +169,6 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
 tbody.xwiki-livetable-display-body tr {
   border-bottom: 1px solid $theme.borderColor;
 }
-tbody.xwiki-livetable-display-body tr:hover , tbody.xwiki-livetable-display-body tr.rowHover { /* for IE6 tr:hover fix*/
-  background-color: $theme.highlightColor;
-}
-tbody.xwiki-livetable-display-body tr.rowHover td { /* IE6 tr border-bottom fix*/
-  border-left-color: $theme.highlightColor;
-  border-right-color: $theme.highlightColor;
-}
 tbody.xwiki-livetable-display-body td {
   color: $theme.textColor;
   padding: 3px 2px 3px 4px;
@@ -201,13 +184,6 @@ tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-
 tbody.xwiki-livetable-display-body td:hover.linkeditor {
   background: $theme.highlightColor url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat scroll right center;
   cursor: pointer;
-}
-tbody.xwiki-livetable-display-body td.linkeditor a.editableCellHover { /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
-  display: block;
-  background: $theme.highlightColor url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat scroll right center;
-  cursor: pointer;
-  color: $theme.textColor;
-  padding-right: 16px;
 }
 tbody.xwiki-livetable-display-body td.linkeditor a {
   color: $theme.textColor;

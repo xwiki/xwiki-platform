@@ -373,10 +373,6 @@ widgets.FullScreen = Class.create({
     this.actionCloseButtonWrapper.show();
     // Maximize the targetElement
     this.resizeTextArea(targetElement);
-    // IE6 has yet another bug, if we don't call this, then sometimes the toolbar will be invisible. Don't ask why.
-    if (targetElement._toolbar) {
-      targetElement._toolbar.viewportOffset();
-    }
     // Reset the cursor and scroll offset
     if (typeof targetElement.setSelectionRange == 'function') {
       // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
@@ -477,11 +473,6 @@ widgets.FullScreen = Class.create({
     // Compute the maximum space available for the textarea:
     var newHeight = document.viewport.getHeight();
     var newWidth = document.viewport.getWidth();
-    // Prototype fails to return the right viewport in IE6. This works:
-    if(newWidth <= 0) {
-      newWidth = document.body.clientWidth;
-      newHeight = document.body.clientHeight;
-    }
     // Window width - styling padding
     newWidth = newWidth - this.margin;
     // Window height - margin (for the toolbar) - styling padding - buttons

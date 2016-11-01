@@ -665,11 +665,7 @@ h1:hover .toolFilter .toolExpand {
   box-shadow: 0 0 2px 1px rgba(128, 128, 128, 0.6);
 }
 
-/** IE6, IE7 **/
-* html ul.activityList  {
-  list-style-position: outside; /* IE6 */
-}
-
+/** IE7 **/
 * html .activityItem ,  * html  .activityHeader, * html  .activityContent ul{
   display: inline-block;
 }
@@ -695,10 +691,6 @@ h1:hover .toolFilter .toolExpand {
 
 * html .activityAction {
   clear: left;
-}
-
-* html .activitySummary {
-  height: 40px; /* IE 6 */
 }
 </code>
     </property>

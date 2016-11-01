@@ -35,16 +35,10 @@ ul.commentreplies, .reply {
 .xwikicomment:target {
   background: $theme.highlightColor;
 }
-* html .xwikicomment {
-  /* Pick-a-boo IE6 bugfix */
-  position: relative;
-}
 .commentavatar {
-  display: inline; /* IE6 bugfix */
   float: left;
   margin-left: -60px;
   padding-top: 5px;
-  position: relative; /* IE6 bugfix */
   text-align: center;
   width: 50px;
 }
@@ -59,13 +53,6 @@ ul.commentreplies, .reply {
 .commentthread .commentavatar img {
   max-width: 30px;
   max-height: 30px;
-}
-/* max-width is not supported in IE6 */
-* html .commentavatar img {
-  width: 50px;
-}
-* html .commentthread .commentavatar img {
-  width: 30px;
 }
 .commentheader {
   border-bottom: 1px dotted $theme.borderColor;
@@ -155,10 +142,6 @@ ul.commentreplies, .reply {
   resize: vertical;
   width: 100%;
 }
-* html #AddComment .commentcontainer textarea {
-  /* fix for IE6 */
-  width: 98%;
-}
 *+html #AddComment .commentcontainer textarea {
   /* fix for IE7 */
   width: 98%;
@@ -194,10 +177,6 @@ form.edit-xcomment .commentPreview {
 }
 form.edit-xcomment .commentcontent textarea {
   width: 100%;
-}
-* html form.edit-xcomment .commentcontent textarea {
-  /* fix for IE6 */
-  width: 98%;
 }
 *+html form.edit-xcomment .commentcontent textarea {
   /* fix for IE7 */

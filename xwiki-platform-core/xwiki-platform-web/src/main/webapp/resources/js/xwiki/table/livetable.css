@@ -169,6 +169,9 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
 tbody.xwiki-livetable-display-body tr {
   border-bottom: 1px solid $theme.borderColor;
 }
+tbody.xwiki-livetable-display-body tr:hover {
+  background-color: $theme.highlightColor;
+}
 tbody.xwiki-livetable-display-body td {
   color: $theme.textColor;
   padding: 3px 2px 3px 4px;

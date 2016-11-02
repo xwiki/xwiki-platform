@@ -22,7 +22,6 @@ package org.xwiki.resource;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Transforms some representation of an XWiki Resource Type into a {@link org.xwiki.resource.ResourceType} instance.
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.1M1
  */
 @Role
-@Unstable
 public interface ResourceTypeResolver<T>
 {
     /**

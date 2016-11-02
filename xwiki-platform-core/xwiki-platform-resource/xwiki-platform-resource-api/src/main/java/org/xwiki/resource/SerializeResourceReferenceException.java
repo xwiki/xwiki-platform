@@ -19,15 +19,12 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Means that an error occurred while trying to serialize a {@link ResourceReference} object.
  *
  * @version $Id$
  * @since 7.2M1
  */
-@Unstable
 public class SerializeResourceReferenceException extends Exception
 {
     /**

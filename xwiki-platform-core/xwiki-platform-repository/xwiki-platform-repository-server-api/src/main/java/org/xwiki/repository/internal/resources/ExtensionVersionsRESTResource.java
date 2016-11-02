@@ -44,7 +44,6 @@ import org.xwiki.extension.version.InvalidVersionRangeException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersion;
-import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.repository.Resources;
@@ -63,8 +62,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
     public ExtensionVersions getExtensionVersions(@PathParam("extensionId") String extensionId,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
-        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException,
-        InvalidVersionRangeException
+        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException, InvalidVersionRangeException
     {
         Query query = createExtensionsSummariesQuery(null, "extension.id = :extensionId", 0, -1, true);
 
@@ -76,7 +74,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 
         // Filter by ranges
         if (StringUtils.isNotBlank(ranges)) {
-            VersionConstraint constraint = new DefaultVersionConstraint(ranges);
+            VersionConstraint constraint = this.extensionFactory.getVersionConstraint(ranges);
 
             if (constraint.getVersion() != null) {
                 throw new InvalidVersionRangeException("Invalid ranges syntax [" + ranges + "]");
@@ -91,7 +89,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
         }
 
         // Order by version
-        final Map<String, Version> versionCache = new HashMap<String, Version>();
+        final Map<String, Version> versionCache = new HashMap<>();
         Collections.sort(extensions.getExtensionVersionSummaries(), new Comparator<ExtensionVersionSummary>()
         {
             @Override
@@ -105,7 +103,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 Version version = versionCache.get(versionString);
 
                 if (version == null) {
-                    version = new DefaultVersion(versionString);
+                    version = extensionFactory.getVersion(versionString);
                     versionCache.put(versionString, version);
                 }
 
@@ -123,8 +121,8 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 List<ExtensionVersionSummary> limited =
                     new ArrayList<ExtensionVersionSummary>(extensions.getExtensionVersionSummaries());
                 extensions.getExtensionVersionSummaries().clear();
-                extensions.withExtensionVersionSummaries(limited.subList(offset < 0 ? 0 : offset, number < 0
-                    ? extensions.getExtensionVersionSummaries().size() : offset + number));
+                extensions.withExtensionVersionSummaries(limited.subList(offset < 0 ? 0 : offset,
+                    number < 0 ? extensions.getExtensionVersionSummaries().size() : offset + number));
             }
         }
 

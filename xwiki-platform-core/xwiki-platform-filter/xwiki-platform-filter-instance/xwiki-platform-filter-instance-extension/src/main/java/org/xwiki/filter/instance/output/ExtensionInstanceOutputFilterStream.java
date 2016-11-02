@@ -33,6 +33,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -68,6 +69,9 @@ public class ExtensionInstanceOutputFilterStream
 
     @Inject
     private ModelContext modelContext;
+
+    @Inject
+    private ExtensionFactory factory;
 
     @Inject
     private Logger logger;
@@ -134,7 +138,7 @@ public class ExtensionInstanceOutputFilterStream
     {
         // TODO: add support for complete extension
 
-        ExtensionId extensionId = new ExtensionId(id, version);
+        ExtensionId extensionId = new ExtensionId(id, factory.getVersion(version));
 
         try {
             LocalExtension localExtension = this.localRepository.getLocalExtension(extensionId);

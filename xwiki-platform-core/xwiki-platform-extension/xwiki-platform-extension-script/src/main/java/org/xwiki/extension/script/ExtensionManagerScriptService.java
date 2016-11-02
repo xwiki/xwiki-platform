@@ -30,13 +30,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceValidator;
 import org.xwiki.extension.CoreExtension;
-import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
@@ -54,7 +54,6 @@ import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
 import org.xwiki.extension.version.internal.DefaultVersion;
-import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersionRange;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -135,6 +134,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     @Inject
     private NamespaceValidator namespaceResolver;
+
+    @Inject
+    private ExtensionFactory factory;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -869,7 +871,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         setError(null);
 
         try {
-            return new DefaultVersionConstraint(versionConstraint);
+            return this.factory.getVersionConstraint(versionConstraint);
         } catch (Exception e) {
             setError(e);
         }
@@ -889,7 +891,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         setError(null);
 
         try {
-            return new DefaultExtensionDependency(id, new DefaultVersionConstraint(versionConstraint));
+            return this.factory.getExtensionDependency(id, this.factory.getVersionConstraint(versionConstraint), null);
         } catch (Exception e) {
             setError(e);
         }

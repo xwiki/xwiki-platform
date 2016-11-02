@@ -41,6 +41,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.internal.maven.MavenUtils;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
@@ -162,7 +163,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
      * Used to extract a document reference from a {@link SolrDocument}.
      */
     @Inject
-    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+    protected DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
+    @Inject
+    protected ExtensionFactory extensionFactory;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -477,7 +481,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected ExtensionRepository toExtensionRepository(String repositoryString) throws URISyntaxException
     {
         if (repositoryString != null) {
-            ExtensionRepositoryDescriptor descriptor = XWikiRepositoryModel.toRepositoryDescriptor(repositoryString);
+            ExtensionRepositoryDescriptor descriptor =
+                XWikiRepositoryModel.toRepositoryDescriptor(repositoryString, extensionFactory);
 
             ExtensionRepository restRepository = new ExtensionRepository();
             restRepository.setId(descriptor.getId());

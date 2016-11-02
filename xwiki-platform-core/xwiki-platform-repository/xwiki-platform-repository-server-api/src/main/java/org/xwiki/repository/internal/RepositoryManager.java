@@ -58,6 +58,7 @@ import org.xwiki.extension.ExtensionIssueManagement;
 import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ExtensionScm;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -165,6 +166,9 @@ public class RepositoryManager implements Initializable, Disposable
 
     @Inject
     private ObservationManager observation;
+
+    @Inject
+    private ExtensionFactory extensionFactory;
 
     @Inject
     private Logger logger;
@@ -924,7 +928,7 @@ public class RepositoryManager implements Initializable, Disposable
             boolean deleteExistingObjects = false;
 
             // Clone since we are going to modify and parse it at the same time
-            xobjects = new ArrayList(document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE));
+            xobjects = new ArrayList<>(document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE));
 
             for (int i = 0; i < xobjects.size(); ++i) {
                 BaseObject dependencyObject = xobjects.get(i);
@@ -947,8 +951,8 @@ public class RepositoryManager implements Initializable, Disposable
 
                             DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
                                 new DefaultVersionConstraint(xobjectConstraint));
-                            xobjectDependency
-                                .setRepositories(XWikiRepositoryModel.toRepositoryDescriptors(xobjectRepositories));
+                            xobjectDependency.setRepositories(
+                                XWikiRepositoryModel.toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
 
                             if (dependencies.size() > dependencyIndex) {
                                 ExtensionDependency dependency = dependencies.get(dependencyIndex);

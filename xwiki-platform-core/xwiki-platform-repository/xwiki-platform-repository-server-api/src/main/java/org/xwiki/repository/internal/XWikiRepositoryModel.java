@@ -34,8 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.rating.RatingExtension;
-import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -270,7 +270,8 @@ public class XWikiRepositoryModel
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL, null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
         SOLR_FIELDS.put(Extension.FIELD_NAMESPACES, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY,
+            new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, null));
         SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
         SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
         SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));
@@ -346,9 +347,10 @@ public class XWikiRepositoryModel
     }
 
     /**
-     * @since 7.3M1
+     * @since 8.4
      */
-    public static List<ExtensionRepositoryDescriptor> toRepositoryDescriptors(Collection<String> stringRepositories)
+    public static List<ExtensionRepositoryDescriptor> toRepositoryDescriptors(Collection<String> stringRepositories,
+        ExtensionFactory factory)
     {
         if (stringRepositories == null) {
             return Collections.emptyList();
@@ -358,7 +360,7 @@ public class XWikiRepositoryModel
 
         for (String stringRepository : stringRepositories) {
             try {
-                reposiories.add(toRepositoryDescriptor(stringRepository));
+                reposiories.add(toRepositoryDescriptor(stringRepository, factory));
             } catch (URISyntaxException e) {
                 LOGGER.warn("Failed to parse repository descriptor [{}]", stringRepository,
                     ExceptionUtils.getRootCauseMessage(e));
@@ -369,9 +371,10 @@ public class XWikiRepositoryModel
     }
 
     /**
-     * @since 7.3M1
+     * @since 8.4
      */
-    public static ExtensionRepositoryDescriptor toRepositoryDescriptor(String repository) throws URISyntaxException
+    public static ExtensionRepositoryDescriptor toRepositoryDescriptor(String repository, ExtensionFactory factory)
+        throws URISyntaxException
     {
         int index;
 
@@ -384,7 +387,7 @@ public class XWikiRepositoryModel
         // URI
         URI uri = new URI(repository.substring(index + 1, repository.length()));
 
-        return new DefaultExtensionRepositoryDescriptor(id, type, uri);
+        return factory.getExtensionRepositoryDescriptor(id, type, uri);
     }
 
     /**

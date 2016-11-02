@@ -93,8 +93,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         @PathParam(Resources.PPARAM_EXTENSIONVERSION) String extensionVersion,
         @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYID) String repositoryId,
         @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYTYPE) String repositoryType,
-        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYURI) String repositoryURI) throws XWikiException,
-        QueryException, URISyntaxException, IOException, ResolveException
+        @QueryParam(ExtensionResourceReference.PARAM_REPOSITORYURI) String repositoryURI)
+        throws XWikiException, QueryException, URISyntaxException, IOException, ResolveException
     {
         ResponseBuilder response;
 
@@ -102,9 +102,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             response =
                 downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryId));
         } else if (repositoryType != null && repositoryURI != null) {
-            response =
-                downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryType,
-                    new URI(repositoryURI)));
+            response = downloadRemoteExtension(
+                new ExtensionResourceReference(extensionId, extensionVersion, repositoryType, new URI(repositoryURI)));
         } else {
             response = downloadLocalExtension(extensionId, extensionVersion);
         }
@@ -129,9 +128,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
             // It's an attachment
-            AttachmentReference attachmentReference =
-                this.attachmentResolver.resolve(resourceReference.getReference(),
-                    extensionDocument.getDocumentReference());
+            AttachmentReference attachmentReference = this.attachmentResolver.resolve(resourceReference.getReference(),
+                extensionDocument.getDocumentReference());
 
             XWikiContext xcontext = getXWikiContext();
 
@@ -153,9 +151,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 60000);
             httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
 
-            ProxySelectorRoutePlanner routePlanner =
-                new ProxySelectorRoutePlanner(httpClient.getConnectionManager().getSchemeRegistry(),
-                    ProxySelector.getDefault());
+            ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
+                httpClient.getConnectionManager().getSchemeRegistry(), ProxySelector.getDefault());
             httpClient.setRoutePlanner(routePlanner);
 
             HttpGet getMethod = new HttpGet(url.toString());
@@ -173,8 +170,10 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // Should probably use javax.ws.rs.ext.MessageBodyWriter
             HttpEntity entity = subResponse.getEntity();
             InputRepresentation content =
-                new InputRepresentation(entity.getContent(), entity.getContentType() != null ? new MediaType(entity
-                    .getContentType().getValue()) : MediaType.APPLICATION_OCTET_STREAM, entity.getContentLength());
+                new InputRepresentation(
+                    entity.getContent(), entity.getContentType() != null
+                        ? new MediaType(entity.getContentType().getValue()) : MediaType.APPLICATION_OCTET_STREAM,
+                    entity.getContentLength());
 
             String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 
@@ -209,9 +208,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         if (repository == null && extensionResource.getRepositoryType() != null
             && extensionResource.getRepositoryURI() != null) {
-            ExtensionRepositoryDescriptor repositoryDescriptor =
-                new DefaultExtensionRepositoryDescriptor("tmp", extensionResource.getRepositoryType(),
-                    extensionResource.getRepositoryURI());
+            ExtensionRepositoryDescriptor repositoryDescriptor = new DefaultExtensionRepositoryDescriptor("tmp",
+                extensionResource.getRepositoryType(), extensionResource.getRepositoryURI());
             try {
                 ExtensionRepositoryFactory repositoryFactory =
                     this.componentManager.getInstance(ExtensionRepositoryFactory.class, repositoryDescriptor.getType());
@@ -227,13 +225,11 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         // Resolve extension
         Extension downloadExtension;
         if (repository == null) {
-            downloadExtension =
-                this.extensionRepositoryManager.resolve(new ExtensionId(extensionResource.getExtensionId(),
-                    extensionResource.getExtensionVersion()));
+            downloadExtension = this.extensionRepositoryManager
+                .resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource.getExtensionVersion()));
         } else {
-            downloadExtension =
-                repository.resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource
-                    .getExtensionVersion()));
+            downloadExtension = repository
+                .resolve(new ExtensionId(extensionResource.getExtensionId(), extensionResource.getExtensionVersion()));
         }
 
         // Get file

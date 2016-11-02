@@ -21,7 +21,6 @@ package org.xwiki.resource.resources;
 
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a static filesystem template resource.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.1M1
  */
-@Unstable
 public class ResourcesResourceReference extends AbstractResourceReference
 {
     /**

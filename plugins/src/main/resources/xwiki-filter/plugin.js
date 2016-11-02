@@ -86,12 +86,15 @@
       // conversion errors caused by such markup.
       var submitOnlySignificantContent = {
         elements: {
-          head: function(element) {
+          html: function(element) {
             if (!editor.config.fullData) {
-              // Discard the HEAD element. Note that we keep the HTML and BODY elements because they allow us to convert
-              // the HTML to wiki syntax without needing to perform server-side HTML cleaning (to add the missing tags).
+              // Discard everything outside the BODY element. Note that we keep the HTML and BODY elements because they
+              // allow us to convert the HTML to wiki syntax without needing to perform server-side HTML cleaning (to
+              // add the missing tags).
               // See CKEDITOR-47: Styles are included in the content when using Firebug during page save
-              return false;
+              // See CKEDITOR-117: The WYSIWYG saves crap when Grammarly browser plugin is enabled
+              var body = element.getFirst('body');
+              element.children = body ? [body] : [];
             }
           },
           body: function(element) {

@@ -19,6 +19,7 @@
  */
 package org.xwiki.activeinstalls.internal.client.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +52,8 @@ public class DistributionPingDataProvider implements PingDataProvider
 
     private static final String PROPERTY_DISTRIBUTION_ID = "distributionId";
 
+    private static final String PROPERTY_DISTRIBUTION_FEATURES = "distributionFeatures";
+
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
@@ -72,6 +75,7 @@ public class DistributionPingDataProvider implements PingDataProvider
         propertiesMap.put(PROPERTY_INSTANCE_ID, map);
         propertiesMap.put(PROPERTY_DISTRIBUTION_VERSION, map);
         propertiesMap.put(PROPERTY_DISTRIBUTION_ID, map);
+        propertiesMap.put(PROPERTY_DISTRIBUTION_FEATURES, map);
 
         return propertiesMap;
     }
@@ -94,7 +98,12 @@ public class DistributionPingDataProvider implements PingDataProvider
             if (distributionVersion != null) {
                 jsonMap.put(PROPERTY_DISTRIBUTION_VERSION, distributionVersion.toString());
             }
+            Collection<String> features = distributionExtension.getFeatures();
+            if (!features.isEmpty()) {
+                jsonMap.put(PROPERTY_DISTRIBUTION_FEATURES, distributionExtension.getFeatures().toArray());
+            }
         }
+
         return jsonMap;
     }
 }

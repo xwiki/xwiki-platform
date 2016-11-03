@@ -112,11 +112,16 @@
       <outputDirectory>webapps/xwiki/WEB-INF</outputDirectory>
     </file>
   </files>
-  <!-- Add License/Notice files -->
   <fileSets>
+    <!-- Add License/Notice files -->
     <fileSet>
       <directory>${basedir}/target/maven-shared-archive-resources/META-INF</directory>
       <outputDirectory>META-INF</outputDirectory>
+    </fileSet>
+    <!-- Add extension descriptor -->
+    <fileSet>
+      <directory>${project.build.outputDirectory}/META-INF</directory>
+      <outputDirectory>webapps/xwiki/META-INF</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

@@ -119,6 +119,9 @@ html>body .xwiki-livetable-display td {
 table.xwiki-livetable table.xwiki-livetable-display thead.xwiki-livetable-display-header {
   border-bottom: 5px solid $theme.backgroundSecondaryColor;
 }
+thead.xwiki-livetable-display-header tr.xwiki-livetable-display-filters:hover {
+  background-color: $theme.pageContentBackgroundColor;
+}
 thead.xwiki-livetable-display-header th.xwiki-livetable-display-header-text {
   background-color: $theme.backgroundSecondaryColor;
   border: 0;

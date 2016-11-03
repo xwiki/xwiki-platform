@@ -27,7 +27,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.activeinstalls.internal.client.PingDataProvider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
@@ -51,9 +50,6 @@ public class DistributionPingDataProvider implements PingDataProvider
     private static final String PROPERTY_DISTRIBUTION_VERSION = "distributionVersion";
 
     private static final String PROPERTY_DISTRIBUTION_ID = "distributionId";
-
-    @Inject
-    private Logger logger;
 
     @Inject
     private CoreExtensionRepository coreExtensionRepository;

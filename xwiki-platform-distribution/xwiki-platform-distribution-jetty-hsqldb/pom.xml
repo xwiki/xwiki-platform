@@ -31,6 +31,12 @@
   <name>XWiki Platform - Distribution - Jetty HSQLDB</name>
   <packaging>pom</packaging>
   <description>Jetty and HSQLDB based all all in one distribution</description>
+  <properties>
+    <!-- Put the name of the distribution which will be displayed in the footer -->
+    <xwiki.extension.name>XWiki Jetty HSQLDB</xwiki.extension.name>
+
+    <xwiki.extension.features>xwiki</xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -65,6 +71,19 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Generate extension descriptor -->
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>register</id>
+            <goals>
+              <goal>register</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Inject Hibernate's configuration for the specified database -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

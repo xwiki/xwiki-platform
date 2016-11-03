@@ -44,6 +44,8 @@
 
     <!-- By default we don't include Legacy modules and thus we don't need to exclude the non legacy JARs -->
     <xwiki.war.legacy.excludes />
+
+    <xwiki.extension.features>xwiki</xwiki.extension.features>
   </properties>
   <dependencies>
     <!-- ********************************************************************** -->
@@ -545,6 +547,14 @@
       <plugin>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>war</id>
+            <goals>
+              <goal>war</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

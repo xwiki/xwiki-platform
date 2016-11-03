@@ -179,13 +179,6 @@
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
           <version>${commons.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>war</goal>
-              </goals>
-            </execution>
-          </executions>
           <configuration>
             <extensionOverrides>
               <!-- Should ok for any version of jcl-over-slf4j (since commons-logging is dead) -->

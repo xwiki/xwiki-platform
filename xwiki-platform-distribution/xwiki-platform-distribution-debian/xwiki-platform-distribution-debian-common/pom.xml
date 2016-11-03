@@ -32,9 +32,14 @@
   <name>XWiki Platform - Distribution - Debian - Common</name>
   <description>XWiki common package</description>
   <properties>
+    <!-- Put the name of the distribution which will be displayed in the footer -->
+    <xwiki.extension.name>XWiki Debian</xwiki.extension.name>
+
     <war.path>${project.build.directory}/war</war.path>
 
     <xwiki.properties.environment.permanentDirectory>/var/lib/xwiki/data</xwiki.properties.environment.permanentDirectory>
+
+    <xwiki.extension.features>xwiki</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
@@ -47,6 +52,19 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Generate extension descriptor -->
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>register</id>
+            <goals>
+              <goal>register</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Unpack the war -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -89,7 +107,7 @@
             <data>
               <src>${war.path}</src>
               <type>directory</type>
-              <excludes>WEB-INF,WEB-INF/**/*</excludes>
+              <excludes>WEB-INF,WEB-INF/**/*,META-INF/extension.xed</excludes>
               <mapper>
                 <type>perm</type>
                 <prefix>/usr/lib/xwiki</prefix>
@@ -101,6 +119,14 @@
               <mapper>
                 <type>perm</type>
                 <prefix>/usr/lib/xwiki/WEB-INF/lib</prefix>
+              </mapper>
+            </data>
+            <data>
+              <src>${project.build.outputDirectory}/META-INF</src>
+              <type>directory</type>
+              <mapper>
+                <type>perm</type>
+                <prefix>/usr/lib/xwiki/META-INF</prefix>
               </mapper>
             </data>
 

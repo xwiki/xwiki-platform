@@ -65,6 +65,8 @@
       ## We still need to specify the template when we save because otherwise the configuration object is not added (the
       ## save action only updates existing objects).
       &lt;input type="hidden" name="template" value="$templateDoc.fullName" /&gt;
+      ## Make sure the configuration page is created as hidden.
+      &lt;input type="hidden" name="xhidden" value="1" /&gt;
     #end
     &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
     &lt;input value="$escapetool.xml($services.localization.render('ckeditor.admin.saveComment'))"

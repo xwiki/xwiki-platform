@@ -51,6 +51,8 @@ public class ExtensionPingDataProvider implements PingDataProvider
 
     private static final String PROPERTY_VERSION = "version";
 
+    private static final String PROPERTY_FEATURES = "features";
+
     private static final String PROPERTY_EXTENSIONS = "extensions";
 
     @Inject
@@ -66,6 +68,7 @@ public class ExtensionPingDataProvider implements PingDataProvider
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put(PROPERTY_ID, map);
         propertiesMap.put(PROPERTY_VERSION, map);
+        propertiesMap.put(PROPERTY_FEATURES, map);
 
         return Collections.singletonMap(PROPERTY_EXTENSIONS,
             (Object) Collections.singletonMap("properties", propertiesMap));

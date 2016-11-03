@@ -25,7 +25,6 @@ import java.util.List;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Holds the differences, in unified format, between two versions of a document.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0RC1
  */
-@Unstable
 public class DocumentUnifiedDiff extends EntityUnifiedDiff<DocumentVersionReference>
 {
     /**

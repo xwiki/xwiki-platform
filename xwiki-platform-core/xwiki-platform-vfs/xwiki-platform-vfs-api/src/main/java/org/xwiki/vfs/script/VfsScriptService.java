@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.vfs.VfsManager;
 import org.xwiki.vfs.VfsResourceReference;
 
@@ -38,7 +37,6 @@ import org.xwiki.vfs.VfsResourceReference;
 @Component
 @Named("vfs")
 @Singleton
-@Unstable
 public class VfsScriptService implements ScriptService
 {
     @Inject

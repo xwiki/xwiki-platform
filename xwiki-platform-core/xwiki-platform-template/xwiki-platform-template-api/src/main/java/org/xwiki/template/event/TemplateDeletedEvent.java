@@ -19,15 +19,12 @@
  */
 package org.xwiki.template.event;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Fired when a template is deleted.
  *
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public class TemplateDeletedEvent extends AbstractTemplateEvent
 {
     /**

@@ -20,14 +20,12 @@
 package org.xwiki.skin;
 
 import org.xwiki.filter.input.InputSource;
-import org.xwiki.stability.Unstable;
 
 /**
  * @param <I> the type of the {@link InputSource}
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public interface Resource<I extends InputSource>
 {
     /**

@@ -20,7 +20,6 @@
 package org.xwiki.template.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link org.xwiki.template.internal.macro.TemplateMacro} Macro.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public class TemplateMacroParameters
 {
     /**

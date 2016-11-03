@@ -21,15 +21,12 @@ package org.xwiki.lesscss.internal.colortheme;
 
 import java.util.HashMap;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Map containing color theme variables and their values.
  *
  * @since 7.0RC1
  * @version $Id$
  */
-@Unstable
 public class ColorTheme extends HashMap<String, String>
 {
     /**

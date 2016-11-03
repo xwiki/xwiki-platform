@@ -25,7 +25,6 @@ import java.util.List;
 import org.xwiki.diff.Delta;
 import org.xwiki.diff.display.UnifiedDiffBlock;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Holds the differences, in unified format, between two versions of an entity.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0RC1
  */
-@Unstable
 public class EntityUnifiedDiff<T extends EntityReference> extends
     LinkedHashMap<String, List<UnifiedDiffBlock<String, Character>>>
 {

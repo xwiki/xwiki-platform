@@ -23,7 +23,6 @@ import java.lang.reflect.Type;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * The content of a template.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public interface TemplateContent
 {
     /**

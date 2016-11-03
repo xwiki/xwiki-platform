@@ -32,7 +32,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -387,7 +386,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      *         entity of the passed type exist
      * @since 7.4M1
      */
-    @Unstable
     public EntityReference extractFirstReference(EntityType type)
     {
         EntityReference reference = extractReference(type);

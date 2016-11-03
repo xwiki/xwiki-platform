@@ -22,7 +22,6 @@ package org.xwiki.extension.xar.internal.question;
 import java.io.Serializable;
 
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
-import org.xwiki.stability.Unstable;
 
 /**
  * The answer to a {@link org.xwiki.extension.xar.question.ConflictQuestion}.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.1RC1
  */
-@Unstable
 public class ConflictAnswer implements Serializable
 {
     /**

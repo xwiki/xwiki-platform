@@ -20,7 +20,6 @@
 package org.xwiki.vfs;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * API to construct a VFS URL or access the content of an archive.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.4M2
  */
 @Role
-@Unstable
 public interface VfsManager
 {
     /**

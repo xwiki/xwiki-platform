@@ -20,7 +20,6 @@
 package org.xwiki.refactoring.job;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Question asked when an entity with the same name is found during a copy or move operation and we don't know whether
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.2M1
  */
-@Unstable
 public class OverwriteQuestion
 {
     /**

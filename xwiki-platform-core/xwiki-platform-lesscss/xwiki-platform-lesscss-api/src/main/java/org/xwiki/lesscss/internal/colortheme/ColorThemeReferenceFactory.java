@@ -22,7 +22,6 @@ package org.xwiki.lesscss.internal.colortheme;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Factory to create the appropriate reference depending on a color theme name.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface ColorThemeReferenceFactory
 {
     /**

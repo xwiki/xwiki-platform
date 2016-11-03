@@ -21,7 +21,6 @@ package org.xwiki.ratings;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.EndEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event fired when failing to update a Rating.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.1M1
  */
-@Unstable
 public class UpdateRatingFailedEvent extends AbstractRatingEvent implements EndEvent
 {
     /**

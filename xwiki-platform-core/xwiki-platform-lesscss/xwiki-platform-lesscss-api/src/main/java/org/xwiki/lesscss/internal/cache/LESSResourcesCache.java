@@ -20,7 +20,6 @@
 package org.xwiki.lesscss.internal.cache;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to cache already computed LESS resources.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface LESSResourcesCache extends LESSCache<String>
 {
 

@@ -19,15 +19,12 @@
  */
 package org.xwiki.lesscss.internal.skin;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Reference to a skin.
  *
  * @since 7.0RC1
  * @version $Id$
  */
-@Unstable
 public interface SkinReference
 {
     @Override

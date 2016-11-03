@@ -44,7 +44,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
@@ -108,7 +107,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * @since 7.2M1
      */
-    @Unstable
     public FilesystemExportContext getFilesystemExportContext()
     {
         return this.exportContext;

@@ -25,8 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Stores states when generating Filesystem URLs. As we generate URLs for passed Resources we also export them to the
  * filesystem at the same time.
@@ -34,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.2M1
  */
-@Unstable
 public class FilesystemExportContext
 {
     /**

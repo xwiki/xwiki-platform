@@ -19,15 +19,12 @@
  */
 package org.xwiki.vfs;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Encapsulate a VFS error.
  *
  * @version $Id$
  * @since 7.4M2
  */
-@Unstable
 public class VfsException extends Exception
 {
     /**

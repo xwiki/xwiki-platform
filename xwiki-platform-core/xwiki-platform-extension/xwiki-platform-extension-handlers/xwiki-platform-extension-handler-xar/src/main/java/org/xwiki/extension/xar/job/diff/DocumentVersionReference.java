@@ -22,7 +22,6 @@ package org.xwiki.extension.xar.job.diff;
 import java.io.Serializable;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A reference to a document version.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0RC1
  */
-@Unstable
 public class DocumentVersionReference extends DocumentReference
 {
     /**

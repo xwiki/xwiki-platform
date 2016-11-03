@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -39,7 +38,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 7.4M2
  */
-@Unstable
 public class VfsResourceReference extends AbstractResourceReference
 {
     /**

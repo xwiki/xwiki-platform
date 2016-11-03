@@ -20,7 +20,6 @@
 package com.xpn.xwiki.api;
 
 import org.xwiki.diff.Delta;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -31,7 +30,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @since 7.0RC1
  * @version $Id$
  */
-@Unstable
 public class AttachmentDiff
 {
     /**

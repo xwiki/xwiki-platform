@@ -23,7 +23,6 @@ import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Generic job status for a job that performs an {@link EntityRequest}.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.2M1
  */
-@Unstable
 public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T>
 {
     /**

@@ -20,7 +20,6 @@
 package org.xwiki.url;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Access various URL-related items from the Execution Context; for example access the current URL scheme.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.2M1
  */
 @Role
-@Unstable
 public interface URLContextManager
 {
     /**

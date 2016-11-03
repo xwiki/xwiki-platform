@@ -27,7 +27,6 @@ import java.util.Map;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A generic job request that targets multiple entities.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.2M1
  */
-@Unstable
 public class EntityRequest extends AbstractRequest
 {
     /**

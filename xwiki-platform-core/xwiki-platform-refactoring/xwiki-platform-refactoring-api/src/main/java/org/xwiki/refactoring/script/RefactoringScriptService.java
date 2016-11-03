@@ -49,7 +49,6 @@ import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides refactoring-specific scripting APIs.
@@ -60,7 +59,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(RefactoringJobs.GROUP)
 @Singleton
-@Unstable
 public class RefactoringScriptService implements ScriptService
 {
     /**

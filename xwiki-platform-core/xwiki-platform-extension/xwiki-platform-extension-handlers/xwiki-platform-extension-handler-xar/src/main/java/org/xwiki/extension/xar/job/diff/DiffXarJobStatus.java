@@ -26,7 +26,6 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * The status of a job that computes the differences between the documents provided by a XAR extension and the documents
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0RC1
  */
-@Unstable
 public class DiffXarJobStatus extends DefaultJobStatus<InstallRequest>
 {
     /**

@@ -20,14 +20,12 @@
 package org.xwiki.skin;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 7.0M1
  */
 @Role
-@Unstable
 public interface SkinManager
 {
     /**

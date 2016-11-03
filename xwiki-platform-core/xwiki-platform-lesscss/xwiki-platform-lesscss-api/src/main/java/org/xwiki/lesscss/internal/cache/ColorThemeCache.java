@@ -21,7 +21,6 @@ package org.xwiki.lesscss.internal.cache;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.lesscss.internal.colortheme.ColorTheme;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to cache color themes computed from LESS files.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.0RC1
  * @version $Id$
  */
-@Unstable
 @Role
 public interface ColorThemeCache extends LESSCache<ColorTheme>
 {

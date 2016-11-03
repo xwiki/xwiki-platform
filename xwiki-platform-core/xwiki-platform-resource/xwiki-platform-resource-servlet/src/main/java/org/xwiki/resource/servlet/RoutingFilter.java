@@ -43,7 +43,6 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.resources.ResourcesResourceReference;
 import org.xwiki.resource.skins.SkinsResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -63,7 +62,6 @@ import org.xwiki.url.ExtendedURL;
  * @version $Id$
  * @since 7.1M1
  */
-@Unstable
 public class RoutingFilter implements Filter
 {
     static final String RESOURCE_TYPE_NAME = "resourceType";

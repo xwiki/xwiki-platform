@@ -19,15 +19,12 @@
  */
 package org.xwiki.template;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A template.
  *
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public interface Template
 {
     /**

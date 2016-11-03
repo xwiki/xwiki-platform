@@ -41,7 +41,6 @@ import org.xwiki.platform.flavor.job.FlavorSearchRequest;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.resources.job.JobStatusResource;
 import org.xwiki.rest.url.ParametrizedRestURLGenerator;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service to find flavors.
@@ -52,7 +51,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(FlavorManagerScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class FlavorManagerScriptService extends AbstractExtensionScriptService
 {
     /**

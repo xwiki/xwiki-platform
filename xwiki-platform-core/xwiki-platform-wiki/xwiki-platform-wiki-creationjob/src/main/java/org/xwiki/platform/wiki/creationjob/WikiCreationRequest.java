@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.job.AbstractRequest;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
 
@@ -33,7 +32,6 @@ import org.xwiki.wiki.user.UserScope;
  * @version $Id$
  * @since 7.0M2
  */
-@Unstable
 public class WikiCreationRequest extends AbstractRequest
 {
     private static final long serialVersionUID = -1887940302223327347L;

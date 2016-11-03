@@ -35,7 +35,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.watchlist.internal.DefaultWatchListStore;
 import org.xwiki.watchlist.internal.api.WatchList;
 import org.xwiki.watchlist.internal.api.WatchedElementType;
@@ -56,7 +55,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("watchlist")
 @Singleton
-@Unstable
 public class WatchListScriptService implements ScriptService
 {
     private static final String ERROR_KEY = "scriptservice.watchlist.error";

@@ -20,7 +20,6 @@
 package org.xwiki.platform.wiki.creationjob;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exception concerning the Wiki Creator module.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0M2
  */
-@Unstable
 public class WikiCreationException extends Exception
 {
     private static final long serialVersionUID = 2501408208237931530L;

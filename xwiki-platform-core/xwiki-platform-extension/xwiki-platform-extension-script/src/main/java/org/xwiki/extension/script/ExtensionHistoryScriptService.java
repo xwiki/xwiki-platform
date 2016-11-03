@@ -48,7 +48,6 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related to extension job history.
@@ -59,7 +58,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionHistoryScriptService.ID)
 @Singleton
-@Unstable
 public class ExtensionHistoryScriptService extends AbstractExtensionScriptService
 {
     /**

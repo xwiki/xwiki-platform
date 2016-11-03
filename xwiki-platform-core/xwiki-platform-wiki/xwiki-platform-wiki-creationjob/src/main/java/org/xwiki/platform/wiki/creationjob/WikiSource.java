@@ -19,15 +19,12 @@
  */
 package org.xwiki.platform.wiki.creationjob;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The source of provisioning for a wiki.
  *
  * @version $Id$
  * @since 7.0M2
  */
-@Unstable
 public enum WikiSource
 {
     /**

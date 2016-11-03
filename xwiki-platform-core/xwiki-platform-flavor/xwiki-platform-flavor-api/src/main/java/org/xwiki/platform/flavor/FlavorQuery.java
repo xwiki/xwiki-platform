@@ -22,7 +22,6 @@ package org.xwiki.platform.flavor;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.search.ExtensionQuery;
-import org.xwiki.stability.Unstable;
 
 /**
  * A query to an extension repository returning only flavors.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.1M2 
  */
-@Unstable
 public class FlavorQuery extends ExtensionQuery
 {
     /**

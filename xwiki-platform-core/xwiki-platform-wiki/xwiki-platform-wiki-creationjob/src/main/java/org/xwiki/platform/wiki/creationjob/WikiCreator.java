@@ -22,7 +22,6 @@ package org.xwiki.platform.wiki.creationjob;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to create a wiki and perform actions during the creation.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.0M2
  */
 @Role
-@Unstable
 public interface WikiCreator
 {
     /**

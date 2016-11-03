@@ -36,7 +36,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -52,7 +51,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("parentchild")
 @Singleton
-@Unstable
 public class ParentChildScriptService implements ScriptService
 {
     @Inject

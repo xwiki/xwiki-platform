@@ -24,7 +24,6 @@ import java.io.Writer;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
-import org.xwiki.stability.Unstable;
 
 /**
  * Internal toolkit to experiment on wiki bases templates.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.0M1
  */
 @Role
-@Unstable
 public interface TemplateManager
 {
     /**

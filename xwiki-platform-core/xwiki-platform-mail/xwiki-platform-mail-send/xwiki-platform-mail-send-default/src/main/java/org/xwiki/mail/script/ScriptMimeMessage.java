@@ -38,7 +38,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.stability.Unstable;
 
 /**
  * Extends {@link javax.mail.internet.MimeMessage} with additional helper methods for scripts.
@@ -46,7 +45,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.1M2
  */
-@Unstable
 public class ScriptMimeMessage extends ExtendedMimeMessage
 {
     private ComponentManager componentManager;

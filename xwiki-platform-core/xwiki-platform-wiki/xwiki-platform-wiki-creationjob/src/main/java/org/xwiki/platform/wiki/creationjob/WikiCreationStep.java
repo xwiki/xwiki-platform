@@ -20,7 +20,6 @@
 package org.xwiki.platform.wiki.creationjob;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Step to be executed during the wiki creation job.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.0M2
  */
 @Role
-@Unstable
 public interface WikiCreationStep
 {
     /**

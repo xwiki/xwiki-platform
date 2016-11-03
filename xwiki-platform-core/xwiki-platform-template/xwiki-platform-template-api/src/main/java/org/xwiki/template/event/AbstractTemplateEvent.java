@@ -21,15 +21,12 @@ package org.xwiki.template.event;
 
 import java.util.Objects;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Base class for all events related to templates.
  *
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public abstract class AbstractTemplateEvent implements TemplateEvent
 {
     private String id;

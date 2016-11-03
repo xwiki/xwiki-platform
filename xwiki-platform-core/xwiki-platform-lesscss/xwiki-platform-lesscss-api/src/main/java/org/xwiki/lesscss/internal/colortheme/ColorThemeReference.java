@@ -19,15 +19,12 @@
  */
 package org.xwiki.lesscss.internal.colortheme;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A reference to a color theme.
  *
  * @since 7.0RC1
  * @version $Id$
  */
-@Unstable
 public interface ColorThemeReference
 {
     @Override

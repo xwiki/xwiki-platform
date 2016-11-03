@@ -20,7 +20,6 @@
 package org.xwiki.refactoring.job;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A job request that can be used to move a collection of entities to a specified destination. This request can also be
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.2M1
  */
-@Unstable
 public class MoveRequest extends EntityRequest
 {
     /**

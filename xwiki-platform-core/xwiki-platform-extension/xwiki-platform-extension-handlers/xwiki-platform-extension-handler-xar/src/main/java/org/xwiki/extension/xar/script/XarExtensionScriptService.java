@@ -37,7 +37,6 @@ import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various XAR oriented APIs for scripts.
@@ -112,7 +111,6 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
      *         computed, or {@code null} in case of failure
      * @since 7.0RC1
      */
-    @Unstable
     public Job diff(String feature, String wiki)
     {
         setError(null);

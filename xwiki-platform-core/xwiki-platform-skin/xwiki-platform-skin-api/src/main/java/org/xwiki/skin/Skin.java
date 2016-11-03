@@ -20,7 +20,6 @@
 package org.xwiki.skin;
 
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represent a skin.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public interface Skin extends ResourceRepository
 {
     @Override

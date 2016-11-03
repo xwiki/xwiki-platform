@@ -40,7 +40,6 @@ import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceReferenceHandlerManager;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -52,7 +51,6 @@ import org.xwiki.url.ExtendedURL;
  * @version $Id$
  * @since 7.1M1
  */
-@Unstable
 public class ResourceReferenceHandlerServlet extends HttpServlet
 {
     /**

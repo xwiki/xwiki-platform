@@ -20,7 +20,6 @@
 package org.xwiki.template.event;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event related to a template.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0M1
  */
-@Unstable
 public interface TemplateEvent extends Event
 {
     /**

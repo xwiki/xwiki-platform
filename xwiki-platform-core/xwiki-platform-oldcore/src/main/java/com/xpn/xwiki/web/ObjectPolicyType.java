@@ -20,8 +20,6 @@
 
 package com.xpn.xwiki.web;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Enumeration of supported object policy types. A object policy type is an
  * implementation on how to manage parameters in the query string that wants to
@@ -48,7 +46,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 7.0RC1
  */
-@Unstable
 public enum ObjectPolicyType {
     /** Only update objects. */
     UPDATE("update"),

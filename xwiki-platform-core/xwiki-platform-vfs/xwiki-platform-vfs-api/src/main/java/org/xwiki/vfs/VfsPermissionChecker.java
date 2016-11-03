@@ -20,7 +20,6 @@
 package org.xwiki.vfs;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Verify if the user has permissions to access the VFS asked. For example it would be dangerous to let a user
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.4M2
  */
 @Role
-@Unstable
 public interface VfsPermissionChecker
 {
     /**

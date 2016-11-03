@@ -22,7 +22,6 @@ package org.xwiki.lesscss.internal.skin;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Constructs the appropriate reference for a given skin.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface SkinReferenceFactory
 {
     /**

@@ -270,7 +270,7 @@ public class InternalTemplateManager
         @PropertyId("raw.syntax")
         public Syntax rawSyntax;
 
-        protected Map<String, Object> properties = new HashMap<String, Object>();
+        protected Map<String, Object> properties = new HashMap<>();
 
         DefaultTemplateContent(String content)
         {
@@ -322,19 +322,19 @@ public class InternalTemplateManager
         {
             Matcher matcher = PROPERTY_LINE.matcher(this.content);
 
-            Map<String, String> properties = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             while (matcher.find()) {
                 String key = matcher.group(1);
                 String value = matcher.group(2);
 
-                properties.put(key, value);
+                map.put(key, value);
 
                 // Remove the line from the content
                 this.content = this.content.substring(matcher.end());
             }
 
             try {
-                InternalTemplateManager.this.beanManager.populate(this, properties);
+                InternalTemplateManager.this.beanManager.populate(this, map);
             } catch (PropertyException e) {
                 // Should never happen
                 InternalTemplateManager.this.logger.error("Failed to populate properties of template", e);
@@ -379,6 +379,9 @@ public class InternalTemplateManager
         public FilesystemTemplateContent(String content)
         {
             super(content);
+
+            // Give programming right to filesystem templates by default
+            setPrivileged(true);
         }
 
         /**
@@ -413,11 +416,14 @@ public class InternalTemplateManager
          * @since 6.3.1
          * @since 6.4M1
          */
-        @SuppressWarnings("unused")
         public void setPrivileged(boolean privileged)
         {
             if (privileged) {
                 setAuthorReference(SUPERADMIN_REFERENCE);
+            } else {
+                // Reset author
+                this.authorReference = null;
+                this.authorProvided = false;
             }
         }
     }

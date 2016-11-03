@@ -1,5 +1,3 @@
-##! Priviledged template in order to be able to execute SOLR queries which require PR.
-##!privileged=true
 ###
 ### Document does not exist message
 ###

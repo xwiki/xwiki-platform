@@ -15,9 +15,16 @@
   #if ($displayEditMenu && $hasEdit && !$isReadOnly)
     #displayEditMenu()
   #end
-  ## Display a create menu if the user has the right to create spaces in the current wiki, even if he doesn't have
-  ## edit that right on the current space. We do this since the Create UI allows creating new pages at any location.
-  #if ($displayCreateMenu && $hasCreateSpace)
+  ## Display a create menu if the user has the right to create spaces in the current wiki (since the Create UI supports)
+  ## creating pages in other places in the hierarchy) or if the user has right to create pages in the current location.
+  ## This supports the following 2 use cases for non-admin users:
+  ## - I'm on a space where I don't have permissions to create pages but I have the right to create pages in the wiki.
+  ##   Example: I'm on my user profile which is located in the XWiki space (in which users don't have Edit rights by
+  ##   default). I can see the Create button. See http://jira.xwiki.org/browse/XWIKI-10999
+  ## - I don't have the right to create pages in the wiki but I have the right to create pages under a given hierarchy.
+  ##   Example: I'm allowed to create pages only in the Sandbox space and I'm there. I can see the Create button.
+  ##   See http://jira.xwiki.org/browse/XWIKI-13847
+  #if ($displayCreateMenu && ($hasCreateSpace || $hasCreatePage))
     #displayCreateButton()
   #end
   

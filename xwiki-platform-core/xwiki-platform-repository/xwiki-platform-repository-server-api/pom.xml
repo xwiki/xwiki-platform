@@ -100,22 +100,28 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            **/DefaultRepositoryManager.java,
-            **/ExtensionUpdaterListener.java,
-            **/RepositoryManager.java,
-            **/RepositoryScriptService.java,
-            **/XWikiRepositoryModel.java,
-            **/AbstractExtensionRESTResource.java,
-            **/ExtensionRESTResource.java,
-            **/ExtensionsRESTResource.java,
-            **/ExtensionVersionFileRESTResource.java,
-            **/ExtensionVersionRESTResource.java,
-            **/ExtensionVersionsRESTResource.java,
-            **/SearchRESTResource.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                **/DefaultRepositoryManager.java,
+                **/ExtensionUpdaterListener.java,
+                **/RepositoryManager.java,
+                **/RepositoryScriptService.java,
+                **/XWikiRepositoryModel.java,
+                **/AbstractExtensionRESTResource.java,
+                **/ExtensionRESTResource.java,
+                **/ExtensionsRESTResource.java,
+                **/ExtensionVersionFileRESTResource.java,
+                **/ExtensionVersionRESTResource.java,
+                **/ExtensionVersionsRESTResource.java,
+                **/SearchRESTResource.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

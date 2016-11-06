@@ -160,13 +160,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <includeTestSourceDirectory>false</includeTestSourceDirectory>
-          <excludes>
-            <!-- Has too many dependencies, especially on the rendering module -->
-            org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <includeTestSourceDirectory>false</includeTestSourceDirectory>
+              <excludes>
+                <!-- Has too many dependencies, especially on the rendering module -->
+                org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

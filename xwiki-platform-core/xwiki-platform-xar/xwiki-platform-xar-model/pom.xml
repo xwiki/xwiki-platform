@@ -75,19 +75,25 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-              org/xwiki/xar/XarPackage.java,
-              org/xwiki/xar/internal/XarUtils.java,
-              org/xwiki/xar/internal/model/XarAttachmentModel.java,
-              org/xwiki/xar/internal/model/XarClassModel.java,
-              org/xwiki/xar/internal/model/XarClassPropertyModel.java,
-              org/xwiki/xar/internal/model/XarDocumentModel.java,
-              org/xwiki/xar/internal/model/XarModel.java,
-              org/xwiki/xar/internal/model/XarObjectModel.java,
-              org/xwiki/xar/internal/model/XarObjectPropertyModel.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/xar/XarPackage.java,
+                org/xwiki/xar/internal/XarUtils.java,
+                org/xwiki/xar/internal/model/XarAttachmentModel.java,
+                org/xwiki/xar/internal/model/XarClassModel.java,
+                org/xwiki/xar/internal/model/XarClassPropertyModel.java,
+                org/xwiki/xar/internal/model/XarDocumentModel.java,
+                org/xwiki/xar/internal/model/XarModel.java,
+                org/xwiki/xar/internal/model/XarObjectModel.java,
+                org/xwiki/xar/internal/model/XarObjectPropertyModel.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

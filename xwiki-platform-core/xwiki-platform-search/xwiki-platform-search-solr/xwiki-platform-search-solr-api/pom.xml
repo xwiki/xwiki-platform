@@ -146,13 +146,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            **/DefaultSolrIndexer.java,
-            **/SolrIndexEventListener.java,
-            **/AbstractSolrMetadataExtractor.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                **/DefaultSolrIndexer.java,
+                **/SolrIndexEventListener.java,
+                **/AbstractSolrMetadataExtractor.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!-- Attach default configuration package -->
       <!-- We require the jar in both test and package but we don't want to get it if we don't need it (for example

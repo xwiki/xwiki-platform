@@ -73,31 +73,37 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- Need time -->
-            **/AbstractDistributionJob.java,
-            **/AbstractDistributionStep.java,
-            **/DefaultUIDistributionStep.java,
-            **/DistributionJob.java,
-            **/DistributionJobStatus.java,
-            **/DistributionQuestion.java,
-            **/DistributionRequest.java,
-            **/DistributionStep.java,
-            **/DistributionStepStatus.java,
-            **/DistributionScriptService.java,
-            **/DocumentsModifiedDuringDistributionListener.java,
-            **/DefaultDistributionManager.java,
-            **/FarmDistributionJob.java,
-            **/FarmDistributionJobStatus.java,
-            **/OutdatedExtensionsDistributionStep.java,
-            **/ReportDistributionStep.java,
-            **/WelcomeDistributionStep.java,
-            **/WikisDefaultUIDistributionStep.java,
-            **/WikiDistributionJob.java,
-            **/WikiDistributionJobStatus.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                <!-- Need time -->
+                **/AbstractDistributionJob.java,
+                **/AbstractDistributionStep.java,
+                **/DefaultUIDistributionStep.java,
+                **/DistributionJob.java,
+                **/DistributionJobStatus.java,
+                **/DistributionQuestion.java,
+                **/DistributionRequest.java,
+                **/DistributionStep.java,
+                **/DistributionStepStatus.java,
+                **/DistributionScriptService.java,
+                **/DocumentsModifiedDuringDistributionListener.java,
+                **/DefaultDistributionManager.java,
+                **/FarmDistributionJob.java,
+                **/FarmDistributionJobStatus.java,
+                **/OutdatedExtensionsDistributionStep.java,
+                **/ReportDistributionStep.java,
+                **/WelcomeDistributionStep.java,
+                **/WikisDefaultUIDistributionStep.java,
+                **/WikiDistributionJob.java,
+                **/WikiDistributionJobStatus.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

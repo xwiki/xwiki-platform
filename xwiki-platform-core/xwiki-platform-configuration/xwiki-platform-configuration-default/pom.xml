@@ -89,15 +89,21 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            org/xwiki/configuration/internal/AbstractDocumentConfigurationSource.java,
-            org/xwiki/configuration/internal/AllConfigurationSource.java,
-            org/xwiki/configuration/internal/CommonsConfigurationSource.java,
-            org/xwiki/configuration/internal/CompositeConfigurationSource.java,
-            org/xwiki/configuration/internal/DefaultConfigurationSource.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/configuration/internal/AbstractDocumentConfigurationSource.java,
+                org/xwiki/configuration/internal/AllConfigurationSource.java,
+                org/xwiki/configuration/internal/CommonsConfigurationSource.java,
+                org/xwiki/configuration/internal/CompositeConfigurationSource.java,
+                org/xwiki/configuration/internal/DefaultConfigurationSource.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

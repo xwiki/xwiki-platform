@@ -110,37 +110,43 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-              **/ConflictQuestion.java,
-              **/UnsupportedNamespaceException.java,
-              **/XarExtensionHandler.java,
-              **/XarExtensionJobFinishedListener.java,
-              **/DefaultPackageConfiguration.java,
-              **/NotADocumentException.java,
-              **/PackageConfiguration.java,
-              **/Packager.java,
-              **/PackagerException.java,
-              **/XarEntry.java,
-              **/XarEntryMergeResult.java,
-              **/XarFile.java,
-              **/XarMergeResult.java,
-              **/AbstractHandler.java,
-              **/AttachmentHandler.java,
-              **/DocumentHandler.java,
-              **/DocumentImporterHandler.java,
-              **/RootHandler.java,
-              **/UnknownRootElement.java,
-              **/XarPageLimitedHandler.java,
-              **/XarInstalledExtension.java,
-              **/XarInstalledExtensionRepository.java,
-              **/DocumentScriptSafeProvider.java,
-              **/SafeConflictQuestion.java,
-              **/DocumentMergeImporter.java,
-              **/WikiEventListener.java,
-              **/XarExtensionPlan.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                **/ConflictQuestion.java,
+                **/UnsupportedNamespaceException.java,
+                **/XarExtensionHandler.java,
+                **/XarExtensionJobFinishedListener.java,
+                **/DefaultPackageConfiguration.java,
+                **/NotADocumentException.java,
+                **/PackageConfiguration.java,
+                **/Packager.java,
+                **/PackagerException.java,
+                **/XarEntry.java,
+                **/XarEntryMergeResult.java,
+                **/XarFile.java,
+                **/XarMergeResult.java,
+                **/AbstractHandler.java,
+                **/AttachmentHandler.java,
+                **/DocumentHandler.java,
+                **/DocumentImporterHandler.java,
+                **/RootHandler.java,
+                **/UnknownRootElement.java,
+                **/XarPageLimitedHandler.java,
+                **/XarInstalledExtension.java,
+                **/XarInstalledExtensionRepository.java,
+                **/DocumentScriptSafeProvider.java,
+                **/SafeConflictQuestion.java,
+                **/DocumentMergeImporter.java,
+                **/WikiEventListener.java,
+                **/XarExtensionPlan.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

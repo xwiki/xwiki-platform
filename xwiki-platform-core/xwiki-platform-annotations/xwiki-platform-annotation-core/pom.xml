@@ -94,12 +94,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            org/xwiki/annotation/Annotation.java,
-            org/xwiki/annotation/internal/content/SpaceNormalizerContentAlterer.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/annotation/Annotation.java,
+                org/xwiki/annotation/internal/content/SpaceNormalizerContentAlterer.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

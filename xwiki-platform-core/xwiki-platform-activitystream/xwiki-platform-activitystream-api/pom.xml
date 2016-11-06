@@ -86,16 +86,22 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>true</failsOnError>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <excludes>
-            <!-- Some methods in the APIs have more than 7 arguments, the 3 classes bellow can't pass our checkstyle -->
-            com/xpn/xwiki/plugin/activitystream/api/ActivityStream.java,
-            com/xpn/xwiki/plugin/activitystream/impl/ActivityStreamImpl.java,
-            com/xpn/xwiki/plugin/activitystream/plugin/ActivityStreamPluginApi.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <failsOnError>true</failsOnError>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <excludes>
+                <!-- Some methods in the APIs have more than 7 arguments, the 3 classes bellow can't pass our checkstyle -->
+                com/xpn/xwiki/plugin/activitystream/api/ActivityStream.java,
+                com/xpn/xwiki/plugin/activitystream/impl/ActivityStreamImpl.java,
+                com/xpn/xwiki/plugin/activitystream/plugin/ActivityStreamPluginApi.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -50,15 +50,21 @@
         -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            **/container/ApplicationContext.java,
-            **/container/Container.java,
-            **/container/ContainerFactory.java,
-            **/container/Request.java,
-            **/container/internal/DefaultContainer.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                **/container/ApplicationContext.java,
+                **/container/Container.java,
+                **/container/ContainerFactory.java,
+                **/container/Request.java,
+                **/container/internal/DefaultContainer.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

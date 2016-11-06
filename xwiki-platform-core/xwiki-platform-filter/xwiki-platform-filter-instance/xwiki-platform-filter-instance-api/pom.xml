@@ -59,20 +59,26 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-              org/xwiki/filter/instance/input/AbstractEntityEventGenerator.java,
-              org/xwiki/filter/instance/input/AbstractInstanceInputEventGenerator.java,
-              org/xwiki/filter/instance/input/EntityEventGenerator.java,
-              org/xwiki/filter/instance/internal/InstanceModel.java,
-              org/xwiki/filter/instance/internal/InstanceUtils.java,
-              org/xwiki/filter/instance/internal/input/AbstractBeanEntityEventGenerator.java,
-              org/xwiki/filter/instance/internal/input/InstanceInputProperties.java,
-              org/xwiki/filter/instance/internal/input/InstanceInputFilterStreamFactory.java,
-              org/xwiki/filter/instance/internal/output/InstanceOutputFilterStreamFactory.java,
-              org/xwiki/filter/instance/output/OutputInstanceFilterStreamFactory.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/filter/instance/input/AbstractEntityEventGenerator.java,
+                org/xwiki/filter/instance/input/AbstractInstanceInputEventGenerator.java,
+                org/xwiki/filter/instance/input/EntityEventGenerator.java,
+                org/xwiki/filter/instance/internal/InstanceModel.java,
+                org/xwiki/filter/instance/internal/InstanceUtils.java,
+                org/xwiki/filter/instance/internal/input/AbstractBeanEntityEventGenerator.java,
+                org/xwiki/filter/instance/internal/input/InstanceInputProperties.java,
+                org/xwiki/filter/instance/internal/input/InstanceInputFilterStreamFactory.java,
+                org/xwiki/filter/instance/internal/output/InstanceOutputFilterStreamFactory.java,
+                org/xwiki/filter/instance/output/OutputInstanceFilterStreamFactory.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

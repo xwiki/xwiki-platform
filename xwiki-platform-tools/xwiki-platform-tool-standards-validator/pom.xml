@@ -80,10 +80,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>true</failsOnError>
-          <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <failsOnError>true</failsOnError>
+              <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

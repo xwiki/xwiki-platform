@@ -93,21 +93,27 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-              org/xwiki/filter/instance/internal/input/BaseClassEventGenerator.java,
-              org/xwiki/filter/instance/internal/input/BaseObjectEventGenerator.java,
-              org/xwiki/filter/instance/internal/input/DocumentInstanceInputEventGenerator.java,
-              org/xwiki/filter/instance/internal/input/XWikiAttachmentEventGenerator.java,
-              org/xwiki/filter/instance/internal/input/XWikiAttachmentInputProperties.java,
-              org/xwiki/filter/instance/internal/input/XWikiDocumentInputProperties.java,
-              org/xwiki/filter/instance/internal/input/XWikiDocumentLocaleEventGenerator.java,
-              org/xwiki/filter/instance/internal/output/DocumentInstanceOutputFilterStream.java,
-              org/xwiki/filter/instance/internal/output/DocumentInstanceOutputProperties.java,
-              org/xwiki/filter/instance/internal/output/UserInstanceOutputFilterStream.java,
-              org/xwiki/filter/instance/internal/output/XWikiDocumentOutputFilterStream.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/filter/instance/internal/input/BaseClassEventGenerator.java,
+                org/xwiki/filter/instance/internal/input/BaseObjectEventGenerator.java,
+                org/xwiki/filter/instance/internal/input/DocumentInstanceInputEventGenerator.java,
+                org/xwiki/filter/instance/internal/input/XWikiAttachmentEventGenerator.java,
+                org/xwiki/filter/instance/internal/input/XWikiAttachmentInputProperties.java,
+                org/xwiki/filter/instance/internal/input/XWikiDocumentInputProperties.java,
+                org/xwiki/filter/instance/internal/input/XWikiDocumentLocaleEventGenerator.java,
+                org/xwiki/filter/instance/internal/output/DocumentInstanceOutputFilterStream.java,
+                org/xwiki/filter/instance/internal/output/DocumentInstanceOutputProperties.java,
+                org/xwiki/filter/instance/internal/output/UserInstanceOutputFilterStream.java,
+                org/xwiki/filter/instance/internal/output/XWikiDocumentOutputFilterStream.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -93,12 +93,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- Implements InvocationHandler and throwing 'Throwable' is not allowed. -->
-            **/DefaultWikiComponentProxy.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                <!-- Implements InvocationHandler and throwing 'Throwable' is not allowed. -->
+                **/DefaultWikiComponentProxy.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

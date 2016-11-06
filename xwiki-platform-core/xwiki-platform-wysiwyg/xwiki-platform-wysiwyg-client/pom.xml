@@ -143,16 +143,21 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <!-- New code should follow checkstyle rules. -->
-          <excludes>
-            org/xwiki/gwt/wysiwyg/client/Images.java,
-            org/xwiki/gwt/wysiwyg/client/Strings.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <!-- New code should follow checkstyle rules. -->
+              <excludes>
+                org/xwiki/gwt/wysiwyg/client/Images.java,
+                org/xwiki/gwt/wysiwyg/client/Strings.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

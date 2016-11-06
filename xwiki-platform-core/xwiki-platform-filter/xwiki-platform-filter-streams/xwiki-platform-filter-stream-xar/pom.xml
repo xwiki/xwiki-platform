@@ -96,30 +96,36 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-              org/xwiki/filter/xar/internal/XARAttachmentModel.java,
-              org/xwiki/filter/xar/internal/XARClassModel.java,
-              org/xwiki/filter/xar/internal/XARClassPropertyModel.java,
-              org/xwiki/filter/xar/internal/XARDocumentModel.java,
-              org/xwiki/filter/xar/internal/XARFilter.java,
-              org/xwiki/filter/xar/internal/XARFilterUtils.java,
-              org/xwiki/filter/xar/internal/XARObjectModel.java,
-              org/xwiki/filter/xar/internal/XARObjectPropertyModel.java,
-              org/xwiki/filter/xar/internal/input/AbstractReader.java,
-              org/xwiki/filter/xar/internal/input/AttachmentReader.java,
-              org/xwiki/filter/xar/internal/input/ClassPropertyReader.java,
-              org/xwiki/filter/xar/internal/input/ClassReader.java,
-              org/xwiki/filter/xar/internal/input/DocumentLocaleReader.java,
-              org/xwiki/filter/xar/internal/input/WikiObjectReader.java,
-              org/xwiki/filter/xar/internal/input/WikiReader.java,
-              org/xwiki/filter/xar/internal/input/XARInputFilterStream.java,
-              org/xwiki/filter/xar/internal/input/XARInputFilterStreamFactory.java,
-              org/xwiki/filter/xar/internal/output/XAROutputFilterStream.java,
-              org/xwiki/filter/xar/internal/output/XAROutputFilterStreamFactory.java,
-              org/xwiki/filter/xar/internal/output/XARWikiWriter.java
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                org/xwiki/filter/xar/internal/XARAttachmentModel.java,
+                org/xwiki/filter/xar/internal/XARClassModel.java,
+                org/xwiki/filter/xar/internal/XARClassPropertyModel.java,
+                org/xwiki/filter/xar/internal/XARDocumentModel.java,
+                org/xwiki/filter/xar/internal/XARFilter.java,
+                org/xwiki/filter/xar/internal/XARFilterUtils.java,
+                org/xwiki/filter/xar/internal/XARObjectModel.java,
+                org/xwiki/filter/xar/internal/XARObjectPropertyModel.java,
+                org/xwiki/filter/xar/internal/input/AbstractReader.java,
+                org/xwiki/filter/xar/internal/input/AttachmentReader.java,
+                org/xwiki/filter/xar/internal/input/ClassPropertyReader.java,
+                org/xwiki/filter/xar/internal/input/ClassReader.java,
+                org/xwiki/filter/xar/internal/input/DocumentLocaleReader.java,
+                org/xwiki/filter/xar/internal/input/WikiObjectReader.java,
+                org/xwiki/filter/xar/internal/input/WikiReader.java,
+                org/xwiki/filter/xar/internal/input/XARInputFilterStream.java,
+                org/xwiki/filter/xar/internal/input/XARInputFilterStreamFactory.java,
+                org/xwiki/filter/xar/internal/output/XAROutputFilterStream.java,
+                org/xwiki/filter/xar/internal/output/XAROutputFilterStreamFactory.java,
+                org/xwiki/filter/xar/internal/output/XARWikiWriter.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

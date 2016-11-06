@@ -71,10 +71,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <!-- New code should follow checkstyle rules. -->
-          <excludes>org/xwiki/gwt/dom/client/DOMUtils.java</excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <!-- New code should follow checkstyle rules. -->
+              <excludes>org/xwiki/gwt/dom/client/DOMUtils.java</excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

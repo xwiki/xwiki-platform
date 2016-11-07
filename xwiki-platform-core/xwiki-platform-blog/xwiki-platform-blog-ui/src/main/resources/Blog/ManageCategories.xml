@@ -761,7 +761,6 @@ document.observe('xwiki:dom:loaded', function() {
 .blog-add-category-label {
   font-style: italic;
   padding-left: 20px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") 2px center no-repeat;
 }
 
 .blog-add-category-label a {

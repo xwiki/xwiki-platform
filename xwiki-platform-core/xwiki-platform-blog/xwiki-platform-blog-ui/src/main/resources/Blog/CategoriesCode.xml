@@ -315,12 +315,12 @@
   #set($nameUrl = $escapetool.url($name))
   #foreach($i in [1..$level])*#end ##
 &lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
-&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$nameUrl"), $doc.syntax)" title="RSS"&gt;&lt;img class="icon icon-manage" src="$xwiki.getSkinFile('icons/xwiki/rss-medium.png')" alt="[RSS]"/&gt;&lt;/a&gt;##
-&lt;span class="wikilink"&gt;&lt;a href="$services.rendering.escape($xwiki.getURL($name), $doc.syntax)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;&lt;/span&gt; ##
+&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$nameUrl"), $doc.syntax)" title="RSS"&gt;#toolImage('feed','[RSS]')&lt;/a&gt;&amp;nbsp;##
+&lt;span class="wikilink"&gt;&lt;a href="$services.rendering.escape($xwiki.getURL($name), $doc.syntax)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;##
 &lt;span class="blog-category-tools"&gt;##
-#if($xwiki.hasAccessLevel('delete', $xcontext.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$nameUrl"), $doc.syntax)" class="tool rename"&gt;#toolImage('pencil' 'Rename ')&lt;/a&gt;#end ##
-#if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showAddCategory&amp;amp;parentCategory=$nameUrl"), $doc.syntax)" class="tool add-subcategory"&gt;#toolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt; #end ##
-#if($xwiki.hasAccessLevel('delete', $xcontext.user, $name)) &lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=delete&amp;amp;category=$nameUrl&amp;amp;form_token=$!{services.csrf.getToken()}"), $doc.syntax)" class="tool delete"&gt;#toolImage('cross' 'Delete ')&lt;/a&gt;#end ##
+#if($xwiki.hasAccessLevel('delete', $xcontext.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$nameUrl"), $doc.syntax)" class="tool rename"&gt;#toolImage('pencil' 'Rename ')&lt;/a&gt;#end##
+#if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showAddCategory&amp;amp;parentCategory=$nameUrl"), $doc.syntax)" class="tool add-subcategory"&gt;#toolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt;#end##
+#if($xwiki.hasAccessLevel('delete', $xcontext.user, $name)) &lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=delete&amp;amp;category=$nameUrl&amp;amp;form_token=$!{services.csrf.getToken()}"), $doc.syntax)" class="tool delete"&gt;#toolImage('cross' 'Delete ')&lt;/a&gt;#end##
 &lt;/span&gt;##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showRenameCategory" &amp;&amp; "$!{request.category}" == $name) #renameCategoryForm() #end##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == $name) #addCategoryForm() #end##
@@ -469,7 +469,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
         'entryObjNb' : $entryObjNbParam
       })))
     #end
-    * &lt;span class="blog-add-category-label"&gt;&lt;a href="$escapetool.xml($addCategURL)"&gt;$services.localization.render('xe.blog.categories.addcategory')&lt;/a&gt;&lt;/span&gt;
+    * &lt;span class="blog-add-category-label"&gt;$services.icon.renderHTML('add')&amp;nbsp;&lt;a href="$escapetool.xml($addCategURL)"&gt;$services.localization.render('xe.blog.categories.addcategory')&lt;/a&gt;&lt;/span&gt;
      #if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "") #addCategoryForm() #end
   #end
 

@@ -572,7 +572,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
-    [[#toolImage('page_white_world' 'publish ')&gt;&gt;path:$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||title="$services.localization.render('xe.blog.code.notpublished')"]]##
+    [[#toolImage('world' 'publish ')&gt;&gt;path:$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||title="$services.localization.render('xe.blog.code.notpublished')"]]##
   #end
 #end
 ##
@@ -835,7 +835,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param message A text message concerning blog article publishing
  *###
 #macro(publishMessageBox $message)
-(% class="plainmessage publish-message" %)((($message)))
+(% class="plainmessage publish-message" %)((($services.icon.render('world') $message)))
 #end
 #**
  * Displays a message box with "show/hide" icon.
@@ -843,7 +843,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param message A text message concerning blog article hiding
  *###
 #macro(hideMessageBox $message)
-(% class="plainmessage hide-message" %)((($message)))
+(% class="plainmessage hide-message" %)((($services.icon.render('lock_open') $message)))
 #end
 ##
 ##

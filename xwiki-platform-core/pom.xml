@@ -37,8 +37,6 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
-    <!-- Follow the specifications regarding the WebJar content path. -->
-    <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
     <!-- The bootstrap version is used is several places -->
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.8</batik.version>
@@ -377,37 +375,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>1.3.2</version>
-          <executions>
-            <execution>
-              <!-- Minify the WebJar resources before packing the jar. -->
-              <id>minify-webjar-resources</id>
-              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
-              <phase>none</phase>
-              <goals>
-                <goal>compress</goal>
-              </goals>
-              <configuration>
-                <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
-                <excludes>
-                  <exclude>**/*.min.*</exclude>
-                </excludes>
-                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
-          <configuration>
-            <skip>${xwiki.minification.skip}</skip>
-            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
-            <jswarn>false</jswarn>
-            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
-              currently more widely used in the JavaScript world. -->
-            <suffix>.min</suffix>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.cj.jshintmojo</groupId>
           <artifactId>jshint-maven-plugin</artifactId>
           <version>1.6.0</version>
@@ -423,23 +390,6 @@
             <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
             <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
           </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <executions>
-            <execution>
-              <!-- Copy the WebJar resources to the right path before packing the jar. -->
-              <id>copy-webjar-resources</id>
-              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
-              <phase>none</phase>
-              <goals>
-                <goal>resources</goal>
-              </goals>
-              <configuration>
-                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

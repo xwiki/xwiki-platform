@@ -76,7 +76,7 @@
         #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiUsers_${fieldName}_${v}"}))
       #end
     #end
-    &lt;select name="XWiki.XWikiUsers_0_${fieldName}" id="XWiki.XWikiUsers_0_${fieldName}" size="3"&gt;
+    &lt;select name="XWiki.XWikiUsers_0_${fieldName}" id="XWiki.XWikiUsers_0_${fieldName}" size="1"&gt;
       #if ("$!default" != '')
         &lt;option value=""&gt;---&lt;/option&gt;
       #end

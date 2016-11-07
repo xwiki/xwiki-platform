@@ -56,7 +56,7 @@
 ############################
 #set($variables = {
   "logos": {
-    "logo": "logo"
+    "logo": "image"
   },
   "base-colors": {
     "text-color": "color",
@@ -79,8 +79,13 @@
     "font-family-monospace": "font",
     "font-size-base" : "size"
   },
+  "tables" : {
+    "table-bg": "color",
+    "table-bg-hover": "color",
+    "table-border-color": "color"
+  },
   "buttons": {
-    "btn-font-weight" : "text",
+    "btn-font-weight" : "fontWeight",
     "btn-default-color" : "color",
     "btn-default-bg" : "color",
     "btn-primary-color" : "color",
@@ -161,6 +166,71 @@
   &lt;/ul&gt;
 #end
 ############################
+## FIELD TEXTAREA
+############################
+#macro(fieldTextarea $varName $obj)
+  #if($varName == 'lessCode')
+    &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
+  #end
+  &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
+    $!escapetool.xml($!doc.getValue($varName, $obj))
+  &lt;/textarea&gt;
+#end
+############################
+## FIELD IMAGE
+############################
+#macro(fieldImage $varName $obj)
+  #set($currentLogo = $obj.getValue($varName))
+  &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName" class="type-image"&gt;
+    #if ($varName == 'logo')
+      &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
+    #else
+      &lt;option value=""&gt;$services.localization.render("no")&lt;/option&gt;
+    #end
+    #foreach($attachment in $doc.getAttachmentList())
+      #if($attachment.isImage())
+        &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
+      #end
+    #end
+  &lt;/select&gt;
+#end
+############################
+## FIELD TEXT
+############################
+#macro(fieldText $varName $obj)
+  &lt;div class="input-group"&gt;
+    &lt;input type="text" class="form-control type-text" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+  &lt;/div&gt;
+#end
+############################
+## FIELD SIZE
+############################
+#macro(fieldSize $varName $obj)
+  &lt;div class="input-group"&gt;
+    &lt;input type="text" class="form-control type-size" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+  &lt;/div&gt;
+#end
+############################
+## FIELD COLOR
+############################
+#macro(fieldColor $varName $obj)
+  &lt;div class="input-group"&gt;
+    &lt;input type="text" class="form-control color-picker type-color" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+  &lt;/div&gt;
+#end
+############################
+## FIELD FONT WEIGHT
+############################
+#macro(fieldFontWeight $varName $obj)
+  &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName" class="type-fontweight"&gt;
+    #set ($value = $doc.getValue($varName, $obj))
+    #set ($options = ['normal', 'bold', 'bolder', 'lighter'])
+    #foreach ($option in $options)
+      &lt;option value="$option" #if("$!value" == $option)selected="selected"#end&gt;$option&lt;/option&gt;
+    #end
+  &lt;/select&gt;
+#end
+############################
 ## DISPLAY VARIABLES PANES
 ############################
 #macro(displayVariablesPanes)
@@ -175,27 +245,18 @@
         &lt;div class="form-group"&gt;
           &lt;label for="var-$varName" class="col-xs-12"&gt;@$varName&lt;/label&gt;
           &lt;div class="col-xs-12"&gt;
-            #if($varType == 'logo')
-              #set($currentLogo = $obj.getValue('logo'))
-              &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName"&gt;
-                &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
-                #foreach($attachment in $doc.getAttachmentList())
-                  #if($attachment.isImage())
-                    &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
-                  #end
-                #end
-              &lt;/select&gt;
+            #if($varType == 'image')
+              #fieldImage($varName, $obj)
             #elseif($varType == 'textarea')
-              #if($varName == 'lessCode')
-                &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
-              #end
-              &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
-                $!escapetool.xml($!doc.getValue($varName, $obj))
-              &lt;/textarea&gt;
+              #fieldTextarea($varName, $obj)
+            #elseif($varType == 'size')
+              #fieldSize($varName, $obj)
+            #elseif($varType == 'color')
+              #fieldColor($varName, $obj)
+            #elseif($varType == 'fontWeight')
+              #fieldFontWeight($varName, $obj)
             #else
-              &lt;div class="input-group"&gt;
-                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end type-${varType}" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
-              &lt;/div&gt;
+              #fieldText($varName, $obj)
             #end
           &lt;/div&gt;
         &lt;/div&gt;
@@ -351,7 +412,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     // Usefull variables
     var iframe = $("#iframe");
     var autoSync = $("#autosync");
-    var variableInputs = $("#bt-variables input");
+    var variableInputs = $("#bt-variables input,#bt-variables select");
     
     // Need IE9+ or any other recent browser
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
@@ -403,6 +464,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     // Refresh the preview
     var refreshPreview = function () {
       addCurtain();
+      
+      // Set the good logo when the iframe is refreshed
+      setLogo();
+      
       // Get the variables' values
       var varMap = {};
       for (var i=0; i&lt;variableInputs.length; ++i) {
@@ -412,8 +477,13 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
           var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
           var value = variableInput.value
+          var input = $(variableInput);
           // Some values need to be placed inside a string
-          if ($(variableInput).hasClass('type-escapedText')) {
+          if (input.hasClass('type-image')) {
+            var url = $("#attachmentsURL").attr('data-value');
+            value = 'url('+ url.replace("__tochange__", value) + ')';
+          }
+          if (input.hasClass('type-escapedText')) {
             value = '"' + value.replace('"', '\\"') + '"';
           }
           varMap[name] = value;
@@ -433,12 +503,13 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         // Instead, we use the following trick: p['catch']()
         // TODO: remove this trick when we replace yuicompressor by something else.
         iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain)['catch'](removeCurtain);
-      }, 10);
+      }, 100);
     };
     
     // Function called when an input is changed by the user
-    var onChange = function (variableInput) {
-      if (autoSync.prop("checked")) {
+    var onChange = function () {
+      var input = $(this);
+      if (autoSync.prop("checked") &amp;&amp; !input.hasClass('type-image')) {
         var oldValue = variableInput.value;
         setTimeout(function(){
           if (variableInput.value == oldValue) {
@@ -525,14 +596,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     });
     for (var i=0; i&lt;variableInputs.length; ++i) {
       var variableInput = variableInputs[i];
-      $(variableInput).on("change", function(){onChange(variableInput);});
+      $(variableInput).on("change", onChange);
     }
     // Event handler for the logo field
     $("#var-logo").on("change", setLogo);
-    // Set the good logo at the start
-    setLogo();
-    
-    
   });
   
 });

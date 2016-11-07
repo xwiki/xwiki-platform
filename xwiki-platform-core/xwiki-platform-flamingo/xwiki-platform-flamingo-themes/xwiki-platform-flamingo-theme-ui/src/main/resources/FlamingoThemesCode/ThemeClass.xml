@@ -755,6 +755,45 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </panel-default-text>
+    <table-bg>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>table-bg</name>
+      <number>61</number>
+      <picker>0</picker>
+      <prettyName>table-bg</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </table-bg>
+    <table-bg-hover>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>table-bg-hover</name>
+      <number>62</number>
+      <picker>0</picker>
+      <prettyName>table-bg-hover</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </table-bg-hover>
+    <table-border-color>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>table-border-color</name>
+      <number>63</number>
+      <picker>0</picker>
+      <prettyName>table-border-color</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </table-border-color>
     <text-color>
       <customDisplay/>
       <disabled>0</disabled>

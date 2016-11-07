@@ -177,7 +177,10 @@
       "panel-default-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
-      "breadcrumb-separator": "escapedText"
+      "breadcrumb-separator": "escapedText",
+      "table-bg": "color",
+      "table-bg-hover": "color",
+      "table-border-color": "color"
       })
     #set($themeClass = $xwiki.getClass('FlamingoThemesCode.ThemeClass'))
     #foreach($property in $variables.keySet())

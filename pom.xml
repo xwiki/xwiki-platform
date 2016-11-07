@@ -52,6 +52,8 @@
     <hsqldb.version>2.3.4</hsqldb.version>
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
+    <!-- Follow the specifications regarding the WebJar content path. -->
+    <webjar.outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.outputDirectory>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -69,6 +71,14 @@
     <module>xwiki-platform-distribution</module>
   </modules>
   <build>
+    <extensions>
+      <!-- Needed to add support for the "webjar" packaging -->
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-webjar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>

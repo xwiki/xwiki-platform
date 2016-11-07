@@ -27,6 +27,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
+import org.xwiki.component.namespace.NamespaceUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -63,18 +65,13 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
 
     private EntityReference convertToType(Type type, String value)
     {
-        EntityType entityType = EntityType.DOCUMENT;
-        String entityReference = value;
+        Namespace namespace = NamespaceUtils.toNamespace(value);
 
-        int index = value.indexOf(':');
-        if (index > 0) {
-            String entityTypeString = value.substring(0, index);
-            EntityType foundEntityType = EnumUtils.getEnum(EntityType.class, entityTypeString.toUpperCase());
-            if (foundEntityType != null) {
-                entityType = foundEntityType;
-                ++index;
-                entityReference = index < value.length() ? value.substring(index) : "";
-            }
+        EntityType entityType = EnumUtils.getEnum(EntityType.class, namespace.getType().toUpperCase());
+        String entityReference = namespace.getValue();
+        if (entityType == null) {
+            entityType = EntityType.DOCUMENT;
+            entityReference = value;
         }
 
         return this.stringResolver.resolve(entityReference, entityType);
@@ -87,6 +84,6 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
             return null;
         }
 
-        return value.getType().getLowerCase() + ':' + this.serialier.serialize(value);
+        return new Namespace(value.getType().getLowerCase(), this.serialier.serialize(value)).toString();
     }
 }

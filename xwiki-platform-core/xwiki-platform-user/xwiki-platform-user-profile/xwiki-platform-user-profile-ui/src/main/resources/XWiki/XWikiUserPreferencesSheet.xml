@@ -40,13 +40,85 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($obj = $doc.getObject("XWiki.XWikiUsers"))
+###############################
+##         GLOBALS
+###############################
+#set ($xclass  = $xwiki.getClass('XWiki.XWikiUsers'))
+#set ($isEdit  = ($xcontext.action == 'edit'))
+#set ($obj     = $doc.getObject("XWiki.XWikiUsers"))
+#set ($discard = $doc.use($obj))
+#set ($discard = $xwiki.ssx.use('XWiki.XWikiUserSheet'))
+###############################
+##        CONTROLLER
+###############################
 #if(!$obj)
-{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
+  {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
 #else
-$doc.use($obj)
-$xwiki.ssx.use('XWiki.XWikiUserSheet')##
-{{html wiki="true"}}
+  #displayFields()
+#end
+###############################
+##   DISPLAY SELECT FIELD
+###############################
+#macro(displaySelectField $fieldName $default)
+  #if ($isEdit)
+    #set ($value = $doc.getValue($fieldName, $obj))
+    #set ($prop = $xclass.get($fieldName))
+    #set ($options = [])
+    #if ($prop.classType == 'Boolean')
+      #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
+      #set ($discard = $options.add({'value': 0, 'label': 'no'}))
+    #elseif ($prop.classType == 'Timezone' &amp;&amp; "$!xwiki.jodatime" != '')
+      #foreach($tz in $xwiki.jodatime.serverTimezone.availableIDs)
+        #set ($discard = $options.add({'value': $tz, 'label': $tz}))
+      #end
+    #else
+      #foreach($v in $prop.listValues)
+        #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiUsers_${fieldName}_${v}"}))
+      #end
+    #end
+    &lt;select name="XWiki.XWikiUsers_0_${fieldName}" id="XWiki.XWikiUsers_0_${fieldName}" size="3"&gt;
+      #if ("$!default" != '')
+        &lt;option value=""&gt;---&lt;/option&gt;
+      #end
+      #foreach ($option in $options)
+        #if ($option.value != '---')
+          &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
+            #if ($services.localization.render($option.label) != $option.label)
+              $services.localization.render($option.label)
+            #else
+              $option.value
+            #end
+            #if ($default == $option.value)
+              (Default)
+            #end
+          &lt;/option&gt;
+        #end
+      #end
+    &lt;/select&gt;
+  #else
+    $doc.display($fieldName)
+  #end
+#end
+###############################
+##      DISPLAY FIELD
+###############################
+#macro(displayField $fieldName $label $default)
+  #set ($hintKey = "XWiki.XWikiUsers_${fieldName}.hint")
+  &lt;dt&gt;
+    &lt;label&gt;$services.localization.render($label)&lt;/label&gt;
+    #if ($services.localization.get($hintKey))
+      &lt;span class="xHint"&gt;$services.localization.render($hintKey)&lt;/span&gt;
+    #end
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    #displaySelectField($fieldName, $default)
+  &lt;dt&gt;
+#end
+###############################
+##      DISPLAY FIELDS
+###############################
+#macro(displayFields)
+{{html}}
   &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class="userPreferences"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
@@ -54,52 +126,17 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
       #end
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.displayPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt&gt;
-          &lt;label&gt;$services.localization.render('platform.core.profile.displayHiddenDocuments')&lt;/label&gt;
-          #set ($hintKey = 'XWiki.XWikiUsers_displayHiddenDocuments.hint')
-          #if ($services.localization.get($hintKey))
-          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
-          #end
-        &lt;/dt&gt;
-        &lt;dd&gt;$doc.display('displayHiddenDocuments')&lt;/dd&gt;
-        &lt;dt&gt;
-          &lt;label&gt;$services.localization.render('platform.core.profile.enableAccessibility')&lt;/label&gt;
-          #set ($hintKey = 'XWiki.XWikiUsers_accessibility.hint')
-          #if ($services.localization.get($hintKey))
-          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
-          #end
-        &lt;/dt&gt;
-        &lt;dd&gt;$doc.display('accessibility')&lt;/dd&gt;
+        #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
+        #displayField('accessibility'         , 'platform.core.profile.enableAccessibility'   , '0')
       &lt;/dl&gt;
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt&gt;
-          &lt;label&gt;$services.localization.render('platform.core.profile.timezone')&lt;/label&gt;
-          #set ($hintKey = 'XWiki.XWikiUsers_timezone.hint')
-          #if ($services.localization.get($hintKey))
-          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
-          #end
-        &lt;/dt&gt;
-        &lt;dd&gt;$doc.display('timezone')&lt;/dd&gt;
+        #displayField('timezone'              , 'platform.core.profile.timezone'              , $xwiki.getXWikiPreference('timezone'))
       &lt;/dl&gt;
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt&gt;
-          &lt;label&gt;$services.localization.render('platform.core.profile.editor')&lt;/label&gt;
-          #set ($hintKey = 'XWiki.XWikiUsers_editor.hint')
-          #if ($services.localization.get($hintKey))
-          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
-          #end
-        &lt;/dt&gt;
-        &lt;dd&gt;$doc.display('editor')&lt;/dd&gt;
-        &lt;dt&gt;
-          &lt;label&gt;$services.localization.render('platform.core.profile.userType')&lt;/label&gt;
-          #set ($hintKey = 'XWiki.XWikiUsers_usertype.hint')
-          #if ($services.localization.get($hintKey))
-          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
-          #end
-        &lt;/dt&gt;
-        &lt;dd&gt;$doc.display('usertype')&lt;/dd&gt;
+        #displayField('editor'                , 'platform.core.profile.editor'                , $xwiki.getXWikiPreference('editor'))
+        #displayField('usertype'              , 'platform.core.profile.userType'              , 'Simple')
       &lt;/dl&gt;
     &lt;/div&gt;
   &lt;/div&gt;

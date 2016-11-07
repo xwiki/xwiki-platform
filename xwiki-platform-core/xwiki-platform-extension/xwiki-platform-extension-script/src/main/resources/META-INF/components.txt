@@ -5,7 +5,6 @@ org.xwiki.extension.script.ExtensionRatingScriptService
 org.xwiki.extension.script.InstalledExtensionScriptService
 org.xwiki.extension.script.LocalExtensionScriptService
 org.xwiki.extension.script.RecommendedExtensionScriptService
-org.xwiki.extension.script.internal.XWikiExtensionValidator
 org.xwiki.extension.script.internal.safe.ExtensionPlanScriptSafeProvider
 org.xwiki.extension.script.internal.safe.ExtensionRepositoryScriptSafeProvider
 org.xwiki.extension.script.internal.safe.ExtensionScriptSafeProvider

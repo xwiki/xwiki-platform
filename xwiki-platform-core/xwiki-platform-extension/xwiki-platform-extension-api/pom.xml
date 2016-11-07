@@ -27,28 +27,23 @@
     <artifactId>xwiki-platform-extension</artifactId>
     <version>9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-extension-handlers</artifactId>
-  <name>XWiki Platform - Extension - Handler - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Extension - Handler - Parent POM</description>
+  <artifactId>xwiki-platform-extension-api</artifactId>
+  <name>XWiki Platform - Extension - API</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Extension - API</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
-    <!-- Test dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-api</artifactId>
-      <version>${commons.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <modules>
-    <module>xwiki-platform-extension-handler-jar</module>
-    <module>xwiki-platform-extension-handler-xar</module>
-  </modules>
 </project>

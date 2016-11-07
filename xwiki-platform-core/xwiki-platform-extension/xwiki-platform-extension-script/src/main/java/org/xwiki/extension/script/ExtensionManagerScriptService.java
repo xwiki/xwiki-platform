@@ -37,6 +37,7 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
@@ -365,7 +366,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             // We set the string value because the extension repository doesn't know how to serialize/parse an extension
             // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
             // because ExtensionPropertySerializers are not components (they are currently hard-coded).
-            installRequest.setExtensionProperty(PROPERTY_USERREFERENCE, currentUserReference.toString());
+            installRequest.setExtensionProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+                currentUserReference.toString());
         }
 
         return installRequest;
@@ -702,13 +704,15 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job createUpgradePlan(InstallRequest request)
     {
-        request.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        request.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+            this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
-            request.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+            request.setProperty(AbstractExtensionValidator.PROPERTY_CALLERREFERENCE,
+                callerDocument.getContentAuthorReference());
         }
 
-        request.setProperty(PROPERTY_CHECKRIGHTS, true);
+        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
 
         Job job = null;
         try {

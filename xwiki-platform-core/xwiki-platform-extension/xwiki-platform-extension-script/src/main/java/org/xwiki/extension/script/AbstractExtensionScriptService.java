@@ -27,6 +27,7 @@ import javax.inject.Provider;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.event.status.JobStatus;
@@ -51,12 +52,6 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      */
     public static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
 
-    protected static final String PROPERTY_USERREFERENCE = "user.reference";
-
-    protected static final String PROPERTY_CALLERREFERENCE = "caller.reference";
-
-    protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
-
     /**
      * Extension request property that specifies from which wiki the job was started.
      */
@@ -66,6 +61,12 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * Extension request property that specifies from which document action the job was started.
      */
     protected static final String PROPERTY_CONTEXT_ACTION = "context.action";
+
+    protected static final String PROPERTY_USERREFERENCE = AbstractExtensionValidator.PROPERTY_USERREFERENCE;
+
+    protected static final String PROPERTY_CALLERREFERENCE = AbstractExtensionValidator.PROPERTY_CALLERREFERENCE;
+
+    protected static final String PROPERTY_CHECKRIGHTS = AbstractExtensionValidator.PROPERTY_CHECKRIGHTS;
 
     /**
      * The prefix used for wiki namespace id.
@@ -114,11 +115,13 @@ public abstract class AbstractExtensionScriptService implements ScriptService
 
     protected <T extends AbstractRequest> void setRightsProperties(T extensionRequest)
     {
-        extensionRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        extensionRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
+        extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+            this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
-            extensionRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+            extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CALLERREFERENCE,
+                callerDocument.getContentAuthorReference());
         }
     }
 

@@ -36,6 +36,7 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -46,8 +47,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @AllComponents
 public class ExtensionManagerScriptServiceTest
@@ -146,29 +147,20 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
-
         install("extension", "version", null);
     }
 
     @Test
     public void testInstallOnNamespace() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
-
         install("extension", "version", "namespace");
     }
 
     @Test(expected = InstallException.class)
     public void testInstallOnRootWithoutProgrammingRigths() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
+        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
 
         install("extension", "version", null);
     }
@@ -176,9 +168,8 @@ public class ExtensionManagerScriptServiceTest
     @Test(expected = InstallException.class)
     public void testInstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
+        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
 
         install("extension", "version", "namespace");
     }
@@ -188,29 +179,20 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testUninstallFromRoot() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
-
         uninstall("installedonroot", null);
     }
 
     @Test
     public void testUninstallOnNamespace() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
-
         uninstall("installedonnamespace", "namespace");
     }
 
     @Test(expected = UninstallException.class)
     public void testUninstallOnRootWithoutProgrammingRigths() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
+        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
 
         uninstall("installedonroot", null);
     }
@@ -218,9 +200,8 @@ public class ExtensionManagerScriptServiceTest
     @Test(expected = UninstallException.class)
     public void testUninstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
-        when(
-            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
-                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
+        doThrow(AccessDeniedException.class).when(this.xwikiBridge.getMockAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null);
 
         uninstall("installedonnamespace", "namespace");
     }

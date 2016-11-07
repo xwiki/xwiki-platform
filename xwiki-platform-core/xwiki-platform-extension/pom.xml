@@ -32,6 +32,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Parent POM</description>
   <modules>
+    <module>xwiki-platform-extension-api</module>
     <module>xwiki-platform-extension-cluster</module>
     <module>xwiki-platform-extension-distribution</module>
     <module>xwiki-platform-extension-handlers</module>

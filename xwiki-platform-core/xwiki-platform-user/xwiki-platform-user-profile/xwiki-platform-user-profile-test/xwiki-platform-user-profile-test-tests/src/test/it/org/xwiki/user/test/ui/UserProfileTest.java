@@ -66,7 +66,7 @@ public class UserProfileTest extends AbstractTest
 
     private static final String TEXT_EDITOR = "Text";
 
-    private static final String DEFAULT_EDITOR = "-";
+    private static final String DEFAULT_EDITOR = "Text (Default)";
 
     private static final String SIMPLE_USER = "Simple";
 

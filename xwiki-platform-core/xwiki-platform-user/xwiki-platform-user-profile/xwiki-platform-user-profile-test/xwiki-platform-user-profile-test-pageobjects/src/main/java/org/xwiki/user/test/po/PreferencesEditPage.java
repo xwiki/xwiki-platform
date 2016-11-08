@@ -27,16 +27,6 @@ import org.xwiki.test.ui.po.editor.EditPage;
 /** User profile, the preferences pane, edit mode. */
 public class PreferencesEditPage extends EditPage
 {
-    private static final String SIMPLE_USER = "Simple";
-
-    private static final String ADVANCED_USER = "Advanced";
-
-    private static final String EDITOR_DEFAULT = "---";
-
-    private static final String EDITOR_WYSIWYG = "Wysiwyg";
-
-    private static final String EDITOR_TEXT = "Text";
-
     @FindBy(id = "XWiki.XWikiUsers_0_editor")
     private WebElement defaultEditor;
 
@@ -49,31 +39,31 @@ public class PreferencesEditPage extends EditPage
     public void setSimpleUserType()
     {
         Select select = new Select(this.userType);
-        select.selectByValue(SIMPLE_USER);
+        select.selectByIndex(1);
     }
 
     public void setAdvancedUserType()
     {
         Select select = new Select(this.userType);
-        select.selectByValue(ADVANCED_USER);
+        select.selectByIndex(2);
     }
 
     public void setDefaultEditorDefault()
     {
         Select select = new Select(this.defaultEditor);
-        select.selectByValue(EDITOR_DEFAULT);
+        select.selectByIndex(0);
     }
 
     public void setDefaultEditorWysiwyg()
     {
         Select select = new Select(this.defaultEditor);
-        select.selectByValue(EDITOR_WYSIWYG);
+        select.selectByIndex(2);
     }
 
     public void setDefaultEditorText()
     {
         Select select = new Select(this.defaultEditor);
-        select.selectByValue(EDITOR_TEXT);
+        select.selectByIndex(1);
     }
 
     public String getDefaultEditor()

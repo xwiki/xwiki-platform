@@ -138,7 +138,11 @@
       #if ($isEdit)
         &lt;input id="XWiki.XWikiUsers_0_${fieldName}" name="XWiki.XWikiUsers_0_${fieldName}" type="text" value="$!escapetool.xml($obj.getValue($fieldName))"/&gt;
       #else
-        $doc.display($fieldName)
+        #if ("$!obj.getValue('timezone')" == '' &amp;&amp; "$!xwiki.getXWikiPreference('timezone')" != '')
+          $xwiki.getXWikiPreference('timezone') &lt;small&gt;($services.localization.render('userprofile.default'))&lt;/small&gt;
+        #else
+          $doc.display('timezone')
+        #end
       #end
     #else
       #displaySelectField($fieldName, $default)
@@ -168,6 +172,9 @@
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('editor'))
+        #if ("$!defaultValue" == '')
+          #set ($defaultValue = 'Text')
+        #end
         #displayField('editor'                , 'platform.core.profile.editor'                , $defaultValue)
         #displayField('usertype'              , 'platform.core.profile.userType'              , 'Simple')
       &lt;/dl&gt;

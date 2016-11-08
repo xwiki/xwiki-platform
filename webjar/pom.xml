@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
+    <!-- Explicitely indicate it's a webjar -->
+    <xwiki.extension.jar.type>webjar</xwiki.extension.jar.type>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->

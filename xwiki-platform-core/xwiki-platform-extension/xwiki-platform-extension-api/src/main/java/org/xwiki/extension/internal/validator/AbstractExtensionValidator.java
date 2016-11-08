@@ -124,7 +124,7 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
 
         // Root namespace
         if (namespace == null) {
-            checkRootRight(request);
+            checkRootRight(entityRight, request);
 
             return;
         }
@@ -159,10 +159,10 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
         }
     }
 
-    private void checkRootRight(Request request) throws AccessDeniedException
+    private void checkRootRight(Right entityRight, Request request) throws AccessDeniedException
     {
         // Need programming right for root namespace
-        checkAccess(null, Right.PROGRAM, request);
+        checkAccess(null, entityRight, request);
     }
 
     private void checkUserRight(EntityReference reference, Request request) throws AccessDeniedException

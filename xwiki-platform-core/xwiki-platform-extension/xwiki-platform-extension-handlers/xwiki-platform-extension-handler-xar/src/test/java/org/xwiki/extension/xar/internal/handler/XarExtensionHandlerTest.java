@@ -40,6 +40,7 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
@@ -52,13 +53,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -73,6 +75,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,6 +110,13 @@ public class XarExtensionHandlerTest
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
     private DocumentReference contextUser;
+
+    @AfterComponent
+    public void afterComponent() throws Exception
+    {
+        // Skip core extension scanner
+        this.componentManager.registerMockComponent(CoreExtensionScanner.class);
+    }
 
     @Before
     public void setUp() throws Exception
@@ -152,15 +162,15 @@ public class XarExtensionHandlerTest
             this.componentManager.getInstance(InstalledExtensionRepository.class, "xar");
     }
 
-    private void mockHasAdminRight(boolean right) throws XWikiException
+    private void mockHasNoAdminRight() throws AccessDeniedException
     {
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(eq(Right.ADMIN), eq(this.contextUser),
-            any(EntityReference.class))).thenReturn(right);
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
+            .checkAccess(eq(Right.ADMIN), eq(this.contextUser), any(EntityReference.class));
     }
 
-    private void verifyHasAdminRight(int times) throws XWikiException
+    private void verifyHasAdminRight(int times) throws AccessDeniedException
     {
-        verify(this.oldcore.getMockAuthorizationManager(), times(times)).hasAccess(eq(Right.ADMIN),
+        verify(this.oldcore.getMockAuthorizationManager(), times(times)).checkAccess(eq(Right.ADMIN),
             eq(this.contextUser), any(EntityReference.class));
     }
 
@@ -228,8 +238,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnWiki() throws Throwable
     {
-        mockHasAdminRight(true);
-
         XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         BaseObject object = new BaseObject();
         object.setXClassReference(new DocumentReference("wiki", "space", "class"));
@@ -512,8 +520,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUpgradeOnWiki() throws Throwable
     {
-        mockHasAdminRight(true);
-
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         verifyHasAdminRight(2);
@@ -632,8 +638,6 @@ public class XarExtensionHandlerTest
         when(this.oldcore.getSpyXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class)))
             .thenReturn(Arrays.asList("wiki1", "wiki2"));
 
-        mockHasAdminRight(true);
-
         install(this.localXarExtensiontId1, null, this.contextUser);
 
         verifyHasAdminRight(2);
@@ -748,8 +752,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testDowngradeOnWiki() throws Throwable
     {
-        mockHasAdminRight(true);
-
         install(this.localXarExtensiontId2, "wiki", this.contextUser);
 
         verifyHasAdminRight(1);
@@ -807,8 +809,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUninstallFromWiki() throws Throwable
     {
-        mockHasAdminRight(true);
-
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         verifyHasAdminRight(2);
@@ -843,8 +843,6 @@ public class XarExtensionHandlerTest
 
         when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).thenReturn(true);
 
-        mockHasAdminRight(true);
-
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         verifyHasAdminRight(2);
@@ -866,7 +864,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUninstallExtensionWithCommonDocumentOnWiki() throws Throwable
     {
-        mockHasAdminRight(true);
         install(this.collisionextension1, "wiki", this.contextUser);
         install(this.collisionextension2, "wiki", this.contextUser);
 
@@ -883,7 +880,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUninstallExtensionWithCommonDocumentOnRoot() throws Throwable
     {
-        mockHasAdminRight(true);
         install(this.collisionextension1, null, this.contextUser);
         install(this.collisionextension2, null, this.contextUser);
     }
@@ -891,7 +887,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUninstallExtensionWithCommonDocumentOnRootAndWiki() throws Throwable
     {
-        mockHasAdminRight(true);
         install(this.collisionextension1, "wiki", this.contextUser);
         install(this.collisionextension2, null, this.contextUser);
     }
@@ -899,7 +894,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUninstallExtensionWithCommonDocumentOnWikiAndRoot() throws Throwable
     {
-        mockHasAdminRight(true);
         install(this.collisionextension1, null, this.contextUser);
         install(this.collisionextension2, "wiki", this.contextUser);
     }
@@ -907,7 +901,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        mockHasAdminRight(true);
         doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
             .getVirtualWikisDatabaseNames(any(XWikiContext.class));
 
@@ -961,7 +954,7 @@ public class XarExtensionHandlerTest
     @Test(expected = InstallException.class)
     public void testInstallOnRootWithoutAdminRights() throws Throwable
     {
-        mockHasAdminRight(false);
+        mockHasNoAdminRight();
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
@@ -973,7 +966,7 @@ public class XarExtensionHandlerTest
     @Test(expected = InstallException.class)
     public void testInstallOnWikiWithoutAdminRights() throws Throwable
     {
-        mockHasAdminRight(false);
+        mockHasNoAdminRight();
 
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
@@ -991,7 +984,6 @@ public class XarExtensionHandlerTest
     @Test(expected = UninstallException.class)
     public void testUninstallOnRootWithoutAdminRights() throws Throwable
     {
-        mockHasAdminRight(true);
         doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
             .getVirtualWikisDatabaseNames(any(XWikiContext.class));
 
@@ -999,7 +991,7 @@ public class XarExtensionHandlerTest
 
         verifyHasAdminRight(2);
 
-        mockHasAdminRight(false);
+        mockHasNoAdminRight();
 
         uninstall(this.localXarExtensiontId1, null);
 
@@ -1009,13 +1001,11 @@ public class XarExtensionHandlerTest
     @Test(expected = UninstallException.class)
     public void testUninstallOnWikiWithoutAdminRights() throws Throwable
     {
-        mockHasAdminRight(true);
-
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         verifyHasAdminRight(2);
 
-        mockHasAdminRight(false);
+        mockHasNoAdminRight();
 
         uninstall(this.localXarExtensiontId1, "wiki");
 
@@ -1025,7 +1015,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnNamespaceThenOnRoot() throws Throwable
     {
-        mockHasAdminRight(true);
         doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
             .getVirtualWikisDatabaseNames(any(XWikiContext.class));
 
@@ -1068,7 +1057,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnNamespaceThenUpgradeOnRoot() throws Throwable
     {
-        mockHasAdminRight(true);
         doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
             .getVirtualWikisDatabaseNames(any(XWikiContext.class));
 
@@ -1134,7 +1122,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testCreateNewWiki() throws Throwable
     {
-        mockHasAdminRight(true);
         doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
             .getVirtualWikisDatabaseNames(any(XWikiContext.class));
 

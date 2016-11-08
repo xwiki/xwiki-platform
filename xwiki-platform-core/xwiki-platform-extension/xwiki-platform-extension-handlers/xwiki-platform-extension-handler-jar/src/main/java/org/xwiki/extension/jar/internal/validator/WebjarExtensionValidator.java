@@ -19,19 +19,13 @@
  */
 package org.xwiki.extension.jar.internal.validator;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.InstallException;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.handler.ExtensionValidator;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.jar.internal.handler.JarExtensionHandler;
-import org.xwiki.job.Request;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Check rights for webjar extensions.
@@ -40,32 +34,15 @@ import org.xwiki.job.Request;
  * @since 9.0RC1
  */
 @Component
-@Named(JarExtensionHandler.JAR)
+@Named(JarExtensionHandler.WEBJAR)
 @Singleton
-public class JarExtensionValidator extends AbstractExtensionValidator
+public class WebjarExtensionValidator extends AbstractExtensionValidator
 {
-    @Inject
-    @Named(JarExtensionHandler.WEBJAR)
-    private ExtensionValidator webjarValidator;
-
-    @Override
-    protected void checkInstallInternal(Extension extension, String namespace, Request request) throws InstallException
+    /**
+     * Default constructor.
+     */
+    public WebjarExtensionValidator()
     {
-        if (JarExtensionHandler.isWebjar(extension)) {
-            this.webjarValidator.checkInstall(extension, namespace, request);
-        } else {
-            super.checkInstallInternal(extension, namespace, request);
-        }
-    }
-
-    @Override
-    public void checkUninstall(InstalledExtension extension, String namespace, Request request)
-        throws UninstallException
-    {
-        if (JarExtensionHandler.isWebjar(extension)) {
-            this.webjarValidator.checkUninstall(extension, namespace, request);
-        } else {
-            super.checkUninstallInternal(extension, namespace, request);
-        }
+        this.entityRight = Right.ADMIN;
     }
 }

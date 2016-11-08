@@ -17,31 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.jar.internal.validator;
+package org.xwiki.extension.xar.internal.validator;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
-import org.xwiki.extension.jar.internal.handler.JarExtensionHandler;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.security.authorization.Right;
 
 /**
- * Check rights for webjar extensions.
+ * Check rights for xar extensions.
  * 
  * @version $Id$
  * @since 9.0RC1
  */
 @Component
-@Named(JarExtensionHandler.WEBJAR)
+@Named(XarExtensionHandler.TYPE)
 @Singleton
-public class WebJarExtensionValidator extends AbstractExtensionValidator
+public class XarExtensionValidator extends AbstractExtensionValidator
 {
     /**
      * Default constructor.
      */
-    public WebJarExtensionValidator()
+    public XarExtensionValidator()
     {
         this.entityRight = Right.ADMIN;
     }

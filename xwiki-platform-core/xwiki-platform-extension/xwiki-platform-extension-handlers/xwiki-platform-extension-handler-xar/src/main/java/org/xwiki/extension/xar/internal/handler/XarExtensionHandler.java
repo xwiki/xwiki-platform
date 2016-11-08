@@ -35,7 +35,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
@@ -54,9 +53,6 @@ import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
 
@@ -77,11 +73,11 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
-    private static final TranslationMarker LOG_EXTENSIONPLAN_BEGIN = new TranslationMarker(
-        "extension.xar.log.extensionplan.begin");
+    private static final TranslationMarker LOG_EXTENSIONPLAN_BEGIN =
+        new TranslationMarker("extension.xar.log.extensionplan.begin");
 
-    private static final TranslationMarker LOG_EXTENSIONPLAN_END = new TranslationMarker(
-        "extension.xar.log.extensionplan.end");
+    private static final TranslationMarker LOG_EXTENSIONPLAN_END =
+        new TranslationMarker("extension.xar.log.extensionplan.end");
 
     @Inject
     private Packager packager;
@@ -94,10 +90,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private ComponentManager componentManager;
 
     @Inject
-    private LocalExtensionRepository localReposirory;
-
-    @Inject
-    private AuthorizationManager authorization;
+    private LocalExtensionRepository localRepository;
 
     /**
      * Used to access the execution context.
@@ -129,8 +122,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                         this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
                     }
 
-                    context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN, new XarExtensionPlan(plan,
-                        this.xarRepository, this.localReposirory));
+                    context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN,
+                        new XarExtensionPlan(plan, this.xarRepository, this.localRepository));
 
                     if (request.isVerbose()) {
                         this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
@@ -187,8 +180,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request)
-        throws InstallException
+    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request) throws InstallException
     {
         try {
             initializePagesIndex(request);
@@ -200,8 +192,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         PackageConfiguration configuration =
             createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
         try {
-            this.packager.importXAR("Install extension [" + newLocalExtension + "]", new File(newLocalExtension
-                .getFile().getAbsolutePath()), configuration);
+            this.packager.importXAR("Install extension [" + newLocalExtension + "]",
+                new File(newLocalExtension.getFile().getAbsolutePath()), configuration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + newLocalExtension + "]", e);
         }
@@ -250,8 +242,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     this.packager.unimportPages(pages, configuration);
                 } catch (Exception e) {
                     // Not supposed to be possible
-                    throw new UninstallException("Failed to get xar extension [" + installedExtension.getId()
-                        + "] from xar repository", e);
+                    throw new UninstallException(
+                        "Failed to get xar extension [" + installedExtension.getId() + "] from xar repository", e);
                 }
             } else {
                 // The actual delete of pages is done in XarExtensionJobFinishedListener
@@ -307,82 +299,5 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         return configuration;
-    }
-
-    // Check
-
-    private boolean hasAccessLevel(String wiki, Right right, Request request)
-    {
-        boolean hasAccess = true;
-
-        WikiReference wikiReference = wiki != null ? new WikiReference(wiki) : null;
-
-        if (request.getProperty(PROPERTY_CALLERREFERENCE) != null) {
-            hasAccess =
-                this.authorization.hasAccess(right, getRequestUserReference(PROPERTY_CALLERREFERENCE, request),
-                    wikiReference);
-        }
-
-        if (hasAccess) {
-            DocumentReference user = getRequestUserReference(PROPERTY_USERREFERENCE, request);
-            if (user != null) {
-                hasAccess = this.authorization.hasAccess(right, user, wikiReference);
-            }
-        }
-
-        return hasAccess;
-    }
-
-    @Override
-    public void checkInstall(Extension extension, String namespace, Request request) throws InstallException
-    {
-        String wiki;
-        try {
-            wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
-        } catch (UnsupportedNamespaceException e) {
-            throw new InstallException("Failed to extract wiki id from namespace", e);
-        }
-
-        // TODO: check for edit right on each page of the extension ?
-
-        if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
-            if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
-                if (namespace == null) {
-                    throw new InstallException(String.format("Admin right is required to install extension [%s]",
-                        extension.getId()));
-                } else {
-                    throw new InstallException(String.format(
-                        "Admin right is required to install extension [%s] on namespace [%s]", extension.getId(),
-                        namespace));
-                }
-            }
-        }
-    }
-
-    @Override
-    public void checkUninstall(InstalledExtension extension, String namespace, Request request)
-        throws UninstallException
-    {
-        String wiki;
-        try {
-            wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
-        } catch (UnsupportedNamespaceException e) {
-            throw new UninstallException("Failed to extract wiki id from namespace", e);
-        }
-
-        // TODO: check for delete right on each page of the extension ?
-
-        if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
-            if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
-                if (namespace == null) {
-                    throw new UninstallException(String.format("Admin right is required to uninstall extension [%s]",
-                        extension.getId()));
-                } else {
-                    throw new UninstallException(String.format(
-                        "Admin right is required to uninstall extension [%s] from namespace [%s]", extension.getId(),
-                        namespace));
-                }
-            }
-        }
     }
 }

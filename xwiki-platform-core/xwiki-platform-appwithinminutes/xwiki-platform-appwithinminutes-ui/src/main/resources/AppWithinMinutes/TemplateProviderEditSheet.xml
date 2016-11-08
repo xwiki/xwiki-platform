@@ -65,18 +65,23 @@
   #end
   #set ($discard = $templateProviderObj.set('icon', $icon))
   #set ($homePageRef = $services.model.resolveDocument('', 'default', $appReference))
+  ## We recommend the users to create the entries in the application space by default because:
+  ## * for most applications it's better to keep the entries in the same place
+  ## * if the application is not yet created the application space doesn't exist so the user cannot select it from the
+  ##   tree unless we select it by default
+  #set ($creationRestrictions = [$services.model.serialize($appReference, 'local')])
   #set ($creationRestrictionsAreSuggestions = 1)
   #if ($xwiki.exists($homePageRef))
     ## We are (most probably) editing an existing application. Initialize the entry location based on the information
     ## stored on the application home page.
     #set ($dataSpace = $xwiki.getDocument($homePageRef).getValue('dataSpace'))
     #set ($dataSpaceReference = $services.model.resolveSpace($dataSpace, 'explicit', $appReference))
-    #set ($discard = $templateProviderObj.set('creationRestrictions',
-      [$services.model.serialize($dataSpaceReference, 'local')]))
+    #set ($creationRestrictions = [$services.model.serialize($dataSpaceReference, 'local')])
     #set ($creationRestrictionsAreSuggestions = 0)
     ## Preserve the old behavior.
     #set ($discard = $templateProviderObj.set('terminal', 1))
   #end
+  #set ($discard = $templateProviderObj.set('creationRestrictions', $creationRestrictions))
   #set ($discard = $templateProviderObj.set('creationRestrictionsAreSuggestions', $creationRestrictionsAreSuggestions))
 #end
 

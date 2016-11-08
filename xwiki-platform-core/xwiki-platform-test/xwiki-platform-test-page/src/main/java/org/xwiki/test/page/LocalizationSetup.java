@@ -25,7 +25,7 @@ import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.TestComponentManager;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,12 +53,12 @@ public final class LocalizationSetup
         LocalizationScriptService lss = mock(LocalizationScriptService.class);
         tcm.registerComponent(ScriptService.class, "localization", lss);
         when(lss.render(anyString())).thenAnswer(
-            new Answer() {
+            new Answer<String>() {
                 @Override
-                public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+                public String answer(InvocationOnMock invocationOnMock) throws Throwable
                 {
                     // Return the translation key as the value
-                    return invocationOnMock.getArgumentAt(0, String.class);
+                    return invocationOnMock.getArgument(0);
                 }
             }
         );

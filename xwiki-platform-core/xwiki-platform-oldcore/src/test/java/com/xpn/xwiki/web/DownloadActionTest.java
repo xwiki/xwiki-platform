@@ -46,9 +46,17 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DownloadAction}.
@@ -223,27 +231,19 @@ public class DownloadActionTest
 
         verifyResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
         verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
+        {
+            @Override
+            public boolean matches(byte[] argument)
             {
-                @Override
-                public boolean matches(Object argument)
-                {
-                    if (!(argument instanceof byte[])) {
-                        return false;
-                    }
-                    byte[] otherByteArray = (byte[]) argument;
-                    return (otherByteArray[0] == '5');
-                }
-            }), eq(0), eq(1));
+                return argument[0] == '5';
+            }
+        }), eq(0), eq(1));
         verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
         {
             @Override
-            public boolean matches(Object argument)
+            public boolean matches(byte[] argument)
             {
-                if (!(argument instanceof byte[])) {
-                    return false;
-                }
-                byte[] otherByteArray = (byte[]) argument;
-                return (otherByteArray[0] == '5');
+                return argument[0] == '5';
             }
         }), eq(0), eq(1));
     }
@@ -599,11 +599,11 @@ public class DownloadActionTest
         this.document.getAttachmentList().add(filetxt);
     }
 
-    private void setRequestExpectations(String uri, String id, String forceDownload,
-        String range, long modifiedSince, String attachmentName)
+    private void setRequestExpectations(String uri, String id, String forceDownload, String range, long modifiedSince,
+        String attachmentName)
     {
-        ResourceReference rr = new EntityResourceReference(new AttachmentReference(attachmentName,
-            this.documentReference), EntityResourceAction.VIEW);
+        ResourceReference rr = new EntityResourceReference(
+            new AttachmentReference(attachmentName, this.documentReference), EntityResourceAction.VIEW);
 
         when(this.request.getRequestURI()).thenReturn(uri);
         when(this.request.getParameter("id")).thenReturn(id);
@@ -632,14 +632,10 @@ public class DownloadActionTest
         verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
         {
             @Override
-            public boolean matches(Object argument)
+            public boolean matches(byte[] argument)
             {
-                if (!(argument instanceof byte[])) {
-                    return false;
-                }
-                byte[] otherByteArray = (byte[]) argument;
                 for (int i = start; i < end; ++i) {
-                    if (otherByteArray[i - start] != DownloadActionTest.this.fileContent[i]) {
+                    if (argument[i - start] != DownloadActionTest.this.fileContent[i]) {
                         return false;
                     }
                 }

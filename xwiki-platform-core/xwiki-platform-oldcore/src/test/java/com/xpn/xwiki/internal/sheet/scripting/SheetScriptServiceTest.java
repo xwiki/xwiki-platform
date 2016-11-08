@@ -19,10 +19,6 @@
  */
 package com.xpn.xwiki.internal.sheet.scripting;
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -47,6 +43,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.script.sheet.SheetScriptService;
 import com.xpn.xwiki.web.Utils;
 
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.when;
+
 /**
  * Unit tests for {@link com.xpn.xwiki.script.sheet.SheetScriptService}.
  * 
@@ -60,8 +60,8 @@ public class SheetScriptServiceTest
      * Mocks the dependencies of the component under test.
      */
     @Rule
-    public final MockitoComponentMockingRule<ScriptService> mocker = new MockitoComponentMockingRule<ScriptService>(
-        SheetScriptService.class);
+    public final MockitoComponentMockingRule<ScriptService> mocker =
+        new MockitoComponentMockingRule<ScriptService>(SheetScriptService.class);
 
     /**
      * The script service being tested.
@@ -122,7 +122,7 @@ public class SheetScriptServiceTest
         when(this.mockClassSheetBinder.bind(argThat(new ArgumentMatcher<DocumentModelBridge>()
         {
             @Override
-            public boolean matches(Object argument)
+            public boolean matches(DocumentModelBridge argument)
             {
                 return classDocument.equals(argument) && classDocument != argument;
             }
@@ -143,11 +143,11 @@ public class SheetScriptServiceTest
         DocumentReference publicClassReference = new DocumentReference("wiki", "Space", "PublicClass");
         DocumentReference privateClassReference = new DocumentReference("wiki", "Space", "PrivateClass");
 
-        when(this.mockDocumentSheetBinder.getDocuments(sheetReference)).thenReturn(
-            Arrays.asList(publicDocumentReference, privateDocumentReference));
+        when(this.mockDocumentSheetBinder.getDocuments(sheetReference))
+            .thenReturn(Arrays.asList(publicDocumentReference, privateDocumentReference));
 
-        when(this.mockClassSheetBinder.getDocuments(sheetReference)).thenReturn(
-            Arrays.asList(privateClassReference, publicClassReference));
+        when(this.mockClassSheetBinder.getDocuments(sheetReference))
+            .thenReturn(Arrays.asList(privateClassReference, publicClassReference));
 
         when(this.mockDocumentAccessBridge.isDocumentViewable(publicClassReference)).thenReturn(true);
         when(this.mockDocumentAccessBridge.isDocumentViewable(publicDocumentReference)).thenReturn(true);

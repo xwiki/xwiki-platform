@@ -158,7 +158,7 @@ public class DefaultPresentationBuilderTest
             @Override
             public Document answer(InvocationOnMock invocation) throws Throwable
             {
-                Reader reader = invocation.getArgumentAt(0, Reader.class);
+                Reader reader = invocation.getArgument(0);
                 return StringUtils.equals(content, IOUtils.toString(reader)) ? document : null;
             }
         };

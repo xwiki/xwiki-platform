@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.test.mockito;
 
-import org.hamcrest.Description;
 import org.mockito.ArgumentMatcher;
 import org.mockito.internal.matchers.Equality;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -28,9 +27,9 @@ import org.xwiki.cache.config.CacheConfiguration;
  * Match a {@link CacheConfiguration} parameter with an id.
  * 
  * @version $Id$
- * @since 7.1M1
+ * @since 9.0RC1
  */
-public class CacheConfigurationMatcher extends ArgumentMatcher<CacheConfiguration>
+public class CacheConfigurationMatcher implements ArgumentMatcher<CacheConfiguration>
 {
     private final String id;
 
@@ -40,15 +39,8 @@ public class CacheConfigurationMatcher extends ArgumentMatcher<CacheConfiguratio
     }
 
     @Override
-    public boolean matches(Object actual)
+    public boolean matches(CacheConfiguration argument)
     {
-        return actual != null && actual instanceof CacheConfiguration
-            && Equality.areEqual(this.id, ((CacheConfiguration) actual).getConfigurationId());
-    }
-
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText(String.valueOf(this.id));
+        return argument != null && Equality.areEqual(this.id, argument.getConfigurationId());
     }
 }

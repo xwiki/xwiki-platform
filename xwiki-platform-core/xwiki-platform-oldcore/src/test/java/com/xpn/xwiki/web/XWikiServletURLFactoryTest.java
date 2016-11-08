@@ -110,7 +110,7 @@ public class XWikiServletURLFactoryTest
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
             {
-                return httpHeaders.get(invocation.getArgumentAt(0, String.class));
+                return httpHeaders.get(invocation.getArgument(0));
             }
         });
         this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
@@ -122,7 +122,7 @@ public class XWikiServletURLFactoryTest
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
             {
-                return invocation.getArgumentAt(0, String.class);
+                return invocation.getArgument(0);
             }
         });
         this.oldcore.getXWikiContext().setResponse(xwikiResponse);

@@ -45,7 +45,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
@@ -230,7 +230,7 @@ public class DatabaseMailListenerTest
     /**
      * Custom Mokito Argument Matchers.
      */
-    class isSameMailStatus extends ArgumentMatcher<MailStatus>
+    class isSameMailStatus implements ArgumentMatcher<MailStatus>
     {
         private String state;
 
@@ -243,14 +243,13 @@ public class DatabaseMailListenerTest
         }
 
         @Override
-        public boolean matches(Object argument)
+        public boolean matches(MailStatus argument)
         {
-            MailStatus statusArgument = (MailStatus) argument;
-            return statusArgument.getBatchId().equals(batchId) &&
-                statusArgument.getMessageId().equals(messageId) &&
-                statusArgument.getType().equals("type") &&
-                statusArgument.getState().equals(state) &&
-                statusArgument.getWiki().equals(wikiId);
+            return argument.getBatchId().equals(batchId) &&
+                argument.getMessageId().equals(messageId) &&
+                argument.getType().equals("type") &&
+                argument.getState().equals(state) &&
+                argument.getWiki().equals(wikiId);
         }
     }
 }

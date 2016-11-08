@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.test.mockito;
 
-import org.hamcrest.Description;
 import org.mockito.ArgumentMatcher;
 import org.mockito.internal.matchers.Equality;
 import org.xwiki.model.reference.DocumentReference;
@@ -30,9 +29,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Match a XWikiDocument parameter with a reference.
  * 
  * @version $Id$
- * @since 7.0M1
+ * @since 9.0RC1
  */
-public class XWikiDocumentMatcher extends ArgumentMatcher<XWikiDocument>
+public class XWikiDocumentMatcher implements ArgumentMatcher<XWikiDocument>
 {
     private final DocumentReference reference;
 
@@ -42,15 +41,8 @@ public class XWikiDocumentMatcher extends ArgumentMatcher<XWikiDocument>
     }
 
     @Override
-    public boolean matches(Object actual)
+    public boolean matches(XWikiDocument argument)
     {
-        return actual != null && actual instanceof XWikiDocument
-            && Equality.areEqual(this.reference, ((XWikiDocument) actual).getDocumentReference());
-    }
-
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText(String.valueOf(this.reference));
+        return argument != null && Equality.areEqual(this.reference, argument.getDocumentReference());
     }
 }

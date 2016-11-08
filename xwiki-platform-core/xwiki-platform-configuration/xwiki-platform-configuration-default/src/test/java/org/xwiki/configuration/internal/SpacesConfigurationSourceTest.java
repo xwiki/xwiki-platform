@@ -83,7 +83,7 @@ public class SpacesConfigurationSourceTest
             {
                 Map<String, String> spacePreferences = getSpacePreferences();
                 if (spacePreferences != null) {
-                    return spacePreferences.get(invocation.getArgumentAt(0, String.class));
+                    return spacePreferences.get(invocation.getArgument(0));
                 }
 
                 return null;
@@ -96,7 +96,7 @@ public class SpacesConfigurationSourceTest
             {
                 Map<String, String> spacePreferences = getSpacePreferences();
                 if (spacePreferences != null) {
-                    return spacePreferences.get(invocation.getArgumentAt(0, String.class));
+                    return spacePreferences.get(invocation.getArgument(0));
                 }
 
                 return null;
@@ -109,13 +109,13 @@ public class SpacesConfigurationSourceTest
             {
                 Map<String, String> spacePreferences = getSpacePreferences();
                 if (spacePreferences != null) {
-                    String key = invocation.getArgumentAt(0, String.class);
+                    String key = invocation.getArgument(0);
                     if (spacePreferences.containsKey(key)) {
                         return spacePreferences.get(key);   
                     }
                 }
 
-                return invocation.getArgumentAt(1, String.class);
+                return invocation.getArgument(1);
             }
         });
 
@@ -126,7 +126,7 @@ public class SpacesConfigurationSourceTest
             {
                 Map<String, String> spacePreferences = getSpacePreferences();
                 if (spacePreferences != null) {
-                    return spacePreferences.containsKey(invocation.getArgumentAt(0, String.class));
+                    return spacePreferences.containsKey(invocation.getArgument(0));
                 }
 
                 return false;

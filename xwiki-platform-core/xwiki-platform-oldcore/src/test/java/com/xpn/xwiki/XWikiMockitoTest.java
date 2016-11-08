@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,11 +70,11 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -304,15 +303,13 @@ public class XWikiMockitoTest
 
         ObservationManager observation = this.mocker.getInstance(ObservationManager.class);
 
-        Matcher<XWikiDocument> matcher = new ArgumentMatcher<XWikiDocument>()
+        ArgumentMatcher<XWikiDocument> matcher = new ArgumentMatcher<XWikiDocument>()
         {
             @Override
-            public boolean matches(Object item)
+            public boolean matches(XWikiDocument argument)
             {
-                XWikiDocument doc = (XWikiDocument) item;
-
-                return doc.getDocumentReference().equals(documentReference)
-                    && doc.getOriginalDocument() == originalDocument;
+                return argument.getDocumentReference().equals(documentReference)
+                    && argument.getOriginalDocument() == originalDocument;
             }
         };
 
@@ -426,7 +423,7 @@ public class XWikiMockitoTest
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
             {
-                return invocation.getArgumentAt(1, String.class);
+                return invocation.getArgument(1);
             }
         });
 
@@ -473,7 +470,7 @@ public class XWikiMockitoTest
                     Map<String, String> spacePreferences =
                         spacesPreferences.get(context.getDoc().getDocumentReference().getParent().getName());
                     if (spacePreferences != null) {
-                        return spacePreferences.get(invocation.getArgumentAt(0, String.class));
+                        return spacePreferences.get(invocation.getArgument(0));
                     }
                 }
 

@@ -54,7 +54,7 @@ public class DBTreeListClassTest
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
             {
-                return invocation.getArgumentAt(0, String.class);
+                return invocation.getArgument(0);
             }
         }).when(this.oldcore.getSpyXWiki()).parseContent(anyString(), any(XWikiContext.class));
 

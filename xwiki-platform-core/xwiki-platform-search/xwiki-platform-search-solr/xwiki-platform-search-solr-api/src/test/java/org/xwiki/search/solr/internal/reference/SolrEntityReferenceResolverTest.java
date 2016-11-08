@@ -81,8 +81,8 @@ public class SolrEntityReferenceResolverTest
             @Override
             public EntityReference answer(InvocationOnMock invocation) throws Throwable
             {
-                EntityReference reference = invocation.getArgumentAt(0, EntityReference.class);
-                EntityType type = invocation.getArgumentAt(1, EntityType.class);
+                EntityReference reference = invocation.getArgument(0);
+                EntityType type = invocation.getArgument(1);
                 return reference.extractReference(type);
             }
         }).when(explicitReferenceEntityReferenceResolver).resolve(any(EntityReference.class), any(EntityType.class));

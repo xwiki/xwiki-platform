@@ -57,46 +57,66 @@
   #displayFields()
 #end
 ###############################
+##  DISPLAY FIELD OPTION LABEL
+###############################
+#macro(displayFieldOptionLabel $option)
+  #if ($services.localization.render($option.label) != $option.label)
+    $services.localization.render($option.label)
+  #else
+    $option.value
+  #end
+#end
+###############################
 ##   DISPLAY SELECT FIELD
 ###############################
 #macro(displaySelectField $fieldName $default)
-  #if ($isEdit)
-    #set ($value = $doc.getValue($fieldName, $obj))
-    #set ($prop = $xclass.get($fieldName))
-    #set ($options = [])
-    #if ($prop.classType == 'Boolean')
-      #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
-      #set ($discard = $options.add({'value': 0, 'label': 'no'}))
-    #elseif ($prop.classType == 'Timezone' &amp;&amp; "$!xwiki.jodatime" != '')
-      #foreach($tz in $xwiki.jodatime.serverTimezone.availableIDs)
-        #set ($discard = $options.add({'value': $tz, 'label': $tz}))
-      #end
-    #else
-      #foreach($v in $prop.listValues)
-        #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiUsers_${fieldName}_${v}"}))
-      #end
+  #set ($value = $doc.getValue($fieldName, $obj))
+  #set ($prop = $xclass.get($fieldName))
+  #set ($options = [])
+  #if ($prop.classType == 'Boolean')
+    #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
+    #set ($discard = $options.add({'value': 0, 'label': 'no'}))
+  #elseif ($prop.classType == 'Timezone')
+    ## For the timezone, we add an empty value with a special label, to be consistent with "display-timezone.vm", used
+    ## in the administration.
+    #set ($discard = $options.add({'value': '', 'label': 'XWiki.XWikiPreferences_timezone_default'}))
+    #foreach($tz in $xwiki.jodatime.serverTimezone.availableIDs)
+      #set ($discard = $options.add({'value': $tz, 'label': $tz}))
     #end
+  #else
+    #foreach($v in $prop.listValues)
+      #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiUsers_${fieldName}_${v}"}))
+    #end
+  #end
+  #if ($isEdit)
     &lt;select name="XWiki.XWikiUsers_0_${fieldName}" id="XWiki.XWikiUsers_0_${fieldName}" size="1"&gt;
-      #if ("$!default" != '')
+      #if ($default)
         &lt;option value=""&gt;---&lt;/option&gt;
       #end
       #foreach ($option in $options)
+        ## Some properties actually have "---" as a possible value, so we don't display it because we have
+        ## already displayed it above.
         #if ($option.value != '---')
           &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
-            #if ($services.localization.render($option.label) != $option.label)
-              $services.localization.render($option.label)
-            #else
-              $option.value
-            #end
+            #displayFieldOptionLabel($option)
             #if ($default == $option.value)
-              (Default)
+              ($services.localization.render('userprofile.default'))
             #end
           &lt;/option&gt;
         #end
       #end
     &lt;/select&gt;
   #else
-    $doc.display($fieldName)
+    #if ("$!value" != '')
+      $doc.display($fieldName)
+    #else
+      #foreach ($option in $options)
+        #if ("$!default" == "$!option.value")
+          #displayFieldOptionLabel($option)
+          &lt;small&gt;($services.localization.render('userprofile.default'))&lt;/small&gt;
+        #end
+      #end
+    #end
   #end
 #end
 ###############################
@@ -111,7 +131,15 @@
     #end
   &lt;/dt&gt;
   &lt;dd&gt;
-    #displaySelectField($fieldName, $default)
+    #if ($fieldName == 'timezone' &amp;&amp; !$xwiki.jodatime)
+      #if ($isEdit)
+        &lt;input id="XWiki.XWikiUsers_0_${fieldName}" name="XWiki.XWikiUsers_0_${fieldName}" type="text" value="$!escapetool.xml($obj.getValue($fieldName))"/&gt;
+      #else
+        $doc.display($fieldName)
+      #end
+    #else
+      #displaySelectField($fieldName, $default)
+    #end
   &lt;dt&gt;
 #end
 ###############################
@@ -131,11 +159,13 @@
       &lt;/dl&gt;
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        #displayField('timezone'              , 'platform.core.profile.timezone'              , $xwiki.getXWikiPreference('timezone'))
+        #set ($defaultValue = $xwiki.getXWikiPreference('timezone'))
+        #displayField('timezone'              , 'platform.core.profile.timezone'              , $defaultValue)
       &lt;/dl&gt;
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        #displayField('editor'                , 'platform.core.profile.editor'                , $xwiki.getXWikiPreference('editor'))
+        #set ($defaultValue = $xwiki.getXWikiPreference('editor'))
+        #displayField('editor'                , 'platform.core.profile.editor'                , $defaultValue)
         #displayField('usertype'              , 'platform.core.profile.userType'              , 'Simple')
       &lt;/dl&gt;
     &lt;/div&gt;

@@ -100,7 +100,6 @@
   #if (!$xwiki.exists($appClassRef))
     #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
     #set ($discard = $queryString.putAll({
-      'editor': 'inline',
       'template': 'AppWithinMinutes.ClassTemplate',
       'parent': $services.model.serialize($appHomeRef),
       'title': "$appReference.name Class"

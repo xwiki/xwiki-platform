@@ -22,7 +22,6 @@ package org.xwiki.mail.internal.thread.context;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -45,7 +44,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -124,7 +124,7 @@ public class XWikiContextCopierTest
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
 
         XWikiURLFactoryService urlFactoryService = mock(XWikiURLFactoryService.class);
-        when(urlFactoryService.createURLFactory(Matchers.anyInt(), any(XWikiContext.class))).thenReturn(
+        when(urlFactoryService.createURLFactory(anyInt(), any(XWikiContext.class))).thenReturn(
             urlFactory);
         when(xwiki.getURLFactoryService()).thenReturn(urlFactoryService);
     }

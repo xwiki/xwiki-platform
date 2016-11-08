@@ -24,7 +24,6 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.BeanManager;
@@ -43,6 +42,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,11 +71,11 @@ public class VelocityMacroSecurityTest
         when(mockBeanDescriptor.getProperties()).thenReturn(Collections.EMPTY_LIST);
 
         BeanManager beanManager = mocker.getInstance(BeanManager.class);
-        when(beanManager.getBeanDescriptor(Matchers.any(Class.class))).thenReturn(mockBeanDescriptor);
+        when(beanManager.getBeanDescriptor(any(Class.class))).thenReturn(mockBeanDescriptor);
 
         Macro velocityMacro = mocker.getComponentUnderTest();
         MacroManager mockMacroManager = mocker.registerMockComponent(MacroManager.class);
-        when(mockMacroManager.getMacro(Matchers.any(MacroId.class))).thenReturn(velocityMacro);
+        when(mockMacroManager.getMacro(any(MacroId.class))).thenReturn(velocityMacro);
     }
 
     @Test(expected = MacroExecutionException.class)

@@ -147,7 +147,7 @@
     #else
       #displaySelectField($fieldName, $default)
     #end
-  &lt;dt&gt;
+  &lt;/dd&gt;
 #end
 ###############################
 ##      DISPLAY FIELDS

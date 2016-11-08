@@ -572,7 +572,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
-    [[#toolImage('world' 'publish ')&gt;&gt;path:$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||title="$services.localization.render('xe.blog.code.notpublished')"]]##
+    [[#toolImage('world')&gt;&gt;path:$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||title="$services.localization.render('xe.blog.code.notpublished')"]]##
   #end
 #end
 ##
@@ -599,14 +599,14 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
         'comment' : $services.localization.render('xe.blog.code.madevisible')
         }))
       #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
-      [[#toolImage('lock_open', 'show ')&gt;&gt;path:$lockURL||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]##
+      [[#toolImage('unlock')&gt;&gt;path:$lockURL||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]##
     #else
       #set ($discard = $queryString.putAll({
         "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden" : 1,
         'comment' : $services.localization.render('xe.blog.code.hid')
         }))
       #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
-      [[#toolImage('lock', 'hide ')&gt;&gt;path:$lockURL||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]##
+      [[#toolImage('lock')&gt;&gt;path:$lockURL||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]##
     #end
   #end
 #end
@@ -622,7 +622,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEditButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
     ## Call getDefaultEditMode() for backward compatibility with older blog posts.
-    [[#toolImage('pencil' 'edit ')&gt;&gt;path:$entryDoc.getURL('edit')||title="$services.localization.render('xe.blog.code.editpost')"]]##
+    [[#toolImage('pencil')&gt;&gt;path:$entryDoc.getURL('edit')||title="$services.localization.render('xe.blog.code.editpost')"]]##
   #end
 #end
 ##
@@ -637,7 +637,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(displayDeleteButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('delete', $xcontext.user, $entryDoc.fullName))
-    [[#toolImage('cross' 'delete ')&gt;&gt;path:$entryDoc.getURL('delete')||title="$services.localization.render('xe.blog.code.deletepost')"]]##
+    [[#toolImage('cross')&gt;&gt;path:$entryDoc.getURL('delete')||title="$services.localization.render('xe.blog.code.deletepost')"]]##
   #end
 #end
 ##

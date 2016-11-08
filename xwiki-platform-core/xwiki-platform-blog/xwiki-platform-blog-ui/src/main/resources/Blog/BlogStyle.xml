@@ -281,10 +281,6 @@ div.edit-categories {
   font-weight: bold;
   padding-left: 9px;
 }
-div .publish-message P, div .hide-message P{
-  /* vertical align inside .publish-message and .hide-message */
-  margin: 0 0 auto;
-}
 .hentry .blog-entry-toolbox .wikiinternallink a :not(.hidden-article), .blog-category-tools a .fa, .blog-categories-list a .fa{
   /* disabled blue hyperlink */
   color: black;

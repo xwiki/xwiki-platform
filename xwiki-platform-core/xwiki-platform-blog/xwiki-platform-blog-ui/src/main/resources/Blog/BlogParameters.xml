@@ -74,7 +74,7 @@
  * @param $imgName The name of the icon to use (without the extension).
  * @param alt The alternate text that should be displayed when images are not viewable.
  *#
-#macro(toolImage $imgName $alt)(% class="icon-manage" alt="${alt}"%)$services.icon.render($imgName)(%%)#end
+#macro(toolImage $imgName)(% class="icon-manage"%)$services.icon.render($imgName)(%%)#end
 {{/velocity}}
 </content>
 </xwikidoc>

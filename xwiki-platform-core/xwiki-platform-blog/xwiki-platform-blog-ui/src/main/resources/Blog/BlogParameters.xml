@@ -71,8 +71,7 @@
 #**
  * Displays an image, taken from the blog style document.
  * 
- * @param $imgName The name of the icon to use (without the extension).
- * @param alt The alternate text that should be displayed when images are not viewable.
+ * @param $imgName The name of the icon from icons set to use.
  *#
 #macro(toolImage $imgName)(% class="icon-manage"%)$services.icon.render($imgName)(%%)#end
 {{/velocity}}

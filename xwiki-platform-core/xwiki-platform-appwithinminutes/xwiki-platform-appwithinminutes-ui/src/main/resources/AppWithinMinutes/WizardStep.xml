@@ -40,17 +40,20 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#macro(appWizardHeader $stepNumber)
+#set ($awmSteps = ['name', 'structure', 'entries', 'presentation'])
+#macro(appWizardHeader $stepId)
   {{html wiki="true"}}
   (% class="wizard-header" %)
   (((
-    #set($stepTitle = $services.localization.render("platform.appwithinminutes.wizardStep${stepNumber}Title"))
+    #set($stepNumber = $awmSteps.indexOf($stepId) + 1)
+    #set($stepTitle = $services.localization.render("appWithinMinutes.wizardStep.${stepId}.title"))
     = $services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])  =
 
     (% class="steps" %)
-    #foreach($index in [1,2,3])
+    #foreach($step in $awmSteps)
+      #set($index = $foreach.index + 1)
       #set($extraClassName = "#if($stepNumber == $index) active#elseif($stepNumber &gt; $index) done#end")
-      * (% class="number$extraClassName" %)#if($stepNumber &gt; $index)&amp;${escapetool.h}10004;#else$index#end(%%) (% class="name$extraClassName" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Name")
+      * (% class="number$extraClassName" %)#if($stepNumber &gt; $index)&amp;${escapetool.h}10004;#else$index#end(%%) (% class="name$extraClassName" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.name")
     #end
 
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
@@ -58,17 +61,22 @@
   {{/html}}
 #end
 
-#macro(appWizardFooter $stepNumber)
+#macro(appWizardFooter $stepId)
   {{html wiki="true"}}
   (% class="wizard-footer buttons" %)
   (((
     #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonLabel'))
     #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonTip'))
-    #if($stepNumber == 3)##
+    #if($stepId == 'presentation')##
       #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonLabel'))
       #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonTip'))
-      #set($previousURL = $xwiki.getURL($className, 'edit', 'wizard=true'))
-    #elseif($stepNumber == 2 &amp;&amp; $doc.isNew())##
+      #set($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
+      #set($previousURL = $xwiki.getURL($templateProviderReference, 'edit',
+        'wizard=true&amp;sheet=AppWithinMinutes.TemplateProviderEditSheet'))
+    #elseif($stepId == 'entries')
+      #set($classReference = "$stringtool.removeEnd($doc.fullName, 'TemplateProvider')Class")
+      #set($previousURL = $xwiki.getURL($classReference, 'edit', 'wizard=true'))
+    #elseif($stepId == 'structure' &amp;&amp; $doc.isNew())##
       #set($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication'))
     #end
     #if($previousURL)##

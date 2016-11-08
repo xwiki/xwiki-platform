@@ -34,7 +34,7 @@
   <date>1319634251000</date>
   <contentUpdateDate>1319634251000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if(!$doc.name.endsWith('Sheet'))Class: $stringtool.removeEnd($doc.title, 'Class')#{else}$doc.name#end</title>
+  <title>#if(!$doc.name.endsWith('Sheet'))$services.localization.render('appWithinMinutes.classEditor.title', [$stringtool.removeEnd($doc.title, 'Class').trim()])#{else}$doc.name#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -417,7 +417,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet')##
   $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator')##
   #if("$!request.wizard" == 'true')
-    #appWizardHeader(2)
+    #appWizardHeader('structure')
 
   #end
   #displayFieldPalette()
@@ -425,7 +425,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #displayClassOptions()
   #if("$!request.wizard" == 'true')
 
-    #appWizardFooter(2)
+    #appWizardFooter('structure')
   #end
   (% class="clearfloats" %)((()))
 #end
@@ -679,31 +679,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #end
 #end
 
-#macro (getAppReference)
-  #set ($appLocalRef = $doc.getValue('dataSpaceName'))
-  #if ("$!appLocalRef" != '')
-    ## Between 6.3M2 (XWIKI-11249) and 7.3RC1 (XWIKI-12741).
-    #set ($appReference = $services.model.resolveSpace($appLocalRef))
-  #else
-    ## Possible locations:
-    ## 1. same space (&lt;6.2M1, XWIKI-8757)
-    ## 2. sibling space (between 6.2M1 and 6.3M2)
-    ## 3. grand parent space (7.3RC1+)
-    #set ($appReferences = [
-      $doc.documentReference.parent,
-      $services.model.createSpaceReference($stringtool.removeEnd($doc.title, ' Class'),
-        $doc.documentReference.parent.parent),
-      $doc.documentReference.parent.parent
-    ])
-    #foreach ($item in $appReferences)
-      #set ($appReference = $item)
-      #if ($xwiki.getDocument($appReference).getObject($appDescriptorClassName))
-        #break
-      #end
-    #end
-  #end
-#end
-
 #**
  * Updates and saves the class definition, the class sheet and the class template.
  *#
@@ -719,23 +694,19 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set ($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
-      #getAppReference
-      #set($homePageRef = $services.model.resolveDocument('', 'default', $appReference))
-      #set($queryString = {"wizard" : true})
-      #if(!$xwiki.exists($homePageRef))
-        #set($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
-        #set($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
-        #set($discard = $queryString.putAll({
-          'editor': 'inline',
-          'template': 'AppWithinMinutes.LiveTableTemplate',
-          "${appDescriptorClassName}_0_class": $doc.fullName,
-          'title': '$doc.documentReference.lastSpaceReference.name',
-          'parent': $wikiHomePage
+      #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+      #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+      #set ($queryString = {
+        'wizard': true,
+        'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
+      })
+      #if (!$xwiki.exists($templateProviderReference))
+        #set ($discard = $queryString.putAll({
+          'template': 'XWiki.TemplateProviderTemplate',
+          'parent': $doc.fullName
         }))
       #end
-      #set($queryString = $escapetool.url($queryString))
-      $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));
+      $response.sendRedirect($xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString)))
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())

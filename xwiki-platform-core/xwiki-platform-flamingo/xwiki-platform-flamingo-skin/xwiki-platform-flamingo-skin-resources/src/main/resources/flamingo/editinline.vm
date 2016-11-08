@@ -59,6 +59,14 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## Otherwise, can edit - continue the form.
 ##
 <div>
+## ----------------------------
+## Display the rendered content
+## ----------------------------
+$renderedContent
+## ----------------
+## Hidden form data
+##-----------------
+## NOTE: We output the hidden form data after the rendered content in order to be able to overwrite it from the sheet.
 <input type="hidden" name="xcontinue" value="$doc.getURL($doc.getDefaultEditMode(), 'editor=inline')"/>
 ## CSRF prevention
 <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -90,10 +98,9 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   #end
   <input type="hidden" name="async" value="$escapetool.xml($async)" />
 #end
-## ----------------------------
-## Display the rendered content
-## ----------------------------
-$renderedContent
+## --------------
+## Action buttons
+## --------------
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 </div> ## form

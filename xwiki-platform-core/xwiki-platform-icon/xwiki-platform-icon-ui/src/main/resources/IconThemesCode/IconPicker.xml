@@ -464,7 +464,8 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     
     // Close the picker if the input and the picker itself have lost the focus
     $(window).click(function(event) {
-      if (document.activeElement != currentInput[0] &amp;&amp; !$.contains(xwikiCurrentIconsPicker[0], document.activeElement)) {
+      if (xwikiCurrentIconsPicker &amp;&amp; document.activeElement != currentInput[0] &amp;&amp;
+          !$.contains(xwikiCurrentIconsPicker[0], document.activeElement)) {
         closePicker();
       }
     });

@@ -24,6 +24,10 @@
   #set ($excludeSelf = ($request.excludeSelf == 'true'))
   #set ($discard = $options.put('excludeSelf', $excludeSelf))
 #end
+#if ("$!request.selfIsActive" != '')
+  #set ($selfIsActive = ($request.selfIsActive == 'true'))
+  #set ($discard = $options.put('selfIsActive', $selfIsActive))
+#end
 #if ("$!request.id" != '')
   #set($discard = $options.put('id', $escapetool.xml($request.id)))
 #end

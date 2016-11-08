@@ -188,6 +188,7 @@
     $services.icon.render('wiki', $iconSetName)
   #end
 {{/velocity}}
+
 {{velocity}}
 {{html clean="false"}}
 &lt;script language="javascript"&gt;
@@ -198,7 +199,7 @@
   });
   require(['jquery', 'xwiki-icon-picker'], function($) {
     var options = {};
-    #if("$!xcontext.macro.params.prefix" != '')
+    #if($xcontext.macro.params.parameterNames.contains('prefix'))
       options['prefix'] = '$escapetool.javascript($xcontext.macro.params.prefix)';
     #end
     #if("$!xcontext.macro.params.id" != '')
@@ -210,9 +211,7 @@
   });
 &lt;/script&gt;
 {{/html}}
-{{/velocity}}
-
-</code>
+{{/velocity}}</code>
     </property>
     <property>
       <contentDescription/>

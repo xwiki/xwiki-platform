@@ -46,14 +46,14 @@
 {{velocity output="false"}}
 #macro(showStep)
   {{html wiki="true"}}
-  #appWizardHeader(1)
+  #appWizardHeader('name')
   (% class="wizard-help" %)
   (((
     **$services.localization.render('platform.appwithinminutes.wizardStepHelpTitle')** $services.localization.render('platform.appwithinminutes.wizardStepHelpDescription')
     (% class="steps vertical" %)
-    #foreach($index in [1, 2, 3])
-      * (% class="number" %)$index(%%) (% class="name" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Name")(%%)
-        (% class="description" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Description")
+    #foreach($step in $awmSteps)
+      * (% class="number" %)$mathtool.add($foreach.index, 1)(%%) (% class="name" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.name")(%%)
+        (% class="description" %)$services.localization.render("appWithinMinutes.wizardStep.${step}.description")
     #end
   )))
   &lt;form action="$doc.getURL()" method="post" class="xform wizard-body"&gt;
@@ -121,23 +121,15 @@
       #set ($appClassRef = $appDescriptorObj.getValue('class'))
       ## The class reference is relative to the document holding the application descriptor.
       #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
-      #set ($appDataRef = $appDescriptorObj.getValue('dataSpace'))
-      ## The data space reference is relative to the document holding the application descriptor.
-      #set ($appDataRef = $services.model.resolveSpace($appDataRef, 'explicit', $appDescriptor.documentReference))
     #else
       ## Create a new application.
-      #set ($appDataRef = $services.model.createSpaceReference('Data', $appReference))
       #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
       #set ($appClassRef = $services.model.createDocumentReference("$!{appReference.name}Class", $appCodeRef))
     #end
     ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
     : {{{$!xwiki.getDocument($appReference).externalURL}}}
-    ; $services.localization.render('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
-    : {{html clean="false"}}#hierarchy($appDataRef){{/html}}
     ; $services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')
     : {{html clean="false"}}#hierarchy($appClassRef.parent){{/html}}
-    ; $services.localization.render('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
-    : {{html clean="false"}}#hierarchy($appClassRef){{/html}}
     #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
     #if ($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
 
@@ -182,7 +174,7 @@
 #else
   #showStep
 #end
-#set ($docextras = [])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.CreateApplication</name>

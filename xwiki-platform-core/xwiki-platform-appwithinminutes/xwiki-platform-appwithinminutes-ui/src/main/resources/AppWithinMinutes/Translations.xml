@@ -55,15 +55,18 @@ platform.appwithinminutes.appPanelCreateEntry=Create your own!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
-platform.appwithinminutes.wizardStep1Name=Name
-platform.appwithinminutes.wizardStep1Title=Name your application
-platform.appwithinminutes.wizardStep1Description=Provide the application name.
-platform.appwithinminutes.wizardStep2Name=Structure
-platform.appwithinminutes.wizardStep2Title=Define the structure of your application
-platform.appwithinminutes.wizardStep2Description=Generate the structure of your application by specifying what types of fields it will contain.
-platform.appwithinminutes.wizardStep3Name=Presentation
-platform.appwithinminutes.wizardStep3Title=Customize the home page of your application
-platform.appwithinminutes.wizardStep3Description=Personalize the home page of your application.
+appWithinMinutes.wizardStep.name.name=Name
+appWithinMinutes.wizardStep.name.title=Name your application
+appWithinMinutes.wizardStep.name.description=Choose the application name
+appWithinMinutes.wizardStep.structure.name=Structure
+appWithinMinutes.wizardStep.structure.title=Structure your data
+appWithinMinutes.wizardStep.structure.description=Describe the application data
+appWithinMinutes.wizardStep.entries.name=Entries
+appWithinMinutes.wizardStep.entries.title=Locate your data
+appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.presentation.name=Presentation
+appWithinMinutes.wizardStep.presentation.title=Customize your application home page
+appWithinMinutes.wizardStep.presentation.description=Customize the application home page
 platform.appwithinminutes.wizardStepNextButtonLabel=Next Step
 platform.appwithinminutes.wizardStepNextButtonTip=Go to next step
 platform.appwithinminutes.wizardStepFinishButtonLabel=Finish
@@ -71,7 +74,7 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Go to the application home p
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Previous Step
 platform.appwithinminutes.wizardStepPreviousButtonTip=Go to previous step
 platform.appwithinminutes.wizardStepHelpTitle=Steps
-platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you towards building your application. These steps will configure the way your application will be displayed and what kind of information will contain:
+platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
 
 ### Wizard Step 1: Application Name
 appWithinMinutes.createApp.location.label=Location
@@ -84,24 +87,23 @@ appWithinMinutes.codeSpace.description=This is the place where the application c
 appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent it, because otherwise none of the application code pages would be visible as they are all hidden by default.
 platform.appwithinminutes.appNamePageTitle=Create Application
 platform.appwithinminutes.appNameLabel=Application Name
-platform.appwithinminutes.appNameHint=The name of the application determines the URL of the application home page, the location where the application code and data will be stored as well as the name of the class that will describe the application structure.
+platform.appwithinminutes.appNameHint=The application name determines the home page URL and the location where the application code is stored.
 platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Application home page URL
-platform.appwithinminutes.appNamePreviewDataSpaceLabel=Application data location
 platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=Application class
 platform.appwithinminutes.appNameIsUsedWarning=This application already exists. If you go to the next step you will be editing the existing application.
 platform.appwithinminutes.appNameEmptyError=Please enter the application name.
 
-### Wizard Step 1: Application Structure
+### Wizard Step 2: Application Structure
+appWithinMinutes.classEditor.title={0} Structure
 platform.appwithinminutes.classEditorPaletteTitle=Field Palette
-platform.appwithinminutes.classEditorPaletteHint=Drag&amp;Drop fields from the palette to create your form.
+platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
 platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
 
-platform.appwithinminutes.classEditorUpdateTemplateLabel=Update class template
-platform.appwithinminutes.classEditorUpdateTemplateHint=Save the default field values in the class template ({0}).
-platform.appwithinminutes.classEditorUpdateSheetLabel=Update class sheet
-platform.appwithinminutes.classEditorUpdateSheetHint=Recreate the sheet used to display and edit objects of this class ({0}).
-platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update class translation bundle
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Update the template
+platform.appwithinminutes.classEditorUpdateTemplateHint=The template ({0}) stores the default field values.
+platform.appwithinminutes.classEditorUpdateSheetLabel=Update the sheet
+platform.appwithinminutes.classEditorUpdateSheetHint=The sheet ({0}) is used to display and edit the structured data.
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
@@ -149,36 +151,46 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Add
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Delete
 
+appWithinMinutes.templateProviderEditor.title={0} Entries
+appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=From where to create the entries
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+
 ### Wizard Step 3: Application Presentation
-platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Class fields
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
 platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generic columns
 platform.appwithinminutes.liveTableEditorHelpTitle=Tip
-platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application entries.
-platform.appwithinminutes.liveTableEditorDocTitleColumnName=Page title
-platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains the application entry
-platform.appwithinminutes.liveTableEditorDocNameColumnName=Page name
-platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of the page that contains the application entry
-platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Space
-platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=The name of the space containing the application entry
-platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Page Title
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Page Name
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Last Author
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=The user who last edited the application entry
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=The user who last edited the application data
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
-platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=The user who created the application entry
-platform.appwithinminutes.liveTableEditorDocDateColumnName=Update date
-platform.appwithinminutes.liveTableEditorDocDateColumnDescription=The date when the application entry was last edited
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Creation date
-platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=The date when the application entry was created
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=The user who created the application data
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Date
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=The date when the application data was last edited
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Creation Date
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=The date when the application data was created
 platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
-platform.appwithinminutes.liveTableEditorActionsColumnDescription=A list of actions that can be performed on the application entry, such as edit and delete
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=A list of actions that can be performed on the application data, such as edit and delete
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Attachments
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of the entry page
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of a data page
 platform.appwithinminutes.liveTableEditorImagesColumnName=Images
-platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to the entry page
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
-platform.appwithinminutes.liveTableEditorDescriptionHint=The description contains a short resume of what the application does and what kind of data it will handle.
+platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the home page above the live table with the application data. Use it to describe the application.
 platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
 platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
@@ -186,7 +198,7 @@ platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=Add
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding class fields have been deleted. Do you wish to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Icon
-platform.appwithinminutes.liveTableEditorIconHintWithPicker=A reference to an icon. It could be any image stored in the wiki but you can also pick an icon from the picker displayed when the field have focus.
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
 ### Application home page
 platform.appwithinminutes.appLiveTableHeading=Entries
@@ -206,7 +218,36 @@ platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its 
 platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you wish to continue?
 platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
-platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.</content>
+platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Application class
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Application data location
+
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Space
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=The name of the space containing the application entry
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=Name
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=Name your application
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=Choose the application name
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=Structure
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=Structure your data
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=Describe the application data
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=Presentation
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=Customize your application home page
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=Customize the application home page</content>
   <object>
     <name>AppWithinMinutes.Translations</name>
     <number>0</number>

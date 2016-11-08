@@ -73,7 +73,7 @@
         <name>columns</name>
         <number>3</number>
         <picker>0</picker>
-        <prettyName>Columns</prettyName>
+        <prettyName>Live Table Columns</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
@@ -113,10 +113,10 @@
       <class/>
     </property>
     <property>
-      <columns>doc.name doc.date doc.author _actions</columns>
+      <columns>doc.title doc.location doc.date doc.author _actions</columns>
     </property>
     <property>
-      <dataSpace>.Data</dataSpace>
+      <dataSpace/>
     </property>
     <property>
       <description/>

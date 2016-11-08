@@ -46,7 +46,7 @@ $string.replace("'", "''")##
 
 #macro(prepareColumnProperties)
   #set ($columnProperties = {})
-  #set ($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
+  #set ($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.location', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
   #set ($specialColumns = ['_avatar', '_images', '_attachments', '_actions'])
   ## Field types that aren't sortable nor filterable.
   #set ($unsortableFieldTypes = ['TextArea', 'ComputedField'])
@@ -92,7 +92,9 @@ $string.replace("'", "''")##
           #set ($titleDisplayNamePlaceHolder = $NULL)
         #end
       #end
-      #if ($column == 'doc.creator' || $column == 'doc.author')
+      #if ($column == 'doc.location')
+        #set ($discard = $properties.put('html', true))
+      #elseif ($column == 'doc.creator' || $column == 'doc.author')
         #set ($discard = $properties.put('link', 'author'))
       #elseif ($column != 'doc.date' &amp;&amp; $column != 'doc.creationDate')
         #set ($discard = $properties.put('link', 'view'))

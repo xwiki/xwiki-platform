@@ -68,7 +68,7 @@
       <name>columns</name>
       <number>3</number>
       <picker>0</picker>
-      <prettyName>Columns</prettyName>
+      <prettyName>Live Table Columns</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

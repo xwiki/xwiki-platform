@@ -69,6 +69,7 @@ $escapetool.h Live table generic keys
   'doc.name': 'liveTableEditorDocNameColumnName',
   'doc.space': 'liveTableEditorDocSpaceColumnName',
   'doc.fullname': 'liveTableEditorDocFullNameColumnName',
+  'doc.location': 'liveTableEditorDocLocationColumnName',
   'doc.author': 'liveTableEditorDocAuthorColumnName',
   'doc.creator': 'liveTableEditorDocCreatorColumnName',
   'doc.date': 'liveTableEditorDocDateColumnName',
@@ -90,6 +91,10 @@ $escapetool.h Live table specific keys
 #map("$prefix$property.name" $property.prettyName)
 #end
 
+$escapetool.h Other keys
+#map("${appName}.entry.name" $stringtool.removeEnd($doc.name, 'Class'))
+
+$escapetool.h Deprecated keys
 #map("${appName}.dataSpace.title" 'Data')
 {{/velocity}}</content>
 </xwikidoc>

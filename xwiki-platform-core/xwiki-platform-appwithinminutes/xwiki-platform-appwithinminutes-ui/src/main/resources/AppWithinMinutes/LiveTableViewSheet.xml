@@ -49,11 +49,24 @@
     ## Determine the user's rights
     #set($classFullName = $liveTableObj.getProperty('class').value)
     #set($className = $stringtool.removeEnd($classFullName, 'Class'))
-    #set($classRef = $services.model.resolveDocument($classFullName))
-    #set($dataSpaceRef = $services.model.resolveSpace($liveTableObj.getValue('dataSpace'), 'explicit',
-      $doc.documentReference))
+    #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+    #set ($creationRestrictions = $xwiki.getDocument($templateProviderReference).getValue('creationRestrictions'))
+    #if ($creationRestrictions)
+      #if ($creationRestrictions.size() &gt; 0)
+        #set ($dataSpaceRef = $services.model.resolveSpace($creationRestrictions.get(0)))
+      #else
+        ## There is no data space as the user can create application entries anywhere. Let's use the application space
+        ## when the user clicks on the Add New Entry link from the home page.
+        #set ($dataSpaceRef = $doc.documentReference.parent)
+      #end
+    #else
+      ## The template provider is missing. Fall-back on the old 'dataSpace' property.
+      #set ($dataSpaceRef = $services.model.resolveSpace($liveTableObj.getValue('dataSpace'), 'explicit',
+        $doc.documentReference))
+    #end
     #set($hasCreateData = $services.security.authorization.hasAccess('edit', $dataSpaceRef))
     #set($hasDeleteData = $services.security.authorization.hasAccess('admin', $dataSpaceRef))
+    #set($classRef = $services.model.resolveDocument($classFullName))
     #set($hasEditApplication = $services.security.authorization.hasAccess('edit', $classRef))
     #set($translationsRef = $services.model.resolveDocument("${className}Translations"))
     #set($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; $xwiki.exists($translationsRef)
@@ -69,8 +82,10 @@
         #if($hasCreateData)
           * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
             #set($entryDoc = $services.model.resolveDocument('__entryName__', 'explicit', $dataSpaceRef))
+            ## We need to set the title if we want to be able to sort or filter the doc.title live table column.
             #set ($params = {
               'template': "${className}Template",
+              'title': '__entryName__',
               'parent': $services.model.serialize($doc.documentReference, 'local')
             })
             #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
@@ -87,15 +102,6 @@
             #end
             {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, $action, $escapetool.url($params))" /&gt;{{/html}}
         #end
-        #if($hasDeleteData)
-          #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
-            'appName': $doc.space,
-            'resolve': true,
-            'scope': 'entries',
-            'xredirect': $doc.getURL()
-          })))
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
-        #end
         #if($hasEditApplication)
           #set ($queryString = $escapetool.url({
             'appName': $doc.space,
@@ -105,6 +111,15 @@
         #end
         #if($hasEditTranslations)
           * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
+        #end
+        #if($hasDeleteData)
+          #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
+            'appName': $doc.space,
+            'resolve': true,
+            'scope': 'entries',
+            'xredirect': $doc.getURL()
+          })))
+          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
         #end
         #if($hasDeleteApplication)
           #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
@@ -255,7 +270,8 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
   },
   _onAdd : function() {
     if (this.input.value != '') {
-      window.self.location = this.urlTemplate.replace('__entryName__', encodeURIComponent(this.input.value));
+      // We use the global flag because we need to replace both the page name and its title.
+      window.self.location = this.urlTemplate.replace(/__entryName__/g, encodeURIComponent(this.input.value));
     } else {
       this.input.focus();
     }
@@ -392,6 +408,7 @@ return XWiki;
 #actionBox ul {
   list-style: none outside none;
   margin: 0;
+  padding: 0;
 }
 
 #actionBox .action {

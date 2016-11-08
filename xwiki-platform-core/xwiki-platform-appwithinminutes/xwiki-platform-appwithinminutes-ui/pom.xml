@@ -52,6 +52,7 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- We need to add an entry to the application panel. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-uiextension-ui</artifactId>
       <version>${project.version}</version>
@@ -59,8 +60,25 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- We need the Icon Picker. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- We need the template provider class. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- We use the default class sheet. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xclass-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

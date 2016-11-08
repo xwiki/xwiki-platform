@@ -41,42 +41,29 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #**
- * Delete only the application's entries (just data) from the data space.
+ * Retrieve the list of pages that contain application data.
  *#
-#macro (deleteApplicationEntries $dataSpaceReference $classReference)
+#macro (getApplicationDataPages $classReference $pageReferences)
   #set ($statement = ', BaseObject as obj where doc.fullName = obj.name and ' +
-    'obj.className = :class and doc.fullName &lt;&gt; :template and ' +
-    "(doc.space = :dataSpace or doc.space like :dataSpacePrefix escape '!')")
+    'obj.className = :class and doc.fullName &lt;&gt; :template')
   #set ($query = $services.query.hql($statement))
   #set ($classLocalReference = $services.model.serialize($classReference, 'local'))
   #set ($discard = $query.bindValue('class', $classLocalReference))
   #set ($discard = $query.bindValue('template', "$stringtool.removeEnd($classLocalReference, 'Class')Template"))
-  #set ($dataLocalSpaceReference = $services.model.serialize($dataSpaceReference, 'local'))
-  #set ($dataSpacePrefix = $dataLocalSpaceReference.replaceAll('([%_!])', '!$1').concat('.%'))
-  #set ($discard = $query.bindValue('dataSpace', $dataLocalSpaceReference))
-  #set ($discard = $query.bindValue('dataSpacePrefix', $dataSpacePrefix))
-  #set ($entryReferences = [])
   #foreach ($entryLocalReference in $query.execute())
-    #set ($discard = $entryReferences.add($services.model.resolveDocument($entryLocalReference)))
+    #set ($discard = $pageReferences.add($services.model.resolveDocument($entryLocalReference)))
   #end
-  #bulkDelete($entryReferences)
 #end
 
 #**
- * Delete the entire application (application space, code space and data space).
+ * Retrieve the list of pages that contain application code.
  *#
-#macro (deleteApplication $appReference $classReference $dataSpaceReference)
-  #set ($spacesToDelete = $collectionstool.set)
-  #set ($discard = $spacesToDelete.add($appReference))
+#macro (getApplicationCodePages $appReference $classReference $pageReferences)
+  #set ($discard = $pageReferences.add($appReference))
   #if (!$classReference.hasParent($appReference))
-    ## The code space is outside the application space.
-    #set ($discard = $spacesToDelete.add($classReference.parent))
+    ## The code pages are outside of the application page tree.
+    #set ($discard = $pageReferences.add($classReference.parent))
   #end
-  #if (!$dataSpaceReference.hasParent($appReference))
-    ## The data space is outside the application space.
-    #set ($discard = $spacesToDelete.add($dataSpaceReference))
-  #end
-  #bulkDelete($spacesToDelete)
 #end
 
 #macro (bulkDelete $entities)
@@ -141,14 +128,13 @@
       ##
       #set ($classLocalReference = $appDescriptor.getValue('class'))
       #set ($classReference = $services.model.resolveDocument($classLocalReference, 'explicit', $appHomeReference))
-      #set ($dataSpace = $appDescriptor.getValue('dataSpace'))
-      #set ($dataSpaceReference = $services.model.resolveSpace($dataSpace, 'explicit', $appReference))
       ##
-      #if ($scope == 'entries')
-        #deleteApplicationEntries($dataSpaceReference $classReference)
-      #else
-        #deleteApplication($appReference $classReference $dataSpaceReference)
+      #set ($pageReferences = [])
+      #getApplicationDataPages($classReference $pageReferences)
+      #if ($scope != 'entries')
+        #getApplicationCodePages($appReference $classReference $pageReferences)
       #end
+      #bulkDelete($pageReferences)
       ##
       #if ($errors.size() &gt; 0)
         {{error}}$errors.get(0){{/error}}

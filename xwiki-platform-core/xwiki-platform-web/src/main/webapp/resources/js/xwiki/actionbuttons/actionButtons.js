@@ -127,7 +127,7 @@ actionButtons.EditActions = Class.create({
     var cancelActionParameter = '&action_cancel=true';
 
     // Include the xredirect element, if it exists.
-    var xredirectElement = event.element().form.elements['xredirect'];
+    var xredirectElement = event.element().form.select('input[name="xredirect"]')[0];
     var xredirectParameter = xredirectElement ? '&xredirect=' + escape(xredirectElement.value) : '';
 
     // Optimisation: Prevent a redundant request to remove the edit lock when the page unload event is triggered. Both the cancel action
@@ -334,8 +334,9 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     if (!isContinue) {
       // Redirect to view mode or to whatever URL was requested.
       url = XWiki.currentDocument.getURL();
-      if (this.form.xredirect && this.form.xredirect.value) {
-        url = this.form.xredirect.value;
+      var xredirectElement = this.form.select('input[name="xredirect"]')[0];
+      if (xredirectElement && xredirectElement.value) {
+        url = xredirectElement.value;
       }
     } else if ($('body').hasClassName('previewbody')) {
       // In preview mode, the &continue part of the save&continue should lead back to the edit action.

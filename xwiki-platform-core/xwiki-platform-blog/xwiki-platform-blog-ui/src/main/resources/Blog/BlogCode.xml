@@ -843,7 +843,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param message A text message concerning blog article hiding
  *###
 #macro(hideMessageBox $message)
-(% class="plainmessage hide-message" %)((($services.icon.render('lock_open') $message)))
+(% class="plainmessage hide-message" %)((($services.icon.render('unlock') $message)))
 #end
 ##
 ##

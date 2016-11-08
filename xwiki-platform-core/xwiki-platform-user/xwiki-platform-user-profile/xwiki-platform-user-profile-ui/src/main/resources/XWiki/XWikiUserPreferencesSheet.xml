@@ -77,11 +77,14 @@
     #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
     #set ($discard = $options.add({'value': 0, 'label': 'no'}))
   #elseif ($prop.classType == 'Timezone')
-    ## For the timezone, we add an empty value with a special label, to be consistent with "display-timezone.vm", used
-    ## in the administration.
-    #set ($discard = $options.add({'value': '', 'label': 'XWiki.XWikiPreferences_timezone_default'}))
     #foreach($tz in $xwiki.jodatime.serverTimezone.availableIDs)
       #set ($discard = $options.add({'value': $tz, 'label': $tz}))
+    #end
+    ## If the default value is empty (nothing has been set by the administrator), the fallback is the timezone of the 
+    ## server. But we won't display the "System Default" option, which is technical (it supposes the user knows there 
+    ## is a server with its own timezone, etc...)
+    #if ("$!default" == '')
+      #set ($default = $xwiki.jodatime.serverTimezone)
     #end
   #else
     #foreach($v in $prop.listValues)

@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.XWikiAction;
 @Component
 @Singleton
 @Named("debug")
-public class DebugScriptService implements ScriptService
+public class DebugInternalScriptService implements ScriptService
 {
     @Inject
     private Execution execution;

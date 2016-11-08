@@ -185,13 +185,13 @@
     #set ($homePageRef = $services.model.resolveDocument('', 'default', $appReference))
     #set ($queryString = {"wizard" : true})
     #if (!$xwiki.exists($homePageRef))
+      #set ($classReference = "${stringtool.removeEnd($doc.fullName, 'TemplateProvider')}Class")
       #set ($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
       #set ($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
       #set ($discard = $queryString.putAll({
-        'editor': 'inline',
         'template': 'AppWithinMinutes.LiveTableTemplate',
-        "${appDescriptorClassName}_0_class": $doc.fullName,
-        'title': '$doc.documentReference.lastSpaceReference.name',
+        "${appDescriptorClassName}_0_class": $classReference,
+        'title': $appReference.name,
         'parent': $wikiHomePage
       }))
     #end

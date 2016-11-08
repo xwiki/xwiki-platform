@@ -65,7 +65,7 @@ $services.localization.render('platform.appwithinminutes.description')
 })
 #set($columns = ['doc.space', 'doc.author', 'doc.date', '_actions'])
 #livetable('livetable' $columns $columnsProperties $options)
-#set($docextras=[])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.WebHome</name>

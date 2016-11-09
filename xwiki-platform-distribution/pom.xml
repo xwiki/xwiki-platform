@@ -181,7 +181,6 @@
             </execution>
           </executions>
         </plugin>
-        </plugin>
       </plugins>
     </pluginManagement>
     <!-- Needed to add support for the XAR packaging -->

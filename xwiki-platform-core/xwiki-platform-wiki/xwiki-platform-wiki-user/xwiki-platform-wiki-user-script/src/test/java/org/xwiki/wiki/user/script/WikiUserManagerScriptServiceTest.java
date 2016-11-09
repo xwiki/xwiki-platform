@@ -53,7 +53,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -241,7 +240,7 @@ public class WikiUserManagerScriptServiceTest
     {
         // Mocks
         WikiUserManagerException expectedException = new WikiUserManagerException("error in setUserScope");
-        doThrow(expectedException).when(wikiUserManager).setUserScope(anyString(), any(UserScope.class));
+        doThrow(expectedException).when(wikiUserManager).setUserScope(any(), any(UserScope.class));
 
         // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
@@ -336,7 +335,7 @@ public class WikiUserManagerScriptServiceTest
     {
         // Mocks
         WikiUserManagerException expectedException = new WikiUserManagerException("error in setMembershipType");
-        doThrow(expectedException).when(wikiUserManager).setMembershipType(anyString(), any(MembershipType.class));
+        doThrow(expectedException).when(wikiUserManager).setMembershipType(any(), any(MembershipType.class));
 
         // Test
         boolean result = mocker.getComponentUnderTest().setMembershipType("subwiki", "INVITE");
@@ -1118,7 +1117,7 @@ public class WikiUserManagerScriptServiceTest
     public void invite() throws Exception
     {
         // Mocks
-        when(wikiUserManager.invite(anyString(), anyString(), anyString())).thenReturn(new MemberCandidacy());
+        when(wikiUserManager.invite(any(), any(), any())).thenReturn(new MemberCandidacy());
         
         // Test
         MemberCandidacy result = mocker.getComponentUnderTest().invite("someUser", "subwiki", "someMessage");

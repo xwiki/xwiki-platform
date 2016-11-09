@@ -37,7 +37,6 @@ import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isCacheConfiguration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -93,8 +92,8 @@ public class XWikiCacheStoreTest
         assertFalse(existingDocument.isNew());
         verify(this.cache).set(eq("4:wiki5:space4:page"), any(XWikiDocument.class));
         verify(this.existCache).set("4:wiki5:space4:page", Boolean.TRUE);
-        verify(this.cache).get(anyString());
-        verify(this.existCache).get(anyString());
+        verify(this.cache).get(any());
+        verify(this.existCache).get(any());
 
         verifyNoMoreInteractions(this.cache);
         verifyNoMoreInteractions(this.existCache);
@@ -109,8 +108,8 @@ public class XWikiCacheStoreTest
         verify(this.cache).set(eq("4:wiki5:space4:page"), any(XWikiDocument.class));
         verify(this.existCache).set("4:wiki5:space4:page", Boolean.TRUE);
         verify(this.existCache).set("4:wiki5:space6:nopage", Boolean.FALSE);
-        verify(this.cache, times(2)).get(anyString());
-        verify(this.existCache, times(2)).get(anyString());
+        verify(this.cache, times(2)).get(any());
+        verify(this.existCache, times(2)).get(any());
 
         verifyNoMoreInteractions(this.cache);
         verifyNoMoreInteractions(this.existCache);

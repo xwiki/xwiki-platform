@@ -33,7 +33,6 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +64,7 @@ public class XWikiContextCacheKeyFactoryTest
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
         when(xcontext.getURLFactory()).thenReturn(urlFactory);
         
-        when(urlFactory.createSkinURL(anyString(), anyString(), any(XWikiContext.class))).thenReturn(
+        when(urlFactory.createSkinURL(any(), any(), any(XWikiContext.class))).thenReturn(
                 new URL("http://host/path"));
         
         // Test

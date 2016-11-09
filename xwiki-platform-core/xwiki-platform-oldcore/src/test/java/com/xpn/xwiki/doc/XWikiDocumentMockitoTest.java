@@ -74,7 +74,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -166,7 +165,7 @@ public class XWikiDocumentMockitoTest
     public void getChildrenReferences() throws Exception
     {
         Query query = mock(Query.class);
-        when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.XWQL))).thenReturn(query);
+        when(this.oldcore.getQueryManager().createQuery(any(), eq(Query.XWQL))).thenReturn(query);
 
         QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 

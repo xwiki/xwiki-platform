@@ -33,7 +33,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -81,9 +81,9 @@ public class DefaultIconRendererTest
 
         // Verify
         assertEquals("image:blabla.png", result);
-        verify(linkExtension, never()).use(anyString());
-        verify(skinExtension, never()).use(anyString());
-        verify(jsExtension, never()).use(anyString());
+        verify(linkExtension, never()).use(any());
+        verify(skinExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
     }
 
     @Test
@@ -101,8 +101,8 @@ public class DefaultIconRendererTest
         Map<String, Object> parameters = new HashMap();
         parameters.put("rel", "stylesheet");
         verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
-        verify(skinExtension, never()).use(anyString());
-        verify(jsExtension, never()).use(anyString());
+        verify(skinExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
     }
 
     @Test
@@ -117,8 +117,8 @@ public class DefaultIconRendererTest
 
         // Verify
         verify(skinExtension).use("ssx");
-        verify(linkExtension, never()).use(anyString());
-        verify(jsExtension, never()).use(anyString());
+        verify(linkExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
     }
 
     @Test
@@ -133,8 +133,8 @@ public class DefaultIconRendererTest
 
         // Verify
         verify(jsExtension).use("jsx");
-        verify(linkExtension, never()).use(anyString());
-        verify(skinExtension, never()).use(anyString());
+        verify(linkExtension, never()).use(any());
+        verify(skinExtension, never()).use(any());
     }
 
     @Test
@@ -169,8 +169,8 @@ public class DefaultIconRendererTest
         Map<String, Object> parameters = new HashMap();
         parameters.put("rel", "stylesheet");
         verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
-        verify(skinExtension, never()).use(anyString());
-        verify(jsExtension, never()).use(anyString());
+        verify(skinExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
     }
 
     @Test
@@ -185,8 +185,8 @@ public class DefaultIconRendererTest
 
         // Verify
         verify(skinExtension).use("ssx");
-        verify(linkExtension, never()).use(anyString());
-        verify(jsExtension, never()).use(anyString());
+        verify(linkExtension, never()).use(any());
+        verify(jsExtension, never()).use(any());
     }
 
     @Test
@@ -201,8 +201,8 @@ public class DefaultIconRendererTest
 
         // Verify
         verify(jsExtension).use("jsx");
-        verify(linkExtension, never()).use(anyString());
-        verify(skinExtension, never()).use(anyString());
+        verify(linkExtension, never()).use(any());
+        verify(skinExtension, never()).use(any());
     }
 
     @Test
@@ -224,7 +224,7 @@ public class DefaultIconRendererTest
         iconSet.setRenderWiki("image:$icon.png");
         iconSet.addIcon("test", new Icon("blabla"));
         IconException exception = new IconException("exception", null);
-        when(velocityRenderer.render(anyString())).thenThrow(exception);
+        when(velocityRenderer.render(any())).thenThrow(exception);
 
         // Test
         IconException caughtException = null;

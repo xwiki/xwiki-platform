@@ -42,7 +42,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -67,7 +66,7 @@ public class XWikiAuthServiceImplTest
 
         // Dummy response
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
-        when(xwikiResponse.encodeURL(anyString())).then(new Answer<String>()
+        when(xwikiResponse.encodeURL(any())).then(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
@@ -217,7 +216,7 @@ public class XWikiAuthServiceImplTest
         doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
-        when(xwikiResponse.encodeURL(anyString()))
+        when(xwikiResponse.encodeURL(any()))
             .thenReturn("http://localhost:8080/anothercontext;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en");
         this.oldcore.getXWikiContext().setResponse(xwikiResponse);
 

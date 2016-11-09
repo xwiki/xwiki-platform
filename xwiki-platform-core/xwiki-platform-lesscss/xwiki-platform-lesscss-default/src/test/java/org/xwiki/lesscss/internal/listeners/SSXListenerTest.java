@@ -50,7 +50,6 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -137,7 +136,7 @@ public class SSXListenerTest
         DocumentReferenceResolver documentReferenceResolver = mock(DocumentReferenceResolver.class);
         when(contextComponentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "default"))
             .thenReturn(documentReferenceResolver);
-        when(documentReferenceResolver.resolve(anyString())).thenReturn(new DocumentReference("a", "b", "c"));
+        when(documentReferenceResolver.resolve(any())).thenReturn(new DocumentReference("a", "b", "c"));
 
         
         ObjectPropertyReference objPropertyReference = 

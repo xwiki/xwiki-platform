@@ -50,7 +50,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -132,7 +131,7 @@ public class DownloadActionTest
         doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
         when(this.ec.getMimeType("file.txt")).thenReturn("text/plain");
         when(this.response.getOutputStream()).thenReturn(this.out);
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), anyString(), anyString(),
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
             any(XWikiContext.class))).thenReturn(false);
 
         // Mock what's needed for extracting the filename from the URL

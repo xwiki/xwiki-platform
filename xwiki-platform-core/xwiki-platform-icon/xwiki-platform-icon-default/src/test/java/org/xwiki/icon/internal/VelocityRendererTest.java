@@ -36,7 +36,6 @@ import org.xwiki.velocity.XWikiVelocityException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -68,7 +67,7 @@ public class VelocityRendererTest
         // Mocks
         VelocityEngine engine = mock(VelocityEngine.class);
         when(velocityManager.getVelocityEngine()).thenReturn(engine);
-        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), anyString(), eq("myCode"))).thenAnswer(
+        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), any(), eq("myCode"))).thenAnswer(
                 new Answer<Object>()
                 {
                     @Override
@@ -116,7 +115,7 @@ public class VelocityRendererTest
         //  Mocks
         VelocityEngine engine = mock(VelocityEngine.class);
         when(velocityManager.getVelocityEngine()).thenReturn(engine);
-        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), anyString(),
+        when(engine.evaluate(any(VelocityContext.class), any(Writer.class), any(),
             eq("myCode"))).thenReturn(false);
 
         // Test

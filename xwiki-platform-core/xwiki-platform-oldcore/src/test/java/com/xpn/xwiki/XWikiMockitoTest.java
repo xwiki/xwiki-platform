@@ -71,7 +71,6 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -418,7 +417,7 @@ public class XWikiMockitoTest
         this.mocker.registerMockComponent(ConfigurationSource.class, "wiki");
         ConfigurationSource spaceConfiguration = this.mocker.registerMockComponent(ConfigurationSource.class, "space");
 
-        when(this.xwikiCfgConfigurationSource.getProperty(anyString(), anyString())).then(new Answer<String>()
+        when(this.xwikiCfgConfigurationSource.getProperty(any(), any())).then(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
@@ -461,7 +460,7 @@ public class XWikiMockitoTest
         spacesPreferences.put(space1Reference.getName(), space1Preferences);
         spacesPreferences.put(space2Reference.getName(), space2Preferences);
 
-        when(spaceConfiguration.getProperty(anyString(), same(String.class))).then(new Answer<String>()
+        when(spaceConfiguration.getProperty(any(), same(String.class))).then(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable

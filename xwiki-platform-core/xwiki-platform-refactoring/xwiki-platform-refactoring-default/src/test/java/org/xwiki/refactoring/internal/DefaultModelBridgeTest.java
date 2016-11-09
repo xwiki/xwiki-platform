@@ -155,7 +155,7 @@ public class DefaultModelBridgeTest
 
         Query query = mock(Query.class);
         QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
-        when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
+        when(queryManager.createQuery(any(), any())).thenReturn(query);
 
         EntityReferenceSerializer<String> localEntityReferenceSerializer =
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");

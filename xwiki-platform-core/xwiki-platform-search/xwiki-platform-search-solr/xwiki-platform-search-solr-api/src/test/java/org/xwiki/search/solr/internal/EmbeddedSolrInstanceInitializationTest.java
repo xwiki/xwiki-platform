@@ -19,10 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Date;
@@ -41,6 +37,10 @@ import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the initialization of the Solr instance.
@@ -76,7 +76,7 @@ public class EmbeddedSolrInstanceInitializationTest
     public void testInitialization() throws Exception
     {
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), anyString())).thenReturn(url.getPath());
+        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), any())).thenReturn(url.getPath());
 
         getInstanceAndAssertHomeDirectory(url.getPath());
     }
@@ -85,7 +85,7 @@ public class EmbeddedSolrInstanceInitializationTest
     public void testInstantiationNewHome() throws Exception
     {
         String newHome = new File(PERMANENT_DIRECTORY, "doesNotExist").getAbsolutePath();
-        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), anyString())).thenReturn(newHome);
+        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), any())).thenReturn(newHome);
 
         getInstanceAndAssertHomeDirectory(newHome);
     }
@@ -93,7 +93,7 @@ public class EmbeddedSolrInstanceInitializationTest
     @Test
     public void testInstantiationInvalidHome() throws ComponentLookupException, Exception
     {
-        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), anyString())).thenReturn("");
+        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), any())).thenReturn("");
 
         // Not actually expecting anything. This will throw an exception.
         try {

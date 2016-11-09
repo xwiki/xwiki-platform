@@ -46,7 +46,7 @@ import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -93,7 +93,7 @@ public class WikiDescriptorMigratorTest
         documentList.add("XWiki.XWikiServerSubwiki1");
 
         Query query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
+        when(queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
         when(query.<String>execute()).thenReturn(documentList);
 
         DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwiki1");
@@ -127,7 +127,7 @@ public class WikiDescriptorMigratorTest
         documentList.add("XWiki.XWikiServerSubwiki1");
 
         Exception exception = new QueryException("error in queryManager.createQuery()", null, null);
-        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenThrow(exception);
+        when(queryManager.createQuery(any(), eq(Query.HQL))).thenThrow(exception);
 
         // Test
         mocker.getComponentUnderTest().hibernateMigrate();
@@ -143,7 +143,7 @@ public class WikiDescriptorMigratorTest
         documentList.add("XWiki.XWikiServerSubwiki1");
 
         Query query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
+        when(queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
         when(query.<String>execute()).thenReturn(documentList);
 
         DocumentReference documentReference = new DocumentReference("mainWiki", "XWiki", "XWikiServerSubwiki1");

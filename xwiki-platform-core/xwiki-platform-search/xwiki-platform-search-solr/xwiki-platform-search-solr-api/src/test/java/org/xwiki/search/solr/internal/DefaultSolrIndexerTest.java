@@ -46,7 +46,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceR
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.web.Utils;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -92,7 +92,7 @@ public class DefaultSolrIndexerTest
 
         URL url = this.getClass().getClassLoader().getResource("solrhome");
         this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
-        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), anyString()))
+        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), any()))
             .thenReturn(url.getPath());
     }
 

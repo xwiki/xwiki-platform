@@ -80,7 +80,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
@@ -159,7 +158,7 @@ public class DocumentSolrMetadataExtractorTest
 
         // Field Name Encoder
         SolrFieldNameEncoder fieldNameEncoder = this.mocker.getInstance(SolrFieldNameEncoder.class);
-        when(fieldNameEncoder.encode(anyString())).then(AdditionalAnswers.returnsFirstArg());
+        when(fieldNameEncoder.encode(any())).then(AdditionalAnswers.returnsFirstArg());
     }
 
     @Test

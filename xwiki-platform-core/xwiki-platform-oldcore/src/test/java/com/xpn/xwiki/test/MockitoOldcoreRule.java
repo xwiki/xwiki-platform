@@ -87,7 +87,6 @@ import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiDocument;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -414,7 +413,7 @@ public class MockitoOldcoreRule implements MethodRule
                 // TODO: implement version store mocking
                 return new XWikiDocument(doc.getDocumentReference());
             }
-        }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), anyString(), anyXWikiContext());
+        }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), any(), anyXWikiContext());
         doAnswer(new Answer<XWikiDocument>()
         {
             @Override

@@ -19,14 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Locale;
 
 import org.junit.Before;
@@ -43,6 +35,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
+
+import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link UndeleteAction}.
@@ -117,7 +116,7 @@ public class UndeleteActionTest
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(anyString(), anyString(), anyInt(), any(XWikiContext.class))).thenReturn(
+        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
         when(deletedDocument.getLanguage()).thenReturn("");
@@ -146,7 +145,7 @@ public class UndeleteActionTest
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(anyString(), anyString(), anyInt(), any(XWikiContext.class))).thenReturn(
+        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
         when(deletedDocument.getLanguage()).thenReturn("");
@@ -175,7 +174,7 @@ public class UndeleteActionTest
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(anyString(), anyString(), anyInt(), any(XWikiContext.class))).thenReturn(
+        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
         when(deletedDocument.getLanguage()).thenReturn("");
@@ -204,7 +203,7 @@ public class UndeleteActionTest
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(anyString(), anyString(), anyInt(), any(XWikiContext.class))).thenReturn(
+        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
         // Document to restore is a translation.

@@ -116,8 +116,8 @@ public class PathWikiReferenceExtractorTest
     {
         testAndAssert("http://localhost/xwiki/wiki/someWiki/view/Main/WebHome", "somewiki");
 
-        verify(this.wikiDescriptorManager, never()).getByAlias(anyString());
-        verify(this.wikiDescriptorManager, never()).getById(anyString());
+        verify(this.wikiDescriptorManager, never()).getByAlias(any());
+        verify(this.wikiDescriptorManager, never()).getById(any());
     }
 
     private void testAndAssert(String urlToTest, String expectedWikiId) throws Exception

@@ -33,8 +33,8 @@ import org.xwiki.wiki.user.WikiUserManagerException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -78,7 +78,7 @@ public class AddUsersStepTest
         request.setMembers(members);
 
         Exception exception = new WikiUserManagerException("Execption in WikiUserManager.");
-        doThrow(exception).when(wikiUserManager).addMembers(anyCollection(), anyString());
+        doThrow(exception).when(wikiUserManager).addMembers(anyCollection(), any());
 
         // Test
         WikiCreationException caughtException = null;

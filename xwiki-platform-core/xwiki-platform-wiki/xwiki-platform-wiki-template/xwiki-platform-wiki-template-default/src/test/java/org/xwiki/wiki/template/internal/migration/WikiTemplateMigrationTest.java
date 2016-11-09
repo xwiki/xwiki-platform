@@ -45,7 +45,6 @@ import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -97,7 +96,7 @@ public class WikiTemplateMigrationTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
         query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), eq(Query.XWQL))).thenReturn(query);
+        when(queryManager.createQuery(any(), eq(Query.XWQL))).thenReturn(query);
     }
 
     @Test

@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -125,9 +125,9 @@ public class DocumentTest
     {
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
 
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), eq("XWiki.Alice"), anyString(),
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), eq("XWiki.Alice"), any(),
             anyXWikiContext())).thenReturn(true);
-        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), eq("XWikiGuest"), anyString(),
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), eq("XWikiGuest"), any(),
             anyXWikiContext())).thenReturn(false);
 
         Document doc = xdoc.newDocument(this.oldcore.getXWikiContext());

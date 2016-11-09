@@ -105,7 +105,7 @@ public class SolrIndexScriptServiceTest
 
         // Rights check success. By default we are allowed (no error is thrown)
         this.logger = mocker.getMockedLogger();
-        verify(this.logger, never()).error(anyString(), any(IllegalAccessException.class));
+        verify(this.logger, never()).error(any(), any(IllegalAccessException.class));
     }
 
     @Test

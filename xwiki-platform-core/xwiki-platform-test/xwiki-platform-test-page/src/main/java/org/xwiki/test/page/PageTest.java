@@ -57,7 +57,6 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -215,7 +214,7 @@ public class PageTest
         ecm.initialize(oldcore.getExecutionContext());
 
         // Let the user have view access to all pages
-        when(oldcore.getMockRightService().hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), anyString(),
+        when(oldcore.getMockRightService().hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), any(),
             eq(context))).thenReturn(true);
 
         // Set up URL Factory

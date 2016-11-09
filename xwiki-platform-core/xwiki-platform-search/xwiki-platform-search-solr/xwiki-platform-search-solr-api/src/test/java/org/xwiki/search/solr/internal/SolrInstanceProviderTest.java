@@ -19,10 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 import java.net.URL;
 
 import org.junit.Assert;
@@ -34,6 +30,10 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SolrInstanceProvider}.
@@ -58,7 +58,7 @@ public class SolrInstanceProviderTest
         URL url = this.getClass().getClassLoader().getResource("solrhome");
 
         this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
-        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), anyString()))
+        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), any()))
             .thenReturn(url.getPath());
 
         this.embedded = this.mocker.registerMockComponent(SolrInstance.class, "embedded");

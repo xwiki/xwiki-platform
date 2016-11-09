@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +76,7 @@ public class SpacesConfigurationSourceTest
 
         ConfigurationSource spaceConfiguration = this.mocker.getInstance(ConfigurationSource.class, "space");
 
-        when(spaceConfiguration.getProperty(anyString(), same(String.class))).then(new Answer<String>()
+        when(spaceConfiguration.getProperty(any(), same(String.class))).then(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
@@ -89,7 +89,7 @@ public class SpacesConfigurationSourceTest
                 return null;
             }
         });
-        when(spaceConfiguration.getProperty(anyString())).then(new Answer<Object>()
+        when(spaceConfiguration.getProperty(any())).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -102,7 +102,7 @@ public class SpacesConfigurationSourceTest
                 return null;
             }
         });
-        when(spaceConfiguration.getProperty(anyString(), anyString())).then(new Answer<Object>()
+        when(spaceConfiguration.getProperty(any(), any())).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -119,7 +119,7 @@ public class SpacesConfigurationSourceTest
             }
         });
 
-    when(spaceConfiguration.containsKey(anyString())).then(new Answer<Boolean>()
+    when(spaceConfiguration.containsKey(any())).then(new Answer<Boolean>()
         {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable

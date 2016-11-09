@@ -30,8 +30,8 @@ import org.xwiki.wiki.manager.WikiManagerException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -82,7 +82,7 @@ public class CreateWikiStepTest
         request.setFailOnExist(true);
 
         Exception exception = new WikiManagerException("Execption in WikiManager.");
-        doThrow(exception).when(wikiManager).create(anyString(), anyString(), anyBoolean());
+        doThrow(exception).when(wikiManager).create(any(), any(), anyBoolean());
 
         // Test
         WikiCreationException caughtException = null;

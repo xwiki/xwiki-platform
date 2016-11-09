@@ -201,7 +201,7 @@ public class DefaultIconSetManagerTest
 
         // Verify
         assertEquals(iconSet, result);
-        verify(iconSetLoader, never()).loadIconSet(any(InputStreamReader.class), anyString());
+        verify(iconSetLoader, never()).loadIconSet(any(InputStreamReader.class), any());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class DefaultIconSetManagerTest
     {
         // Mocks
         Exception exception = new MalformedURLException();
-        when(xwiki.getResourceAsStream(anyString())).thenThrow(exception);
+        when(xwiki.getResourceAsStream(any())).thenThrow(exception);
 
         // Test
         Exception exceptionCaught = null;
@@ -285,7 +285,7 @@ public class DefaultIconSetManagerTest
     {
         // Mocks
         Exception exception = new QueryException("exception in the query", null, null);
-        when(queryManager.createQuery(anyString(), anyString())).thenThrow(exception);
+        when(queryManager.createQuery(any(), any())).thenThrow(exception);
 
         // Test
         Exception caughtException = null;
@@ -334,7 +334,7 @@ public class DefaultIconSetManagerTest
     {
         // Mocks
         QueryException exception = new QueryException("exception in the query", null, null);
-        when(queryManager.createQuery(anyString(), eq(Query.XWQL))).thenThrow(exception);
+        when(queryManager.createQuery(any(), eq(Query.XWQL))).thenThrow(exception);
 
         // Test
         IconException caughtException = null;

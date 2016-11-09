@@ -45,10 +45,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -172,7 +171,7 @@ public class DatabaseMailListenerTest
         // Verify that save and delete happened
         verify(mailStatusStore).save(any(MailStatus.class), anyMap());
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        verify(mailContentStore).delete(anyString(), anyString());
+        verify(mailContentStore).delete(any(), any());
     }
 
     @Test

@@ -19,13 +19,6 @@
  */
 package org.xwiki.watchlist.internal;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +33,6 @@ import org.xwiki.observation.internal.DefaultObservationContext;
 import org.xwiki.observation.internal.ObservationContextListener;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.watchlist.internal.AutomaticWatchModeListener;
 import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
 import org.xwiki.watchlist.internal.api.WatchListStore;
 import org.xwiki.watchlist.internal.api.WatchedElementType;
@@ -49,6 +41,12 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AutomaticWatchModeListener}.
@@ -89,8 +87,8 @@ public class AutomaticWatchModeListenerTest
 
         mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
 
-        verify(mockStore, never()).getAutomaticWatchMode(anyString());
-        verify(mockStore, never()).addWatchedElement(anyString(), anyString(), any(WatchedElementType.class));
+        verify(mockStore, never()).getAutomaticWatchMode(any());
+        verify(mockStore, never()).addWatchedElement(any(), any(), any(WatchedElementType.class));
     }
 
     /**
@@ -104,8 +102,8 @@ public class AutomaticWatchModeListenerTest
 
         mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
 
-        verify(mockStore, never()).getAutomaticWatchMode(anyString());
-        verify(mockStore, never()).addWatchedElement(anyString(), anyString(), any(WatchedElementType.class));
+        verify(mockStore, never()).getAutomaticWatchMode(any());
+        verify(mockStore, never()).addWatchedElement(any(), any(), any(WatchedElementType.class));
     }
 
     @Test

@@ -45,7 +45,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -157,7 +156,7 @@ public class DefaultLESSCompilerTest
 
         // Verify
         verify(cache, times(1)).set(any(LESSResourceReference.class), any(SkinReference.class),
-                any(ColorThemeReference.class), anyString());
+                any(ColorThemeReference.class), any());
         verify(cache, never()).get(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference));
     }
 
@@ -196,7 +195,7 @@ public class DefaultLESSCompilerTest
         
         // Verify we don't put anything in the cache
         verify(cache, never()).set(any(LESSResourceReference.class), any(SkinReference.class),
-                any(ColorThemeReference.class), anyString());
+                any(ColorThemeReference.class), any());
     }
     
     @Test
@@ -205,7 +204,7 @@ public class DefaultLESSCompilerTest
         // Mocks
         LESSCompilerException expectedException = new LESSCompilerException("an exception");
         when(cachedLESSCompiler.compute(any(LESSResourceReference.class), anyBoolean(), anyBoolean(), anyBoolean(),
-                anyString())).thenThrow(expectedException);
+                any())).thenThrow(expectedException);
         
         // Test
         String result = mocker.getComponentUnderTest().compile(lessResourceReference, false, false, false);

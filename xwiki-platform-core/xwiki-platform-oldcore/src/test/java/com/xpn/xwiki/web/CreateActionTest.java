@@ -51,7 +51,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -93,7 +92,7 @@ public class CreateActionTest
             oldcore.getMocker().registerMockComponent((Type) QueryManager.class, "secure");
 
         mockTemplateProvidersQuery = mock(Query.class);
-        when(mockSecureQueryManager.createQuery(anyString(), anyString())).thenReturn(mockTemplateProvidersQuery);
+        when(mockSecureQueryManager.createQuery(any(), any())).thenReturn(mockTemplateProvidersQuery);
         when(mockTemplateProvidersQuery.execute()).thenReturn(Collections.emptyList());
 
         when(oldcore.getMockContextualAuthorizationManager().hasAccess(any(Right.class), any(EntityReference.class)))
@@ -292,8 +291,8 @@ public class CreateActionTest
         // none was able to be deducted from the given information. The user needs to specify more info in order to
         // continue.
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     @Test
@@ -317,8 +316,8 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     @Test
@@ -465,8 +464,8 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     @Test
@@ -669,8 +668,8 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     /**
@@ -891,8 +890,8 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     @Test
@@ -930,8 +929,8 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     @Test
@@ -968,8 +967,8 @@ public class CreateActionTest
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
         // We should not get this far so no redirect should be done, just the template will be rendered.
-        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString(), any(XWikiContext.class));
+        verify(mockURLFactory, never()).createURL(any(), any(), any(), any(), any(),
+            any(), any(XWikiContext.class));
     }
 
     @Test

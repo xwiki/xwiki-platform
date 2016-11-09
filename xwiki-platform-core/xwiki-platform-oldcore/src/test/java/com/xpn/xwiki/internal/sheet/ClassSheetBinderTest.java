@@ -62,7 +62,7 @@ public class ClassSheetBinderTest
         sheetBindingsQuery = mock(Query.class);
         QueryManager queryManager = mocker.getInstance(QueryManager.class);
         // This is called when the component is initialized.
-        when(queryManager.createQuery(anyString(), anyString())).thenReturn(sheetBindingsQuery);
+        when(queryManager.createQuery(any(), any())).thenReturn(sheetBindingsQuery);
     }
 
     /**

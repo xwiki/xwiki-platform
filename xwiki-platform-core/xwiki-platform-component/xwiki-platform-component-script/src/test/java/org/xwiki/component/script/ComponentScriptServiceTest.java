@@ -19,16 +19,6 @@
  */
 package org.xwiki.component.script;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import javax.inject.Provider;
 
 import org.junit.Before;
@@ -44,6 +34,16 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.component.script.ComponentScriptService}.
@@ -161,7 +161,7 @@ public class ComponentScriptServiceTest
         assertNull(this.mocker.getComponentUnderTest().getComponentManager("wiki:xwiki"));
 
         ComponentManagerManager componentManagerManager = this.mocker.getInstance(ComponentManagerManager.class);
-        verify(componentManagerManager, never()).getComponentManager(anyString(), anyBoolean());
+        verify(componentManagerManager, never()).getComponentManager(any(), anyBoolean());
     }
 
     @Test

@@ -50,7 +50,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
@@ -114,7 +113,7 @@ public class DefaultMailTemplateManagerTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            anyString(), eq("Hello <b>${name}</b> <br />${email}"));
+            any(), eq("Hello <b>${name}</b> <br />${email}"));
 
         String result =
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP);
@@ -148,7 +147,7 @@ public class DefaultMailTemplateManagerTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            anyString(), eq("Salut <b>${name}</b> <br />${email}"));
+            any(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
@@ -193,7 +192,7 @@ public class DefaultMailTemplateManagerTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            anyString(), eq("Salut <b>${name}</b> <br />${email}"));
+            any(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
@@ -240,7 +239,7 @@ public class DefaultMailTemplateManagerTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            anyString(), eq("Salut <b>${name}</b> <br />${email}"));
+            any(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
@@ -305,7 +304,7 @@ public class DefaultMailTemplateManagerTest
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
         when(velocityEngine.evaluate(any(VelocityContext.class), any(Writer.class),
-            anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
+            any(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
 
         try {
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html",

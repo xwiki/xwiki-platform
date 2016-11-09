@@ -38,7 +38,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -64,7 +63,7 @@ public class UsersClassTest
         when(xwiki.getGroupService(any(XWikiContext.class))).thenReturn(groupService);
         when(groupService.getAllMatchedUsers(any(Object[][].class), anyBoolean(), anyInt(), anyInt(),
             any(Object[][].class), any(XWikiContext.class))).thenReturn((List)Arrays.asList("XWiki.Admin"));
-        when(xwiki.getUserName(eq("XWiki.Admin"), anyString(), anyBoolean(), any(XWikiContext.class)))
+        when(xwiki.getUserName(eq("XWiki.Admin"), any(), anyBoolean(), any(XWikiContext.class)))
             .thenReturn("Administrator");
 
         Utils.setComponentManager(this.componentManager);

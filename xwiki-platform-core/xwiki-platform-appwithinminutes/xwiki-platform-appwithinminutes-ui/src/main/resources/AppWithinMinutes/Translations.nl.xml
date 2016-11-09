@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Geef de applicatienaam op.
+appWithinMinutes.wizardStep.name.name=Naam
+appWithinMinutes.wizardStep.name.title=Geef uw applicatie een naam
+appWithinMinutes.wizardStep.presentation.description=Personaliseer de homepage van uw applicatie.
+appWithinMinutes.wizardStep.presentation.name=Presentatie
+appWithinMinutes.wizardStep.presentation.title=Pas de homepage van uw applicatie aan
+appWithinMinutes.wizardStep.structure.description=Genereer de structuur van uw applicatie door op te geven welke soorten velden de applicatie zal bevatten.
+appWithinMinutes.wizardStep.structure.name=Structureren
+appWithinMinutes.wizardStep.structure.title=Bepaal de structuur van uw applicatie
 platform.appwithinminutes.appHomePageActionsHeading=Acties
 platform.appwithinminutes.appHomePageAddEntryHint=Nieuwe gegevens toevoegen
 platform.appwithinminutes.appHomePageAddEntryLabel=Toevoegen

@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language it generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Fornire un nome per l'applicazione.
+appWithinMinutes.wizardStep.name.name=Nome
+appWithinMinutes.wizardStep.name.title=Nome dell'applicazione
+appWithinMinutes.wizardStep.presentation.description=Personalizzazione della home page dell'applicazione.
+appWithinMinutes.wizardStep.presentation.name=Presentazione
+appWithinMinutes.wizardStep.presentation.title=Personalizzazione della home page dell'applicazione
+appWithinMinutes.wizardStep.structure.description=Generare la struttura dell'applicazione specificando i tipi di dati che conterrà.
+appWithinMinutes.wizardStep.structure.name=Struttura
+appWithinMinutes.wizardStep.structure.title=Definire la struttura dell'applicazione
 platform.appwithinminutes.appHomePageActionsHeading=Azioni
 platform.appwithinminutes.appHomePageAddEntryHint=Aggiungi una nuova voce
 platform.appwithinminutes.appHomePageAddEntryLabel=Aggiungi

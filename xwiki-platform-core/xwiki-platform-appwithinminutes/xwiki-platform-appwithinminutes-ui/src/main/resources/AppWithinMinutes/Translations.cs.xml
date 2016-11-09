@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language cs generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Zadejte název aplikace
+appWithinMinutes.wizardStep.name.name=Název
+appWithinMinutes.wizardStep.name.title=Pojmenujte svou aplikaci
+appWithinMinutes.wizardStep.presentation.description=Přizpůsobte domovskou stránku aplikace.
+appWithinMinutes.wizardStep.presentation.name=Prezentace
+appWithinMinutes.wizardStep.presentation.title=Upravte domovskou stránku aplikace.
+appWithinMinutes.wizardStep.structure.description=Vygenerujte strukturu vaší aplikace určením, jaké typy polí bude obsahovat.
+appWithinMinutes.wizardStep.structure.name=Struktura
+appWithinMinutes.wizardStep.structure.title=Určete strukturu vaší aplikace
 platform.appwithinminutes.appHomePageActionsHeading=Akce
 platform.appwithinminutes.appHomePageAddEntryHint=Přidejte novou položku
 platform.appwithinminutes.appHomePageAddEntryLabel=Přidat

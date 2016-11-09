@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Укажите имя приложения.
+appWithinMinutes.wizardStep.name.name=Имя
+appWithinMinutes.wizardStep.name.title=Назовите свое приложение
+appWithinMinutes.wizardStep.presentation.description=Персонализировать домашнюю страницу приложения
+appWithinMinutes.wizardStep.presentation.name=Внешний вид
+appWithinMinutes.wizardStep.presentation.title=Настройка домашней страницы приложения
+appWithinMinutes.wizardStep.structure.description=Создайте структуру вашего приложения указав состав и типы полей, которые оно будет содержать.
+appWithinMinutes.wizardStep.structure.name=Структура
+appWithinMinutes.wizardStep.structure.title=Определить структуру приложения
 platform.appwithinminutes.appHomePageActionsHeading=Действия
 platform.appwithinminutes.appHomePageAddEntryHint=Добавить новую запись
 platform.appwithinminutes.appHomePageAddEntryLabel=Добавить

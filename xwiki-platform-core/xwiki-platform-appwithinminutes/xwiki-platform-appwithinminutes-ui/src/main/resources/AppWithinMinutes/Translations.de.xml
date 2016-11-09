@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Geben Sie der Anwendung einen Namen
+appWithinMinutes.wizardStep.name.name=Name
+appWithinMinutes.wizardStep.name.title=Geben Sie der Anwendung einen Namen
+appWithinMinutes.wizardStep.presentation.description=Geben Sie der Startseite Ihrer Anwendung ein eigenes Aussehen.
+appWithinMinutes.wizardStep.presentation.name=Anzeige
+appWithinMinutes.wizardStep.presentation.title=Passen Sie die Startseite Ihrer Anwendung an.
+appWithinMinutes.wizardStep.structure.description=Erzeugen Sie die Datenstruktur, indem Sie Art und Name jedes Feldes in der Struktur definieren.
+appWithinMinutes.wizardStep.structure.name=Struktur
+appWithinMinutes.wizardStep.structure.title=Definieren Sie die Felder in Ihrer Datenstruktur
 platform.appwithinminutes.appHomePageActionsHeading=Aktionen
 platform.appwithinminutes.appHomePageAddEntryHint=Neuer Eintrag
 platform.appwithinminutes.appHomePageAddEntryLabel=Hinzufügen

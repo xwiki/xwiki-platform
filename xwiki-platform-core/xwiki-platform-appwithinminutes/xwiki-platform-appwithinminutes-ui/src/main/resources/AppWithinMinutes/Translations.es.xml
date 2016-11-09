@@ -43,6 +43,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.name=Nombre
+appWithinMinutes.wizardStep.presentation.name=Presentación
+appWithinMinutes.wizardStep.structure.name=Estructura
 platform.appwithinminutes.appHomePageActionsHeading=Acciones
 platform.appwithinminutes.appHomePageAddEntryHint=Añadir nueva entrada
 platform.appwithinminutes.appHomePageAddEntryLabel=Añadir

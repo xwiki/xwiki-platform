@@ -569,12 +569,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($discard = $instanceDoc.save($services.localization.render('core.comment.updateClassPropertyName'), true))
     #end
   #end
-  ##
-  ## Clear cache.
-  ##
-  #if(!$errorMessage)
-    #set($discard = $xwiki.getXWiki().flushCache($xcontext.context))
-  #end
 #end
 
 #**

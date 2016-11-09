@@ -50,7 +50,9 @@ public class ExtensionPingDataProviderTest
     @Test
     public void provideMapping() throws Exception
     {
-        assertEquals("{\"extensions\":{\"properties\":{\"id\":{\"index\":\"not_analyzed\","
+        assertEquals("{\"extensions\":{\"properties\":{"
+                + "\"features\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
+                + "\"id\":{\"index\":\"not_analyzed\","
                 + "\"type\":\"string\"},\"version\":{\"index\":\"not_analyzed\",\"type\":\"string\"}}}}",
             JSONObject.fromObject(this.mocker.getComponentUnderTest().provideMapping()).toString()
         );

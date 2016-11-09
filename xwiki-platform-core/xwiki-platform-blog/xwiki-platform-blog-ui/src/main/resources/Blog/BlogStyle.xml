@@ -260,15 +260,6 @@
 .entry-author-label {
   display: inline;
 }
-/* Pseudo-tools visible in the edit mode */
-div.publish-message {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.png')");
-  background-position: 6px center;
-}
-div.hide-message {
-  background-image: url("$xwiki.getSkinFile('icons/silk/lock_open.png')");
-  background-position: 6px center;
-}
 .publish-message, .hide-message {
   padding: 8px 28px;
 }
@@ -286,11 +277,21 @@ div.edit-categories {
   font-weight: bold;
 }
 .createPost {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat scroll left center;
   font-size: 80%; 
   font-weight: bold;
-  padding-left: 18px;
-}</code>
+  padding-left: 9px;
+}
+.hentry .blog-entry-toolbox .wikiinternallink a :not(.hidden-article), .blog-category-tools a .fa, .blog-categories-list a .fa{
+  /* disabled blue hyperlink */
+  color: black;
+}
+.blog-category-tools .tool {
+    padding-left: 0.25em;
+}
+</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Default blog style</name>

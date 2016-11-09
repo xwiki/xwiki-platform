@@ -38,7 +38,6 @@ import org.xwiki.sheet.SheetManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 /**

@@ -52,7 +52,7 @@ public class DistributionPingDataProviderTest
     public void provideMapping() throws Exception
     {
         Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
-        assertEquals(3, mapping.size());
+        assertEquals(4, mapping.size());
 
         Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("distributionId");
         assertEquals(2, propertiesMapping.size());

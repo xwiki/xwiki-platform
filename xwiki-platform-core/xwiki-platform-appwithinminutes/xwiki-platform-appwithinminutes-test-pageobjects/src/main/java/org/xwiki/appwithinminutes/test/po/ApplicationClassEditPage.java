@@ -38,12 +38,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  */
 public class ApplicationClassEditPage extends ApplicationEditPage
 {
-    @FindBy(id = "wizard-next")
-    private WebElement nextStepButton;
-
-    @FindBy(xpath = "//*[@title='Go to previous step']")
-    private WebElement previousStepButton;
-
     @FindBy(id = "palette")
     private WebElement palette;
 
@@ -61,10 +55,10 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      *
      * @return the page that represents the next step of the App Within Minutes wizard
      */
-    public ApplicationHomeEditPage clickNextStep()
+    public ApplicationTemplateProviderEditPage clickNextStep()
     {
         nextStepButton.click();
-        return new ApplicationHomeEditPage();
+        return new ApplicationTemplateProviderEditPage();
     }
 
     /**
@@ -83,7 +77,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      */
     public boolean hasPreviousStep()
     {
-        return getDriver().findElementsWithoutWaiting(By.linkText("PREVIOUS STEP")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.linkText("Previous Step")).size() > 0;
     }
 
     /**

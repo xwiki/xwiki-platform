@@ -24,14 +24,20 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
 
 /**
- * Represents some custom actions available on application pages in inline edit mode, since the default save and view and
- * save and continue buttons are overridden in AWM.
+ * Represents some custom actions available on application pages in inline edit mode, since the default save and view
+ * and save and continue buttons are overridden in AWM.
  *
  * @version $Id$
  * @since 7.4M2
  */
 public class ApplicationEditPage extends InlinePage
 {
+    @FindBy(id = "wizard-next")
+    protected WebElement nextStepButton;
+
+    @FindBy(xpath = "//a[. = 'Previous Step']")
+    protected WebElement previousStepButton;
+
     /**
      * The form used to edit the application class overwrites the save button because it needs to process the submitted
      * data. Otherwise the request is forwarded by the action filter to the save action.

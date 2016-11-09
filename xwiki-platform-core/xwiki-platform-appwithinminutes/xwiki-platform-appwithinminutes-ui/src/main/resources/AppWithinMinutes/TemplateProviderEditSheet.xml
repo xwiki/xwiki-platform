@@ -334,7 +334,9 @@
 {{/velocity}}
 
 {{velocity}}
-#doEdit
+#if ($doc.getObject('XWiki.TemplateProviderClass'))
+  #doEdit
+#end
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.TemplateProviderEditSheet</name>

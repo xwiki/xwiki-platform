@@ -69,7 +69,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     /**
      * Make default wiki document based translation priority a bit higher than the default one.
      */
-    public static int DEFAULTPRIORITY_WIKI = DEFAULTPRIORITY - 100;
+    public static final int DEFAULTPRIORITY_WIKI = DEFAULTPRIORITY - 100;
 
     protected ComponentManager componentManager;
 

@@ -46,8 +46,8 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceR
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.web.Utils;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

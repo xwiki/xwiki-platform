@@ -55,7 +55,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants

@@ -33,9 +33,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 
 /**

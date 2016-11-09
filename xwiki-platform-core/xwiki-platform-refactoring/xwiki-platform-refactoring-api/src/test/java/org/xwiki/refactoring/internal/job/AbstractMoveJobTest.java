@@ -25,7 +25,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.MoveRequest;
 
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 /**

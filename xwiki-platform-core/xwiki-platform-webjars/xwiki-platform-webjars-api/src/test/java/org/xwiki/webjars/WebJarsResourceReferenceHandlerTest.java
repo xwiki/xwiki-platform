@@ -51,7 +51,7 @@ import org.xwiki.webjars.internal.WebJarsResourceReference;
 import org.xwiki.webjars.internal.WebJarsResourceReferenceHandler;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**

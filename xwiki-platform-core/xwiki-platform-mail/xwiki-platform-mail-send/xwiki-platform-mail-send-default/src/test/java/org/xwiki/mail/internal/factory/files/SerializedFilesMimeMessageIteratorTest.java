@@ -41,7 +41,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.test.LogRule;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

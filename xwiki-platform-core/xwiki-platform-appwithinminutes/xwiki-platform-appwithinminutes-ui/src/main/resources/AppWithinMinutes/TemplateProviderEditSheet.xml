@@ -289,7 +289,7 @@
         ## Creation Restrictions As Suggestions
         ##
         &lt;dt&gt;
-          &lt;label for="XWiki.TemplateProviderClass_0_creationSuggestion"&gt;
+          &lt;label for="XWiki.TemplateProviderClass_0_creationRestrictionsAreSuggestions"&gt;
             #displayPropertyValue('creationRestrictionsAreSuggestions')
             $escapetool.xml($services.localization.render('appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name'))
           &lt;/label&gt;
@@ -311,6 +311,8 @@
             &lt;/span&gt;
           &lt;/dt&gt;
           &lt;dd&gt;#displayPropertyValue('terminal')&lt;/dd&gt;
+        #else
+          &lt;dd&gt;#displayPropertyValue('terminal' 'hidden')&lt;/dd&gt;
         #end
       &lt;/dl&gt;
     &lt;/div&gt;

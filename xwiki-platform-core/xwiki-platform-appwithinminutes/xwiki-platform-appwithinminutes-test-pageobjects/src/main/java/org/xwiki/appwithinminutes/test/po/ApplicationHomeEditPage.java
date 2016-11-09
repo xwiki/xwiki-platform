@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
- * Represents the actions available when editing the application home page. This is also the third step of the App
+ * Represents the actions available when editing the application home page. This is also the forth step of the App
  * Within Minutes wizard, in which the presentation of the application home page is customized.
  *
  * @version $Id$
@@ -40,12 +40,6 @@ import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
  */
 public class ApplicationHomeEditPage extends ApplicationEditPage
 {
-    @FindBy(xpath = "//a[. = 'Previous Step']")
-    private WebElement previousStepButton;
-
-    @FindBy(id = "wizard-next")
-    private WebElement finishButton;
-
     @FindBy(id = "availableColumns")
     private WebElement availableColumns;
 
@@ -65,10 +59,10 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
      *
      * @return the page that represents the previous step of the App Within Minutes wizard
      */
-    public ApplicationClassEditPage clickPreviousStep()
+    public ApplicationTemplateProviderEditPage clickPreviousStep()
     {
         previousStepButton.click();
-        return new ApplicationClassEditPage();
+        return new ApplicationTemplateProviderEditPage();
     }
 
     /**
@@ -78,7 +72,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
      */
     public ApplicationHomePage clickFinish()
     {
-        finishButton.click();
+        nextStepButton.click();
         return new ApplicationHomePage();
     }
 

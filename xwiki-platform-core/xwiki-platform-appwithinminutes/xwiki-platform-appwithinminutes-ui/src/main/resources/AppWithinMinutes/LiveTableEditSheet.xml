@@ -111,7 +111,7 @@
     #set ($icon = 'icon:application')
     #set ($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
     #set ($entryIcon = $xwiki.getDocument($templateProviderReference).getValue('icon'))
-    #if ("$entryIcon" != '')
+    #if ("$!entryIcon" != '')
       ## Use the entry icon by default, if set.
       #set ($icon = "icon:$entryIcon")
     #end

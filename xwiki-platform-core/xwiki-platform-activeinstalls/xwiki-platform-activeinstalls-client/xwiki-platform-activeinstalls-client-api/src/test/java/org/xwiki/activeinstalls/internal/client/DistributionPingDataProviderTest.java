@@ -52,7 +52,9 @@ public class DistributionPingDataProviderTest
     @Test
     public void provideMapping() throws Exception
     {
-        assertEquals("{\"distributionId\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
+        assertEquals("{\"distributionId\":{"
+                + "\"features\":\"not_analyzed\",\"type\":\"string\"},"
+                + "\"index\":\"not_analyzed\",\"type\":\"string\"},"
                 + "\"distributionVersion\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
                 + "\"instanceId\":{\"index\":\"not_analyzed\",\"type\":\"string\"}}",
             JSONObject.fromObject(this.mocker.getComponentUnderTest().provideMapping()).toString()

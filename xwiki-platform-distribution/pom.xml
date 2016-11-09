@@ -191,38 +191,6 @@
             </execution>
           </executions>
         </plugin>
-        <!-- Overwrite various properties while generating extension descriptors -->
-        <plugin>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
-          <version>${commons.version}</version>
-          <configuration>
-            <extensionOverrides>
-              <!-- Should ok for any version of jcl-over-slf4j (since commons-logging is dead) -->
-              <extensionOverride>
-                <id>org.slf4j:jcl-over-slf4j</id>
-                <features>commons-logging:commons-logging/1.2</features>
-              </extensionOverride>
-              <!-- Should ok for any version of log4j-over-slf4j (since log4j 1.x is dead) -->
-              <extensionOverride>
-                <id>org.slf4j:log4j-over-slf4j</id>
-                <features>log4j:log4j/1.2.17</features>
-              </extensionOverride>
-              <!-- For Jython 2.7.0 (don't forget to refresh it when Jython version id changed !) -->
-              <extensionOverride>
-                <id>org.python:jython-standalone</id>
-                <features>
-                  org.python:jython,
-                  com.github.jnr:jffi/1.2.7,
-                  com.github.jnr:jnr-constants/0.8.6,
-                  com.github.jnr:jnr-ffi/2.0.1,
-                  com.github.jnr:jnr-netdb/1.1.4,
-                  com.github.jnr:jnr-posix/3.0.9
-                </features>
-              </extensionOverride>
-            </extensionOverrides>
-          </configuration>
-        </plugin>
         <!-- Ensure we don't have duplicates in WEB-INF/lib -->
         <plugin>
           <groupId>org.basepom.maven</groupId>

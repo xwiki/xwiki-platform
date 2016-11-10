@@ -38,6 +38,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.mockito.StringReaderMatcher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -59,20 +60,20 @@ public class RenderingScriptServiceTest
     public void parseAndRender() throws Exception
     {
         Parser parser = this.mocker.registerMockComponent(Parser.class, "plain/1.0");
-        when(parser.parse(new StringReader("some [[TODO]] stuff")))
+        when(parser.parse(argThat(new StringReaderMatcher("some [[TODO]] stuff"))))
             .thenReturn(new XDOM(Collections.<Block>emptyList()));
 
         BlockRenderer blockRenderer = this.mocker.registerMockComponent(BlockRenderer.class, "xwiki/2.0");
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 WikiPrinter printer = (WikiPrinter) invocationOnMock.getArguments()[1];
                 printer.print("some ~[~[TODO]] stuff");
                 return null;
             }
-        }).when(blockRenderer).render(any(XDOM.class), any(WikiPrinter.class));
+        }).when(blockRenderer).render(any(XDOM.class), any());
 
         XDOM xdom = this.mocker.getComponentUnderTest().parse("some [[TODO]] stuff", "plain/1.0");
         Assert.assertEquals("some ~[~[TODO]] stuff", this.mocker.getComponentUnderTest().render(xdom, "xwiki/2.0"));

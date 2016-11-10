@@ -97,7 +97,7 @@ public class MailStorageScriptServiceTest
             this.mocker.getInstance(MailListener.class, "memory"));
 
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(any(Session.class), eq("batchId"), eq("messageId"))).thenThrow(
+        when(contentStore.load(any(), eq("batchId"), eq("messageId"))).thenThrow(
             new MailStoreException("error"));
 
         ScriptMailResult result = this.mocker.getComponentUnderTest().resend("batchId", "messageId");
@@ -117,11 +117,11 @@ public class MailStorageScriptServiceTest
         String batchId = UUID.randomUUID().toString();
 
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(any(Session.class), eq(batchId), eq("messageId"))).thenReturn(message);
+        when(contentStore.load(any(), eq(batchId), eq("messageId"))).thenReturn(message);
 
         MailSender sender = this.mocker.getInstance(MailSender.class);
-        when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(Session.class),
-            same(memoryMailListener))).thenReturn(new DefaultMailResult(batchId));
+        when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(), same(memoryMailListener)))
+            .thenReturn(new DefaultMailResult(batchId));
 
         // Since resend() will wait indefinitely for the message count to be correct, we need to configure it here
         // as we're mocking the MailSender.

@@ -315,7 +315,7 @@
   #set($nameUrl = $escapetool.url($name))
   #foreach($i in [1..$level])*#end ##
 &lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
-&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$nameUrl"), $doc.syntax)" title="RSS"&gt;#toolImage('feed')&lt;/a&gt;&amp;nbsp;##
+&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$nameUrl"), $doc.syntax)" title="RSS"&gt;#toolImage('rss')&lt;/a&gt;&amp;nbsp;##
 &lt;span class="wikilink"&gt;&lt;a href="$services.rendering.escape($xwiki.getURL($name), $doc.syntax)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;##
 &lt;span class="blog-category-tools"&gt;##
 #if($xwiki.hasAccessLevel('delete', $xcontext.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$services.rendering.escape($xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$nameUrl"), $doc.syntax)" class="tool rename"&gt;#toolImage('pencil')&lt;/a&gt;#end##
@@ -352,7 +352,7 @@
   #getEntriesForCategory($name $discard $totalEntries)
   #set($nameUrl = $escapetool.url($name))
   #getCallingDocument($callingDocument)
-  #foreach($i in [1..$level])*#end (% class="blog-category-level" %)((( [[#toolImage('feed')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$nameUrl" title="RSS"]] &lt;span class="wikilink"&gt;&lt;a href="$services.rendering.escape($xwiki.getURL($name), $callingDocument.syntax)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;)))
+  #foreach($i in [1..$level])*#end (% class="blog-category-level" %)((( [[#toolImage('rss')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$nameUrl" title="RSS"]] &lt;span class="wikilink"&gt;&lt;a href="$services.rendering.escape($xwiki.getURL($name), $callingDocument.syntax)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;)))
 #end
 ##
 ##

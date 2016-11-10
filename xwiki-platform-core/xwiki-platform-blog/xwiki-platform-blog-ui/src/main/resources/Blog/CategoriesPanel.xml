@@ -128,7 +128,7 @@
 #panelheader($services.localization.render('xe.blog.categories.paneltitle'))
 {{html wiki="true"}}
 #getCallingDocument($callingDocument)
-* (% class="blog-category-level" %)((( [[#toolImage('feed')&gt;&gt;Blog.BlogRss||queryString="xpage=plain" title="RSS"]] &lt;span class="wikilink"&gt;&lt;a href="$xwiki.getURL('Blog.WebHome')"&gt;$services.localization.render('blog.categories.all')&lt;/a&gt;&lt;/span&gt;)))
+* (% class="blog-category-level" %)((( [[#toolImage('rss')&gt;&gt;Blog.BlogRss||queryString="xpage=plain" title="RSS"]] &lt;span class="wikilink"&gt;&lt;a href="$xwiki.getURL('Blog.WebHome')"&gt;$services.localization.render('blog.categories.all')&lt;/a&gt;&lt;/span&gt;)))
 {{/html}}
 
 #getCategoriesHierarchy('Blog' $tree)

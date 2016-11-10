@@ -82,33 +82,6 @@
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Random webjars dependency that we install in a custom local repo to install it into the test wiki to verify
-           that serving webjars work in XWiki. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-webjar-for-test</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.webjars</groupId>
-                  <artifactId>AjaxQ</artifactId>
-                  <version>0.0.2</version>
-                  <type>jar</type>
-                  <overWrite>false</overWrite>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/test-classes/repository</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
            http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
       <plugin>

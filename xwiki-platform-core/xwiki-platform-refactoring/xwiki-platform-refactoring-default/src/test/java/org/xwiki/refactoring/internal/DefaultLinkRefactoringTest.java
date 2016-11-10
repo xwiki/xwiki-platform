@@ -41,9 +41,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.BlockMatcher;
-import org.xwiki.rendering.block.match.ClassBlockMatcher;
-import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -127,8 +124,8 @@ public class DefaultLinkRefactoringTest
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
         LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
 
-        when(xdom.getBlocks(any(ClassBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
+            .thenReturn(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference)).thenReturn(
@@ -177,8 +174,8 @@ public class DefaultLinkRefactoringTest
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
         LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
 
-        when(xdom.getBlocks(any(ClassBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
+            .thenReturn(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference)).thenReturn(
@@ -229,8 +226,7 @@ public class DefaultLinkRefactoringTest
 
         ResourceReference linkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
         LinkBlock linkBlock = new LinkBlock(Collections.<Block>emptyList(), linkReference, false);
-        when(xdom.getBlocks(any(ClassBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(linkBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.<Block>asList(linkBlock));
 
         when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference)).thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
@@ -267,8 +263,8 @@ public class DefaultLinkRefactoringTest
         ResourceReference spaceLinkReference = new ResourceReference("A", ResourceType.SPACE);
         LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
 
-        when(xdom.getBlocks(any(ClassBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
+            .thenReturn(Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference)).thenReturn(
@@ -316,8 +312,8 @@ public class DefaultLinkRefactoringTest
         ResourceReference spaceLinkReference = new ResourceReference("A", ResourceType.SPACE);
         LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
 
-        when(xdom.getBlocks(any(ClassBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
+            .thenReturn(Arrays.<Block>asList(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference)).thenReturn(
@@ -373,8 +369,8 @@ public class DefaultLinkRefactoringTest
         displayParameters.put("reference", "A.B");
         MacroBlock displayMacroBlock = new MacroBlock("display", displayParameters, false);
 
-        when(xdom.getBlocks(any(MacroBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
+            .thenReturn(Arrays.<Block>asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
 
         ResourceReference macroResourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
 
@@ -415,8 +411,8 @@ public class DefaultLinkRefactoringTest
         ResourceReference resourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
         LinkBlock documentLinkBlock = new LinkBlock(Collections.<Block>emptyList(), resourceReference, false);
 
-        when(xdom.getBlocks(any(BlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
-            Arrays.<Block>asList(includeMacroBlock, documentLinkBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
+            .thenReturn(Arrays.<Block>asList(includeMacroBlock, documentLinkBlock));
 
         when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference)).thenReturn(
             oldLinkTarget);

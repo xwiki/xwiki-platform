@@ -21,7 +21,6 @@ package org.xwiki.mail.internal.factory.template;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.mail.Address;
@@ -43,7 +42,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMapOf;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -71,14 +69,13 @@ public class TemplateMimeMessageFactoryTest
         this.templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
 
         MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
-        when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"),
-            anyMapOf(String.class, Object.class), any(Locale.class))).thenReturn("XWiki news");
+        when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"), any(), any()))
+            .thenReturn("XWiki news");
 
         MimeBodyPartFactory<DocumentReference> templateBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, DocumentReference.class), "xwiki/template");
         this.mimeBodyPart = mock(MimeBodyPart.class);
-        when(templateBodyPartFactory.create(same(this.templateReference),
-            anyMapOf(String.class, Object.class))).thenReturn(this.mimeBodyPart);
+        when(templateBodyPartFactory.create(same(this.templateReference), any())).thenReturn(this.mimeBodyPart);
     }
 
     @Test

@@ -29,7 +29,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,9 +49,16 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.webjars.internal.WebJarsResourceReference;
 import org.xwiki.webjars.internal.WebJarsResourceReferenceHandler;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReferenceHandler}.
@@ -73,8 +79,6 @@ public class WebJarsResourceReferenceHandlerTest
     private ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
 
     private WebJarsResourceReferenceHandler handler;
-
-    private ClassLoaderManager clm;
 
     private NamespaceURLClassLoader classLoader;
 
@@ -182,13 +186,13 @@ public class WebJarsResourceReferenceHandlerTest
 
         doAnswer(new Answer<Void>()
         {
+            @Override
             public Void answer(InvocationOnMock invocation)
             {
                 ((StringWriter) invocation.getArguments()[1]).write("evaluated content");
                 return null;
             }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(StringWriter.class),
-            eq("angular/2.1.11/angular.js"), any(Reader.class));
+        }).when(velocityEngine).evaluate(any(), any(), eq("angular/2.1.11/angular.js"), any(Reader.class));
 
         this.handler.handle(reference, this.chain);
 
@@ -199,8 +203,8 @@ public class WebJarsResourceReferenceHandlerTest
         verify(this.response).setContentType("application/javascript");
 
         // Verify that the dynamic resource is not cached.
-        verify(this.response.getHttpServletResponse(), never()).setHeader(any(String.class), any(String.class));
-        verify(this.response.getHttpServletResponse(), never()).setDateHeader(any(String.class), any(Long.class));
+        verify(this.response.getHttpServletResponse(), never()).setHeader(any(), any());
+        verify(this.response.getHttpServletResponse(), never()).setDateHeader(any(), anyLong());
     }
 
     @Test
@@ -218,8 +222,8 @@ public class WebJarsResourceReferenceHandlerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
-        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class),
-            eq("angular/2.1.11/angular.js"), any(Reader.class))).thenThrow(new VelocityException("Bad code!"));
+        when(velocityEngine.evaluate(any(), any(), eq("angular/2.1.11/angular.js"), any(Reader.class)))
+            .thenThrow(new VelocityException("Bad code!"));
 
         this.handler.handle(reference, this.chain);
 

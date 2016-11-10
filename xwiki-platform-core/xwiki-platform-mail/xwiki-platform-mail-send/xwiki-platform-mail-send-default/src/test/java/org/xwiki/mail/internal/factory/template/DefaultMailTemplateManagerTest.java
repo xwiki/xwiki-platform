@@ -23,6 +23,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Provider;
 import javax.mail.MessagingException;
@@ -34,7 +35,6 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
@@ -80,14 +80,14 @@ public class DefaultMailTemplateManagerTest
 
         this.xwiki = mock(XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(this.xwiki);
-        when(this.xwiki.getDefaultLocale(xwikiContext)).thenReturn(LocaleUtils.toLocale("en"));
+        when(this.xwiki.getDefaultLocale(xwikiContext)).thenReturn(Locale.ENGLISH);
 
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xwiki.getDocument(any(DocumentReference.class), eq(xwikiContext))).thenReturn(document);
 
         BaseObject object = mock(BaseObject.class);
 
-        when(document.getXObjects(any(DocumentReference.class))).thenReturn(Collections.singletonList(object));
+        when(document.getXObjects(any())).thenReturn(Collections.singletonList(object));
     }
 
     @Test
@@ -96,17 +96,17 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html")))
+        when(documentBridge.getProperty(same(documentReference), any(), anyInt(), eq("html")))
             .thenReturn("Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+            public Void answer(InvocationOnMock invocation) throws Throwable
             {
                 Object[] args = invocation.getArguments();
                 ((Writer) args[1]).write("Hello <b>John Doe</b> <br />john@doe.com");
@@ -116,7 +116,7 @@ public class DefaultMailTemplateManagerTest
             any(), eq("Hello <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP);
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap());
 
         assertEquals(result, "Hello <b>John Doe</b> <br />john@doe.com");
     }
@@ -127,20 +127,18 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr")))
-            .thenReturn(1);
-        when(documentBridge.getProperty(any(DocumentReference.class), any(DocumentReference.class), eq(1), eq("html")))
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("fr"))).thenReturn(1);
+        when(documentBridge.getProperty(any(DocumentReference.class), any(), eq(1), eq("html")))
             .thenReturn("Salut <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+            public Void answer(InvocationOnMock invocation) throws Throwable
             {
                 Object[] args = invocation.getArguments();
                 ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
@@ -149,12 +147,10 @@ public class DefaultMailTemplateManagerTest
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
             any(), eq("Salut <b>${name}</b> <br />${email}"));
 
-        String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
-                LocaleUtils.toLocale("fr"));
+        String result = this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
+            Locale.FRENCH);
 
-        verify(documentBridge)
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr"));
+        verify(documentBridge).getObjectNumber(any(), any(), eq("language"), eq("fr"));
 
         assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }
@@ -165,43 +161,35 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        //First call with the passed language, return -1 (No XWiki.Mail xobject found)
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr")))
-            .thenReturn(-1);
+        // First call with the passed language, return -1 (No XWiki.Mail xobject found)
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("fr"))).thenReturn(-1);
 
-        //Second call with the default language (en), return one (Only XWiki.Mail xobject is found)
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("en")))
-            .thenReturn(1);
+        // Second call with the default language (en), return one (Only XWiki.Mail xobject is found)
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("en"))).thenReturn(1);
 
-        when(documentBridge.getProperty(any(DocumentReference.class), any(DocumentReference.class), eq(1), eq("html")))
+        when(documentBridge.getProperty(any(DocumentReference.class), any(), eq(1), eq("html")))
             .thenReturn("Salut <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+            public Void answer(InvocationOnMock invocation) throws Throwable
             {
                 Object[] args = invocation.getArguments();
                 ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
                 return null;
             }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            any(), eq("Salut <b>${name}</b> <br />${email}"));
+        }).when(velocityEngine).evaluate(any(), any(), any(), eq("Salut <b>${name}</b> <br />${email}"));
 
-        String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
-                LocaleUtils.toLocale("fr"));
+        String result = this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
+            Locale.FRENCH);
 
-        verify(documentBridge)
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr"));
-        verify(documentBridge).getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq(
-            "language"), eq("en"));
+        verify(documentBridge).getObjectNumber(any(), any(), eq("language"), eq("fr"));
+        verify(documentBridge).getObjectNumber(any(), any(), eq("language"), eq("en"));
 
         assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }
@@ -212,43 +200,35 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        //First call with the passed language, return -1 (No XWiki.Mail xobject found)
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr")))
-            .thenReturn(-1);
+        // First call with the passed language, return -1 (No XWiki.Mail xobject found)
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("fr"))).thenReturn(-1);
 
-        //Second call with the default language, return -1 (No XWiki.Mail xobject found)
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("en")))
-            .thenReturn(-1);
+        // Second call with the default language, return -1 (No XWiki.Mail xobject found)
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("en"))).thenReturn(-1);
 
-        when(documentBridge.getProperty(any(DocumentReference.class), any(DocumentReference.class), eq(0), eq("html")))
+        when(documentBridge.getProperty(any(DocumentReference.class), any(), eq(0), eq("html")))
             .thenReturn("Salut <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
-        doAnswer(new Answer()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+            public Void answer(InvocationOnMock invocation) throws Throwable
             {
                 Object[] args = invocation.getArguments();
                 ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
                 return null;
             }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            any(), eq("Salut <b>${name}</b> <br />${email}"));
+        }).when(velocityEngine).evaluate(any(), any(), any(), eq("Salut <b>${name}</b> <br />${email}"));
 
-        String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
-                LocaleUtils.toLocale("fr"));
+        String result = this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
+            Locale.FRENCH);
 
-        verify(documentBridge)
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr"));
-        verify(documentBridge)
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("en"));
+        verify(documentBridge).getObjectNumber(any(), any(), eq("language"), eq("fr"));
+        verify(documentBridge).getObjectNumber(any(), any(), eq("language"), eq("en"));
 
         assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }
@@ -257,30 +237,27 @@ public class DefaultMailTemplateManagerTest
     public void evaluateWithErrorNoObjectMatches() throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(document);
+        when(this.xwiki.getDocument(any(DocumentReference.class), any())).thenReturn(document);
 
         BaseObject object1 = mock(BaseObject.class);
         BaseObject object2 = mock(BaseObject.class);
 
         List<BaseObject> xobjects = Arrays.asList(object1, object2);
-        when(document.getXObjects(any(DocumentReference.class))).thenReturn(xobjects);
+        when(document.getXObjects(any())).thenReturn(xobjects);
 
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        //First call with the passed language, return -1 (No XWiki.Mail xobject found)
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("fr")))
-            .thenReturn(-1);
+        // First call with the passed language, return -1 (No XWiki.Mail xobject found)
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("fr"))).thenReturn(-1);
 
-        //Second call with the default language, return -1 (No XWiki.Mail xobject found)
-        when(documentBridge
-            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), eq("en")))
-            .thenReturn(-1);
+        // Second call with the default language, return -1 (No XWiki.Mail xobject found)
+        when(documentBridge.getObjectNumber(any(), any(), eq("language"), eq("en"))).thenReturn(-1);
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
-                LocaleUtils.toLocale("fr"));
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
+                Locale.FRENCH);
+
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertEquals(
@@ -296,7 +273,7 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html")))
+        when(documentBridge.getProperty(same(documentReference), any(), anyInt(), eq("html")))
             .thenReturn("Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);

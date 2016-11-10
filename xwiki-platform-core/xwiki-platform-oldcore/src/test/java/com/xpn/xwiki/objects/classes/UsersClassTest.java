@@ -60,11 +60,10 @@ public class UsersClassTest
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(context.getWiki()).thenReturn(xwiki);
         XWikiGroupService groupService = mock(XWikiGroupService.class);
-        when(xwiki.getGroupService(any(XWikiContext.class))).thenReturn(groupService);
-        when(groupService.getAllMatchedUsers(any(Object[][].class), anyBoolean(), anyInt(), anyInt(),
-            any(Object[][].class), any(XWikiContext.class))).thenReturn((List)Arrays.asList("XWiki.Admin"));
-        when(xwiki.getUserName(eq("XWiki.Admin"), any(), anyBoolean(), any(XWikiContext.class)))
-            .thenReturn("Administrator");
+        when(xwiki.getGroupService(any())).thenReturn(groupService);
+        when(groupService.getAllMatchedUsers(any(), anyBoolean(), anyInt(), anyInt(), any(), any()))
+            .thenReturn((List) Arrays.asList("XWiki.Admin"));
+        when(xwiki.getUserName(eq("XWiki.Admin"), any(), anyBoolean(), any())).thenReturn("Administrator");
 
         Utils.setComponentManager(this.componentManager);
         this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");

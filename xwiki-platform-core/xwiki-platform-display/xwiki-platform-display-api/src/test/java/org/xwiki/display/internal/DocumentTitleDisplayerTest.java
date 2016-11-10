@@ -23,7 +23,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -124,10 +123,7 @@ public class DocumentTitleDisplayerTest
         when(modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
 
         AuthorizationManager authorizationManager = this.mocker.getInstance(AuthorizationManager.class);
-        when(
-            authorizationManager
-                .hasAccess(eq(Right.SCRIPT), any(DocumentReference.class), any(DocumentReference.class))).thenReturn(
-            true);
+        when(authorizationManager.hasAccess(eq(Right.SCRIPT), any(), any())).thenReturn(true);
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
 
@@ -138,11 +134,11 @@ public class DocumentTitleDisplayerTest
         this.mocker.getComponentUnderTest().display(document, params);
 
         // Check that the context is set.
-        verify(dab).pushDocumentInContext(any(Map.class), eq(documentReference));
+        verify(dab).pushDocumentInContext(any(), eq(documentReference));
         verify(modelContext).setCurrentEntityReference(documentReference.getWikiReference());
 
         // Check that the context is restored.
-        verify(dab).popDocumentFromContext(any(Map.class));
+        verify(dab).popDocumentFromContext(any());
         verify(modelContext).setCurrentEntityReference(currentWikiReference);
     }
 }

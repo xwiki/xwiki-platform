@@ -49,6 +49,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
@@ -102,7 +103,7 @@ public class SpacesConfigurationSourceTest
                 return null;
             }
         });
-        when(spaceConfiguration.getProperty(any(), any())).then(new Answer<Object>()
+        when(spaceConfiguration.getProperty(any(), anyString())).then(new Answer<Object>()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -111,7 +112,7 @@ public class SpacesConfigurationSourceTest
                 if (spacePreferences != null) {
                     String key = invocation.getArgument(0);
                     if (spacePreferences.containsKey(key)) {
-                        return spacePreferences.get(key);   
+                        return spacePreferences.get(key);
                     }
                 }
 
@@ -119,7 +120,7 @@ public class SpacesConfigurationSourceTest
             }
         });
 
-    when(spaceConfiguration.containsKey(any())).then(new Answer<Boolean>()
+        when(spaceConfiguration.containsKey(any())).then(new Answer<Boolean>()
         {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable

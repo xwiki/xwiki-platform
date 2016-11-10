@@ -475,6 +475,11 @@
                   }
                 },
                 "ignore": [
+                  {
+                    "code": "java.class.externalClassNoLongerExposedInAPI",
+                    "old": "class org.xwiki.observation.event.ActionExecutionEvent",
+                    "justification": "Note a breakage. This class already exist in xwiki-commons-observation-api"
+                  }
                 ]
               }
             }

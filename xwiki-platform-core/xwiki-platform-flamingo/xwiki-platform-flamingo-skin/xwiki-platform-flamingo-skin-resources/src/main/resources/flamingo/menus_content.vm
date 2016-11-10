@@ -2,7 +2,8 @@
 ## Globals
 ##
 #set ($canView = !$doc.isNew() && $xwiki.hasAccessLevel('view'))
-#set ($canCopy = $canView && $hasCreatePage)
+## Note: Checking only the view right because $hasCreatePage is not yet reliable.
+#set ($canCopy = $canView)
 #set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 

@@ -67,7 +67,8 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
     {
         Namespace namespace = NamespaceUtils.toNamespace(value);
 
-        EntityType entityType = EnumUtils.getEnum(EntityType.class, namespace.getType().toUpperCase());
+        EntityType entityType = namespace.getType() != null
+            ? EnumUtils.getEnum(EntityType.class, namespace.getType().toUpperCase()) : null;
         String entityReference = namespace.getValue();
         if (entityType == null) {
             entityType = EntityType.DOCUMENT;

@@ -31,7 +31,7 @@ import org.xwiki.properties.ConverterManager;
 
 import com.google.gson.JsonObject;
 
-import io.searchbox.Action;
+import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.Search;

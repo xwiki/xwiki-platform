@@ -99,7 +99,7 @@ public class DefaultPingSenderIntegrationTest
         } catch (Exception expected) {
             // We expect a 404 since we haven't configured the proxy to return something specific, but we don't need to
             // do that since all we want is to ensure the proxy is called!
-            assertEquals("404 Not Found", expected.getMessage());
+            assertTrue(expected.getMessage().contains("404 Not Found"));
         }
         assertFalse("The HTTP server was called by the ping sender", findAll(allRequests()).isEmpty());
     }

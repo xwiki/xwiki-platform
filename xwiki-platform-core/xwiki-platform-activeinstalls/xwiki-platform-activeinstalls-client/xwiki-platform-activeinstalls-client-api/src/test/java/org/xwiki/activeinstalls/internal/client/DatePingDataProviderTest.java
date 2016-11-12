@@ -34,8 +34,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,7 +77,7 @@ public class DatePingDataProviderTest
         when(idManager.getInstanceId()).thenReturn(id);
 
         JestClient client = mock(JestClient.class);
-        JestResult searchResult = new JestResult(new Gson());
+        SearchResult searchResult = new SearchResult(new Gson());
         String resultString = "{\n" +
             "   \"took\": 4,\n" +
             "   \"timed_out\": false,\n" +

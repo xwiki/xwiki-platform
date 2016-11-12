@@ -51,7 +51,7 @@
            See https://github.com/elasticsearch/elasticsearch/issues/2091#issuecomment-23630194 -->
       <groupId>io.searchbox</groupId>
       <artifactId>jest</artifactId>
-      <version>0.1.0</version>
+      <version>2.0.3</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>

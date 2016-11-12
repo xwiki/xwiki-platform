@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
+import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
 
 import org.junit.Rule;
@@ -50,7 +50,7 @@ public class DefaultPingSenderTest
     public void sendPing() throws Exception
     {
         JestClient client = mock(JestClient.class);
-        JestResult indexResult = new JestResult(new Gson());
+        DocumentResult indexResult = new DocumentResult(new Gson());
         indexResult.setSucceeded(true);
         when(client.execute(any(Index.class))).thenReturn(indexResult);
 

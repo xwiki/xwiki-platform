@@ -63,12 +63,11 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock</artifactId>
-      <version>1.46</version>
+      <version>1.58</version>
       <scope>test</scope>
       <exclusions>
         <!-- We are using SLF4J -->

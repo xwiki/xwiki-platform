@@ -43,7 +43,6 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 
-import com.sun.star.auth.InvalidArgumentException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -155,7 +154,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         for (Block block : blocks) {
             try {
                 modified |= renameLink(block, currentDocumentReference, oldTarget, newTarget);
-            } catch (InvalidArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 continue;
             }
         }
@@ -171,14 +170,14 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     }
 
     private boolean renameLink(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
-        DocumentReference newTarget) throws InvalidArgumentException
+        DocumentReference newTarget) throws IllegalArgumentException
     {
         boolean modified = false;
 
         ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
         if (resourceReference == null) {
             // Skip invalid blocks.
-            throw new InvalidArgumentException();
+            throw new IllegalArgumentException();
         }
 
         ResourceType resourceType = resourceReference.getType();
@@ -186,7 +185,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         // TODO: support ATTACHMENT as well.
         if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
             // We are currently only interested in Document or Space references.
-            throw new InvalidArgumentException();
+            throw new IllegalArgumentException();
         }
 
         // Resolve the resource reference.

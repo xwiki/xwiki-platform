@@ -60,7 +60,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("distribution")
 @Singleton
-public class DistributionScriptService implements ScriptService
+public class DistributionInternalScriptService implements ScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.

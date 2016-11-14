@@ -52,7 +52,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
@@ -80,8 +79,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -134,7 +133,7 @@ public class DocumentSolrMetadataExtractorTest
         when(this.document.isHidden()).thenReturn(false);
         when(this.document.getLocale()).thenReturn(Locale.ROOT);
         when(this.document.getRealLocale()).thenReturn(Locale.US);
-        when(this.document.getTranslatedDocument(isNull(Locale.class), eq(this.xcontext))).thenReturn(this.document);
+        when(this.document.getTranslatedDocument((Locale) isNull(), same(this.xcontext))).thenReturn(this.document);
 
         DocumentAccessBridge dab = this.mocker.registerMockComponent(DocumentAccessBridge.class);
         when(dab.getDocument(this.documentReference)).thenReturn(this.document);
@@ -142,7 +141,7 @@ public class DocumentSolrMetadataExtractorTest
         // Field Name Serializer
         EntityReferenceSerializer<String> fieldNameSerializer =
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "solr");
-        when(fieldNameSerializer.serialize(any(EntityReference.class))).then(new Answer<String>()
+        when(fieldNameSerializer.serialize(any())).then(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
@@ -230,15 +229,15 @@ public class DocumentSolrMetadataExtractorTest
 
         // Title
         String title = "title";
-        when(this.document.getRenderedTitle(any(Syntax.class), eq(this.xcontext))).thenReturn(title);
+        when(this.document.getRenderedTitle(any(), same(this.xcontext))).thenReturn(title);
 
         // Rendered Content
         final String renderedContent = "rendered content";
         BlockRenderer plainRenderer = this.mocker.registerMockComponent(BlockRenderer.class, "plain/1.0");
-        doAnswer(new Answer<Object>()
+        doAnswer(new Answer<Void>()
         {
             @Override
-            public Object answer(InvocationOnMock invocation)
+            public Void answer(InvocationOnMock invocation)
             {
                 Object[] args = invocation.getArguments();
 
@@ -247,7 +246,7 @@ public class DocumentSolrMetadataExtractorTest
 
                 return null;
             }
-        }).when(plainRenderer).render(any(Block.class), any(WikiPrinter.class));
+        }).when(plainRenderer).render((Block) any(), any());
 
         // Raw Content
         String rawContent = "raw content";

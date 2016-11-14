@@ -49,7 +49,7 @@
    ""query"": {
       ""query_string"": {
          ""lowercase_expanded_terms"": false,
-         ""query"": ""distributionId:$distributionId $snapshotQueryFragment""
+         ""query"": ""distributionId:${distributionId.replace(':', '\\:')} $snapshotQueryFragment""
       }
    },
    ""aggs"": {

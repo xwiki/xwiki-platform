@@ -165,13 +165,13 @@ public class XarExtensionHandlerTest
     private void mockHasNoAdminRight() throws AccessDeniedException
     {
         doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
-            .checkAccess(eq(Right.ADMIN), eq(this.contextUser), any(EntityReference.class));
+            .checkAccess(eq(Right.ADMIN), eq(this.contextUser), any());
     }
 
     private void verifyHasAdminRight(int times) throws AccessDeniedException
     {
         verify(this.oldcore.getMockAuthorizationManager(), times(times)).checkAccess(eq(Right.ADMIN),
-            eq(this.contextUser), any(EntityReference.class));
+            eq(this.contextUser), any());
     }
 
     private XWikiContext getXWikiContext()

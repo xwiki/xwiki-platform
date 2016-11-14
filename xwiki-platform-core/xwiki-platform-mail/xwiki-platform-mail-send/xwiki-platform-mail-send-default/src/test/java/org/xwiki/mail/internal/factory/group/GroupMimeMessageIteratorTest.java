@@ -89,14 +89,13 @@ public class GroupMimeMessageIteratorTest
         parameters.put("session", session);
 
         DocumentAccessBridge accessBridge = mock(DocumentAccessBridge.class);
-        when(accessBridge.getProperty(eq(groupReference),any(DocumentReference.class), eq(0), eq("member"))).thenReturn("XWiki.JohnDoe");
-        when(accessBridge.getProperty(eq(groupReference),any(DocumentReference.class), eq(1), eq("member"))).thenReturn("XWiki.JaneDoe");
-        when(accessBridge.getProperty(eq(groupReference),any(DocumentReference.class), eq(2), eq("member"))).thenReturn("XWiki.JonnieDoe");
+        when(accessBridge.getProperty(eq(groupReference), any(), eq(0), eq("member"))).thenReturn("XWiki.JohnDoe");
+        when(accessBridge.getProperty(eq(groupReference), any(), eq(1), eq("member"))).thenReturn("XWiki.JaneDoe");
+        when(accessBridge.getProperty(eq(groupReference), any(), eq(2), eq("member"))).thenReturn("XWiki.JonnieDoe");
 
-        when(accessBridge.getProperty(eq(userReference1),any(DocumentReference.class), eq("email"))).thenReturn("john@doe.com");
-        when(accessBridge.getProperty(eq(userReference2),any(DocumentReference.class), eq("email"))).thenReturn("jane@doe.com");
-        when(accessBridge.getProperty(eq(userReference3),any(DocumentReference.class), eq("email"))).thenReturn(
-            "jannie@doe.com");
+        when(accessBridge.getProperty(eq(userReference1), any(), eq("email"))).thenReturn("john@doe.com");
+        when(accessBridge.getProperty(eq(userReference2), any(), eq("email"))).thenReturn("jane@doe.com");
+        when(accessBridge.getProperty(eq(userReference3), any(), eq("email"))).thenReturn("jannie@doe.com");
 
         Execution execution = mock(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);

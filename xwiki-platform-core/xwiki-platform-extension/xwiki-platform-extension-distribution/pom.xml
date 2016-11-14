@@ -89,7 +89,7 @@
                 **/DistributionRequest.java,
                 **/DistributionStep.java,
                 **/DistributionStepStatus.java,
-                **/DistributionScriptService.java,
+                **/DistributionInternalScriptService.java,
                 **/DocumentsModifiedDuringDistributionListener.java,
                 **/DefaultDistributionManager.java,
                 **/FarmDistributionJob.java,

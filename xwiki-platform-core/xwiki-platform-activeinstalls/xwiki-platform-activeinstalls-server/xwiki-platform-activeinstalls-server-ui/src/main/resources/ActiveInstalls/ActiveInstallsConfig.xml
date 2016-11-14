@@ -122,7 +122,7 @@ $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section
       </snapshots>
     </class>
     <property>
-      <distributionId>org.xwiki.enterprise:xwiki-enterprise-web</distributionId>
+      <distributionId>org.xwiki.*</distributionId>
     </property>
     <property>
       <snapshots>0</snapshots>

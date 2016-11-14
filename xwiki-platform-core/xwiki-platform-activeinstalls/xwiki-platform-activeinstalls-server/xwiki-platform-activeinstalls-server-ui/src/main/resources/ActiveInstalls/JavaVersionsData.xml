@@ -46,7 +46,7 @@
    ""query"": {
        ""query_string"": {
            ""lowercase_expanded_terms"": false,
-           ""query"": ""_timestamp:[now-1d TO *] $snapshotQueryFragment AND distributionId:\""$distributionId\""""
+           ""query"": ""_timestamp:[now-1d TO *] $snapshotQueryFragment AND distributionId:$distributionId""
        }
    },
    ""aggs"": {

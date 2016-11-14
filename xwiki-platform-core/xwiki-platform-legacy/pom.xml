@@ -34,6 +34,8 @@
   <properties>
     <!-- We don't really care about checkstyle in legacy -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Skip Enforcer check on legacy dependencies since we allow legacy modules to depend on other legacy modules -->
+    <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
   </properties>
   <modules>
     <!-- Sorted Alphabetically -->
@@ -62,19 +64,6 @@
               <goals>
                 <goal>compile</goal>
               </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <!-- Don't check for legacy dependency usages in legacy modules since they can depend on one another -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>enforce-no-legacy-dependencies</id>
-              <configuration>
-                <skip>true</skip>
-              </configuration>
             </execution>
           </executions>
         </plugin>

@@ -69,7 +69,7 @@ public class HelpTest extends PageTest
         mocker.registerComponent(ScriptService.class, "query", qss);
         ScriptQuery sq = mock(ScriptQuery.class);
         when(qss.xwql(contains("from doc.object(XWiki.XWikiSyntaxClass)"))).thenReturn(sq);
-        when(sq.addFilter(any())).thenReturn(sq);
+        when(sq.addFilter((String)any())).thenReturn(sq);
         when(sq.execute()).thenReturn(Arrays.asList("XWiki.XWikiSyntaxLinks"));
 
         String result = renderPage(new DocumentReference("xwiki", "XWiki", "XWikiSyntax"));

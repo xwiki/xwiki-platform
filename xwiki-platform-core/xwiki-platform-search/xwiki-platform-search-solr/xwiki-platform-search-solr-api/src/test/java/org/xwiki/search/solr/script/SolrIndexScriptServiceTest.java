@@ -98,8 +98,7 @@ public class SolrIndexScriptServiceTest
         // RightService
         this.mockAuthorization = this.mocker.getInstance(AuthorizationManager.class);
         // By default, we have the rights.
-        when(mockAuthorization.hasAccess(any(Right.class), any(DocumentReference.class), any(EntityReference.class)))
-            .thenReturn(true);
+        when(mockAuthorization.hasAccess(any(), any(), any())).thenReturn(true);
 
         this.service = mocker.getComponentUnderTest();
 

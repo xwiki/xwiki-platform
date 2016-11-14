@@ -923,6 +923,11 @@ body[data-maximized] .xnotification-container {
   position: absolute;
 }
 
+/* Overwrite the CKEditor style reset. */
+.resourcePicker .dropdown-menu li * {
+  cursor: pointer;
+}
+
 .resourcePicker .resource-hint.breadcrumb a,
 .resourcePicker .resource-hint.breadcrumb li.ellipsis {
   font-size: smaller;

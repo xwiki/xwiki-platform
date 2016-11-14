@@ -152,17 +152,17 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           return resourceReference;
         },
         setValue: function(resourceReference) {
-          // Reset the input if no resource reference is provided.
+          // Reset the resource picker if no resource reference is provided.
           resourceReference = resourceReference || {
             type: this.resourceTypes[0],
-            reference: ''
+            reference: '',
+            // Make sure the picker doesn't try to resolve the empty reference.
+            isNew: true
           };
-          var serializedResourceReference = resourceReference.type + ':' + resourceReference.reference;
+          var serializedResourceReference = (resourceReference.type || '') + ':' + (resourceReference.reference || '');
           $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {
             reference: resourceReference
           });
-          // Clear the previously cached resource reference.
-          $(this.getElement().$).find('.resourcePicker').removeProp('previousResourceReference');
         },
         //
         // Custom fields

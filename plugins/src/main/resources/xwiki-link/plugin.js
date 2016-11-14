@@ -31,6 +31,8 @@
     requires: 'xwiki-marker,xwiki-resource',
 
     init: function(editor) {
+      // Remove the link markers (XML comments used by the XWiki Rendering to detect wiki links) when the content is
+      // loaded (toHtml), in order to protect them, and add them back when the content is saved (toDataFormat).
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'wikilink', {
         // startLinkComment: CKEDITOR.htmlParser.comment
         // content: CKEDITOR.htmlParser.node[]
@@ -116,21 +118,31 @@
     if (!linkPlugin) {
       return;
     }
+    // Parse the link resource reference before the link dialog is opened.
     if (typeof linkPlugin.parseLinkAttributes === 'function') {
       var oldParseLinkAttributes = linkPlugin.parseLinkAttributes;
       linkPlugin.parseLinkAttributes = function(editor, element) {
+        // This is the data passed to the link dialog.
         var data = oldParseLinkAttributes.call(linkPlugin, editor, element);
-        var serializedResourceReference = element && element.getAttribute('data-reference');
-        if (serializedResourceReference) {
-          data.resourceReference = CKEDITOR.plugins.xwikiResource
-            .parseResourceReference(serializedResourceReference);
+        if (element) {
+          var serializedResourceReference = element.getAttribute('data-reference');
+          if (serializedResourceReference) {
+            data.resourceReference = CKEDITOR.plugins.xwikiResource.parseResourceReference(serializedResourceReference);
+          } else {
+            // Fall-back on URL or Path resource reference.
+            var reference = element.getAttribute('href') || '';
+            var type = reference.indexOf('://') < 0 ? 'path' : 'url';
+            data.resourceReference = {type: type, reference: reference};
+          }
         }
         return data;
       };
     }
+    // Serialize the link resource reference after the link dialog is closed.
     if (typeof linkPlugin.getLinkAttributes === 'function') {
       var oldGetLinkAttributes = linkPlugin.getLinkAttributes;
       linkPlugin.getLinkAttributes = function(editor, data) {
+        // The data comes from the link dialog.
         var attributes = oldGetLinkAttributes.call(linkPlugin, editor, data);
         var resourceReference = data.resourceReference;
         if (resourceReference) {
@@ -238,8 +250,14 @@
         return data.resourceReference;
       },
       setup: function(data) {
-        var resourceReference = data.resourceReference;
-        if (resourceReference && resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
+        // Create a link to a new page if the resource reference is not provided.
+        var resourceReference = data.resourceReference || {
+          type: this.resourceTypes[0],
+          reference: this.getDialog().getParentEditor().getSelection().getSelectedText(),
+          // Make sure the picker doesn't try to resolve the link label as a resource reference.
+          isNew: true
+        };
+        if (resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
             this.resourceTypes.indexOf('doc') >= 0) {
           // Convert the space resource reference to a document resource reference.
           resourceReference = {

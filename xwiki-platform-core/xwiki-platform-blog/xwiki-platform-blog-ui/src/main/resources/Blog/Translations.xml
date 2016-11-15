@@ -41,7 +41,9 @@
   <hidden>true</hidden>
   <content>blog.templateProvider.blogpost.name=Blog Post
 blog.templateProvider.blogpost.description=Communicate news
-blog.categories.all=All</content>
+blog.categories.all=All
+blog.changeVisibility.changing=Changing the visibility
+blog.changeVisibility.success=The visibility of the blog entry has been successfully changed</content>
   <object>
     <name>Blog.Translations</name>
     <number>0</number>

@@ -40,6 +40,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.*;
@@ -241,5 +242,68 @@ public class DefaultModelBridgeTest
         verify(document).setTitle("foo");
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
         verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    public void updateParentWhenPageIsTerminal() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+        when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
+
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+
+        verify(document).setParentReference(new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome"));
+        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    public void updateParentWhenPageIsNested() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+        when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
+
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+
+        verify(document).setParentReference(new DocumentReference("wiki", "Path", "WebHome"));
+        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    public void updateParentWhenPageIsTopLevel() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Path", "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+        when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
+
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+
+        verify(document).setParentReference(new DocumentReference("wiki", "Main", "WebHome"));
+        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    public void dontUpdateParentWhenLegacyMode() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+        when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
+
+        ParentChildConfiguration parentChildConfiguration = mocker.getInstance(ParentChildConfiguration.class);
+        when(parentChildConfiguration.isParentChildMechanismEnabled()).thenReturn(true);
+
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+
+        verify(document, never()).setParentReference(any(DocumentReference.class));
+        verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
+                any(XWikiContext.class));
     }
 }

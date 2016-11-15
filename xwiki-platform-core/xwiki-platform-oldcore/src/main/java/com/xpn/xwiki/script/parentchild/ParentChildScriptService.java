@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -40,6 +39,7 @@ import org.xwiki.script.service.ScriptService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 
 /**
  * This script service give an access to the configuration of the parent/child mechanism, which has been deprecated
@@ -54,7 +54,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class ParentChildScriptService implements ScriptService
 {
     @Inject
-    private ConfigurationSource configurationSource;
+    private ParentChildConfiguration configuration;
     
     @Inject
     private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
@@ -70,8 +70,7 @@ public class ParentChildScriptService implements ScriptService
      */
     public boolean isParentChildMechanismEnabled()
     {
-        return "parentchild".equals(
-                configurationSource.getProperty("core.hierarchyMode", "reference"));
+        return configuration.isParentChildMechanismEnabled();
     }
 
     /**

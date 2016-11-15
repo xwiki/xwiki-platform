@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -121,9 +124,7 @@ public class WikiEditPage extends PreviewableEditPage
      */
     public void setMinorEdit(boolean value)
     {
-        if ((this.minorEditCheckBox.isSelected() && !value)
-            || (!this.minorEditCheckBox.isSelected() && value))
-        {
+        if ((this.minorEditCheckBox.isSelected() && !value) || (!this.minorEditCheckBox.isSelected() && value)) {
             this.minorEditCheckBox.click();
         }
     }
@@ -135,5 +136,53 @@ public class WikiEditPage extends PreviewableEditPage
     {
         this.commentInput.clear();
         this.commentInput.sendKeys(comment);
+    }
+
+    /**
+     * @return a list of the locales already translated for this document
+     * @since 9.0RC1
+     */
+    public List<String> getExistingTranslations()
+    {
+        List<WebElement> elements =
+            getDriver().findElementsByXPath("//p[starts-with(text(), 'Existing translations:')]//a");
+
+        List<String> translations = new ArrayList<>(elements.size());
+        for (WebElement element : elements) {
+            translations.add(element.getText());
+        }
+
+        return translations;
+    }
+
+    /**
+     * @return a list of the supported locales not yet translated for this document
+     * @since 9.0RC1
+     */
+    public List<String> getNotExistingTranslations()
+    {
+        List<WebElement> elements =
+            getDriver().findElementsByXPath("//p[starts-with(text(), 'Translate this page in:')]//a");
+
+        List<String> translations = new ArrayList<>(elements.size());
+        for (WebElement element : elements) {
+            translations.add(element.getText());
+        }
+
+        return translations;
+    }
+
+    /**
+     * @param locale the locale to translate to
+     * @return the target locale edit page
+     */
+    public WikiEditPage clickTranslate(String locale)
+    {
+        WebElement element = getDriver()
+            .findElementByXPath("//p[starts-with(text(), 'Translate this page in:')]//a[text()=" + locale + "]");
+
+        element.click();
+
+        return new WikiEditPage();
     }
 }

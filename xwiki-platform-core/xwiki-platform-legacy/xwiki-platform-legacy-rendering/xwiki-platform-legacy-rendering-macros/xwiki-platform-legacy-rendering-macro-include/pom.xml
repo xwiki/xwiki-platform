@@ -43,7 +43,7 @@
       <artifactId>xwiki-platform-rendering-macro-include</artifactId>
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it -->
-      <scope>provided</scope>
+      <type>pom</type>
     </dependency>
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->

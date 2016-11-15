@@ -117,6 +117,13 @@
       <artifactId>xwiki-rendering-legacy-api</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -221,8 +228,12 @@
       <artifactId>xwiki-platform-legacy-rendering-macro-include</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-      <exclusions>
-      xwiki-rendering-api
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+       <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

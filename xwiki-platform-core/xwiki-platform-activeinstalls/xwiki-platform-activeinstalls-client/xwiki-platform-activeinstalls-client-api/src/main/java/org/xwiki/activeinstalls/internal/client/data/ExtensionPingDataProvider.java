@@ -86,6 +86,7 @@ public class ExtensionPingDataProvider implements PingDataProvider
             Map<String, Object> extensionMap = new HashMap<>();
             extensionMap.put(PROPERTY_ID, extension.getId().getId());
             extensionMap.put(PROPERTY_VERSION, extension.getId().getVersion().toString());
+            extensionMap.put(PROPERTY_FEATURES, extension.getFeatures().toArray());
             extensions[i] = JSONObject.fromObject(extensionMap);
             i++;
         }

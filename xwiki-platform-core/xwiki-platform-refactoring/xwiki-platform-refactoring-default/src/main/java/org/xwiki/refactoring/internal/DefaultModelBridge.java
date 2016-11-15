@@ -33,8 +33,10 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -45,6 +47,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 
 /**
  * Default implementation of {@link ModelBridge} based on the old XWiki model.
@@ -67,6 +70,8 @@ public class DefaultModelBridge implements ModelBridge
      */
     private static final LocalDocumentReference REDIRECT_CLASS_REFERENCE = new LocalDocumentReference(
         XWiki.SYSTEM_SPACE, "RedirectClass");
+
+    private static final String SPACE_HOME_PAGE = "WebHome";
 
     @Inject
     private Logger logger;
@@ -107,6 +112,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private JobProgressManager progressManager;
+
+    @Inject
+    private ParentChildConfiguration parentChildConfiguration;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -327,6 +335,22 @@ public class DefaultModelBridge implements ModelBridge
                 save = true;
             }
 
+            // Some old applications still rely on the parent/child links between documents.
+            // For the retro-compatibility, we synchronize the "parent" field of the document with the (real)
+            // hierarchical parent.
+            //
+            // But if the user has voluntary enabled the legacy "parent/child" mechanism for the breadcrumbs, we keep
+            // the old behaviour when location and parent/child mechanism were not linked.
+            //
+            // More information: http://jira.xwiki.org/browse/XWIKI-13493
+            if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
+                DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
+                if (!hierarchicalParent.equals(document.getParentReference())) {
+                    document.setParentReference(hierarchicalParent);
+                    save = true;
+                }
+            }
+
             if (save) {
                 wiki.saveDocument(document, "Update document after refactoring.", true, context);
                 this.logger.info("Document [{}] has been updated.", documentReference);
@@ -334,5 +358,29 @@ public class DefaultModelBridge implements ModelBridge
         } catch (Exception e) {
             this.logger.error("Failed to update the document [{}] after refactoring.", documentReference, e);
         }
+    }
+
+    private DocumentReference getHierarchicalParent(DocumentReference documentReference)
+    {
+        EntityReference parentOfTheSpace = documentReference.getLastSpaceReference().getParent();
+
+        boolean pageIsNotTerminal = documentReference.getName().equals(SPACE_HOME_PAGE);
+
+        // Case 1: The document has the location A.B.C.WebHome
+        //         The parent should be A.B.WebHome
+        if (pageIsNotTerminal && parentOfTheSpace.getType() == EntityType.SPACE) {
+            return new DocumentReference(SPACE_HOME_PAGE, new SpaceReference(parentOfTheSpace));
+        }
+
+        // Case 2: The document has the location A.WebHome
+        //         The parent should be Main.WebHome
+        if (pageIsNotTerminal && parentOfTheSpace.getType() == EntityType.WIKI) {
+            return new DocumentReference(SPACE_HOME_PAGE, new SpaceReference("Main",
+                    documentReference.getWikiReference()));
+        }
+
+        // Case 3: The document has the location A.B
+        //         The parent should be A.WebHome
+        return new DocumentReference(SPACE_HOME_PAGE, documentReference.getLastSpaceReference());
     }
 }

@@ -92,7 +92,7 @@ public class ManageCategoriesPage extends BasePage
     {
         // click delete button
         By deletePath =
-            By.xpath("//a[@class='tool delete' and contains(@href, '" + getUtil().escapeURL(name) + "')]/img");
+            By.xpath("//a[@class='tool delete' and contains(@href, '" + getUtil().escapeURL(name) + "')]");
         hoverCategoryItem(name);
         getDriver().waitUntilElementIsVisible(deletePath);
         getDriver().findElement(deletePath).click();
@@ -114,7 +114,7 @@ public class ManageCategoriesPage extends BasePage
     {
         // show the rename form
         By renamePath =
-            By.xpath("//a[@class='tool rename' and contains(@href, '" + getUtil().escapeURL(fromName) + "')]/img");
+            By.xpath("//a[@class='tool rename' and contains(@href, '" + getUtil().escapeURL(fromName) + "')]");
         hoverCategoryItem(fromName);
         getDriver().waitUntilElementIsVisible(renamePath);
         getDriver().findElement(renamePath).click();

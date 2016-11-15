@@ -22,6 +22,7 @@ package org.xwiki.blog.test.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -38,6 +39,18 @@ public class BlogPostViewPage extends ViewPage
     /**
      * The blog post content.
      */
+    @FindBy(className = "hentry")
+    private WebElement entry;
+
+    /**
+     * A warning message.
+     */
+    @FindBy(className = "warningmessage")
+    private WebElement warningMessage;
+
+    /**
+     * The blog post content.
+     */
     @FindBy(className = "entry-content")
     private WebElement content;
 
@@ -46,17 +59,10 @@ public class BlogPostViewPage extends ViewPage
      */
     @FindBy(className = "entry-footer")
     private WebElement footer;
-
-    /**
-     * The container for the blog post action buttons.
-     */
-    @FindBy(className = "blog-entry-toolbox")
-    private WebElement toolBox;
-
     /**
      * The edit blog post icon.
      */
-    @FindBy(xpath = "//*[@class = 'blog-entry-toolbox']//img[@alt = 'edit ']")
+    @FindBy(xpath = "//*[@class = 'blog-entry-toolbox']//a[contains(@title, 'Edit')]")
     private WebElement editIcon;
 
     @Override
@@ -82,7 +88,8 @@ public class BlogPostViewPage extends ViewPage
      */
     public boolean isPublished()
     {
-        return toolBox.findElements(By.xpath("//img[@alt = 'publish ']")).isEmpty();
+        return !getDriver().hasElementWithoutWaiting(entry, By.className("warningmessage"))
+                || !StringUtils.equals("This blog post is not published yet.", warningMessage.getText());
     }
 
     /**
@@ -90,7 +97,8 @@ public class BlogPostViewPage extends ViewPage
      */
     public boolean isHidden()
     {
-        return !toolBox.findElements(By.xpath("//img[@alt = 'show ']")).isEmpty();
+        return getDriver().hasElementWithoutWaiting(entry, By.className("warningmessage"))
+                && StringUtils.equals("This blog post is hidden.", warningMessage.getText());
     }
 
     /**

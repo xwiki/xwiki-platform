@@ -46,6 +46,15 @@
       <artifactId>xwiki-platform-instance</artifactId>
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it -->
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- We need this dependency so xwiki-platform-legacy-instance trigger the same dependencies than xwiki-platform-instance -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-instance</artifactId>
+      <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it -->
       <type>pom</type>
     </dependency>
 

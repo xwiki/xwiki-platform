@@ -48,7 +48,16 @@
       <artifactId>xwiki-platform-legacy-url</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- We need this dependency so that the wrapped module is built before this one -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it -->
+      <scope>provided</scope>
+    </dependency>
+    <!-- We need this dependency so that the module trigger the same dependencies than xwiki-platform-oldcore -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

@@ -8267,6 +8267,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
 
+        backup.put("cdoc", context.get("cdoc"));
+        backup.put("tdoc", context.get("tdoc"));
+
         // Backup the secure document
         backup.put(CKEY_SDOC, context.get(CKEY_SDOC));
 
@@ -8290,6 +8293,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));
+
+        context.put("cdoc", backup.get("cdoc"));
+        context.put("tdoc", backup.get("tdoc"));
 
         // Restore the secure document
         context.put(CKEY_SDOC, backup.get(CKEY_SDOC));

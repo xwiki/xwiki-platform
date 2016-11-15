@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
@@ -35,8 +34,9 @@ import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsResourceReference;
 import org.xwiki.vfs.internal.attach.AttachVfsPermissionChecker;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link CascadingVfsPermissionChecker}.

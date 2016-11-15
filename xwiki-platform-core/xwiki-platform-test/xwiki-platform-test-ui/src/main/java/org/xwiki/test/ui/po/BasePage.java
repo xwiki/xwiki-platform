@@ -19,9 +19,6 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.List;
-import java.util.Locale;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -437,16 +434,6 @@ public class BasePage extends BaseElement
         String user = this.userLink.getText();  
         toggleDrawer();
         return user;
-    }
-
-    /**
-     * @since 9.0RC1
-     */
-    public List<Locale> getLocales()
-    {
-        toggleDrawer();
-        
-        toggleDrawer();
     }
 
     /**

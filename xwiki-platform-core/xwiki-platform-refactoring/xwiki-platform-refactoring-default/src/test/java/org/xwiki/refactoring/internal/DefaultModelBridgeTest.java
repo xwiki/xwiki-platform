@@ -47,11 +47,11 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -268,7 +268,7 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.<String, String>emptyMap());
 
         verify(document).setParentReference(new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome"));
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
@@ -283,7 +283,7 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.<String, String>emptyMap());
 
         verify(document).setParentReference(new DocumentReference("wiki", "Path", "WebHome"));
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
@@ -298,7 +298,7 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.<String, String>emptyMap());
 
         verify(document).setParentReference(new DocumentReference("wiki", "Main", "WebHome"));
         verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
@@ -316,7 +316,7 @@ public class DefaultModelBridgeTest
         ParentChildConfiguration parentChildConfiguration = mocker.getInstance(ParentChildConfiguration.class);
         when(parentChildConfiguration.isParentChildMechanismEnabled()).thenReturn(true);
 
-        this.mocker.getComponentUnderTest().update(documentReference, Collections.emptyMap());
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.<String, String>emptyMap());
 
         verify(document, never()).setParentReference(any(DocumentReference.class));
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),

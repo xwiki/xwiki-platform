@@ -77,20 +77,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-component-default</artifactId>
       <version>${commons.version}</version>
-      <scope>runtime</scope>
-      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-component-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-configuration</artifactId>
       <version>${commons.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -103,7 +94,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-properties</artifactId>
       <version>${commons.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -116,7 +106,6 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-legacy-api</artifactId>
       <version>${rendering.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -129,7 +118,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -154,7 +142,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-observation</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -171,7 +158,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-annotation</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -184,13 +170,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-model</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-office-importer</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -207,7 +191,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-url</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
@@ -221,13 +204,11 @@
       <artifactId>xwiki-platform-legacy-web</artifactId>
       <version>${project.version}</version>
       <type>war</type>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-rendering-macro-include</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
        <exclusions>
         <exclusion>
@@ -240,7 +221,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-watchlist-api</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

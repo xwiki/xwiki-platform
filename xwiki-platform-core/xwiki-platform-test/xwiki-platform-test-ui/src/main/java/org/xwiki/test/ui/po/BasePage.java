@@ -19,6 +19,13 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -49,14 +56,14 @@ public class BasePage extends BaseElement
      */
     @FindBy(id = "contentmenu")
     private WebElement contentMenuBar;
-    
-    @FindBy(xpath ="//div[@id='tmCreate']/a[contains(@role, 'button')]")
+
+    @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@role, 'button')]")
     private WebElement tmCreate;
-    
+
     @FindBy(xpath = "//div[@id='tmMoreActions']/a[contains(@role, 'button')]")
     private WebElement moreActionsMenu;
 
-    @FindBy(id ="tmDrawerActivator")
+    @FindBy(id = "tmDrawerActivator")
     private WebElement drawerActivator;
 
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
@@ -65,7 +72,7 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmPage")
     private WebElement pageMenu;
 
-    @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
+    @FindBys({ @FindBy(id = "tmRegister"), @FindBy(tagName = "a") })
     private WebElement registerLink;
 
     @FindBy(xpath = "//a[@id='tmLogin']")
@@ -88,7 +95,7 @@ public class BasePage extends BaseElement
 
     @FindBy(css = "#tmMoreActions a[title='Children']")
     private WebElement childrenLink;
-    
+
     @FindBy(id = "tmNotifications")
     private WebElement notificationsMenu;
 
@@ -175,7 +182,7 @@ public class BasePage extends BaseElement
     public void edit()
     {
         WebElement editMenuButton =
-                getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@role, 'button')]"));
+            getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@role, 'button')]"));
         // The edit button is not the same depending on whether the user is advanced or not
         if ("dropdown".equals(editMenuButton.getAttribute("data-toggle"))) {
             clickEditSubMenuEntry("tmEditDefault");
@@ -277,7 +284,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * @since 7.2M3  
+     * @since 7.2M3
      */
     public void toggleDrawer()
     {
@@ -306,8 +313,7 @@ public class BasePage extends BaseElement
      */
     public void clickMoreActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(
-                By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
     }
 
     /**
@@ -315,8 +321,7 @@ public class BasePage extends BaseElement
      */
     public void clickAdminActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(
-                By.xpath("//div[@id='tmAdminActions']/a[contains(@role, 'button')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmAdminActions']/a[contains(@role, 'button')]"), id);
     }
 
     /**
@@ -368,8 +373,8 @@ public class BasePage extends BaseElement
     {
         clickAdminActionsSubMenuEntry("tmActionRename");
         return new RenamePage();
-    }    
-    
+    }
+
     /**
      * @since 4.5M1
      */
@@ -431,9 +436,49 @@ public class BasePage extends BaseElement
     public String getCurrentUser()
     {
         toggleDrawer();
-        String user = this.userLink.getText();  
+        String user = this.userLink.getText();
         toggleDrawer();
         return user;
+    }
+
+    /**
+     * @since 9.0RC1
+     */
+    public List<Locale> getLocales()
+    {
+        List<WebElement> elements =
+            getDriver().findElementsWithoutWaiting(By.xpath("//ul[@id='tmLanguages_menu']/li/a"));
+        List<Locale> locales = new ArrayList<>(elements.size());
+        for (WebElement element : elements) {
+            String href = element.getAttribute("href");
+            Matcher matcher = Pattern.compile(".*\\?.*language=([^=&]*)").matcher(href);
+            if (matcher.matches()) {
+                String locale = matcher.group(1);
+                locales.add(LocaleUtils.toLocale(locale));
+            }
+        }
+
+        return locales;
+    }
+
+    /**
+     * @since 9.0RC1
+     */
+    public ViewPage clickLocale(Locale locale)
+    {
+        // Open drawer
+        toggleDrawer();
+
+        // Open Languages
+        WebElement languagesElement = getDriver().findElementWithoutWaiting(By.xpath("//a[@id='tmLanguages']"));
+        languagesElement.click();
+
+        // Click passed locale
+        WebElement localeElement = getDriver().findElementWithoutWaiting(
+            By.xpath("//ul[@id='tmLanguages_menu']/li/a[contains(@href,'language=" + locale + "')]"));
+        localeElement.click();
+
+        return new ViewPage();
     }
 
     /**
@@ -520,9 +565,9 @@ public class BasePage extends BaseElement
 
     /**
      * Says if the notifications menu is present (it is displayed only if it has some content).
-     *  
+     * 
      * @return either or not the notifications menu is present
-     * @since 7.4M1 
+     * @since 7.4M1
      */
     public boolean hasNotificationsMenu()
     {
@@ -531,7 +576,8 @@ public class BasePage extends BaseElement
 
     /**
      * Open/Close the notifications menu.
-     * @since 7.4M1 
+     * 
+     * @since 7.4M1
      */
     public void toggleNotificationsMenu()
     {
@@ -544,7 +590,7 @@ public class BasePage extends BaseElement
         }
     }
 
-    /** 
+    /**
      * @return true if the notifications menu is open
      * @since 7.4M1
      */
@@ -559,7 +605,8 @@ public class BasePage extends BaseElement
      */
     public String getErrorContent()
     {
-        return getDriver().findElementWithoutWaiting(
-            By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]")).getText();
+        return getDriver()
+            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
+            .getText();
     }
 }

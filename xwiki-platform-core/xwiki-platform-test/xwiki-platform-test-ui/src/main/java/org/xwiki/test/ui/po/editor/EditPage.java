@@ -19,9 +19,14 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.LocaleUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -271,5 +276,54 @@ public class EditPage extends BasePage
         getDriver().waitUntilJavascriptCondition(
             "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
                 + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
+    }
+
+    protected List<Locale> getExistingLocales(List<WebElement> elements)
+    {
+        List<Locale> locales = new ArrayList<>(elements.size());
+        for (WebElement element : elements) {
+            locales.add(LocaleUtils.toLocale(element.getText()));
+        }
+
+        return locales;
+    }
+
+    /**
+     * @return a list of the locales already translated for this document
+     * @since 9.0RC1
+     */
+    public List<Locale> getExistingLocales()
+    {
+        List<WebElement> elements =
+            getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Existing translations:')]//a"));
+
+        return getExistingLocales(elements);
+    }
+
+    /**
+     * @return a list of the supported locales not yet translated for this document
+     * @since 9.0RC1
+     */
+    public List<Locale> getNotExistingLocales()
+    {
+        List<WebElement> elements =
+            getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a"));
+
+        return getExistingLocales(elements);
+    }
+
+    /**
+     * @param locale the locale to translate to
+     * @return the target locale edit page
+     * @since 9.0RC1
+     */
+    public WikiEditPage clickTranslate(String locale)
+    {
+        WebElement element = getDriver().findElementWithoutWaiting(
+            By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+
+        element.click();
+
+        return new WikiEditPage();
     }
 }

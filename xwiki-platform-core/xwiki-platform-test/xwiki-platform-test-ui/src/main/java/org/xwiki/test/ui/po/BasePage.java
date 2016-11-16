@@ -412,12 +412,9 @@ public class BasePage extends BaseElement
      */
     public boolean hasLoginLink()
     {
-        toggleDrawer();
         // Note that we cannot test if the loginLink field is accessible since we're using an AjaxElementLocatorFactory
         // and thus it would wait 15 seconds before considering it's not accessible.
-        boolean result = !getDriver().findElementsWithoutWaiting(By.id("tmLogin")).isEmpty();
-        toggleDrawer();
-        return result;
+        return !getDriver().findElementsWithoutWaiting(By.id("tmLogin")).isEmpty();
     }
 
     /**
@@ -435,10 +432,7 @@ public class BasePage extends BaseElement
      */
     public String getCurrentUser()
     {
-        toggleDrawer();
-        String user = this.userLink.getText();
-        toggleDrawer();
-        return user;
+        return this.userLink.getText();
     }
 
     /**

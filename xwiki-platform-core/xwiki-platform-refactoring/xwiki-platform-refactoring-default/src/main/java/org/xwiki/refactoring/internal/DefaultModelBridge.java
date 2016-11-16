@@ -37,6 +37,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -70,8 +71,6 @@ public class DefaultModelBridge implements ModelBridge
      */
     private static final LocalDocumentReference REDIRECT_CLASS_REFERENCE = new LocalDocumentReference(
         XWiki.SYSTEM_SPACE, "RedirectClass");
-
-    private static final String SPACE_HOME_PAGE = "WebHome";
 
     @Inject
     private Logger logger;
@@ -115,6 +114,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private ParentChildConfiguration parentChildConfiguration;
+
+    @Inject
+    private EntityReferenceProvider entityReferenceProvider;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -362,25 +364,28 @@ public class DefaultModelBridge implements ModelBridge
 
     private DocumentReference getHierarchicalParent(DocumentReference documentReference)
     {
+        final String spaceHomePage = entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+
         EntityReference parentOfTheSpace = documentReference.getLastSpaceReference().getParent();
 
-        boolean pageIsNotTerminal = documentReference.getName().equals(SPACE_HOME_PAGE);
+        boolean pageIsNotTerminal = documentReference.getName().equals(spaceHomePage);
 
         // Case 1: The document has the location A.B.C.WebHome
         //         The parent should be A.B.WebHome
         if (pageIsNotTerminal && parentOfTheSpace.getType() == EntityType.SPACE) {
-            return new DocumentReference(SPACE_HOME_PAGE, new SpaceReference(parentOfTheSpace));
+            return new DocumentReference(spaceHomePage, new SpaceReference(parentOfTheSpace));
         }
 
         // Case 2: The document has the location A.WebHome
         //         The parent should be Main.WebHome
         if (pageIsNotTerminal && parentOfTheSpace.getType() == EntityType.WIKI) {
-            return new DocumentReference(SPACE_HOME_PAGE, new SpaceReference("Main",
+            return new DocumentReference(spaceHomePage, new SpaceReference(
+                    entityReferenceProvider.getDefaultReference(EntityType.SPACE).getName(),
                     documentReference.getWikiReference()));
         }
 
         // Case 3: The document has the location A.B
         //         The parent should be A.WebHome
-        return new DocumentReference(SPACE_HOME_PAGE, documentReference.getLastSpaceReference());
+        return new DocumentReference(spaceHomePage, documentReference.getLastSpaceReference());
     }
 }

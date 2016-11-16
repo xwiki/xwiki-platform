@@ -20,14 +20,21 @@
 package com.xpn.xwiki.internal.parentchild;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Configuration of the Parent Child mechanism.
+ * Configuration of the Parent/Child mechanism.
+ *
+ * Note: this configuration is supposed to be transient and should be removed when all users have migrated to Nested
+ * Pages successfully. This is why we have created a dedicated role in order to not pollute
+ * {@link com.xpn.xwiki.CoreConfiguration} with temporary things.
  *
  * @version $Id$
  * @since 9.0RC1
+ * @since 8.4.1
  */
 @Role
+@Unstable
 public interface ParentChildConfiguration
 {
     /**

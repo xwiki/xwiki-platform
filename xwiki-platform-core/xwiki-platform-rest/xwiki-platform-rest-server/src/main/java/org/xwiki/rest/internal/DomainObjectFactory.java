@@ -29,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.rest.Relations;
-import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.HistorySummary;
@@ -140,7 +139,7 @@ public class DomainObjectFactory
 
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
         List<String> spaces, String pageName, String language, Version version, String modifier, Date modified,
-        String comment, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiRestException
+        String comment, XWiki xwikiApi, Boolean withPrettyNames)
     {
         HistorySummary historySummary = objectFactory.createHistorySummary();
 

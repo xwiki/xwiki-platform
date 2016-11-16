@@ -62,14 +62,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class XWikiResource implements XWikiRestComponent, Initializable
 {
     /**
-     * The actual URI information about the JAX-RS resource being called. This variable is useful when generating
-     * links to other resources in representations.
+     * The actual URI information about the JAX-RS resource being called. This variable is useful when generating links
+     * to other resources in representations.
      */
     @Context
     protected UriInfo uriInfo;
 
     /**
      * The logger to be used to output log messages.
+     * 
      * @deprecated since 7.3M1, use {@link #slf4Jlogger} instead
      */
     @Deprecated
@@ -190,10 +191,10 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     {
         return Utils.getSpaceReference(parseSpaceSegments(spaceSegments), wikiName);
     }
-    
+
     /**
-     * Retrieve a document. This method never returns null. If something goes wrong with respect to some
-     * precondition an exception is thrown.
+     * Retrieve a document. This method never returns null. If something goes wrong with respect to some precondition an
+     * exception is thrown.
      *
      * @param wikiName The wiki name. Cannot be null.
      * @param spaceName The space name. Cannot be null.
@@ -205,83 +206,69 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * @return A DocumentInfo structure containing the actual document and additional information about it.
      * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
      * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
-     * @throws XWikiRestException if the URL is malformed 
-     * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
+     * @throws XWikiRestException if the URL is malformed PRECONDITION_FAILED if failIfLocked is true and the document
+     *             is locked.
      */
     public DocumentInfo getDocumentInfo(String wikiName, String spaceName, String pageName, String language,
-            String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException, XWikiRestException
+        String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException, XWikiRestException
     {
         return getDocumentInfo(wikiName, parseSpaceSegments(spaceName), pageName, language, version, failIfDoesntExist,
             failIfLocked);
     }
 
     /**
-     * Retrieve a document. This method never returns null. If something goes wrong with respect to some
-     * precondition an exception is thrown.
+     * Retrieve a document. This method never returns null. If something goes wrong with respect to some precondition an
+     * exception is thrown.
      *
      * @param wikiName The wiki name. Cannot be null.
      * @param spaces The space hierarchy. Cannot be null.
      * @param pageName The page name. Cannot be null.
-     * @param language The language. Null for the default language.
+     * @param localeString The language. Null for the default language.
      * @param version The version. Null for the latest version.
      * @param failIfDoesntExist True if an exception should be raised whenever the page doesn't exist.
      * @param failIfLocked True if an exception should be raised whenever the page is locked.
      * @return A DocumentInfo structure containing the actual document and additional information about it.
      * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
      * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
-     * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
+     *             PRECONDITION_FAILED if failIfLocked is true and the document is locked.
      */
-    public DocumentInfo getDocumentInfo(String wikiName, List<String> spaces, String pageName, String language,
-            String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
+    public DocumentInfo getDocumentInfo(String wikiName, List<String> spaces, String pageName, String localeString,
+        String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
     {
         if ((wikiName == null) || (spaces == null || spaces.isEmpty()) || (pageName == null)) {
-            throw new IllegalArgumentException(String.format(
-                    "wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)", wikiName,
-                    spaces, pageName));
+            throw new IllegalArgumentException(
+                String.format("wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)",
+                    wikiName, spaces, pageName));
         }
 
-        String pageFullName =  Utils.getPageId(wikiName, spaces, pageName);
-
-        boolean existed = Utils.getXWikiApi(componentManager).exists(pageFullName);
-
-        if (failIfDoesntExist) {
-            if (!existed) {
+        // If the language of the translated document is not the one we requested, then the requested translation
+        // doesn't exist. new translated document by hand.
+        // TODO: Ideally this method should take a Locale as input and not a String
+        Locale locale;
+        if (localeString != null) {
+            try {
+                locale = LocaleUtils.toLocale(localeString);
+            } catch (Exception e) {
+                // Language is invalid, we consider that the translation has not been found.
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
+        } else {
+            locale = null;
         }
 
-        Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
+        // Create document reference
+        DocumentReference reference = new DocumentReference(wikiName, spaces, pageName, locale);
+
+        // Get document
+        Document doc = Utils.getXWikiApi(componentManager).getDocument(reference);
 
         // If doc is null, we don't have the rights to access the document
         if (doc == null) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        if (language != null) {
-            doc = doc.getTranslatedDocument(language);
-
-            // If the language of the translated document is not the one we requested, then the requested translation
-            // doesn't exist. new translated document by hand.
-            // TODO: Ideally this method should take a Locale as input and not a String
-            Locale locale;
-            try {
-                locale = LocaleUtils.toLocale(language);
-            } catch (Exception e) {
-                // Language is invalid, we consider that the translation has not been found.
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-            if (!locale.equals(doc.getLocale())) {
-                // If we are here the requested translation doesn't exist
-                if (failIfDoesntExist) {
-                    throw new WebApplicationException(Status.NOT_FOUND);
-                } else {
-                    XWikiDocument xwikiDocument =
-                        new XWikiDocument(new DocumentReference(wikiName, spaces, pageName), locale);
-                    doc = new Document(xwikiDocument, getXWikiContext());
-
-                    existed = false;
-                }
-            }
+        if (failIfDoesntExist && doc.isNew()) {
+            throw new WebApplicationException(Status.NOT_FOUND);
         }
 
         // Get a specific version if requested to
@@ -290,13 +277,11 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         }
 
         // Check if the doc is locked.
-        if (failIfLocked) {
-            if (doc.getLocked()) {
-                throw new WebApplicationException(Status.PRECONDITION_FAILED);
-            }
+        if (failIfLocked && doc.getLocked()) {
+            throw new WebApplicationException(Status.PRECONDITION_FAILED);
         }
 
-        return new DocumentInfo(doc, !existed);
+        return new DocumentInfo(doc, doc.isNew());
     }
 
     /**

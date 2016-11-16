@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -84,6 +85,7 @@ import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
@@ -1739,7 +1741,20 @@ public class TestUtils
     {
         public static final Boolean ELEMENTS_ENCODED = new Boolean(true);
 
-        public static final Map<EntityType, Class<?>> RESOURCES_MAP = new IdentityHashMap<>();
+        public static final Map<EntityType, ResourceAPI> RESOURCES_MAP = new IdentityHashMap<>();
+
+        public static class ResourceAPI
+        {
+            public Class<?> api;
+
+            public Class<?> localeAPI;
+
+            public ResourceAPI(Class<?> api, Class<?> localeAPI)
+            {
+                this.api = api;
+                this.localeAPI = localeAPI;
+            }
+        }
 
         /**
          * Used to match number part of the object reference name.
@@ -1757,10 +1772,10 @@ public class TestUtils
                 throw new RuntimeException(e);
             }
 
-            RESOURCES_MAP.put(EntityType.DOCUMENT, PageResource.class);
-            RESOURCES_MAP.put(EntityType.OBJECT, ObjectResource.class);
-            RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, ObjectPropertyResource.class);
-            RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, ClassPropertyResource.class);
+            RESOURCES_MAP.put(EntityType.DOCUMENT, new ResourceAPI(PageResource.class, PageTranslationResource.class));
+            RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
+            RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
+            RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, new ResourceAPI(ClassPropertyResource.class, null));
         }
 
         /**
@@ -1959,6 +1974,12 @@ public class TestUtils
                 }
             }
 
+            // Add locale
+            Locale locale = getLocale(reference);
+            if (locale != null) {
+                elements.add(locale);
+            }
+
             return elements.toArray();
         }
 
@@ -2083,19 +2104,35 @@ public class TestUtils
 
         public void delete(EntityReference reference) throws Exception
         {
-            Class<?> resource = RESOURCES_MAP.get(reference.getType());
-
-            if (resource == null) {
-                throw new Exception("Unsuported type [" + reference.getType() + "]");
-            }
+            Class<?> resource = getResourceAPI(reference);
 
             TestUtils.assertStatusCodes(executeDelete(resource, toElements(reference)), true,
                 STATUS_NO_CONTENT_NOT_FOUND);
         }
 
+        // TODO: make EntityReference#getParameter() public
+        private Locale getLocale(EntityReference reference)
+        {
+            if (reference instanceof DocumentReference) {
+                return ((DocumentReference) reference).getLocale();
+            } else if (reference instanceof LocalDocumentReference) {
+                return ((LocalDocumentReference) reference).getLocale();
+            }
+
+            return null;
+        }
+
         public void deletePage(String space, String page) throws Exception
         {
             delete(new LocalDocumentReference(space, page));
+        }
+
+        /**
+         * @since 9.0RC1
+         */
+        public void deletePage(String space, String page, Locale locale) throws Exception
+        {
+            delete(new LocalDocumentReference(space, page, locale));
         }
 
         /**
@@ -2143,13 +2180,23 @@ public class TestUtils
          */
         public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
         {
-            Class<?> resourceClass = RESOURCES_MAP.get(reference.getType());
+            Class<?> resource = getResourceAPI(reference);
 
-            if (resourceClass == null) {
+            return get(resource, reference, failIfNotFound);
+        }
+
+        /**
+         * @since 9.0RC1
+         */
+        public Class<?> getResourceAPI(EntityReference reference) throws Exception
+        {
+            ResourceAPI resource = RESOURCES_MAP.get(reference.getType());
+
+            if (resource == null) {
                 throw new Exception("Unsuported type [" + reference.getType() + "]");
             }
 
-            return get(resourceClass, reference, failIfNotFound);
+            return getLocale(reference) != null ? resource.localeAPI : resource.api;
         }
 
         /**
@@ -2233,11 +2280,7 @@ public class TestUtils
          */
         public GetMethod executeGet(EntityReference reference) throws Exception
         {
-            Class<?> resource = RESOURCES_MAP.get(reference.getType());
-
-            if (resource == null) {
-                throw new Exception("Unsuported type [" + reference.getType() + "]");
-            }
+            Class<?> resource = getResourceAPI(reference);
 
             return executeGet(resource, reference);
         }

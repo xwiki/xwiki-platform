@@ -24,8 +24,6 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 
@@ -41,15 +39,15 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
 {
     @Override
     public Page getPageTranslation(String wikiName, String spaceName, String pageName, String language,
-            Boolean withPrettyNames) throws XWikiRestException
+        Boolean withPrettyNames) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
 
             Document doc = documentInfo.getDocument();
 
-            return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-                    false, Utils.getXWikiApi(componentManager), withPrettyNames);
+            return this.factory.toRestPage(this.uriInfo.getBaseUri(), this.uriInfo.getAbsolutePath(), doc, false,
+                withPrettyNames, false, false, false);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }
@@ -57,7 +55,7 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
 
     @Override
     public Response putPageTranslation(String wikiName, String spaceName, String pageName, String language, Page page)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, false, true);
@@ -70,7 +68,7 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
 
     @Override
     public void deletePageTranslation(String wikiName, String spaceName, String pageName, String language)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);

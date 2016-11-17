@@ -56,7 +56,11 @@ Caused by: #printThrowable($throwable.cause true)
       ## Skip the last message element because we always have more message elements than arguments.
       #break
     #end
-    #set ($argument = $log.argumentArray.get($foreach.index))
+    #if ($log.argumentArray.size() > $foreach.index)
+      #set ($argument = $log.argumentArray.get($foreach.index))
+    #else
+      #set ($argument = $NULL)
+    #end
     #set ($message = "$message$escapetool.xml($messageElement)")
     ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
     ## We will display a link to that entity, so we need to extract the document from it.

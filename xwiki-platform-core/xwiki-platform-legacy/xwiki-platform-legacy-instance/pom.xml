@@ -40,6 +40,13 @@
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
+    <!-- Trigger xwiki-platform-instance dependencies (but without xwiki-platform-instance jar itself) -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-instance</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -47,15 +54,6 @@
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it -->
       <scope>provided</scope>
-    </dependency>
-
-    <!-- We need this dependency so xwiki-platform-legacy-instance trigger the same dependencies than xwiki-platform-instance -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-instance</artifactId>
-      <version>${project.version}</version>
-      <!-- We don't want to draw this dependency since we're wrapping it -->
-      <type>pom</type>
     </dependency>
 
     <!-- Build tools -->

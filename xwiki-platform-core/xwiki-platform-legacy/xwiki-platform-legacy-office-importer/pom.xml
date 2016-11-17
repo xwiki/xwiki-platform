@@ -37,6 +37,13 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-importer</xwiki.extension.features>
   </properties>
   <dependencies>
+    <!-- Trigger xwiki-platform-office-importer dependencies (but without xwiki-platform-office-importer jar itself) -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-office-importer</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -44,14 +51,6 @@
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it. -->
       <scope>provided</scope>
-    </dependency>
-    <!-- We need this dependency so that the module trigger the same dependencies than xwiki-platform-office-importer -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-office-importer</artifactId>
-      <version>${project.version}</version>
-      <!-- We don't want to draw this dependency since we're wrapping it. -->
-      <type>pom</type>
     </dependency>
 
     <dependency>

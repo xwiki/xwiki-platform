@@ -42,13 +42,13 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- Legacy oldcore needs some legacy classes from legacy URL -->
+    <!-- Trigger xwiki-platform-oldcore dependencies (but without xwiki-platform-oldcore jar itself) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-url</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+      <type>pom</type>
     </dependency>
-
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -57,13 +57,18 @@
       <!-- We don't want to draw this dependency since we're wrapping it -->
       <scope>provided</scope>
     </dependency>
-    <!-- We need this dependency so that the module trigger the same dependencies than xwiki-platform-oldcore -->
+
+    <!-- Legacy oldcore needs some legacy classes from legacy URL -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-legacy-url</artifactId>
       <version>${project.version}</version>
-      <!-- We don't want to draw this dependency since we're wrapping it -->
-      <type>pom</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Build tools -->

@@ -37,6 +37,13 @@
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
+    <!-- Trigger xwiki-platform-rendering-macro-include dependencies (but without xwiki-platform-rendering-macro-include jar itself) -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
     <!-- Aspectified dependency -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -44,14 +51,6 @@
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it -->
       <scope>provided</scope>
-    </dependency>
-    <!-- We need this dependency so that the module trigger the same dependencies than xwiki-platform-rendering-macro-include -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
-      <!-- We don't want to draw this dependency since we're wrapping it -->
-      <type>pom</type>
     </dependency>
 
     <!-- Build tools -->

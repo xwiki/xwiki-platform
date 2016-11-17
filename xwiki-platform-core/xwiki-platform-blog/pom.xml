@@ -32,6 +32,7 @@
   <packaging>pom</packaging>
   <description>Blog application for XWiki</description>
   <modules>
+    <module>xwiki-platform-blog-api</module>
     <module>xwiki-platform-blog-ui</module>
   </modules>
   <profiles>

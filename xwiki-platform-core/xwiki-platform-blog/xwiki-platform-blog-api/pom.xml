@@ -27,45 +27,18 @@
     <artifactId>xwiki-platform-blog</artifactId>
     <version>9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-blog-ui</artifactId>
-  <name>XWiki Platform - Blog - UI</name>
-  <packaging>xar</packaging>
-  <properties>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-blog</xwiki.extension.features>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Blog Application</xwiki.extension.name>
-  </properties>
+  <artifactId>xwiki-platform-blog-api</artifactId>
+  <name>XWiki Platform - Blog - API</name>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-blog-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-macro</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

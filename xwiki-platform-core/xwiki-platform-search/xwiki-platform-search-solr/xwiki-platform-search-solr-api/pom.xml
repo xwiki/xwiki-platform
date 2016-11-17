@@ -74,10 +74,6 @@
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.restlet.jee</groupId>
-      <artifactId>org.restlet.ext.servlet</artifactId>
-    </dependency>
     <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -87,6 +83,15 @@
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
+    </dependency>
+    <!-- Extract data from attachments -->
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parsers</artifactId>
     </dependency>
     <!-- XWiki dependencies -->
     <dependency>

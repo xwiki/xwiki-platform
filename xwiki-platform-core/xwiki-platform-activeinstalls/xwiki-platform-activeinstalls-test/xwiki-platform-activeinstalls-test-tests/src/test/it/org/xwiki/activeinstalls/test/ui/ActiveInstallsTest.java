@@ -78,9 +78,9 @@ public class ActiveInstallsTest extends AbstractTest
         Assert.assertEquals(ActiveInstallsHomePage.getSpace(), vp.getMetaDataValue("space"));
         Assert.assertEquals(ActiveInstallsHomePage.getPage(), vp.getMetaDataValue("page"));
 
-        // Configure the Active Installs feature to count "org.xwiki.platform:xwiki-platform-web" distribution ids.
+        // Configure the Active Installs feature to count "org.xwiki.*" distribution ids.
         getUtil().updateObject("ActiveInstalls", "ActiveInstallsConfig", "ActiveInstalls.ActiveInstallsConfig", 0,
-            "distributionId", "org.xwiki.platform:xwiki-platform-web");
+            "distributionId", "org.xwiki.*");
 
         // By default we don't show SNAPSHOTs, verify that!
 
@@ -130,6 +130,13 @@ public class ActiveInstallsTest extends AbstractTest
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Database Active Installs Count\\r?\\nHSQL Database Engine 1"));
+
+        // Verify Distribution data
+        getUtil().gotoPage("ActiveInstalls", "DistributionData");
+        vp  = new ViewPage();
+        assertTrue("Got [" + vp.getContent() + "]",
+            vp.getContent().matches("Distributions Active Installs Count\\r?\\n"
+                + "org.xwiki.platform:xwiki-platform-web 1"));
 
         // Verify top 10 XWiki versions data
         getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData");

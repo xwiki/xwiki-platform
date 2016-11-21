@@ -523,7 +523,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         ## The field name has changed.
         #if($xclass.get($field.name))
           ## There is already a field with the same name.
-          #set($errorMessage = $services.localization.render('platform.appwithinminutes.classEditorDuplicateFieldNameError', $field.name))
+          #set($errorMessage = $services.localization.render('platform.appwithinminutes.classEditorDuplicateFieldNameError', [$field.name]))
           #break
         #else
           #set($discard = $xclass.removeField($fieldName))

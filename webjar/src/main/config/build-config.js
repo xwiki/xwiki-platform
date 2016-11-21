@@ -18,13 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 var CKBUILDER_CONFIG = {
-  skin: 'moono',
+  skin: 'moono-lisa',
   ignore: [
+    'CHANGES.md',
     'bender.js',
     '.bender',
     'bender-err.log',
     'bender-out.log',
     'dev',
+    'docs',
     '.DS_Store',
     '.editorconfig',
     '.gitignore',
@@ -34,15 +36,14 @@ var CKBUILDER_CONFIG = {
     '.jscsrc',
     '.jshintignore',
     '.jshintrc',
+    'less',
+    'LICENSE.md',
     '.mailmap',
     'node_modules',
     'package.json',
     'README.md',
-    'tests',
-    // Additional ignores for the XWiki WebJar.
     'samples',
-    'CHANGES.md',
-    'LICENSE.md'
+    'tests'
   ],
   plugins: {
     a11yhelp: 1,
@@ -87,6 +88,7 @@ var CKBUILDER_CONFIG = {
     tabletools: 1,
     toolbar: 1,
     undo: 1,
+    uploadfile: 1,
     uploadimage: 1,
     wysiwygarea: 1,
     'xwiki-filter': 1,

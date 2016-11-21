@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 var CKBUILDER_CONFIG = {
-  skin: 'moono',
+  skin: 'moono-lisa',
   ignore: [
     'CHANGES.md',
     'bender.js',
@@ -26,6 +26,7 @@ var CKBUILDER_CONFIG = {
     'bender-err.log',
     'bender-out.log',
     'dev',
+    'docs',
     '.DS_Store',
     '.editorconfig',
     '.gitignore',
@@ -35,6 +36,7 @@ var CKBUILDER_CONFIG = {
     '.jscsrc',
     '.jshintignore',
     '.jshintrc',
+    'less',
     'LICENSE.md',
     '.mailmap',
     'node_modules',
@@ -45,6 +47,7 @@ var CKBUILDER_CONFIG = {
   ],
   plugins: {
     a11yhelp: 1,
+    autolink: 1,
     basicstyles: 1,
     bidi: 1,
     blockquote: 1,
@@ -61,7 +64,7 @@ var CKBUILDER_CONFIG = {
     font: 1,
     format: 1,
     horizontalrule: 1,
-    image: 1,
+    image2: 1,
     indentlist: 1,
     justify: 1,
     link: 1,
@@ -81,10 +84,12 @@ var CKBUILDER_CONFIG = {
     stylescombo: 1,
     tab: 1,
     table: 1,
+    tableresize: 1,
     tabletools: 1,
     toolbar: 1,
     undo: 1,
-    widget: 1,
+    uploadfile: 1,
+    uploadimage: 1,
     wysiwygarea: 1
   }
 };

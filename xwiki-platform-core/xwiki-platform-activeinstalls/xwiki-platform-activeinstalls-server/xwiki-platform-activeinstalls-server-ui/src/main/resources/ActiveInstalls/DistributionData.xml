@@ -41,14 +41,16 @@
   <hidden>true</hidden>
   <content>{{include reference="ActiveInstalls.QueryVariables"/}}
 {{velocity}}
-## Note: We use the following regex query in order to match all versions &gt;= 8.4
-## distributionVersion:/8\.[4-9].*|9\..*|[1-9][0-9]+\..*/
+## Note: We filter distributionFeatures to contain "xwiki" since we want to have data only for XWiki 8.4+ versions
+## (since before XWiki 8.4 we were sending a single distributionId and now we're sending several and it only makes
+## sense to graph the distributionId values after we started sending the various values, i.e. after 8.4), and that new
+## property started being sent in 8.4.
 #set ($query = "
 {
    ""query"": {
        ""query_string"": {
            ""lowercase_expanded_terms"": false,
-           ""query"": ""_timestamp:[now-1d TO *] $snapshotQueryFragment AND distributionId:$distributionId AND distributionVersion:/8\\.[4-9].*|9\\..*|[1-9][0-9]+\\..*/""
+           ""query"": ""_timestamp:[now-1d TO *] $snapshotQueryFragment AND distributionId:$distributionId AND distributionFeatures:xwiki""
        }
    },
    ""aggs"": {

@@ -140,11 +140,9 @@
               <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml</filesToInclude>
               <replacements>
                 <replacement>
-                  <token>&lt;/description&gt;</token>
-                  <value>&lt;/description&gt;
-  &lt;properties&gt;
-    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
-  &lt;/properties&gt;</value>
+                  <token>&lt;/properties&gt;</token>
+                  <value>&lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
+    &lt;/properties&gt;</value>
                 </replacement>
               </replacements>
             </configuration>

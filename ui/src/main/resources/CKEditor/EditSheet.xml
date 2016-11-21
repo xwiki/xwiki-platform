@@ -251,6 +251,7 @@ define('xwiki-ckeditor', [
       'xwiki-resource': {
         dispatcher: sourceDocument.getURL('get', 'sheet=CKEditor.ResourceDispatcher&amp;outputSyntax=plain')
       },
+      height: $(element).height(),
       'xwiki-source': {
         htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
       }

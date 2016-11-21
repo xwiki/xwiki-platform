@@ -41,7 +41,6 @@ CKEDITOR.editorConfig = function(config) {
     entities_latin: false,
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,
-    height: 500,
     // Simplify the link dialog.
     linkShowAdvancedTab: false,
     linkShowTargetTab: false,

@@ -370,7 +370,7 @@ if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
       if (event.editor.contextMenu) {
         event.editor.contextMenu._.panelDefinition.css.push(
           '.cke_menuarrow {' +
-            'background-image: url("' + CKEDITOR_BASEPATH + 'skins/moono/images/arrow.png") !important;' +
+            'background-image: url("' + CKEDITOR_BASEPATH + 'skins/moono-lisa/images/arrow.png") !important;' +
           '}'
         );
       }
@@ -755,10 +755,10 @@ require(['jquery', 'xwiki-ckeditor', 'autosave'], function($, ckeditorPromise) {
       <code>#template('colorThemeInit.vm')
 
 /*
-#set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono'))
+#set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono-lisa'))
 #if ("$!ckeditorSkinPath" == '')
   ## Before 6.3RC1
-  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.10-SNAPSHOT/skins/moono'))
+  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.10-SNAPSHOT/skins/moono-lisa'))
 #end
 #if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
   ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving

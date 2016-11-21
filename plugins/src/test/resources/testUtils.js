@@ -25,7 +25,7 @@ var testUtils = (function() {
         customConfig: '',
         // Basic plugins, as per http://docs.ckeditor.com/#!/guide/dev_tests-section-test-requirements .
         plugins: 'wysiwygarea,toolbar,undo,basicstyles',
-        skin: 'moono'
+        skin: 'moono-lisa'
       }, config, true));
       editor.on('instanceReady', done);
       return editor;

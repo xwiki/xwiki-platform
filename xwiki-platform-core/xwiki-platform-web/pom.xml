@@ -33,6 +33,11 @@
   <description>Web Resources for the XWiki platform</description>
   <!-- Explicitly put product home page so that it's found by core extension scanner no mater what -->
   <url>http://www.xwiki.org</url>
+  <properties>
+    <!-- TODO: This is currently required for the Packager Mojo which currently doesn't create its own distribution
+         descriptor (as xwiki-platform-distribution-web and xwiki-enterprise-web do). -->
+    <xwiki.extension.features>xwiki</xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -41,10 +41,13 @@
   <hidden>true</hidden>
   <content>{{include reference="ActiveInstalls.QueryVariables"/}}
 {{velocity}}
-## Note: We filter distributionFeatures to contain "xwiki" since we want to have data only for XWiki 8.4+ versions
-## (since before XWiki 8.4 we were sending a single distributionId and now we're sending several and it only makes
-## sense to graph the distributionId values after we started sending the various values, i.e. after 8.4), and that new
-## property started being sent in 8.4.
+## Note: We filter "distributionFeatures" for 2 reasons:
+## - It allows us to filter all distributions done by the XWiki dev team.
+## - We started sending the "distributionFeatures" property at the same time as we started sending various
+##   distribution id that represent what packaging is being used to install XWiki (before that we were sending a unique
+##   distribution id). Thus by filtering on "xwiki" we're sure to not get older distribution ids and we can have
+##   meaningful data to present.
+## Those new behaviors were introduced in XWiki 8.4.
 #set ($query = "
 {
    ""query"": {

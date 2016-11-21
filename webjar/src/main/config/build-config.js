@@ -98,6 +98,7 @@ var CKBUILDER_CONFIG = {
     'xwiki-maximize': 1,
     'xwiki-save': 1,
     'xwiki-source': 1,
-    'xwiki-table': 1
+    'xwiki-table': 1,
+    'xwiki-upload': 1
   }
 };

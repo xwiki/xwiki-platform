@@ -52,37 +52,7 @@
     },
 
     afterInit: function(editor) {
-      this.overrideUploadImageWidget(editor);
       this.overrideImageWidget(editor);
-    },
-
-    /**
-     * Overrides the Upload Image widget definition to include the image markers.
-     */
-    overrideUploadImageWidget: function(editor) {
-      var uploadImageWidget = editor.widgets.registered.uploadimage;
-      if (!uploadImageWidget) {
-        return;
-      }
-
-      var originalOnUploaded = uploadImageWidget.onUploaded;
-      uploadImageWidget.onUploaded = function(upload) {
-        var response = JSON.parse(upload.xhr.responseText);
-        this.parts.img.setAttribute('data-reference', CKEDITOR.plugins.xwikiResource
-          .serializeResourceReference(response.resourceReference));
-        originalOnUploaded.call(this, upload);
-      };
-
-      var originalReplaceWith = uploadImageWidget.replaceWith;
-      uploadImageWidget.replaceWith = function(data, mode) {
-        var reference = this.parts.img.getAttribute('data-reference');
-        if (typeof reference === 'string') {
-          var startImageMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(reference) + '-->';
-          var stopImageMarker = '<!--stopimage-->';
-          data = startImageMarker + data + stopImageMarker;
-        }
-        originalReplaceWith.call(this, data, mode);
-      };
     },
 
     overrideImageWidget: function(editor) {

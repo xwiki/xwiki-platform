@@ -38,10 +38,12 @@ import org.xwiki.component.annotation.Role;
 public interface LocalizationManager
 {
     /**
-     * Find a translation in the specified language.
+     * Find a translation in the specified locale.
      * 
      * @param key the key identifying the message to look for
-     * @param locale the locale of the target language
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
      * @return the translation in the defined language
      * @see LocalizationManager
      */
@@ -73,6 +75,6 @@ public interface LocalizationManager
      * @throws TranslationBundleDoesNotExistsException when no bundle could be found for the passed identifier
      * @throws TranslationBundleFactoryDoesNotExistsException when no bundle factory could be found for the passed type
      */
-    void use(String bundleType, String bundleId) throws TranslationBundleDoesNotExistsException,
-        TranslationBundleFactoryDoesNotExistsException;
+    void use(String bundleType, String bundleId)
+        throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException;
 }

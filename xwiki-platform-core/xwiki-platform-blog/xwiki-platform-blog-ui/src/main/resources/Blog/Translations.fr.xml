@@ -43,6 +43,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+blog.changeVisibility.changing=Modifier la visibilité
+blog.changeVisibility.success=La visibilité du blog a été modifiée avec succès
 blog.templateProvider.blogpost.description=Nouvelle postée sur un blog
 blog.templateProvider.blogpost.name=Article de Blog
 </content>

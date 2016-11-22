@@ -29,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.job.Job;
@@ -47,6 +49,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -154,6 +158,36 @@ public class ExtensionManagerScriptServiceTest
     public void testInstallOnNamespace() throws Throwable
     {
         install("extension", "version", "namespace");
+    }
+
+    @Test
+    public void testOverwriteAllowedNamespaces() throws Throwable
+    {
+        InstallRequest installRequest = this.scriptService.createInstallRequest("extension", "version", "namespace");
+
+        // Indicate all extensions of type "test" should be installed on root
+        ((ScriptExtensionRewriter) installRequest.getRewriter()).installExtensionTypeOnRootNamespace("test");
+
+        // Allow redirect on root
+        installRequest.setRootModificationsAllowed(true);
+
+        Job job = this.scriptService.install(installRequest);
+        if (job == null) {
+            throw this.scriptService.getLastError();
+        }
+
+        job.join();
+
+        List<LogEvent> errors = job.getStatus().getLog().getLogsFrom(LogLevel.WARN);
+        if (!errors.isEmpty()) {
+            throw errors.get(0).getThrowable();
+        }
+
+        // Validate
+
+        InstalledExtensionRepository repository = mocker.getInstance(InstalledExtensionRepository.class);
+
+        assertNotNull(repository.getInstalledExtension("extension", null));
     }
 
     @Test(expected = InstallException.class)

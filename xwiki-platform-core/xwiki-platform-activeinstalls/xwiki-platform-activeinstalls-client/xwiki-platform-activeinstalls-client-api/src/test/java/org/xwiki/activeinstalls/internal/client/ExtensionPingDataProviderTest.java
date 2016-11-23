@@ -34,7 +34,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -295,7 +295,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   $(document).ready(function () {
   
     /**
-     * The tour is not adapted for screen size like mobile phone.
+     * The tour is not adapted for little screen sizes like mobile phones have.
+     * The value 768 is taken from bootstrap in order to be consistent with their media queries.
      */
     if ($(window).innerWidth() &lt;= 768) {
       return;

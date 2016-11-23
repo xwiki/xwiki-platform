@@ -293,6 +293,14 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    * everywhere.
    */ 
   $(document).ready(function () {
+  
+    /**
+     * The tour is not adapted for screen size like mobile phone.
+     */
+    if ($(window).innerWidth() &lt;= 768) {
+      return;
+    }
+  
     var ajaxOptions = {
       url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plain'),
       dataType    : 'json',

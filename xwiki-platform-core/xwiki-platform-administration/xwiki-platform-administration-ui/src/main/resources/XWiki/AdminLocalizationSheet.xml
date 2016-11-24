@@ -153,6 +153,8 @@ require.config({
  * by using a custom displayer.
  * However, it's a pain to upgrade the XWiki.XWikiPreferences class to add a displayer.
  * The class is not even packaged by the administration application.
+ *
+ * We also enable the improved select widget on the "timezone" field to make the user able to filter the choices.
  */
 require(['jquery','bootstrap','bootstrap-select'], function($) {
   'use strict';
@@ -206,6 +208,30 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
    */
   $(document).ready(function() {
   
+    /**
+     * Enable the bootstrap-select plugin to have a nicer UI.
+     */
+    var enableSelectPicker = function (select) {
+      // Return the width of an input which has no custom transformation so that we get the pure results of CSS rules.
+      var getBaseWidth = function () {
+        return $('input[name="XWiki.XWikiPreferences_0_documentBundles"]').outerWidth() + 'px';
+      }
+    
+      select.selectpicker({
+        // We need to set the width manually using pixels because if we use "100%", it won't work because the select 
+        // picker is using an absolute position, so using "100%" would exceed the window limit.
+        width: getBaseWidth(),
+        // Enable the filtering on choices if there is a lot of choices
+        liveSearch: select.find('option').length &gt; 10
+      });
+      
+      // Update the width of the select picker when the window is resized
+      $(window).resize(function() {
+        select.selectpicker({width: getBaseWidth()});
+        select.selectpicker('refresh');
+      });
+    }
+  
     //
     // Adding the CSS of the boostrap-select plugin
     //
@@ -239,11 +265,8 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
     // Adds the new select widget in the DOM
     select.insertAfter(localesInput);
     
-    // Enable the bootstrap-select plugin to have a nicer UI.
-    // We need to set the width manually using pixels because if we use "100%", it won't work because the select picker
-    // is using an absolute position, so using "100%" would exceed the window limit.
-    // TODO: we could update this width when the window is resized.
-    select.selectpicker({width: $('select[name="XWiki.XWikiPreferences_0_multilingual"]').outerWidth() + 'px'});
+    // Enable the select picker
+    enableSelectPicker(select);
     
     // Synchronize the value of the hidden input text with the selected item in the select widget.
     select.on('changed.bs.select', function (event) {
@@ -265,6 +288,15 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
       select2.append(option);
     }
     defaultLocaleInput.replaceWith(select2);
+    
+    // Enable bootstrap-select on the "timezone" field
+    enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_timezone"]'));
+    
+    // Enable it on the default local field too
+    enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_default_language"]'));
+    
+    // Enable it on the last select field to be consistent
+    enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_multilingual"]'));
   });
 });
 </code>

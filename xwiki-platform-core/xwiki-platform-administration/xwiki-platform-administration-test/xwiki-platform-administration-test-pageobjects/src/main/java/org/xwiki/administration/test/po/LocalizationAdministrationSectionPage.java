@@ -25,7 +25,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
+import org.xwiki.test.ui.po.BootstrapSelect;
 
 /**
  * Represents the actions possible on the Localization Administration Page.
@@ -55,17 +55,13 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
 
     public void setMultiLingual(boolean isMultiLingual)
     {
-        Select select = new Select(this.multiLingualSelect);
-        if (isMultiLingual) {
-            select.selectByIndex(1);
-        } else {
-            select.selectByIndex(2);
-        }
+        BootstrapSelect select = new BootstrapSelect(this.multiLingualSelect, getDriver());
+        select.selectByValue(isMultiLingual ? "Yes" : "No");
     }
 
     public void setDefaultLanguage(String defaultLanguage)
     {
-        Select select = new Select(this.defaultLanguageSelect);
+        BootstrapSelect select = new BootstrapSelect(this.defaultLanguageSelect, getDriver());
         select.selectByValue(defaultLanguage);
     }
 

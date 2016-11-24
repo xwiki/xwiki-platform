@@ -19,7 +19,7 @@
  */
 package org.xwiki.platform.blog.internal;
 
-import java.util.Arrays;
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,7 +27,11 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.VersionConstraint;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -51,6 +55,17 @@ public class BlogUpgradeEventListener extends AbstractEventListener
      */
     public static final String NAME = "Blog Upgrade Listener";
 
+    /**
+     * ID of the Blog Application.
+     */
+    private static final String EXTENSION_ID = "org.xwiki.platform:xwiki-platform-blog-ui";
+
+    /**
+     * The visibility is synchronized since 7.4.6, 8.4.2 and 9.0RC1, so we do the migration only if the previous
+     * version was anterior, ie matches the following constraint.
+     */
+    private static final VersionConstraint VERSION_CONSTRAINT = new DefaultVersionConstraint("(.7.4.6),(8.0,8.4.2)");
+
     @Inject
     private BlogVisibilityMigration blogVisibilityMigration;
 
@@ -62,26 +77,37 @@ public class BlogUpgradeEventListener extends AbstractEventListener
      */
     public BlogUpgradeEventListener()
     {
-        super(NAME, Arrays.asList(new ExtensionUpgradedEvent()));
+        super(NAME, new ExtensionUpgradedEvent(EXTENSION_ID));
     }
 
-
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void onEvent(Event event, Object installedExtension, Object previousExtensions)
     {
         ExtensionUpgradedEvent extensionUpgradedEvent = (ExtensionUpgradedEvent) event;
-        if (!extensionUpgradedEvent.getExtensionId().getId().equals("org.xwiki.platform:xwiki-platform-blog-ui")) {
-            return;
-        }
 
-        WikiReference wikiReference = namespaceToWikiReference(extensionUpgradedEvent.getNamespace());
-        if (wikiReference != null) {
-            try {
-                blogVisibilityMigration.execute(wikiReference);
-            } catch (Exception e) {
-                logger.warn("Failed to migrate the visibility of non published blog posts.");
+        Version previousVersion = getPreviousVersion((Collection<InstalledExtension>) previousExtensions);
+
+        if (previousVersion != null && VERSION_CONSTRAINT.containsVersion(previousVersion)) {
+            WikiReference wikiReference = namespaceToWikiReference(extensionUpgradedEvent.getNamespace());
+            if (wikiReference != null) {
+                try {
+                    blogVisibilityMigration.execute(wikiReference);
+                } catch (Exception e) {
+                    logger.warn("Failed to migrate the visibility of non published blog posts.");
+                }
             }
         }
+    }
+
+    private Version getPreviousVersion(Collection<InstalledExtension> previousExtensions)
+    {
+        for (InstalledExtension extension : previousExtensions) {
+            if (extension.getId().getId().equals(EXTENSION_ID)) {
+                return extension.getId().getVersion();
+            }
+        }
+        // Should never happen
+        return null;
     }
 
     private WikiReference namespaceToWikiReference(String namespace)

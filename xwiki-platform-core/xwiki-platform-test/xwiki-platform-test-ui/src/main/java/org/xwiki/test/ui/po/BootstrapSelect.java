@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -29,8 +30,11 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
- * Represent an select field enhanced with the "bootstrap-select" plugin
+ * Represent an select field enhanced with the "bootstrap-select" plugin.
+ *
  * @version $Id$
+ * @since 8.4.2
+ * @since 9.0RC1
  */
 public class BootstrapSelect
 {
@@ -57,6 +61,11 @@ public class BootstrapSelect
     {
         String value = this.hiddenSelect.getAttribute("multiple");
         return value != null && !"false".equals(value);
+    }
+
+    public void selectByValue(String value)
+    {
+        selectByValues(Arrays.asList(value));
     }
 
     public void selectByValues(List<String> values)

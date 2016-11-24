@@ -19,8 +19,6 @@
  */
 package org.xwiki.platform.blog.internal;
 
-import java.util.Arrays;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -76,7 +74,7 @@ public class BlogDocumentSavingListener extends AbstractEventListener
      */
     public BlogDocumentSavingListener()
     {
-        super(NAME, Arrays.asList(new DocumentCreatingEvent(), new DocumentUpdatingEvent()));
+        super(NAME, new DocumentCreatingEvent(), new DocumentUpdatingEvent());
     }
 
     @Override

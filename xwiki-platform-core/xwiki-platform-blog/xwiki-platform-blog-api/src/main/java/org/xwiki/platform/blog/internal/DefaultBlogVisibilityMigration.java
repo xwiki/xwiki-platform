@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -56,6 +57,9 @@ public class DefaultBlogVisibilityMigration implements BlogVisibilityMigration
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public void execute(WikiReference wikiReference) throws Exception
     {
@@ -77,6 +81,9 @@ public class DefaultBlogVisibilityMigration implements BlogVisibilityMigration
                 xwiki.saveDocument(document, "Hide the page because the blog post is not published or hidden.",
                         context);
             }
+
+            logger.info("Migration of blog posts' visibility has been successfully executed on the wiki [{}].",
+                    wikiReference.getName());
         } catch (Exception e) {
             throw new Exception("Failed to migrate the blog posts' visibility.", e);
         }

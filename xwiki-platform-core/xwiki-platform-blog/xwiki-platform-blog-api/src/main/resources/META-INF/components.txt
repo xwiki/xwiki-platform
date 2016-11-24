@@ -1,1 +1,3 @@
 org.xwiki.platform.blog.internal.BlogDocumentSavingListener
+org.xwiki.platform.blog.internal.BlogUpgradeEventListener
+org.xwiki.platform.blog.internal.DefaultBlogVisibilityMigration

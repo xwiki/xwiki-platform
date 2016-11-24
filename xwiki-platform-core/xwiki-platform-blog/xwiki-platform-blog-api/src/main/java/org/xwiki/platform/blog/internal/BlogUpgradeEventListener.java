@@ -36,11 +36,14 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.platform.blog.BlogVisibilityMigration;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * React to the upgrade of the blog application by starting the blog post visibility migration.
  *
  * @version $Id$
+ *
  * @since 9.0RC1
  * @since 8.4.2
  * @since 7.4.6
@@ -64,10 +67,13 @@ public class BlogUpgradeEventListener extends AbstractEventListener
      * The visibility is synchronized since 7.4.6, 8.4.2 and 9.0RC1, so we do the migration only if the previous
      * version was anterior, ie matches the following constraint.
      */
-    private static final VersionConstraint VERSION_CONSTRAINT = new DefaultVersionConstraint("(.7.4.6),(8.0,8.4.2)");
+    private static final VersionConstraint VERSION_CONSTRAINT = new DefaultVersionConstraint("(,7.4.6),[8.0,8.4.2)");
 
     @Inject
     private BlogVisibilityMigration blogVisibilityMigration;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private Logger logger;
@@ -88,14 +94,35 @@ public class BlogUpgradeEventListener extends AbstractEventListener
         Version previousVersion = getPreviousVersion((Collection<InstalledExtension>) previousExtensions);
 
         if (previousVersion != null && VERSION_CONSTRAINT.containsVersion(previousVersion)) {
-            WikiReference wikiReference = namespaceToWikiReference(extensionUpgradedEvent.getNamespace());
-            if (wikiReference != null) {
-                try {
-                    blogVisibilityMigration.execute(wikiReference);
-                } catch (Exception e) {
-                    logger.warn("Failed to migrate the visibility of non published blog posts.");
-                }
+            String namespace = extensionUpgradedEvent.getNamespace();
+            if (namespace == null) {
+                // When the namespace is null, it means the application is installed on the root namespace, ie. on
+                // the farm.
+                migrateAllWikis();
+            } else if (namespace.startsWith("wiki:")) {
+                migrateWiki(new WikiReference(namespace.substring(5)));
             }
+        }
+    }
+
+    private void migrateAllWikis()
+    {
+        try {
+            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                migrateWiki(new WikiReference(wikiId));
+            }
+        } catch (WikiManagerException e) {
+            logger.warn("Failed to migrate the visibility of non published blog posts.", e);
+        }
+    }
+
+    private void migrateWiki(WikiReference wikiReference)
+    {
+        try {
+            blogVisibilityMigration.execute(wikiReference);
+        } catch (Exception e) {
+            logger.warn("Failed to migrate the visibility of non published blog posts on the wiki [{}].",
+                    wikiReference.getName(), e);
         }
     }
 
@@ -105,15 +132,6 @@ public class BlogUpgradeEventListener extends AbstractEventListener
             if (extension.getId().getId().equals(EXTENSION_ID)) {
                 return extension.getId().getVersion();
             }
-        }
-        // Should never happen
-        return null;
-    }
-
-    private WikiReference namespaceToWikiReference(String namespace)
-    {
-        if (namespace.startsWith("wiki:")) {
-            return new WikiReference(namespace.substring(5));
         }
         // Should never happen
         return null;

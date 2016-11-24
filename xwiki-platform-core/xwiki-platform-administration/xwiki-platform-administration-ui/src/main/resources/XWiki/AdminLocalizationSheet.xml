@@ -292,7 +292,7 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
     // Enable bootstrap-select on the "timezone" field
     enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_timezone"]'));
     
-    // Enable it on the default local field too
+    // Enable it on the default locale field too
     enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_default_language"]'));
     
     // Enable it on the last select field to be consistent

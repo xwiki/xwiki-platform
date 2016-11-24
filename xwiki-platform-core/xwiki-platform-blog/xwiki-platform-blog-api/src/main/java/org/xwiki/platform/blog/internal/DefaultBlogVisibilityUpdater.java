@@ -19,21 +19,18 @@
  */
 package org.xwiki.platform.blog.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.event.DocumentCreatingEvent;
-import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.AbstractEventListener;
-import org.xwiki.observation.event.Event;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.platform.blog.BlogVisibilityUpdater;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Synchronize the visibility of blog pages with the "published" and "hidden" fields of the BlogPostClass object.
+ * Default implementation of {@link BlogVisibilityUpdater}.
  *
  * @version $Id$
  *
@@ -43,28 +40,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 @Component
 @Singleton
-@Named(BlogDocumentSavingListener.NAME)
-public class BlogDocumentSavingListener extends AbstractEventListener
+public class DefaultBlogVisibilityUpdater implements BlogVisibilityUpdater
 {
-    /**
-     * Name of the listener.
-     */
-    public static final String NAME = "Blog Document Saving Listener";
-
-    @Inject
-    private BlogVisibilityUpdater blogVisibilityUpdater;
-
-    /**
-     * Construct a BlogDocumentSavingListener.
-     */
-    public BlogDocumentSavingListener()
-    {
-        super(NAME, new DocumentCreatingEvent(), new DocumentUpdatingEvent());
-    }
-
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void synchronizeHiddenMetadata(XWikiDocument document)
     {
-        blogVisibilityUpdater.synchronizeHiddenMetadata((XWikiDocument) source);
+        final DocumentReference blogPostClass = new DocumentReference("BlogPostClass", new SpaceReference("Blog",
+                document.getDocumentReference().getWikiReference()));
+
+        BaseObject blogPost = document.getXObject(blogPostClass);
+        if (blogPost != null) {
+            // Set the document visibility according to the values of the blog object.
+            // The change will be saved after because the event is sent before the actual saving.
+            document.setHidden(blogPost.getIntValue("published") == 0 || blogPost.getIntValue("hidden") == 1);
+        }
     }
 }

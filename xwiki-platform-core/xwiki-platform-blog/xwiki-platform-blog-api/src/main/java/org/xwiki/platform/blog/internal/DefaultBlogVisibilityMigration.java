@@ -29,6 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.blog.BlogVisibilityMigration;
+import org.xwiki.platform.blog.BlogVisibilityUpdater;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
@@ -40,6 +41,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Default implementation of {@link BlogVisibilityMigration}.
  *
  * @version $Id$
+ *
  * @since 9.0RC1
  * @since 8.4.2
  * @since 7.4.6
@@ -58,6 +60,9 @@ public class DefaultBlogVisibilityMigration implements BlogVisibilityMigration
     private Provider<XWikiContext> contextProvider;
 
     @Inject
+    private BlogVisibilityUpdater blogVisibilityUpdater;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -67,19 +72,22 @@ public class DefaultBlogVisibilityMigration implements BlogVisibilityMigration
             XWikiContext context = contextProvider.get();
             XWiki xwiki = context.getWiki();
 
-            // Detect the blog posts that are not published or hidden but that do not have the correct visibility on the
-            // document level
-            Query query = queryManager.createQuery("from doc.object(Blog.BlogPostClass) obj where "
-                    + "(obj.published = 0 or obj.hidden = 1) AND (doc.hidden is null or doc.hidden = false)",
-                    Query.XWQL).setWiki(wikiReference.getName());
+            // Detect the blog posts where the visibility is not what it should be
+            final String xwql =
+                    "from doc.object(Blog.BlogPostClass) obj where "
+                            + "((obj.published = 0 or obj.hidden = 1) and doc.hidden <> 1)"
+                            + " or "
+                            + "(obj.published = 1 and obj.hidden = 0 and doc.hidden <> 0)";
+
+            Query query = queryManager.createQuery(xwql, Query.XWQL).setWiki(wikiReference.getName());
             for (String docName : query.<String>execute()) {
                 DocumentReference documentReference = referenceResolver.resolve(docName, wikiReference);
                 XWikiDocument document = xwiki.getDocument(documentReference, context);
-                // We hide blog posts that should be hidden, but we don't do the opposite because we won't change the
-                // visibility manually set by someone.
-                document.setHidden(true);
-                xwiki.saveDocument(document, "Hide the page because the blog post is not published or hidden.",
-                        context);
+                // The following line is not necessary since the BlogDocumentSavingListener will do the same
+                // but I think it's more clean to not rely on this and to do it anyway.
+                blogVisibilityUpdater.synchronizeHiddenMetadata(document);
+                // The saving is the necessary thing here.
+                xwiki.saveDocument(document, "Change the page's visibility according to the blog post.", context);
             }
 
             logger.info("Migration of blog posts' visibility has been successfully executed on the wiki [{}].",

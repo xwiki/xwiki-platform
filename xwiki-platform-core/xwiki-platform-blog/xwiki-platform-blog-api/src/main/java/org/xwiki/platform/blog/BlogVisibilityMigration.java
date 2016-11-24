@@ -21,16 +21,21 @@ package org.xwiki.platform.blog;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Update the visibility of existing blog posts according to their publication status.
  *
+ * See {@link BlogVisibilityUpdater} for more information.
+ *
  * @version $Id$
+ *
  * @since 9.0RC1
  * @since 8.4.2
  * @since 7.4.6
  */
 @Role
+@Unstable
 public interface BlogVisibilityMigration
 {
     /**

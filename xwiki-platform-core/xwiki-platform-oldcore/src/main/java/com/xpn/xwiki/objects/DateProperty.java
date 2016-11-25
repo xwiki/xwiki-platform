@@ -21,8 +21,6 @@ package com.xpn.xwiki.objects;
 
 import java.util.Date;
 
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
 import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 /**
@@ -55,20 +53,6 @@ public class DateProperty extends BaseProperty implements Cloneable
 
         setValueDirty(date);
         this.value = date;
-    }
-
-    @Override
-    public Element toXML()
-    {
-        Element el = new DOMElement(getName());
-        el.setText(toXMLString());
-        return el;
-    }
-
-    @Override
-    public String toXMLString()
-    {
-        return toText();
     }
 
     @Override

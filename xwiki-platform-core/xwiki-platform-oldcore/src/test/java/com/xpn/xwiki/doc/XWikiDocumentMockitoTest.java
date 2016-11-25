@@ -55,6 +55,7 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -87,6 +88,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ReferenceComponentList
+@XWikiDocumentFilterUtilsComponentList
 @ComponentList({DefaultSyntaxFactory.class, StaticListMetaClass.class})
 public class XWikiDocumentMockitoTest
 {

@@ -107,8 +107,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     {
         // Always use the default separator because this is the value that is stored in the database (for non-relational
         // lists).
-        String result = ListClass.getStringFromList(this.getList(), ListClass.DEFAULT_SEPARATOR);
-        return result;
+        return ListClass.getStringFromList(this.getList(), ListClass.DEFAULT_SEPARATOR);
     }
 
     /**
@@ -237,22 +236,6 @@ public class ListProperty extends BaseProperty implements Cloneable
                 it.remove();
             }
         }
-    }
-
-    @Override
-    public Element toXML()
-    {
-        Element el = new DOMElement(getName());
-        List<String> list = getList();
-        for (String value : list) {
-            if (value != null) {
-                Element vel = new DOMElement(ListXarObjectPropertySerializer.ELEMENT_VALUE);
-                vel.setText(value);
-                el.add(vel);
-            }
-        }
-
-        return el;
     }
 
     /**

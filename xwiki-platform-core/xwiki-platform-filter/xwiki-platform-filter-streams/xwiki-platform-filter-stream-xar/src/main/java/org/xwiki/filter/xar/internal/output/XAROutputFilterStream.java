@@ -227,7 +227,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
         this.writer.writeStartDocument(this.properties.getEncoding(), "1.1");
 
         this.writer.writeStartElement(XarDocumentModel.ELEMENT_DOCUMENT);
-        this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_SPECVERSION, XarDocumentModel.VERSION_12);
+        this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_SPECVERSION, XarDocumentModel.VERSION_CURRENT);
         this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE,
             localSerializer.serialize(this.currentDocumentReference));
         this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE, toString(locale));

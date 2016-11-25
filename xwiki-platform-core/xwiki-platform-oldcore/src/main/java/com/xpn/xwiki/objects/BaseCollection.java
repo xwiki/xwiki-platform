@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,11 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.dom.DOMDocument;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
@@ -53,6 +47,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -737,23 +732,21 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     @Override
-    public abstract Element toXML(BaseClass bclass);
+    public Element toXML()
+    {
+        return super.toXML();
+    }
 
+    @Override
+    public Element toXML(BaseClass bclass)
+    {
+        return toXML();
+    }
+
+    @Override
     public String toXMLString()
     {
-        Document doc = new DOMDocument();
-        doc.setRootElement(toXML(null));
-        OutputFormat outputFormat = new OutputFormat("", true);
-        StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter(out, outputFormat);
-        try {
-            writer.write(doc);
-            return out.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return "";
-        }
+        return super.toXMLString();
     }
 
     @Override

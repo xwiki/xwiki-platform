@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Constructor;
@@ -36,7 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +56,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.dom.DOMResult;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -65,12 +64,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
-import org.dom4j.dom.DOMElement;
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.Diff;
@@ -86,6 +84,15 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.input.StringInputSource;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.filter.xml.input.DefaultSourceInputSource;
+import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
@@ -137,10 +144,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.xar.internal.model.XarAttachmentModel;
-import org.xwiki.xar.internal.model.XarClassModel;
 import org.xwiki.xar.internal.model.XarDocumentModel;
-import org.xwiki.xar.internal.model.XarObjectModel;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -155,6 +159,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
@@ -4404,15 +4409,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String toXML(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            toXML(baos, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
-            return baos.toString(context.getWiki().getEncoding());
-        } catch (IOException e) {
-            LOGGER.warn("Exception while generating XML serialization of document [{}]: {}", getDocumentReference(),
-                e.getMessage(), e);
-            return "";
-        }
+        StringWriter writer = new StringWriter();
+        toXML(new DefaultWriterOutputTarget(writer), bWithObjects, bWithRendering, bWithAttachmentContent,
+            bWithVersions, context);
+        return writer.toString();
     }
 
     /**
@@ -4423,7 +4423,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context current XWikiContext
      * @return a {@link DOMDocument} containing the serialized document.
      * @throws XWikiException when an errors occurs during wiki operations
+     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, XWikiContext)}
+     *             instead
      */
+    @Deprecated
     public Document toXMLDocument(XWikiContext context) throws XWikiException
     {
         return toXMLDocument(true, false, false, false, context);
@@ -4442,7 +4445,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context current XWikiContext
      * @return a {@link DOMDocument} containing the serialized document.
      * @throws XWikiException when an errors occurs during wiki operations
+     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, XWikiContext)}
+     *             instead
      */
+    @Deprecated
     public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException
     {
@@ -4468,194 +4474,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException when an errors occurs during wiki operations
      * @throws IOException when an errors occurs during streaming operations
      * @since 2.3M2
+     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, XWikiContext)}
+     *             instead
      */
+    @Deprecated
     public void toXML(XMLWriter wr, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
     {
-        // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter for retro
-        // compatibility reasons
+        // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter and in this
+        // case com.xpn.xwiki.internal.xml.XMLWriter is not compatible with the SAX API
+        DocumentResult domResult = new DocumentResult();
 
-        Element docel = new DOMElement(XarDocumentModel.ELEMENT_DOCUMENT);
-        docel.addAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE,
-            LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
-        docel.addAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE, getLocale().toString());
-        wr.writeOpen(docel);
+        toXML(new DefaultResultOutputTarget(domResult), bWithObjects, bWithRendering, bWithAttachmentContent,
+            bWithVersions, context);
 
-        Element el = new DOMElement(XarDocumentModel.ELEMENT_SPACE);
-        if (getDocumentReference().getLastSpaceReference().getParent().getType() == EntityType.SPACE) {
-            // If nested space put the space reference in the field
-            el.addText(LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference()));
-        } else {
-            // If single space behave as it used to and put the space name instead of the reference to keep
-            // compatibility when importing in older version
-            el.addText(getDocumentReference().getLastSpaceReference().getName());
-        }
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_NAME);
-        el.addText(getDocumentReference().getName());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_LOCALE);
-        el.addText(getLanguage());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_DEFAULTLOCALE);
-        el.addText(getDefaultLanguage());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_ISTRANSLATION);
-        el.addText("" + getTranslation());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_PARENT);
-        if (getRelativeParentReference() == null) {
-            // No parent have been specified
-            el.addText("");
-        } else {
-            el.addText(getDefaultEntityReferenceSerializer().serialize(getRelativeParentReference()));
-        }
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_CREATION_AUTHOR);
-        el.addText(getCreator());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_AUTHOR);
-        el.addText(getAuthor());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_CUSTOMCLASS);
-        el.addText(getCustomClass());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT_AUTHOR);
-        el.addText(getContentAuthor());
-        wr.write(el);
-
-        long d = getCreationDate().getTime();
-        el = new DOMElement(XarDocumentModel.ELEMENT_CREATION_DATE);
-        el.addText("" + d);
-        wr.write(el);
-
-        d = getDate().getTime();
-        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_DATE);
-        el.addText("" + d);
-        wr.write(el);
-
-        d = getContentUpdateDate().getTime();
-        el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT_DATE);
-        el.addText("" + d);
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION);
-        el.addText(getVersion());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_TITLE);
-        el.addText(getTitle());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_DEFAULTTEMPLATE);
-        el.addText(getDefaultTemplate());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_VALIDATIONSCRIPT);
-        el.addText(getValidationScript());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_COMMENT);
-        el.addText(getComment());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_MINOR);
-        el.addText(String.valueOf(isMinorEdit()));
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_SYNTAX);
-        el.addText(getSyntaxId());
-        wr.write(el);
-
-        el = new DOMElement(XarDocumentModel.ELEMENT_HIDDEN);
-        el.addText(String.valueOf(isHidden()));
-        wr.write(el);
-
-        List<XWikiAttachment> sortedAttachments = new ArrayList<XWikiAttachment>(getAttachmentList());
-        Collections.sort(sortedAttachments, new Comparator<XWikiAttachment>()
-        {
-            @Override
-            public int compare(XWikiAttachment o1, XWikiAttachment o2)
-            {
-                if (o1 == null || o2 == null) {
-                    int result = 0;
-                    if (o1 != null) {
-                        result = -1;
-                    } else if (o2 != null) {
-                        result = 1;
-                    }
-                    return result;
-                }
-                return o1.getFilename().compareTo(o2.getFilename());
-            }
-        });
-        for (XWikiAttachment attach : sortedAttachments) {
-            attach.toXML(wr, bWithAttachmentContent, bWithVersions, context);
-        }
-
-        if (bWithObjects) {
-            // Add Class
-            BaseClass bclass = getXClass();
-            if (!bclass.getFieldList().isEmpty()) {
-                // If the class has fields, add class definition and field information to XML
-                wr.write(bclass.toXML(null));
-            }
-
-            // Add Objects (THEIR ORDER IS MOLDED IN STONE!)
-            for (List<BaseObject> objects : getXObjects().values()) {
-                for (BaseObject obj : objects) {
-                    if (obj != null) {
-                        BaseClass objclass;
-                        if (getDocumentReference() == obj.getXClassReference()) {
-                            objclass = bclass;
-                        } else {
-                            objclass = obj.getXClass(context);
-                        }
-                        wr.write(obj.toXML(objclass));
-                    }
-                }
-            }
-        }
-
-        // Add Content
-        el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT);
-
-        // Filter filter = new CharacterFilter();
-        // String newcontent = filter.process(getContent());
-        // String newcontent = encodedXMLStringAsUTF8(getContent());
-        String newcontent = this.content;
-        el.addText(newcontent);
-        wr.write(el);
-
-        if (bWithRendering) {
-            el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT_HTML);
-            try {
-                el.addText(getRenderedContent(context));
-            } catch (XWikiException e) {
-                el.addText("Exception with rendering content: " + e.getFullMessage());
-            }
-            wr.write(el);
-        }
-
-        if (bWithVersions) {
-            el = new DOMElement(XarDocumentModel.ELEMENT_REVISIONS);
-            try {
-                el.addText(getDocumentArchive(context).getArchive(context));
-                wr.write(el);
-            } catch (XWikiException e) {
-                LOGGER.error("Document [" + getDefaultEntityReferenceSerializer().serialize(getDocumentReference())
-                    + "] has malformed history");
-            }
-        }
+        wr.write(domResult.getDocument());
     }
 
     /**
@@ -4673,12 +4506,45 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void toXML(OutputStream out, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
     {
-        XMLWriter wr = new XMLWriter(out, new OutputFormat("", true, context.getWiki().getEncoding()));
+        toXML(new DefaultOutputStreamOutputTarget(out), bWithObjects, bWithRendering, bWithAttachmentContent,
+            bWithVersions, context);
+    }
 
-        Document doc = new DOMDocument();
-        wr.writeDocumentStart(doc);
-        toXML(wr, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
-        wr.writeDocumentEnd(doc);
+    /**
+     * Serialize the document to an OutputStream.
+     *
+     * @param out the output where to write the XML
+     * @param bWithObjects include XObjects
+     * @param bWithRendering include the rendered content
+     * @param bWithAttachmentContent include attachments content
+     * @param bWithVersions include archived versions
+     * @param context current XWikiContext
+     * @throws XWikiException when an errors occurs during wiki operations
+     * @since 9.0RC1
+     */
+    public void toXML(OutputTarget out, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException
+    {
+        // Input
+        DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
+        documentProperties.setWithWikiObjects(bWithObjects);
+        documentProperties.setWithWikiDocumentContentHTML(bWithRendering);
+        documentProperties.setWithWikiAttachments(bWithAttachmentContent);
+        documentProperties.setWithJRCSRevisions(bWithVersions);
+        documentProperties.setWithRevisions(false);
+
+        // Output
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setPreserveVersion(bWithVersions);
+        xarProperties.setEncoding(context.getWiki().getEncoding());
+
+        try {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, out, xarProperties,
+                documentProperties);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
+        }
     }
 
     protected String encodedXMLStringAsUTF8(String xmlString)
@@ -4750,158 +4616,41 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         fromXML(is, false);
     }
 
-    public void fromXML(String xml, boolean withArchive) throws XWikiException
+    public void fromXML(String source, boolean withArchive) throws XWikiException
     {
-        SAXReader reader = new SAXReader();
-        Document domdoc;
-
         try {
-            StringReader in = new StringReader(xml);
-            domdoc = reader.read(in);
-        } catch (DocumentException e) {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importDocument(this, new StringInputSource(source),
+                withArchive);
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
-
-        fromXML(domdoc, withArchive);
     }
 
-    public void fromXML(InputStream in, boolean withArchive) throws XWikiException
+    public void fromXML(InputStream source, boolean withArchive) throws XWikiException
     {
-        SAXReader reader = new SAXReader();
-        Document domdoc;
-
         try {
-            domdoc = reader.read(in);
-        } catch (DocumentException e) {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importDocument(this,
+                new DefaultInputStreamInputSource(source), withArchive);
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
-
-        fromXML(domdoc, withArchive);
     }
 
+    /**
+     * @deprecated since 9.0RC1, use {@link #fromXML(InputStream)} instead
+     */
+    @Deprecated
     public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
     {
-        Element docel = domdoc.getRootElement();
-
-        // Reference
-        String referenceString = docel.attributeValue(XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
-        EntityReference reference;
-        if (StringUtils.isEmpty(referenceString)) {
-            // If, for some reason, the document name or space are not set in the XML input, we still ensure that the
-            // constructed XWikiDocument object has a valid name or space (by using current document values if they are
-            // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
-            // instance.
-            String name = getElement(docel, XarDocumentModel.ELEMENT_NAME);
-            String space = getElement(docel, XarDocumentModel.ELEMENT_SPACE);
-
-            if (StringUtils.isEmpty(name) || StringUtils.isEmpty(space)) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Invalid XML: \"name\" and \"web\" cannot be empty");
-            }
-
-            reference = new LocalDocumentReference(space, name);
-        } else {
-            reference = getRelativeEntityReferenceResolver().resolve(referenceString, EntityType.DOCUMENT);
+        try {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importDocument(this,
+                new DefaultSourceInputSource(new DocumentSource(domdoc)), withArchive);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
         }
-        reference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
-        setDocumentReference(new DocumentReference(reference));
-
-        // Locale
-        String localeString = docel.attributeValue(XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
-        if (localeString == null) {
-            localeString = getElement(docel, XarDocumentModel.ELEMENT_LOCALE);
-        }
-        setLocale(LocaleUtils.toLocale(localeString));
-
-        // Parent
-        String parent = getElement(docel, XarDocumentModel.ELEMENT_PARENT);
-        if (StringUtils.isNotEmpty(parent)) {
-            setParentReference(getRelativeEntityReferenceResolver().resolve(parent, EntityType.DOCUMENT));
-        }
-
-        setCreator(getElement(docel, XarDocumentModel.ELEMENT_CREATION_AUTHOR));
-        setAuthor(getElement(docel, XarDocumentModel.ELEMENT_REVISION_AUTHOR));
-        setCustomClass(getElement(docel, XarDocumentModel.ELEMENT_CUSTOMCLASS));
-        setContentAuthor(getElement(docel, XarDocumentModel.ELEMENT_CONTENT_AUTHOR));
-        if (docel.element(XarDocumentModel.ELEMENT_REVISION) != null) {
-            setVersion(getElement(docel, XarDocumentModel.ELEMENT_REVISION));
-        }
-        setContent(getElement(docel, XarDocumentModel.ELEMENT_CONTENT));
-        setDefaultLanguage(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTLOCALE));
-        setTitle(getElement(docel, XarDocumentModel.ELEMENT_TITLE));
-        setDefaultTemplate(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTTEMPLATE));
-        setValidationScript(getElement(docel, XarDocumentModel.ELEMENT_VALIDATIONSCRIPT));
-        setComment(getElement(docel, XarDocumentModel.ELEMENT_REVISION_COMMENT));
-
-        String minorEdit = getElement(docel, XarDocumentModel.ELEMENT_REVISION_MINOR);
-        setMinorEdit(Boolean.valueOf(minorEdit).booleanValue());
-
-        String hidden = getElement(docel, XarDocumentModel.ELEMENT_HIDDEN);
-        setHidden(Boolean.valueOf(hidden).booleanValue());
-
-        String archive = getElement(docel, XarDocumentModel.ELEMENT_REVISIONS);
-        if (withArchive && archive != null && archive.length() > 0) {
-            setDocumentArchive(archive);
-        }
-
-        String sdate = getElement(docel, XarDocumentModel.ELEMENT_REVISION_DATE);
-        if (!sdate.equals("")) {
-            Date date = new Date(Long.parseLong(sdate));
-            setDate(date);
-        }
-
-        String contentUpdateDateString = getElement(docel, XarDocumentModel.ELEMENT_CONTENT_DATE);
-        if (!StringUtils.isEmpty(contentUpdateDateString)) {
-            Date contentUpdateDate = new Date(Long.parseLong(contentUpdateDateString));
-            setContentUpdateDate(contentUpdateDate);
-        }
-
-        String scdate = getElement(docel, XarDocumentModel.ELEMENT_CREATION_DATE);
-        if (!scdate.equals("")) {
-            Date cdate = new Date(Long.parseLong(scdate));
-            setCreationDate(cdate);
-        }
-
-        String syntaxId = getElement(docel, XarDocumentModel.ELEMENT_SYNTAX);
-        if ((syntaxId == null) || (syntaxId.length() == 0)) {
-            // Documents that don't have syntax ids are considered old documents and thus in
-            // XWiki Syntax 1.0 since newer documents always have syntax ids.
-            setSyntax(Syntax.XWIKI_1_0);
-        } else {
-            setSyntaxId(syntaxId);
-        }
-
-        List<Element> atels = docel.elements(XarAttachmentModel.ELEMENT_ATTACHMENT);
-        for (Element atel : atels) {
-            XWikiAttachment attach = new XWikiAttachment();
-            attach.setDoc(this);
-            attach.fromXML(atel);
-            getAttachmentList().add(attach);
-        }
-
-        Element cel = docel.element(XarClassModel.ELEMENT_CLASS);
-        BaseClass bclass = new BaseClass();
-        if (cel != null) {
-            bclass.fromXML(cel);
-            setXClass(bclass);
-        }
-
-        @SuppressWarnings("unchecked")
-        List<Element> objels = docel.elements(XarObjectModel.ELEMENT_OBJECT);
-        for (Element objel : objels) {
-            BaseObject bobject = new BaseObject();
-            bobject.fromXML(objel);
-            setXObject(bobject.getNumber(), bobject);
-        }
-
-        // We have been reading from XML so the document does not need a new version when saved
-        setMetaDataDirty(false);
-        setContentDirty(false);
-
-        // Note: We don't set the original document as that is not stored in the XML, and it doesn't make much sense to
-        // have an original document for a de-serialized object.
     }
 
     /**

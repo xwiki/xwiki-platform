@@ -32,8 +32,13 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
   <properties>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
+    <xwiki.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      com.xpn.xwiki.platform:xwiki-core,
+
+      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
+      org.xwiki.platform:xwiki-platform-filter-instance-oldcore
+    </xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
@@ -541,6 +546,21 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+        <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-event-xwiki</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-event-user</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-filter-instance-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -549,11 +569,8 @@
       <artifactId>xwiki-platform-filter-instance-document</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
+    <!-- Test dependencies -->
 
     <!-- XWiki syntax parsers -->
     <dependency>
@@ -584,6 +601,19 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-filter-test</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -667,6 +697,12 @@
                 **/i18n/i18n.java,
                 **/internal/DefaultCoreConfiguration.java,
                 **/internal/DefaultXWikiStubContextProvider.java,
+                **/internal/filter/XWikiDocumentFilterUtils.java,
+                **/internal/filter/input/DocumentInstanceInputEventGenerator.java,
+                **/internal/filter/input/XWikiDocumentLocaleEventGenerator.java,
+                **/internal/filter/output/DocumentInstanceOutputFilterStream.java,
+                **/internal/filter/output/UserInstanceOutputFilterStream.java,
+                **/internal/filter/output/XWikiDocumentOutputFilterStream.java,
                 **/internal/render/OldRendering.java,
                 **/render/groovy/ParseGroovyFromString.java,
                 **/internal/mandatory/AbstractRightsDocumentInitializer.java,

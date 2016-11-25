@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -513,58 +511,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public void merge(BaseClass bclass)
     {
-    }
-
-    @Override
-    public Element toXML(BaseClass bclass)
-    {
-        return toXML();
-    }
-
-    public Element toXML()
-    {
-        Element cel = new DOMElement("class");
-
-        Element el = new DOMElement("name");
-        el.addText((getName() == null) ? "" : getName());
-        cel.add(el);
-
-        el = new DOMElement("customClass");
-        el.addText((getCustomClass() == null) ? "" : getCustomClass());
-        cel.add(el);
-
-        el = new DOMElement("customMapping");
-        el.addText((getCustomMapping() == null) ? "" : getCustomMapping());
-        cel.add(el);
-
-        el = new DOMElement("defaultViewSheet");
-        el.addText((getDefaultViewSheet() == null) ? "" : getDefaultViewSheet());
-        cel.add(el);
-
-        el = new DOMElement("defaultEditSheet");
-        el.addText((getDefaultEditSheet() == null) ? "" : getDefaultEditSheet());
-        cel.add(el);
-
-        el = new DOMElement("defaultWeb");
-        el.addText((getDefaultWeb() == null) ? "" : getDefaultWeb());
-        cel.add(el);
-
-        el = new DOMElement("nameField");
-        el.addText((getNameField() == null) ? "" : getNameField());
-        cel.add(el);
-
-        el = new DOMElement("validationScript");
-        el.addText((getValidationScript() == null) ? "" : getValidationScript());
-        cel.add(el);
-
-        // Iterate over values sorted by field name so that the values are
-        // exported to XML in a consistent order.
-        Iterator it = getSortedIterator();
-        while (it.hasNext()) {
-            PropertyClass bprop = (PropertyClass) it.next();
-            cel.add(bprop.toXML());
-        }
-        return cel;
     }
 
     public void fromXML(Element cel) throws XWikiException

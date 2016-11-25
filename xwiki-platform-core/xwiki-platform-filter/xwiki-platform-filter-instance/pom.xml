@@ -33,7 +33,6 @@
   <modules>
     <module>xwiki-platform-filter-instance-api</module>
     <module>xwiki-platform-filter-instance-document</module>
-    <module>xwiki-platform-filter-instance-oldcore</module>
     <module>xwiki-platform-filter-instance-extension</module>
     <module>xwiki-platform-filter-instance-script</module>
   </modules>

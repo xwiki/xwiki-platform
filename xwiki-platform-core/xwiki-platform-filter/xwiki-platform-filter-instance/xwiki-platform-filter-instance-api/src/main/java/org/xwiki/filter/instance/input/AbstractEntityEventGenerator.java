@@ -40,7 +40,7 @@ import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 public abstract class AbstractEntityEventGenerator<E, F> implements EntityEventGenerator<E>, Initializable
 {
     @Inject
-    private FilterDescriptorManager filterDescriptorManager;
+    protected FilterDescriptorManager filterDescriptorManager;
 
     protected Class<F> filterType;
 

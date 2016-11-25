@@ -40,6 +40,20 @@ public class XarDocumentModel
      */
     public static final String VERSION_12 = "1.2";
 
+    /**
+     * Use XML 1.1.
+     * 
+     * @since 9.0RC1
+     */
+    public static final String VERSION_13 = "1.3";
+
+    /**
+     * The current version.
+     * 
+     * @since 9.0RC1
+     */
+    public static final String VERSION_CURRENT = VERSION_13;
+
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
     /**

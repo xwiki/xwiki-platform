@@ -19,18 +19,11 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.dom.DOMDocument;
-import org.dom4j.dom.DOMElement;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -181,11 +174,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public Element toXML()
     {
-        Element el = new DOMElement(getName());
-
-        el.setText(toText());
-
-        return el;
+        return super.toXML();
     }
 
     @Override
@@ -201,22 +190,10 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
         return (value == null) ? "" : value.toString();
     }
 
+    @Override
     public String toXMLString()
     {
-        Document doc = new DOMDocument();
-        doc.setRootElement(toXML());
-        OutputFormat outputFormat = new OutputFormat("", true);
-        StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter(out, outputFormat);
-        try {
-            writer.write(doc);
-
-            return out.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return "";
-        }
+        return super.toXMLString();
     }
 
     @Override

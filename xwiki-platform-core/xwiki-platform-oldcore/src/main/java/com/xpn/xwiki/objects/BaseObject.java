@@ -21,8 +21,6 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -243,41 +241,6 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
 
         return true;
-    }
-
-    @Override
-    public Element toXML(BaseClass bclass)
-    {
-        Element oel = new DOMElement("object");
-
-        // Add Class
-        if (bclass != null) {
-            // If the class has fields, add field information to XML
-            Collection fields = bclass.getFieldList();
-            if (fields.size() > 0) {
-                oel.add(bclass.toXML());
-            }
-        }
-
-        oel.add(exportProperty("name", getName()));
-        oel.add(exportProperty("number", String.valueOf(getNumber())));
-        oel.add(exportProperty("className", getClassName()));
-        oel.add(exportProperty("guid", getGuid()));
-
-        // Iterate over values/properties sorted by field name so that the values are
-        // exported to XML in a consistent order.
-        Iterator it = getSortedIterator();
-        while (it.hasNext()) {
-            Element pel = new DOMElement("property");
-            PropertyInterface bprop = (PropertyInterface) it.next();
-
-            String pname = bprop.getName();
-            if (pname != null && !pname.trim().equals("")) {
-                pel.add(bprop.toXML());
-                oel.add(pel);
-            }
-        }
-        return oel;
     }
 
     private Element exportProperty(String propertyName, String propertyValue)

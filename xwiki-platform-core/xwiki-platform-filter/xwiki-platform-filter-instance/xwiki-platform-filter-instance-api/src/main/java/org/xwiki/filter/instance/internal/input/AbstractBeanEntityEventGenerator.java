@@ -29,6 +29,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.DefaultFilterStreamBeanDescriptor;
 import org.xwiki.filter.instance.input.AbstractEntityEventGenerator;
+import org.xwiki.filter.instance.input.BeanEntityEventGenerator;
 import org.xwiki.filter.instance.input.EntityEventGenerator;
 import org.xwiki.properties.BeanManager;
 
@@ -40,6 +41,7 @@ import org.xwiki.properties.BeanManager;
  * @since 6.2M1
  */
 public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends AbstractEntityEventGenerator<E, F>
+    implements BeanEntityEventGenerator<E, P>
 {
     @Inject
     private BeanManager beanManager;
@@ -119,6 +121,14 @@ public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends Abstract
         }
 
         write(entity, filter, internalFilter, propertiesBean);
+    }
+
+    @Override
+    public void write(E entity, Object filter, P properties) throws FilterException
+    {
+        F internalFilter = this.filterDescriptorManager.createFilterProxy(filter, this.filterType);
+
+        write(entity, filter, internalFilter, properties);
     }
 
     protected abstract void write(E entity, Object filter, F internalFilter, P properties) throws FilterException;

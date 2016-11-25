@@ -22,6 +22,11 @@ package com.xpn.xwiki.objects;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Element;
+import org.dom4j.io.DocumentResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -31,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
@@ -42,6 +48,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class BaseElement<R extends EntityReference> implements ElementInterface, Serializable
 {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseObject.class);
+
     /**
      * Full reference of this element.
      *
@@ -372,5 +380,32 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public XWikiDocument getOwnerDocument()
     {
         return this.ownerDocument;
+    }
+
+    protected Element toXML()
+    {
+        DocumentResult domResult = new DocumentResult();
+
+        try {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this,
+                new DefaultResultOutputTarget(domResult));
+        } catch (Exception e) {
+            LOGGER.error("Failed to serialize element to XML", e);
+
+            return null;
+        }
+
+        return domResult.getDocument().getRootElement();
+    }
+
+    protected String toXMLString()
+    {
+        try {
+            return Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this);
+        } catch (Exception e) {
+            LOGGER.error("Failed to serialize collection to XML", e);
+
+            return "";
+        }
     }
 }

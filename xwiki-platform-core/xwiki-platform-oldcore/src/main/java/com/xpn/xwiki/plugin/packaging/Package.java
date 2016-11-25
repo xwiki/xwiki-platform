@@ -43,6 +43,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -516,10 +517,10 @@ public class Package
                     XWikiDocument doc = null;
                     try {
                         doc = readFromXML(new CloseShieldInputStream(zis));
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Failed to parse document [" + entry.getName()
-                            + "] from XML during import, thus it will not be installed. " + "The error was: "
-                            + ex.getMessage());
+                    } catch (Throwable e) {
+                        LOGGER.warn(
+                            "Failed to parse document [{}] from XML during import, thus it will not be installed. "
+                                + "The error was: " + ExceptionUtils.getRootCauseMessage(e));
                         // It will be listed in the "failed documents" section after the import.
                         addToErrors(entry.getName().replaceAll("/", "."), context);
 

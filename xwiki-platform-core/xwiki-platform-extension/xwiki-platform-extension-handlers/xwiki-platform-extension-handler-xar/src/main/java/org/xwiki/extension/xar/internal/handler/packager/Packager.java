@@ -37,12 +37,11 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
-import org.xwiki.filter.instance.internal.output.XWikiDocumentOutputFilterStream;
+import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.logging.marker.BeginTranslationMarker;
 import org.xwiki.logging.marker.EndTranslationMarker;
 import org.xwiki.logging.marker.TranslationMarker;
@@ -52,11 +51,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.filter.FilterException;
-import org.xwiki.filter.input.BeanInputFilterStream;
-import org.xwiki.filter.input.BeanInputFilterStreamFactory;
-import org.xwiki.filter.input.DefaultInputStreamInputSource;
-import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarFile;
 import org.xwiki.xar.internal.model.XarModel;
@@ -67,6 +61,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 
 /**
  * Default implementation of {@link Packager}.
@@ -78,23 +73,20 @@ import com.xpn.xwiki.internal.event.XARImportingEvent;
 @Singleton
 public class Packager
 {
-    private static final BeginTranslationMarker LOG_INSTALLDOCUMENT_BEGIN = new BeginTranslationMarker(
-        "extension.xar.log.install.document.begin");
+    private static final BeginTranslationMarker LOG_INSTALLDOCUMENT_BEGIN =
+        new BeginTranslationMarker("extension.xar.log.install.document.begin");
 
-    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_SUCCESS_END = new EndTranslationMarker(
-        "extension.xar.log.install.document.success.end");
+    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_SUCCESS_END =
+        new EndTranslationMarker("extension.xar.log.install.document.success.end");
 
-    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_FAILURE_END = new EndTranslationMarker(
-        "extension.xar.log.install.document.failure.end");
+    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_FAILURE_END =
+        new EndTranslationMarker("extension.xar.log.install.document.failure.end");
 
-    private static final TranslationMarker LOG_DELETEDDOCUMENT = new TranslationMarker(
-        "extension.xar.log.delete.document");
+    private static final TranslationMarker LOG_DELETEDDOCUMENT =
+        new TranslationMarker("extension.xar.log.delete.document");
 
-    private static final TranslationMarker LOG_DELETEDDOCUMENT_FAILURE = new TranslationMarker(
-        "extension.xar.log.delete.document.failure");
-
-    @Inject
-    private ComponentManager componentManager;
+    private static final TranslationMarker LOG_DELETEDDOCUMENT_FAILURE =
+        new TranslationMarker("extension.xar.log.delete.document.failure");
 
     @Inject
     @Named("explicit")
@@ -119,11 +111,10 @@ public class Packager
     private MandatoryDocumentInitializerManager initializerManager;
 
     @Inject
-    @Named(XARFilterUtils.ROLEHINT_CURRENT)
-    private InputFilterStreamFactory xarFilterStreamFactory;
+    private XWikiDocumentFilterUtils documentImporter;
 
-    public void importXAR(String comment, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException, ComponentLookupException, FilterException
+    public void importXAR(String comment, File xarFile, PackageConfiguration configuration)
+        throws IOException, XWikiException, ComponentLookupException, FilterException
     {
         if (configuration.getWiki() == null) {
             XWikiContext xcontext = this.xcontextProvider.get();
@@ -138,8 +129,8 @@ public class Packager
     }
 
     private XarMergeResult importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, ComponentLookupException, XWikiException,
-        FilterException
+        PackageConfiguration configuration)
+        throws IOException, ComponentLookupException, XWikiException, FilterException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
@@ -150,8 +141,8 @@ public class Packager
     }
 
     private XarMergeResult importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, ComponentLookupException, XWikiException,
-        FilterException
+        PackageConfiguration configuration)
+        throws IOException, ComponentLookupException, XWikiException, FilterException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
@@ -168,9 +159,8 @@ public class Packager
             for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (!entry.isDirectory()) {
                     // Only import what should be imported
-                    if (!entry.getName().equals(XarModel.PATH_PACKAGE)
-                        && (configuration.getEntriesToImport() == null || configuration.getEntriesToImport().contains(
-                            entry.getName()))) {
+                    if (!entry.getName().equals(XarModel.PATH_PACKAGE) && (configuration.getEntriesToImport() == null
+                        || configuration.getEntriesToImport().contains(entry.getName()))) {
                         XarEntryMergeResult entityMergeResult =
                             importDocumentToWiki(comment, wikiReference, zis, configuration);
                         if (entityMergeResult != null) {
@@ -189,8 +179,8 @@ public class Packager
     }
 
     private XarEntryMergeResult importDocumentToWiki(String comment, WikiReference wikiReference,
-        InputStream inputStream, PackageConfiguration configuration) throws XWikiException, FilterException,
-        ComponentLookupException, IOException
+        InputStream inputStream, PackageConfiguration configuration)
+        throws XWikiException, FilterException, ComponentLookupException, IOException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -302,7 +292,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
-        XarFile xarFile) throws FilterException, ComponentLookupException, IOException
+        XarFile xarFile) throws FilterException, IOException
     {
         XarEntry realEntry = xarFile.getEntry(documentReference);
         if (realEntry != null) {
@@ -318,33 +308,20 @@ public class Packager
         return null;
     }
 
-    public XWikiDocument getXWikiDocument(InputStream stream, WikiReference wikiReference) throws FilterException,
-        ComponentLookupException, IOException
+    public XWikiDocument getXWikiDocument(InputStream source, WikiReference wikiReference)
+        throws FilterException, IOException
     {
         // Output
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
         documentProperties.setDefaultReference(wikiReference);
         documentProperties.setVersionPreserved(false);
-        documentProperties.setAuthorPreserved(true);
-        XWikiDocumentOutputFilterStream documentFilter =
-            this.componentManager.getInstance(XWikiDocumentOutputFilterStream.class);
-        documentFilter.setProperties(documentProperties);
 
         // Input
         XARInputProperties xarProperties = new XARInputProperties();
-        xarProperties.setForceDocument(true);
         xarProperties.setWithHistory(false);
-        xarProperties.setSource(new DefaultInputStreamInputSource(stream));
-        BeanInputFilterStream<XARInputProperties> xarFilterStream =
-            ((BeanInputFilterStreamFactory<XARInputProperties>) this.xarFilterStreamFactory)
-                .createInputFilterStream(xarProperties);
 
-        // Convert
-        xarFilterStream.read(documentFilter);
-
-        xarFilterStream.close();
-
-        return documentFilter.getDocument();
+        return this.documentImporter.importDocument(new DefaultInputStreamInputSource(source), xarProperties,
+            documentProperties);
     }
 
     public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)

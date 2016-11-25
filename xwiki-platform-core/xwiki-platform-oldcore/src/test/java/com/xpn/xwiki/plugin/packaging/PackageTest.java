@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.plugin.packaging;
 
+import java.util.Locale;
+
 import org.jmock.Mock;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -65,14 +67,15 @@ public class PackageTest extends AbstractPackageTest
         doc2.setTitle(docTitle);
         doc2.setContent(docContent);
 
-        XWikiDocument docs[] = {doc1, doc2};
+        XWikiDocument docs[] = { doc1, doc2 };
 
-        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}, null), getContext());
+        this.pack.Import(this.createZipFile(docs, new String[] { "ISO-8859-1", "UTF-8" }, null), getContext());
 
         assertEquals(2, this.pack.getFiles().size());
-        assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(), (this.pack.getFiles().get(1)).getDoc().getTitle());
-        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(), this.pack.getFiles().get(1).getDoc()
-            .getContent());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(),
+            (this.pack.getFiles().get(1)).getDoc().getTitle());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(),
+            this.pack.getFiles().get(1).getDoc().getContent());
     }
 
     public void testImportWithHeterogeneousEncodingInFilesUsingCommonsCompress() throws Exception
@@ -88,15 +91,16 @@ public class PackageTest extends AbstractPackageTest
         doc2.setTitle(docTitle);
         doc2.setContent(docContent);
 
-        XWikiDocument docs[] = {doc1, doc2};
+        XWikiDocument docs[] = { doc1, doc2 };
 
-        this.pack.Import(this.createZipFileUsingCommonsCompress(docs, new String[] {"ISO-8859-1", "UTF-8"}, null),
+        this.pack.Import(this.createZipFileUsingCommonsCompress(docs, new String[] { "ISO-8859-1", "UTF-8" }, null),
             getContext());
 
         assertEquals(2, this.pack.getFiles().size());
-        assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(), (this.pack.getFiles().get(1)).getDoc().getTitle());
-        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(), this.pack.getFiles().get(1).getDoc()
-            .getContent());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(),
+            (this.pack.getFiles().get(1)).getDoc().getTitle());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(),
+            this.pack.getFiles().get(1).getDoc().getContent());
     }
 
 }

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,10 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
@@ -49,7 +45,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.merge.MergeUtils;
-import com.xpn.xwiki.internal.objects.classes.PropertyClassProvider;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -513,111 +508,16 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
     }
 
-    public void fromXML(Element cel) throws XWikiException
+    @Override
+    public void fromXML(Element element) throws XWikiException
     {
-        try {
-            int j = 1;
-            setName(cel.element("name").getText());
-            Element cclel = cel.element("customClass");
-            if (cclel != null) {
-                setCustomClass(cclel.getText());
-                j++;
-            }
-            Element cmapel = cel.element("customMapping");
-            if (cmapel != null) {
-                setCustomMapping(cmapel.getText());
-                j++;
-            }
-            Element cdvsel = cel.element("defaultViewSheet");
-            if (cdvsel != null) {
-                setDefaultViewSheet(cdvsel.getText());
-                j++;
-            }
-            Element cdesel = cel.element("defaultEditSheet");
-            if (cdesel != null) {
-                setDefaultViewSheet(cdesel.getText());
-                j++;
-            }
-            Element cdwel = cel.element("defaultWeb");
-            if (cdwel != null) {
-                setDefaultWeb(cdwel.getText());
-                j++;
-            }
-            Element cnfel = cel.element("nameField");
-            if (cnfel != null) {
-                setNameField(cnfel.getText());
-                j++;
-            }
-
-            Element valel = cel.element("validationScript");
-            if (valel != null) {
-                setValidationScript(valel.getText());
-                j++;
-            }
-
-            @SuppressWarnings("unchecked")
-            List<Element> list = cel.elements();
-            for (int i = j; i < list.size(); i++) {
-                Element pcel = list.get(i);
-                String name = pcel.getName();
-                String classType = pcel.element("classType").getText();
-
-                PropertyClassProvider provider = null;
-                // First try to use the specified class type as hint.
-                if (Utils.getComponentManager().hasComponent(PropertyClassProvider.class, classType)) {
-                    provider = Utils.getComponent(PropertyClassProvider.class, classType);
-                } else {
-                    // In previous versions the class type was the full Java class name of the property class
-                    // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
-                    classType = StringUtils.removeEnd(StringUtils.substringAfterLast(classType, "."), "Class");
-                    provider = Utils.getComponent(PropertyClassProvider.class, classType);
-                }
-
-                if (provider != null) {
-                    // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but
-                    // it doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
-                    // assumption that all property classes extend PropertyClass.
-                    PropertyClass property = (PropertyClass) provider.getInstance();
-                    property.setName(name);
-                    property.setObject(this);
-                    property.fromXML(pcel);
-                    safeput(name, property);
-                } else {
-                    LOGGER.warn("Uknown property type [{}]", classType);
-                }
-            }
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION, "Error instanciating property class",
-                e, null);
-        }
+        super.fromXML(element);
     }
 
+    @Override
     public void fromXML(String xml) throws XWikiException
     {
-        SAXReader reader = new SAXReader();
-        Document domdoc;
-
-        if ((xml == null) || (xml.trim().equals(""))) {
-            return;
-        }
-
-        xml = xml.replaceAll("<>", "<unknown>");
-        xml = xml.replaceAll("</>", "</unknown>");
-
-        try {
-            StringReader in = new StringReader(xml);
-            domdoc = reader.read(in);
-        } catch (DocumentException e) {
-            Object[] args = { xml };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml {0}", e, args);
-        }
-
-        Element docel = domdoc.getRootElement();
-        if (docel != null) {
-            fromXML(docel);
-        }
+        super.fromXML(xml);
     }
 
     public boolean addTextField(String fieldName, String fieldPrettyName, int size)
@@ -862,8 +762,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         // If the passed content type is null and the set content type is ContentType.WIKI_TEXT we don't consider that
         // the content type is different (and vice versa).
         if ((contenttype == null && !textAreaClass.getContentType().equalsIgnoreCase(ContentType.WIKI_TEXT.toString()))
-            || (contenttype != null && !textAreaClass.getContentType().equalsIgnoreCase(contenttype)))
-        {
+            || (contenttype != null && !textAreaClass.getContentType().equalsIgnoreCase(contenttype))) {
             textAreaClass.setContentType(contenttype);
             result = true;
         }

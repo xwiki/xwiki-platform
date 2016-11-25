@@ -20,11 +20,9 @@
 package com.xpn.xwiki.internal.filter;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -44,9 +42,9 @@ import org.xwiki.filter.instance.input.EntityEventGenerator;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.output.BeanOutputFilterStream;
 import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
-import org.xwiki.filter.output.DefaultWriterOutputTarget;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.output.StringWriterOutputTarget;
 import org.xwiki.filter.output.WriterOutputTarget;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARFilter;
@@ -56,9 +54,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.filter.output.EntityOutputFilterStream;
 import com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Various XWikiDocument related helpers.
@@ -70,9 +73,6 @@ import com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream;
 @Singleton
 public class XWikiDocumentFilterUtils
 {
-    @Inject
-    private Provider<EntityOutputFilterStream<XWikiDocument>> streamProvider;
-
     @Inject
     @Named(XARFilterUtils.ROLEHINT_CURRENT)
     private InputFilterStreamFactory xarInputFilterStreamFactory;
@@ -86,58 +86,75 @@ public class XWikiDocumentFilterUtils
 
     // Import
 
+    private <T> Class<T> getClass(Object entity)
+    {
+        Class<T> entityClass;
+
+        if (entity instanceof Class) {
+            entityClass = (Class<T>) entity;
+        } else if (entity instanceof XWikiDocument) {
+            entityClass = (Class<T>) XWikiDocument.class;
+        } else if (entity instanceof XWikiAttachment) {
+            entityClass = (Class<T>) XWikiAttachment.class;
+        } else if (entity instanceof BaseClass) {
+            entityClass = (Class<T>) BaseClass.class;
+        } else if (entity instanceof BaseObject) {
+            entityClass = (Class<T>) BaseObject.class;
+        } else if (entity instanceof BaseProperty) {
+            entityClass = (Class<T>) BaseProperty.class;
+        } else if (entity instanceof PropertyClass) {
+            entityClass = (Class<T>) PropertyClass.class;
+        } else {
+            entityClass = (Class<T>) entity.getClass();
+        }
+
+        return entityClass;
+    }
+
     /**
-     * @param document the document to write
+     * @param entity the entity to write to or its class to create a new one
      * @param source the stream to read
-     * @param history import or skip the history in the XML
+     * @return the imported entity, same as {@code entity} if not null
      * @throws FilterException when failing to import
      * @throws IOException when failing to import
+     * @throws ComponentLookupException when failing to find a EntityOutputFilterStream corresponding to passed class
      */
-    public void importDocument(XWikiDocument document, InputSource source, boolean history)
-        throws FilterException, IOException
+    public <T> T importEntity(Object entity, InputSource source)
+        throws FilterException, IOException, ComponentLookupException
     {
         // Output
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
-        documentProperties.setVersionPreserved(history);
 
         // Input
         XARInputProperties xarProperties = new XARInputProperties();
-        xarProperties.setWithHistory(history);
 
-        importDocument(document, source, xarProperties, documentProperties);
+        return importEntity(getClass(entity), entity instanceof Class ? null : (T) entity, source, xarProperties,
+            documentProperties);
     }
 
     /**
+     * @param entityClass to class used to find the {@link EntityOutputFilterStream} component
+     * @param entity the entity to write to or null to create a new entity of the passed class
      * @param source the stream to read
      * @param xarProperties the configuration of the input filter
      * @param documentProperties the configuration of the output filter
-     * @return the imported document, same as {@code document} if not null
+     * @return the imported entity, same as {@code entity} if not null
      * @throws FilterException when failing to import
      * @throws IOException when failing to import
+     * @throws ComponentLookupException when failing to find a EntityOutputFilterStream corresponding to passed class
      */
-    public XWikiDocument importDocument(InputSource source, XARInputProperties xarProperties,
-        DocumentInstanceOutputProperties documentProperties) throws FilterException, IOException
-    {
-        return importDocument(null, source, xarProperties, documentProperties);
-    }
-
-    /**
-     * @param document the document to write to or null to create a new XWikiDocument instance
-     * @param source the stream to read
-     * @param xarProperties the configuration of the input filter
-     * @param documentProperties the configuration of the output filter
-     * @return the imported document, same as {@code document} if not null
-     * @throws FilterException when failing to import
-     * @throws IOException when failing to import
-     */
-    public XWikiDocument importDocument(XWikiDocument document, InputSource source, XARInputProperties xarProperties,
-        DocumentInstanceOutputProperties documentProperties) throws FilterException, IOException
+    public <T> T importEntity(Class<T> entityClass, T entity, InputSource source, XARInputProperties xarProperties,
+        DocumentInstanceOutputProperties documentProperties)
+        throws FilterException, IOException, ComponentLookupException
     {
         // Output
-        XWikiDocumentOutputFilterStream documentFilter = (XWikiDocumentOutputFilterStream) this.streamProvider.get();
-        documentFilter.setProperties(documentProperties);
-        documentFilter.setEntity(document);
-        documentFilter.disableRenderingEvents();
+        EntityOutputFilterStream<T> filterStream = this.componentManager
+            .getInstance(new DefaultParameterizedType(null, EntityOutputFilterStream.class, entityClass));
+        filterStream.setProperties(documentProperties);
+        filterStream.setEntity(entity);
+        if (filterStream instanceof XWikiDocumentOutputFilterStream) {
+            ((XWikiDocumentOutputFilterStream) filterStream).disableRenderingEvents();
+        }
 
         // Input
         xarProperties.setForceDocument(true);
@@ -147,11 +164,27 @@ public class XWikiDocumentFilterUtils
                 .createInputFilterStream(xarProperties);
 
         // Convert
-        xarReader.read(documentFilter.getFilter());
+        xarReader.read(filterStream.getFilter());
 
         xarReader.close();
 
-        return documentFilter.getEntity();
+        return filterStream.getEntity();
+    }
+
+    /**
+     * @param source the stream to read
+     * @param xarProperties the configuration of the input filter
+     * @param documentProperties the configuration of the output filter
+     * @return the imported document
+     * @throws FilterException when failing to import
+     * @throws IOException when failing to import
+     * @throws ComponentLookupException when failing to find a EntityOutputFilterStream corresponding to passed class
+     */
+    public XWikiDocument importDocument(InputSource source, XARInputProperties xarProperties,
+        DocumentInstanceOutputProperties documentProperties)
+        throws FilterException, IOException, ComponentLookupException
+    {
+        return importEntity(XWikiDocument.class, null, source, xarProperties, documentProperties);
     }
 
     // Export
@@ -189,11 +222,11 @@ public class XWikiDocumentFilterUtils
     public String exportEntity(Object entity, XAROutputProperties xarProperties,
         DocumentInstanceInputProperties documentProperties) throws ComponentLookupException, FilterException
     {
-        WriterOutputTarget target = new DefaultWriterOutputTarget(new StringWriter());
+        WriterOutputTarget target = new StringWriterOutputTarget();
 
         exportEntity(entity, target, xarProperties, documentProperties);
 
-        return target.getWriter().toString();
+        return target.toString();
     }
 
     /**

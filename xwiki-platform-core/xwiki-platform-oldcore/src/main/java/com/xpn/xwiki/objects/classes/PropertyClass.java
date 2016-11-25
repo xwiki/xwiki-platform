@@ -513,27 +513,10 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return pel;
     }
 
-    public void fromXML(Element pcel) throws XWikiException
+    @Override
+    public void fromXML(Element element) throws XWikiException
     {
-        List list = pcel.elements();
-        BaseClass bclass = getxWikiClass();
-
-        for (int i = 0; i < list.size(); i++) {
-            Element ppcel = (Element) list.get(i);
-            String name = ppcel.getName();
-            if (bclass == null) {
-                Object[] args = { getClass().getName() };
-                throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                    XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_IN_METACLASS,
-                    "Cannot find property class {0} in MetaClass object", null, args);
-            }
-            PropertyClass pclass = (PropertyClass) bclass.safeget(name);
-            if (pclass != null) {
-                BaseProperty bprop = pclass.newPropertyfromXML(ppcel);
-                bprop.setObject(this);
-                safeput(name, bprop);
-            }
-        }
+        super.fromXML(element);
     }
 
     @Override

@@ -20,7 +20,6 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,7 +55,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.dom.DOMResult;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -85,11 +83,14 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.output.DefaultOutputStreamOutputTarget;
 import org.xwiki.filter.output.DefaultWriterOutputTarget;
 import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.filter.xml.input.DefaultSourceInputSource;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
@@ -4616,26 +4617,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         fromXML(is, false);
     }
 
-    public void fromXML(String source, boolean withArchive) throws XWikiException
+    public void fromXML(InputSource source, boolean withArchive) throws XWikiException
     {
+        // Output
+        DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
+        documentProperties.setVersionPreserved(withArchive);
+
+        // Input
+        XARInputProperties xarProperties = new XARInputProperties();
+        xarProperties.setWithHistory(withArchive);
+
         try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).importDocument(this, new StringInputSource(source),
-                withArchive);
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(XWikiDocument.class, this, source,
+                xarProperties, documentProperties);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
     }
 
+    public void fromXML(String source, boolean withArchive) throws XWikiException
+    {
+        fromXML(new StringInputSource(source), withArchive);
+    }
+
     public void fromXML(InputStream source, boolean withArchive) throws XWikiException
     {
-        try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).importDocument(this,
-                new DefaultInputStreamInputSource(source), withArchive);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml", e, null);
-        }
+        fromXML(new DefaultInputStreamInputSource(source), withArchive);
     }
 
     /**
@@ -4644,13 +4652,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
     {
-        try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).importDocument(this,
-                new DefaultSourceInputSource(new DocumentSource(domdoc)), withArchive);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml", e, null);
-        }
+        fromXML(new DefaultSourceInputSource(new DocumentSource(domdoc)), withArchive);
     }
 
     /**

@@ -292,7 +292,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
-        XarFile xarFile) throws FilterException, IOException
+        XarFile xarFile) throws FilterException, IOException, ComponentLookupException
     {
         XarEntry realEntry = xarFile.getEntry(documentReference);
         if (realEntry != null) {
@@ -309,7 +309,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(InputStream source, WikiReference wikiReference)
-        throws FilterException, IOException
+        throws FilterException, IOException, ComponentLookupException
     {
         // Output
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();

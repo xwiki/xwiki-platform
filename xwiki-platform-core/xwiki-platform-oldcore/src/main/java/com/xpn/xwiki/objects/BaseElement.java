@@ -24,8 +24,11 @@ import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.filter.input.StringInputSource;
+import org.xwiki.filter.xml.input.DefaultSourceInputSource;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,6 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -380,6 +384,28 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public XWikiDocument getOwnerDocument()
     {
         return this.ownerDocument;
+    }
+
+    protected void fromXML(Element oel) throws XWikiException
+    {
+        DocumentSource source = new DocumentSource(oel);
+
+        try {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(this, new DefaultSourceInputSource(source));
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
+        }
+    }
+
+    protected void fromXML(String source) throws XWikiException
+    {
+        try {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(this, new StringInputSource(source));
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
+        }
     }
 
     protected Element toXML()

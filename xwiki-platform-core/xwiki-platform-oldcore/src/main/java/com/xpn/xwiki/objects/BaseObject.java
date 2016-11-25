@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -94,10 +92,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
 
         if (reference != null) {
             EntityReference relativeReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
-            reference =
-                new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
-                        .getParent().getParent()));
+            reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
+                    reference.getParent().getParent()));
         } else {
             reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
         }
@@ -243,55 +240,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         return true;
     }
 
-    private Element exportProperty(String propertyName, String propertyValue)
-    {
-        Element propertyElement = new DOMElement(propertyName);
-        propertyElement.addText(StringUtils.defaultString(propertyValue));
-        return propertyElement;
-    }
-
+    @Override
     public void fromXML(Element oel) throws XWikiException
     {
-        BaseClass bclass = new BaseClass();
-
-        Element cel = oel.element("class");
-        if (cel != null) {
-            bclass.fromXML(cel);
-        } else {
-            bclass.setName(oel.elementText("className"));
-
-            // Get what we can find in the database (we need a class to load the properties)
-            XWikiContext xcontext = Utils.getContext();
-            if (xcontext != null) {
-                bclass = xcontext.getWiki().getXClass(bclass.getDocumentReference(), xcontext);
-            }
-        }
-        setXClassReference(bclass.getDocumentReference());
-
-        setName(oel.element("name").getText());
-        String number = oel.element("number").getText();
-        if (number != null) {
-            setNumber(Integer.parseInt(number));
-        }
-
-        // If no GUID exists in the XML, then use the one randomly generated at initialization
-        Element guidElement = oel.element("guid");
-        if (guidElement != null && guidElement.getText() != null) {
-            this.guid = guidElement.getText();
-        }
-
-        List list = oel.elements("property");
-        for (int i = 0; i < list.size(); i++) {
-            Element pcel = (Element) ((Element) list.get(i)).elements().get(0);
-            String name = pcel.getName();
-            PropertyClass pclass = (PropertyClass) bclass.get(name);
-            if (pclass != null) {
-                BaseProperty property = pclass.newPropertyfromXML(pcel);
-                property.setName(name);
-                property.setObject(this);
-                safeput(name, property);
-            }
-        }
+        super.fromXML(oel);
     }
 
     @Override
@@ -310,9 +262,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
-                    String newPropertyValue =
-                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
-                            .displayView(propertyName, this, context);
+                    String newPropertyValue = (newProperty.getValue() instanceof String || pclass == null)
+                        ? newProperty.toText() : pclass.displayView(propertyName, this, context);
                     difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
                         ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                 }
@@ -320,20 +271,18 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
                 // The property exists in both objects and is different
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
-                    String newPropertyValue =
-                        (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                            propertyName, this, context);
-                    String oldPropertyValue =
-                        (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                            propertyName, oldObject, context);
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
-                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
-                        newPropertyValue));
+                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
+                        : pclass.displayView(propertyName, this, context);
+                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                        : pclass.displayView(propertyName, oldObject, context);
+                    difflist.add(
+                        new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
+                            propertyName, propertyType, oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), getGuid(),
-                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
-                        newProperty.toText()));
+                    difflist.add(
+                        new ObjectDiff(getXClassReference(), getNumber(), getGuid(), ObjectDiff.ACTION_PROPERTYCHANGED,
+                            propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
                 }
             }
         }
@@ -351,17 +300,16 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
-                        String oldPropertyValue =
-                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                                propertyName, oldObject, context);
-                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject
-                            .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType,
-                            oldPropertyValue, ""));
+                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                            : pclass.displayView(propertyName, oldObject, context);
+                        difflist.add(
+                            new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
+                                ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject
-                            .getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty
-                            .toText(), ""));
+                        difflist.add(new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(),
+                            oldObject.getGuid(), ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType,
+                            oldProperty.toText(), ""));
                     }
                 }
             }

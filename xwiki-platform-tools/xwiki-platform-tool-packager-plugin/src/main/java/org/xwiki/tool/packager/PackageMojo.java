@@ -714,15 +714,6 @@ public class PackageMojo extends AbstractExtensionMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.slf4j", "log4j-over-slf4j",
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
 
-        // When writing functional tests there's is often the need to export pages as XAR. Thus, in order to make
-        // developer's life easy, we also include the filter module (used for XAR exports).
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-filter-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
-        // XAR module is triggered by org.xwiki.platform:xwiki-platform-oldcore but we still trigger it explicitly to
-        // not have bad surprises if that changes later
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-filter-stream-xar", getXWikiPlatformVersion(), null, "jar"));
-
         // Also add the skins artifacts, that may have JAR dependencies
         mandatoryTopLevelArtifacts.addAll(getSkinArtifacts());
 

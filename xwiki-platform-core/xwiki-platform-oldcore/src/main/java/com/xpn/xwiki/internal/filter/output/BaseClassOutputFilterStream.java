@@ -65,6 +65,7 @@ public class BaseClassOutputFilterStream extends AbstractEntityOutputFilterStrea
                 this.entity = new BaseClass();
             }
 
+            this.entity.setDocumentReference(getDocumentReference(WikiClassFilter.PARAMETER_NAME, parameters, null));
             this.entity.setCustomClass(getString(WikiClassFilter.PARAMETER_CUSTOMCLASS, parameters, null));
             this.entity.setCustomMapping(getString(WikiClassFilter.PARAMETER_CUSTOMMAPPING, parameters, null));
             this.entity.setDefaultViewSheet(getString(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW, parameters, null));

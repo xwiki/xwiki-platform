@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.codec.binary.Base64;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.FilterException;
@@ -56,7 +57,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
     }
 
     @Override
-    public WikiAttachment read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
+    public WikiAttachment read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException, FilterException
     {
         WikiAttachment wikiAttachment = new WikiAttachment();
 

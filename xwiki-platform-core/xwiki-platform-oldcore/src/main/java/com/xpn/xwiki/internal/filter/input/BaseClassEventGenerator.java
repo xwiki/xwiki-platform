@@ -64,6 +64,7 @@ public class BaseClassEventGenerator
 
         FilterEventParameters classParameters = new FilterEventParameters();
 
+        classParameters.put(WikiClassFilter.PARAMETER_NAME, xclass.getName());
         classParameters.put(WikiClassFilter.PARAMETER_CUSTOMCLASS, xclass.getCustomClass());
         classParameters.put(WikiClassFilter.PARAMETER_CUSTOMMAPPING, xclass.getCustomMapping());
         classParameters.put(WikiClassFilter.PARAMETER_DEFAULTSPACE, xclass.getDefaultWeb());

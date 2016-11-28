@@ -63,6 +63,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>customclass</string>
                 <string>customClass</string>
               </entry>

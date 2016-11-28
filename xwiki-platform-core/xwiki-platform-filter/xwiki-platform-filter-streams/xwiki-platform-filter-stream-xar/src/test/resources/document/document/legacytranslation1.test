@@ -254,6 +254,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>customclass</string>
                 <string>customClass</string>
               </entry>
@@ -313,6 +317,10 @@
           <wikiClass>
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.page</string>
+                </entry>
                 <entry>
                   <string>customclass</string>
                   <string>customClass</string>
@@ -375,6 +383,10 @@
           <wikiClass>
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>otherclass</string>
+                </entry>
                 <entry>
                   <string>customclass</string>
                   <string>customClass2</string>

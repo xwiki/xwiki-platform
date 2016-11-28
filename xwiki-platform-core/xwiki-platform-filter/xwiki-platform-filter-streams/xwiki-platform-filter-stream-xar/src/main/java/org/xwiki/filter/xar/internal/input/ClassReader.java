@@ -29,10 +29,12 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiClassFilter;
+import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
-import org.xwiki.filter.FilterException;
 
 /**
  * @version $Id$
@@ -76,7 +78,8 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
     }
 
     @Override
-    public WikiClass read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
+    public WikiClass read(XMLStreamReader xmlReader, XARInputProperties properties)
+        throws XMLStreamException, FilterException
     {
         WikiClass wikiClass = new WikiClass();
 
@@ -85,6 +88,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
 
             if (wikiClass.name == null && XARClassModel.ELEMENT_NAME.equals(elementName)) {
                 wikiClass.name = xmlReader.getElementText();
+                wikiClass.parameters.put(WikiClassFilter.PARAMETER_NAME, wikiClass.name);
             } else if (XARClassModel.CLASS_PARAMETERS.containsKey(elementName)) {
                 String value = xmlReader.getElementText();
 
@@ -97,7 +101,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
                     }
                 }
             } else {
-                wikiClass.addProperty(this.propertyReader.read(xmlReader));
+                wikiClass.addProperty(this.propertyReader.read(xmlReader, properties));
             }
         }
 

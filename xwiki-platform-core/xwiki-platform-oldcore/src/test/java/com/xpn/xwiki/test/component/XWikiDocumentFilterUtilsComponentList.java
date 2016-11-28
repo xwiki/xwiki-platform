@@ -30,6 +30,7 @@ import org.xwiki.filter.xar.internal.input.AttachmentReader;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader;
 import org.xwiki.filter.xar.internal.input.ClassReader;
 import org.xwiki.filter.xar.internal.input.DocumentLocaleReader;
+import org.xwiki.filter.xar.internal.input.WikiObjectPropertyReader;
 import org.xwiki.filter.xar.internal.input.WikiObjectReader;
 import org.xwiki.filter.xar.internal.input.WikiReader;
 import org.xwiki.filter.xar.internal.input.XARInputFilterStream;
@@ -41,6 +42,7 @@ import org.xwiki.properties.internal.DefaultConverterManager;
 import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
 import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.properties.internal.converter.LocaleConverter;
+import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.transformation.DefaultRenderingContext;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
@@ -62,6 +64,24 @@ import com.xpn.xwiki.internal.filter.output.PropertyClassOutputFilterStream;
 import com.xpn.xwiki.internal.filter.output.XWikiAttachmentOutputFilterStream;
 import com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream;
 import com.xpn.xwiki.internal.localization.XWikiLocalizationContext;
+import com.xpn.xwiki.objects.meta.BooleanMetaClass;
+import com.xpn.xwiki.objects.meta.ComputedFieldMetaClass;
+import com.xpn.xwiki.objects.meta.DBListMetaClass;
+import com.xpn.xwiki.objects.meta.DBTreeListMetaClass;
+import com.xpn.xwiki.objects.meta.DateMetaClass;
+import com.xpn.xwiki.objects.meta.EmailMetaClass;
+import com.xpn.xwiki.objects.meta.GroupsMetaClass;
+import com.xpn.xwiki.objects.meta.LevelsMetaClass;
+import com.xpn.xwiki.objects.meta.ListMetaClass;
+import com.xpn.xwiki.objects.meta.NumberMetaClass;
+import com.xpn.xwiki.objects.meta.PageMetaClass;
+import com.xpn.xwiki.objects.meta.PasswordMetaClass;
+import com.xpn.xwiki.objects.meta.StaticListMetaClass;
+import com.xpn.xwiki.objects.meta.StringMetaClass;
+import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
+import com.xpn.xwiki.objects.meta.TimezoneMetaClass;
+import com.xpn.xwiki.objects.meta.UsersMetaClass;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -87,6 +107,24 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     LocaleConverter.class,
     XWikiLocalizationContext.class,
     DefaultRenderingContext.class,
+    DefaultSyntaxFactory.class,
+    BooleanMetaClass.class,
+    ComputedFieldMetaClass.class,
+    DateMetaClass.class,
+    ListMetaClass.class,
+    DBListMetaClass.class,
+    DBTreeListMetaClass.class,
+    PageMetaClass.class,
+    GroupsMetaClass.class,
+    LevelsMetaClass.class,
+    StaticListMetaClass.class,
+    UsersMetaClass.class,
+    NumberMetaClass.class,
+    StringMetaClass.class,
+    EmailMetaClass.class,
+    PasswordMetaClass.class,
+    TextAreaMetaClass.class,
+    TimezoneMetaClass.class,
 
     // Document output
     BaseClassOutputFilterStream.class,
@@ -118,12 +156,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     ClassPropertyReader.class,
     ClassReader.class,
     WikiObjectReader.class,
+    WikiObjectPropertyReader.class,
     WikiReader.class,
 
     // Entry point
     XWikiDocumentFilterUtils.class
 })
 @Inherited
+@ReferenceComponentList
 public @interface XWikiDocumentFilterUtilsComponentList
 {
 }

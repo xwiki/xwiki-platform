@@ -41,6 +41,7 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.filter.xar.input.XARInputProperties.SourceType;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARDocumentModel;
@@ -75,7 +76,13 @@ public class DocumentLocaleReader extends AbstractReader
     private XARXMLReader<WikiObjectReader.WikiObject> objectReader;
 
     @Inject
+    private XARXMLReader<WikiObjectPropertyReader.WikiObjectProperty> objectPropertyReader;
+
+    @Inject
     private XARXMLReader<ClassReader.WikiClass> classReader;
+
+    @Inject
+    private XARXMLReader<ClassPropertyReader.WikiClassProperty> classPropertyReader;
 
     @Inject
     private XARXMLReader<AttachmentReader.WikiAttachment> attachmentReader;
@@ -109,6 +116,8 @@ public class DocumentLocaleReader extends AbstractReader
     private boolean sentBeginWikiDocumentLocale;
 
     private boolean sentBeginWikiDocumentRevision;
+
+    private SourceType currentSourceType = SourceType.DOCUMENT;
 
     private WikiClass currentClass = new WikiClass();
 
@@ -347,14 +356,48 @@ public class DocumentLocaleReader extends AbstractReader
 
         xmlReader.nextTag();
 
-        xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
+        this.currentSourceType = this.properties.getSourceType();
+        if (this.currentSourceType != null && this.currentSourceType != SourceType.DOCUMENT) {
+            switch (this.currentSourceType) {
+                case ATTACHMENT:
+                    readAttachment(xmlReader, filter, proxyFilter);
+                    break;
 
-        readDocument(xmlReader, filter, proxyFilter);
+                case CLASS:
+                    readClass(xmlReader, filter, proxyFilter);
+
+                    break;
+
+                case CLASSPROPERTY:
+                    readClassProperty(xmlReader, filter, proxyFilter);
+
+                    break;
+
+                case OBJECT:
+                    readObject(xmlReader, filter, proxyFilter);
+
+                    break;
+
+                case OBJECTPROPERTY:
+                    readObjectProperty(xmlReader, filter, proxyFilter);
+
+                    break;
+
+                default:
+                    break;
+            }
+        } else {
+            xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
+
+            readDocument(xmlReader, filter, proxyFilter);
+        }
     }
 
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
+        this.currentSourceType = SourceType.DOCUMENT;
+
         // Initialize with a few defaults (thing that don't exist in old XAR format)
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, false);
@@ -471,37 +514,55 @@ public class DocumentLocaleReader extends AbstractReader
     private void readObject(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, false);
+        if (this.currentSourceType == SourceType.DOCUMENT) {
+            sendBeginWikiDocumentRevision(proxyFilter, false);
+        }
 
-        WikiObject wikiObject = this.objectReader.read(xmlReader);
+        WikiObject wikiObject = this.objectReader.read(xmlReader, this.properties);
 
-        if (this.sentBeginWikiDocumentRevision) {
+        if (this.currentSourceType != SourceType.DOCUMENT || this.sentBeginWikiDocumentRevision) {
             wikiObject.send(proxyFilter);
         } else {
             this.currentObjects.offer(wikiObject);
         }
     }
 
+    private void readObjectProperty(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+        throws XMLStreamException, FilterException
+    {
+        this.objectPropertyReader.read(xmlReader, this.properties).send(proxyFilter);
+    }
+
     private void readClass(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, false);
+        if (this.currentSourceType == SourceType.DOCUMENT) {
+            sendBeginWikiDocumentRevision(proxyFilter, false);
+        }
 
-        this.currentClass = this.classReader.read(xmlReader);
+        this.currentClass = this.classReader.read(xmlReader, this.properties);
 
-        if (this.sentBeginWikiDocumentRevision) {
+        if (this.currentSourceType != SourceType.DOCUMENT || this.sentBeginWikiDocumentRevision) {
             sendWikiClass(proxyFilter);
         }
+    }
+
+    private void readClassProperty(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+        throws XMLStreamException, FilterException
+    {
+        this.classPropertyReader.read(xmlReader, this.properties).send(proxyFilter);
     }
 
     private void readAttachment(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, false);
+        if (this.currentSourceType == SourceType.DOCUMENT) {
+            sendBeginWikiDocumentRevision(proxyFilter, false);
+        }
 
-        WikiAttachment wikiAttachment = this.attachmentReader.read(xmlReader);
+        WikiAttachment wikiAttachment = this.attachmentReader.read(xmlReader, this.properties);
 
-        if (this.sentBeginWikiDocumentRevision) {
+        if (this.currentSourceType != SourceType.DOCUMENT || this.sentBeginWikiDocumentRevision) {
             wikiAttachment.send(proxyFilter);
         } else {
             this.currentAttachments.offer(wikiAttachment);
@@ -518,14 +579,14 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendWikiObjects(XARInputFilter proxyFilter) throws FilterException
     {
-        while (this.currentObjects.size() > 0) {
+        while (!this.currentObjects.isEmpty()) {
             this.currentObjects.poll().send(proxyFilter);
         }
     }
 
     private void sendWikiAttachments(XARInputFilter proxyFilter) throws FilterException
     {
-        while (this.currentAttachments.size() > 0) {
+        while (!this.currentAttachments.isEmpty()) {
             this.currentAttachments.poll().send(proxyFilter);
         }
     }

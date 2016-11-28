@@ -28,17 +28,15 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiObjectFilter;
+import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARClassModel;
+import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.XARObjectModel;
 import org.xwiki.filter.xar.internal.XARObjectPropertyModel;
-import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
-import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
-import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
 
 /**
  * @version $Id$
@@ -46,11 +44,9 @@ import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
  */
 @Component
 @Singleton
-public class WikiObjectReader extends AbstractReader implements XARXMLReader<WikiObjectReader.WikiObject>
+public class WikiObjectReader extends AbstractWikiObjectPropertyReader
+    implements XARXMLReader<WikiObjectReader.WikiObject>
 {
-    @Inject
-    private XarObjectPropertySerializerManager propertySerializerManager;
-
     @Inject
     private XARXMLReader<ClassReader.WikiClass> classReader;
 
@@ -93,31 +89,18 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
         }
     }
 
-    public class WikiObjectProperty
-    {
-        public String name;
-
-        public Object value;
-
-        public FilterEventParameters parameters = new FilterEventParameters();
-
-        public void send(XARInputFilter proxyFilter) throws FilterException
-        {
-            proxyFilter.onWikiObjectProperty(this.name, this.value, this.parameters);
-        }
-    }
-
     @Override
-    public WikiObject read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
+    public WikiObject read(XMLStreamReader xmlReader, XARInputProperties properties)
+        throws XMLStreamException, FilterException
     {
         WikiObject wikiObject = new WikiObject();
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
             if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
-                wikiObject.wikiClass = this.classReader.read(xmlReader);
+                wikiObject.wikiClass = this.classReader.read(xmlReader, properties);
             } else if (elementName.equals(XARObjectPropertyModel.ELEMENT_PROPERTY)) {
-                wikiObject.properties.add(readObjectProperty(xmlReader, wikiObject.wikiClass));
+                wikiObject.properties.add(readObjectProperty(xmlReader, properties, wikiObject.wikiClass));
             } else {
                 String value = xmlReader.getElementText();
 
@@ -133,33 +116,5 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
         }
 
         return wikiObject;
-    }
-
-    private WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, WikiClass wikiClass)
-        throws XMLStreamException, FilterException
-    {
-        xmlReader.nextTag();
-
-        WikiObjectProperty property = new WikiObjectProperty();
-
-        property.name = xmlReader.getLocalName();
-
-        String type;
-        if (wikiClass != null) {
-            WikiClassProperty classProperty = wikiClass.properties.get(property.name);
-            type = classProperty != null ? classProperty.type : null;
-        } else {
-            type = null;
-        }
-
-        try {
-            property.value = this.propertySerializerManager.getPropertySerializer(type).read(xmlReader);
-        } catch (ComponentLookupException e) {
-            throw new FilterException("Failed to get a property parser", e);
-        }
-
-        xmlReader.nextTag();
-
-        return property;
     }
 }

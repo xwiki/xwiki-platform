@@ -19,6 +19,7 @@
  */
 package org.xwiki.filter.xar.input;
 
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.xml.input.XMLInputProperties;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.properties.annotation.PropertyDescription;
@@ -34,9 +35,58 @@ import org.xwiki.properties.annotation.PropertyName;
 public class XARInputProperties extends XMLInputProperties
 {
     /**
+     * The type of the {@link InputSource}.
+     * 
+     * @version $Id$
+     * @since 9.0RC1
+     */
+    public enum SourceType
+    {
+        /**
+         * A XAR package.
+         */
+        XAR,
+
+        /**
+         * A document as XML.
+         */
+        DOCUMENT,
+
+        /**
+         * An attachment as XML.
+         */
+        ATTACHMENT,
+
+        /**
+         * A class as XML.
+         */
+        CLASS,
+
+        /**
+         * A class property as XML.
+         */
+        CLASSPROPERTY,
+
+        /**
+         * An object as XML.
+         */
+        OBJECT,
+
+        /**
+         * An object property as XML.
+         */
+        OBJECTPROPERTY
+    }
+
+    /**
      * @see #getEntities()
      */
     private EntityReferenceSet entities;
+
+    /**
+     * @see #getSourceType()
+     */
+    private SourceType sourceType;
 
     /**
      * @see #isWithHistory()
@@ -44,14 +94,14 @@ public class XARInputProperties extends XMLInputProperties
     private boolean withHistory = true;
 
     /**
-     * @see #isForceDocument()
-     */
-    private boolean forceDocument;
-
-    /**
      * @see #isWithExtension()
      */
     private boolean withExtension = true;
+
+    /**
+     * @see #getObjectPropertyType()
+     */
+    private String objectPropertyType;
 
     /**
      * @return The entities to take into account or skip
@@ -92,21 +142,43 @@ public class XARInputProperties extends XMLInputProperties
     }
 
     /**
+     * @return the type of the source
+     * @since 9.0RC1
+     */
+    public SourceType getSourceType()
+    {
+        return this.sourceType;
+    }
+
+    /**
+     * @param sourceType the type of the source
+     * @since 9.0RC1
+     */
+    public void setSourceType(SourceType sourceType)
+    {
+        this.sourceType = sourceType;
+    }
+
+    /**
      * @return true if the input should be forced as document
+     * @deprecated since 9.0RC1, use {@link #getSourceType()} instead
      */
     @PropertyName("Force document")
     @PropertyDescription("Force considering the input stream as a document")
+    @Deprecated
     public boolean isForceDocument()
     {
-        return this.forceDocument;
+        return this.sourceType == SourceType.DOCUMENT;
     }
 
     /**
      * @param forceDocument true if the input should be forced as document
+     * @deprecated since 9.0RC1, use {@link #setSourceType(SourceType)} instead
      */
+    @Deprecated
     public void setForceDocument(boolean forceDocument)
     {
-        this.forceDocument = forceDocument;
+        this.sourceType = SourceType.DOCUMENT;
     }
 
     /**
@@ -127,5 +199,23 @@ public class XARInputProperties extends XMLInputProperties
     public void setWithExtension(boolean withExtension)
     {
         this.withExtension = withExtension;
+    }
+
+    /**
+     * @return the type of the object property to parse
+     * @since 9.0RC1
+     */
+    public String getObjectPropertyType()
+    {
+        return this.objectPropertyType;
+    }
+
+    /**
+     * @param objectPropertyType the type of the object property to parse
+     * @since 9.0RC1
+     */
+    public void setObjectPropertyType(String objectPropertyType)
+    {
+        this.objectPropertyType = objectPropertyType;
     }
 }

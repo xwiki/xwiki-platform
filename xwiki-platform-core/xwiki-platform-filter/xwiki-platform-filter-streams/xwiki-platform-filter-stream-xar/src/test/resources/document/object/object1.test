@@ -133,6 +133,14 @@
             </parameters>
           </p>
           <wikiClass>
+            <p>
+              <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.class</string>
+                </entry>
+              </parameters>
+            </p>
             <wikiClassProperty name="booleanproperty1" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
             <wikiClassProperty name="booleanproperty2" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
             <wikiClassProperty name="booleanproperty3" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>

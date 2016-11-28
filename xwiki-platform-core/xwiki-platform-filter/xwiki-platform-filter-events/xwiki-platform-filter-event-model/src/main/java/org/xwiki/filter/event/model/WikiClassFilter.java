@@ -33,6 +33,12 @@ public interface WikiClassFilter
 {
     /**
      * @type {@link String}
+     * @since 9.0RC1
+     */
+    String PARAMETER_NAME = "name";
+
+    /**
+     * @type {@link String}
      */
     String PARAMETER_CUSTOMCLASS = "customclass";
 

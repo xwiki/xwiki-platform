@@ -2,6 +2,7 @@ org.xwiki.filter.xar.internal.input.AttachmentReader
 org.xwiki.filter.xar.internal.input.ClassPropertyReader
 org.xwiki.filter.xar.internal.input.ClassReader
 org.xwiki.filter.xar.internal.input.DocumentLocaleReader
+org.xwiki.filter.xar.internal.input.WikiObjectPropertyReader
 org.xwiki.filter.xar.internal.input.WikiObjectReader
 org.xwiki.filter.xar.internal.input.WikiReader
 org.xwiki.filter.xar.internal.input.XARInputFilterStream

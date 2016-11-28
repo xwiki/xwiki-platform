@@ -455,8 +455,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
         try {
             this.writer.writeStartElement(XARClassModel.ELEMENT_CLASS);
 
-            this.writer.writeElement(XARClassModel.ELEMENT_NAME, this.currentObjectClass != null
-                ? this.currentObjectClass : this.localSerializer.serialize(this.currentDocumentReference));
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_NAME)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_NAME,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_NAME));
+            } else {
+                this.writer.writeElement(XARClassModel.ELEMENT_NAME, this.currentObjectClass != null
+                    ? this.currentObjectClass : this.localSerializer.serialize(this.currentDocumentReference));
+            }
 
             if (parameters.containsKey(WikiClassFilter.PARAMETER_CUSTOMCLASS)) {
                 this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMCLASS,

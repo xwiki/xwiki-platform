@@ -82,6 +82,10 @@
               <p>
                 <parameters>
                   <entry>
+                    <string>name</string>
+                    <string>otherspace.otherclass</string>
+                  </entry>
+                  <entry>
                     <string>customclass</string>
                     <string>customClass2</string>
                   </entry>
@@ -249,6 +253,10 @@
               <p>
                 <parameters>
                   <entry>
+                    <string>name</string>
+                    <string>space.page</string>
+                  </entry>
+                  <entry>
                     <string>customclass</string>
                     <string>customClass</string>
                   </entry>
@@ -308,6 +316,10 @@
               <wikiClass>
                 <p>
                   <parameters>
+                    <entry>
+                      <string>name</string>
+                      <string>otherspace.otherclass</string>
+                    </entry>
                     <entry>
                       <string>customclass</string>
                       <string>customClass2</string>
@@ -374,6 +386,10 @@
               <wikiClass>
                 <p>
                   <parameters>
+                    <entry>
+                      <string>name</string>
+                      <string>space.page</string>
+                    </entry>
                     <entry>
                       <string>customclass</string>
                       <string>customClass</string>
@@ -547,6 +563,10 @@
                 <p>
                   <parameters>
                     <entry>
+                      <string>name</string>
+                      <string>space.nestedspace.page</string>
+                    </entry>
+                    <entry>
                       <string>customclass</string>
                       <string>customClass</string>
                     </entry>
@@ -606,6 +626,10 @@
                 <wikiClass>
                   <p>
                     <parameters>
+                      <entry>
+                        <string>name</string>
+                        <string>otherspace.otherclass</string>
+                      </entry>
                       <entry>
                         <string>customclass</string>
                         <string>customClass2</string>
@@ -672,6 +696,10 @@
                 <wikiClass>
                   <p>
                     <parameters>
+                      <entry>
+                        <string>name</string>
+                        <string>space.nestedspace.page</string>
+                      </entry>
                       <entry>
                         <string>customclass</string>
                         <string>customClass</string>

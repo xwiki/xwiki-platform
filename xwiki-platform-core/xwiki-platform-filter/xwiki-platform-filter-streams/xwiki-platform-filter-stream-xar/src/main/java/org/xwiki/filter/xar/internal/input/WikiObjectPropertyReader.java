@@ -19,29 +19,27 @@
  */
 package org.xwiki.filter.xar.internal.input;
 
+import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.xar.input.XARInputProperties;
 
 /**
- * Read XML to create an entity instance.
- * 
- * @param <E> the type of instance to create
  * @version $Id$
- * @since 6.2M1
+ * @since 9.0RC1
  */
-@Role
-public interface XARXMLReader<E>
+@Component
+@Singleton
+public class WikiObjectPropertyReader extends AbstractWikiObjectPropertyReader
+    implements XARXMLReader<WikiObjectPropertyReader.WikiObjectProperty>
 {
-    /**
-     * @param xmlReader the XML reader
-     * @param properties the properties
-     * @return the entity created from XML
-     * @throws XMLStreamException when failing to read XML
-     * @throws FilterException when failing to read XML
-     */
-    E read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException, FilterException;
+    @Override
+    public WikiObjectProperty read(XMLStreamReader xmlReader, XARInputProperties properties)
+        throws XMLStreamException, FilterException
+    {
+        return readObjectProperty(xmlReader, properties, null);
+    }
 }

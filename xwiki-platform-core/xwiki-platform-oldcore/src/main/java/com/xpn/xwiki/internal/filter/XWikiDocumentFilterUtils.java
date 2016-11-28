@@ -47,6 +47,7 @@ import org.xwiki.filter.output.OutputTarget;
 import org.xwiki.filter.output.StringWriterOutputTarget;
 import org.xwiki.filter.output.WriterOutputTarget;
 import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.filter.xar.input.XARInputProperties.SourceType;
 import org.xwiki.filter.xar.internal.XARFilter;
 import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.filter.xar.output.XAROutputProperties;
@@ -111,6 +112,29 @@ public class XWikiDocumentFilterUtils
         return entityClass;
     }
 
+    private SourceType getSourceType(Class<?> entityClass) throws FilterException
+    {
+        SourceType sourceType;
+
+        if (entityClass == XWikiDocument.class) {
+            sourceType = SourceType.DOCUMENT;
+        } else if (entityClass == XWikiAttachment.class) {
+            sourceType = SourceType.ATTACHMENT;
+        } else if (entityClass == BaseClass.class) {
+            sourceType = SourceType.CLASS;
+        } else if (entityClass == BaseObject.class) {
+            sourceType = SourceType.OBJECT;
+        } else if (entityClass == BaseProperty.class) {
+            sourceType = SourceType.OBJECTPROPERTY;
+        } else if (entityClass == PropertyClass.class) {
+            sourceType = SourceType.CLASSPROPERTY;
+        } else {
+            throw new FilterException("Unsupported type [" + entityClass + "]");
+        }
+
+        return sourceType;
+    }
+
     /**
      * @param entity the entity to write to or its class to create a new one
      * @param source the stream to read
@@ -157,7 +181,7 @@ public class XWikiDocumentFilterUtils
         }
 
         // Input
-        xarProperties.setForceDocument(true);
+        xarProperties.setSourceType(getSourceType(entityClass));
         xarProperties.setSource(source);
         BeanInputFilterStream<XARInputProperties> xarReader =
             ((BeanInputFilterStreamFactory<XARInputProperties>) this.xarInputFilterStreamFactory)

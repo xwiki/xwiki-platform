@@ -28,8 +28,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.filter.xar.internal.XARClassPropertyModel;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.filter.xar.internal.XARClassPropertyModel;
 
 /**
  * @version $Id$
@@ -47,7 +48,7 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        public Map<String, String> fields = new LinkedHashMap<String, String>();
+        public Map<String, String> fields = new LinkedHashMap<>();
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
@@ -63,7 +64,8 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
     }
 
     @Override
-    public WikiClassProperty read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
+    public WikiClassProperty read(XMLStreamReader xmlReader, XARInputProperties properties)
+        throws XMLStreamException, FilterException
     {
         WikiClassProperty wikiClassProperty = new WikiClassProperty();
 
@@ -81,8 +83,8 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
         }
 
         if (wikiClassProperty.type == null) {
-            throw new FilterException(String.format("No <classType> element found for property [%s]",
-                wikiClassProperty.name));
+            throw new FilterException(
+                String.format("No <classType> element found for property [%s]", wikiClassProperty.name));
         }
 
         return wikiClassProperty;

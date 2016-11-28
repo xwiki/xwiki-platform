@@ -192,7 +192,7 @@
     #if ("$!defaultValue" == '')
       #set ($defaultValue = 'blank')
     #end
-    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-small', '', true)</dd>
+    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-adaptable-medium', '', true)</dd>
   #else
     <input type="hidden" name="template" value="$escapetool.xml($template)" />
   #end

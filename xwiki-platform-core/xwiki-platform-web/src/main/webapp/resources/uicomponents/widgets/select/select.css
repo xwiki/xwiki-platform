@@ -21,6 +21,11 @@
   height: 400px;
 }
 
+.xwiki-select-adaptable-medium .xwiki-select-options {
+  min-height: 200px;
+  max-height: 315px;
+}
+
 .xwiki-select-tall .xwiki-select-options {
   height: 800px;
 }

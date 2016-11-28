@@ -205,12 +205,19 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
             || this.properties.getTarget() instanceof ResultOutputTarget;
     }
 
+    private void checkXMLWriter() throws FilterException
+    {
+        if (this.writer == null) {
+            this.writer = new FilterStreamXMLStreamWriter(this.properties, true);
+        }
+    }
+
     @Override
     public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
     {
         if (this.writer == null) {
             if (this.wikiWriter == null && (this.properties.isForceDocument() || isTargetTextualContent())) {
-                this.writer = new FilterStreamXMLStreamWriter(this.properties, true);
+                checkXMLWriter();
             } else {
                 if (this.wikiWriter == null) {
                     this.wikiWriter = new XARWikiWriter(
@@ -287,6 +294,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWikiDocumentRevision(String revision, FilterEventParameters parameters) throws FilterException
     {
+        checkXMLWriter();
+
         this.currentDocumentVersion = revision;
 
         try {
@@ -367,6 +376,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
     {
+        checkXMLWriter();
+
         try {
             this.writer.writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
 
@@ -439,6 +450,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWikiClass(FilterEventParameters parameters) throws FilterException
     {
+        checkXMLWriter();
+
         try {
             this.writer.writeStartElement(XARClassModel.ELEMENT_CLASS);
 
@@ -494,6 +507,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     public void beginWikiClassProperty(String name, String type, FilterEventParameters parameters)
         throws FilterException
     {
+        checkXMLWriter();
+
         try {
             this.writer.writeStartElement(name);
 
@@ -527,6 +542,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     public void onWikiClassPropertyField(String name, String value, FilterEventParameters parameters)
         throws FilterException
     {
+        checkXMLWriter();
+
         try {
             this.writer.writeElement(name, value);
         } catch (Exception e) {
@@ -540,6 +557,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
+        checkXMLWriter();
+
         try {
             this.writer.writeStartElement(XARObjectModel.ELEMENT_OBJECT);
 
@@ -584,6 +603,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {
+        checkXMLWriter();
+
         try {
             this.writer.writeStartElement(XARObjectPropertyModel.ELEMENT_PROPERTY);
 

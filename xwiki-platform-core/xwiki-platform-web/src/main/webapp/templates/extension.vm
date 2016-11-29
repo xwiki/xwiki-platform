@@ -1009,6 +1009,10 @@ $namespace##
   #if ($extensionConfig.skipCurrentUser)
     #set ($discard = $installPlanRequest.removeProperty('user.reference'))
   #end
+  #if ($extensionConfig.installJAROnRoot)
+    #set ($discard = $installRequest.rewriter.installExtensionTypeOnRootNamespace('jar'))
+    #set ($discard = $installRequest.rewriter.installExtensionTypeOnRootNamespace('webjar'))
+  #end
   #set ($discard = $extensionManager.createInstallPlan($installPlanRequest))
   #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
 #end
@@ -1108,6 +1112,10 @@ $namespace##
   #end
   #if ($extensionConfig.skipCurrentUser)
     #set ($discard = $installRequest.removeProperty('user.reference'))
+  #end
+  #if ($extensionConfig.installJAROnRoot)
+    #set ($discard = $installRequest.rewriter.installExtensionTypeOnRootNamespace('jar'))
+    #set ($discard = $installRequest.rewriter.installExtensionTypeOnRootNamespace('webjar'))
   #end
   #set ($discard = $extensionManager.install($installRequest))
   #handleExtensionJobStartFailure('extensions.install.error.installFailure')

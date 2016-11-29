@@ -125,6 +125,11 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
                 this.entity = new BaseObject();
             }
 
+            if (parameters.containsKey(WikiObjectFilter.PARAMETER_NAME)) {
+                this.entity
+                    .setDocumentReference(getDocumentReference(WikiObjectFilter.PARAMETER_NAME, parameters, null));
+            }
+
             int number = getInt(WikiObjectFilter.PARAMETER_NUMBER, parameters, -1);
 
             EntityReference classReference =

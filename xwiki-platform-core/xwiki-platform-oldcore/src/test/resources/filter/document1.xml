@@ -300,6 +300,10 @@
               <p>
                 <parameters>
                   <entry>
+                    <string>name</string>
+                    <string>space.page</string>
+                  </entry>
+                  <entry>
                     <string>class_reference</string>
                     <string>otherspace.otherclass</string>
                   </entry>
@@ -369,6 +373,10 @@
             <wikiObject name="wiki:space.page[0]">
               <p>
                 <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>space.page</string>
+                  </entry>
                   <entry>
                     <string>class_reference</string>
                     <string>space.page</string>
@@ -610,6 +618,10 @@
                 <p>
                   <parameters>
                     <entry>
+                      <string>name</string>
+                      <string>space.nestedspace.page</string>
+                    </entry>
+                    <entry>
                       <string>class_reference</string>
                       <string>otherspace.otherclass</string>
                     </entry>
@@ -679,6 +691,10 @@
               <wikiObject name="wiki:space.nestedspace.page[0]">
                 <p>
                   <parameters>
+                    <entry>
+                      <string>name</string>
+                      <string>space.nestedspace.page</string>
+                    </entry>
                     <entry>
                       <string>class_reference</string>
                       <string>space.nestedspace.page</string>

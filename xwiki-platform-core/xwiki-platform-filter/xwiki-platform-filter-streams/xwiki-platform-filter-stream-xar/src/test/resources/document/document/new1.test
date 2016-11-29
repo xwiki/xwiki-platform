@@ -295,6 +295,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>number</string>
                 <int>0</int>
               </entry>
@@ -355,11 +359,24 @@
               <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="prop1" value="1"></wikiObjectProperty>
+          <wikiObjectProperty name="prop1" value="1">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.NumberClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
         <wikiObject name="otherclass[0]">
           <p>
             <parameters>
+              <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
               <entry>
                 <string>number</string>
                 <int>0</int>
@@ -421,7 +438,16 @@
               <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="prop2" value="2"></wikiObjectProperty>
+          <wikiObjectProperty name="prop2" value="2">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.NumberClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
       </wikiDocumentRevision>
     </wikiDocumentLocale>

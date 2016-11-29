@@ -32,6 +32,12 @@ import org.xwiki.filter.annotation.Default;
 public interface WikiObjectFilter
 {
     /**
+     * @type {@link String}
+     * @since 9.0RC1
+     */
+    String PARAMETER_NAME = "name";
+
+    /**
      * @type {@link Integer}
      */
     String PARAMETER_NUMBER = "number";

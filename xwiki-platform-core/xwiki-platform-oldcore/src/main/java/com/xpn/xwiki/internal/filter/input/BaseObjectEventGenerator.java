@@ -76,11 +76,13 @@ public class BaseObjectEventGenerator
 
         FilterEventParameters objectParameters = new FilterEventParameters();
 
+        objectParameters.put(WikiObjectFilter.PARAMETER_NAME, xobject.getName());
         objectParameters.put(WikiObjectFilter.PARAMETER_CLASS_REFERENCE, xobject.getClassName());
         objectParameters.put(WikiObjectFilter.PARAMETER_GUID, xobject.getGuid());
         objectParameters.put(WikiObjectFilter.PARAMETER_NUMBER, xobject.getNumber());
 
-        objectFilter.beginWikiObject(xobject.getReference().getName(), objectParameters);
+        objectFilter.beginWikiObject(xobject.getReference() != null ? xobject.getReference().getName() : null,
+            objectParameters);
 
         // Object class
 

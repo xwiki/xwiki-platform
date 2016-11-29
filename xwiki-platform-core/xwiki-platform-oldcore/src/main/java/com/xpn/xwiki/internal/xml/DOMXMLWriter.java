@@ -221,9 +221,9 @@ public class DOMXMLWriter extends XMLWriter
     public void write(Element element) throws IOException
     {
         if (this.parent.isEmpty()) {
-            this.doc.setRootElement(element);
+            this.doc.setRootElement((Element) element.clone());
         } else {
-            this.parent.peek().add(element);
+            this.parent.peek().add((Element) element.clone());
         }
     }
 

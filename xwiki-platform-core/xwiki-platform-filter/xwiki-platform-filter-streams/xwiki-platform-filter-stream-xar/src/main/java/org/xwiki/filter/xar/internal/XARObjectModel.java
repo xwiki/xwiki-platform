@@ -37,6 +37,7 @@ public class XARObjectModel extends XarObjectModel
     public static final Map<String, EventParameter> OBJECT_PARAMETERS = new HashMap<String, EventParameter>()
     {
         {
+            put(ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME));
             put(ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
             put(ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID));
             put(ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));

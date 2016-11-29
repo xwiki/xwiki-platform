@@ -19,16 +19,16 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
-import org.dom4j.io.DocumentSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.filter.input.StringInputSource;
-import org.xwiki.filter.xml.input.DefaultSourceInputSource;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -388,14 +388,19 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     protected void fromXML(Element oel) throws XWikiException
     {
-        DocumentSource source = new DocumentSource(oel);
-
+        // Serialize the Document (could not find a way to convert a dom4j Element into a usable StAX source)
+        StringWriter writer = new StringWriter();
         try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(this, new DefaultSourceInputSource(source));
-        } catch (Exception e) {
+            org.dom4j.io.XMLWriter domWriter = new org.dom4j.io.XMLWriter(writer);
+            domWriter.write(oel);
+            domWriter.flush();
+        } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
+
+        // Actually parse the XML
+        fromXML(writer.toString());
     }
 
     protected void fromXML(String source) throws XWikiException

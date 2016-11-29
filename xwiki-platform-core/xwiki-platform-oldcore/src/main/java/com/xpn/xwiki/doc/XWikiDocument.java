@@ -65,7 +65,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.DocumentResult;
-import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +91,6 @@ import org.xwiki.filter.output.DefaultWriterOutputTarget;
 import org.xwiki.filter.output.OutputTarget;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.output.XAROutputProperties;
-import org.xwiki.filter.xml.input.DefaultSourceInputSource;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -4482,14 +4480,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void toXML(XMLWriter wr, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
     {
-        // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter and in this
-        // case com.xpn.xwiki.internal.xml.XMLWriter is not compatible with the SAX API
+        // IMPORTANT: we don't use directly XMLWriter's SAX apis here because it's not really working well
         DocumentResult domResult = new DocumentResult();
 
         toXML(new DefaultResultOutputTarget(domResult), bWithObjects, bWithRendering, bWithAttachmentContent,
             bWithVersions, context);
 
-        wr.write(domResult.getDocument());
+        wr.write(domResult.getDocument().getRootElement());
     }
 
     /**
@@ -4652,7 +4649,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
     {
-        fromXML(new DefaultSourceInputSource(new DocumentSource(domdoc)), withArchive);
+        // Serialize the Document (could not find a way to convert a dom4j Document into a usable StAX source)
+        StringWriter writer = new StringWriter();
+        try {
+            org.dom4j.io.XMLWriter domWriter = new org.dom4j.io.XMLWriter(writer);
+            domWriter.write(domdoc);
+            domWriter.flush();
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
+        }
+
+        // Actually parse the XML
+        fromXML(writer.toString(), withArchive);
     }
 
     /**

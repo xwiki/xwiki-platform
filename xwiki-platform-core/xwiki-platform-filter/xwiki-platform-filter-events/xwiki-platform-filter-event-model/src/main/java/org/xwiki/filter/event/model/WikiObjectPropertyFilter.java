@@ -32,6 +32,12 @@ import org.xwiki.filter.annotation.Default;
 public interface WikiObjectPropertyFilter
 {
     /**
+     * @type {@link String}
+     * @since 9.0RC1
+     */
+    String PARAMETER_TYPE = "type";
+
+    /**
      * @param name the name of the property
      * @param value the value of the property
      * @param parameters the properties of the property

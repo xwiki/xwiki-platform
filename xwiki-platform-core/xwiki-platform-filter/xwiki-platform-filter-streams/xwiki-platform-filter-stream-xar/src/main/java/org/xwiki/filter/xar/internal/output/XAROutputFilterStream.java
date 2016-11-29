@@ -39,6 +39,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiClassFilter;
 import org.xwiki.filter.event.model.WikiObjectFilter;
+import org.xwiki.filter.event.model.WikiObjectPropertyFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
@@ -569,8 +570,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
             this.currentObjectClass = (String) parameters.get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
 
-            this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
-                this.localSerializer.serialize(this.currentDocumentReference));
+            if (parameters.containsKey(WikiObjectFilter.PARAMETER_NAME)) {
+                this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
+                    (String) parameters.get(WikiObjectFilter.PARAMETER_NAME));
+            } else {
+                this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
+                    this.localSerializer.serialize(this.currentDocumentReference));
+            }
             this.writer.writeElement(XARObjectModel.ELEMENT_NUMBER,
                 toString((Integer) parameters.get(WikiObjectFilter.PARAMETER_NUMBER)));
             this.writer.writeElement(XARObjectModel.ELEMENT_CLASSNAME, this.currentObjectClass);
@@ -615,9 +621,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
             this.writer.writeStartElement(name);
 
+            String type = (String) parameters.get(WikiObjectPropertyFilter.PARAMETER_TYPE);
+            if (type == null && this.currentObjectProperties != null) {
+                type = this.currentObjectProperties.get(name);
+            }
+
             try {
-                this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name))
-                    .write(this.writer.getWriter(), value);
+                this.propertySerializerManager.getPropertySerializer(type).write(this.writer.getWriter(), value);
             } catch (Exception e) {
                 throw new FilterException("Failed to write property value", e);
             }

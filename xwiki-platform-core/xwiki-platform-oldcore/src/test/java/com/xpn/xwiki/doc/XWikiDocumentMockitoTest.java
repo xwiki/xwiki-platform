@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.dom4j.Document;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -89,7 +90,6 @@ import static org.mockito.Mockito.when;
  */
 @ReferenceComponentList
 @XWikiDocumentFilterUtilsComponentList
-@ComponentList({DefaultSyntaxFactory.class, StaticListMetaClass.class})
 public class XWikiDocumentMockitoTest
 {
     private static final String DOCWIKI = "wiki";
@@ -138,7 +138,7 @@ public class XWikiDocumentMockitoTest
         this.baseClass.addPasswordField("passwd", "Password", 30);
         this.baseClass.addBooleanField("boolean", "Boolean", "yesno");
         this.baseClass.addNumberField("int", "Int", 10, "integer");
-        this.baseClass.addStaticListField("stringlist", "StringList", "value1, value2");
+        this.baseClass.addStaticListField("stringlist", "StringList", 1, true, "value1, value2");
 
         this.baseObject = this.document.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext());
         this.baseObject.setStringValue("string", "string");
@@ -1362,5 +1362,20 @@ public class XWikiDocumentMockitoTest
 
         assertFalse(this.document.validate(this.oldcore.getXWikiContext()));
         assertFalse(this.baseClass.validateObject(this.baseObject, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    public void tofromXMLDocument() throws XWikiException
+    {
+        // equals won't work on password fields because of http://jira.xwiki.org/browse/XWIKI-12561
+        this.baseObject.removeField("passwd");
+        this.baseObject2.removeField("passwd");
+
+        Document document = this.document.toXMLDocument(this.oldcore.getXWikiContext());
+
+        XWikiDocument newDocument = new XWikiDocument(this.document.getDocumentReference());
+        newDocument.fromXML(document, false);
+
+        assertEquals(this.document, newDocument);
     }
 }

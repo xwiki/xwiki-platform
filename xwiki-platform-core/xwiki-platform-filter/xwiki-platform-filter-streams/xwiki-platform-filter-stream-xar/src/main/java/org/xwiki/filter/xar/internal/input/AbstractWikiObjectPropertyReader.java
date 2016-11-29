@@ -20,14 +20,13 @@
 package org.xwiki.filter.xar.internal.input;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiObjectPropertyFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
@@ -56,8 +55,8 @@ public class AbstractWikiObjectPropertyReader extends AbstractReader
         }
     }
 
-    public WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties, WikiClass wikiClass)
-        throws XMLStreamException, FilterException
+    public WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties,
+        WikiClass wikiClass) throws XMLStreamException, FilterException
     {
         xmlReader.nextTag();
 
@@ -78,6 +77,8 @@ public class AbstractWikiObjectPropertyReader extends AbstractReader
         } catch (ComponentLookupException e) {
             throw new FilterException("Failed to get a property parser", e);
         }
+
+        property.parameters.put(WikiObjectPropertyFilter.PARAMETER_TYPE, type);
 
         xmlReader.nextTag();
 

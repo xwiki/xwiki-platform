@@ -58,6 +58,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>number</string>
                 <int>0</int>
               </entry>
@@ -67,7 +71,16 @@
               </entry>
             </parameters>
           </p>
-          <wikiObjectProperty name="property1" value="value"></wikiObjectProperty>
+          <wikiObjectProperty name="property1" value="value">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <null></null>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
       </wikiDocumentRevision>
     </wikiDocumentLocale>

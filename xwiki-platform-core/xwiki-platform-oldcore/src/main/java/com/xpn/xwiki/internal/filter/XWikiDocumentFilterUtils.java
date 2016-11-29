@@ -279,7 +279,7 @@ public class XWikiDocumentFilterUtils
         XARFilter filter = (XARFilter) xarFilter.getFilter();
 
         BeanEntityEventGenerator<Object, DocumentInstanceInputProperties> generator = this.componentManager
-            .getInstance(new DefaultParameterizedType(null, EntityEventGenerator.class, entity.getClass()));
+            .getInstance(new DefaultParameterizedType(null, EntityEventGenerator.class, getClass(entity)));
 
         // Spaces and document events
         FilterEventParameters documentParameters = null;

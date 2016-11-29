@@ -33,6 +33,7 @@ import org.xwiki.filter.input.DefaultURLInputSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
@@ -81,7 +82,7 @@ public class XWikiDocumentFilterUtilsTest
     // Tests
 
     @Test
-    public void exportClass1() throws FilterException, IOException, ComponentLookupException
+    public void class1() throws FilterException, IOException, ComponentLookupException
     {
         assertXML(BaseClass.class, "class1");
     }

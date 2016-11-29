@@ -400,11 +400,13 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     protected void fromXML(String source) throws XWikiException
     {
-        try {
-            Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(this, new StringInputSource(source));
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml", e, null);
+        if (!source.isEmpty()) {
+            try {
+                Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(this, new StringInputSource(source));
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                    "Error parsing xml", e, null);
+            }
         }
     }
 

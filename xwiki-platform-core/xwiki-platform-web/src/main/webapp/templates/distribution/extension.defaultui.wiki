@@ -1,4 +1,9 @@
 ##!source.syntax=xwiki/2.1
+## Install main wiki default UI JARS on root
+#if ($xcontext.isMainWiki())
+  #set ($discard = $extensionConfig.put('installJAROnRoot', true))
+#end
+##
 {{template name="extension.vm" output="false"/}}
 
 {{template name="distribution/macros.vm" output="false"/}}

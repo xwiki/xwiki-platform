@@ -25,17 +25,19 @@ import org.xwiki.test.ui.po.ViewPage;
 
 public class ExtendedViewPage extends ViewPage
 {
-    @FindBy(id = "tmCreateWiki")
-    private WebElement createWikiMenuLink;
+    @FindBy(xpath = "//div[contains(@class, 'drawer-menu-item-text') and contains(text(), 'Wiki Index')]")
+    private WebElement wikiIndex;
 
-    @FindBy(id = "tmDeleteWiki")
-    private WebElement deleteWikiMenuLink;
+    public WikiIndexPage goToWikiIndex()
+    {
+        toggleDrawer();
+        wikiIndex.click();
+        return new WikiIndexPage();
+    }
 
     public CreateWikiPage createWiki()
     {
-        toggleDrawer();
-        this.createWikiMenuLink.click();
-        return new CreateWikiPage();
+        return goToWikiIndex().createWiki();
     }
 
     /**
@@ -43,8 +45,7 @@ public class ExtendedViewPage extends ViewPage
      */
     public DeleteWikiPage deleteWiki()
     {
-        toggleDrawer();
-        this.deleteWikiMenuLink.click();
-        return new DeleteWikiPage();
+        String currentWiki = getHTMLMetaDataValue("wiki");
+        return goToWikiIndex().deleteWiki(currentWiki);
     }
 }

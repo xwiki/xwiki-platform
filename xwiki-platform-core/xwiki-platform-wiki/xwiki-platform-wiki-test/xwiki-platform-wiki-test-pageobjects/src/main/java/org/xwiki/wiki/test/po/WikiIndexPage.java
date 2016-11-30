@@ -22,6 +22,7 @@ package org.xwiki.wiki.test.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -38,6 +39,9 @@ public class WikiIndexPage extends ExtendedViewPage
 
     @FindBy(xpath = "//table[@id='wikis']//td[@class='wikiprettyname linkfield typetext']/a\n")
     private List<WebElement> wikiPrettyNames;
+
+    @FindBy(id = "tmCreateWiki")
+    private WebElement createWikiMenuButton;
 
     /**
      * The wiki index live table.
@@ -81,5 +85,28 @@ public class WikiIndexPage extends ExtendedViewPage
     {
         this.liveTable.waitUntilReady();
         return this;
+    }
+
+    /**
+     * @since 8.4.2
+     */
+    public CreateWikiPage createWiki()
+    {
+        this.createWikiMenuButton.click();
+        return new CreateWikiPage();
+    }
+
+    /**
+     * @since 8.4.2
+     */
+    public DeleteWikiPage deleteWiki(String wikiName)
+    {
+        // Note: this can work only if there is not a lot of wikis otherwise the wiki might not be present in the index
+        // because of the pagination.
+        // TODO: improve this by filtering on the livetable first
+        WebElement deleteWikiLink = getDriver().findElement(
+                By.xpath(String.format("//a[contains(@class, 'actiondelete') and contains(@href, '%s')]", wikiName)));
+        deleteWikiLink.click();
+        return new DeleteWikiPage();
     }
 }

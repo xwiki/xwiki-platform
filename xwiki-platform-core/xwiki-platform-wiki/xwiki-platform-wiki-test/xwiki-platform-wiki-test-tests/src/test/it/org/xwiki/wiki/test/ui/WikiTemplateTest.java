@@ -106,9 +106,7 @@ public class WikiTemplateTest extends AbstractTest
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        WikiHomePage wikiHomePage = templateWikiLink.click();
-        // Delete the wiki
-        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki().confirm(TEMPLATE_WIKI_ID);
+        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki(TEMPLATE_WIKI_ID).confirm(TEMPLATE_WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();

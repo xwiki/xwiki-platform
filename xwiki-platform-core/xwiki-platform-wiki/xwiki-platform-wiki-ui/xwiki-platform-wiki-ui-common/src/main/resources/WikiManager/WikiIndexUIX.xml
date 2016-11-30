@@ -124,13 +124,13 @@
 </content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.drawer</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.drawer.global</extensionPointId>
     </property>
     <property>
       <name>org.xwiki.plaftorm.wiki.ui.wikindex</name>
     </property>
     <property>
-      <parameters>order=30000
+      <parameters>order=10000
 separator=true</parameters>
     </property>
     <property>

@@ -16,6 +16,8 @@
 @xwiki-drawer-menu-item-hover-bg:        @navbar-inverse-link-active-bg;
 @xwiki-drawer-menu-subitem-indent:       @navbar-padding-horizontal * 2;
 @xwiki-drawer-menu-item-seperator-color: darken(@xwiki-page-content-bg, 10%);
+@xwiki-drawer-menu-category-bg:          @xwiki-drawer-menu-item-seperator-color;
+@xwiki-drawer-menu-category-color:       lighten(@xwiki-drawer-menu-item-color, 10%);
 
 
 .drawer-default {
@@ -89,6 +91,13 @@
     a {
       padding-left: @xwiki-drawer-menu-subitem-indent;
     }
+  }
+  
+  // Menu Category ========================================================
+  .drawer-category-header {
+    background-color: @xwiki-drawer-menu-category-bg;
+    color: @xwiki-drawer-menu-category-color;
+    padding: @xwiki-drawer-menu-item-padding;
   }
 }
 

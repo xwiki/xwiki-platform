@@ -46,3 +46,9 @@
 #macro(drawerSeparator)
   <li class="drawer-menuseparator"></li>
 #end
+#**
+ * Display a category header in the drawer
+ *#
+#macro(drawerCategoryHeader $title)
+  <li class="drawer-menu-item drawer-category-header"><hr class="hidden"/>$title</li>
+#end

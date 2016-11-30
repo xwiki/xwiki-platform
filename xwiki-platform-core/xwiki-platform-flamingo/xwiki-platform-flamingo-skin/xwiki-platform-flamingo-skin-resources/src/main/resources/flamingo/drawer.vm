@@ -51,9 +51,15 @@
       ##
       #template('menus_language.vm')
       ##
-      ## UIX
+      ## UIX: Drawer items for the current wiki
       ##
+      #drawerCategoryHeader($services.wiki.currentWikiDescriptor.prettyName)
       #displayDrawerUIX('org.xwiki.plaftorm.drawer')
+      ##
+      ## UIX: Drawer items for the global scope
+      ##
+      #drawerCategoryHeader($services.localization.render('core.drawer.global'))
+      #displayDrawerUIX('org.xwiki.plaftorm.drawer.global')
     </ul>
   </nav>
 </div>

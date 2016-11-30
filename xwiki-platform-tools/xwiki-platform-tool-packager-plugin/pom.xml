@@ -345,6 +345,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
+              **/AbstractImportMojo.java,
+              **/DataMojo.java,
               **/ImportMojo.java,
               **/ExportMojo.java,
               **/PackageMojo.java

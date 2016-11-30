@@ -70,6 +70,17 @@
     <module>xwiki-platform-core</module>
     <module>xwiki-platform-distribution</module>
   </modules>
+  <!-- Dependency Management that are used in platform and in sub-projects too (like xwiki-enterprise) -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap-select</artifactId>
+        <version>1.12.0</version>
+        <scope>runtime</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
     <extensions>
       <!-- Needed to add support for the "webjar" packaging -->

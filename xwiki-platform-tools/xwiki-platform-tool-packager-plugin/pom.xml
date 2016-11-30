@@ -339,6 +339,8 @@
             <id>default</id>
             <configuration>
               <excludes>
+                **/AbstractImportMojo.java,
+                **/DataMojo.java,
                 **/ImportMojo.java,
                 **/ExportMojo.java,
                 **/PackageMojo.java

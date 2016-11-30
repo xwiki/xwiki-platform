@@ -100,6 +100,7 @@ import com.xpn.xwiki.objects.meta.StaticListMetaClass;
 import com.xpn.xwiki.objects.meta.StringMetaClass;
 import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
 import com.xpn.xwiki.render.XWikiScriptContextInitializer;
+import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -232,6 +233,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     CurrentMacroEntityReferenceResolver.class,
 })
 @Inherited
+@XWikiDocumentFilterUtilsComponentList
 public @interface PageComponentList
 {
 }

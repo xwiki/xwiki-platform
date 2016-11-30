@@ -52,7 +52,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
-import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
@@ -69,7 +68,6 @@ import static org.mockito.Mockito.when;
  * @since 7.3M1
  */
 @PageComponentList
-@ReferenceComponentList
 public class PageTest
 {
     /**

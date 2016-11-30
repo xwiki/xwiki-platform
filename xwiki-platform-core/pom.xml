@@ -511,13 +511,13 @@
             <difference>
               <differenceType>7002</differenceType>
               <className>com/xpn/xwiki/web/XWikiServletRequest</className>
-              <medtho>javax.servlet.http.HttpServletRequest ajc$get$request(com.xpn.xwiki.web.XWikiServletRequest)</medtho>
+              <method>javax.servlet.http.HttpServletRequest ajc$get$request(com.xpn.xwiki.web.XWikiServletRequest)</method>
               <justification>Not an actual breakage. AspectJ internal hacks.</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
               <className>com/xpn/xwiki/web/XWikiServletRequest</className>
-              <medtho>void ajc$set$request(com.xpn.xwiki.web.XWikiServletRequest, javax.servlet.http.HttpServletRequest)</medtho>
+              <method>void ajc$set$request(com.xpn.xwiki.web.XWikiServletRequest, javax.servlet.http.HttpServletRequest)</method>
               <justification>Not an actual breakage. AspectJ internal hacks.</justification>
             </difference>
           </ignored>

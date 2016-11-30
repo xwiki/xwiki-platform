@@ -40,6 +40,12 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+{{html}}
+#set ($createWikiDocReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'CreateWiki'))
+#if ($hasCreateWiki&amp;&amp; $xwiki.exists($createWikiDocReference)&amp;&amp; $services.security.authorization.hasAccess('view', $createWikiDocReference))
+&lt;p&gt;&lt;a href="$xwiki.getURL('WikiManager.CreateWiki')" class="button button-primary" id="tmCreateWiki"&gt;$services.icon.renderHTML('add') $services.localization.render('platform.wiki.create.title')&lt;/a&gt;&lt;/p&gt;
+#end
+{{/html}}
 ## Load the User Picker style for the wiki owner column.
 #set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #set($columns = ['wikiprettyname', 'description', 'owner', 'doc.creationDate', 'membershipType'])

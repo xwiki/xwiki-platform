@@ -34,7 +34,16 @@
     ##
     <ul class="drawer-menu">
       ##
-      ## Administer wiki (import actually)
+      ## Languages
+      ##
+      #template('menus_language.vm')
+      ##
+      ## Local Category
+      ##
+      #drawerCategoryHeader($services.wiki.currentWikiDescriptor.prettyName)
+      ##
+      ## Display an "Administer wiki" item if the Administration App is not installed.
+      ## The role of the item is to help the user importing content.
       ##
       #if ($hasGlobalAdmin)
         #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
@@ -47,18 +56,16 @@
         #end
       #end
       ##
-      ## Languages
-      ##
-      #template('menus_language.vm')
-      ##
       ## UIX: Drawer items for the current wiki
       ##
-      #drawerCategoryHeader($services.wiki.currentWikiDescriptor.prettyName)
       #displayDrawerUIX('org.xwiki.plaftorm.drawer')
+      ##
+      ## Global category
+      ##
+      #drawerCategoryHeader($services.localization.render('core.drawer.global'))
       ##
       ## UIX: Drawer items for the global scope
       ##
-      #drawerCategoryHeader($services.localization.render('core.drawer.global'))
       #displayDrawerUIX('org.xwiki.plaftorm.drawer.global')
     </ul>
   </nav>

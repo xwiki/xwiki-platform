@@ -25,7 +25,6 @@
     #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
   #end
   #drawerTopItemStop()
-  #drawerSeparator()
 #end
 ##########################################
 ## Display the pretty name of a language

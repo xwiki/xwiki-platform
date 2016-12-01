@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * So we have decided to synchronize the "hidden" field of the document with the values of the object.
  *
  * Note: according to the blog workflow, a post cannot be "unpublished" and "hidden" in the same time. The workflow is:
- * "unpublished" (draft) -> "published" -> "hidden".
+ * "unpublished" (draft) -&gt; "published" -&gt; "hidden".
  *
  * For some reason, we cannot go back from "published" to "unpublished", and that is why the "hidden" field has been
  * introduced in the BlogPostClass.

@@ -43,7 +43,7 @@ import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
 import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.properties.internal.converter.LocaleConverter;
 import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
-import org.xwiki.rendering.internal.transformation.DefaultRenderingContext;
+import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.xar.internal.XarObjectPropertySerializerManager;
 import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
@@ -106,7 +106,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     FilterEventParametersConverter.class,
     LocaleConverter.class,
     XWikiLocalizationContext.class,
-    DefaultRenderingContext.class,
+    XWikiRenderingContext.class,
     DefaultSyntaxFactory.class,
     BooleanMetaClass.class,
     ComputedFieldMetaClass.class,

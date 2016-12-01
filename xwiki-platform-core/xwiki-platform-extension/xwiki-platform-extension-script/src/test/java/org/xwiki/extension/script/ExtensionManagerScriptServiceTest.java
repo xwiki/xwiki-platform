@@ -169,6 +169,10 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testOverwriteAllowedNamespaces() throws Throwable
     {
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
+
         InstallRequest installRequest = this.scriptService.createInstallRequest("extension", "version", "namespace");
 
         // Indicate all extensions of type "test" should be installed on root

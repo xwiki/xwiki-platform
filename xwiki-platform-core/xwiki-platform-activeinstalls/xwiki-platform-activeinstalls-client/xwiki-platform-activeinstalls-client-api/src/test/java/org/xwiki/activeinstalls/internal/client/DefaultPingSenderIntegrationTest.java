@@ -26,16 +26,16 @@ import org.junit.Test;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.internal.DefaultJestClientManager;
 import org.xwiki.test.LogRule;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import io.searchbox.client.AbstractJestClient;
 
 import static com.github.tomakehurst.wiremock.client.RequestPatternBuilder.allRequests;
-import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -66,21 +66,17 @@ public class DefaultPingSenderIntegrationTest
     @Rule
     public WireMockRule proxyWireMockRule = new WireMockRule(8888);
 
-    @BeforeComponent
-    public void registerMockComponents() throws Exception
+    @Test
+    public void sendPingThroughProxy() throws Exception
     {
         ActiveInstallsConfiguration configuration =
             this.componentManager.registerMockComponent(ActiveInstallsConfiguration.class);
         when(configuration.getPingInstanceURL()).thenReturn("http://unknownhostforxwikitest");
-    }
 
-    @Test
-    public void sendPingThroughProxy() throws Exception
-    {
         PingSender pingSender = this.componentManager.getInstance(PingSender.class);
 
         // First call the Ping Sender but since we haven't set up any proxy our Mock HTTP Server is not going to be
-        // called (since http://unknownhostforxwikitest will lead to nowhere...
+        // called (since http://xwikitestserver/path will lead to nowhere...).
         try {
             pingSender.sendPing();
             fail("Should have raised an exception here");
@@ -102,5 +98,25 @@ public class DefaultPingSenderIntegrationTest
             assertTrue(expected.getMessage().contains("404 Not Found"));
         }
         assertFalse("The HTTP server was called by the ping sender", findAll(allRequests()).isEmpty());
+    }
+
+    @Test
+    public void pingIsSentWithUserAgent() throws Exception
+    {
+        ActiveInstallsConfiguration configuration =
+            this.componentManager.registerMockComponent(ActiveInstallsConfiguration.class);
+        when(configuration.getPingInstanceURL()).thenReturn("http://localhost:8888/path");
+        when(configuration.getUserAgent()).thenReturn("customuseragent");
+
+        stubFor(WireMock.any(urlPathMatching(".*"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")));
+
+        PingSender pingSender = this.componentManager.getInstance(PingSender.class);
+        pingSender.sendPing();
+
+        WireMock.verify(putRequestedFor(urlPathEqualTo("/path/installs"))
+            .withHeader("User-Agent", equalTo("customuseragent")));
     }
 }

@@ -46,6 +46,8 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
      */
     private static final String DEFAULT_PING_URL = "http://extensions.xwiki.org/activeinstalls";
 
+    private static final String DEFAULT_USER_AGENT = "XWikiActiveInstalls";
+
     /**
      * Defines from where to read the rendering configuration data.
      */
@@ -56,5 +58,11 @@ public class DefaultActiveInstallsConfiguration implements ActiveInstallsConfigu
     public String getPingInstanceURL()
     {
         return this.configuration.getProperty(PREFIX + "pingURL", DEFAULT_PING_URL);
+    }
+
+    @Override
+    public String getUserAgent()
+    {
+        return this.configuration.getProperty(PREFIX + "userAgent", DEFAULT_USER_AGENT);
     }
 }

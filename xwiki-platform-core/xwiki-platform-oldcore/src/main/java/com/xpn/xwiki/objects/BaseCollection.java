@@ -47,7 +47,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -62,8 +61,8 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
-public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
-    Cloneable
+public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R>
+    implements ObjectInterface, Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
@@ -167,9 +166,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public DocumentReference getXClassReference()
     {
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
-            this.xClassReferenceCache =
-                getCurrentReferenceDocumentReferenceResolver().resolve(getRelativeXClassReference(),
-                    getDocumentReference());
+            this.xClassReferenceCache = getCurrentReferenceDocumentReferenceResolver()
+                .resolve(getRelativeXClassReference(), getDocumentReference());
         }
 
         return this.xClassReferenceCache;
@@ -661,9 +659,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     if (pclass != null) {
-                        String newPropertyValue =
-                            (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                                propertyName, this, context);
+                        String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
+                            : pclass.displayView(propertyName, this, context);
                         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
                             ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                     }
@@ -672,20 +669,18 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 // The property exists in both objects and is different
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
-                    String newPropertyValue =
-                        (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                            propertyName, this, context);
-                    String oldPropertyValue =
-                        (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                            propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
-                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldPropertyValue,
-                        newPropertyValue));
+                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
+                        : pclass.displayView(propertyName, this, context);
+                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                        : pclass.displayView(propertyName, oldCollection, context);
+                    difflist
+                        .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                            propertyName, propertyType, oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
-                        ObjectDiff.ACTION_PROPERTYCHANGED, propertyName, propertyType, oldProperty.toText(),
-                        newProperty.toText()));
+                    difflist
+                        .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+                            propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
                 }
             }
         }
@@ -704,9 +699,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
-                        String oldPropertyValue =
-                            (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                                propertyName, oldCollection, context);
+                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                            : pclass.displayView(propertyName, oldCollection, context);
                         difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
                             ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
                     } else {
@@ -737,22 +731,50 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return super.toXML();
     }
 
+    /**
+     * @deprecated since 9.0RC1, use {@link #toXML()} instead
+     */
     @Override
+    @Deprecated
     public Element toXML(BaseClass bclass)
     {
-        return toXML();
+        // Set passed class in the context so that the input event generator finds it
+        XWikiContext xcontext = getXWikiContext();
+
+        BaseClass currentBaseClass;
+        DocumentReference classReference;
+        if (bclass != null && xcontext != null) {
+            classReference = bclass.getDocumentReference();
+            currentBaseClass = xcontext.getBaseClass(bclass.getDocumentReference());
+            xcontext.addBaseClass(bclass);
+        } else {
+            classReference = null;
+            currentBaseClass = null;
+        }
+
+        try {
+            return super.toXML();
+        } finally {
+            if (classReference != null) {
+                if (currentBaseClass != null) {
+                    xcontext.addBaseClass(currentBaseClass);
+                } else {
+                    xcontext.removeBaseClass(classReference);
+                }
+            }
+        }
     }
 
-    @Override
+    /**
+     * Return a XML version of this collection.
+     * <p>
+     * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
+     * 
+     * @return the XML as a String
+     */
     public String toXMLString()
     {
-        return super.toXMLString();
-    }
-
-    @Override
-    public String toString()
-    {
-        return toXMLString();
+        return toXMLString(true);
     }
 
     /**
@@ -796,8 +818,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
-                    safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
-                        : newProperty.clone());
+                    safeput(diff.getPropName(),
+                        configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // collision between DB and new: property to add but already exists in the DB
@@ -822,8 +844,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Let some automatic migration take care of that modification between DB and new
-                        safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
-                            : newProperty.clone());
+                        safeput(diff.getPropName(),
+                            configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
                         // Try to apply 3 ways merge on the property
@@ -834,8 +856,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     // Lets assume it's a mistake to fix
                     mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
 
-                    safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
-                        : newProperty.clone());
+                    safeput(diff.getPropName(),
+                        configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                     mergeResult.setModified(true);
                 }
             }

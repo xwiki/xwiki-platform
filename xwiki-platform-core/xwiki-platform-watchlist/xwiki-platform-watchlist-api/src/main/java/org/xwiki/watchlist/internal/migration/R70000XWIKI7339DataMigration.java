@@ -122,6 +122,7 @@ public class R70000XWIKI7339DataMigration extends AbstractHibernateDataMigration
             fixClassProperty(watchListClass, "users", "User list");
 
             // Serialize the modified XClass into the document and save it.
+            // Don't format the XML to reduce the size of the stored data as much as possible
             watchListClassDocument.setXClassXML(watchListClass.toXMLString());
             session.save(watchListClassDocument);
 

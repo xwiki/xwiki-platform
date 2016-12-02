@@ -253,7 +253,7 @@ public class ListProperty extends BaseProperty implements Cloneable
             return "";
         }
 
-        return toXMLString();
+        return super.toString();
     }
 
     @Override

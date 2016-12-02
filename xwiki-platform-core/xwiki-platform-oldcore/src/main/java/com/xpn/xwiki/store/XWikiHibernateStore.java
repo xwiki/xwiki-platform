@@ -527,7 +527,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             BaseClass bclass = doc.getXClass();
             if (bclass != null) {
                 if (bclass.getFieldList().size() > 0) {
-                    doc.setXClassXML(bclass.toXMLString());
+                    // Don't format the XML to reduce the size of the stored data as much as possible
+                    doc.setXClassXML(bclass.toXMLString(false));
                 } else {
                     doc.setXClassXML("");
                 }

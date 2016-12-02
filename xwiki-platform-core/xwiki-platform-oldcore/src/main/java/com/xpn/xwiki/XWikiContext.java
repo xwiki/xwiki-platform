@@ -824,9 +824,18 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @since 2.2M2
      */
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public BaseClass getBaseClass(DocumentReference documentReference)
+    public BaseClass getBaseClass(DocumentReference classReference)
     {
-        return this.classCache.get(documentReference);
+        return this.classCache.get(classReference);
+    }
+
+    /**
+     * @param classReference the reference of the class
+     * @since 9.0RC1
+     */
+    public void removeBaseClass(DocumentReference classReference)
+    {
+        this.classCache.remove(classReference);
     }
 
     /**

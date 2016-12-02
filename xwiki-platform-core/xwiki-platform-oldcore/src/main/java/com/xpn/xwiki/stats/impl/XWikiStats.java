@@ -205,12 +205,6 @@ public class XWikiStats extends BaseCollection
     }
 
     @Override
-    public Element toXML()
-    {
-        return toXML(null);
-    }
-
-    @Override
     // TODO: implement an EntityEventGenerator for XWikiStats
     public Element toXML(BaseClass bclass)
     {

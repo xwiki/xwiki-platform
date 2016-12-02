@@ -23,12 +23,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 
+import javax.inject.Provider;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.filter.input.StringInputSource;
+import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -386,6 +389,23 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return this.ownerDocument;
     }
 
+    /**
+     * Get XWiki context from execution context.
+     *
+     * @return the XWiki context for the current thread
+     * @since 9.0RC1
+     */
+    protected XWikiContext getXWikiContext()
+    {
+        Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+
+        if (xcontextProvider != null) {
+            return xcontextProvider.get();
+        }
+
+        return null;
+    }
+
     protected void fromXML(Element oel) throws XWikiException
     {
         // Serialize the Document (could not find a way to convert a dom4j Element into a usable StAX source)
@@ -403,7 +423,11 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         fromXML(writer.toString());
     }
 
-    protected void fromXML(String source) throws XWikiException
+    /**
+     * @param source the XML to read
+     * @throws XWikiException when failing to parse XML
+     */
+    public void fromXML(String source) throws XWikiException
     {
         if (!source.isEmpty()) {
             try {
@@ -431,14 +455,28 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return domResult.getDocument().getRootElement();
     }
 
-    protected String toXMLString()
+    /**
+     * @param format true if the XML should be formated
+     * @return the XML as a String
+     * @since 9.0RC1
+     */
+    public String toXMLString(boolean format)
     {
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setFormat(false);
+
         try {
-            return Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this);
+            return Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, xarProperties);
         } catch (Exception e) {
             LOGGER.error("Failed to serialize collection to XML", e);
 
             return "";
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return toXMLString(true);
     }
 }

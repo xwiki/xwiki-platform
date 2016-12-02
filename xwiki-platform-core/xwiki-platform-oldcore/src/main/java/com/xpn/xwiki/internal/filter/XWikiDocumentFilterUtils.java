@@ -218,10 +218,25 @@ public class XWikiDocumentFilterUtils
      * @return the XML as a String
      * @throws ComponentLookupException failed to find an event generator for passed entity
      * @throws FilterException when failing to generate export the passed entity
+     * @throws IOException when failing to close the stream
      */
-    public String exportEntity(Object entity) throws ComponentLookupException, FilterException
+    public String exportEntity(Object entity) throws ComponentLookupException, FilterException, IOException
     {
-        return exportEntity(entity, new XAROutputProperties(), new DocumentInstanceInputProperties());
+        return exportEntity(entity, new XAROutputProperties());
+    }
+
+    /**
+     * @param entity the entity to read
+     * @param xarProperties the configuration of the output filter
+     * @return the XML as a String
+     * @throws ComponentLookupException failed to find an event generator for passed entity
+     * @throws FilterException when failing to generate export the passed entity
+     * @throws IOException when failing to close the stream
+     */
+    public String exportEntity(Object entity, XAROutputProperties xarProperties)
+        throws ComponentLookupException, FilterException, IOException
+    {
+        return exportEntity(entity, xarProperties, new DocumentInstanceInputProperties());
     }
 
     /**
@@ -229,10 +244,26 @@ public class XWikiDocumentFilterUtils
      * @param target the target where to write the result
      * @throws ComponentLookupException failed to find an event generator for passed entity
      * @throws FilterException when failing to generate export the passed entity
+     * @throws IOException when failing to close the stream
      */
-    public void exportEntity(Object entity, OutputTarget target) throws ComponentLookupException, FilterException
+    public void exportEntity(Object entity, OutputTarget target)
+        throws ComponentLookupException, FilterException, IOException
     {
-        exportEntity(entity, target, new XAROutputProperties(), new DocumentInstanceInputProperties());
+        exportEntity(entity, target, new DocumentInstanceInputProperties());
+    }
+
+    /**
+     * @param entity the entity to read
+     * @param target the target where to write the result
+     * @param documentProperties the configuration of the input filter
+     * @throws ComponentLookupException failed to find an event generator for passed entity
+     * @throws FilterException when failing to generate export the passed entity
+     * @throws IOException when failing to close the stream
+     */
+    public void exportEntity(Object entity, OutputTarget target, DocumentInstanceInputProperties documentProperties)
+        throws ComponentLookupException, FilterException, IOException
+    {
+        exportEntity(entity, target, new XAROutputProperties(), documentProperties);
     }
 
     /**
@@ -242,9 +273,11 @@ public class XWikiDocumentFilterUtils
      * @return the XML as a String
      * @throws ComponentLookupException failed to find an event generator for passed entity
      * @throws FilterException when failing to generate export the passed entity
+     * @throws IOException when failing to close the stream
      */
     public String exportEntity(Object entity, XAROutputProperties xarProperties,
-        DocumentInstanceInputProperties documentProperties) throws ComponentLookupException, FilterException
+        DocumentInstanceInputProperties documentProperties)
+        throws ComponentLookupException, FilterException, IOException
     {
         WriterOutputTarget target = new StringWriterOutputTarget();
 
@@ -260,9 +293,11 @@ public class XWikiDocumentFilterUtils
      * @param documentProperties the configuration of the input filter
      * @throws ComponentLookupException failed to find an event generator for passed entity
      * @throws FilterException when failing to generate export the passed entity
+     * @throws IOException when failing to close the stream
      */
     public void exportEntity(Object entity, OutputTarget target, XAROutputProperties xarProperties,
-        DocumentInstanceInputProperties documentProperties) throws ComponentLookupException, FilterException
+        DocumentInstanceInputProperties documentProperties)
+        throws ComponentLookupException, FilterException, IOException
     {
         // Input
         documentProperties.setVerbose(false);
@@ -308,5 +343,7 @@ public class XWikiDocumentFilterUtils
                 filter.beginWikiSpace(reference.getName(), FilterEventParameters.EMPTY);
             }
         }
+
+        xarFilter.close();
     }
 }

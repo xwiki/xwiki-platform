@@ -190,16 +190,16 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
         return (value == null) ? "" : value.toString();
     }
 
-    @Override
+    /**
+     * Return a XML version of this collection.
+     * <p>
+     * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
+     * 
+     * @return the XML as a String
+     */
     public String toXMLString()
     {
-        return super.toXMLString();
-    }
-
-    @Override
-    public String toString()
-    {
-        return toXMLString();
+        return super.toXMLString(true);
     }
 
     public Object getCustomMappingValue()

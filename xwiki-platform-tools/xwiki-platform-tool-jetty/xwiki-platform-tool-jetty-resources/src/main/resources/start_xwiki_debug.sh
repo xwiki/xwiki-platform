@@ -178,6 +178,13 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
+# Check version of Java
+JAVA_VERSION=$(java -version 2>&1 | grep -i version | sed 's/.*version ".*\.\(.*\)\..*"/\1/; 1q')
+if [ "$JAVA_VERSION" -lt 8 ]; then
+  echo This version of XWiki requires Java 8 or greater.
+  exit 0
+fi
+
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command
 # and thus the java process PID will actually be the shell PID.
 XWIKI_PID=$$

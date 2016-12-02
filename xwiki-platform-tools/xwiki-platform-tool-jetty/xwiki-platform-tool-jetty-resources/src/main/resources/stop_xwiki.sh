@@ -123,6 +123,13 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
+# Check version of Java
+JAVA_VERSION=$(java -version 2>&1 | grep -i version | sed 's/.*version ".*\.\(.*\)\..*"/\1/; 1q')
+if [ "$JAVA_VERSION" -lt 8 ]; then
+  echo This version of XWiki requires Java 8 or greater.
+  exit 0
+fi
+
 [ ! -e $XWIKI_LOCK_FILE ] && echo "Lock file [${XWIKI_LOCK_FILE}] is missing. Aborting stop." && exit 0
 
 if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then

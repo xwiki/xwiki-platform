@@ -83,8 +83,8 @@ public class DocumentUpdateMojoTest
 
         File outputFile = new File(tempFolder.getRoot(), "Test/SampleWikiXMLDocument.input");
         String outputContent = IOUtils.toString(new FileReader(outputFile));
-        assertTrue(outputContent.contains("<attachment>\n<filename>fileToAttach.txt</filename>"));
-        assertTrue(outputContent.contains("<attachment>\n<filename>fileToAttach.js</filename>"));
+        assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.txt</filename>"));
+        assertTrue(outputContent.contains("<attachment>\n    <filename>fileToAttach.js</filename>"));
     }
 
     private void set(AttachMojo mojo, String fieldName, Object value) throws Exception

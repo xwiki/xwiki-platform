@@ -60,7 +60,7 @@
                2) it's a bit involved to configure the various Maven poms using those plugins to have the Clover JAR
                injected in the right places. -->
           <groupId>com.atlassian.maven.plugins</groupId>
-          <artifactId>maven-clover2-plugin</artifactId>
+          <artifactId>clover-maven-plugin</artifactId>
           <configuration>
             <skip>true</skip>
           </configuration>

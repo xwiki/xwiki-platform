@@ -225,16 +225,27 @@
           <artifactId>clover</artifactId>
         </dependency>
       </dependencies>
-      <!-- Skip Duplicate class finder since it's causing duplicate problems with Clovered jars containing dups and we
-           don't need it -->
       <build>
         <plugins>
+          <!-- Skip Duplicate class finder since it's causing duplicate problems with Clovered jars containing dups and
+               we don't need it -->
           <plugin>
             <groupId>org.basepom.maven</groupId>
             <artifactId>duplicate-finder-maven-plugin</artifactId>
             <configuration>
               <skip>true</skip>
             </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>com.atlassian.clover</groupId>
+                <artifactId>clover</artifactId>
+                <version>${clover.version}</version>
+              </dependency>
+            </dependencies>
           </plugin>
         </plugins>
       </build>

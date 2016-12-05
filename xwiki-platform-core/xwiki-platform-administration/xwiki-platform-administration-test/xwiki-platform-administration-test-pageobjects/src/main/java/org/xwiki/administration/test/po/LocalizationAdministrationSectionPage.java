@@ -35,13 +35,13 @@ import org.xwiki.test.ui.po.BootstrapSelect;
  */
 public class LocalizationAdministrationSectionPage extends AdministrationSectionPage
 {
-    @FindBy(id = "XWiki.XWikiPreferences_0_multilingual")
+    @FindBy(xpath = "(//div[contains(@class, 'bootstrap-select')])[1]")
     private WebElement multiLingualSelect;
 
-    @FindBy(id = "XWiki.XWikiPreferences_0_default_language")
+    @FindBy(xpath = "(//div[contains(@class, 'bootstrap-select')])[3]")
     private WebElement defaultLanguageSelect;
 
-    @FindBy(css = ".bootstrap-select")
+    @FindBy(xpath = "(//div[contains(@class, 'bootstrap-select')])[2]")
     private WebElement supportedLanguagesSelect;
 
     public LocalizationAdministrationSectionPage()

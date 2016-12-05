@@ -54,7 +54,7 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     public void setMultiLingual(boolean isMultiLingual)
     {
         BootstrapSelect select = new BootstrapSelect(this.multiLingualSelect, getDriver());
-        select.selectByValue(isMultiLingual ? "Yes" : "No");
+        select.selectByValue(isMultiLingual ? "1" : "0");
     }
 
     public void setDefaultLanguage(String defaultLanguage)

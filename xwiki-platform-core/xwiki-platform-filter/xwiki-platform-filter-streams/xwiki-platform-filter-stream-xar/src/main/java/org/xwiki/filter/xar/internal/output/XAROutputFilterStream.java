@@ -107,8 +107,18 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void close() throws IOException
     {
+        if (this.writer != null) {
+            try {
+                this.writer.close();
+                this.writer = null;
+            } catch (FilterException e) {
+                throw new IOException("Failed to close XML writer", e);
+            }
+        }
+
         if (this.wikiWriter != null) {
             this.wikiWriter.close();
+            this.wikiWriter = null;
         }
 
         this.properties.getTarget().close();

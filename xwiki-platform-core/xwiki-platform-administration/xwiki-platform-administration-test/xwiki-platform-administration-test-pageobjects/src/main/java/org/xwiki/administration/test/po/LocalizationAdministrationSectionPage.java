@@ -49,8 +49,6 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         super("Localization");
         // Wait for asynchronous widgets to be loaded
         getDriver().waitUntilElementIsVisible(By.cssSelector(".bootstrap-select"));
-        getDriver().waitUntilElementIsVisible(
-                By.cssSelector("select[name=\"XWiki.XWikiPreferences_0_default_language\"]"));
     }
 
     public void setMultiLingual(boolean isMultiLingual)

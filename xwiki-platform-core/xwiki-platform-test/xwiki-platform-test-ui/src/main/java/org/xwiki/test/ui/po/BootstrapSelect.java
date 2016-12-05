@@ -91,7 +91,7 @@ public class BootstrapSelect
             if (isElementSelected(element) != values.contains(value)) {
                 element.findElement(By.tagName("a")).click();
                 // If the element is not displayed inside the window (selenium does not handle scrolling inside an
-                // element) the previous action has actually closed the menu, withotu changing the state of the element.
+                // element) the previous action has actually closed the menu, without changing the state of the element.
                 // So we need to check if the menu has been close.
                 if (!this.menu.isDisplayed()) {
                     // In that was, we reopen it
@@ -104,8 +104,9 @@ public class BootstrapSelect
             }
         }
 
-        // To finish, close the enhanced bootstrap-select widget
-        closeMenu();
+        if (this.menu.isDisplayed()) {
+            closeMenu();
+        }
     }
 
     private void openMenu()

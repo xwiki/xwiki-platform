@@ -120,4 +120,14 @@ public class BaseClassTest
 
         assertFalse(baseClass.addTextAreaField("field", "pretty name", 55, 33));
     }
+
+    @Test
+    public void addTextAreaFieldWhenExistingNumberField() throws Exception
+    {
+        BaseClass baseClass = new BaseClass();
+
+        baseClass.addNumberField("field", "int pretty name", 30, "int");
+
+        assertTrue(baseClass.addTextAreaField("field", "pretty name", 55, 33));
+    }
 }

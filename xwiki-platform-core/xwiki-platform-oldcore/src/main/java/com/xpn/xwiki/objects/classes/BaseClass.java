@@ -887,12 +887,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         boolean result = false;
 
-        TextAreaClass textAreaClass = (TextAreaClass) get(fieldName);
-        if (textAreaClass == null) {
+        TextAreaClass textAreaClass;
+        PropertyInterface field  = get(fieldName);
+        if (field instanceof TextAreaClass) {
+            textAreaClass = (TextAreaClass) field;
+        } else {
+            // Remove the field if it already exist
+            if (field != null) {
+                removeField(fieldName);
+            }
+
+            // Create a new field
             textAreaClass = new TextAreaClass();
             textAreaClass.setName(fieldName);
             textAreaClass.setObject(this);
             put(fieldName, textAreaClass);
+
             result = true;
         }
 

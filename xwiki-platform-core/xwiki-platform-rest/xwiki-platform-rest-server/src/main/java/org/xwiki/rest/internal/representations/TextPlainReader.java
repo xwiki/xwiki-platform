@@ -34,6 +34,9 @@ public abstract class TextPlainReader<T> implements MessageBodyReader<T>, XWikiR
 {
     protected String getEntityAsString(InputStream entityStream) throws IOException
     {
+        if (entityStream == null) {
+            return "";
+        }
         return IOUtils.toString(entityStream);
     }
 }

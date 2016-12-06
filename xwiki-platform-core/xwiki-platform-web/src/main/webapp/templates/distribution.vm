@@ -153,9 +153,9 @@
   </div>
 #end
 
+#set ($extensionConfig = {})
 ## Make sure to skip all right checking for guest user
 #if (!$xcontext.userReference)
-  #set ($extensionConfig = {})
   #set ($discard = $extensionConfig.put('skipCheckRight', true))
   #set ($discard = $extensionConfig.put('skipCurrentUser', true))
 #end

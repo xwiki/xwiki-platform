@@ -421,28 +421,28 @@
       var savedIds = readSavedValues(dataElement.val());
 
       // Wait for the tree to be ready (root children loaded).
-      treeElement.on('ready.jstree', function(event, data) {
+      treeElement.one('ready.jstree', function(event, data) {
         var tree = $.jstree.reference(treeElement);
 
         // Configure the tree to not cascade the check status when checking nodes.
         // tree.settings.checkbox.three_state = false;
         tree.settings.checkbox.cascade = '';
 
-        // Expand into view and check all tree nodes that are initially supposed to be checked.
-        for (var i=0; i&lt;savedIds.length; i++) {
-          var savedId = savedIds[i];
-          // Load and expand to the node.
-          tree.openTo(savedId, function(idToCheck) {
-            // Once the node is loaded, check it, if possible.
-            // If the node did not load (lack of permissions, hidden document, etc.), nothing happens.
-            tree.check_node(idToCheck);
-          }.bind(this, savedId));
-        }
+        // Expand into view and check all the nodes that are initially supposed to be checked.
+        // The tree is lazy-loaded so we need to load the nodes before selecting them.
+        tree.openTo(savedIds, $.proxy(tree, 'select_node', savedIds));
       });
 
       // Listen to tree nodes being checked/unchecked and save the changes in the DOM to be saved on submit.
       treeElement.on('changed.jstree', function(event, data) {
         var node = data.node;
+        // Handle only document nodes. The tree can have other node types, such as Pagination nodes.
+        // We also check if the node is specified because the target of the 'changed.jstree' event is not always a
+        // single node (e.g. the event is also fired when calling tree.deselect_all()).
+        // TODO: Handle also the cases when the event target is a list of document nodes.
+        if (!node || node.id.substr(0, 9) != 'document:') {
+          return;
+        }
         var initialNrOfNodes = savedIds.length;
 
         // Update the savedIds list.

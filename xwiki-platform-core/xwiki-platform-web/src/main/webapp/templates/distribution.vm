@@ -158,6 +158,13 @@
   #set ($discard = $extensionConfig.put('skipCheckRight', true))
   #set ($discard = $extensionConfig.put('skipCurrentUser', true))
 #end
+## FIXME: refactor distribution.vm to let steps deal with all request, even extension related requests
+#if ($services.distribution.jobStatus.currentStep.id == 'extension.defaultui')
+  ## Install main wiki default UI JARS on root
+  #if ($xcontext.isMainWiki())
+    #set ($discard = $extensionConfig.put('installJAROnRoot', true))
+  #end
+#end
 
 ## Keep displaying the wizard after the distribution job is done if the request targets a specific extension (e.g. if
 ## you follow the link to an extension dependency).

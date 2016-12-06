@@ -65,10 +65,6 @@
 {{/velocity}}
 
 {{velocity}}
-## Install main wiki default UI JARS on root
-#if ($xcontext.isMainWiki())
-  #set ($discard = $extensionConfig.put('installJAROnRoot', true))
-#end
 #if ("$!request.action" == '')
   #displayDefaultUIStep()
 #end

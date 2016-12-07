@@ -66,7 +66,7 @@
       ##
       ## UIX: Drawer items for the global scope
       ##
-      #displayDrawerUIX('org.xwiki.plaftorm.drawer.global')
+      #displayDrawerUIX('org.xwiki.plaftorm.drawer.global', 'global')
     </ul>
   </nav>
 </div>
@@ -74,11 +74,16 @@
  * Display the UI extensions.
  *
  * @param $name the name of the UI extension to display
+ * @param $category the name of the category to filter on (by default, it fallbacks on "local")
  *#
-#macro(displayDrawerUIX $name)
+#macro(displayDrawerUIX $name $category)
   #set ($canHaveMenuSeparator = false)
+  #if ("$!category" == '')
+    #set ($category = 'local')
+  #end
   #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
-    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+    #set ($uixCategory = "$!uix.parameters.category")
+    #if (($uixCategory == $category || $category == 'local' && $uixCategory == '') && $services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       #if ("$!uix.getParameters().separator" == 'true' && $canHaveMenuSeparator)
         #drawerSeparator()
         #set ($canHaveMenuSeparator = false)

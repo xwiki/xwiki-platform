@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.TemplateProviderMacros" locale="">
+  <web>XWiki</web>
+  <name>TemplateProviderMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1481035571000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1481090789000</date>
+  <contentUpdateDate>1481090596000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{template name="hierarchy_macros.vm" /}}
+
+{{velocity output="false"}}
+#set ($isEditing = $xcontext.action == 'edit')
+
+#macro (displayPropertyValue $property $action)
+  #if ($action)
+    #set ($output = $doc.display($property, $action))
+  #else
+    #set ($output = $doc.display($property))
+  #end
+  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
+  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
+  $output
+#end
+
+#macro (displayPathsPropertyValue $property)
+  &lt;ul class="paths"&gt;
+    #set ($hierarchyOptions = {
+      'local': true,
+      'selfIsActive': false
+    })
+    #set ($paths = $doc.getValue($property))
+    #foreach ($path in $paths)
+      &lt;li class="path"&gt;
+        #if ($isEditing)
+          &lt;a href="#path-delete" class="path-delete"&gt;$services.icon.renderHTML('delete')&lt;/a&gt;
+          &lt;input type="hidden" name="XWiki.TemplateProviderClass_0_$property"
+            value="$escapetool.xml($path)" /&gt;
+        #end
+        #set ($spaceReference = $services.model.resolveSpace($path))
+        #hierarchy($spaceReference $hierarchyOptions)
+      &lt;/li&gt;
+    #end
+    #if ($isEditing)
+      ## This is used as a template on the client side when a new path is added.
+      &lt;li class="path hidden"&gt;
+        &lt;a href="#path-delete" class="path-delete"&gt;$services.icon.renderHTML('delete')&lt;/a&gt;
+        &lt;input type="hidden" name="XWiki.TemplateProviderClass_0_$property" disabled="disabled" /&gt;
+        &lt;ol class="breadcrumb"&gt;
+          &lt;li class="loading"&gt;&lt;/li&gt;
+        &lt;/ol&gt;
+      &lt;/li&gt;
+      &lt;li class="path-add"&gt;
+        &lt;input type="hidden" name="XWiki.TemplateProviderClass_0_$property" value="" /&gt;
+        &lt;a href="#path-add"&gt;$services.icon.renderHTML('add')&lt;/a&gt;
+      &lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (locationPickerModal)
+  &lt;div class="location-picker modal fade" tabindex="-1" role="dialog" data-backdrop="static"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;h4 class="modal-title"&gt;$services.localization.render('core.documentPicker.title')&lt;/h4&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          #documentTree({
+            'class': 'location-tree',
+            'finder': true,
+            'showAttachments': false,
+            'showTerminalDocuments': false,
+            'showTranslations': false
+          })
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $services.localization.render('core.documentPicker.cancel')
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+            $services.localization.render('core.documentPicker.select')
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.TemplateProviderMacros</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>1ee18166-c41f-49a6-9d98-939ee9ed7e32</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function($) {
+  $('.paths').on('click', '.path-delete', function(event) {
+    event.preventDefault();
+    $(this).closest('.path').remove();
+  }).on('click', '.path-add', function(event) {
+    event.preventDefault();
+    $('.location-picker.modal').prop('modalTrigger', $(this)).modal();
+  });
+
+  var getLocalSpaceReference = function(nodeId) {
+    var separatorIndex = nodeId.indexOf(':');
+    var nodeType = nodeId.substr(0, separatorIndex);
+    var nodeStringReference = nodeId.substr(separatorIndex + 1);
+    var currentDocRef = XWiki.currentDocument.getDocumentReference();
+    var nodeReference = XWiki.Model.resolve(nodeStringReference, XWiki.EntityType.byName(nodeType), currentDocRef);
+    var spaceReference = nodeReference.extractReference(XWiki.EntityType.SPACE);
+    var localSpaceReference = spaceReference.relativeTo(currentDocRef.extractReference(XWiki.EntityType.WIKI));
+    return XWiki.Model.serialize(localSpaceReference);
+  };
+
+  var addLocation = function(value, paths) {
+    var template = paths.find('.path.hidden');
+    var newPath = template.clone().removeClass('hidden').insertBefore(template);
+    newPath.find('input').prop('disabled', false).val(value);
+    $.post(XWiki.currentDocument.getURL('get'), {
+      'xpage': 'hierarchy_reference',
+      // The passed reference is resolved as document reference.
+      'reference': value + '.WebHome',
+      'local': true,
+      'selfIsActive': false
+    }, function(data) {
+      newPath.find('.breadcrumb').replaceWith(data);
+    });
+  };
+
+  $('.location-picker.modal').on('xwiki:locationTreePicker:select', function(event, data) {
+    var trigger = $(this).prop('modalTrigger');
+    data.tree.get_selected().map(getLocalSpaceReference).forEach(function(localReference) {
+      addLocation(localReference, trigger.closest('.paths'));
+    });
+  });
+
+  // Location Tree Picker
+  require(['tree'], function($) {
+    $('.location-picker.modal').each(function() {
+      var modal = $(this);
+      var treeElement = modal.find('.location-tree');
+      var selectButton = modal.find('.modal-footer .btn-primary');
+
+      modal.on('shown.bs.modal', function(event) {
+        if (!$.jstree.reference(treeElement)) {
+          // Initialize the tree and hook the event listeners.
+          treeElement.xtree({
+            core: {
+              multiple: true
+            }
+          }).on('changed.jstree', function(event, data) {
+            selectButton.prop('disabled', data.selected.size() === 0);
+          }).on('dblclick', '.jstree-anchor', function() {
+            selectButton.click();
+          });
+        }
+      });
+
+      selectButton.click(function() {
+        modal.modal('hide');
+        modal.triggerHandler('xwiki:locationTreePicker:select', {
+          'tree': $.jstree.reference(treeElement)
+        });
+      });
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.TemplateProviderMacros</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>c507678c-2294-487b-a795-84756a3e90da</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.templateProviderSheet &gt; .xHint {
+  margin-bottom: 2em;
+}
+
+.templateProviderSheet .paths {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.templateProviderSheet .paths .breadcrumb {
+  margin-bottom: 3px;
+  padding-right: 30px;
+}
+
+.templateProviderSheet .paths .path-add {
+  border: 1px dashed $theme.borderColor;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 7px 15px;
+}
+
+.templateProviderSheet .paths .path-delete {
+  cursor: pointer;
+  margin-top: 8px;
+  position: absolute;
+  right: 30px;
+}
+
+.templateProviderSheet .breadcrumb &gt; .loading {
+  min-height: 16px;
+  min-width: 16px;
+  vertical-align: middle;
+}
+
+.templateProviderSheet label input[type="checkbox"] {
+  margin-top: 0;
+  vertical-align: middle;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

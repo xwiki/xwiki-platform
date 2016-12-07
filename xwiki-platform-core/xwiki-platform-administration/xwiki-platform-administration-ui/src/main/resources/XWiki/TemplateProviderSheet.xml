@@ -39,24 +39,27 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-## Variables
-#set ($providerObj = $doc.getObject('XWiki.TemplateProviderClass'))
-#set ($isEditing   = $xcontext.action == 'edit')
-## Javascript and CSS
-#if ($isEditing)
-  ## Use the JSX only in edit mode.
-  #set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
-#end
-#set ($discard = $xwiki.ssx.use('XWiki.TemplateProviderSheet'))
-## Hierarchy macros needed to display the restrictions. Evaluate the template in a string to discard the junk empty
-## lines it would produce since the template is written for html rendering.
-#set ($discard = "#template('hierarchy_macros.vm')")
+  <content>{{include reference="XWiki.TemplateProviderMacros" /}}
 
-##
-## Display the sheet.
-##
-{{html clean='false'}}
+{{velocity output="false"}}
+#macro (initializeTemplateProvider)
+  #if ($doc.name.endsWith('Provider'))
+    #set ($discard = $doc.set('template', $stringtool.removeEnd($doc.fullName, 'Provider').trim()))
+    #set ($templateName = $stringtool.removeEnd($doc.name, 'Provider').trim())
+    #set ($templateName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($templateName), ' '))
+    #set ($discard = $doc.set('name', $templateName))
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html clean="false"}}
+#set ($discard = $xwiki.ssx.use('XWiki.TemplateProviderMacros'))
+#set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderMacros'))
+#set ($discard = $doc.use('XWiki.TemplateProviderClass'))
+#if ($doc.isNew())
+  #initializeTemplateProvider
+#end
 &lt;div class="xform row templateProviderSheet"&gt;
   ##
   ## Left side
@@ -64,187 +67,77 @@
   &lt;div class="col-xs-12 col-md-6"&gt;
     &lt;dl&gt;
       ##
-      ## Title
+      ## Template Provider Title
       ##
       #if ($isEditing)
         &lt;dt&gt;
-          &lt;label for="title"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.name'))&lt;/label&gt;
+          &lt;label for="title"&gt;
+            $escapetool.xml($services.localization.render('xe.templateprovider.name'))
+          &lt;/label&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
-          &lt;input type="text" value="$!{escapetool.xml($doc.title)}" name="title" id="title" /&gt;
+          &lt;input type="text" value="$!escapetool.xml($doc.title)" name="title" id="title" /&gt;
         &lt;/dd&gt;
       #end
       ##
-      ## Name
+      ## Template Name
       ##
       &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_name"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename'))&lt;/label&gt;
+        &lt;label#if ($isEditing) for="XWiki.TemplateProviderClass_0_name"#end&gt;
+          $escapetool.xml($services.localization.render('xe.templateprovider.templatename'))
+        &lt;/label&gt;
         #if ($isEditing)
-          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename.info'))&lt;/span&gt;
+          &lt;span class="xHint"&gt;
+            $escapetool.xml($services.localization.render('xe.templateprovider.templatename.info'))
+          &lt;/span&gt;
         #end
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #if ($isEditing)
-          {{/html}}
-
-          {{html wiki='true' clean='false'}}$!providerObj.get('name'){{/html}}
-
-          {{html clean='false'}}
-        #else
-          &lt;p&gt;$!escapetool.xml($services.localization.render($providerObj.getValue('name')))&lt;/p&gt;
-        #end
-      &lt;/dd&gt;
-      ##
-      ## Template
-      ##
-      &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_template"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.template'))&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         #if ($isEditing)
-          &lt;input type="text" id="XWiki.TemplateProviderClass_0_template" name="XWiki.TemplateProviderClass_0_template" class="suggestDocuments"
-            size="30" autocomplete="off" value="$!{providerObj.getValue('template')}" /&gt;
+          #displayPropertyValue('name')
         #else
-          #set ($templateDocName = $providerObj.getValue('template'))
-          #if ("$!templateDocName" != '')
-            {{/html}}
-
-            {{html wiki='true' clean='false'}}[[$templateDocName&gt;&gt;$templateDocName]]{{/html}}
-
-            {{html clean='false'}}
-          #end
+          $!escapetool.xml($services.localization.render($doc.getValue('name')))
         #end
       &lt;/dd&gt;
       ##
-      ## Terminal page creation - Advanced user (both view and edit mode)
-      ##
-      #if ($isAdvancedUser || $isSuperAdmin)
-        &lt;dt&gt;
-          &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_terminal"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal'))&lt;/label&gt;
-          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal.hint'))&lt;/span&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-{{/html}}
-
-{{html wiki='true' clean='false'}}$!providerObj.get('terminal'){{/html}}
-
-{{html clean='false'}}
-        &lt;/dd&gt;
-      #end
-      ##
-      ## Action
+      ## Template Description
       ##
       &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_action"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action'))&lt;/label&gt;
+        &lt;label#if ($isEditing) for="XWiki.TemplateProviderClass_0_description"#end&gt;
+          $escapetool.xml($services.localization.render('administration.templateProvider.description'))
+        &lt;/label&gt;
         #if ($isEditing)
-          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action.info'))&lt;/span&gt;
+          &lt;span class="xHint"&gt;
+            $services.localization.render('administration.templateProvider.description.hint')
+          &lt;/span&gt;
         #end
       &lt;/dt&gt;
       &lt;dd&gt;
-{{/html}}
-
-{{html wiki='true' clean='false'}}$!providerObj.get('action'){{/html}}
-
-{{html clean='false'}}
-      &lt;/dd&gt;
-      ##
-      ## Description
-      ##
-      &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_description"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.description'))&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #if($isEditing)
-          {{/html}}
-
-          {{html wiki=true clean='false'}}
-            &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.description.hint')&lt;/span&gt;
-            $!providerObj.get('description')
-          {{/html}}
-
-          {{html clean='false'}}
+        #if ($isEditing)
+          #displayPropertyValue('description')
         #else
-          $!escapetool.xml($services.localization.render($!providerObj.getValue('description')))
+          $!escapetool.xml($services.localization.render($doc.getValue('description')))
         #end
       &lt;/dd&gt;
       ##
-      ## Icon
+      ## Template Icon
       ##
       &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_icon"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.icon'))&lt;/label&gt;
+        &lt;label#if($isEditing) for="XWiki.TemplateProviderClass_0_icon"#end&gt;
+          $escapetool.xml($services.localization.render('administration.templateProvider.icon'))
+        &lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;
+            $services.localization.render('administration.templateProvider.icon.hint', ['', ''])
+          &lt;/span&gt;
+        #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        #if($isEditing)
-          ## get the current IconTheme and create a link to it in order to see the full list of available icons
-          ## it would be great to use IconPicker, but it can't be used in edit mode.
-          #set ($currentIconTheme = $xwiki.getXWikiPreference('iconTheme'))
-          {{/html}}
-
-          {{html wiki='true' clean='false'}}
-            &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.icon.hint', ['[[', "&gt;&gt;${currentIconTheme}]]"])&lt;/span&gt;
-            $!providerObj.get('icon')
-          {{/html}}
-
-          {{html clean='false'}}
+        #if ($isEditing)
+          #displayPropertyValue('icon')
         #else
-          $services.icon.renderHTML($!providerObj.getValue('icon'))
+          $!services.icon.renderHTML($doc.getValue('icon'))
         #end
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-  &lt;/div&gt;
-  ##
-  ## Right side: enabled spaces
-  ##
-  &lt;div class="col-xs-12 col-md-6"&gt;
-    &lt;dl&gt;
-      ##
-      ## Creation Restrictions
-      ##
-      &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_creationRestrictions"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictions'))&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #if($isEditing)
-          {{/html}}
-
-          {{html wiki=true clean='false'}}
-            &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.creationRestrictions.hint')&lt;/span&gt;
-            $!providerObj.get('creationRestrictions')
-          {{/html}}
-
-          {{html clean='false'}}
-        #else
-          #set ($creationRestrictions = $providerObj.getValue('creationRestrictions'))
-          #if (!$creationRestrictions.isEmpty())
-            &lt;ul&gt;
-              ## Note: Sorting the list, in case they are not already sorted.
-              #foreach ($creationRestriction in $sorttool.sort($creationRestrictions))
-                #set ($spaceReference = $services.model.resolveSpace($creationRestriction))
-                &lt;li&gt;#hierarchy($spaceReference, { 'local' : true })&lt;/li&gt;
-              #end
-            &lt;/ul&gt;
-          #else
-            &lt;span&gt;$services.localization.render('administration.templateProvider.creationRestrictions.none')&lt;/span&gt;
-          #end
-        #end
-      &lt;/dd&gt;
-      ##
-      ## Creation Restrictions As Suggestions
-      ##
-      &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_creationSuggestion"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictionsAreSuggestions'))&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-          {{/html}}
-
-          {{html wiki=true clean='false'}}
-            #if($isEditing)
-              &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.creationRestrictionsAreSuggestions.hint')&lt;/span&gt;
-            #end
-            $!providerObj.creationRestrictionsAreSuggestions
-          {{/html}}
-
-          {{html clean='false'}}
       &lt;/dd&gt;
       ##
       ## Visibility Restrictions
@@ -252,46 +145,128 @@
       &lt;dt&gt;
         &lt;label&gt;$escapetool.xml($services.localization.render('xe.templateprovider.spaces'))&lt;/label&gt;
         #if ($isEditing)
-          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.spaces.info'))&lt;/span&gt;
+          &lt;span class="xHint"&gt;
+            $escapetool.xml($services.localization.render('xe.templateprovider.spaces.info'))
+          &lt;/span&gt;
         #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        #if ($isEditing)
-          ## We can`t just join the list values in the hidden DOM element without escaping the separator from each value first.
-          #set ($spacesEscapedValues = [])
-          #foreach ($spacesValue in $providerObj.getValue('visibilityRestrictions'))
-            #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
-          #end
-
-          &lt;input id="XWiki.TemplateProviderClass_0_visibilityRestrictions" name="XWiki.TemplateProviderClass_0_visibilityRestrictions"
-            value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
-
-          {{/html}}
-
-          {{html wiki='true' clean='false'}}
-            {{documentTree showTerminalDocuments='false' checkboxes='true' links='false' showTranslations='false' showAttachments='false' /}}
-          {{/html}}
-
-          {{html clean='false'}}
+        #set ($visibilityRestrictions = $doc.getValue('visibilityRestrictions'))
+        #if ($isEditing || ($visibilityRestrictions &amp;&amp; $visibilityRestrictions.size() &gt; 0))
+          #displayPathsPropertyValue('visibilityRestrictions')
         #else
-          #set ($spacesValues = $providerObj.getValue('visibilityRestrictions'))
-          #if ($spacesValues &amp;&amp; !$spacesValues.isEmpty())
-            &lt;ul&gt;
-              ## Note: Sorting the list, in case they are not already sorted.
-              #foreach ($spacesValue in $sorttool.sort($spacesValues))
-                #set ($spaceReference = $services.model.resolveSpace($spacesValue))
-                &lt;li&gt;#hierarchy($spaceReference, { 'local' : true })&lt;/li&gt;
-              #end
-            &lt;/ul&gt;
-          #else
-            $escapetool.xml($services.localization.render('xe.templateprovider.spaces.all'))
-          #end
+          $escapetool.xml($services.localization.render('xe.templateprovider.spaces.all'))
         #end
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
+  ##
+  ## Right side
+  ##
+  &lt;div class="col-xs-12 col-md-6"&gt;
+    &lt;dl&gt;
+      ##
+      ## Template Reference
+      ##
+      &lt;dt&gt;
+        &lt;label#if ($isEditing) for="XWiki.TemplateProviderClass_0_template"#end&gt;
+          $escapetool.xml($services.localization.render('xe.templateprovider.template'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #set ($template = $doc.getValue('template'))
+        #if ($isEditing)
+          &lt;input type="text" id="XWiki.TemplateProviderClass_0_template" name="XWiki.TemplateProviderClass_0_template"
+            class="suggestDocuments" autocomplete="off" value="$!escapetool.xml($template)" /&gt;
+        #elseif ("$!template" != '')
+          #set ($templateReference = $services.model.resolveDocument($template))
+          #hierarchy($templateReference {
+            'local': true,
+            'selfIsActive': false
+          })
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Creation Restrictions
+      ##
+      &lt;dt&gt;
+        &lt;label&gt;
+          $escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictions'))
+        &lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;
+            $services.localization.render('administration.templateProvider.creationRestrictions.hint')
+          &lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #set ($creationRestrictions = $doc.getValue('creationRestrictions'))
+        #if ($isEditing || ($creationRestrictions &amp;&amp; $creationRestrictions.size() &gt; 0))
+          #displayPathsPropertyValue('creationRestrictions')
+        #else
+          $escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictions.none'))
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Creation Restrictions As Suggestions
+      ##
+      &lt;dt&gt;
+        &lt;label&gt;
+          #if ($isEditing)
+            #displayPropertyValue('creationRestrictionsAreSuggestions')
+          #end
+          $escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictionsAreSuggestions'))
+        &lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;
+            $services.localization.render('administration.templateProvider.creationRestrictionsAreSuggestions.hint')
+          &lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if (!$isEditing)
+          #displayPropertyValue('creationRestrictionsAreSuggestions')
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Terminal page creation - Advanced user (both view and edit mode)
+      ##
+      #if ($isAdvancedUser || $isSuperAdmin)
+        &lt;dt&gt;
+          &lt;label#if ($isEditing) for="XWiki.TemplateProviderClass_0_terminal"#end&gt;
+            $escapetool.xml($services.localization.render('xe.templateprovider.terminal'))
+          &lt;/label&gt;
+          #if ($isEditing)
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('xe.templateprovider.terminal.hint'))
+            &lt;/span&gt;
+          #end
+        &lt;/dt&gt;
+        &lt;dd&gt;#displayPropertyValue('terminal')&lt;/dd&gt;
+      #else
+        &lt;dd&gt;#displayPropertyValue('terminal' 'hidden')&lt;/dd&gt;
+      #end
+      ##
+      ## Action
+      ##
+      &lt;dt&gt;
+        &lt;label#if ($isEditing) for="XWiki.TemplateProviderClass_0_action"#end&gt;
+          $escapetool.xml($services.localization.render('xe.templateprovider.action'))
+        &lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;
+            $escapetool.xml($services.localization.render('xe.templateprovider.action.info'))
+          &lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;#displayPropertyValue('action')&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+  #locationPickerModal
 &lt;/div&gt;
 {{/html}}
+
+{{iconPicker id="XWiki\\.TemplateProviderClass_0_icon" prefix="" /}}
 
 ##
 ## Go back to the administration
@@ -300,353 +275,5 @@
   (% class="buttonwrapper" %)
   [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=Templates')]]
 #end
-{{/velocity}}
-</content>
-  <object>
-    <name>XWiki.TemplateProviderSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>d5d86859-b40a-4566-8765-653581793652</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
-
-  // Reminder: 'tree' is a jQuery plugin and returns the jQuery instance itself when required.
-  require(['tree', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
-    /**
-     * Initialization method.
-     */
-    function initialize() {
-      addLiveValidations();
-      addEnabledSpacesTreeExtraConfiguration();
-    }
-
-    /**
-     * Add live validations
-     */
-    function addLiveValidations() {
-      if (typeof LiveValidation != 'undefined') {
-        var templateNameValidator = new LiveValidation($('#XWiki\\.TemplateProviderClass_0_name')[0], {
-          validMessage: "$escapetool.javascript($services.localization.render('core.validation.valid.message'))"
-        });
-        templateNameValidator.add(Validate.Presence, {
-          failureMessage: "$escapetool.javascript($services.localization.render('core.validation.required.message'))"
-        });
-      }
-    }
-
-    /**
-     * Configures the jsTree generated by the documentTree macro, initializes the checked values and adds the handlers
-     * for checking and unchecking tree nodes (documents).
-     */
-    function addEnabledSpacesTreeExtraConfiguration() {
-      var treeElement = $('.templateProviderSheet .xtree');
-      var dataElement = $('#XWiki\\.TemplateProviderClass_0_visibilityRestrictions');
-
-      // Extract the list of initially checked elements.
-      var savedIds = readSavedValues(dataElement.val());
-
-      // Wait for the tree to be ready (root children loaded).
-      treeElement.one('ready.jstree', function(event, data) {
-        var tree = $.jstree.reference(treeElement);
-
-        // Configure the tree to not cascade the check status when checking nodes.
-        // tree.settings.checkbox.three_state = false;
-        tree.settings.checkbox.cascade = '';
-
-        // Expand into view and check all the nodes that are initially supposed to be checked.
-        // The tree is lazy-loaded so we need to load the nodes before selecting them.
-        tree.openTo(savedIds, $.proxy(tree, 'select_node', savedIds));
-      });
-
-      // Listen to tree nodes being checked/unchecked and save the changes in the DOM to be saved on submit.
-      treeElement.on('changed.jstree', function(event, data) {
-        var node = data.node;
-        // Handle only document nodes. The tree can have other node types, such as Pagination nodes.
-        // We also check if the node is specified because the target of the 'changed.jstree' event is not always a
-        // single node (e.g. the event is also fired when calling tree.deselect_all()).
-        // TODO: Handle also the cases when the event target is a list of document nodes.
-        if (!node || node.id.substr(0, 9) != 'document:') {
-          return;
-        }
-        var initialNrOfNodes = savedIds.length;
-
-        // Update the savedIds list.
-        var savedIdIndex = savedIds.indexOf(node.id);
-        if (data.action == 'select_node') {
-          // If it's not in the list, add it.
-          if (savedIdIndex == -1) {
-            savedIds.push(node.id);
-          }
-        } else if (data.action == 'deselect_node') {
-          // If it's in the list, remove it.
-          if (savedIdIndex &gt; -1) {
-            savedIds.splice(savedIdIndex, 1);
-          }
-        }
-
-        // Save the list in the DOM, if nodes were added/removed.
-        if (initialNrOfNodes != savedIds.length) {
-          var serializedValues = serializeValues(savedIds);
-          dataElement.val(serializedValues);
-        }
-      });
-    }
-
-    function readSavedValues(savedValuesString) {
-      // Extract the list and transform local space references to space webhome references as IDs in the tree.
-      //
-      // When splitting by the separator char ('), we want to avoid values that contain the spliting char inside them, escaped.
-      // Trick: Since JavaScript does not support negative lookbehind regex "(?&lt;!\\)," we apply a negative lookahead ",(?!\\)" on the reversed string to properly split.
-      return reverseString(savedValuesString).split(/\s*,(?!\\)\s*/).map(function(refString) {
-        if (!refString) {
-          return refString;
-        }
-
-        // Unescape any input separator that might be part of the value and that was previously escaped when serialized in the hidden input element.
-        // Trick: Remember that we previously reverset the savedValuesString, so individual values need to be reversed back to make sense before unescaping.
-        refString = reverseString(refString).replace('\\,', ',');
-
-        // Transform the local space reference to an absolute document reference, for the Nested Pages tree to use as node ID.
-        refString = refString + '.WebHome';
-        var defaultValues = {};
-        defaultValues[XWiki.EntityType.WIKI] = xm.wiki;
-        var resolvedSpaceRef = XWiki.Model.resolve(refString, XWiki.EntityType.DOCUMENT, defaultValues);
-        var serializedSpaceRef = XWiki.Model.serialize(resolvedSpaceRef);
-
-        // Complete the tree node ID by adding the reference type prefix.
-        return 'document:' + serializedSpaceRef;
-      }).filter(function(id) {
-        return id;
-      });
-    }
-
-    function reverseString(initialString) {
-      return initialString.split('').reverse().join('');
-    }
-
-    function serializeValues(savedIds) {
-      return savedIds.map(function (id) {
-        // Transform the ID back to a local space reference string.
-        var refString = id.substring('document:'.length);
-        var reference = XWiki.Model.resolve(refString, XWiki.EntityType.DOCUMENT);
-        var wikiReference = reference.extractReference(XWiki.EntityType.WIKI);
-        var spaceReference = reference.extractReference(XWiki.EntityType.SPACE);
-        var localSpaceReference = spaceReference.relativeTo(wikiReference);
-
-        // Remember to escape the separator char "," from the serialized individual value.
-        return XWiki.Model.serialize(localSpaceReference).replace(/,/g, '\\,');
-      }).sort().join(',');
-    }
-
-    (XWiki.isInitialized ? initialize() : document.on('xwiki:dom:loaded', initialize));
-  });
-
-});</code>
-    </property>
-    <property>
-      <name>Javascript</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.TemplateProviderSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>46d40ee0-3464-4ac0-9295-b0f9c391cc91</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>6</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>3</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>1</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>5</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>4</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.templateProviderSheet .breadcrumb &gt; .active:last-of-type a {
-  color: @link-color;
-}
-
-.templateProviderSheet .breadcrumb {
-  margin-bottom: 0;
-  background-color: transparent;
-  border-radius: 0;
-  padding: 0;
-}</code>
-    </property>
-    <property>
-      <contentType>LESS</contentType>
-    </property>
-    <property>
-      <name>CSS</name>
-    </property>
-    <property>
-      <parse>0</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
+{{/velocity}}</content>
 </xwikidoc>

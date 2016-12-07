@@ -88,7 +88,7 @@ public class WikiIndexPage extends ExtendedViewPage
     }
 
     /**
-     * @since 8.4.2
+     * @since 8.4.3
      */
     public CreateWikiPage createWiki()
     {
@@ -97,7 +97,7 @@ public class WikiIndexPage extends ExtendedViewPage
     }
 
     /**
-     * @since 8.4.2
+     * @since 8.4.3
      */
     public DeleteWikiPage deleteWiki(String wikiName)
     {

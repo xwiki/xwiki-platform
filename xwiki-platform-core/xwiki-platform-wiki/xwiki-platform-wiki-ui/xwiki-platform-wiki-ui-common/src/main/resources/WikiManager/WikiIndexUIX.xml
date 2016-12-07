@@ -131,7 +131,8 @@
     </property>
     <property>
       <parameters>order=10000
-separator=true</parameters>
+separator=true
+category=global</parameters>
     </property>
     <property>
       <scope>wiki</scope>

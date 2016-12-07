@@ -75,6 +75,70 @@
         <values>edit|saveandedit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </action>
+      <creationRestrictions>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <idField/>
+        <multiSelect>1</multiSelect>
+        <name>creationRestrictions</name>
+        <number>9</number>
+        <picker>1</picker>
+        <prettyName>Creation Restrictions</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> ,</separator>
+        <separators>,</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <sql>select distinct doc.web, doc.title from XWikiDocument doc</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </creationRestrictions>
+      <creationRestrictionsAreSuggestions>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>creationRestrictionsAreSuggestions</name>
+        <number>10</number>
+        <prettyName>Creation Restrictions Are Suggestions</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </creationRestrictionsAreSuggestions>
+      <description>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>description</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </description>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
       <name>
         <customDisplay/>
         <disabled>0</disabled>
@@ -132,16 +196,52 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>terminal</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>terminal</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </terminal>
+      <visibilityRestrictions>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <idField/>
+        <multiSelect>1</multiSelect>
+        <name>visibilityRestrictions</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>Visibility Restrictions</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> ,</separator>
+        <separators>,</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </visibilityRestrictions>
     </class>
     <property>
       <action>edit</action>
+    </property>
+    <property>
+      <creationRestrictions/>
+    </property>
+    <property>
+      <creationRestrictionsAreSuggestions>0</creationRestrictionsAreSuggestions>
+    </property>
+    <property>
+      <description/>
+    </property>
+    <property>
+      <icon>file-text</icon>
     </property>
     <property>
       <name/>
@@ -154,6 +254,9 @@
     </property>
     <property>
       <terminal>0</terminal>
+    </property>
+    <property>
+      <visibilityRestrictions/>
     </property>
   </object>
 </xwikidoc>

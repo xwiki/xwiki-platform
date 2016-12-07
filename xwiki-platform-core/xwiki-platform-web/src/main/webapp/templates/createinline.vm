@@ -5,7 +5,7 @@
 ## * $name - the name to use for the new document, read from the "name" parameter
 ## * $isSpace - true if we are creating a non-terminal document ($name is the space name), false if we are
 ##              creating a terminal document ($name is the document name). Determined by the create action
-## * $availableTemplatesProviders - list of template provider documents available from the current space
+## * $availableTemplateProviders - list of template provider documents available from the current space
 ##
 ## Note: Make sure to use these bindings instead of directly using the request parameters, as the bindings
 ## also consider backwards compatibility and convert older "space" and "page" parameters if they are passed.
@@ -70,7 +70,7 @@
 
 ## ---------------------------------------------------------------------------------------------------------
 ## Note: The list of available template providers is computed in the action and set on the context under
-## the "availableTemplatesProviders" binding.
+## the "availableTemplateProviders" binding.
 ## ---------------------------------------------------------------------------------------------------------
 
 ## ---------------------------------------------------------------------------------------------------------

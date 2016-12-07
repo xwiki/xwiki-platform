@@ -414,10 +414,15 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
 
   var customTreeAPI = {
     openTo: function(nodeIds, callback) {
-      nodeIds = $.isArray(nodeIds) ? nodeIds : [nodeIds];
+      var isArray = $.isArray(nodeIds);
+      if (!isArray) {
+        nodeIds = [nodeIds];
+      }
       // Select the nodes if no callback is provided.
       callback = callback || $.proxy(this, 'select_node');
-      openToNodes(this, nodeIds).done(callback);
+      openToNodes(this, nodeIds).then(function(nodes) {
+        return isArray ? nodes : nodes[0];
+      }).done(callback);
     },
     refreshNode: function(node) {
       if (node === '#') {

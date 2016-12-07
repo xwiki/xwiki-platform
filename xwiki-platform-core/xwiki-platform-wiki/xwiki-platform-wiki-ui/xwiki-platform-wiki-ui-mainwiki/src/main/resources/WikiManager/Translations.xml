@@ -84,6 +84,7 @@ platform.wiki.dependencies.template.missing=The "Wiki Template" java component i
 platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 
 ## Create
+platform.wiki.create.button=Create Wiki
 platform.wiki.create.title=Create a new wiki
 platform.wiki.create.members=MEMBERS
 platform.wiki.create.prettyname.empty=Pretty name must not be empty

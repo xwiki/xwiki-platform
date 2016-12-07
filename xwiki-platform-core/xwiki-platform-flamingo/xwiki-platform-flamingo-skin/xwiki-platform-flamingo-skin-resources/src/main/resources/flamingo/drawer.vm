@@ -34,10 +34,6 @@
     ##
     <ul class="drawer-menu">
       ##
-      ## Languages
-      ##
-      #template('menus_language.vm')
-      ##
       ## Local Category
       ##
       #drawerCategoryHeader($services.wiki.currentWikiDescriptor.prettyName)
@@ -63,6 +59,10 @@
       ## Global category
       ##
       #drawerCategoryHeader($services.localization.render('core.drawer.global'))
+      ##
+      ## Languages
+      ##
+      #template('menus_language.vm')
       ##
       ## UIX: Drawer items for the global scope
       ##

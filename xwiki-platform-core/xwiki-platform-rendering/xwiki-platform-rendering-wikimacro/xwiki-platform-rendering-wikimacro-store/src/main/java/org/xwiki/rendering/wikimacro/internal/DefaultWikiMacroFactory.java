@@ -313,7 +313,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                                 .getWiki()
                                 .getRightService()
                                 .hasAccessLevel("admin", this.serializer.serialize(authorReference),
-                                    doc.getDocumentReference().getWikiReference().getName() + "XWiki.XWikiPreferences",
+                                    doc.getDocumentReference().getWikiReference().getName() + ":XWiki.XWikiPreferences",
                                     xcontext);
                     } else {
                         isAllowed = xcontext.getWiki().getRightService().hasWikiAdminRights(xcontext);

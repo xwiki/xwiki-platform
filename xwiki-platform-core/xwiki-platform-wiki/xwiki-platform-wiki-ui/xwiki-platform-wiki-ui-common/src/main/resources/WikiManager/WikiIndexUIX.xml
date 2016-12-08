@@ -124,7 +124,7 @@
 </content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.drawer.global</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.drawer</extensionPointId>
     </property>
     <property>
       <name>org.xwiki.plaftorm.wiki.ui.wikindex</name>

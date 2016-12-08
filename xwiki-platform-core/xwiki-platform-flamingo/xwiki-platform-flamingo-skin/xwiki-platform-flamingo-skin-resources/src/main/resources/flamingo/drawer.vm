@@ -33,6 +33,7 @@
     ## Display the content of the drawer
     ##
     <ul class="drawer-menu">
+      #set ($drawerExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.drawer', {'sortByParameter' : 'order'}))
       ##
       ## Local Category
       ##
@@ -54,7 +55,7 @@
       ##
       ## UIX: Drawer items for the current wiki
       ##
-      #displayDrawerUIX('org.xwiki.plaftorm.drawer')
+      #displayTheseDrawerUIX($drawerExtensions, 'local')
       ##
       ## Global category
       ##
@@ -66,7 +67,7 @@
       ##
       ## UIX: Drawer items for the global scope
       ##
-      #displayDrawerUIX('org.xwiki.plaftorm.drawer.global', 'global')
+      #displayTheseDrawerUIX($drawerExtensions, 'global')
     </ul>
   </nav>
 </div>
@@ -77,11 +78,20 @@
  * @param $category the name of the category to filter on (by default, it fallbacks on "local")
  *#
 #macro(displayDrawerUIX $name $category)
+  #displayTheseDrawerUIX($services.uix.getExtensions($name, {'sortByParameter' : 'order'}), $category)
+#end
+#**
+ * Display the UI extensions.
+ *
+ * @param $extensions a list of extensions to display
+ * @param $category the name of the category to filter on (by default, it fallbacks on "local")
+ *#
+#macro(displayTheseDrawerUIX $extensions $category)
   #set ($canHaveMenuSeparator = false)
   #if ("$!category" == '')
     #set ($category = 'local')
   #end
-  #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
+  #foreach($uix in $extensions)
     #set ($uixCategory = "$!uix.parameters.category")
     #if (($uixCategory == $category || $category == 'local' && $uixCategory == '') && $services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       #if ("$!uix.getParameters().separator" == 'true' && $canHaveMenuSeparator)

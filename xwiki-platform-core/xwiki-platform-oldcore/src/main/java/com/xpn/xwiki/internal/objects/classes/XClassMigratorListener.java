@@ -50,7 +50,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * Listen to classes modifications and automatically update objects accordingly when needed.
  * <p>
  * The actual conversion is done in {@link PropertyConverter}.
- * 
+ *
  * @version $Id$
  * @since 7.1RC1
  */
@@ -172,16 +172,16 @@ public class XClassMigratorListener extends AbstractEventListener
             if (property != null && property.getClass() != newProperty.getClass()) {
                 BaseProperty<?> convertedProperty = this.propertyConverter.convertProperty(property, newPropertyClass);
 
-                // Mark old field for removal
-                xobject.removeField(propertyReference.getName());
-
                 // Set new field
-                // Don't set the new property if it's null (it means the property is not set).
                 if (convertedProperty != null) {
-                    xobject.safeput(propertyReference.getName(), convertedProperty);
-                }
+                    // Mark old field for removal, only if the conversion was successful, to avoid losing data.
+                    xobject.removeField(propertyReference.getName());
 
-                modified = true;
+                    // Don't set the new property if it's null (it means the property is not set).
+                    xobject.safeput(propertyReference.getName(), convertedProperty);
+
+                    modified = true;
+                }
             }
         }
 

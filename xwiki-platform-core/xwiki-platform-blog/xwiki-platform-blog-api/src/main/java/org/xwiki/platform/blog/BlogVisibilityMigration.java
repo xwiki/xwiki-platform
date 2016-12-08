@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  *
  * @since 9.0RC1
- * @since 8.4.2
+ * @since 8.4.3
  * @since 7.4.6
  */
 @Role

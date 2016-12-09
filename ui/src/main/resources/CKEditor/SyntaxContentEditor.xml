@@ -39,7 +39,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
+  <content>{{include reference="CKEditor.VelocityMacros"/}}
+
+{{template name="editors/xdom_macros.vm"/}}
+
+{{velocity}}
+{{html clean="false"}}
+#if ($edit)
+  ## Requires XWiki 8.2RC1+
+  #getTextArea
+  #if ($services.wysiwyg.isSyntaxSupported($syntaxId))
+    #set ($discard = $textArea.attributes.put('data-sourceDocumentReference', $edit.parameters.sourceDocumentReference))
+    #ckeditor($textArea)
+  #else
+    ## Fall back on a plain text area.
+    #printTextArea($textArea)
+  #end
+#end
+{{/html}}
+{{/velocity}}</content>
   <object>
     <name>CKEditor.SyntaxContentEditor</name>
     <number>0</number>
@@ -122,23 +140,7 @@
       <category>wysiwyg</category>
     </property>
     <property>
-      <code>{{include reference="CKEditor.VelocityMacros"/}}
-
-{{template name="editors/xdom_macros.vm"/}}
-
-{{velocity}}
-{{html clean="false"}}
-## Requires XWiki 8.2RC1+
-#getTextArea
-#if ($services.wysiwyg.isSyntaxSupported($syntaxId))
-  #set ($discard = $textArea.attributes.put('data-sourceDocumentReference', $edit.parameters.sourceDocumentReference))
-  #ckeditor($textArea)
-#else
-  ## Fall back on a plain text area.
-  #printTextArea($textArea)
-#end
-{{/html}}
-{{/velocity}}</code>
+      <code>{{include reference="CKEditor.SyntaxContentEditor"/}}</code>
     </property>
     <property>
       <dataType>org.xwiki.rendering.syntax.SyntaxContent</dataType>

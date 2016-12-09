@@ -122,10 +122,7 @@
       <category>wysiwyg</category>
     </property>
     <property>
-      <code>{{velocity}}
-#set ($syntaxContentEditor = $xwiki.getDocument('CKEditor.SyntaxContentEditor'))
-$syntaxContentEditor.display('code', 'view')
-{{/velocity}}</code>
+      <code>{{include reference="CKEditor.SyntaxContentEditor"/}}</code>
     </property>
     <property>
       <dataType>org.xwiki.rendering.block.XDOM</dataType>

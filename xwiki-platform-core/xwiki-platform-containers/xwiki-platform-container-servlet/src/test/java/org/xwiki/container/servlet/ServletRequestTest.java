@@ -115,4 +115,21 @@ public class ServletRequestTest
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("value", result.get(0));
     }
+
+    @Test
+    public void getPropertiesWhenNoValueSetAsRequestAttribute()
+    {
+        final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
+        this.mockery.checking(new Expectations() {{
+            oneOf(httpRequest).getParameterValues("key");
+                will(returnValue("value"));
+            oneOf(httpRequest).getAttribute("key");
+                will(returnValue(null));
+        }});
+
+        ServletRequest request = new ServletRequest(httpRequest);
+        List<Object> result = request.getProperties("key");
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("value", result.get(0));
+    }
 }

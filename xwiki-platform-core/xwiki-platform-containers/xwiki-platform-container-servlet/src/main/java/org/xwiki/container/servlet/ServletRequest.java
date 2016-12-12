@@ -65,7 +65,10 @@ public class ServletRequest implements Request
         if (requestParameters != null) {
             result.addAll(Arrays.asList(requestParameters));
         }
-        result.add(this.httpServletRequest.getAttribute(key));
+        Object attributeValue = this.httpServletRequest.getAttribute(key);
+        if (attributeValue != null) {
+            result.add(attributeValue);
+        }
 
         return result;
     }

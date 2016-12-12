@@ -601,33 +601,20 @@ $namespace##
     ## Display any incompatibility errors
     #set ($jobStatusCollapsed = false)
     #if ($jobStatus.state == 'FINISHED')
-      ## Check if there are any logged errors.
-      #foreach ($log in $jobStatus.log.getLogs('ERROR'))
-        #if ($log.throwable && $exceptiontool.getRootCauseMessage($log.throwable).contains('not compatible'))
-          #set ($jobStatusCollapsed = true)
-          #set ($errorMessage = $services.localization.render('platform.extension.info.error.versionNotCompatible'))
-          #set ($errorMessage = "${errorMessage}<br/>")
-          #set ($errorMessage = "${errorMessage}${services.localization.render('platform.extension.info.error.versionNotCompatibleHint')}")
-          <p>#error($errorMessage)</p>
-          #break
-        #end
-      #end
+      #if ($jobStatus.error && $exceptiontool.getRootCauseMessage($jobStatus.error).contains('not compatible'))
+        #set ($jobStatusCollapsed = true)
+        #set ($errorMessage = $services.localization.render('platform.extension.info.error.versionNotCompatible'))
+        #set ($errorMessage = "${errorMessage}<br/>")
+        #set ($errorMessage = "${errorMessage}${services.localization.render('platform.extension.info.error.versionNotCompatibleHint')}")
+        <p>#error($errorMessage)</p>
+      #end      
     #end
     #displayJobStatusLog($jobStatus, $jobStatusCollapsed)
   #end
 #end
 
 #macro (isExtensionPlan $jobStatus $return)
-  #set ($isExtensionPlan = $jobStatus.state == 'FINISHED' && $jobStatus.actions)
-  #if ($isExtensionPlan)
-    ## Check if there are any logged errors.
-    #foreach($log in $jobStatus.log)
-      #if ($log.level.name() == 'ERROR')
-        #set ($isExtensionPlan = false)
-        #break
-      #end
-    #end
-  #end
+  #set ($isExtensionPlan = $jobStatus.state == 'FINISHED' && $jobStatus.actions && !$jobStatus.error)
   #set ($return = $NULL)
   #setVariable ("$return" $isExtensionPlan)
 #end
@@ -1465,15 +1452,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
 #end
 
 #macro (displayExtensionUpdaterPlan $plan)
-  #set($hasError = false)
-  #foreach($log in $plan.log)
-    #if ($log.level.name() == 'ERROR')
-      #set($hasError = true)
-      #break
-    #end
-  #end
-  ##
-  #if ($hasError)
+  #if ($plan.error)
     #displayExtensionUpdaterPlanStatus($plan)
   #else
     ## Group extensions by status (invalid/outdated) and by namespace.

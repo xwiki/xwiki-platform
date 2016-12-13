@@ -59,15 +59,20 @@
       ##
       ## Global category
       ##
-      #drawerCategoryHeader($services.localization.render('core.drawer.global'))
-      ##
-      ## Languages
-      ##
-      #template('menus_language.vm')
-      ##
-      ## UIX: Drawer items for the global scope
-      ##
-      #displayTheseDrawerUIX($drawerExtensions, 'global')
+      #define ($globalPart)
+        ##
+        ## Languages
+        ##
+        #template('menus_language.vm')
+        ##
+        ## UIX: Drawer items for the global scope
+        ##
+        #displayTheseDrawerUIX($drawerExtensions, 'global')
+      #end
+      #if ($stringtool.isNotBlank($globalPart.toString()))
+        #drawerCategoryHeader($services.localization.render('core.drawer.global'))
+        $globalPart
+      #end
     </ul>
   </nav>
 </div>

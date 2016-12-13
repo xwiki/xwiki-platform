@@ -64,10 +64,10 @@ public class BlogUpgradeEventListener extends AbstractEventListener
     private static final String EXTENSION_ID = "org.xwiki.platform:xwiki-platform-blog-ui";
 
     /**
-     * The visibility is synchronized since 7.4.6, 8.4.2 and 9.0RC1, so we do the migration only if the previous
+     * The visibility is synchronized since 7.4.6, 8.4.3 and 9.0RC1, so we do the migration only if the previous
      * version was anterior, ie matches the following constraint.
      */
-    private static final VersionConstraint VERSION_CONSTRAINT = new DefaultVersionConstraint("(,7.4.6),[8.0,8.4.2)");
+    private static final VersionConstraint VERSION_CONSTRAINT = new DefaultVersionConstraint("(,7.4.6),[8.0,8.4.3)");
 
     @Inject
     private BlogVisibilityMigration blogVisibilityMigration;

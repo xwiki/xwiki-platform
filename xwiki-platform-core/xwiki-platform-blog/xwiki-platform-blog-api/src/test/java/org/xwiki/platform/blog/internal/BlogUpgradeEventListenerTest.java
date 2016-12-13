@@ -103,9 +103,9 @@ public class BlogUpgradeEventListenerTest
     }
 
     @Test
-    public void onEventWithVersion842() throws Exception
+    public void onEventWithVersion843() throws Exception
     {
-        testWithVersion("8.4.2", false);
+        testWithVersion("8.4.3", false);
     }
 
     @Test

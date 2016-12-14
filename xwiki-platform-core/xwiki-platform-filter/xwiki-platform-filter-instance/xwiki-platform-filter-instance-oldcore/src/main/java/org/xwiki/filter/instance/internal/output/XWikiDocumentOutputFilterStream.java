@@ -461,6 +461,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
             }
             attachment.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
             attachment.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
+            attachment.setMimeType(getString(WikiAttachmentFilter.PARAMETER_MIMETYPE, parameters, null));
 
             String revisions = getString(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
             if (revisions != null) {

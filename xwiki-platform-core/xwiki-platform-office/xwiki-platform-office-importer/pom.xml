@@ -108,12 +108,6 @@
       <artifactId>jdatauri</artifactId>
       <version>1.0</version>
     </dependency>
-    <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
-    <dependency>
-      <groupId>org.gagravarr</groupId>
-      <artifactId>vorbis-java-core</artifactId>
-      <version>0.1</version>
-    </dependency>
     <!-- Replace a runtime transitive dependency of tika-parsers because it includes old bcprov/bcmail classes. -->
     <dependency>
       <groupId>org.bouncycastle</groupId>

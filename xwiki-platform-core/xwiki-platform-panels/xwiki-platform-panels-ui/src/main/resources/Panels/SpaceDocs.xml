@@ -127,9 +127,9 @@
 #if ($hasAdmin)
   {{warning}}Deprecated: Replace with [[Children&gt;&gt;Panels.Children]] or [[Siblings&gt;&gt;Panels.Siblings]] Panels{{/warning}}
 #end
-#foreach ($docName in $services.query.xwql('where doc.space = :space order by doc.fullName').bindValue('space', $doc.space).addFilter('hidden').addFilter('unique').execute())
-  * [[$docName]]
-#end
+
+{{documentTree root="space:$services.model.serialize($doc.documentReference.lastSpaceReference, 'default')" showSpaces="true" compact="true" showDocumentTitle="false" showTranslations="false" /}}
+
 #panelfooter()
 {{/velocity}}</content>
     </property>

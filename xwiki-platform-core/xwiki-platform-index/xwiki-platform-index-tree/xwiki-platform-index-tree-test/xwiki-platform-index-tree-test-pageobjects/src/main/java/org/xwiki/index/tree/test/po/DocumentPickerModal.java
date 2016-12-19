@@ -41,7 +41,12 @@ public class DocumentPickerModal extends BaseElement
 
     public DocumentPickerModal()
     {
-        this.container = getDriver().findElement(By.cssSelector(".location-picker .modal.fade.in"));
+        this(By.cssSelector(".location-picker .modal.fade.in"));
+    }
+
+    public DocumentPickerModal(By selector)
+    {
+        this.container = getDriver().findElementWithoutWaiting(selector);
 
         this.waitForIt();
     }
@@ -57,11 +62,13 @@ public class DocumentPickerModal extends BaseElement
     public void cancel()
     {
         this.container.findElement(By.className("btn-default")).click();
+        waitToClose();
     }
 
     public void select()
     {
         this.container.findElement(By.className("btn-primary")).click();
+        waitToClose();
     }
 
     public void selectDocument(String... path)
@@ -90,6 +97,25 @@ public class DocumentPickerModal extends BaseElement
         // Wait for the document tree to load.
         getTree().waitForIt();
 
+        return this;
+    }
+
+    /**
+     * The modal may have a fade out effect on close which means it may not disappear instantly. It's safer to wait for
+     * the modal to disappear when closed, before proceeding with next actions.
+     * 
+     * @return this model
+     */
+    public DocumentPickerModal waitToClose()
+    {
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                return !container.isDisplayed();
+            }
+        });
         return this;
     }
 

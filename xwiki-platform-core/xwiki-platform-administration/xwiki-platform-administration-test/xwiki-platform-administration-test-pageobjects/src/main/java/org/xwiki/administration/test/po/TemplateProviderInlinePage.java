@@ -19,23 +19,13 @@
  */
 package org.xwiki.administration.test.po;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.index.tree.test.po.DocumentTreeElement;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.Select;
-import org.xwiki.tree.test.po.TreeElement;
-import org.xwiki.tree.test.po.TreeNodeElement;
 
 /**
  * Represents a template provider page in inline mode
@@ -64,13 +54,14 @@ public class TemplateProviderInlinePage extends InlinePage
     @FindBy(name = "XWiki.TemplateProviderClass_0_action")
     private WebElement templateActionSelect;
 
-    @FindBy(name = "XWiki.TemplateProviderClass_0_creationRestrictions")
-    private WebElement creationRestrictionsInput;
+    private LocationPicker creationRestrictionsPicker =
+        new LocationPicker("XWiki.TemplateProviderClass_0_creationRestrictions");
 
     @FindBy(name = "XWiki.TemplateProviderClass_0_creationRestrictionsAreSuggestions")
     private WebElement creationRestrictionsAreSuggestionsCheckbox;
 
-    private DocumentTreeElement spacesTree;
+    private LocationPicker visibilityRestrictionsPicker =
+        new LocationPicker("XWiki.TemplateProviderClass_0_visibilityRestrictions");
 
     public String getTemplateName()
     {
@@ -132,31 +123,13 @@ public class TemplateProviderInlinePage extends InlinePage
         select.selectByValue(value);
     }
 
-    public TreeElement getSpacesTree()
-    {
-        if (this.spacesTree == null) {
-            this.spacesTree =
-                new DocumentTreeElement(this.getDriver().findElement(By.cssSelector(".templateProviderSheet .xtree")))
-                    .waitForIt();
-        }
-
-        return this.spacesTree;
-    }
-
     /**
      * @return the list of spaces
      * @since 8.2M3 (renamed from getSpaces)
      */
     public List<String> getVisibilityRestrictions()
     {
-        List<String> spaces = new ArrayList<String>();
-
-        for (String nodeID : getSpacesTree().getNodeIDs()) {
-            String space = getSpaceFromNodeID(nodeID);
-            spaces.add(space);
-        }
-
-        return spaces;
+        return this.visibilityRestrictionsPicker.getValue();
     }
 
     /**
@@ -165,31 +138,7 @@ public class TemplateProviderInlinePage extends InlinePage
      */
     public void setVisibilityRestrictions(List<String> spaces)
     {
-        // Clean any existing selection.
-        List<String> selectedNodeIDs = getSpacesTree().getSelectedNodeIDs();
-        for (String selectedSpaceID : selectedNodeIDs) {
-            getSpacesTree().getNode(selectedSpaceID).deselect();
-        }
-
-        // Open to and select the given spaces.
-        for (final String space : spaces) {
-            String nodeId = getNodeIDFromSpace(space);
-
-            getSpacesTree().openTo(nodeId);
-
-            // Wait for the selection to get registered by the template provider UI javascript code.
-            getDriver().waitUntilCondition(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(WebDriver input)
-                {
-                    return getDriver()
-                        .findElementWithoutWaiting(
-                            By.xpath("//input[@id='XWiki.TemplateProviderClass_0_visibilityRestrictions' and contains(@value, '"
-                                + space + "')]"));
-                }
-            });
-        }
+        this.visibilityRestrictionsPicker.setValue(spaces);
     }
 
     /**
@@ -198,10 +147,7 @@ public class TemplateProviderInlinePage extends InlinePage
      */
     public void setCreationRestrictions(List<String> spaces)
     {
-        String value = StringUtils.join(spaces.toArray());
-
-        this.creationRestrictionsInput.clear();
-        this.creationRestrictionsInput.sendKeys(value);
+        this.creationRestrictionsPicker.setValue(spaces);
     }
 
     /**
@@ -210,71 +156,7 @@ public class TemplateProviderInlinePage extends InlinePage
      */
     public List<String> getCreationRestrictions()
     {
-        String value = this.creationRestrictionsInput.getAttribute("value");
-        List<String> values = Arrays.asList(value.split(","));
-
-        return values;
-    }
-
-    /**
-     * @return the list of _actually_ checked spaces. If none is checked it actually means that the template is
-     *         available in all spaces
-     */
-    public List<String> getSelectedSpaces()
-    {
-        List<String> selectedSpaces = new ArrayList<String>();
-
-        List<String> selectedNodeIDs = getSpacesTree().getSelectedNodeIDs();
-        for (String selectedNodeID : selectedNodeIDs) {
-            String spaceLocalSerializedReference = getSpaceFromNodeID(selectedNodeID);
-            selectedSpaces.add(spaceLocalSerializedReference);
-        }
-
-        return selectedSpaces;
-    }
-
-    private String getNodeIDFromSpace(String space)
-    {
-        EntityReference spaceReference = getUtil().resolveDocumentReference(String.format("%s.WebHome", space));
-        String nodeId = getUtil().serializeReference(spaceReference);
-        nodeId = String.format("document:%s", nodeId);
-        return nodeId;
-    }
-
-    private String getSpaceFromNodeID(String selectedNodeId)
-    {
-        String selectedNodeIdReferenceString = selectedNodeId.substring("document:".length());
-        EntityReference nodeReference = getUtil().resolveDocumentReference(selectedNodeIdReferenceString);
-        nodeReference = nodeReference.removeParent(nodeReference.extractReference(EntityType.WIKI));
-        nodeReference = nodeReference.extractReference(EntityType.SPACE);
-
-        String spaceLocalSerializedReference = getUtil().serializeReference(nodeReference);
-        return spaceLocalSerializedReference;
-    }
-
-    /**
-     * Sets all spaces besides the ones passed in the list.
-     *
-     * @param spaces the spaces to exclude
-     */
-    public void excludeSpaces(List<String> spaces)
-    {
-        List<String> selectedSpaces = getSelectedSpaces();
-
-        // Go through each (loaded) node in the tree.
-        List<String> nodeIDs = getSpacesTree().getNodeIDs();
-        for (String nodeId : nodeIDs) {
-            TreeNodeElement node = getSpacesTree().getNode(nodeId);
-
-            if (spaces.contains(getSpaceFromNodeID(nodeId))) {
-                // If its in the list, deselect it.
-                node.deselect();
-            } else if (selectedSpaces.size() == 0 || spaces.containsAll(selectedSpaces)) {
-                // If its not in the list, but if there would be no selections left in the tree after the exclusion
-                // operation, select it, for the exclusion to still make sense.
-                node.select();
-            }
-        }
+        return this.creationRestrictionsPicker.getValue();
     }
 
     /**

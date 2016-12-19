@@ -116,7 +116,12 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
         // Note that deleting or moving the existing node may not be allowed by #validateOperation().
         if (!tree.get_node(this)) {
           tree.create_node(parent, this, position + index, index === 0 && function(firstChild) {
-            tree.select_node(firstChild);
+            // Focus the first node in order to resume the keyboard navigation. We don't select the node because the
+            // tree can be used as a picker and we don't want to modify the selection when performing the pagination.
+            // Focusing the node right away doesn't always work so we do it after the current event is handled.
+            setTimeout(function() {
+              tree.get_node(firstChild, true).find('.jstree-anchor').first().focus();
+            }, 0);
           });
         }
       });

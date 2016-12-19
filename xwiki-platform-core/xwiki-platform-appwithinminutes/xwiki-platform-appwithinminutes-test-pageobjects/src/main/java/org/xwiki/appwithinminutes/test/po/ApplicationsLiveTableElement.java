@@ -71,9 +71,9 @@ public class ApplicationsLiveTableElement extends LiveTableElement
 
     public ApplicationHomePage viewApplication(String... path)
     {
-        String escapedPath = join(path).replace("'", "''");
+        String escapedPath = getUtil().escapeXPath(join(path));
         getDriver().findElementWithoutWaiting(
-            By.xpath("//td[contains(@class, 'doc_space')]/a[. = '" + escapedPath + "']")).click();
+            By.xpath("//td[contains(@class, 'doc_space')]/a[. = " + escapedPath + "]")).click();
         return new ApplicationHomePage();
     }
 

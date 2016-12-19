@@ -1593,6 +1593,23 @@ public class TestUtils
         return encodedURL;
     }
 
+    /**
+     * Usage example:
+     * 
+     * <pre>
+     * {@code
+     * By.xpath("//a[. = " + escapeXPath(value) + "]")
+     * }
+     * </pre>
+     * 
+     * @param value the value to escape
+     * @return the escaped value
+     */
+    public String escapeXPath(String value)
+    {
+        return "concat('" + value.replace("'", "', \"'\", '") + "', '')";
+    }
+
     public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
     {
         return getInputStream(getBaseURL(), path, queryParams);

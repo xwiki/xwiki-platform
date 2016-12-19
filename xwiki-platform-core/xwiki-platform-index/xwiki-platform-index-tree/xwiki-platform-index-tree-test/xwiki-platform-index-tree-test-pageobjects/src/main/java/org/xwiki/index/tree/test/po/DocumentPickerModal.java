@@ -41,7 +41,7 @@ public class DocumentPickerModal extends BaseElement
 
     public DocumentPickerModal()
     {
-        this(By.cssSelector(".location-picker .modal.fade.in"));
+        this(By.cssSelector(".location-picker .modal"));
     }
 
     public DocumentPickerModal(By selector)

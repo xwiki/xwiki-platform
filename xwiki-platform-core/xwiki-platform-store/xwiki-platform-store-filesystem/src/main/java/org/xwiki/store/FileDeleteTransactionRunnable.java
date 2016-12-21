@@ -82,6 +82,7 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      *
      * @see StartableTransactionRunnable#onPreRun()
      */
+    @Override
     protected void onPreRun() throws IOException
     {
         this.lock.writeLock().lock();
@@ -89,6 +90,7 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
         this.preRunComplete = true;
     }
 
+    @Override
     protected void onRun() throws IOException
     {
         if (this.toDelete.exists()) {
@@ -113,6 +115,7 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      *
      * @see StartableTransactionRunnable#onRollback()
      */
+    @Override
     protected void onRollback()
     {
         // If this is false then we know run() has not yet happened and we know there is nothing to do.
@@ -156,6 +159,7 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      *
      * @see StartableTransactionRunnable#onComplete()
      */
+    @Override
     protected void onComplete() throws IOException
     {
         if (!this.preRunComplete) {

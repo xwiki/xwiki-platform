@@ -697,6 +697,7 @@
                 **/i18n/i18n.java,
                 **/internal/DefaultCoreConfiguration.java,
                 **/internal/DefaultXWikiStubContextProvider.java,
+                **/internal/file/TemporaryFile.java,
                 **/internal/filter/XWikiDocumentFilterUtils.java,
                 **/internal/filter/input/DocumentInstanceInputEventGenerator.java,
                 **/internal/filter/input/XWikiDocumentLocaleEventGenerator.java,

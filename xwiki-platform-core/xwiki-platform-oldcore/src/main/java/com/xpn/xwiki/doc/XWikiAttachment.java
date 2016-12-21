@@ -20,10 +20,9 @@
 package com.xpn.xwiki.doc;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,25 +30,25 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
-import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MediaType;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.dom.DOMDocument;
-import org.dom4j.dom.DOMElement;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
+import org.dom4j.io.DocumentResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.filter.input.StringInputSource;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.filter.xml.output.DefaultResultOutputTarget;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -63,7 +62,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.xml.DOMXMLWriter;
+import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
@@ -465,19 +464,13 @@ public class XWikiAttachment implements Cloneable
     public String toStringXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
         throws XWikiException
     {
-        // This is very bad. baos holds the entire attachment on the heap, then it makes a copy when toByteArray
-        // is called, then String forces us to make a copy when we construct a new String.
-        // Unfortunately this can't be fixed because jrcs demands the content as a String.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            XMLWriter wr = new XMLWriter(baos, new OutputFormat("", true, context.getWiki().getEncoding()));
-            Document doc = new DOMDocument();
-            wr.writeDocumentStart(doc);
-            toXML(wr, bWithAttachmentContent, bWithVersions, context);
-            wr.writeDocumentEnd(doc);
-            return baos.toString();
+            StringWriter writer = new StringWriter();
+            toXML(new DefaultWriterOutputTarget(writer), bWithAttachmentContent, bWithVersions, true, context);
+            return writer.toString();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to write attachment XML", e);
+
             return "";
         }
     }
@@ -507,72 +500,48 @@ public class XWikiAttachment implements Cloneable
     public void toXML(XMLWriter wr, boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
         throws IOException, XWikiException
     {
-        // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter for retro
-        // compatibility reasons
+        // IMPORTANT: we don't use directly XMLWriter's SAX apis here because it's not really working well
+        DocumentResult domResult = new DocumentResult();
 
-        Element docel = new DOMElement("attachment");
-        wr.writeOpen(docel);
+        toXML(new DefaultResultOutputTarget(domResult), bWithAttachmentContent, bWithVersions, true, context);
 
-        Element el = new DOMElement("filename");
-        el.addText(getFilename());
-        wr.write(el);
+        wr.write(domResult.getDocument().getRootElement());
+    }
 
-        el = new DOMElement("filesize");
-        el.addText(String.valueOf(getFilesize()));
-        wr.write(el);
+    /**
+     * Write an XML representation of the attachment into an {@link com.xpn.xwiki.internal.xml.XMLWriter}
+     *
+     * @param out the output where to write the XML
+     * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
+     * @param bWithVersions if true, all archive version is also included
+     * @param format true if the XML should be formated
+     * @param context current XWikiContext
+     * @throws IOException when an error occurs during streaming operation
+     * @throws XWikiException when an error occurs during xwiki operation
+     * @since 9.0RC1
+     */
+    public void toXML(OutputTarget out, boolean bWithAttachmentContent, boolean bWithVersions, boolean format,
+        XWikiContext context) throws IOException, XWikiException
+    {
+        // Input
+        DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
+        documentProperties.setWithWikiAttachments(bWithAttachmentContent);
+        documentProperties.setWithJRCSRevisions(bWithVersions);
+        documentProperties.setWithRevisions(false);
 
-        if (StringUtils.isNotEmpty(getMimeType())) {
-            el = new DOMElement("mimetype");
-            el.addText(getMimeType());
-            wr.write(el);
+        // Output
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setPreserveVersion(bWithVersions);
+        xarProperties.setEncoding(context.getWiki().getEncoding());
+        xarProperties.setFormat(format);
+
+        try {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, out, xarProperties,
+                documentProperties);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
         }
-
-        el = new DOMElement("author");
-        el.addText(getAuthor());
-        wr.write(el);
-
-        long d = getDate().getTime();
-        el = new DOMElement("date");
-        el.addText(String.valueOf(d));
-        wr.write(el);
-
-        el = new DOMElement("version");
-        el.addText(getVersion());
-        wr.write(el);
-
-        el = new DOMElement("comment");
-        el.addText(getComment());
-        wr.write(el);
-
-        if (bWithAttachmentContent) {
-            el = new DOMElement("content");
-            // We need to make sure content is loaded
-            loadContent(context);
-            XWikiAttachmentContent acontent = getAttachment_content();
-            if (acontent != null) {
-                try (InputStream stream = acontent.getContentInputStream()) {
-                    wr.writeBase64(el, stream);
-                }
-            } else {
-                el.addText("");
-                wr.write(el);
-            }
-        }
-
-        if (bWithVersions) {
-            // We need to make sure content is loaded
-            XWikiAttachmentArchive aarchive = loadArchive(context);
-            if (aarchive != null) {
-                el = new DOMElement("versions");
-                try {
-                    el.addText(aarchive.getArchiveAsString());
-                    wr.write(el);
-                } catch (XWikiException e) {
-                }
-            }
-        }
-
-        wr.writeClose(docel);
     }
 
     /**
@@ -590,67 +559,59 @@ public class XWikiAttachment implements Cloneable
     public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
         throws XWikiException
     {
-        Document doc = new DOMDocument();
-        DOMXMLWriter wr = new DOMXMLWriter(doc, new OutputFormat("", true, context.getWiki().getEncoding()));
+        DocumentResult domResult = new DocumentResult();
 
         try {
-            toXML(wr, bWithAttachmentContent, bWithVersions, context);
+            toXML(new DefaultResultOutputTarget(domResult), bWithAttachmentContent, bWithVersions, true, context);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return doc.getRootElement();
+
+        return domResult.getDocument().getRootElement();
     }
 
-    public void fromXML(String data) throws XWikiException
+    public void fromXML(String source) throws XWikiException
     {
-        SAXReader reader = new SAXReader();
-        Document domdoc;
+        if (!source.isEmpty()) {
+            fromXML(new StringInputSource(source));
+        }
+    }
+
+    /**
+     * @param source the XML source to parse
+     * @throws XWikiException when failing to parse the XML
+     * @since 9.0RC1
+     */
+    public void fromXML(InputSource source) throws XWikiException
+    {
         try {
-            StringReader in = new StringReader(data);
-            domdoc = reader.read(in);
-        } catch (DocumentException e) {
+            Utils.getComponent(XWikiDocumentFilterUtils.class).importEntity(this, source);
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
-        Element docel = domdoc.getRootElement();
-        fromXML(docel);
     }
 
     public void fromXML(Element docel) throws XWikiException
     {
-        setFilename(getElementText(docel, "filename"));
-        setFilesize(Integer.parseInt(getElementText(docel, "filesize")));
-        setMimeType(getElementText(docel, "mimetype"));
-        setAuthor(getElementText(docel, "author"));
-        setVersion(getElementText(docel, "version"));
-        setComment(getElementText(docel, "comment"));
-
-        String sdate = getElementText(docel, "date");
-        setDate(new Date(Long.parseLong(sdate)));
-
-        String base64content = getElementText(docel, "content");
-        if (base64content != null) {
-            try (Base64InputStream decoded =
-                new Base64InputStream(new ReaderInputStream(new StringReader(base64content)))) {
-                setContent(decoded);
-            } catch (IOException e) {
-                throw new XWikiException("Failed to read base 64 encoded atachment content", e);
-            }
+        // Serialize the Document (could not find a way to convert a dom4j Element into a usable StAX source)
+        StringWriter writer = new StringWriter();
+        try {
+            org.dom4j.io.XMLWriter domWriter = new org.dom4j.io.XMLWriter(writer);
+            domWriter.write(docel);
+            domWriter.flush();
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
         }
 
-        setArchive(getElementText(docel, "versions"));
+        // Actually parse the XML
+        fromXML(writer.toString());
 
         // The setters we're calling above will set the metadata dirty flag to true since they're changing the
         // attachment's identity. However since this method is about loading the attachment from XML it shouldn't be
         // considered as dirty.
         setMetaDataDirty(false);
-    }
-
-    private String getElementText(Element element, String name)
-    {
-        Element child = element.element(name);
-
-        return child != null ? child.getText() : null;
     }
 
     public XWikiAttachmentContent getAttachment_content()

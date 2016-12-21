@@ -68,6 +68,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class XWikiHibernateBaseStore implements Initializable
 {
+    /**
+     * The role hint of this component.
+     * 
+     * @since 9.0RC1
+     */
+    public static final String HINT = "hibernate";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateBaseStore.class);
 
     /**

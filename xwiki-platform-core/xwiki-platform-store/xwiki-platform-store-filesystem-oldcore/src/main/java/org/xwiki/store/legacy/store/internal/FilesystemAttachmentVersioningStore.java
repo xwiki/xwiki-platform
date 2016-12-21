@@ -26,21 +26,24 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.store.AttachmentVersioningStore;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
-import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
+import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.FileSystemStoreUtils;
+import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
+import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
 import org.xwiki.store.serialization.Serializer;
-import org.xwiki.store.StartableTransactionRunnable;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
 
 /**
  * Filesystem based AttachmentVersioningStore implementation.
@@ -49,7 +52,7 @@ import org.xwiki.store.StartableTransactionRunnable;
  * @since 3.0M2
  */
 @Component
-@Named("file")
+@Named(FileSystemStoreUtils.HINT)
 @Singleton
 public class FilesystemAttachmentVersioningStore implements AttachmentVersioningStore
 {

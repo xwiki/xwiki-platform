@@ -20,13 +20,8 @@
 package org.xwiki.store;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.locks.ReadWriteLock;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * A TransactionRunnable for saving a file safely.
@@ -59,9 +54,9 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
     private final ReadWriteLock lock;
 
     /**
-     * The source of the data to save.
+     * The serializer.
      */
-    private final StreamProvider provider;
+    private final FileSerializer serializer;
 
     /**
      * False until run() has complete. If false then we know there is nothing to rollback and
@@ -94,7 +89,35 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         this.tempFile = tempFile;
         this.backupFile = backupFile;
         this.lock = lock;
-        this.provider = provider;
+        this.serializer = new StreamProviderFileSerializer(provider);
+    }
+
+    /**
+     * The Constructor.
+     *
+     * @param toSave the file to put the content in.
+     * @param tempFile a temporary file, this should not contain anything important as it will be deleted
+     * and must not be altered while the operation is running. This will contain the data
+     * until onCommit when it is renamed to the toSave file.
+     * @param backupFile a temporary file, this should not contain anything important as it will be deleted
+     * and must not be altered while the operation is running. This will contain whatever
+     * was in the toSave file prior, just in case onRollback must be called.
+     * @param lock a ReadWriteLock whose writeLock will be locked as the beginning of the process and
+     * unlocked when complete.
+     * @param serializer a FileSerializer in charge to serializing what need to be serialize to the file.
+     * @since 9.0RC1
+     */
+    public FileSaveTransactionRunnable(final File toSave,
+        final File tempFile,
+        final File backupFile,
+        final ReadWriteLock lock,
+        final FileSerializer serializer)
+    {
+        this.toSave = toSave;
+        this.tempFile = tempFile;
+        this.backupFile = backupFile;
+        this.lock = lock;
+        this.serializer = serializer;
     }
 
     /**
@@ -105,6 +128,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      *
      * @see TransactionRunnable#preRun()
      */
+    @Override
     protected void onPreRun() throws IOException
     {
         this.lock.writeLock().lock();
@@ -119,6 +143,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      *
      * @see TransactionRunnable#run()
      */
+    @Override
     protected void onRun() throws Exception
     {
         if (!this.toSave.getParentFile().exists() && !this.toSave.getParentFile().mkdirs()) {
@@ -127,17 +152,10 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
                 + this.toSave.getAbsolutePath() + "] ?");
         }
 
-        final InputStream in = this.provider.getStream();
         try {
-            final OutputStream out = new FileOutputStream(this.tempFile);
-            try {
-                IOUtils.copy(in, out);
-            } finally {
-                out.close();
-            }
+            this.serializer.serialize(this.tempFile);
         } finally {
             this.runComplete = true;
-            in.close();
         }
     }
 
@@ -150,6 +168,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      *
      * @see TransactionRunnable#onCommit()
      */
+    @Override
     protected void onCommit()
     {
         if (this.toSave.exists()) {
@@ -158,6 +177,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         this.tempFile.renameTo(this.toSave);
     }
 
+    @Override
     protected void onRollback()
     {
         // If this is false then we know run() has not yet happened and we know there is nothing to do.
@@ -179,6 +199,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      *
      * @see TransactionRunnable#onComplete()
      */
+    @Override
     protected void onComplete() throws IOException
     {
         try {

@@ -1,6 +1,7 @@
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentVersioningStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinStore
+org.xwiki.store.legacy.store.internal.FilesystemRecycleBinContentStore
 org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools
 org.xwiki.store.filesystem.internal.DefaultFilesystemAttachmentsConfiguration
 org.xwiki.store.serialization.xml.internal.DeletedAttachmentMetadataSerializer

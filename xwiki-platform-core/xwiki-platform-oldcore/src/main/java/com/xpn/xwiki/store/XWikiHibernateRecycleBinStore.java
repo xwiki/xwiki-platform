@@ -22,20 +22,28 @@ package com.xpn.xwiki.store;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
+import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -44,7 +52,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  */
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements XWikiRecycleBinStoreInterface
 {
@@ -98,9 +106,19 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
      */
     private static final String LANGUAGE_PROPERTY_NAME = "language";
 
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource configuration;
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
+
     /**
      * @param context used for environment
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiRecycleBinStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use ComponentManager#getInstance(XWikiRecycleBinStoreInterface.class) instead.
      */
     @Deprecated
     public XWikiHibernateRecycleBinStore(XWikiContext context)
@@ -115,20 +133,96 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     {
     }
 
+    private XWikiRecycleBinContentStoreInterface getDefaultXWikiRecycleBinContentStore()
+    {
+        String storeType = this.configuration.getProperty("xwiki.store.recyclebin.content.hint");
+
+        return getXWikiRecycleBinContentStore(storeType);
+    }
+
+    private XWikiRecycleBinContentStoreInterface getXWikiRecycleBinContentStore(String storeType)
+    {
+        if (storeType != null && !storeType.equals(HINT)) {
+            try {
+                return this.componentManager.getInstance(XWikiRecycleBinContentStoreInterface.class, storeType);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Can't find recycle bin content store for type [{}]", storeType, e);
+            }
+        }
+
+        return null;
+    }
+
+    private XWikiDeletedDocument resolveDeletedDocumentContent(XWikiDeletedDocument deletedDocument,
+        DocumentReference reference, boolean bTransaction) throws XWikiException
+    {
+        XWikiRecycleBinContentStoreInterface contentStore =
+            getXWikiRecycleBinContentStore(deletedDocument.getStoreType());
+
+        if (contentStore != null) {
+            XWikiDeletedDocumentContent content = contentStore.get(reference, deletedDocument.getId(), bTransaction);
+
+            try {
+                FieldUtils.writeDeclaredField(deletedDocument, "content", content, true);
+            } catch (IllegalAccessException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to set deleted document content", e);
+            }
+        }
+
+        return deletedDocument;
+    }
+
+    private XWikiDeletedDocument createXWikiDeletedDocument(XWikiDocument doc, String deleter, Date date,
+        XWikiRecycleBinContentStoreInterface contentStore) throws XWikiException
+    {
+        XWikiDeletedDocument trashdoc;
+
+        if (contentStore != null) {
+            trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), contentStore.getStoreType(),
+                deleter, date, null);
+        } else {
+            trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), null, deleter, date,
+                new XWikiHibernateDeletedDocumentContent(doc));
+        }
+
+        return trashdoc;
+    }
+
+    private void deleteDeletedDocumentContent(XWikiDocument doc, XWikiDeletedDocument deletedDocument,
+        boolean bTransaction) throws XWikiException
+    {
+        XWikiRecycleBinContentStoreInterface contentStore =
+            getXWikiRecycleBinContentStore(deletedDocument.getStoreType());
+
+        if (contentStore != null) {
+            contentStore.delete(doc.getDocumentReferenceWithLocale(), deletedDocument.getId(), bTransaction);
+        }
+    }
+
     @Override
     public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getXWikiContext(inputxcontext);
 
-        final XWikiDeletedDocument trashdoc = new XWikiDeletedDocument(doc, deleter, date, context);
-
-        executeWrite(context, new HibernateCallback<Object>()
+        executeWrite(context, new HibernateCallback<Void>()
         {
             @Override
-            public Object doInHibernate(Session session) throws HibernateException
+            public Void doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.save(trashdoc);
+                XWikiRecycleBinContentStoreInterface contentStore = getDefaultXWikiRecycleBinContentStore();
+
+                XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore);
+
+                // Hibernate store
+                long index = ((Number) session.save(trashdoc)).longValue();
+
+                // External store
+                if (contentStore != null) {
+                    contentStore.save(doc, index, bTransaction);
+                }
+
                 return null;
             }
         });
@@ -140,28 +234,31 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     {
         XWikiContext context = getXWikiContext(inputxcontext);
 
-        return executeRead(context, new HibernateCallback<XWikiDocument>()
-        {
-            @Override
-            public XWikiDocument doInHibernate(Session session) throws HibernateException, XWikiException
-            {
-                XWikiDeletedDocument trashdoc =
-                    (XWikiDeletedDocument) session.load(XWikiDeletedDocument.class, Long.valueOf(index));
-                return trashdoc.restoreDocument(null, context);
-            }
-        });
+        XWikiDeletedDocument deletedDocument = getDeletedDocument(doc, index, context, bTransaction);
+        return deletedDocument.restoreDocument(context);
     }
 
     @Override
     public XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, final long index, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
+        return getDeletedDocument(doc, index, context, true, bTransaction);
+    }
+
+    private XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, final long index, XWikiContext context,
+        boolean resolve, boolean bTransaction) throws XWikiException
+    {
         return executeRead(context, new HibernateCallback<XWikiDeletedDocument>()
         {
             @Override
             public XWikiDeletedDocument doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                return (XWikiDeletedDocument) session.get(XWikiDeletedDocument.class, Long.valueOf(index));
+                XWikiDeletedDocument deletedDocument =
+                    (XWikiDeletedDocument) session.get(XWikiDeletedDocument.class, Long.valueOf(index));
+
+                return resolve
+                    ? resolveDeletedDocumentContent(deletedDocument, doc.getDocumentReferenceWithLocale(), false)
+                    : deletedDocument;
             }
         });
     }
@@ -170,20 +267,34 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDeletedDocument[] getAllDeletedDocuments(XWikiDocument doc, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        return executeRead(context, new DeletedDocumentsHibernateCallback(doc));
+        XWikiDeletedDocument[] deletedDocuments = executeRead(context, new DeletedDocumentsHibernateCallback(doc));
+
+        // Resolve deleted document content if needed
+        for (int i = 0; i < deletedDocuments.length; ++i) {
+            deletedDocuments[i] =
+                resolveDeletedDocumentContent(deletedDocuments[i], doc.getDocumentReferenceWithLocale(), bTransaction);
+        }
+
+        return deletedDocuments;
     }
 
     @Override
     public void deleteFromRecycleBin(XWikiDocument doc, final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        executeWrite(context, new HibernateCallback<Object>()
+        executeWrite(context, new HibernateCallback<Void>()
         {
             @Override
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+            public Void doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.createQuery("delete from " + XWikiDeletedDocument.class.getName() + " where id=?")
-                    .setLong(0, index).executeUpdate();
+                XWikiDeletedDocument deletedDocument = getDeletedDocument(doc, index, context, false, bTransaction);
+
+                // Delete metadata
+                session.delete(deletedDocument);
+
+                // Delete content
+                deleteDeletedDocumentContent(doc, deletedDocument, bTransaction);
+
                 return null;
             }
         });

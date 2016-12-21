@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -33,7 +34,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,8 +43,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Default tools for getting files to store data in the filesystem.
- * This should be replaced by a module which provides a secure extension of java.io.File.
+ * Default tools for getting files to store data in the filesystem. This should be replaced by a module which provides a
+ * secure extension of java.io.File.
  *
  * @version $Id$
  * @since 3.0M2
@@ -59,11 +59,18 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     private static final String STORAGE_DIR_NAME = "storage";
 
     /**
-     * The name of the directory where document information is stored.
-     * This must have a URL illegal character in it,
+     * The name of the directory where document information is stored. This must have a URL illegal character in it,
      * otherwise it will be confused if/when nested spaces are implemented.
      */
     private static final String DOCUMENT_DIR_NAME = "~this";
+
+    /**
+     * The name of the directory where document locale information is stored. This must have a URL illegal character in
+     * it, otherwise it will be confused if/when nested spaces are implemented.
+     * 
+     * @since 9.0RC1
+     */
+    private static final String DOCUMENTLOCALE_DIR_NAME = DOCUMENT_DIR_NAME;
 
     /**
      * The directory within each document's directory where the document's attachments are stored.
@@ -76,22 +83,41 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     private static final String DELETED_ATTACHMENT_DIR_NAME = "deleted-attachments";
 
     /**
-     * The part of the deleted attachment directory name after this is the date of deletion,
-     * The part before this is the URL encoded attachment filename.
+     * The part of the deleted attachment directory name after this is the date of deletion, The part before this is the
+     * URL encoded attachment filename.
      */
     private static final String DELETED_ATTACHMENT_NAME_SEPARATOR = "-";
 
     /**
-     * When a file is being saved, the original will be moved to the same name with this after it.
-     * If the save operation fails then this file will be moved back to the regular position to come as
-     * close as possible to ACID transaction handling.
+     * The directory within each document's directory for documents which have been deleted.
+     */
+    private static final String DELETED_DOCUMENT_DIR_NAME = "deleted-documents";
+
+    /**
+     * The directory within each document's directory for document locales.
+     * 
+     * @since 9.0RC1
+     */
+    private static final String DOCUMENT_LOCALES_DIR_NAME = "locales";
+
+    /**
+     * The folder name of {@link Locale#ROOT}.
+     * 
+     * @since 9.0RC1
+     */
+    private static final String DOCUMENT_LOCALES_ROOT_NAME = "~";
+
+    /**
+     * When a file is being saved, the original will be moved to the same name with this after it. If the save operation
+     * fails then this file will be moved back to the regular position to come as close as possible to ACID transaction
+     * handling.
      */
     private static final String BACKUP_FILE_SUFFIX = "~bak";
 
     /**
-     * When a file is being deleted, it will be renamed with this at the end of the filename in the
-     * transaction. If the transaction succeeds then the temp file will be deleted, if it fails then the
-     * temp file will be renamed back to the original filename.
+     * When a file is being deleted, it will be renamed with this at the end of the filename in the transaction. If the
+     * transaction succeeds then the temp file will be deleted, if it fails then the temp file will be renamed back to
+     * the original filename.
      */
     private static final String TEMP_FILE_SUFFIX = "~tmp";
 
@@ -106,15 +132,8 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     private FilesystemAttachmentsConfiguration config;
 
     /**
-     * We need to get the XWiki object in order to get the work directory.
-     */
-    @Inject
-    private Execution exec;
-
-    /**
-     * A means of acquiring locks for attachments.
-     * Because the attachments temp files are randomly named and rename is atomic, locks are not needed.
-     * DummyLockProvider provides fake locks.
+     * A means of acquiring locks for attachments. Because the attachments temp files are randomly named and rename is
+     * atomic, locks are not needed. DummyLockProvider provides fake locks.
      */
     @Inject
     @Named("dummy")
@@ -136,11 +155,9 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      *
      * @param pathSerializer an EntityReferenceSerializer for generating file paths.
      * @param storageDir the directory to store the content in.
-     * @param lockProvider a means of getting locks for making sure
-     * only one thread accesses an attachment at a time.
+     * @param lockProvider a means of getting locks for making sure only one thread accesses an attachment at a time.
      */
-    public DefaultFilesystemStoreTools(final EntityReferenceSerializer<String> pathSerializer,
-        final File storageDir,
+    public DefaultFilesystemStoreTools(final EntityReferenceSerializer<String> pathSerializer, final File storageDir,
         final LockProvider lockProvider)
     {
         this.pathSerializer = pathSerializer;
@@ -161,7 +178,8 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
         this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME);
         if (config.cleanOnStartup()) {
             final File dir = this.storageDir;
-            new Thread(new Runnable() {
+            new Thread(new Runnable()
+            {
                 public void run()
                 {
                     deleteEmptyDirs(dir, 0);
@@ -171,9 +189,8 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     /**
-     * Delete all empty directories under the given directory.
-     * A directory which contains only empty directories is also considered an empty ditectory.
-     * This function will not delete *location* unless depth is non-zero.
+     * Delete all empty directories under the given directory. A directory which contains only empty directories is also
+     * considered an empty ditectory. This function will not delete *location* unless depth is non-zero.
      *
      * @param location a directory to delete.
      * @param depth used for recursion, should always be zero.
@@ -216,16 +233,23 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final XWikiAttachment attachment,
         final Date deleteDate)
     {
-        return new DefaultDeletedAttachmentFileProvider(
-            this.getDeletedAttachmentDir(attachment, deleteDate), attachment.getFilename());
+        return new DefaultDeletedAttachmentFileProvider(getDeletedAttachmentDir(attachment, deleteDate),
+            attachment.getFilename());
     }
 
     @Override
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final String pathToDirectory)
     {
-        final File attachDir = new File(this.storageDir, this.getStorageLocationPath());
-        return new DefaultDeletedAttachmentFileProvider(
-            attachDir, getFilenameFromDeletedAttachmentDirectory(attachDir));
+        final File attachDir = new File(this.storageDir, getStorageLocationPath());
+        return new DefaultDeletedAttachmentFileProvider(attachDir,
+            getFilenameFromDeletedAttachmentDirectory(attachDir));
+    }
+
+    @Override
+    public DeletedDocumentContentFileProvider getDeletedDocumentFileProvider(DocumentReference documentReference,
+        long index)
+    {
+        return new DefaultDeletedDocumentContentFileProvider(getDeletedDocumentContentDir(documentReference, index));
     }
 
     @Override
@@ -247,8 +271,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
                 out.put(currentName, new HashMap<Date, DeletedAttachmentFileProvider>());
             }
             out.get(currentName).put(getDeleteDateFromDeletedAttachmentDirectory(file),
-                new DefaultDeletedAttachmentFileProvider(file,
-                    getFilenameFromDeletedAttachmentDirectory(file)));
+                new DefaultDeletedAttachmentFileProvider(file, getFilenameFromDeletedAttachmentDirectory(file)));
         }
         return out;
     }
@@ -291,13 +314,12 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Override
     public AttachmentFileProvider getAttachmentFileProvider(final XWikiAttachment attachment)
     {
-        return new DefaultAttachmentFileProvider(this.getAttachmentDir(attachment),
-            attachment.getFilename());
+        return new DefaultAttachmentFileProvider(this.getAttachmentDir(attachment), attachment.getFilename());
     }
 
     /**
-     * Get the directory for storing files for an attachment.
-     * This will look like storage/xwiki/Main/WebHome/~this/attachments/file.name/
+     * Get the directory for storing files for an attachment. This will look like
+     * storage/xwiki/Main/WebHome/~this/attachments/file.name/
      *
      * @param attachment the attachment to get the directory for.
      * @return a File representing the directory. Note: The directory may not exist.
@@ -306,63 +328,78 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     {
         final XWikiDocument doc = attachment.getDoc();
         if (doc == null) {
-            throw new NullPointerException("Could not store attachment because it is not "
-                + "associated with a document.");
+            throw new NullPointerException(
+                "Could not store attachment because it is not " + "associated with a document.");
         }
-        final File docDir = getDocumentDir(doc.getDocumentReference(),
-            this.storageDir,
-            this.pathSerializer);
+        final File docDir = getDocumentDir(doc.getDocumentReference(), this.storageDir, this.pathSerializer);
         final File attachmentsDir = new File(docDir, ATTACHMENT_DIR_NAME);
         return new File(attachmentsDir, GenericFileUtils.getURLEncoded(attachment.getFilename()));
     }
 
     /**
-     * Get a directory for storing the contentes of a deleted attachment.
-     * The format is <document name>/~this/deleted-attachments/<attachment name>-<delete date>/
-     * <delete date> is expressed in "unix time" so it might look like:
-     * WebHome/~this/deleted-attachments/file.txt-0123456789/
+     * Get a directory for storing the contentes of a deleted attachment. The format is <document
+     * name>/~this/deleted-attachments/<attachment name>-<delete date>/ <delete date> is expressed in "unix time" so it
+     * might look like: WebHome/~this/deleted-attachments/file.txt-0123456789/
      *
      * @param attachment the attachment to get the file for.
      * @param deleteDate the date the attachment was deleted.
      * @return a directory which will be repeatable only with the same inputs.
      */
-    private File getDeletedAttachmentDir(final XWikiAttachment attachment,
-        final Date deleteDate)
+    private File getDeletedAttachmentDir(final XWikiAttachment attachment, final Date deleteDate)
     {
         final XWikiDocument doc = attachment.getDoc();
         if (doc == null) {
-            throw new NullPointerException("Could not store deleted attachment because "
-                + "it is not attached to any document.");
+            throw new NullPointerException(
+                "Could not store deleted attachment because " + "it is not attached to any document.");
         }
-        final File docDir = getDocumentDir(doc.getDocumentReference(),
-            this.storageDir,
-            this.pathSerializer);
+        final File docDir = getDocumentDir(doc.getDocumentReference(), this.storageDir, this.pathSerializer);
         final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);
-        final String fileName =
-            attachment.getFilename() + DELETED_ATTACHMENT_NAME_SEPARATOR + deleteDate.getTime();
+        final String fileName = attachment.getFilename() + DELETED_ATTACHMENT_NAME_SEPARATOR + deleteDate.getTime();
         return new File(deletedAttachmentsDir, GenericFileUtils.getURLEncoded(fileName));
     }
 
     /**
-     * Get the directory associated with this document.
-     * This is a path obtained from the owner document reference, where each reference segment
-     * (wiki, spaces, document name) contributes to the final path.
-     * For a document called xwiki:Main.WebHome, the directory will be:
-     * <code>(storageDir)/xwiki/Main/WebHome/~this/</code>
+     * Get a directory for storing the content of a deleted document. The format is <document
+     * name>/~this/deleted-documents/<index>/content.xml.
+     *
+     * @param documentReference the document to get the file for.
+     * @param index the index of the deleted document.
+     * @return a directory which will be repeatable only with the same inputs.
+     */
+    private File getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
+    {
+        final File docDir = getDocumentDir(documentReference, this.storageDir, this.pathSerializer);
+        final File deletedDocumentContentsDir = new File(docDir, DELETED_DOCUMENT_DIR_NAME);
+        return new File(deletedDocumentContentsDir, String.valueOf(index));
+    }
+
+    /**
+     * Get the directory associated with this document. This is a path obtained from the owner document reference, where
+     * each reference segment (wiki, spaces, document name) contributes to the final path. For a document called
+     * xwiki:Main.WebHome, the directory will be: <code>(storageDir)/xwiki/Main/WebHome/~this/</code>
      *
      * @param docRef the DocumentReference for the document to get the directory for.
      * @param storageDir the directory to place the directory hirearcy for attachments in.
-     * @param pathSerializer an EntityReferenceSerializer which will make a directory path from an
-     * an EntityReference.
-     * @return a file path corresponding to the attachment location; each segment in the path is
-     *         URL-encoded in order to be safe.
+     * @param pathSerializer an EntityReferenceSerializer which will make a directory path from an an EntityReference.
+     * @return a file path corresponding to the attachment location; each segment in the path is URL-encoded in order to
+     *         be safe.
      */
-    private static File getDocumentDir(final DocumentReference docRef,
-        final File storageDir,
+    private static File getDocumentDir(final DocumentReference docRef, final File storageDir,
         final EntityReferenceSerializer<String> pathSerializer)
     {
         final File path = new File(storageDir, pathSerializer.serialize(docRef));
-        return new File(path, DOCUMENT_DIR_NAME);
+        File docDir = new File(path, DOCUMENT_DIR_NAME);
+
+        // Add the locale
+        Locale docLocale = docRef.getLocale();
+        if (docLocale != null) {
+            final File docLocalesDir = new File(docDir, DOCUMENT_LOCALES_DIR_NAME);
+            final File docLocaleDir = new File(docLocalesDir,
+                docLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALES_ROOT_NAME : docLocale.toString());
+            docDir = new File(docLocaleDir, DOCUMENTLOCALE_DIR_NAME);
+        }
+
+        return docDir;
     }
 
     @Override

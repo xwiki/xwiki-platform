@@ -116,6 +116,7 @@
             <property name="date" type="timestamp" column="XDD_DATE" index="XDD_DATE" />
         </natural-id>
         <property name="deleter" type="string" column="XDD_DELETER" index="XDD_DELETER" />
+        <property name="storeType" type="string" column="XDD_STORETYPE" length="50" />
         <property name="xml" type="materialized_clob" column="XDD_XML" not-null="true" length="1000000000" />
     </class>
 

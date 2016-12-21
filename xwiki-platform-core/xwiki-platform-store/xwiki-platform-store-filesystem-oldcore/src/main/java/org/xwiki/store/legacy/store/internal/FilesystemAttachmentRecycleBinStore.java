@@ -45,6 +45,7 @@ import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.legacy.doc.internal.MutableDeletedFilesystemAttachment;
@@ -66,7 +67,7 @@ import com.xpn.xwiki.store.AttachmentVersioningStore;
  * @since 3.0M3
  */
 @Component
-@Named("file")
+@Named(FileSystemStoreUtils.HINT)
 @Singleton
 public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBinStore, Initializable
 {
@@ -91,8 +92,8 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     private Serializer<DeletedAttachment, MutableDeletedFilesystemAttachment> deletedAttachmentSerializer;
 
     /**
-     * This is needed in order to be able to map the database ids given by the
-     * user to meaningful paths to deleted attachments.
+     * This is needed in order to be able to map the database ids given by the user to meaningful paths to deleted
+     * attachments.
      */
     @Inject
     @Named("deleted-attachment-id-mappings/1.0")
@@ -102,7 +103,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      * Used to store the versions of the deleted attachment.
      */
     @Inject
-    @Named("file")
+    @Named(FileSystemStoreUtils.HINT)
     private AttachmentVersioningStore attachmentVersionStore;
 
     /**
@@ -113,9 +114,9 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     private DocumentReferenceResolver<String> pathDocumentReferenceResolver;
 
     /**
-     * This is required because deleted attachments may be looked up by a database id number
-     * So we are forced to simulate the database id numbering scheme even though they
-     * are and should be stored with their documents which are stored by name.
+     * This is required because deleted attachments may be looked up by a database id number So we are forced to
+     * simulate the database id numbering scheme even though they are and should be stored with their documents which
+     * are stored by name.
      */
     private final Map<Long, String> pathById = new ConcurrentHashMap<Long, String>();
 
@@ -141,8 +142,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         this.pathByIdStore = this.fileTools.getGlobalFile("DELETED_ATTACHMENT_ID_MAPPINGS.xml");
         if (pathByIdStore.exists()) {
             try {
-                this.pathById.putAll(
-                    attachmentIdMappingSerializer.parse(new FileInputStream(this.pathByIdStore)));
+                this.pathById.putAll(attachmentIdMappingSerializer.parse(new FileInputStream(this.pathByIdStore)));
             } catch (IOException e) {
                 throw new InitializationException("Failed to parse deleted attachment id mappings.", e);
             }
@@ -150,25 +150,19 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     }
 
     @Override
-    public void saveToRecycleBin(final XWikiAttachment attachment,
-        final String deleter,
-        final Date deleteDate,
-        final XWikiContext context,
-        final boolean bTransaction) throws XWikiException
+    public void saveToRecycleBin(final XWikiAttachment attachment, final String deleter, final Date deleteDate,
+        final XWikiContext context, final boolean bTransaction) throws XWikiException
     {
-        final DeletedFilesystemAttachment dfa =
-            new DeletedFilesystemAttachment(attachment, deleter, deleteDate);
+        final DeletedFilesystemAttachment dfa = new DeletedFilesystemAttachment(attachment, deleter, deleteDate);
         final StartableTransactionRunnable tr = this.getSaveTrashAttachmentRunnable(dfa, context);
 
         // Need to add the ID to the map and persist the map
         // otherwise the attachment will not be able to loaded by the ID.
         // TODO standardize a deleted attachment entity reference and deprecate the use of a long integer
-        //      as a key to load a deleted attachment with.
-        final String absolutePath =
-            this.fileTools.getDeletedAttachmentFileProvider(attachment, deleteDate)
-                .getAttachmentContentFile().getParentFile().getAbsolutePath();
-        final String path =
-            absolutePath.substring(absolutePath.indexOf(this.fileTools.getStorageLocationPath()));
+        // as a key to load a deleted attachment with.
+        final String absolutePath = this.fileTools.getDeletedAttachmentFileProvider(attachment, deleteDate)
+            .getAttachmentContentFile().getParentFile().getAbsolutePath();
+        final String path = absolutePath.substring(absolutePath.indexOf(this.fileTools.getStorageLocationPath()));
         final Long id = Long.valueOf(dfa.getId());
         (new StartableTransactionRunnable()
         {
@@ -184,22 +178,18 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         }).runIn(tr);
 
         // Need to save the updated map right away in case the power goes out or something.
-        new FileSaveTransactionRunnable(
-            this.pathByIdStore,
-            this.fileTools.getTempFile(this.pathByIdStore),
-            this.fileTools.getBackupFile(this.pathByIdStore),
-            this.fileTools.getLockForFile(this.pathByIdStore),
-            new SerializationStreamProvider<Map<Long, String>>(
-                this.attachmentIdMappingSerializer,
-                this.pathById)).runIn(tr);
+        new FileSaveTransactionRunnable(this.pathByIdStore, this.fileTools.getTempFile(this.pathByIdStore),
+            this.fileTools.getBackupFile(this.pathByIdStore), this.fileTools.getLockForFile(this.pathByIdStore),
+            new SerializationStreamProvider<Map<Long, String>>(this.attachmentIdMappingSerializer, this.pathById))
+                .runIn(tr);
 
         try {
             tr.start();
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.MODULE_XWIKI,
-                "Failed to store deleted attachment " + attachment.getFilename()
-                    + " for document: " + attachment.getDoc().getDocumentReference(), e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
+                "Failed to store deleted attachment " + attachment.getFilename() + " for document: "
+                    + attachment.getDoc().getDocumentReference(),
+                e);
         }
     }
 
@@ -207,26 +197,20 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      * Get a StartableTransactionRunnable to save an attachment in the recycle-bin.
      *
      * @param deleted the FilesystemDeletedAttachment to save.
-     * @param context the legacy XWikiContext which might be needed to get the content
-     * from the attachment, or to load the attachment versioning store.
+     * @param context the legacy XWikiContext which might be needed to get the content from the attachment, or to load
+     *            the attachment versioning store.
      * @return a TransactionRunnable for storing the deleted attachment.
-     * @throws XWikiException if one is thrown trying to get data from the attachment
-     * or loading the attachment archive in order to save it in the deleted section.
+     * @throws XWikiException if one is thrown trying to get data from the attachment or loading the attachment archive
+     *             in order to save it in the deleted section.
      */
-    public StartableTransactionRunnable
-    getSaveTrashAttachmentRunnable(final DeletedFilesystemAttachment deleted,
-        final XWikiContext context)
-        throws XWikiException
+    public StartableTransactionRunnable getSaveTrashAttachmentRunnable(final DeletedFilesystemAttachment deleted,
+        final XWikiContext context) throws XWikiException
     {
         final DeletedAttachmentFileProvider provider =
             this.fileTools.getDeletedAttachmentFileProvider(deleted.getAttachment(), deleted.getDate());
 
-        return new SaveTrashAttachmentRunnable(deleted,
-            provider,
-            this.fileTools,
-            this.deletedAttachmentSerializer,
-            this.versionSerializer,
-            context);
+        return new SaveTrashAttachmentRunnable(deleted, provider, this.fileTools, this.deletedAttachmentSerializer,
+            this.versionSerializer, context);
     }
 
     /**
@@ -238,10 +222,8 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      * @see AttachmentRecycleBinStore#restoreFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)
      */
     @Override
-    public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment,
-        final long index,
-        final XWikiContext context,
-        boolean bTransaction) throws XWikiException
+    public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment, final long index,
+        final XWikiContext context, boolean bTransaction) throws XWikiException
     {
         final DeletedAttachment delAttach = getDeletedAttachment(index, context, false);
         return delAttach != null ? delAttach.restoreAttachment(attachment, context) : null;
@@ -250,15 +232,13 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     /**
      * {@inheritDoc}
      * <p>
-     * bTransaction is ignored by this implementation.
-     * context is unused and may safely be null.
+     * bTransaction is ignored by this implementation. context is unused and may safely be null.
      * </p>
      *
      * @see AttachmentRecycleBinStore#getDeletedAttachment(long, XWikiContext, boolean)
      */
     @Override
-    public DeletedAttachment getDeletedAttachment(final long index,
-        final XWikiContext context,
+    public DeletedAttachment getDeletedAttachment(final long index, final XWikiContext context,
         final boolean bTransaction) throws XWikiException
     {
         final String path = this.pathById.get(Long.valueOf(index));
@@ -269,10 +249,8 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         try {
             return this.deletedAttachmentFromProvider(this.fileTools.getDeletedAttachmentFileProvider(path), context);
         } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.MODULE_XWIKI,
-                "Failed to get deleted attachment at index " + index
-                    + " with filesystem path " + path, e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
+                "Failed to get deleted attachment at index " + index + " with filesystem path " + path, e);
         }
     }
 
@@ -286,15 +264,12 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
      */
     @Override
     public List<DeletedAttachment> getAllDeletedAttachments(final XWikiAttachment attachment,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+        final XWikiContext context, final boolean bTransaction) throws XWikiException
     {
         if (attachment.getDoc() == null) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.MODULE_XWIKI,
-                "Cannot load deleted attachments because the given attachment "
-                    + attachment.getFilename() + " is not attached to any document.");
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
+                "Cannot load deleted attachments because the given attachment " + attachment.getFilename()
+                    + " is not attached to any document.");
         }
 
         // I don't know that there is no way to upload an attachment named ""
@@ -303,9 +278,8 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
             return this.getAllDeletedAttachments(attachment.getDoc(), context, false);
         }
 
-        final Map<Date, DeletedAttachmentFileProvider> attachMap =
-            this.fileTools.deletedAttachmentsForDocument(attachment.getDoc().getDocumentReference())
-                .get(attachment.getFilename());
+        final Map<Date, DeletedAttachmentFileProvider> attachMap = this.fileTools
+            .deletedAttachmentsForDocument(attachment.getDoc().getDocumentReference()).get(attachment.getFilename());
 
         // There may not be any deleted versions matching the requested attachment filename.
         if (attachMap == null) {
@@ -321,11 +295,10 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
                 out.add(this.deletedAttachmentFromProvider(attachMap.get(date), context));
             }
         } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.MODULE_XWIKI,
-                "Failed to get deleted attachment " + attachment.getFilename()
-                    + " attached to the document: "
-                    + attachment.getDoc().getDocumentReference(), e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
+                "Failed to get deleted attachment " + attachment.getFilename() + " attached to the document: "
+                    + attachment.getDoc().getDocumentReference(),
+                e);
         }
         return out;
     }
@@ -333,17 +306,14 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     /**
      * {@inheritDoc}
      * <p>
-     * bTransaction is ignored by this implementation.
-     * context is unused and may safely be null.
+     * bTransaction is ignored by this implementation. context is unused and may safely be null.
      * </p>
      *
      * @see AttachmentRecycleBinStore#getAllDeletedAttachments(XWikiDocument, XWikiContext, boolean)
      */
     @Override
-    public List<DeletedAttachment> getAllDeletedAttachments(final XWikiDocument doc,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public List<DeletedAttachment> getAllDeletedAttachments(final XWikiDocument doc, final XWikiContext context,
+        final boolean bTransaction) throws XWikiException
     {
         final Map<String, Map<Date, DeletedAttachmentFileProvider>> attachMap =
             this.fileTools.deletedAttachmentsForDocument(doc.getDocumentReference());
@@ -371,27 +341,23 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
             }
             return out;
         } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.MODULE_XWIKI,
-                "Failed to get deleted attachments for document: "
-                    + doc.getDocumentReference(), e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
+                "Failed to get deleted attachments for document: " + doc.getDocumentReference(), e);
         }
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * bTransaction is ignored because the filesystem cannot synchronize with the database commit.
-     * TODO: make getDeletedAttachmentPurgeRunnable public so that a transaction safe method is available.
-     * context is unused and may safely be null.
+     * bTransaction is ignored because the filesystem cannot synchronize with the database commit. TODO: make
+     * getDeletedAttachmentPurgeRunnable public so that a transaction safe method is available. context is unused and
+     * may safely be null.
      * </p>
      *
      * @see AttachmentRecycleBinStore#deleteFromRecycleBin(long, XWikiContext, boolean)
      */
     @Override
-    public void deleteFromRecycleBin(final long index,
-        final XWikiContext context,
-        final boolean bTransaction)
+    public void deleteFromRecycleBin(final long index, final XWikiContext context, final boolean bTransaction)
         throws XWikiException
     {
         final String path = this.pathById.get(Long.valueOf(index));
@@ -401,14 +367,13 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     }
 
     /**
-     * Get a TransactionRunnable for removing a deleted attachment from the filesystem entirely.
-     * TODO: Standardize an EntityReference for deleted attachments and make that the parameter.
+     * Get a TransactionRunnable for removing a deleted attachment from the filesystem entirely. TODO: Standardize an
+     * EntityReference for deleted attachments and make that the parameter.
      *
      * @param provider the file provider for the deleted attachment to purge from the recycle bin.
      * @return a StartableTransactionRunnable for removing the attachment.
      */
-    private StartableTransactionRunnable getDeletedAttachmentPurgeRunnable(
-        final DeletedAttachmentFileProvider provider)
+    private StartableTransactionRunnable getDeletedAttachmentPurgeRunnable(final DeletedAttachmentFileProvider provider)
     {
         final StartableTransactionRunnable out = new StartableTransactionRunnable();
         final File deletedAttachDir = provider.getDeletedAttachmentMetaFile().getParentFile();
@@ -418,8 +383,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         }
         // Easy thing to do is just delete everything in the deleted-attachment directory.
         for (File toDelete : deletedAttachDir.listFiles()) {
-            new FileDeleteTransactionRunnable(toDelete,
-                this.fileTools.getBackupFile(toDelete),
+            new FileDeleteTransactionRunnable(toDelete, this.fileTools.getBackupFile(toDelete),
                 this.fileTools.getLockForFile(toDelete)).runIn(out);
         }
 
@@ -486,8 +450,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         attachment.setAttachment_content(new FilesystemAttachmentContent(contentFile, attachment));
 
         attachment.setAttachment_archive(
-            ((FilesystemAttachmentVersioningStore) this.attachmentVersionStore)
-                .loadArchive(attachment, provider));
+            ((FilesystemAttachmentVersioningStore) this.attachmentVersionStore).loadArchive(attachment, provider));
 
         return delAttach.getImmutable();
     }

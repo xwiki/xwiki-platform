@@ -43,6 +43,7 @@ import org.xwiki.test.LogRule;
 
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 import static org.junit.Assert.assertEquals;
@@ -62,6 +63,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@XWikiDocumentFilterUtilsComponentList
 public class XWikiAttachmentTest
 {
     @Rule

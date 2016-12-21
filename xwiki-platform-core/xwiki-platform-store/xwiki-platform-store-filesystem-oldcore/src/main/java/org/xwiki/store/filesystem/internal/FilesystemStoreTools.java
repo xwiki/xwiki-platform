@@ -30,9 +30,8 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
- * Tools for getting files to store data in the filesystem.
- * These APIs are in flux and may change at any time without warning.
- * This should be replaced by a module which provides a secure extension of java.io.File.
+ * Tools for getting files to store data in the filesystem. These APIs are in flux and may change at any time without
+ * warning. This should be replaced by a module which provides a secure extension of java.io.File.
  *
  * @version $Id$
  * @since 3.0M2
@@ -41,8 +40,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 public interface FilesystemStoreTools
 {
     /**
-     * Get a backup file which for a given storage file.
-     * This file name will never collide with any other file gotten through this interface.
+     * Get a backup file which for a given storage file. This file name will never collide with any other file gotten
+     * through this interface.
      *
      * @param storageFile the file to get a backup file for.
      * @return a backup file with a name based on the name of the given file.
@@ -50,8 +49,8 @@ public interface FilesystemStoreTools
     File getBackupFile(File storageFile);
 
     /**
-     * Get a temporary file which for a given storage file.
-     * This file name will never collide with any other file gotten through this interface.
+     * Get a temporary file which for a given storage file. This file name will never collide with any other file gotten
+     * through this interface.
      *
      * @param storageFile the file to get a temporary file for.
      * @return a temporary file with a name based on the name of the given file.
@@ -59,9 +58,8 @@ public interface FilesystemStoreTools
     File getTempFile(File storageFile);
 
     /**
-     * Get an instance of AttachmentFileProvider which will save everything to do with an attachment
-     * in a separate location which is repeatable only with the same attachment name, and containing
-     * document.
+     * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
+     * location which is repeatable only with the same attachment name, and containing document.
      *
      * @param attachment the attachment to get a tools for.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
@@ -69,15 +67,25 @@ public interface FilesystemStoreTools
     AttachmentFileProvider getAttachmentFileProvider(XWikiAttachment attachment);
 
     /**
-     * Get an instance of AttachmentFileProvider which will save everything to do with an attachment
-     * in a separate location which is repeatable only with the same attachment name, containing document,
-     * and date of deletion.
+     * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
+     * location which is repeatable only with the same attachment name, containing document, and date of deletion.
      *
      * @param attachment the attachment to get a tools for.
      * @param deleteDate the date the attachment was deleted.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      */
     DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(XWikiAttachment attachment, Date deleteDate);
+
+    /**
+     * Get an instance of DeletedDocumentFileProvider which will save everything to do with an document in a separate
+     * location which is repeatable only with the same document reference, and date of deletion.
+     *
+     * @param documentReference the reference of the document.
+     * @param index the index of the deleted document.
+     * @return a provider which will provide files with collision free path and repeatable with same inputs.
+     * @since 9.0RC1
+     */
+    DeletedDocumentContentFileProvider getDeletedDocumentFileProvider(DocumentReference documentReference, long index);
 
     /**
      * Get a map of dates of deletion by the document where the attachment was attached.
@@ -109,9 +117,8 @@ public interface FilesystemStoreTools
     DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(String pathToDirectory);
 
     /**
-     * Get a {@link java.util.concurrent.locks.ReadWriteLock} which is unique to the given file.
-     * This method will always return the same lock for the path on the filesystem even if the
-     * {@link java.io.File} object is different.
+     * Get a {@link java.util.concurrent.locks.ReadWriteLock} which is unique to the given file. This method will always
+     * return the same lock for the path on the filesystem even if the {@link java.io.File} object is different.
      *
      * @param toLock the file to get a lock for.
      * @return a lock for the given file.

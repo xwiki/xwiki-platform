@@ -19,11 +19,19 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
+import org.xwiki.filter.input.DefaultReaderInputSource;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository;
+import com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository.TemporaryDeferredStringFile;
 import com.xpn.xwiki.util.AbstractSimpleClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Archive of deleted attachment, stored in {@link com.xpn.xwiki.store.AttachmentRecycleBinStore}. Immutable, because
@@ -52,12 +60,8 @@ public class DeletedAttachment extends AbstractSimpleClass
     /** The user who deleted the attachment, in the <tt>XWiki.UserName</tt> format. */
     private String deleter;
 
-    /**
-     * XML export of the full attachment, with content and history.
-     *
-     * @see XWikiAttachment#toXML(boolean, boolean, XWikiContext)
-     */
-    private String xml;
+    private TemporaryDeferredStringFile xml = Utils.getComponent(TemporaryDeferredFileRepository.class)
+        .createTemporaryDeferredStringFile("deleted-attachments-xml", StandardCharsets.UTF_8);
 
     /** Default constructor. Used only by hibernate when restoring objects from the database. */
     protected DeletedAttachment()
@@ -211,7 +215,11 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public String getXml()
     {
-        return this.xml;
+        try {
+            return this.xml.getString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read XML", e);
+        }
     }
 
     /**
@@ -221,7 +229,11 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     protected void setXml(String xml)
     {
-        this.xml = xml;
+        try {
+            this.xml.setString(xml);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write xml", e);
+        }
     }
 
     /**
@@ -233,7 +245,12 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
-        setXml(attachment.toStringXML(true, true, context));
+        try {
+            attachment.toXML(new DefaultWriterOutputTarget(this.xml.getWriter(), true), true, true, false, context);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error serializing attachment to xml", e, null);
+        }
     }
 
     /**
@@ -253,10 +270,18 @@ public class DeletedAttachment extends AbstractSimpleClass
         if (result == null) {
             result = new XWikiAttachment();
         }
-        result.fromXML(getXml());
+
+        try {
+            result.fromXML(new DefaultReaderInputSource(this.xml.getReader(), true));
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error restoring attachment from xml", e, null);
+        }
+
         if (result.getDoc() == null || !(this.getDocName().equals(result.getDoc().getFullName()))) {
             result.setDoc(context.getWiki().getDocument(this.getDocName(), context));
         }
+
         return result;
     }
 }

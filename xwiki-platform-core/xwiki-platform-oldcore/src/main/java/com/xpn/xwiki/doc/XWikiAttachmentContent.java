@@ -54,6 +54,7 @@ public class XWikiAttachmentContent implements Cloneable
     private boolean isContentDirty;
 
     /** Storage which holds the actual content. */
+    // TODO: use TemporaryDeferredFileRepository instead (see DeletedAttachment)
     private FileItem file;
 
     /** The owner document. */

@@ -35,6 +35,7 @@ import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
 
@@ -55,7 +56,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
  * @since 3.0M2
  */
 @Component
-@Named("file")
+@Named(FileSystemStoreUtils.HINT)
 @Singleton
 public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 {
@@ -95,17 +96,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation cannot operate in a larger transaction so it starts a new transaction no matter
-     * whether bTransaction is true or false.
+     * This implementation cannot operate in a larger transaction so it starts a new transaction no matter whether
+     * bTransaction is true or false.
      * </p>
      *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentContent(
-     *XWikiAttachment, XWikiContext, boolean)
+     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentContent( XWikiAttachment, XWikiContext,
+     *      boolean)
      */
-    public void saveAttachmentContent(final XWikiAttachment attachment,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public void saveAttachmentContent(final XWikiAttachment attachment, final XWikiContext context,
+        final boolean bTransaction) throws XWikiException
     {
         this.saveAttachmentContent(attachment, true, context, bTransaction);
     }
@@ -113,18 +112,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation cannot operate in a larger transaction so it starts a new transaction no matter
-     * whether bTransaction is true or false.
+     * This implementation cannot operate in a larger transaction so it starts a new transaction no matter whether
+     * bTransaction is true or false.
      * </p>
      *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentContent(
-     *XWikiAttachment, boolean, XWikiContext, boolean)
+     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentContent( XWikiAttachment, boolean,
+     *      XWikiContext, boolean)
      */
-    public void saveAttachmentContent(final XWikiAttachment attachment,
-        final boolean updateDocument,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public void saveAttachmentContent(final XWikiAttachment attachment, final boolean updateDocument,
+        final XWikiContext context, final boolean bTransaction) throws XWikiException
     {
         final XWikiHibernateTransaction transaction = new XWikiHibernateTransaction(context);
         this.getAttachmentContentSaveRunnable(attachment, updateDocument, context).runIn(transaction);
@@ -135,14 +131,13 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 throw (XWikiException) e;
             }
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
-                "Exception while saving attachment.", e);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT, "Exception while saving attachment.", e);
         }
     }
 
     /**
-     * Get a TransactionRunnable for saving the attachment content.
-     * If {@link XWikiAttachment#getAttachment_content()} yields null, this runnable will do nothing.
+     * Get a TransactionRunnable for saving the attachment content. If {@link XWikiAttachment#getAttachment_content()}
+     * yields null, this runnable will do nothing.
      *
      * @param attachment the XWikiAttachment whose content should be saved.
      * @param updateDocument whether or not to update the document at the same time.
@@ -151,9 +146,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
      * @throws XWikiException if thrown by AttachmentSaveTransactionRunnable()
      */
     private TransactionRunnable<XWikiHibernateTransaction> getAttachmentContentSaveRunnable(
-        final XWikiAttachment attachment,
-        final boolean updateDocument,
-        final XWikiContext context)
+        final XWikiAttachment attachment, final boolean updateDocument, final XWikiContext context)
         throws XWikiException
     {
         final XWikiAttachmentContent content = attachment.getAttachment_content();
@@ -168,30 +161,22 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             getFilesystemStoreTools().getAttachmentFileProvider(attachment).getAttachmentContentFile();
         final FilesystemStoreTools ft = getFilesystemStoreTools();
 
-        return new AttachmentSaveTransactionRunnable(attachment,
-            updateDocument,
-            context,
-            attachFile,
-            ft.getTempFile(attachFile),
-            ft.getBackupFile(attachFile),
-            ft.getLockForFile(attachFile));
+        return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile,
+            ft.getTempFile(attachFile), ft.getBackupFile(attachFile), ft.getLockForFile(attachFile));
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation cannot operate in a larger transaction so it starts a new transaction no matter
-     * whether bTransaction is true or false.
+     * This implementation cannot operate in a larger transaction so it starts a new transaction no matter whether
+     * bTransaction is true or false.
      * </p>
      *
-     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentsContent(
-     *List, XWikiDocument, boolean, XWikiContext, boolean)
+     * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentsContent( List, XWikiDocument, boolean,
+     *      XWikiContext, boolean)
      */
-    public void saveAttachmentsContent(final List<XWikiAttachment> attachments,
-        final XWikiDocument doc,
-        final boolean updateDocument,
-        final XWikiContext context,
-        final boolean bTransaction) throws XWikiException
+    public void saveAttachmentsContent(final List<XWikiAttachment> attachments, final XWikiDocument doc,
+        final boolean updateDocument, final XWikiContext context, final boolean bTransaction) throws XWikiException
     {
         if (attachments == null || attachments.size() == 0) {
             return;
@@ -212,7 +197,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                     {
                         context.getWiki().getStore().saveXWikiDoc(doc, context, false);
                     }
-                } .runIn(transaction);
+                }.runIn(transaction);
             }
 
             transaction.start();
@@ -221,16 +206,13 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 throw (XWikiException) e;
             }
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
-                "Exception while saving attachments", e);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT, "Exception while saving attachments", e);
         }
     }
 
     @Override
-    public void loadAttachmentContent(final XWikiAttachment attachment,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public void loadAttachmentContent(final XWikiAttachment attachment, final XWikiContext context,
+        final boolean bTransaction) throws XWikiException
     {
         final File attachFile =
             getFilesystemStoreTools().getAttachmentFileProvider(attachment).getAttachmentContentFile();
@@ -242,8 +224,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             return;
         }
 
-        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-            XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
+        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
             "The attachment could not be found in the filesystem attachment store.\n"
                 + "This can happen if attachment storage is switched from database to "
                 + "filesystem without first moving all of the database attachments over "
@@ -251,20 +232,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     }
 
     @Override
-    public void deleteXWikiAttachment(final XWikiAttachment attachment,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public void deleteXWikiAttachment(final XWikiAttachment attachment, final XWikiContext context,
+        final boolean bTransaction) throws XWikiException
     {
         this.deleteXWikiAttachment(attachment, true, context, bTransaction);
     }
 
     @Override
-    public void deleteXWikiAttachment(final XWikiAttachment attachment,
-        final boolean parentUpdate,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public void deleteXWikiAttachment(final XWikiAttachment attachment, final boolean parentUpdate,
+        final XWikiContext context, final boolean bTransaction) throws XWikiException
     {
         final XWikiHibernateTransaction transaction = new XWikiHibernateTransaction(context);
         this.getAttachmentDeleteRunnable(attachment, parentUpdate, context).runIn(transaction);
@@ -274,8 +250,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             if (e instanceof XWikiException) {
                 throw (XWikiException) e;
             }
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Exception while deleting attachment.", e);
         }
     }
@@ -290,22 +265,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
      *         XWikiHibernateTransaction
      * @throws XWikiException if unable to load the attachment archive to delete.
      */
-    private TransactionRunnable<XWikiHibernateTransaction> getAttachmentDeleteRunnable(
-        final XWikiAttachment attachment,
-        final boolean updateDocument,
-        final XWikiContext context)
-        throws XWikiException
+    private TransactionRunnable<XWikiHibernateTransaction> getAttachmentDeleteRunnable(final XWikiAttachment attachment,
+        final boolean updateDocument, final XWikiContext context) throws XWikiException
     {
         final File attachFile =
             getFilesystemStoreTools().getAttachmentFileProvider(attachment).getAttachmentContentFile();
         final FilesystemStoreTools ft = getFilesystemStoreTools();
 
-        return new AttachmentDeleteTransactionRunnable(attachment,
-            updateDocument,
-            context,
-            attachFile,
-            ft.getBackupFile(attachFile),
-            ft.getLockForFile(attachFile));
+        return new AttachmentDeleteTransactionRunnable(attachment, updateDocument, context, attachFile,
+            ft.getBackupFile(attachFile), ft.getLockForFile(attachFile));
     }
 
     @Override
@@ -319,8 +287,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     /**
      * A TransactionRunnable for saving an attachment.
      */
-    private static class AttachmentSaveTransactionRunnable
-        extends TransactionRunnable<XWikiHibernateTransaction>
+    private static class AttachmentSaveTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
     {
         /**
          * The XWikiAttachment whose content should be saved.
@@ -347,18 +314,12 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param tempFile the File to put the attachment content in until the transaction is complete.
          * @param backupFile the File to backup the content of the existing attachment in.
          * @param lock this Lock will be locked while the attachment file is being written to.
-         * @throws XWikiException if thrown by {@link XWikiAttachment#updateContentArchive(XWikiContext)}
-         * or {@link FilesystemAttachmentVersioningStore#
-         * getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
+         * @throws XWikiException if thrown by {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
+         *             {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
          */
-        AttachmentSaveTransactionRunnable(final XWikiAttachment attachment,
-            final boolean updateDocument,
-            final XWikiContext context,
-            final File attachFile,
-            final File tempFile,
-            final File backupFile,
-            final ReadWriteLock lock)
-            throws XWikiException
+        AttachmentSaveTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
+            final XWikiContext context, final File attachFile, final File tempFile, final File backupFile,
+            final ReadWriteLock lock) throws XWikiException
         {
             final StreamProvider provider = new AttachmentContentStreamProvider(attachment, context);
             new FileSaveTransactionRunnable(attachFile, tempFile, backupFile, lock, provider).runIn(this);
@@ -382,7 +343,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                     {
                         avs.saveArchive(archive, context, false);
                     }
-                } .runIn(this);
+                }.runIn(this);
             }
 
             // If updating of the parent document is required then add a TransactionRunnable to do that.
@@ -395,7 +356,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                     {
                         store.saveXWikiDoc(doc, context, false);
                     }
-                } .runIn(this);
+                }.runIn(this);
             }
 
             this.attachment = attachment;
@@ -407,8 +368,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     /**
      * A TransactionRunnable for deleting an attachment.
      */
-    private static class AttachmentDeleteTransactionRunnable
-        extends TransactionRunnable<XWikiHibernateTransaction>
+    private static class AttachmentDeleteTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
     {
         /**
          * The XWikiAttachment whose content should be saved.
@@ -436,12 +396,8 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param lock this Lock will be locked while the attachment file is being written to.
          * @throws XWikiException if unable to load the archive for the attachment to delete.
          */
-        AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment,
-            final boolean updateDocument,
-            final XWikiContext context,
-            final File attachFile,
-            final File tempFile,
-            final ReadWriteLock lock)
+        AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
+            final XWikiContext context, final File attachFile, final File tempFile, final ReadWriteLock lock)
             throws XWikiException
         {
             new FileDeleteTransactionRunnable(attachFile, tempFile, lock).runIn(this);
@@ -459,7 +415,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                     {
                         avs.deleteArchive(attachment, context, false);
                     }
-                } .runIn(this);
+                }.runIn(this);
             }
 
             this.context = context;
@@ -471,7 +427,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         protected void onRun() throws Exception
         {
             // TODO: When the rest of storage is rewritten using TransactionRunnable,
-            //       this method should be disolved.
+            // this method should be disolved.
 
             final Session session = this.context.getWiki().getHibernateStore().getSession(this.context);
 
@@ -489,9 +445,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                         break;
                     }
                 }
-                this.context.getWiki().getStore().saveXWikiDoc(this.attachment.getDoc(),
-                    this.context,
-                    false);
+                this.context.getWiki().getStore().saveXWikiDoc(this.attachment.getDoc(), this.context, false);
             }
 
             // Delete the attachment metadata.

@@ -29,6 +29,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -4409,8 +4410,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         boolean bWithVersions, XWikiContext context) throws XWikiException
     {
         StringWriter writer = new StringWriter();
+
         toXML(new DefaultWriterOutputTarget(writer), bWithObjects, bWithRendering, bWithAttachmentContent,
-            bWithVersions, context);
+            bWithVersions, true, context != null ? context.getWiki().getEncoding() : StandardCharsets.UTF_8.name());
+
         return writer.toString();
     }
 
@@ -4484,7 +4487,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         DocumentResult domResult = new DocumentResult();
 
         toXML(new DefaultResultOutputTarget(domResult), bWithObjects, bWithRendering, bWithAttachmentContent,
-            bWithVersions, context);
+            bWithVersions, true, context != null ? context.getWiki().getEncoding() : StandardCharsets.UTF_8.name());
 
         wr.write(domResult.getDocument().getRootElement());
     }
@@ -4505,7 +4508,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
     {
         toXML(new DefaultOutputStreamOutputTarget(out), bWithObjects, bWithRendering, bWithAttachmentContent,
-            bWithVersions, context);
+            bWithVersions, true, context != null ? context.getWiki().getEncoding() : StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -4516,12 +4519,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param bWithRendering include the rendered content
      * @param bWithAttachmentContent include attachments content
      * @param bWithVersions include archived versions
-     * @param context current XWikiContext
+     * @param format true if the XML should be formated
+     * @param encoding the encoding to use to write the XML
      * @throws XWikiException when an errors occurs during wiki operations
      * @since 9.0RC1
      */
     public void toXML(OutputTarget out, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
-        boolean bWithVersions, XWikiContext context) throws XWikiException
+        boolean bWithVersions, boolean format, String encoding) throws XWikiException
     {
         // Input
         DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
@@ -4534,7 +4538,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Output
         XAROutputProperties xarProperties = new XAROutputProperties();
         xarProperties.setPreserveVersion(bWithVersions);
-        xarProperties.setEncoding(context.getWiki().getEncoding());
+        xarProperties.setEncoding(encoding);
+        xarProperties.setFormat(format);
 
         try {
             Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, out, xarProperties,

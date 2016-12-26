@@ -36,9 +36,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface XWikiRecycleBinContentStoreInterface
 {
     /**
-     * @return the type of the store (usually its role hint)
+     * @return the hint of the component
      */
-    String getStoreType();
+    String getHint();
 
     /**
      * Save document to recycle bin.

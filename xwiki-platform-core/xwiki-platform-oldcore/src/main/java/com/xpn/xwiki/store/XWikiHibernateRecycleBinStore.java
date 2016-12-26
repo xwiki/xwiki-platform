@@ -157,13 +157,13 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         DocumentReference reference, boolean bTransaction) throws XWikiException
     {
         XWikiRecycleBinContentStoreInterface contentStore =
-            getXWikiRecycleBinContentStore(deletedDocument.getStoreType());
+            getXWikiRecycleBinContentStore(deletedDocument.getXmlStore());
 
         if (contentStore != null) {
             XWikiDeletedDocumentContent content = contentStore.get(reference, deletedDocument.getId(), bTransaction);
 
             try {
-                FieldUtils.writeDeclaredField(deletedDocument, "content", content, true);
+                FieldUtils.writeDeclaredField(deletedDocument, "xml", content, true);
             } catch (IllegalAccessException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Failed to set deleted document content", e);
@@ -179,8 +179,8 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         XWikiDeletedDocument trashdoc;
 
         if (contentStore != null) {
-            trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), contentStore.getStoreType(),
-                deleter, date, null);
+            trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), contentStore.getHint(), deleter,
+                date, null);
         } else {
             trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), null, deleter, date,
                 new XWikiHibernateDeletedDocumentContent(doc));
@@ -193,7 +193,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         boolean bTransaction) throws XWikiException
     {
         XWikiRecycleBinContentStoreInterface contentStore =
-            getXWikiRecycleBinContentStore(deletedDocument.getStoreType());
+            getXWikiRecycleBinContentStore(deletedDocument.getXmlStore());
 
         if (contentStore != null) {
             contentStore.delete(doc.getDocumentReferenceWithLocale(), deletedDocument.getId(), bTransaction);

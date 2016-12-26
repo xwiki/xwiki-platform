@@ -71,7 +71,7 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
-    public String getStoreType()
+    public String getHint()
     {
         return FileSystemStoreUtils.HINT;
     }

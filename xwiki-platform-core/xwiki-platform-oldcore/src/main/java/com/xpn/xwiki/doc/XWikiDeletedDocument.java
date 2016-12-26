@@ -66,9 +66,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     private String deleter;
 
-    private String storeType;
+    private String xmlStore;
 
-    private XWikiDeletedDocumentContent content;
+    private XWikiDeletedDocumentContent xml;
 
     /**
      * Default constructor. Used only in hibernate.
@@ -92,7 +92,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
         this.locale = locale;
         this.deleter = deleter;
         this.date = deleteDate;
-        this.storeType = storeType;
+        this.xmlStore = storeType;
     }
 
     /**
@@ -124,7 +124,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     {
         this(fullName, locale, storeType, deleter, deleteDate);
 
-        this.content = content;
+        this.xml = content;
     }
 
     /**
@@ -223,17 +223,17 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     /**
      * @return the type of the stored used for the content
      */
-    public String getStoreType()
+    public String getXmlStore()
     {
-        return this.storeType;
+        return this.xmlStore;
     }
 
     /**
-     * @param storeType the type of store (supported values are "hibernate" and "file")
+     * @param xmlStore the type of store (supported values are null/"hibernate" and "file")
      */
-    protected void setStoreType(String storeType)
+    protected void setXmlStore(String xmlStore)
     {
-        this.storeType = storeType;
+        this.xmlStore = xmlStore;
     }
 
     /**
@@ -243,9 +243,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     public String getXml()
     {
-        if (this.content != null) {
+        if (this.xml != null) {
             try {
-                return this.content.getContentAsString();
+                return this.xml.getContentAsString();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -264,7 +264,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     {
         if (StringUtils.isNotEmpty(xml)) {
             try {
-                this.content = new XWikiHibernateDeletedDocumentContent(xml);
+                this.xml = new XWikiHibernateDeletedDocumentContent(xml);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -284,7 +284,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     @Deprecated
     protected void setDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        this.content = new XWikiHibernateDeletedDocumentContent(doc);
+        this.xml = new XWikiHibernateDeletedDocumentContent(doc);
     }
 
     /**
@@ -296,7 +296,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     public XWikiDocument restoreDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
-            return this.content.getXWikiDocument(doc);
+            return this.xml.getXWikiDocument(doc);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error restoring document", e, null);

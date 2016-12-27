@@ -4425,7 +4425,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context current XWikiContext
      * @return a {@link DOMDocument} containing the serialized document.
      * @throws XWikiException when an errors occurs during wiki operations
-     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, XWikiContext)}
+     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)}
      *             instead
      */
     @Deprecated
@@ -4447,7 +4447,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context current XWikiContext
      * @return a {@link DOMDocument} containing the serialized document.
      * @throws XWikiException when an errors occurs during wiki operations
-     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, XWikiContext)}
+     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)}
      *             instead
      */
     @Deprecated
@@ -4476,7 +4476,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException when an errors occurs during wiki operations
      * @throws IOException when an errors occurs during streaming operations
      * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, XWikiContext)}
+     * @deprecated since 9.0RC1, use {@link #toXML(OutputTarget, boolean, boolean, boolean, boolean, boolean, String)}
      *             instead
      */
     @Deprecated

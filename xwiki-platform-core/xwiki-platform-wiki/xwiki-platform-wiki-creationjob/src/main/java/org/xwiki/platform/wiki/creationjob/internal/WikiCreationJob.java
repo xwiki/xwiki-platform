@@ -94,6 +94,8 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
                 this.progressManager.startStep(this);
 
                 step.execute(request);
+
+                this.progressManager.endStep(this);
             }
 
             this.progressManager.popLevelProgress(this);

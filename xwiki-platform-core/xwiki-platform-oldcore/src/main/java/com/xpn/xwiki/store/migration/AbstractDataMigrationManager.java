@@ -657,7 +657,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     {
         Set<String> databasesToMigrate = getDatabasesToMigrate();
 
-        this.progress.pushLevelProgress(databasesToMigrate.size() + 1, this);
+        this.progress.pushLevelProgress(databasesToMigrate.size(), this);
 
         try {
             // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
@@ -674,6 +674,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 if (!migrateDatabase(database)) {
                     errorCount++;
                 }
+
+                this.progress.endStep(this);
             }
 
             if (errorCount > 0) {
@@ -857,6 +859,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                     this.logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
                         migration.dataMigration.getName(), database, getDBVersion());
                 }
+
+                this.progress.endStep(this);
             }
         } finally {
             this.progress.popLevelProgress(this);

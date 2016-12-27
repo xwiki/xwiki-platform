@@ -132,6 +132,8 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                             this.progressManager.startStep(this);
 
                             repairExtension(extensionId, namespace, false, Collections.emptyMap());
+
+                            this.progressManager.endStep(this);
                         }
                     } finally {
                         this.progressManager.popLevelProgress(this);
@@ -139,6 +141,8 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                 } else {
                     repairExtension(extensionId, null, false, Collections.emptyMap());
                 }
+
+                this.progressManager.endStep(this);
             }
         } finally {
             this.progressManager.popLevelProgress(this);
@@ -162,11 +166,15 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
                 Extension extension = this.repositoryManager.resolve(extensionId);
 
+                this.progressManager.endStep(this);
+
                 this.progressManager.startStep(this);
 
                 if (extension.getType().equals(XarExtensionHandler.TYPE)) {
                     localExtension = this.localExtensionRepository.storeExtension(extension);
                 }
+
+                this.progressManager.endStep(this);
             } catch (ResolveException e) {
                 throw new InstallException("Failed to find extension", e);
             } catch (LocalExtensionRepositoryException e) {
@@ -211,11 +219,10 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
         try {
             this.progressManager.startStep(this);
-
             LocalExtension localExtension = getLocalXARExtension(extensionId);
+            this.progressManager.endStep(this);
 
             this.progressManager.startStep(this);
-
             if (localExtension != null) {
                 repairExtension(localExtension, namespace, dependency, managedDependencies);
             }
@@ -252,11 +259,11 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
             Collection<? extends ExtensionDependency> dependencies = localExtension.getDependencies();
 
             if (!dependencies.isEmpty()) {
-                this.progressManager.pushLevelProgress(dependencies.size(), this);
+                this.progressManager.pushLevelProgress(dependencies.size(), dependencies);
 
                 try {
                     for (ExtensionDependency extensionDependency : dependencies) {
-                        this.progressManager.startStep(this);
+                        this.progressManager.startStep(dependencies);
 
                         // Replace with managed dependency if any
                         ExtensionDependency resolvedDependency =
@@ -264,11 +271,15 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
                         repairDependency(resolvedDependency, namespace,
                             ExtensionUtils.append(managedDependencies, localExtension));
+
+                        this.progressManager.endStep(dependencies);
                     }
                 } finally {
-                    this.progressManager.popLevelProgress(this);
+                    this.progressManager.popLevelProgress(dependencies);
                 }
             }
+
+            this.progressManager.endStep(this);
 
             this.progressManager.startStep(this);
 

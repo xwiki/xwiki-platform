@@ -117,11 +117,13 @@ public class DefaultLinkRefactoring implements LinkRefactoring
             // Update the default locale instance.
             this.progressManager.startStep(this);
             renameLinks(document, oldLinkTarget, newLinkTarget);
+            this.progressManager.endStep(this);
 
             // Update the translations.
             for (Locale locale : locales) {
                 this.progressManager.startStep(this);
                 renameLinks(document.getTranslatedDocument(locale, xcontext), oldLinkTarget, newLinkTarget);
+                this.progressManager.endStep(this);
             }
         } catch (XWikiException e) {
             this.logger.error("Failed to rename the links that target [{}] from [{}].", oldLinkTarget,

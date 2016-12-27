@@ -1179,6 +1179,8 @@ public class XWiki implements EventListener
             // potential document changes can use it
             Utils.<XWikiStubContextProvider>getComponent(XWikiStubContextProvider.class).initialize(context);
 
+            getProgress().endStep(this);
+
             getProgress().startStep(this);
 
             // Make sure these classes exists
@@ -1187,10 +1189,14 @@ public class XWiki implements EventListener
                 getStatsService(context);
             }
 
+            getProgress().endStep(this);
+
             getProgress().startStep(this);
 
             // Prepare the Plugin Engine
             preparePlugins(context);
+
+            getProgress().endStep(this);
 
             getProgress().startStep(this);
 

@@ -164,8 +164,8 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             this.logger.error("You are not allowed to delete [{}].", oldReference);
         } else if (!hasAccess(Right.VIEW, newReference) || !hasAccess(Right.EDIT, newReference)
             || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
-            this.logger
-                .error("You don't have sufficient permissions over the destination document [{}].", newReference);
+            this.logger.error("You don't have sufficient permissions over the destination document [{}].",
+                newReference);
         } else {
             move(oldReference, newReference);
         }
@@ -188,16 +188,19 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
                     return;
                 }
             }
+            this.progressManager.endStep(this);
 
             // Step 2: Copy the source document to the destination.
             this.progressManager.startStep(this);
             if (!this.modelBridge.copy(oldReference, newReference)) {
                 return;
             }
+            this.progressManager.endStep(this);
 
             // Step 3: Update the destination document based on the source document parameters.
             this.progressManager.startStep(this);
             this.modelBridge.update(newReference, this.request.getEntityParameters(oldReference));
+            this.progressManager.endStep(this);
 
             // Step 4 + 5: Update other documents that might be affected by this move.
             updateDocuments(oldReference, newReference);
@@ -207,6 +210,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             if (this.request.isDeleteSource()) {
                 this.modelBridge.delete(oldReference);
             }
+            this.progressManager.endStep(this);
 
             // Step 7: Create an automatic redirect.
             this.progressManager.startStep(this);
@@ -225,6 +229,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         if (this.request.isUpdateLinks()) {
             updateLinks(oldReference, newReference);
         }
+        this.progressManager.endStep(this);
 
         // Step 4: (legacy) Preserve existing parent-child relationships by updating the parent field of documents
         // having the moved document as parent.
@@ -232,6 +237,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         if (this.request.isUpdateParentField()) {
             this.modelBridge.updateParentField(oldReference, newReference);
         }
+        this.progressManager.endStep(this);
     }
 
     private boolean confirmOverwrite(EntityReference source, EntityReference destination)
@@ -264,6 +270,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             if (this.request.isDeleteSource()) {
                 updateBackLinks(oldReference, newReference);
             }
+            this.progressManager.endStep(this);
 
             // Step 2: Update the relative links from the document content.
             this.progressManager.startStep(this);
@@ -284,6 +291,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
                 if (hasAccess(Right.EDIT, backlinkDocumentReference)) {
                     this.linkRefactoring.renameLinks(backlinkDocumentReference, oldReference, newReference);
                 }
+                this.progressManager.endStep(this);
             }
         } finally {
             this.progressManager.popLevelProgress(this);

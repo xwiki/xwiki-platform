@@ -125,6 +125,8 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
                 if (installedExtension != null && installedExtension.isInstalled(namespace)) {
                     diff(extensionId.getId(), namespace);
                 }
+
+                this.progressManager.endStep(this);
             }
         } finally {
             this.progressManager.popLevelProgress(this);

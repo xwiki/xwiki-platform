@@ -146,6 +146,7 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
                 } else {
                     this.progressManager.startStep(this);
                     process(entityReference);
+                    this.progressManager.endStep(this);
                 }
             }
         } finally {
@@ -264,5 +265,6 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         if (!this.status.isCanceled()) {
             visitDocumentNodes(node, visitor);
         }
+        this.progressManager.endStep(this);
     }
 }

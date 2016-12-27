@@ -178,6 +178,8 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
 
                 // Remember we took care of this flavor
                 doneFlavors.add(flavorId.getId());
+
+                this.progressManager.endStep(this);
             }
 
             // Add remote flavors
@@ -191,6 +193,8 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
                         this.foundFlavors.add(validExtension);
                     }
                 }
+
+                this.progressManager.endStep(this);
             }
         } finally {
             this.progressManager.popLevelProgress(this);
@@ -233,6 +237,9 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
                 Version version = it.previous();
 
                 Extension extension = tryInstallExtension(new ExtensionId(flavorId, version), namespace);
+
+                this.progressManager.endStep(flavorId);
+
                 if (extension != null) {
                     return extension;
                 }

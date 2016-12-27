@@ -294,6 +294,8 @@ public class DefaultModelBridge implements ModelBridge
                 childDocument.setParentReference(newParentReference);
 
                 wiki.saveDocument(childDocument, "Updated parent field.", true, context);
+
+                this.progressManager.endStep(this);
             }
 
             if (childReferences.size() > 0) {

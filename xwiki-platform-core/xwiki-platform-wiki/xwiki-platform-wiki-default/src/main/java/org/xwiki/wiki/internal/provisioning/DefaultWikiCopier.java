@@ -44,6 +44,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Default implementation for {@link WikiCopier}.
+ * 
  * @version $Id$
  * @since 7.0M2
  */
@@ -73,30 +74,46 @@ public class DefaultWikiCopier implements WikiCopier
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
 
+        this.progress.pushLevelProgress(2, this);
+
         try {
+            // Get documents
+
+            this.progress.startStep(this, "Get documents to copy");
+
             Query query = queryManager.createQuery("select distinct doc.fullName from Document as doc", Query.XWQL);
             query.setWiki(fromWikiId);
             List<String> documentFullnames = query.execute();
 
-            WikiReference fromWikiReference = new WikiReference(fromWikiId);
+            this.progress.endStep(this);
 
+            // Copy documents
+
+            this.progress.startStep(this, "Copy documents");
             this.progress.pushLevelProgress(documentFullnames.size(), this);
 
-            for (String documentFullName : documentFullnames) {
-                this.progress.startStep(this);
+            WikiReference fromWikiReference = new WikiReference(fromWikiId);
 
-                DocumentReference origDocReference = documentReferenceResolver.resolve(documentFullName,
-                        fromWikiReference);
-                DocumentReference newDocReference = origDocReference.setWikiReference(new WikiReference(toWikiId));
+            try {
+                for (String documentFullName : documentFullnames) {
+                    this.progress.startStep(this);
 
-                logger.info("Copying document [{}] to [{}].", origDocReference, newDocReference);
-                xwiki.copyDocument(origDocReference, newDocReference, null, !withHistory, true, context);
-                logger.info("Done copying document [{}] to [{}].", origDocReference, newDocReference);
+                    DocumentReference origDocReference =
+                        documentReferenceResolver.resolve(documentFullName, fromWikiReference);
+                    DocumentReference newDocReference = origDocReference.setWikiReference(new WikiReference(toWikiId));
+
+                    logger.info("Copying document [{}] to [{}].", origDocReference, newDocReference);
+                    xwiki.copyDocument(origDocReference, newDocReference, null, !withHistory, true, context);
+                    logger.info("Done copying document [{}] to [{}].", origDocReference, newDocReference);
+
+                    this.progress.endStep(this);
+                }
+            } finally {
+                this.progress.popLevelProgress(this);
+                this.progress.endStep(this);
             }
-
-            this.progress.popLevelProgress(this);
         } catch (QueryException e) {
-            WikiManagerException thrownException = 
+            WikiManagerException thrownException =
                 new WikiManagerException("Unable to get the list of wiki documents to copy.", e);
             logger.error(thrownException.getMessage(), thrownException);
             throw thrownException;
@@ -104,8 +121,9 @@ public class DefaultWikiCopier implements WikiCopier
             WikiManagerException thrownException = new WikiManagerException("Failed to copy documents.", e);
             logger.error(thrownException.getMessage(), thrownException);
             throw thrownException;
+        } finally {
+            this.progress.popLevelProgress(this);
         }
-
     }
 
     @Override

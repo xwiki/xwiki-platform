@@ -71,10 +71,12 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
 
         this.entity.setFilename(name);
 
-        try {
-            this.entity.setContent(content);
-        } catch (IOException e) {
-            throw new FilterException("Failed to set attachment content", e);
+        if (content != null) {
+            try {
+                this.entity.setContent(content);
+            } catch (IOException e) {
+                throw new FilterException("Failed to set attachment content", e);
+            }
         }
 
         // Author

@@ -102,14 +102,19 @@ public class XWikiAttachmentEventGenerator
 
         InputStream content;
         Long size;
-        try {
-            content = attachment.getContentInputStream(xcontext);
-            size = Long.valueOf(attachment.getFilesize());
-        } catch (XWikiException e) {
-            this.logger.error("Failed to get content of attachment [{}]", attachment.getReference(), e);
+        if (properties.isWithWikiAttachmentsContent()) {
+            try {
+                content = attachment.getContentInputStream(xcontext);
+                size = Long.valueOf(attachment.getFilesize());
+            } catch (XWikiException e) {
+                this.logger.error("Failed to get content of attachment [{}]", attachment.getReference(), e);
 
-            content = new ByteArrayInputStream(new byte[0]);
-            size = 0L;
+                content = new ByteArrayInputStream(new byte[0]);
+                size = 0L;
+            }
+        } else {
+            content = null;
+            size = null;
         }
 
         // WikiAttachment

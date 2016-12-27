@@ -525,7 +525,7 @@ public class XWikiAttachment implements Cloneable
     {
         // Input
         DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
-        documentProperties.setWithWikiAttachments(bWithAttachmentContent);
+        documentProperties.setWithWikiAttachmentsContent(bWithAttachmentContent);
         documentProperties.setWithJRCSRevisions(bWithVersions);
         documentProperties.setWithRevisions(false);
 

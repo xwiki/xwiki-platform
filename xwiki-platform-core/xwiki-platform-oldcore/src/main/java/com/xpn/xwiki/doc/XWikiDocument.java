@@ -4531,7 +4531,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
         documentProperties.setWithWikiObjects(bWithObjects);
         documentProperties.setWithWikiDocumentContentHTML(bWithRendering);
-        documentProperties.setWithWikiAttachments(bWithAttachmentContent);
+        documentProperties.setWithWikiAttachmentsContent(bWithAttachmentContent);
         documentProperties.setWithJRCSRevisions(bWithVersions);
         documentProperties.setWithRevisions(false);
 

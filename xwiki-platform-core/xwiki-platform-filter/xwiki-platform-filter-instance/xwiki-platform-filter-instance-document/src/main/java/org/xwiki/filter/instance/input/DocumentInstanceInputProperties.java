@@ -44,6 +44,11 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     private boolean withWikiAttachments = true;
 
     /**
+     * @see #isWithWikiAttachmentsContent()
+     */
+    private boolean withWikiAttachmentsContent = true;
+
+    /**
      * @see #isWithWikiObjects()
      */
     private boolean withWikiObjects = true;
@@ -85,7 +90,7 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     {
         return withJRCSRevisions;
     }
-    
+
     /**
      * @param withJRCSRevisions Indicates if JRCS based history should be added to document locale event properties
      */
@@ -93,7 +98,7 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     {
         this.withJRCSRevisions = withJRCSRevisions;
     }
-    
+
     /**
      * @return Indicate if events should be generated for attachments
      */
@@ -110,6 +115,26 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     public void setWithWikiAttachments(boolean withWikiAttachments)
     {
         this.withWikiAttachments = withWikiAttachments;
+    }
+
+    /**
+     * @return Indicate if events should be generated for attachments
+     * @since 9.0RC1
+     */
+    @PropertyName("With attachments content")
+    @PropertyDescription("Indicate if events should be generated for attachments content")
+    public boolean isWithWikiAttachmentsContent()
+    {
+        return this.withWikiAttachmentsContent;
+    }
+
+    /**
+     * @param withWikiAttachmentsContent Indicate if events should be generated for attachments content
+     * @since 9.0RC1
+     */
+    public void setWithWikiAttachmentsContent(boolean withWikiAttachmentsContent)
+    {
+        this.withWikiAttachmentsContent = withWikiAttachmentsContent;
     }
 
     /**

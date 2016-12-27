@@ -103,16 +103,39 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(solrIterator, databaseIterator);
         iterator.setRootReference(getRequest().getRootReference());
 
-        this.progressManager.pushLevelProgress((int) iterator.size(), this);
+        this.progressManager.pushLevelProgress(2, this);
 
         try {
-            long[] counter = new long[4];
+            // Calculate index progress size
+
+            this.progressManager.startStep(this);
+            int progressSize = (int) iterator.size();
+            this.progressManager.endStep(this);
+
+            // Index
+
+            this.progressManager.startStep(this);
+            updateSolrIndex(progressSize, iterator);
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void updateSolrIndex(int progressSize, DiffDocumentIterator<String> iterator)
+    {
+        this.progressManager.pushLevelProgress(progressSize, this);
+
+        try {
+            long[] counter = new long[Action.values().length];
+
             while (iterator.hasNext()) {
                 this.progressManager.startStep(this);
 
                 Pair<DocumentReference, Action> entry = iterator.next();
                 if (entry.getValue() == Action.ADD || entry.getValue() == Action.UPDATE) {
-                    // The database entry has not been indexed or the indexed version doesn't match the latest version
+                    // The database entry has not been indexed or the indexed version doesn't match the latest
+                    // version
                     // from the database.
                     this.indexer.index(entry.getKey(), true);
                 } else if (entry.getValue() == Action.DELETE && getRequest().isRemoveMissing()) {
@@ -121,6 +144,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 }
 
                 counter[entry.getValue().ordinal()]++;
+
+                this.progressManager.endStep(this);
             }
 
             logger.info("{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",

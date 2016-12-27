@@ -4636,6 +4636,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
+
+        // We have been reading from XML so the document does not need a new version when saved
+        setMetaDataDirty(false);
+        setContentDirty(false);
     }
 
     public void fromXML(String source, boolean withArchive) throws XWikiException

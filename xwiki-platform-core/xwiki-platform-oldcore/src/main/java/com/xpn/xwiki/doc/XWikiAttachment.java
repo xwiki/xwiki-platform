@@ -590,6 +590,11 @@ public class XWikiAttachment implements Cloneable
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml", e, null);
         }
+
+        // The setters we're calling above will set the metadata dirty flag to true since they're changing the
+        // attachment's identity. However since this method is about loading the attachment from XML it shouldn't be
+        // considered as dirty.
+        setMetaDataDirty(false);
     }
 
     public void fromXML(Element docel) throws XWikiException
@@ -607,11 +612,6 @@ public class XWikiAttachment implements Cloneable
 
         // Actually parse the XML
         fromXML(writer.toString());
-
-        // The setters we're calling above will set the metadata dirty flag to true since they're changing the
-        // attachment's identity. However since this method is about loading the attachment from XML it shouldn't be
-        // considered as dirty.
-        setMetaDataDirty(false);
     }
 
     public XWikiAttachmentContent getAttachment_content()

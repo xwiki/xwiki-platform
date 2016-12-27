@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -51,7 +50,7 @@ public class UndeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-        String deletedDocumentLanguage = null;
+        Locale deletedDocumentLocale = null;
 
         if (xwiki.hasRecycleBin(context)) {
             String sindex = request.getParameter("id");
@@ -62,12 +61,11 @@ public class UndeleteAction extends XWikiAction
             XWikiDeletedDocument deletedDocument =
                 xwiki.getDeletedDocument(StringUtils.EMPTY, StringUtils.EMPTY, (int) index, context);
             if (deletedDocument != null) {
-                deletedDocumentLanguage = deletedDocument.getLanguage();
+                deletedDocumentLocale = deletedDocument.getLocale();
 
                 // If the document (or the translation) that we want to restore does not exist, restore it.
                 DocumentReference translatedDocumentReference =
-                    new DocumentReference(doc.getDocumentReference(), LocaleUtils.toLocale(deletedDocumentLanguage,
-                        Locale.ROOT));
+                    new DocumentReference(doc.getDocumentReference(), deletedDocumentLocale);
                 if (!xwiki.exists(translatedDocumentReference, context)) {
                     xwiki.restoreFromRecycleBin(doc, index, "Restored from recycle bin", context);
                 }
@@ -76,8 +74,8 @@ public class UndeleteAction extends XWikiAction
 
         // Redirect to the undeleted document. Make sure to redirect to the proper translation.
         String queryString = null;
-        if (deletedDocumentLanguage != null && xwiki.isMultiLingual(context)) {
-            queryString = String.format("language=%s", deletedDocumentLanguage);
+        if (deletedDocumentLocale != null && xwiki.isMultiLingual(context)) {
+            queryString = String.format("language=%s", deletedDocumentLocale);
         }
         sendRedirect(response, doc.getURL("view", queryString, context));
 

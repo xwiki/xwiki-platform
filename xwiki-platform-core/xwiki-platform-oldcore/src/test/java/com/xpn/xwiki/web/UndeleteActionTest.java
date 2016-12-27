@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.csrf.CSRFToken;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -119,7 +118,7 @@ public class UndeleteActionTest
         when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
-        when(deletedDocument.getLanguage()).thenReturn("");
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
 
         when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(false);
 
@@ -148,7 +147,7 @@ public class UndeleteActionTest
         when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
-        when(deletedDocument.getLanguage()).thenReturn("");
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
 
         when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(false);
 
@@ -177,7 +176,7 @@ public class UndeleteActionTest
         when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
             deletedDocument);
 
-        when(deletedDocument.getLanguage()).thenReturn("");
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
 
         when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(true);
 
@@ -207,11 +206,10 @@ public class UndeleteActionTest
             deletedDocument);
 
         // Document to restore is a translation.
-        when(deletedDocument.getLanguage()).thenReturn("ro");
+        when(deletedDocument.getLocale()).thenReturn(new Locale("ro"));
 
         DocumentReference translationDocumentReference =
-            new DocumentReference(document.getDocumentReference(), LocaleUtils.toLocale(deletedDocument.getLanguage(),
-                Locale.ROOT));
+            new DocumentReference(document.getDocumentReference(), deletedDocument.getLocale());
         when(xwiki.exists(translationDocumentReference, context)).thenReturn(false);
 
         assertFalse(undeleteAction.action(context));

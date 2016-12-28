@@ -51,9 +51,12 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
-            proxyFilter.onWikiAttachment(this.name,
-                this.content != null ? new ByteArrayInputStream(this.content) : null, Long.valueOf(this.content.length),
-                this.parameters);
+            if (this.content != null) {
+                proxyFilter.onWikiAttachment(this.name, new ByteArrayInputStream(this.content),
+                    Long.valueOf(this.content.length), this.parameters);
+            } else {
+                proxyFilter.onWikiAttachment(this.name, null, null, this.parameters);
+            }
         }
     }
 

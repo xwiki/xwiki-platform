@@ -28,10 +28,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.codec.binary.Base64;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.filter.FilterException;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
-import org.xwiki.filter.FilterException;
 
 /**
  * @version $Id$
@@ -51,13 +51,15 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
-            proxyFilter.onWikiAttachment(this.name, new ByteArrayInputStream(this.content),
-                Long.valueOf(this.content.length), this.parameters);
+            proxyFilter.onWikiAttachment(this.name,
+                this.content != null ? new ByteArrayInputStream(this.content) : null, Long.valueOf(this.content.length),
+                this.parameters);
         }
     }
 
     @Override
-    public WikiAttachment read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException, FilterException
+    public WikiAttachment read(XMLStreamReader xmlReader, XARInputProperties properties)
+        throws XMLStreamException, FilterException
     {
         WikiAttachment wikiAttachment = new WikiAttachment();
 

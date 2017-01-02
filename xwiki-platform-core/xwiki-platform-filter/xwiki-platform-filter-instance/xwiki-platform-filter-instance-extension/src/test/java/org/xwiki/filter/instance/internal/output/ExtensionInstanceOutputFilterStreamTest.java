@@ -78,9 +78,6 @@ public class ExtensionInstanceOutputFilterStreamTest
         this.extensionRepositoryMock =
             this.repositoryUtil.getComponentManager().registerMockComponent(ExtensionRepositoryManager.class);
         doThrow(ResolveException.class).when(this.extensionRepositoryMock).resolve((ExtensionId) any());
-
-        // Skip core extension scanner
-        this.repositoryUtil.getComponentManager().registerMockComponent(CoreExtensionScanner.class);
     }
 
     // Tests

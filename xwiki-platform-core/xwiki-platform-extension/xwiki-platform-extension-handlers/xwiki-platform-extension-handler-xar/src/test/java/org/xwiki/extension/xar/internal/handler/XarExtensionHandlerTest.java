@@ -111,13 +111,6 @@ public class XarExtensionHandlerTest
 
     private DocumentReference contextUser;
 
-    @AfterComponent
-    public void afterComponent() throws Exception
-    {
-        // Skip core extension scanner
-        this.componentManager.registerMockComponent(CoreExtensionScanner.class);
-    }
-
     @Before
     public void setUp() throws Exception
     {

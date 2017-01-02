@@ -39,11 +39,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.DefaultExtensionScmConnection;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
-import org.xwiki.extension.internal.maven.MavenUtils;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
@@ -445,8 +445,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected ExtensionScmConnection toScmConnection(String connectionString)
     {
         if (connectionString != null) {
-            org.xwiki.extension.ExtensionScmConnection connection =
-                MavenUtils.toExtensionScmConnection(connectionString);
+            org.xwiki.extension.ExtensionScmConnection connection = new DefaultExtensionScmConnection(connectionString);
 
             ExtensionScmConnection restConnection = new ExtensionScmConnection();
             restConnection.setPath(connection.getPath());

@@ -72,13 +72,6 @@ public class ExtensionManagerScriptServiceTest
 
     private ExtensionManagerScriptService scriptService;
 
-    @AfterComponent
-    public void afterComponent() throws Exception
-    {
-        // Skip core extension scanner
-        this.mocker.registerMockComponent(CoreExtensionScanner.class);
-    }
-
     @Before
     public void before() throws Exception
     {

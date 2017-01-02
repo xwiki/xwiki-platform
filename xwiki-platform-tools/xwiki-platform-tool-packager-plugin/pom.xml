@@ -35,16 +35,15 @@
     as a Maven2 plugin or directly from the command line.
    </description>
   <properties>
-    <mavenVersion>3.0.5</mavenVersion>
     <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
-    <!-- Maven -->
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-      <version>${mavenVersion}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+      <version>${commons.version}</version>
     </dependency>
+    <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
@@ -98,11 +97,6 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-standard</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <!-- By default we import/export using HSQLDB. We could have let users of this plugin define which version to use

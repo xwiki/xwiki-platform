@@ -82,7 +82,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * Used to escape a separator character inside a string serialized list item.
-     * 
+     *
      * @since 7.0M2
      */
     public static final char SEPARATOR_ESCAPE = '\\';
@@ -248,7 +248,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * Convenience method, using {@value #DEFAULT_SEPARATOR} as separator and parsing key=value items.
-     * 
+     *
      * @param value the string holding a serialized list
      * @return the list that was stored in the input string
      * @see #getListFromString(String, String, boolean)
@@ -269,7 +269,7 @@ public abstract class ListClass extends PropertyClass
      */
     public static List<String> getListFromString(String value, String separators, boolean withMap)
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         if (value == null) {
             return list;
         }
@@ -315,7 +315,7 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * Convenience method, using {@value #DEFAULT_SEPARATOR} as separator.
-     * 
+     *
      * @param list the list to serialize
      * @return a string representing a serialized list, delimited by the first separator character (from the ones inside
      *         the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
@@ -351,7 +351,7 @@ public abstract class ListClass extends PropertyClass
         String unescapedSeparatorsRegex =
             String.format(UNESCAPED_SEPARATORS_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
 
-        List<String> escapedValues = new ArrayList<String>();
+        List<String> escapedValues = new ArrayList<>();
         for (String value : list) {
             String escapedValue = value.replaceAll(unescapedSeparatorsRegex, UNESCAPED_SEPARATOR_REPLACEMENT);
             escapedValues.add(escapedValue);
@@ -363,7 +363,7 @@ public abstract class ListClass extends PropertyClass
 
     public static Map<String, ListItem> getMapFromString(String value)
     {
-        Map<String, ListItem> map = new LinkedHashMap<String, ListItem>();
+        Map<String, ListItem> map = new LinkedHashMap<>();
         if (value == null) {
             return map;
         }
@@ -442,7 +442,7 @@ public abstract class ListClass extends PropertyClass
             return fromString(strings[0]);
         }
 
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         if (strings.length == 0) {
             return prop;
@@ -596,7 +596,8 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         List<String> selectlist;
         String separator = getSeparator();
@@ -610,7 +611,7 @@ public abstract class ListClass extends PropertyClass
 
         if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
-            List<String> newlist = new ArrayList<String>();
+            List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
                 newlist.add(getDisplayValue(value, name, map, context));
             }
@@ -621,7 +622,8 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             input input = new input();
@@ -848,7 +850,7 @@ public abstract class ListClass extends PropertyClass
         BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        List<String> currentList = new LinkedList<String>(toList(currentProperty));
+        List<String> currentList = new LinkedList<>(toList(currentProperty));
         List<String> previousList = toList(previousProperty);
         List<String> newList = toList(newProperty);
 

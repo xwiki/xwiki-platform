@@ -99,14 +99,14 @@ public class UsersClass extends ListClass
         Map<String, ListItem> result;
         List<String> users = getList(context);
         if (users != null && users.size() > 0) {
-            result = new LinkedHashMap<String, ListItem>();
+            result = new LinkedHashMap<>();
             for (String userName : users) {
                 // Get the user name for pretty display
                 String prettyUserName = context.getWiki().getUserName(userName, null, false, context);
                 result.put(userName, new ListItem(userName, prettyUserName));
             }
         } else {
-            result = Collections.EMPTY_MAP;
+            result = Collections.emptyMap();
         }
         return result;
     }
@@ -155,7 +155,7 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (int i = 0; i < strings.length; i++) {
             if (!StringUtils.isBlank(strings[i])) {
                 list.add(strings[i]);

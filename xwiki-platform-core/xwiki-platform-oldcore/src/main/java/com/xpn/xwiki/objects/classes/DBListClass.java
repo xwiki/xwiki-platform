@@ -73,7 +73,7 @@ public class DBListClass extends ListClass
 
     public List<ListItem> makeList(List<Object> list)
     {
-        List<ListItem> result = new ArrayList<ListItem>();
+        List<ListItem> result = new ArrayList<>();
         for (Object item : list) {
             // Oracle databases treat NULL and empty strings similarly. Thus the list passed
             // as parameter can have some elements being NULL (for XWiki string properties which
@@ -114,7 +114,7 @@ public class DBListClass extends ListClass
             String hqlQuery = getQuery(context);
 
             if (hqlQuery == null) {
-                list = new ArrayList<ListItem>();
+                list = new ArrayList<>();
             } else {
                 try {
                     // We need the query manager
@@ -128,7 +128,7 @@ public class DBListClass extends ListClass
                     list = makeList(query.execute());
                 } catch (Exception e) {
                     LOGGER.error("Failed to get the list", e);
-                    list = new ArrayList<ListItem>();
+                    list = new ArrayList<>();
                 }
             }
             setCachedDBList(list, context);
@@ -149,7 +149,7 @@ public class DBListClass extends ListClass
             Collections.sort(dblist, ListItem.VALUE_COMPARATOR);
         }
 
-        List<String> result = new ArrayList<String>(dblist.size());
+        List<String> result = new ArrayList<>(dblist.size());
         for (ListItem value : dblist) {
             result.add(value.getId());
         }
@@ -160,7 +160,7 @@ public class DBListClass extends ListClass
     public Map<String, ListItem> getMap(XWikiContext context)
     {
         List<ListItem> list = getDBList(context);
-        Map<String, ListItem> result = new LinkedHashMap<String, ListItem>();
+        Map<String, ListItem> result = new LinkedHashMap<>();
         if ((list == null) || (list.size() == 0)) {
             return result;
         }
@@ -252,15 +252,16 @@ public class DBListClass extends ListClass
                 // if there is no classname specified and at least one of the selected columns is
                 // not an object property.
                 boolean usesDoc = idField.startsWith("doc.") || valueField.startsWith("doc.");
-                if ((!idField.startsWith("obj.") || (hasValueField && !valueField.startsWith("obj."))) && !hasClassname) {
+                if ((!idField.startsWith("obj.") || (hasValueField && !valueField.startsWith("obj.")))
+                    && !hasClassname) {
                     usesDoc = true;
                 }
 
                 // Build the query in this variable.
                 StringBuffer select = new StringBuffer("select distinct ");
                 // These will hold the components of the from and where parts of the query.
-                List<String> fromStatements = new ArrayList<String>();
-                List<String> whereStatements = new ArrayList<String>();
+                List<String> fromStatements = new ArrayList<>();
+                List<String> whereStatements = new ArrayList<>();
 
                 // Add the document to the query only if it is needed.
                 if (usesDoc) {
@@ -406,7 +407,7 @@ public class DBListClass extends ListClass
             // There are two columns selected
             if (commaIndex > 0) {
                 StringTokenizer st = new StringTokenizer(beforeFrom, " ,()", true);
-                ArrayList<String> words = new ArrayList<String>();
+                ArrayList<String> words = new ArrayList<>();
 
                 while (st.hasMoreTokens()) {
                     words.add(st.nextToken());
@@ -482,7 +483,8 @@ public class DBListClass extends ListClass
 
     // override the method from parent ListClass
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         // input display
         if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
@@ -573,7 +575,8 @@ public class DBListClass extends ListClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         List<String> selectlist;
         String separator = getSeparator();
@@ -587,7 +590,7 @@ public class DBListClass extends ListClass
 
         if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
-            List<String> newlist = new ArrayList<String>();
+            List<String> newlist = new ArrayList<>();
             for (String entry : selectlist) {
                 newlist.add(getDisplayValue(entry, name, map, context));
             }

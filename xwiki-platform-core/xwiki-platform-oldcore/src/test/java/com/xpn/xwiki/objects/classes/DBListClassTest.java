@@ -38,7 +38,7 @@ import static org.mockito.Mockito.doAnswer;
 
 /**
  * Unit tests for {@link DBListClass}.
- * 
+ *
  * @version $Id$
  */
 @ReferenceComponentList
@@ -266,7 +266,7 @@ public class DBListClassTest
     /** Tests that {@link DBListClass#getList} returns values sorted according to the property's sort option. */
     public void testGetListIsSorted()
     {
-        List<ListItem> values = new ArrayList<ListItem>(4);
+        List<ListItem> values = new ArrayList<>(4);
         values.add(new ListItem("a", "A"));
         values.add(new ListItem("c", "D"));
         values.add(new ListItem("d", "C"));

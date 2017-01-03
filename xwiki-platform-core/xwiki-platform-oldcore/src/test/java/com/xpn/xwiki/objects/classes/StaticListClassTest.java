@@ -38,7 +38,7 @@ import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for {@link StaticListClass}.
- * 
+ *
  * @version $Id$
  */
 @ReferenceComponentList
@@ -74,7 +74,7 @@ public class StaticListClassTest
 
     /**
      * Tests that the list values are joined using the specified separator without being XML-encoded.
-     * 
+     *
      * @see "XWIKI-9680: Apostrophes in static list value are encoded on .display()"
      */
     @Test
@@ -97,7 +97,7 @@ public class StaticListClassTest
 
     /**
      * Tests the HTML output produced in edit mode.
-     * 
+     *
      * @param displayType the display type (input, radio, select, etc.)
      * @param selectedValues the selected values
      * @param expectedHTML the expected HTML output

@@ -164,14 +164,8 @@ public class DBListClass extends ListClass
         if ((list == null) || (list.size() == 0)) {
             return result;
         }
-        for (int i = 0; i < list.size(); i++) {
-            Object res = list.get(i);
-            if (res instanceof String) {
-                result.put((String) res, new ListItem((String) res));
-            } else {
-                ListItem item = (ListItem) res;
-                result.put(item.getId(), item);
-            }
+        for (ListItem item : list) {
+            result.put(item.getId(), item);
         }
         return result;
     }

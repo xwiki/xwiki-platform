@@ -288,6 +288,31 @@ public class DBListClassTest
             dblc.getList(this.oldcore.getXWikiContext()).toString());
     }
 
+    /** Tests that {@link DBListClass#getMap} returns values sorted according to the property's sort option. */
+    public void testGetMapIsSorted()
+    {
+        List<ListItem> values = new ArrayList<>(4);
+        values.add(new ListItem("a", "A"));
+        values.add(new ListItem("c", "D"));
+        values.add(new ListItem("d", "C"));
+        values.add(new ListItem("b", "B"));
+        DBListClass dblc = new DBListClass();
+        dblc.setCache(true);
+        dblc.setCachedDBList(values, this.oldcore.getXWikiContext());
+
+        assertEquals("Default order was not preserved.", "{a=[a, A, ], c=[c, D, ], d=[d, C, ], b=[b, B, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        dblc.setSort("none");
+        assertEquals("Default order was not preserved.", "{a=[a, A, ], c=[c, D, ], d=[d, C, ], b=[b, B, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        dblc.setSort("id");
+        assertEquals("Items were not ordered by ID.", "{a=[a, A, ], b=[b, B, ], c=[c, D, ], d=[d, C, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        dblc.setSort("value");
+        assertEquals("Items were not ordered by value.", "{a=[a, A, ], b=[b, B, ], d=[d, C, ], c=[c, D, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+    }
+
     public void testReturnColWithOneColumn()
     {
         DBListClass dblc = new DBListClass();

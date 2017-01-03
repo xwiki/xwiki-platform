@@ -21,7 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -160,10 +160,18 @@ public class DBListClass extends ListClass
     public Map<String, ListItem> getMap(XWikiContext context)
     {
         List<ListItem> list = getDBList(context);
-        Map<String, ListItem> result = new HashMap<String, ListItem>();
+        Map<String, ListItem> result = new LinkedHashMap<String, ListItem>();
         if ((list == null) || (list.size() == 0)) {
             return result;
         }
+
+        String sort = getSort();
+        if ("id".equals(sort)) {
+            Collections.sort(list, ListItem.ID_COMPARATOR);
+        } else if ("value".equals(sort)) {
+            Collections.sort(list, ListItem.VALUE_COMPARATOR);
+        }
+
         for (ListItem item : list) {
             result.put(item.getId(), item);
         }

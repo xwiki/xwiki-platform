@@ -21,7 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +99,7 @@ public class UsersClass extends ListClass
         Map<String, ListItem> result;
         List<String> users = getList(context);
         if (users != null && users.size() > 0) {
-            result = new HashMap<String, ListItem>();
+            result = new LinkedHashMap<String, ListItem>();
             for (String userName : users) {
                 // Get the user name for pretty display
                 String prettyUserName = context.getWiki().getUserName(userName, null, false, context);

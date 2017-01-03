@@ -27,6 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +46,22 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
  */
 public class Importer extends AbstractPackager
 {
+    /**
+     * Default constructor.
+     */
+    public Importer()
+    {
+
+    }
+
+    /**
+     * @param componentManager the component manager
+     */
+    public Importer(ComponentManager componentManager)
+    {
+        super(componentManager);
+    }
+
     /**
      * Import documents defined in an XML file located in the passed document definition directory into a database
      * defined by its passed name and by an Hibernate configuration file.
@@ -97,8 +114,8 @@ public class Importer extends AbstractPackager
         try {
             pack.readFromDir(sourceDirectory, xcontext);
         } catch (IOException e) {
-            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to import documents from ["
-                + sourceDirectory + "]", e);
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
+                "Failed to import documents from [" + sourceDirectory + "]", e);
         }
         installWithUser(importUser, pack, xcontext);
 

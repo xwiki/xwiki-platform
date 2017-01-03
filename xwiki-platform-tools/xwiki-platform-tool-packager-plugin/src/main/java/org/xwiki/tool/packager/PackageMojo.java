@@ -241,6 +241,8 @@ public class PackageMojo extends AbstractExtensionMojo
             String.format("Import XAR dependencies %s...", this.importUser == null ? "as a backup pack"
                 : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
+
+        disposeComponents();
     }
 
     protected void installJAR(Artifact artifact, File libDirectory) throws MojoExecutionException
@@ -376,7 +378,7 @@ public class PackageMojo extends AbstractExtensionMojo
     {
         Set<Artifact> xarArtifacts = resolveXARs();
         if (!xarArtifacts.isEmpty()) {
-            Importer importer = new Importer();
+            Importer importer = new Importer(this.componentManager);
             // Make sure that we generate the Database in the right directory
             // TODO: In the future control completely the Hibernate config from inside the packager plugin and not in
             // the project using the packager plugin

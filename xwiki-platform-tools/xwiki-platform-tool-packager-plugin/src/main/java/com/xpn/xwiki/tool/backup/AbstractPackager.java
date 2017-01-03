@@ -48,6 +48,26 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
  */
 public abstract class AbstractPackager
 {
+    private ComponentManager componentManager;
+
+    private boolean externalCompoonentManager;
+
+    /**
+     * Default constructor.
+     */
+    public AbstractPackager()
+    {
+    }
+
+    /**
+     * @param componentManager the component manager
+     */
+    public AbstractPackager(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+        this.externalCompoonentManager = true;
+    }
+
     /**
      * @param wikiId id of the wiki for which to prepare the XWiki Context (e.g. {@code xwiki})
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
@@ -59,14 +79,16 @@ public abstract class AbstractPackager
     public XWikiContext createXWikiContext(String wikiId, File hibernateConfig) throws Exception
     {
         // Initialize the Component Manager and Environment
-        ComponentManager cm = org.xwiki.environment.System.initialize();
-        Utils.setComponentManager(cm);
+        if (this.componentManager == null) {
+            this.componentManager = org.xwiki.environment.System.initialize();
+        }
+        Utils.setComponentManager(this.componentManager);
 
         XWikiContext xcontext = new XWikiContext();
-        xcontext.put(ComponentManager.class.getName(), cm);
+        xcontext.put(ComponentManager.class.getName(), this.componentManager);
 
         // Initialize the Container fields (request, response, session).
-        ExecutionContextManager ecim = cm.getInstance(ExecutionContextManager.class);
+        ExecutionContextManager ecim = this.componentManager.getInstance(ExecutionContextManager.class);
         try {
             ExecutionContext econtext = new ExecutionContext();
 
@@ -134,16 +156,15 @@ public abstract class AbstractPackager
      */
     public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
     {
-        ComponentManager componentManager = Utils.getRootComponentManager();
-
         // Remove ExecutionContext
         Execution execution = componentManager.getInstance(Execution.class);
         execution.removeContext();
 
         // Dispose component manager
-        org.xwiki.environment.System.dispose(componentManager);
+        if (!this.externalCompoonentManager) {
+            org.xwiki.environment.System.dispose(componentManager);
+        }
 
         Utils.setComponentManager(null);
     }
-
 }

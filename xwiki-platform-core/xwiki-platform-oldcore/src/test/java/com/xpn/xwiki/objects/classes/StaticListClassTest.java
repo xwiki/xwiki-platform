@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Rule;
@@ -70,6 +71,30 @@ public class StaticListClassTest
         listClass.setSort("value");
         assertEquals("Items were not ordered by value.", "[a, b, d, c]",
             listClass.getList(this.oldcore.getXWikiContext()).toString());
+    }
+
+    /**
+     * Tests that {@link StaticListClass#getMap} properly supports the values definition syntax:
+     * <ul>
+     * <li>values are separated by {@code |}</li>
+     * <li>simple {@code key} entries are allowed, and the key is also used as the label</li>
+     * <li>{@code key=a pretty label} is allowed</li>
+     * <li>{@code key=label with = in it} is allowed</li>
+     * <li>{@code key=label with \| in it} is allowed</li>
+     * </ul>
+     */
+    @Test
+    public void testValuesSyntax()
+    {
+        StaticListClass listClass = new StaticListClass();
+        listClass.setValues("a|b=B and B|c=<=C=>|d=d\\|D|e");
+
+        Map<String, ListItem> result = listClass.getMap(this.oldcore.getXWikiContext());
+        assertEquals("Proper splitting not supported", 5, result.size());
+        assertEquals("key syntax not supported", "a", result.get("a").getValue());
+        assertEquals("key=label syntax not supported", "B and B", result.get("b").getValue());
+        assertEquals("= in labels not supported", "<=C=>", result.get("c").getValue());
+        assertEquals("Escaped \\| in labels not supported", "d|D", result.get("d").getValue());
     }
 
     /**

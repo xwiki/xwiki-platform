@@ -373,7 +373,7 @@ public abstract class ListClass extends PropertyClass
         for (String element2 : result) {
             String element = StringUtils.replace(element2, "%PIPE%", DEFAULT_SEPARATOR);
             if (element.indexOf('=') != -1) {
-                String[] data = StringUtils.split(element, "=");
+                String[] data = StringUtils.split(element, "=", 2);
                 map.put(data[0], new ListItem(data[0], data[1]));
             } else {
                 map.put(element, new ListItem(element, element));

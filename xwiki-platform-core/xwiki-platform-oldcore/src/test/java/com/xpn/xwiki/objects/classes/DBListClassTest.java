@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -62,6 +63,7 @@ public class DBListClassTest
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument());
     }
 
+    @Test
     public void testGetDefaultQueryWhenNoSqlSCriptSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -70,6 +72,7 @@ public class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithSqlScriptSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -79,6 +82,7 @@ public class DBListClassTest
         assertEquals(sql, dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithClassSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -89,6 +93,7 @@ public class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithIdSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -103,6 +108,7 @@ public class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithValueSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -117,6 +123,7 @@ public class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithIdAndClassnameSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -136,6 +143,7 @@ public class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithIdAndValueSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -188,6 +196,7 @@ public class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testGetQueryWithIdValueAndClassSpecified()
     {
         DBListClass dblc = new DBListClass();
@@ -264,6 +273,7 @@ public class DBListClassTest
     }
 
     /** Tests that {@link DBListClass#getList} returns values sorted according to the property's sort option. */
+    @Test
     public void testGetListIsSorted()
     {
         List<ListItem> values = new ArrayList<>(4);
@@ -289,6 +299,7 @@ public class DBListClassTest
     }
 
     /** Tests that {@link DBListClass#getMap} returns values sorted according to the property's sort option. */
+    @Test
     public void testGetMapIsSorted()
     {
         List<ListItem> values = new ArrayList<>(4);
@@ -313,6 +324,7 @@ public class DBListClassTest
             dblc.getMap(this.oldcore.getXWikiContext()).toString());
     }
 
+    @Test
     public void testReturnColWithOneColumn()
     {
         DBListClass dblc = new DBListClass();
@@ -320,6 +332,7 @@ public class DBListClassTest
         assertEquals("-", dblc.returnCol("select doc.fullName from XWikiDocument as doc", false));
     }
 
+    @Test
     public void testReturnColWithOneColumnAndExtraWhitespace()
     {
         DBListClass dblc = new DBListClass();
@@ -327,6 +340,7 @@ public class DBListClassTest
         assertEquals("-", dblc.returnCol("select   doc.fullName   from XWikiDocument as doc", false));
     }
 
+    @Test
     public void testReturnColWithOneColumnAndUppercaseTokens()
     {
         DBListClass dblc = new DBListClass();
@@ -334,6 +348,7 @@ public class DBListClassTest
         assertEquals("-", dblc.returnCol("SELECT doc.fullName FROM XWikiDocument as doc", false));
     }
 
+    @Test
     public void testReturnColWithTwoColumns()
     {
         DBListClass dblc = new DBListClass();
@@ -341,6 +356,7 @@ public class DBListClassTest
         assertEquals("doc.title", dblc.returnCol("select doc.fullName, doc.title from XWikiDocument as doc", false));
     }
 
+    @Test
     public void testReturnColWithTwoColumnsAndExtraWhitespace()
     {
         DBListClass dblc = new DBListClass();
@@ -350,6 +366,7 @@ public class DBListClassTest
             dblc.returnCol("select   doc.fullName  ,  doc.title  from XWikiDocument as doc", false));
     }
 
+    @Test
     public void testReturnColWithTwoColumnsAndUppercaseTokens()
     {
         DBListClass dblc = new DBListClass();
@@ -357,6 +374,7 @@ public class DBListClassTest
         assertEquals("doc.title", dblc.returnCol("SELECT doc.fullName, doc.title FROM XWikiDocument as doc", false));
     }
 
+    @Test
     public void testReturnColWithNullQuery()
     {
         DBListClass dblc = new DBListClass();
@@ -364,6 +382,7 @@ public class DBListClassTest
         assertEquals("-", dblc.returnCol(null, false));
     }
 
+    @Test
     public void testReturnColWithEmptyQuery()
     {
         DBListClass dblc = new DBListClass();
@@ -371,6 +390,7 @@ public class DBListClassTest
         assertEquals("-", dblc.returnCol("", false));
     }
 
+    @Test
     public void testReturnColWithInvalidQuery()
     {
         DBListClass dblc = new DBListClass();

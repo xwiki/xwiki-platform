@@ -32,14 +32,9 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.7.0</gwt.version>
-    <gwt.maven.plugin.version>2.7.0</gwt.maven.plugin.version>
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
-    <!-- The bootstrap version is used is several places -->
-    <bootstrap.version>3.3.7-1</bootstrap.version>
-    <batik.version>1.8</batik.version>
   </properties>
   <build>
     <pluginManagement>

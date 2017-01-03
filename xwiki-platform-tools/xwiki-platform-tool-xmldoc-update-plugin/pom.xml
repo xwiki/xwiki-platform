@@ -32,7 +32,6 @@
   <packaging>maven-plugin</packaging>
   <description>A Maven plugin to load XWiki documents from XML and perform file attachment or setting object properties, before writting the document back to XML </description>
   <properties>
-    <mavenVersion>3.0.5</mavenVersion>
     <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
@@ -69,12 +68,10 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>${mavenVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.5</version>
       <scope>provided</scope>
     </dependency>
 

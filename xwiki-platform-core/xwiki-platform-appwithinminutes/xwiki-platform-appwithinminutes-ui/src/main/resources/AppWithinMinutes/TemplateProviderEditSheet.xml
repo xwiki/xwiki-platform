@@ -48,6 +48,8 @@
 {{/velocity}}
 
 {{velocity output="false"}}
+#set ($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
+
 #macro (initializeTemplateProvider)
   #set ($prefix = $stringtool.removeEnd($doc.name, 'TemplateProvider'))
   #set ($discard = $doc.setTitle("$prefix Template Provider"))
@@ -97,7 +99,7 @@
     ## 3. grand parent space (7.3RC1+)
     #set ($appReferences = [
       $doc.documentReference.parent,
-      $services.model.createSpaceReference($stringtool.removeEnd($doc.title, ' Class'),
+      $services.model.createSpaceReference($stringtool.removeEnd($doc.name, 'TemplateProvider'),
         $doc.documentReference.parent.parent),
       $doc.documentReference.parent.parent
     ])
@@ -113,7 +115,6 @@
 #macro (maybeAddXRedirectToNextWizardStep)
   #if ("$!request.wizard" == 'true')
     ## Add redirect to next wizard step.
-    #set ($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
     #getAppReference
     #set ($homePageRef = $services.model.resolveDocument('', 'default', $appReference))
     #set ($queryString = {"wizard" : true})

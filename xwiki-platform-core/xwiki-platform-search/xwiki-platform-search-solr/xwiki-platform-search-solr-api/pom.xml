@@ -43,25 +43,6 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
-      <version>${solr.version}</version>
-      <exclusions>
-        <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache
-             module -->
-        <exclusion>
-          <groupId>org.codehaus.woodstox</groupId>
-          <artifactId>wstx-asl</artifactId>
-        </exclusion>
-        <!-- XWiki uses SLF4J for logging. -->
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache module -->
-    <dependency>
-      <groupId>org.codehaus.woodstox</groupId>
-      <artifactId>woodstox-core-asl</artifactId>
     </dependency>
     <!-- Embedded Solr instance. -->
     <dependency>

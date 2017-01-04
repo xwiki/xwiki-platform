@@ -112,19 +112,10 @@
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet</artifactId>
-      <version>${restlet.version}</version>
     </dependency>
     <dependency>
       <groupId>org.restlet.jee</groupId>
       <artifactId>org.restlet.ext.servlet</artifactId>
-      <version>${restlet.version}</version>
-      <exclusions>
-        <!-- Restlet API is already provided above -->
-        <exclusion>
-          <groupId>org.restlet.jee</groupId>
-          <artifactId>org.restlet</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
@@ -140,35 +131,14 @@
         See XWIKI-9136: Rest API JSON does not retrieve inherited fields -->
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jackson</artifactId>
-      <version>${restlet.version}</version>
-      <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
+    <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
         above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
         good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
         JAXB converter for XML representation. -->
+    <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxb</artifactId>
-      <version>${restlet.version}</version>
-      <scope>runtime</scope>
-      <exclusions>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>jaxb-impl</artifactId>
-          <groupId>com.sun.xml.bind</groupId>
-        </exclusion>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>jaxb-api</artifactId>
-          <groupId>javax.xml.bind</groupId>
-        </exclusion>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>javax.xml.stream</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

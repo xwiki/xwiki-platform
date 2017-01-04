@@ -38,6 +38,11 @@
     <dependencies>
       <dependency>
         <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj</artifactId>
+        <version>${solr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
         <artifactId>solr-core</artifactId>
         <version>${solr.version}</version>
         <exclusions>
@@ -55,16 +60,20 @@
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
-          </exclusion>
           <!-- Exclude the dependencies that are needed by Solr when it runs as a separate webapp because we use
             solr-core to embed Solr in the same webapp as XWiki. This doesn't mean we cannot communicate with a remote
             Solr instance. This part is handled by solr-solrj jar. -->
           <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -73,18 +82,6 @@
         <groupId>org.restlet.jse</groupId>
         <artifactId>org.restlet</artifactId>
         <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet.jee</groupId>
-        <artifactId>org.restlet.ext.servlet</artifactId>
-        <version>${restlet.version}</version>
-        <exclusions>
-          <!-- Restlet API is already provided above -->
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

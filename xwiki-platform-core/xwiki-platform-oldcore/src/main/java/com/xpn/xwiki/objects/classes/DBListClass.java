@@ -414,25 +414,25 @@ public class DBListClass extends ListClass
                 }
 
                 int comma = words.indexOf(",") - 1;
-                while (words.get(comma).toString().compareTo(" ") == 0) {
+                while (words.get(comma).compareTo(" ") == 0) {
                     comma--;
                 }
-                firstCol = words.get(comma).toString().trim();
+                firstCol = words.get(comma).trim();
 
                 comma = words.indexOf(",") + 1;
-                while (words.get(comma).toString().compareTo(" ") == 0) {
+                while (words.get(comma).compareTo(" ") == 0) {
                     comma++;
                 }
 
-                if (words.get(comma).toString().compareTo("(") == 0) {
+                if (words.get(comma).compareTo("(") == 0) {
                     int i = comma + 1;
-                    while (words.get(i).toString().compareTo(")") != 0) {
-                        secondCol += words.get(i).toString();
+                    while (words.get(i).compareTo(")") != 0) {
+                        secondCol += words.get(i);
                         i++;
                     }
                     secondCol += ")";
                 } else {
-                    secondCol = words.get(comma).toString().trim();
+                    secondCol = words.get(comma).trim();
                 }
             }
             // Only one column selected
@@ -476,7 +476,7 @@ public class DBListClass extends ListClass
                 res = list[0].toString();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to execute SQL query", e);
         }
         return res;
     }

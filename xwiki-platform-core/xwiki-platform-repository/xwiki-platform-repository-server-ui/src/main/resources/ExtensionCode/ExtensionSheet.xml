@@ -290,9 +290,9 @@
       #if ($isEditMode)
         == Custom installation instructions
 
-      #end
-      #if ($isEditMode || $extraInstallation != '')
         $extension.installation
+      #elseif ($extraInstallation != '')
+        $extraInstallation
       #end
     #end
 

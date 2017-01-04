@@ -340,6 +340,12 @@
         <artifactId>batik-awt-util</artifactId>
         <version>${batik.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>4.2.2</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

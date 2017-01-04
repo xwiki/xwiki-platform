@@ -63,11 +63,6 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
       <exclusions>
-        <!-- Exclude LOG4J so that we use SLF4J's LOG4J JAR instead to have LOG4J logs go through SLF4J -->
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
         <!-- Exclude Servlet Environment since we want to run our code in a Standard Environment -->
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
@@ -93,18 +88,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-default</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <!-- Route LOG4J calls to SLF4J -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-    </dependency>
-    <!-- Make sure we provide a default implementation of SLF4J when executing this plugin -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-logging-logback</artifactId>
-      <version>${commons.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <!-- We need the Servlet API dep since it's used by the Packager and since it has
          a provided scope in XWiki core it's not inherited as part of transitive deps -->
@@ -255,11 +238,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-xar-script</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- We need to pick a URL implementation @ runtime -->

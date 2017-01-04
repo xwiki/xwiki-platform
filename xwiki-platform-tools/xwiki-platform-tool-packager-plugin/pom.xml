@@ -56,15 +56,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>2.4.3</version>
-      <exclusions>
-        <!-- We draw version 1.0-alpha-9-stable-1 but org.xwiki.commons:xwiki-commons-tool-xar-plugin draws
-             org.codehaus.plexus:plexus-container-default:1.5.5 -->
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- XWiki -->
     <dependency>

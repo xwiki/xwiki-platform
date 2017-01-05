@@ -48,7 +48,7 @@
   #set ($discard = $analyticsObj.set('account', $!account))
   #set ($discard = $analyticsObj.set('method', $!method))
   $analyticsConfigDoc.save()
-  #if ("$!jsObj" != "") 
+  #if ("$!jsObj" != "")
     #if ("$!account" != "")
       #set ($discard = $jsObj.set('use', 'always'))
     #else
@@ -75,7 +75,7 @@
 
 {{velocity}}
 #if ($doc.name != 'XWikiPreferences' &amp;&amp; $xcontext.action == 'view')
-  $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics')) 
+  $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics'))
 #end
 #set ($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
 #set ($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))##
@@ -468,7 +468,7 @@
 #foreach($aObj in $analyticsObj.account.split(' '))
 #if("$!aObj" != "")
 #set($discard = $accounts.add($aObj))##
-#end 
+#end
 #end
 #end
 #if($accounts.size() &gt; 0)

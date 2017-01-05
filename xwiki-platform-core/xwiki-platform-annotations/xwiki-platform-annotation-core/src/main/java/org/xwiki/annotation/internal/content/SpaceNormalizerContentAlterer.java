@@ -34,7 +34,7 @@ import org.xwiki.component.annotation.Component;
  * Space normalizer content alterer. Will trim all leading and trailing white spaces in the passed sequence along with
  * collapsing all the inner white spaces to a single space. It also replaces all sorts of white spaces such as
  * non-breakable spaces with regular spaces.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

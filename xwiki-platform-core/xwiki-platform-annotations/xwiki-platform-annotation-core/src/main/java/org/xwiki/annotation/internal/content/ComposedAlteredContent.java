@@ -26,7 +26,7 @@ import org.xwiki.annotation.content.AlteredContent;
  * {@link AlteredContent} implementation built as the composition of two content alterers. {@code initial} is the
  * original altered content, whose {@link AlteredContent#getContent()} was altered and the {@code altered} altered
  * content was obtained.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -45,7 +45,7 @@ public class ComposedAlteredContent implements AlteredContent
     /**
      * Builds a composed content alterer for the original altered content, {@code initial} and its content's alteration,
      * {@code altered}.
-     * 
+     *
      * @param initial the original altered content
      * @param altered the altering of the initial altered content
      */

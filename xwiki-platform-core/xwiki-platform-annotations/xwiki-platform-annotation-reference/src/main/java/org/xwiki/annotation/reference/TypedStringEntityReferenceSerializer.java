@@ -28,7 +28,7 @@ import org.xwiki.model.reference.EntityReference;
  * Note that, although it performs the roughly the same function as the entity reference serializer this is a different
  * hierarchy because it's a different strategy and to make it obvious that typed serializers and resolvers should be
  * used together.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Represents the location picker.
- * 
+ *
  * @version $Id$
  * @since 8.4.3
  * @since 9.0RC1

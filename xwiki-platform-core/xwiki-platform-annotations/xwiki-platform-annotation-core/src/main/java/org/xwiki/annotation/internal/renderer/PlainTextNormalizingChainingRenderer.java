@@ -31,7 +31,7 @@ import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Plain text renderer that normalizes spaces in the printed text.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -57,7 +57,7 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
 
     /**
      * Builds an abstract plain text normalizing renderer with the passed text cleaner.
-     * 
+     *
      * @param textCleaner the text cleaner used to normalize the texts produced by the events
      * @param listenerChain the listeners chain this listener is part of
      */
@@ -134,7 +134,7 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
 
     /**
      * Prints a text to the renderer's printer.
-     * 
+     *
      * @param text the text to print
      */
     protected void printText(String text)

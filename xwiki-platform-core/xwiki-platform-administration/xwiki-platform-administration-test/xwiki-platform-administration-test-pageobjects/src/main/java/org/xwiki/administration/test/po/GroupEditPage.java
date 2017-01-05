@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.editor.UserPicker;
 
 /**
  * Page Object for a Group page in Edit mode.
- * 
+ *
  * @version $Id$
  * @since 8.1M2
  */

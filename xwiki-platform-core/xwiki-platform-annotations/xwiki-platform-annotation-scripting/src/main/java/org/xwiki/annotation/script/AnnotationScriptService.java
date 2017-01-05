@@ -42,7 +42,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Wrapper for the annotation service functions to be exposed to scripting contexts.
- * 
+ *
  * @version $Id$
  * @since 3.0RC1
  */
@@ -77,7 +77,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Adds an the specified annotation for the specified target.
-     * 
+     *
      * @param target serialized reference of the target of the annotation
      * @param selection HTML selection concerned by annotations
      * @param selectionContext HTML selection context
@@ -108,7 +108,7 @@ public class AnnotationScriptService implements ScriptService
      * It's a particular case of {@link #getAnnotatedRenderedContent(String, String, String, Collection)} for
      * unspecified input syntax, {@code xhtml/1.0} output syntax and the list of annotations returned by
      * {@link #getValidAnnotations(String)} for this source reference.
-     * 
+     *
      * @param sourceReference reference to the source to be rendered in XHTML with annotations
      * @return rendered and annotated document or {@code null} if an exception occurs and the exception is saved on the
      *         xwiki context
@@ -135,7 +135,7 @@ public class AnnotationScriptService implements ScriptService
      * in the {@code annotations} parameter. Note that no test is done on the actual target of the annotations in the
      * passed list, they will all be rendered, as long as their selected text and context can be identified in the
      * content.
-     * 
+     *
      * @param sourceReference the reference to the source to be rendered in XHTML with annotations
      * @param sourceSyntax the syntax to parse the source in. If this parameter is null, the default source syntax will
      *            be used, as returned by the target IO service.
@@ -164,7 +164,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Returns the annotation identified by {@code id} on the specified target.
-     * 
+     *
      * @param target the serialized reference to the content on which the annotation is added
      * @param id the identifier of the annotation
      * @return the annotation identified by {@code id}, or {@code null} if an exception occurs and the exception is
@@ -187,7 +187,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Returns the annotation identified by {@code id} on the specified target.
-     * 
+     *
      * @param reference the reference to the content on which the annotation is added
      * @param id the identifier of the annotation
      * @return the annotation identified by {@code id}, or {@code null} if an exception occurs and the exception is
@@ -203,7 +203,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Returns all the annotations on the passed content.
-     * 
+     *
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which target the specified content, or {@code null} if an exception occurs and the
      *         exception is saved on the xwiki context
@@ -226,7 +226,7 @@ public class AnnotationScriptService implements ScriptService
     /**
      * Shortcut function to get all annotations which are valid on the specified target, regardless of the updates the
      * document and its annotations suffered from creation ('safe' or 'updated' state).
-     * 
+     *
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which are valid on the specified content, or {@code null} if an exception occurs and the
      *         exception is saved on the xwiki context
@@ -249,7 +249,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Remove an annotation given by its identifier, which should be unique among all annotations on the same target.
-     * 
+     *
      * @param target the string serialized reference to the content on which the annotation is added
      * @param annotationID annotation identifier
      * @return {@code true} if removing succeeds, {@code false} if an exception occurs and the exception is saved on the
@@ -274,7 +274,7 @@ public class AnnotationScriptService implements ScriptService
     /**
      * Updates the passed annotation with the new values. Matching of the annotation is done by the annotation id field,
      * among all annotations on the same target.
-     * 
+     *
      * @param target the string serialized reference to the content on which the annotation is added
      * @param annotation the new description of the annotation to update, with a valid id
      * @return {@code true} if update succeeds, {@code false} if an exception occurs and the exception is saved on the
@@ -303,7 +303,7 @@ public class AnnotationScriptService implements ScriptService
      * TODO: annotations should only operate on targets, and velocity context should only operate with targets so that
      * they can pass a target to this function. This also assumes refactoring of the REST service to always get target
      * references instead of wiki, space and pages in the path.
-     * 
+     *
      * @param annotationId the id of the annotation to edit
      * @param wiki the wiki of the document where the annotation is added
      * @param space the space of the document where the annotation is added
@@ -320,7 +320,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Checks if the current user can edit an annotation on the document given by wiki, space and page.
-     * 
+     *
      * @param annotationId the id of the annotation to edit
      * @param reference the reference of the document where the annotation is added
      * @return {@code true} if the current user can edit the annotation identified by the id on the specified document,
@@ -338,7 +338,7 @@ public class AnnotationScriptService implements ScriptService
      * Checks if the current user can add an annotation on the document given by the wiki, space and page. This function
      * is a helper function, using wiki, space and page instead of the target to avoid target generation in velocity
      * scripting.<br>
-     * 
+     *
      * @param wiki the wiki of the document where the annotation is added
      * @param space the space of the document where the annotation is added
      * @param page the document page
@@ -354,7 +354,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Checks if the current user can add an annotation on the document given by the reference.
-     * 
+     *
      * @param reference the reference of the document where the annotation is added
      * @return {@code true} if the current user can add an annotation on the specified document, {@code false} otherwise
      * @see #canEditAnnotation(String, String, String, String)
@@ -369,7 +369,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Helper function to get the currently logged in user.
-     * 
+     *
      * @return the currently logged in user
      */
     private String getCurrentUser()
@@ -379,7 +379,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Helper function to get the XWiki Context.
-     * 
+     *
      * @return the xwiki context
      */
     private XWikiContext getXWikiContext()
@@ -389,7 +389,7 @@ public class AnnotationScriptService implements ScriptService
 
     /**
      * Helper function to set an exception on the xwiki context, as the last exception.
-     * 
+     *
      * @param exception the exception to set on the context
      */
     private void setExceptionOnContext(Exception exception)

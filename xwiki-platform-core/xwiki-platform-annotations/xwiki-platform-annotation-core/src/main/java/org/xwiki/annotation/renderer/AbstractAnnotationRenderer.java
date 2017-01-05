@@ -40,7 +40,7 @@ import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 /**
  * Abstract class for annotation renderer, any specific syntax renderer should implement this class and provide the
  * specific annotation listener.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -111,7 +111,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
     /**
      * Getter for the link label generator to be used for generating link labels in this mapping and rendering process
      * for links that don't have labels.
-     * 
+     *
      * @return the {@link LinkLabelGenerator} used to generate labels for links without labels by this renderer
      */
     public abstract LinkLabelGenerator getLinkLabelGenerator();

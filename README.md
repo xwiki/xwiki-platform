@@ -24,7 +24,7 @@ Read our [Release Notes](http://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).
 * [Development Flow](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HGeneralDevelopmentFlow) to see the full list of tools we use to build XWiki
 
 ## Community
-We're always looking for contributors! 
+We're always looking for contributors!
 You should read our [Get Involved Guide](http://dev.xwiki.org/xwiki/bin/view/Community/Contributing) or get in touch:
 * [Blog](http://www.xwiki.org/xwiki/bin/view/Blog/)
 * [Mailing Lists](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists)

@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions possible on the Administration Import Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

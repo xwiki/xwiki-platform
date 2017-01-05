@@ -77,7 +77,7 @@
 #else
   ## Generate table with data
   #set ($jsonItems = $result.getAsJsonObject('aggregations').getAsJsonObject('versions').getAsJsonArray('buckets'))
-  ## We're only interested in displaying major Java versions, so we only take into account the first 2 digits in 
+  ## We're only interested in displaying major Java versions, so we only take into account the first 2 digits in
   ## the Java version string, e.g. "1.8" for "1.8.0_66"
   #set ($versionMap = {})
   #foreach ($jsonItem in $jsonItems)

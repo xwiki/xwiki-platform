@@ -22,7 +22,7 @@ package org.xwiki.annotation;
 
 /**
  * General wrapping exception.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -35,7 +35,7 @@ public class AnnotationServiceException extends Exception
 
     /**
      * Builds an annotation exception with the specified message.
-     * 
+     *
      * @param message the message of this exception
      */
     public AnnotationServiceException(String message)
@@ -45,7 +45,7 @@ public class AnnotationServiceException extends Exception
 
     /**
      * Builds an annotation exception for the specified cause.
-     * 
+     *
      * @param cause the cause of this exception
      */
     public AnnotationServiceException(Throwable cause)
@@ -55,7 +55,7 @@ public class AnnotationServiceException extends Exception
 
     /**
      * Builds an annotation exception for the specified cause with the specified message.
-     * 
+     *
      * @param message the message of this exception
      * @param cause the cause of the exception
      */

@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 
 /**
  * Content alterer that filters out all spaces.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

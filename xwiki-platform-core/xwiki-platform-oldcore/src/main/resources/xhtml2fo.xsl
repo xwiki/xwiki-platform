@@ -904,7 +904,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                                         </xsl:when>
                                     </xsl:choose>
                                     -->
-                                    <xsl:value-of select="."/> 
+                                    <xsl:value-of select="."/>
                                 </fo:basic-link>
                                 <xsl:text> </xsl:text>
                                 <fo:leader leader-length.minimum="12pt" leader-length.optimum="40pt"

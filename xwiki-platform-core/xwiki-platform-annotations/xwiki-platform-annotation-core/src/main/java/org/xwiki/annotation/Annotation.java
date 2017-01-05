@@ -30,7 +30,7 @@ import org.xwiki.annotation.maintainer.AnnotationState;
 
 /**
  * This class wraps together the data needed to describe an annotation.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -97,7 +97,7 @@ public class Annotation
     /**
      * Builds an annotation description for the annotation with the passed id: used for annotation updates where only a
      * part of the fields my need to be set.
-     * 
+     *
      * @param id the id of this annotation
      */
     public Annotation(String id)
@@ -108,7 +108,7 @@ public class Annotation
     /**
      * Builds an annotation for the passed selection in the context, used to pass an annotation to be added (which does
      * not have an id yet since it hasn't been stored yet).
-     * 
+     *
      * @param initialSelection the selected text of this annotation
      * @param leftContext the context to the left of the selection, which makes the selection uniquely identifiable in
      *            the content on which this annotation is added. Can be void if selection itself is unique
@@ -133,7 +133,7 @@ public class Annotation
 
     /**
      * Sets the author of this annotation.
-     * 
+     *
      * @param author the author of this annotation.
      */
     public void setAuthor(String author)
@@ -202,7 +202,7 @@ public class Annotation
      * Helper method to get the selection of this annotation in its context, with the context left to the left and
      * context right to the right. This method ensures that a non-null value will be returned, even if some of the
      * components of the selection are missing.
-     * 
+     *
      * @return the selection of this annotation in its context, with the context left to the left and context right to
      *         the right
      */
@@ -215,7 +215,7 @@ public class Annotation
 
     /**
      * Sets the selection of this annotation and the context along with it.
-     * 
+     *
      * @param selection the selection of this annotation
      * @param contextLeft the context to the left of the annotation
      * @param contextRight the context to the right of the annotation
@@ -229,7 +229,7 @@ public class Annotation
 
     /**
      * Sets the selection of this annotation.
-     * 
+     *
      * @param selection the selection of the annotation
      */
     public void setSelection(String selection)
@@ -321,7 +321,7 @@ public class Annotation
 
     /**
      * Sets / adds a value in the fields of this annotation.
-     * 
+     *
      * @param key the key of the field
      * @param value the value to set for the field
      * @return the old value of this field, or null if none was set

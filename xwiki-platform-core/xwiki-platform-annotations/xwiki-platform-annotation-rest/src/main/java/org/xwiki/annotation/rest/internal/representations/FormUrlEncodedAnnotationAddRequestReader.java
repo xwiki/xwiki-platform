@@ -35,7 +35,7 @@ import org.xwiki.component.annotation.Component;
 
 /**
  * Implementation of the form url encoded reader for the annotation creation requests.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -79,7 +79,7 @@ public class FormUrlEncodedAnnotationAddRequestReader extends
         addRequest.setRequest(new AnnotationRequest.Request());
         addRequest.setFilter(factory.createAnnotationFieldCollection());
         addRequest.setAnnotation(factory.createAnnotationFieldCollection());
-        
+
         return addRequest;
     }
 

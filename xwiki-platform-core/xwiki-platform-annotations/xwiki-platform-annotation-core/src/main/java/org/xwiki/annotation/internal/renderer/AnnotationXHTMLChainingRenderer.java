@@ -42,7 +42,7 @@ import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Extends the default XHTML renderer to add handling of annotations.<br>
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -60,7 +60,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * Constructor from super class.
-     * 
+     *
      * @param linkRenderer the renderer for links
      * @param imageRenderer the renderer for images
      * @param listenerChain the listener chain in which to add this listener
@@ -201,7 +201,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @since 2.5RC1
      */
     @Override
@@ -234,7 +234,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @since 3.0M2
      */
     @Override
@@ -379,7 +379,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @since 2.5RC1
      */
     @Override
@@ -462,7 +462,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     /**
      * Helper function to get the current event count of the specified type, and increment it. Similar to a ++ operation
      * on the Integer mapped to the passed event type.
-     * 
+     *
      * @param type the event type
      * @return the current event count for the passed type.
      */

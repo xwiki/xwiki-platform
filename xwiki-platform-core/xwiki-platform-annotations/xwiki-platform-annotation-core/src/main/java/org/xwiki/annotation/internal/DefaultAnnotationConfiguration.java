@@ -40,7 +40,7 @@ import org.xwiki.model.reference.WikiReference;
 
 /**
  * Default implementation using as configuration source the configuration document on the current wiki.
- * 
+ *
  * @version $Id$
  * @since 4.0M2
  */

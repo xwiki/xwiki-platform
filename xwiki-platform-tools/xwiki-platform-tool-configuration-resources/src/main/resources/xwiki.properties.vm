@@ -132,7 +132,7 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.imageDimensionsIncludedInImageURL = true
 
 #-# [Since 2.5M2]
-#-# One way to improve page load speed is to resize images on the server side just before rendering the page. The 
+#-# One way to improve page load speed is to resize images on the server side just before rendering the page. The
 #-# rendering module can use the image width provided by the user to scale the image (See
 #-# rendering.includeImageDimensionsInImageURL configuration parameter). When the user doesn't specify the image width
 #-# the rendering module can limit the width of the image based on this configuration parameter.
@@ -243,7 +243,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-------------------------------------------------------------------------------------
 # Settings for the OpenOffice server instance consumed by the OfficeImporter component
 #-------------------------------------------------------------------------------------
- 
+
 #-# [Since 1.9M2]
 #-# Type of the openoffice server instance used by officeimporter component.
 #-# 0 - Internally managed server instance. (Default)
@@ -252,7 +252,7 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 1.9M2]
 #-# Port number used for connecting to the openoffice server instance.
-#-# Default port is 8100 
+#-# Default port is 8100
 # openoffice.serverPort=8100
 
 #-# [Since 1.9M2]
@@ -292,7 +292,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.tools = numbertool = org.apache.velocity.tools.generic.NumberTool
 #-#   velocity.tools = datetool = org.apache.velocity.tools.generic.ComparisonDateTool
 #-#   velocity.tools = mathtool = org.apache.velocity.tools.generic.MathTool
-#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool     
+#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
 #-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
 #-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool
@@ -366,7 +366,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# If enabled, all actions requiring "comment", "edit", "delete", "admin" or "programming" rights
 #-# will check that the parameter "form_token" with the value of a random secret token is present
 #-# in the request.
-#-# 
+#-#
 #-# Valid values:
 #-#   true : Enabled
 #-#   false: Disabled
@@ -395,22 +395,22 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 2.5]
 #-# Repositories to use when searching and downloading extensions.
 #-# Repositories will be checked in the same order they have in this configuration file.
-#-# 
+#-#
 #-# The format is <id>:<type>:<url> where
 #-# * id can be anything as long as there is only one
 #-# * type is the type of the repository (maven, xwiki, etc.)
 #-# * url is the URL or the root of the repository
-#-# 
+#-#
 #-# [Since 4.3] It's also possible to associate various properties to each repository.
 #-# Here are the standard properties:
 #-# * user: the user to use to authenticate to the repository
 #-# * password: the password to use to authenticate to the repository
-#-# 
+#-#
 #-# Here is an example:
 # extension.repositories=privatemavenid:maven:http://host.com/private/maven/
 # extension.repositories.privatemavenid.auth.user=someuser
 # extension.repositories.privatemavenid.auth.password=thepassword
-#-# 
+#-#
 #-# Here's an example to add your local Maven Repository
 ## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
 ## Apache Commons Configuration syntax for specifying the user.home system property!
@@ -424,7 +424,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=store.xwiki.com:xwiki:https://store.xwiki.com/xwiki/rest/
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
-#-# 
+#-#
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=
 #if ($xwikiExtensionRepositories)
@@ -435,14 +435,14 @@ extension.repositories=$extensionRepository
 
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.
-#-# 
+#-#
 #-# The default is extension/repository in whatever is the general persistent directory.
 #-# See container.persistentDirectory.
 # extension.localRepository=extension/repository
 
 #-# [Since 3.4]
 #-# The user agent to use when communication with external services (generally repositories).
-#-# 
+#-#
 #-# The default is:
 # extension.userAgent=XWikiExtensionManager
 
@@ -459,7 +459,7 @@ extension.oldflavors=$oldFlavor.trim()
 
 #-# [Since 8.3]
 #-# Indicate of the XWiki you try to find more informations about the core extension in the repositories.
-#-# 
+#-#
 #-# The default is:
 # extension.core.resolve=true
 
@@ -494,7 +494,7 @@ extension.oldflavors=$oldFlavor.trim()
 #-# [Since 5.1M1]
 #-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
 #-# It's possible to configure this behavior with the following properties:
-#-# 
+#-#
 #-# The maximum number of elements sent at the same time to the Solr server
 #-# The default is 50.
 # solr.indexer.batch.size=50
@@ -600,11 +600,11 @@ extension.oldflavors=$oldFlavor.trim()
 #-# would be displayed inline if possible)
 #-#
 #-# By default we use the following whitelist (coma separated list of values).
-# attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv 
+# attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv
 #-#
 #-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of values.
 #-# We advise you to forbid at least the following mimetypes : text/html, text/javascript
-# attachment.download.blacklist=text/html,text/javascript 
+# attachment.download.blacklist=text/html,text/javascript
 
 #-------------------------------------------------------------------------------------
 # Active Installs

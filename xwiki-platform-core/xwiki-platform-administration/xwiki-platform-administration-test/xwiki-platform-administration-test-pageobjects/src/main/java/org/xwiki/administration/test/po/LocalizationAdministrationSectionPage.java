@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.BootstrapSelect;
 
 /**
  * Represents the actions possible on the Localization Administration Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

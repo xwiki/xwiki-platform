@@ -30,7 +30,7 @@ import org.xwiki.annotation.content.filter.Filter;
  * Content alterer to filter out characters which are part of a wiki syntax. This class should be extended to provide
  * the {@link Filter} used to determine which characters are not meaningful text and should be preserved (not
  * syntax characters).
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

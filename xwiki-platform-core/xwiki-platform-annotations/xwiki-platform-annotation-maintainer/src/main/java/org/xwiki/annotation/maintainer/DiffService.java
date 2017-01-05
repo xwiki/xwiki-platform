@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Defines the interface of a service providing the differences between two strings.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -35,7 +35,7 @@ public interface DiffService
     /**
      * Returns the differences between the previous content and the current content, to be implemented depending on the
      * algorithm used to get the differences, or the granulation, etc.
-     * 
+     *
      * @param previous the previous content
      * @param current the current content
      * @return the collection of differences between the old content and the new content

@@ -45,7 +45,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
  * Default implementation for the annotation maintainer.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -91,7 +91,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             }
 
             // store the annotations to save after update
-            List<Annotation> toUpdate = new ArrayList<Annotation>();            
+            List<Annotation> toUpdate = new ArrayList<Annotation>();
 
             // produce the ptr of the previous and current, wrt to syntax
             String syntaxId = ioContentService.getSourceSyntax(target);
@@ -129,7 +129,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
 
     /**
      * Helper method to render the plain text version of the passed content.
-     * 
+     *
      * @param content the content to render in plain text
      * @param syntaxId the source syntax of the content to render
      * @throws Exception if anything goes wrong while rendering the content
@@ -164,7 +164,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      * done using the spaceless version of the rendered previous content, in order to have synchronization with the
      * rendering, whereas the annotation diff and update will be done wrt to the normalized spaces version, to produce
      * human readable versions of the annotation selection and contexts.
-     * 
+     *
      * @param annotation the annotation to update properties for
      * @param differences the differences between {@code renderedPreviousContent} and {@code renderedCurrentContent}
      * @param renderedPreviousContent the plain text space normalized rendered previous content
@@ -312,7 +312,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
 
     /**
      * Helper function to adjust passed annotation to make sure it is unique in the content.
-     * 
+     *
      * @param annotation the annotation to ensure uniqueness for
      * @param content the content in which the annotation must be unique
      * @param cStart precomputed position where the annotation starts, passed here for cache reasons
@@ -402,7 +402,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
 
     /**
      * Helper function to get all occurrences of {@code pattern} in {@code subject}.
-     * 
+     *
      * @param subject the subject of the search
      * @param pattern the pattern of the search
      * @param exclude value to exclude from the results set
@@ -426,7 +426,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
      * Helper function to advance to the next word in the subject, until the first space is encountered, starting from
      * {@code position} and going to the left or to the right, as {@code toLeft} specifies. The returned value is the
      * length of the offset from position to where the space was found.
-     * 
+     *
      * @param subject the string to search for spaces in
      * @param position the position to start the search from
      * @param toLeft {@code true} if the search should be done to the left of the string, {@code false} otherwise
@@ -454,7 +454,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
     /**
      * Helper function to safely get the character at position {@code position} in the passed content, or null
      * otherwise.
-     * 
+     *
      * @param content the content to get the character from
      * @param position the position to get character at
      * @return the character at position {@code position} or {@code null} otherwise.

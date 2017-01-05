@@ -53,7 +53,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Base class for the annotation REST services, to implement common functionality to all annotation REST services.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -86,7 +86,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     /**
      * Builds an annotation response containing the annotated content along with the annotation stubs, according to the
      * requirements in the passed annotations request.
-     * 
+     *
      * @param request the annotations request
      * @param documentName the name of the document to provide an annotated response for
      * @return an annotation response with the annotated content and the annotation stubs
@@ -120,7 +120,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     /**
      * Helper function to translate a collection of annotations from the {@link Annotation} model to the JAXB model to
      * be serialized for REST communication.
-     * 
+     *
      * @param annotations the annotations collection to be translated
      * @param requestedFields the extra parameters that should be set for the prepared annotations
      * @return translate set of org.xwiki.annotation.internal.annotation.Annotation to set of
@@ -151,7 +151,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
 
     /**
      * Helper function to create an error response from a passed exception. <br>
-     * 
+     *
      * @param exception the exception that was encountered during regular execution of service
      * @return an error response
      */
@@ -175,7 +175,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      * Helper function to get the rendered content of the document with annotations. All setup of context for rendering
      * content similar to the rendering on standard view will be done in this function. <br>
      * FIXME: find out if this whole context setup code has to be here or in the annotations service
-     * 
+     *
      * @param docName the name of the document to render
      * @param language the language in which to render the document
      * @param action the context action to render the document for
@@ -222,7 +222,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     /**
      * Helper function to prepare the XWiki documents and translations on the context and velocity context. <br>
      * TODO: check how this code could be written only once (not duplicate the prepareDocuments function in XWiki)
-     * 
+     *
      * @param docName the full name of the document to prepare context for
      * @param language the language of the document
      * @throws XWikiException if anything goes wrong accessing documents
@@ -250,7 +250,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      * Helper method to filter a set of annotations according to the criteria in the passed annotation request. The
      * fields in the filter of the request will be interpreted as a filter for equality with the value in the actual
      * annotation, and all the fields conditions will be put together with an "or" operation.
-     * 
+     *
      * @param annotations the collection of annotations to filter
      * @param request the request according which to filter
      * @return the filtered collection of annotations
@@ -305,7 +305,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
 
     /**
      * Helper method to make sure that the context is set to the right document and database name.
-     * 
+     *
      * @param wiki the REST wikiName path parameter
      * @param space the REST spaceName path parameter
      * @param page the REST pageName path parameter

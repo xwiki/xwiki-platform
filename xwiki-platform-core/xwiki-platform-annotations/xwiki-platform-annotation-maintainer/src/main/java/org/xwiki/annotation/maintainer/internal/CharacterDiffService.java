@@ -34,7 +34,7 @@ import org.xwiki.component.annotation.Component;
 
 /**
  * DiffService implementation providing character level differences between content.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -69,7 +69,7 @@ public class CharacterDiffService implements DiffService
 
     /**
      * Helper function to prepare an {@link XDelta} object for the passed content.
-     * 
+     *
      * @param previous the previous content
      * @param current the current content
      * @param diff the difference to prepare the XDelta object for

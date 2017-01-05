@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
  * This service does not parse or interpret the references of targets its operating with, caller is responsible to be
  * consistent in calls and use references which are interpreted by the used implementations for
  * {@link org.xwiki.annotation.io.IOService and org.xwiki.annotation.io.IOTargetService}. <br>
- * 
+ *
  * @version $Id$
  * @see org.xwiki.annotation.io.IOTargetService
  * @see org.xwiki.annotation.io.IOTargetService
@@ -44,7 +44,7 @@ public interface AnnotationService
      * It's a particular case of {@link #getAnnotatedRenderedContent(String, String, String, Collection)} for
      * unspecified input syntax, {@code xhtml/1.0} output syntax and the list of annotations returned by
      * {@link #getValidAnnotations(String)} for this source reference.
-     * 
+     *
      * @param sourceReference reference to the source to be rendered in XHTML with annotations
      * @return rendered and annotated document
      * @throws AnnotationServiceException if anything goes wrong retrieving or rendering the requested source
@@ -58,7 +58,7 @@ public interface AnnotationService
      * in the {@code annotations} parameter. Note that no test is done on the actual target of the annotations in the
      * passed list, they will all be rendered, as long as their selected text and context can be identified in the
      * content.
-     * 
+     *
      * @param sourceReference the reference to the source to be rendered in XHTML with annotations
      * @param sourceSyntax the syntax to parse the source in. If this parameter is null, the default source syntax will
      *            be used, as returned by the target IO service.
@@ -73,7 +73,7 @@ public interface AnnotationService
 
     /**
      * Adds an the specified annotation for the specified target.
-     * 
+     *
      * @param target serialized reference of the target of the annotation
      * @param selection HTML selection concerned by annotations
      * @param selectionContext HTML selection context
@@ -87,7 +87,7 @@ public interface AnnotationService
 
     /**
      * Remove an annotation given by its identifier, which should be unique among all annotations on the same target.
-     * 
+     *
      * @param target the string serialized reference to the content on which the annotation is added
      * @param annotationID annotation identifier
      * @throws AnnotationServiceException if anything goes wrong accessing the annotations store
@@ -97,7 +97,7 @@ public interface AnnotationService
     /**
      * Updates the passed annotation with the new values. Matching of the annotation is done by the annotation id field,
      * among all annotations on the same target.
-     * 
+     *
      * @param target the string serialized reference to the content on which the annotation is added
      * @param annotation the new description of the annotation to update, with a valid id
      * @throws AnnotationServiceException if anything goes wrong accessing the annotations store
@@ -106,7 +106,7 @@ public interface AnnotationService
 
     /**
      * Returns all the annotations on the passed content.
-     * 
+     *
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which target the specified content
      * @throws AnnotationServiceException if anything goes wrong accessing the annotations store
@@ -115,7 +115,7 @@ public interface AnnotationService
 
     /**
      * Returns the annotation identified by {@code id} on the specified target.
-     * 
+     *
      * @param target the serialized reference to the content on which the annotation is added
      * @param id the identifier of the annotation
      * @return the annotation identified by {@code id}
@@ -126,7 +126,7 @@ public interface AnnotationService
     /**
      * Shortcut function to get all annotations which are valid on the specified target, regardless of the updates the
      * document and its annotations suffered from creation ('safe' or 'updated' state).
-     * 
+     *
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which are valid on the specified content
      * @throws AnnotationServiceException if anything goes wrong accessing the annotations store

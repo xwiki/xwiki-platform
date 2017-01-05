@@ -146,7 +146,7 @@ require.config({
   }
 });
 /**
- * Replace the simple text input field for supported locales by a nicer select widget with all available locales 
+ * Replace the simple text input field for supported locales by a nicer select widget with all available locales
  * ready to be selected.
  *
  * Instead of dynamically replace the text input field on the client-side, we could have done on the server-side,
@@ -158,7 +158,7 @@ require.config({
  */
 require(['jquery','bootstrap','bootstrap-select'], function($) {
   'use strict';
-  
+
   var locales = [
 #set ($separator = '')
 #set ($currentLocale = $services.localization.currentLocale)
@@ -186,7 +186,7 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
     }
     return results;
   }
-  
+
   /**
    * Serialize an array of locales to a string that the XWiki server can handle
    */
@@ -202,12 +202,12 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
     }
     return result;
   }
-  
+
   /**
    * Initialization
    */
   $(document).ready(function() {
-  
+
     /**
      * Enable the bootstrap-select plugin to have a nicer UI.
      */
@@ -216,34 +216,34 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
       var getBaseWidth = function () {
         return $('input[name="XWiki.XWikiPreferences_0_documentBundles"]').outerWidth() + 'px';
       }
-    
+
       select.selectpicker({
-        // We need to set the width manually using pixels because if we use "100%", it won't work because the select 
+        // We need to set the width manually using pixels because if we use "100%", it won't work because the select
         // picker is using an absolute position, so using "100%" would exceed the window limit.
         width: getBaseWidth(),
         // Enable the filtering on choices if there is a lot of choices
         liveSearch: select.find('option').length &gt; 10
       });
-      
+
       // Update the width of the select picker when the window is resized
       $(window).resize(function() {
         select.selectpicker({width: getBaseWidth()});
         select.selectpicker('refresh');
       });
     }
-  
+
     //
     // Adding the CSS of the boostrap-select plugin
     //
     var css = $('&lt;link rel="stylesheet" href="$services.webjars.url("bootstrap-select", "css/bootstrap-select.min.css")"&gt;');
     $('head').append(css);
-  
+
     // Getting the original input
     var localesInput = $('input[name="XWiki.XWikiPreferences_0_languages"]');
-    
+
     // Creating the select box
     var select = $('&lt;select multiple&gt;');
-    
+
     // Add all available options
     var currentLocales = getLocalesFromInput(localesInput);
     for (var i = 0; i &lt; locales.length; ++i) {
@@ -255,24 +255,24 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
       }
       select.append(option);
     }
-    
+
     // Problem: when we save the document, XWiki expects 'XWiki.XWikiPreferences_0_languages' to be a simple text,
     // not a "select" field with different values.
-    // So we keep the old input field as an hidden input which will hold the serialized representation of the 
+    // So we keep the old input field as an hidden input which will hold the serialized representation of the
     // selected locales.
     localesInput.prop('type', 'hidden');
-    
+
     // Adds the new select widget in the DOM
     select.insertAfter(localesInput);
-    
+
     // Enable the select picker
     enableSelectPicker(select);
-    
+
     // Synchronize the value of the hidden input text with the selected item in the select widget.
     select.on('changed.bs.select', function (event) {
       localesInput.prop('value', serializeArray(select.val()));
     });
-    
+
     // We can also do it for the "default locale" field.
     var defaultLocaleInput = $('input[name="XWiki.XWikiPreferences_0_default_language"]');
     var select2 = $('&lt;select&gt;');
@@ -288,13 +288,13 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
       select2.append(option);
     }
     defaultLocaleInput.replaceWith(select2);
-    
+
     // Enable bootstrap-select on the "timezone" field
     enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_timezone"]'));
-    
+
     // Enable it on the default locale field too
     enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_default_language"]'));
-    
+
     // Enable it on the last select field to be consistent
     enableSelectPicker($('select[name="XWiki.XWikiPreferences_0_multilingual"]'));
   });

@@ -54,7 +54,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * for documents or with an object and property reference if the target is an object property. Use the reference module
  * to generate the references passed to this module, so that they can be resolved to XWiki content back by this
  * implementation.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

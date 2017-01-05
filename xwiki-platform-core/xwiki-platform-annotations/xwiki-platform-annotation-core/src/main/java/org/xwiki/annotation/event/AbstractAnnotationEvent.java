@@ -25,7 +25,7 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
 /**
  * Base class for all annotation {@link org.xwiki.observation.event.Event}.
- * 
+ *
  * @version $Id$
  * @since 2.6RC2
  */
@@ -55,7 +55,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent impl
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
      * meaning that this event will match only comment events affecting the document matching the passed document name.
-     * 
+     *
      * @param documentName the name of the updated document to match
      * @param identifier the identifier of the annotation added/updated/deleted
      */
@@ -68,7 +68,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent impl
 
     /**
      * Constructor using a custom {@link EventFilter}.
-     * 
+     *
      * @param eventFilter the filter to use for matching events
      */
     public AbstractAnnotationEvent(EventFilter eventFilter)

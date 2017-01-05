@@ -24,7 +24,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the actions possible on the Page Elements administration section.
- * 
+ *
  * @version $Id$
  * @since 4.3.1
  */
@@ -46,7 +46,7 @@ public class PageElementsAdministrationSectionPage extends AdministrationSection
 
     /**
      * Open the "Page Elements" administration section.
-     * 
+     *
      * @return the "Page Elements" administration section
      */
     public static PageElementsAdministrationSectionPage gotoPage()
@@ -57,7 +57,7 @@ public class PageElementsAdministrationSectionPage extends AdministrationSection
 
     /**
      * Sets the list of the panels to be displayed on the right column
-     * 
+     *
      * @param rightPanels a comma-separated list of panel document names
      */
     public void setRightPanels(String rightPanels)

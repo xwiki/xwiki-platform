@@ -21,7 +21,7 @@ package org.xwiki.annotation.maintainer;
 
 /**
  * This interface models a difference between two pieces of content.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -41,7 +41,7 @@ public interface XDelta
      * Returns the original string at the position returned by {@link #getOffset()}. If this string is void and the one
      * returned by {@link #getChanged()} is not, it means that this difference is an addition at position
      * {@link #getOffset()}.
-     * 
+     *
      * @return the original string at the position returned by {@link #getOffset()}
      */
     String getOriginal();
@@ -50,7 +50,7 @@ public interface XDelta
      * Returns the modified string at the position returned by {@link #getOffset()}. If this string is void and the one
      * returned by {@link #getOriginal()} is not, it means that this difference is a deletion at position
      * {@link #getOffset()}.
-     * 
+     *
      * @return the modified string at the position returned by {@link #getOffset()}
      */
     String getChanged();

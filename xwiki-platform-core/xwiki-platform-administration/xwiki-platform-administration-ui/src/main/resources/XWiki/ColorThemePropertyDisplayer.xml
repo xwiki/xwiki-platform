@@ -141,7 +141,7 @@
         &lt;li role="presentation" #if ($currentScope=='global')class="active"#end&gt;&lt;a href="#global" role="tab" data-toggle="tab" data-scope="global"&gt;$escapetool.xml($services.localization.render('admin.colorthemes.global'))&lt;/a&gt;&lt;/li&gt;
       &lt;/ul&gt;
     #end
-    
+
     &lt;select name="${prefix}${name}" id="${prefix}${name}" data-current-scope="$currentScope"&gt;
       #if (!$value || !$colorThemeExists)
         &lt;option value="$!escapetool.xml($value)" selected="selected"&gt;---&lt;/option&gt;
@@ -240,9 +240,9 @@
     <property>
       <code>require(['jquery'], function ($) {
   'use strict';
-  
+
   $(document).ready(function() {
-    
+
     /**
      * Show only options of the current scope (local/global)
      */
@@ -259,17 +259,17 @@
         }
       }
     }
-    
+
     /**
      * Initialization
      */
     var init = function () {
       $('.XWikiColorThemeDisplayer').each(function() {
         var displayer = $(this);
-        
+
         // Refresh the displayer to hide unecessary elements
         refreshDisplayer(displayer);
-        
+
         /**
          * Event called when the user click on a tab and so change the current scope
          */
@@ -291,10 +291,10 @@
         });
       });
     }
-    
-    
+
+
     init();
-    
+
   });
 });
 </code>

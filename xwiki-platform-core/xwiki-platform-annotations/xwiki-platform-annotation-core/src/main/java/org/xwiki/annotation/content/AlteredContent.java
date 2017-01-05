@@ -23,7 +23,7 @@ package org.xwiki.annotation.content;
 /**
  * This class models an altered content, by providing the translations of offsets from the original content to the
  * altered content.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

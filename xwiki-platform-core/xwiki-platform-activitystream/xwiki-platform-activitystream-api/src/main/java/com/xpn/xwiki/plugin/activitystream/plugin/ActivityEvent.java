@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * Api wrapper for a {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEvent} to be exposed from velocity.
- * 
+ *
  * @version $Id$
  */
 public class ActivityEvent extends Api
@@ -39,7 +39,7 @@ public class ActivityEvent extends Api
 
     /**
      * Constructor.
-     *  
+     *
      * @param event event to wrap
      * @param context the XWiki context
      */
@@ -163,7 +163,7 @@ public class ActivityEvent extends Api
 
     /**
      * Allows to modify the title of an event This might be useful to control the display or RSS feeds.
-     * 
+     *
      * @param title title to set
      */
     public void setTitle(String title)
@@ -175,7 +175,7 @@ public class ActivityEvent extends Api
 
     /**
      * Allows to modify the body of an event This might be useful to control the display or RSS feeds.
-     * 
+     *
      * @param body body to set
      */
     public void setBody(String body)
@@ -272,7 +272,7 @@ public class ActivityEvent extends Api
     {
         return event.getParameters();
     }
-    
+
     /**
      * @return the wrapped event
      */

@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Role;
 /**
  * Interface defining the annotation maintainer service, which should be able to update the annotations on a specified
  * target, wrt to the previous and the current versions of the content.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -34,7 +34,7 @@ public interface AnnotationMaintainer
     /**
      * Updates all the annotations found on the passed target. Should use the IO services to get the annotations and
      * information about the target, such as syntax.
-     * 
+     *
      * @param target is serialized reference to the content concerned by the annotation
      * @param previousContent the previous content of the document (before the update)
      * @param currentContent the current content of the document (after the update)

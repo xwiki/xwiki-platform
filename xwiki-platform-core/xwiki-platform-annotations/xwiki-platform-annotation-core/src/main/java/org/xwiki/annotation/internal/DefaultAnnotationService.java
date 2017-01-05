@@ -45,7 +45,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 /**
  * Default annotation service, using the default {@link IOTargetService} and and {@link IOTargetService}, dispatching
  * calls and implementing the rendering of the content based on these data from the 2 services.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -88,7 +88,7 @@ public class DefaultAnnotationService implements AnnotationService
             // for these values or constructor
             Collection<String> skippedFields =
                 Arrays.asList(new String[] {Annotation.SELECTION_FIELD, Annotation.SELECTION_LEFT_CONTEXT_FIELD,
-                    Annotation.SELECTION_RIGHT_CONTEXT_FIELD, Annotation.ORIGINAL_SELECTION_FIELD, 
+                    Annotation.SELECTION_RIGHT_CONTEXT_FIELD, Annotation.ORIGINAL_SELECTION_FIELD,
                     Annotation.AUTHOR_FIELD, Annotation.STATE_FIELD});
             for (Map.Entry<String, Object> field : metadata.entrySet()) {
                 if (!skippedFields.contains(field.getKey())) {

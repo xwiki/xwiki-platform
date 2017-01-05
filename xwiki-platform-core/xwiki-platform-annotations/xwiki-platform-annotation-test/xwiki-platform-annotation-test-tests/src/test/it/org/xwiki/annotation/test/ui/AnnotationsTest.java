@@ -31,7 +31,7 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 
 /**
  * Annotation Test.
- * 
+ *
  * @version $Id$
  * @since 2.7RC1
  */

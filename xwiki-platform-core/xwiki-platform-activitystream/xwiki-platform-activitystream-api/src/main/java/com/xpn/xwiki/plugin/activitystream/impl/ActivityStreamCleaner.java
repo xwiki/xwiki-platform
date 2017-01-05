@@ -32,9 +32,9 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 
 /**
- * Manager for the activitystream cleaning feature. The cleaning consist in deleting old events to prevent infinite 
+ * Manager for the activitystream cleaning feature. The cleaning consist in deleting old events to prevent infinite
  * growth of the activitystream table in the database.
- * 
+ *
  * @version $Id$
  */
 public final class ActivityStreamCleaner
@@ -43,17 +43,17 @@ public final class ActivityStreamCleaner
      * Logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityStreamCleaner.class);
-    
+
     /**
      * Document holding the cleaner Job.
      */
     private static final String CLEANER_JOB_DOCNAME = "Scheduler.ActivityStreamCleaner";
-    
+
     /**
      * Document holding the cleaner Job.
      */
     private static final String CLEANER_JOB_NAME = "ActivityStream cleaner";
-    
+
     /**
      * Document holding the cleaner Job.
      */
@@ -63,12 +63,12 @@ public final class ActivityStreamCleaner
      * XWiki Default Admin account.
      */
     private static final String XWIKI_DEFAULT_ADMIN = "XWiki.Admin";
-    
+
     /**
      * XWiki Rights class name.
      */
     private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
-    
+
     /**
      * Unique instance of ActivityStreamCleaner.
      */
@@ -94,22 +94,22 @@ public final class ActivityStreamCleaner
 
         return instance;
     }
-    
+
     /**
      * @param context the XWiki context
-     * @return the number of days activitystream events should be kept (default: infinite duration). 
+     * @return the number of days activitystream events should be kept (default: infinite duration).
      */
     public static int getNumberOfDaysToKeep(XWikiContext context)
     {
-        ActivityStreamPlugin plugin = 
-            (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context); 
+        ActivityStreamPlugin plugin =
+            (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context);
         String pref = plugin.getActivityStreamPreference("daystokeepevents", "0", context);
         return Integer.parseInt(pref);
     }
-    
+
     /**
      * Set cleaner common documents fields.
-     * 
+     *
      * @param doc document to modify
      * @return true if the fields have been modified, false otherwise
      */
@@ -134,10 +134,10 @@ public final class ActivityStreamCleaner
 
         return needsUpdate;
     }
-                                              
+
     /**
      * Create the XWiki rights object in the cleaner job document.
-     * 
+     *
      * @param doc Cleaner job document
      * @param context the XWiki context
      * @return true if the document has been updated, false otherwise
@@ -157,10 +157,10 @@ public final class ActivityStreamCleaner
 
         return false;
     }
-    
+
     /**
      * Create the cleaner job document in the wiki.
-     *     
+     *
      * @param context the XWiki context
      * @throws XWikiException if the job creation fails
      */
@@ -171,9 +171,9 @@ public final class ActivityStreamCleaner
         BaseObject job = null;
 
         try {
-            doc = context.getWiki().getDocument(CLEANER_JOB_DOCNAME, context);            
-            needsUpdate = setCleanerCommonDocumentsFields(doc);       
-            
+            doc = context.getWiki().getDocument(CLEANER_JOB_DOCNAME, context);
+            needsUpdate = setCleanerCommonDocumentsFields(doc);
+
             job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
             if (job == null) {
                 needsUpdate = true;
@@ -202,10 +202,10 @@ public final class ActivityStreamCleaner
             LOGGER.error("Cannot initialize ActivityStreamCleanerJob", e);
         }
     }
-    
+
     /**
      * Method that must be called on plugin init. Create the scheduler job.
-     * 
+     *
      * @param context the XWiki context
      * @throws XWikiException if the job creation failed
      */

@@ -35,7 +35,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Test the Import XAR feature.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -77,7 +77,7 @@ public class ImportTest extends AbstractTest
 
     /**
      * Verify that the Import page doesn't list any package by default in default XE.
-     * 
+     *
      * @since 2.6RC1
      */
     @Test

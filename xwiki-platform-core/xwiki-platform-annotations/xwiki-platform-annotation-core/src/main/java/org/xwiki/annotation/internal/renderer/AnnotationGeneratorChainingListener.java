@@ -48,7 +48,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * content and identifying the events in the stream that hold the start and end of the annotations. <br>
  * FIXME: this should use the PlainTextNormalizingChaininngRenderer to generate the plain text version of the content,
  * and match with the space normalized selection.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -100,7 +100,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
 
     /**
      * Builds an annotation generator listener from the passed link generator in the passed chain.
-     * 
+     *
      * @param selectionAlterer cleaner for the annotation selection text, so that it can be mapped on the content
      * @param listenerChain the chain in which this listener is part of
      */
@@ -138,7 +138,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
 
     /**
      * Helper function to help handle raw text, such as the raw blocks or the verbatim blocks.
-     * 
+     *
      * @param text the raw text to handle
      */
     private void handleRawText(String text)
@@ -246,7 +246,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     /**
      * Helper function to get the event where the passed index falls in, based on the isEnd setting to know if the
      * offset should be given before the character at the index position or after it.
-     * 
+     *
      * @param index the index to get the event for
      * @param isEnd {@code true} if the index should be considered as an end index, {@code false} otherwise
      * @return an array of objects to hold the event reference, on the first position, and the offset inside this event
@@ -293,7 +293,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
 
     /**
      * Adds an annotation bookmark in this list of bookmarks.
-     * 
+     *
      * @param renderingEvent the rendering event where the annotation should be bookmarked
      * @param offset the offset of the annotation event inside this rendering event
      * @param annotationEvent the annotation event to bookmark
@@ -317,7 +317,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     /**
      * Helper function to help add an annotation event to the list of events, and keep the restriction that end events
      * are stored before start events. Otherwise put, for the same offset, annotations end first and open after.
-     * 
+     *
      * @param evt the annotation event to add to the list
      * @param list the annotation events list to add the event to
      */
@@ -361,7 +361,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
 
     /**
      * Sets the collections of annotations to identify on the listened content and send notifications for.
-     * 
+     *
      * @param annotations the collection of annotations to generate events for
      */
     public void setAnnotations(Collection<Annotation> annotations)

@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Represents the actions possible on the Users Administration Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

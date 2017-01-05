@@ -27,7 +27,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 /**
  * The configuration of the Annotations Application for the current wiki.
- * 
+ *
  * @version $Id$
  * @since 4.0M2
  */
@@ -48,7 +48,7 @@ public interface AnnotationConfiguration
      * @return true if the annotations application is installed.
      */
     boolean isInstalled();
-    
+
     /**
      * @return true if the annotations UI is activated, false otherwise.
      */

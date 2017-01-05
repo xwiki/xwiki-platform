@@ -54,7 +54,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 /**
  * Listens to object events of the same class as the currently configured annotation class and launches corresponding
  * {@link org.xwiki.annotation.event.AnnotationEvent}s.
- * 
+ *
  * @version $Id$
  * @since 4.0RC1
  */

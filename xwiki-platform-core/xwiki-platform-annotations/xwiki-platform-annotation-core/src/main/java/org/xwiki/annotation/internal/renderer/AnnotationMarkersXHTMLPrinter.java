@@ -37,7 +37,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  * Note that, although this class could aggregate a XHTMLWikiPrinter, and be used to wrap the default XHTMLWikiPrinter
  * in a XHTML Renderer, it extends it so that it can replace. TODO: in a future improved implementation, this could
  * handle annotations rendering alone, just using state information from the renderer.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -65,7 +65,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
 
     /**
      * Builds an XHTML markers annotations printer which uses the underlying wiki printer.
-     * 
+     *
      * @param printer the wiki printer used by this XHTML printer
      */
     public AnnotationMarkersXHTMLPrinter(WikiPrinter printer)
@@ -75,7 +75,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
 
     /**
      * Handles the beginning of a new annotation.
-     * 
+     *
      * @param annotation the annotation that begins
      */
     public void beginAnnotation(Annotation annotation)
@@ -91,7 +91,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
 
     /**
      * Handles the end of an annotation.
-     * 
+     *
      * @param annotation the annotation that ends
      */
     public void endAnnotation(Annotation annotation)
@@ -114,7 +114,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
 
     /**
      * Prints the start marker for the passed annotation.
-     * 
+     *
      * @param annotation the annotation to print the start marker for
      */
     private void printAnnotationStartMarker(Annotation annotation)
@@ -127,7 +127,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
 
     /**
      * Prints the end marker for the passed annotation.
-     * 
+     *
      * @param annotation the annotation to print end marker for
      */
     private void printAnnotationEndMarker(Annotation annotation)
@@ -175,7 +175,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
     /**
      * Helper function to help render a piece of text with annotation events inside it, at the specified offsets. To be
      * used for the events which generate text and need to generate annotation markers inside them.
-     * 
+     *
      * @param text the text to render
      * @param annotations the map of indexes and annotation events to render in this text
      */

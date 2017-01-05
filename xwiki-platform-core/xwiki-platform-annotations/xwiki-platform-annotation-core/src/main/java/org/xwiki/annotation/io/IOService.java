@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Role;
  * This component provides services related to annotations storage and retrieval. It operates with string serialized
  * references for the targets of annotations. This interface does not restrict the implementation of the annotation
  * targets, they can be anything referencable through a string.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -37,7 +37,7 @@ public interface IOService
 {
     /**
      * Returns all the annotations on the passed content.
-     * 
+     *
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which target the specified content
      * @throws IOServiceException if any exception occurs while manipulating annotations store
@@ -54,7 +54,7 @@ public interface IOService
 
     /**
      * Adds annotation on the specified target.
-     * 
+     *
      * @param target serialized reference of the target of the annotation
      * @param annotation annotation to add on the target
      * @throws IOServiceException can be thrown if any exception occurs while manipulating annotations store
@@ -63,7 +63,7 @@ public interface IOService
 
     /**
      * Removes an annotation given by its identifier, which should be unique among all annotations on the same target.
-     * 
+     *
      * @param target serialized reference of the target of the annotation
      * @param annotationID annotation identifier
      * @throws IOServiceException can be thrown if any exception occurs while manipulating annotations store
@@ -73,7 +73,7 @@ public interface IOService
     /**
      * Updates the set of annotations in the annotations store. They will be identified by their identifiers as returned
      * by {@link Annotation#getId()}, and updated each to match the fields in the Annotation objects.
-     * 
+     *
      * @param target serialized reference of the target of the annotation
      * @param annotations collection of annotations to update
      * @throws IOServiceException can be thrown if any exception occurs while manipulating annotations store

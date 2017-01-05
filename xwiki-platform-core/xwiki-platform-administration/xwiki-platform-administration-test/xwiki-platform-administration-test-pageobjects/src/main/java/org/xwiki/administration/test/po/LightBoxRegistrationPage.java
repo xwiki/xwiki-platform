@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.AbstractRegistrationPage;
 
 /**
  * Represents a registration page in a lightbox.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

@@ -62,7 +62,7 @@
       <artifactId>xwiki-commons-text</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly load some 
+    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly load some
       components (e.g. DefaultXWikiStubContextProvider) -->
     <dependency>
       <groupId>javax.servlet</groupId>

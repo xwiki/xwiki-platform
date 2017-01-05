@@ -21,7 +21,7 @@ package org.xwiki.annotation.maintainer;
 
 /**
  * Thrown when a maintainer error occurs.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -34,7 +34,7 @@ public class MaintainerServiceException extends Exception
 
     /**
      * Builds a maintainer exception with the specified message.
-     * 
+     *
      * @param message the message of this exception
      */
     public MaintainerServiceException(String message)
@@ -44,7 +44,7 @@ public class MaintainerServiceException extends Exception
 
     /**
      * Builds an maintainer exception for the specified cause with the specified message.
-     * 
+     *
      * @param message the message of this exception
      * @param cause the cause of the exception
      */

@@ -38,7 +38,7 @@ import org.xwiki.security.authorization.Right;
 
 /**
  * Implementation of the rights service based on the XWiki access rights.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -118,7 +118,7 @@ public class XWikiAnnotationRightService implements AnnotationRightService
      * Helper method to parse the target as a reference and extract a serialized document reference from it: the
      * document reference serialized if the target can be parsed as a typed reference, or the initial string itself
      * otherwise.
-     * 
+     *
      * @param target the serialized reference to target to extract the document reference from
      * @return the serialized reference to the document to which the target refers
      */
@@ -136,7 +136,7 @@ public class XWikiAnnotationRightService implements AnnotationRightService
 
     /**
      * Helper method to log an xwiki exception during rights checking process.
-     * 
+     *
      * @param e exception to log
      * @param target the annotation target for which exception has occurred
      * @param user the user name for which exception occurred on verification

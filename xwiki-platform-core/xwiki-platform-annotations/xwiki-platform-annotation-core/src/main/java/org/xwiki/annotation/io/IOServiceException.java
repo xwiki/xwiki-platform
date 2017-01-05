@@ -22,7 +22,7 @@ package org.xwiki.annotation.io;
 
 /**
  * Thrown when an input/output error occurs.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -35,7 +35,7 @@ public class IOServiceException extends Exception
 
     /**
      * Builds an IOService exception with the specified message.
-     * 
+     *
      * @param message the message of this exception
      */
     public IOServiceException(String message)
@@ -45,7 +45,7 @@ public class IOServiceException extends Exception
 
     /**
      * Builds an IOService exception for the specified cause with the specified message.
-     * 
+     *
      * @param message the message of this exception
      * @param cause the cause of the exception
      */

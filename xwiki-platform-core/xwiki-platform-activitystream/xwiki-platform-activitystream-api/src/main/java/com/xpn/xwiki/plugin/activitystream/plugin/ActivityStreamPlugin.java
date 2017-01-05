@@ -28,7 +28,7 @@ import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
 
 /**
  * Plug-in for for managing streams of activity events.
- * 
+ *
  * @see ActivityStream
  * @version $Id$
  */
@@ -46,7 +46,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
 
     /**
      * Constructor.
-     * 
+     *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      * @param name name of the plugin
      * @param className class name of the plugin
@@ -88,7 +88,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
 
     /**
      * Get a preference for the activitystream from the XWiki configuration.
-     * 
+     *
      * @param preference Name of the preference to get the value from
      * @param defaultValue Default value if the preference is not found in the configuration
      * @param context the XWiki context

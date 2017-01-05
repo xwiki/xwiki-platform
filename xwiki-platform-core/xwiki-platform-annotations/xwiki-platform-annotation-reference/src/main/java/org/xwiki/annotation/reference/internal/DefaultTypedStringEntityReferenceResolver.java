@@ -27,7 +27,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
  * Default implementation of the typed entity resolver, which gets missing values from the default configuration.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -37,7 +37,7 @@ public class DefaultTypedStringEntityReferenceResolver extends AbstractTypedStri
 {
     /**
      * Reference resolver used to resolve the reference without the type specification.
-     */    
+     */
     @Inject
     private EntityReferenceResolver<String> referenceResolver;
 

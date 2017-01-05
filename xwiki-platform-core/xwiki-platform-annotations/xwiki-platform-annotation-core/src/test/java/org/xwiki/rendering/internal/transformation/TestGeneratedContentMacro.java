@@ -35,7 +35,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Test macro that generates a piece of fixed text.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReference;
  * Note that, although it roughly does the same thing, this is a different hierarchy than EntityReferenceResolver
  * because it's a different strategy, different interpretation of the type parameter and resolvers and serializers of
  * this type should be used together.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

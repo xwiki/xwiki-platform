@@ -23,7 +23,7 @@ import org.xwiki.observation.event.FilterableEvent;
 
 /**
  * A base interface for all annotation events.
- * 
+ *
  * @version $Id$
  * @since 4.0RC1
  */
@@ -31,7 +31,7 @@ public interface AnnotationEvent extends FilterableEvent
 {
     /**
      * Retrieves the identifier of the annotation added/updated/deleted in the event.
-     * 
+     *
      * @return identifier of the annotation
      */
     String getIdentifier();

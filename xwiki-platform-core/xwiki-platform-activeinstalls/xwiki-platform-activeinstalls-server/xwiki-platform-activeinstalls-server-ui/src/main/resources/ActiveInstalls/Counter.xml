@@ -1117,7 +1117,7 @@ var activeCounterValue2 = $.ajax({
 }).responseText;
 var activeInstallsCounter2 = new flipCounter("activeCounter2", {value: activeCounterValue2, auto:false});
 
-setInterval(function(){ 
+setInterval(function(){
   var totalCounterValue1 = $.ajax({
     url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
     async: false

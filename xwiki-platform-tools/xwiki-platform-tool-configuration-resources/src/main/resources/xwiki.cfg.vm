@@ -294,7 +294,7 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 
 #-# Indicate if the authentication has do be done for each request
 #-# 0: the default value, authentication is done only once by session.
-#-# 1: the authentication is done for each request. 
+#-# 1: the authentication is done for each request.
 # xwiki.authentication.always=0
 
 #-# Cookie encryption keys. You SHOULD replace these values with any random string,
@@ -461,13 +461,13 @@ xwiki.plugin.image.cache.capacity=30
 #
 
 #-# [Since 2.0RC1]
-#-# Activity Stream plugin. 
+#-# Activity Stream plugin.
 #-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
 #-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
 #-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
 #-#
-#-# Default: 1 
+#-# Default: 1
 # xwiki.plugin.activitystream.uselocalstore=1
 #-#
 #-# Default: 1

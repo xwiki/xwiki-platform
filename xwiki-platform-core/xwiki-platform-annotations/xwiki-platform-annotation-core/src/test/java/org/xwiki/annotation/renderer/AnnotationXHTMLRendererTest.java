@@ -44,7 +44,7 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Renderer tests for the XHTML annotations renderer, from the test files.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -163,7 +163,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
     /**
      * Creates a test for the passed document. Will be instantiated by the parameterized runner for all the parameters.
-     * 
+     *
      * @param docName the document (and corpus filename) to run tests for
      */
     public AnnotationXHTMLRendererTest(String docName)
@@ -173,7 +173,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
     /**
      * Adds a file to the list of files to run tests for.
-     * 
+     *
      * @param docName the name of the document / file to test
      */
     private static void addFileToTest(String docName)
@@ -211,7 +211,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
     /**
      * Test rendering the annotations in the document description file results in the annotated html.
-     * 
+     *
      * @throws Exception in case something goes wrong looking up components and rendering
      */
     @Test
@@ -243,7 +243,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
     /**
      * Test rendering with the annotations renderer but without annotations doesn't alter the content.
-     * 
+     *
      * @throws Exception in case something goes wrong looking up components and rendering
      */
     @Test

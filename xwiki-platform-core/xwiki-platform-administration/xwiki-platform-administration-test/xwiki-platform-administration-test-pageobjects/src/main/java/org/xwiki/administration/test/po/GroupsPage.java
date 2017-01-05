@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Page Object for the Administration/Groups page.
- * 
+ *
  * @version $Id$
  * @since 8.1M2
  */
@@ -83,7 +83,7 @@ public class GroupsPage extends BasePage
 
     /**
      * Method that overrides waitUntilPageIsLoaded() and waits also for the Groups livetable to load.
-     * 
+     *
      * @see org.xwiki.test.ui.po.BasePage#waitUntilPageIsLoaded()
      */
     @Override

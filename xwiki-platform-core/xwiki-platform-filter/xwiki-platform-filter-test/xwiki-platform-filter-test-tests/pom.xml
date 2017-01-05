@@ -48,7 +48,7 @@
       <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    
+
     <!-- Add Panel deps which is optional in xwiki-platform-filter-ui in order to test registration in the App panel -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

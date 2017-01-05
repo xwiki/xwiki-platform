@@ -87,7 +87,7 @@
 
 {{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
-### Input variables: 
+### Input variables:
 ### - $params (mandatory): list of properties to display and their associated sections
 ### - $paramDoc (optional): document object which contains the $paramClass
 ### - $paramClass (optional): name of the xclass type for the xobject from which to read/save from

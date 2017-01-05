@@ -4,11 +4,11 @@ XWiki Invitation Application
 Works on XWiki 2.4M2
 XWiki Syntax: 2.0
 
-This application creates a document called InvitationMessages and one called InvitationConfig the first time it runs. 
+This application creates a document called InvitationMessages and one called InvitationConfig the first time it runs.
 You may configure InvitationMessages to be a different file by navigating to the invitation section of the administration
 interface and setting the field "Document containing email XObjects".
 
-It is space agnostic and will create the documents in the same space as itself although it will be installed in the 
+It is space agnostic and will create the documents in the same space as itself although it will be installed in the
 Invitation space by default.
 
 Allows users to invite friends to join the wiki. Allows administrators to invite multiple people at once.

@@ -24,7 +24,7 @@ import org.xwiki.annotation.Annotation;
 /**
  * Class to hold information about an annotation event, namely its type (annotation start or end) and the annotation for
  * which the event takes place.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -32,7 +32,7 @@ public class AnnotationEvent
 {
     /**
      * The type of annotation event that can occur during the processing.
-     * 
+     *
      * @version $Id$
      */
     public enum AnnotationEventType
@@ -59,7 +59,7 @@ public class AnnotationEvent
 
     /**
      * Builds an annotation event for the passed annotation and type.
-     * 
+     *
      * @param type the type of the annotation event
      * @param ann the annotation for which the event took place
      */

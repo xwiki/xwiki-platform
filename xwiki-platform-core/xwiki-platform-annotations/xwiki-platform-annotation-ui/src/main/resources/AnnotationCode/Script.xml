@@ -171,8 +171,8 @@ XWiki.Selection = Class.create({
     if (!this.container) {
       return;
     }
-    if (window.getSelection) { 
-      // FF selection &amp; hopefully other browsers 
+    if (window.getSelection) {
+      // FF selection &amp; hopefully other browsers
       if (window.getSelection().rangeCount == 0) {
         return;
       }
@@ -199,7 +199,7 @@ XWiki.Selection = Class.create({
   },
 
   isDescendantOrSelf : function(ancestor, descendant) {
-    return ancestor == descendant || Element.descendantOf(descendant, ancestor); 
+    return ancestor == descendant || Element.descendantOf(descendant, ancestor);
   },
 
   computeContext : function() {
@@ -242,7 +242,7 @@ XWiki.Selection = Class.create({
       this.range.execCommand("BackColor", false, color);
     }
   },
-  
+
   /**
    * Returns all the text nodes in the range, in depth first preorder, and also splitting the startContainer &amp; endContainer in text nodes by the start &amp; end offset, if needed
    */
@@ -254,13 +254,13 @@ XWiki.Selection = Class.create({
 
     var firstLeaf = this.getFirstLeafInRange(this.range);
     var lastLeaf = this.getLastLeafInRange(this.range);
-    
+
     var leafs = this.getLeafsBetween(firstLeaf, lastLeaf);
     // filter out the text leafs
     var textLeafs = leafs.findAll(function(item) {
       return item.nodeType == 3;
     });
-    
+
     // and now split the ends, if necessary
     if (startContainer == textLeafs[0] &amp;&amp; startOffset != 0) {
       // split the start
@@ -303,7 +303,7 @@ XWiki.Selection = Class.create({
         }
     } else {
         return range.startContainer;
-    }  
+    }
   },
 
   getLastLeafInRange : function(range) {
@@ -331,7 +331,7 @@ XWiki.Selection = Class.create({
     } else {
         // Return the first leaf in the subtree whose root is the next sibling of the ancestor.
         return this.getFirstLeaf(ancestor.nextSibling);
-    }    
+    }
   },
 
   getPreviousLeaf : function(node) {
@@ -353,7 +353,7 @@ XWiki.Selection = Class.create({
     while (descendant.hasChildNodes()) {
       descendant = descendant.firstChild;
     }
-    return descendant;    
+    return descendant;
   },
 
   getLastLeaf : function(node) {
@@ -361,7 +361,7 @@ XWiki.Selection = Class.create({
     while (descendant.hasChildNodes()) {
       descendant = descendant.lastChild;
     }
-    return descendant;    
+    return descendant;
   },
 
   removeSelectionHighlight : function() {
@@ -396,8 +396,8 @@ XWiki.Selection = Class.create({
       left = this.offsetX;
       top = this.offsetY;
     }
-    
-    return {'left' : left, 'top' : top}; 
+
+    return {'left' : left, 'top' : top};
   },
 
   /*
@@ -451,7 +451,7 @@ XWiki.Selection = Class.create({
     this.selectionContext = subLeft + this.selectionText + subRight;
     this.selectionOffset = Math.max(subLeft.length, 0);
   },
-  
+
   computeContextIE : function() {
     var containerInnerText = this.container.innerText;
     // copy the range to make the expanding on a range copy
@@ -633,7 +633,7 @@ XWiki.Annotation = Class.create({
   selectionService : false,
   // the stack of bubbles, so that we can close them one by one if needed
   bubbles : new Array(),
-  // the currently set filter (pair of field names and their values) that all annotations should be fetched according to. 
+  // the currently set filter (pair of field names and their values) that all annotations should be fetched according to.
   // It will be updated any time a changed filter event is received
   currentFilter : {},
 
@@ -770,7 +770,7 @@ XWiki.Annotation = Class.create({
           this.attachSettingsListeners();
           $('tmAnnotations').toggleClassName('active');
         }.bind(this),
-   
+
         onFailure: function(response) {
           var failureReason = response.statusText;
           if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
@@ -838,7 +838,7 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching 
+   * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching
    * the annotations.
    */
   onFilterChange : function(event) {
@@ -854,7 +854,7 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Returns an array of extra fields that need to be requested from the annotations. 
+   * Returns an array of extra fields that need to be requested from the annotations.
    */
   getExtraFields : function() {
     // TODO: request for color when it will be used by the annotation displayer and sent by the backend
@@ -872,7 +872,7 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its 
+   * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its
    * hash parameter and returns the altered value.
    */
   prepareRequestParameters : function(parametersHash) {
@@ -900,7 +900,7 @@ XWiki.Annotation = Class.create({
 
   /*
    * @param andShow whether the annotations should also be shown (highlighted) on the content
-   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)   
+   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)
    */
   fetchAnnotations : function(andShow, force) {
     require(['xwiki-meta'], function (xm) {
@@ -955,7 +955,7 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Checks if the passed response contains a non-zero response code and, in this case, executes the failure callback 
+   * Checks if the passed response contains a non-zero response code and, in this case, executes the failure callback
    * of the response.
    */
   checkResponseCodeAndFail : function(response) {
@@ -976,11 +976,11 @@ XWiki.Annotation = Class.create({
 
   /**
    * Loads the annotated content in the annotated element content, if there are any annotations or if forced.
-   * 
+   *
    * @param annotatedContent object holding the annotated content to update the annotated element with (stores the annotations list and the annotated html)
    * @param andShow whether the annotations should also be shown (highlighted) on the content
    * @param navigateToPane if the document should be repositioned to the annotations tab in the document extra section. Useful when the changes on annotations are done from the tab, when the document position should still stay in the tab
-   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)   
+   * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)
    */
   loadAnnotatedContent : function(annotatedContent, andShow, navigateToPane, force) {
     // only load the annotated content if there are any annotations
@@ -1050,7 +1050,7 @@ XWiki.Annotation = Class.create({
         new XWiki.widgets.ConfirmedAjaxRequest(
           item.href,
           {
-            parameters: this.prepareRequestParameters(new Hash()),  
+            parameters: this.prepareRequestParameters(new Hash()),
             onCreate : function() {
               // Disable the button, to avoid a cascade of clicks from impatient users
               item.disabled = true;
@@ -1090,7 +1090,7 @@ XWiki.Annotation = Class.create({
       item.blur();
       event.stop();
       // and submit the update
-      this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST', 
+      this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST',
         new Hash({'state' : 'SAFE', 'originalSelection' : ''}),
         {
           successText : "$services.localization.render('annotations.action.validate.success')",
@@ -1210,7 +1210,7 @@ XWiki.Annotation = Class.create({
           // display the annotation creation form
           this.fillViewPanel(container, response.responseText, annotationId, true);
         }.bind(this),
-   
+
         onFailure: function(response) {
           var failureReason = response.statusText;
           if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
@@ -1253,7 +1253,7 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Updates the container with the passed content only if the container is still displayed, and returns true if this is the case. 
+   * Updates the container with the passed content only if the container is still displayed, and returns true if this is the case.
    */
   safeUpdate : function(container, content) {
     if (!container.parentNode) {
@@ -1267,8 +1267,8 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all 
-   * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the 
+   * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all
+   * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the
    * bottom panel.
    */
   fillEditForm : function(container, content, annotationId, inBubble) {
@@ -1285,17 +1285,17 @@ XWiki.Annotation = Class.create({
     var validateButton = container.down('a.validate');
     if (validateButton) {
       this.addValidateListener(validateButton, annotationId, container, inBubble);
-    }    
+    }
     container.down('form').focusFirstElement();
     // and add the button listeners
     container.down('input[type=submit]').observe('click', this.onAnnotationEdit.bindAsEventListener(this, container, annotationId, inBubble));
     container.down('input[type=reset]').observe('click', function(event) {
       if (inBubble) {
-        // close this bubble. 
+        // close this bubble.
         this.hideBubble(container);
       } else {
         // reload the original content on cancel
-        this.fillViewPanel(container, container.originalContentHTML, annotationId, false);        
+        this.fillViewPanel(container, container.originalContentHTML, annotationId, false);
       }
     }.bindAsEventListener(this));
   },
@@ -1305,7 +1305,7 @@ XWiki.Annotation = Class.create({
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
     // aaand update
-    this.updateAnnotationAsync(container, annotationId, inBubble, form.action, form.method, formData, 
+    this.updateAnnotationAsync(container, annotationId, inBubble, form.action, form.method, formData,
       {
         successText : "$services.localization.render('annotations.action.edit.success')",
         failureText : "$services.localization.render('annotations.action.edit.loaderror')"
@@ -1313,8 +1313,8 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Handles the asynchronous update of annotation given by annotatinId, to the specified url, sending the specified 
-   * parameters and using the passed messages. Container will pass in loading state while the async call takes place, 
+   * Handles the asynchronous update of annotation given by annotatinId, to the specified url, sending the specified
+   * parameters and using the passed messages. Container will pass in loading state while the async call takes place,
    * and the tab update &amp; form hiding will be handled as specified by inBubble. The passed messages must specify
    * successText and failureText.
    */
@@ -1347,25 +1347,25 @@ XWiki.Annotation = Class.create({
         var failureReason = response.statusText;
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
-        }        
+        }
         this._x_notification.replace(new XWiki.widgets.Notification(messages.failureText + failureReason, 'error', {timeout : 5}));
         if (inBubble) {
           // and close the bubble on failure to update
           this.hideBubble(container);
         } else {
           // reload the original content on failure
-          this.fillViewPanel(container, container.originalContentHTML, annotationId, false);          
+          this.fillViewPanel(container, container.originalContentHTML, annotationId, false);
         }
       }.bind(this),
       on0 : function (response) {
         response.request.options.onFailure(response);
       }
-    }); 
+    });
   },
 
   /**
-   * Fills the display panel for the passed container, with the passed content, for the passed annotation and sets the 
-   * edit and delete listeners. If inBubble is set to true, then the panel is in a view bubble, not in the bottom panel 
+   * Fills the display panel for the passed container, with the passed content, for the passed annotation and sets the
+   * edit and delete listeners. If inBubble is set to true, then the panel is in a view bubble, not in the bottom panel
    * (or other place).
    */
   fillViewPanel : function(container, content, annotationId, inBubble) {
@@ -1375,7 +1375,7 @@ XWiki.Annotation = Class.create({
     // and add the button observers
     /*
     No hide button ftm
-    bubble.down('a.annotation-view-hide').observe('click', function(event, bubble) { 
+    bubble.down('a.annotation-view-hide').observe('click', function(event, bubble) {
       event.stop();
       this.hideBubble(bubble);
     }.bindAsEventListener(this, bubble));
@@ -1468,7 +1468,7 @@ XWiki.Annotation = Class.create({
 
   onToggleAnnotationsShortcut : function() {
     if (this.fetchedAnnotations) {
-      this.setAnnotationVisibility(!this.displayingAnnotations); 
+      this.setAnnotationVisibility(!this.displayingAnnotations);
       this.toggleAnnotations(this.displayingAnnotations);
     } else {
       this.fetchAnnotations(true);
@@ -1553,7 +1553,7 @@ XWiki.Annotation = Class.create({
     var position = this.selectionService.getPositionNextToSelection();
     this.createPanel = this.displayLoadingBubble(position.top, position.left);
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
-    this.unregisterAddAnnotationShortcut();    
+    this.unregisterAddAnnotationShortcut();
   },
 
   fillCreateForm : function(container, panelContent) {
@@ -1664,7 +1664,7 @@ document.observe('xwiki:dom:loaded', function() {
   #else
     var activated = false;
   #end
-  
+
   // parse the exception spaces and check where is the current space in that list
   var exceptions = [];
   #foreach($space in $exceptionSpaces)
@@ -1673,7 +1673,7 @@ document.observe('xwiki:dom:loaded', function() {
   var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
   // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
   if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
-    // initialize the annotations on the xwikicontent element which is the document content by default  
+    // initialize the annotations on the xwikicontent element which is the document content by default
     new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
   }
 });

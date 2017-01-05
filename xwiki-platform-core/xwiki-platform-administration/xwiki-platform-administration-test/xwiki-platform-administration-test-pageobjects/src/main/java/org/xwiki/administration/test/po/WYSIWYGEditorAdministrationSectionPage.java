@@ -28,7 +28,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the actions possible on the WYSIWYG Editor administration section.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
@@ -69,7 +69,7 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
 
     /**
      * Enable the specified WYSIWYG editor plugin.
-     * 
+     *
      * @param name the name of the WYSIWYG editor plugin to enable
      */
     public void enablePlugin(String name)

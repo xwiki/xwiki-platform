@@ -24,7 +24,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the actions possible on the Annotations Administration Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

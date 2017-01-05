@@ -46,7 +46,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * This class allow to do delete a single annotation.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -64,7 +64,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 
     /**
      * Deletes the specified annotation.
-     * 
+     *
      * @param space the space of the document to delete the annotation from
      * @param page the name of the document to delete the annotation from
      * @param wiki the wiki of the document to delete the annotation from
@@ -107,7 +107,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 
     /**
      * Updates the specified annotation with the values of the fields in received collection.
-     * 
+     *
      * @param space the space of the document to update the annotation from
      * @param page the name of the document to update the annotation from
      * @param wiki the wiki of the document to update the annotation from

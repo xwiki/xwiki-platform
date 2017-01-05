@@ -34,7 +34,7 @@ import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 
 /**
  * Renders annotations in the XHTML format.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

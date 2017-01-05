@@ -551,7 +551,7 @@
               #set($error = $mustMatch.get('failureMessage'))
             #end
           #else
-            ERROR: In field: ${fieldName}: mustMatch validation required both name 
+            ERROR: In field: ${fieldName}: mustMatch validation required both name
                    (of field which this field must match) and failureMessage.
           #end
         #end
@@ -818,7 +818,7 @@
             #set($failMessage = $regex.get('jsFailureMessage'))
           #elseif($regex.get('failureMessage'))
             #set($failMessage = $regex.get('failureMessage'))
-          #end          
+          #end
           #if($pattern != '' &amp;&amp; $failMessage != '' &amp;&amp; !$regex.get('noscript'))
             ${fieldName}Validator.add( Validate.Format, { pattern: $pattern, failureMessage: "$failMessage"} );
           #end

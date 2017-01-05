@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents common actions available in all Administration pages.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

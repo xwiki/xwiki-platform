@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.chaining.ListenerChain;
  * Empty block chaining listener to push in the chain before the generator listener. It adds no special functionality to
  * the {@link EmptyBlockChainingListener}, it's just a new type so that we can add two such listeners, for different
  * purposes at different positions in the chain.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -34,7 +34,7 @@ public class GeneratorEmptyBlockChainingListener extends EmptyBlockChainingListe
 {
     /**
      * Builds a new empty block chaining listener to push in the passed chain.
-     * 
+     *
      * @param listenerChain the chain to push the listener in
      */
     public GeneratorEmptyBlockChainingListener(ListenerChain listenerChain)

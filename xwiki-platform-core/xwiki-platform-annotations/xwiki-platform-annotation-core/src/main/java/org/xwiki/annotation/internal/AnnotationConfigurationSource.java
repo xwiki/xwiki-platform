@@ -30,7 +30,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Provides configuration from the Annotation Application's configuration document, for the current wiki.
- * 
+ *
  * @version $Id$
  * @since 4.0M2
  */

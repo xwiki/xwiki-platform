@@ -50,7 +50,7 @@ public class FormUrlEncodedAnnotationRequestReader extends
         AnnotationRequest request = factory.createAnnotationRequest();
         request.setRequest(new AnnotationRequest.Request());
         request.setFilter(factory.createAnnotationFieldCollection());
-        
+
         return request;
     }
 

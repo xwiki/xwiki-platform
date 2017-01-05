@@ -38,7 +38,7 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
  * Tests the annotation maintainer that updates annotations when documents change.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -141,7 +141,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
 
     /**
      * Builds a maintainer test to test the passed document name.
-     * 
+     *
      * @param docName the name of the document (and mock file) to test
      */
     public AnnotationMaintainerTest(String docName)
@@ -151,7 +151,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
 
     /**
      * Adds a file to the list of files to run tests for.
-     * 
+     *
      * @param docName the name of the document / file to test
      */
     protected static void addFileToTest(String docName)
@@ -188,7 +188,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
 
     /**
      * Tests the update of a document.
-     * 
+     *
      * @throws IOException if anything goes wrong mocking the documents
      * @throws MaintainerServiceException if anything goes wrong maintaining the the document annotations
      */
@@ -208,7 +208,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
 
     /**
      * Helper method to test if the two passed annotation lists contain the same annotations.
-     * 
+     *
      * @param expected the expected list of annotations
      * @param actual the actual list of annotations
      */
@@ -229,7 +229,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
 
     /**
      * Helper function to get the annotation with the passed id from the passed list.
-     * 
+     *
      * @param annId the id of the searched annotation
      * @param list the list of annotations where to search for the passed annotation
      * @return the found annotation
@@ -248,7 +248,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
     /**
      * Helper function to set the original selected contents in the updated annotations of this document from the
      * original list of annotations.
-     * 
+     *
      * @param doc the document for which to set the updated annotations original selected contents
      */
     private void copyOriginalSelections(MockDocument doc)

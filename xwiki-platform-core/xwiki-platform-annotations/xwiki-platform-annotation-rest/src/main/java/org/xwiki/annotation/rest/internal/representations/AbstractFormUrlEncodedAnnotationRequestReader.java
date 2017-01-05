@@ -43,7 +43,7 @@ import org.xwiki.rest.XWikiRestComponent;
 /**
  * Partial implementation of a reader from form submits requests for annotation related types, to handle generic request
  * reader code.
- * 
+ *
  * @param <T> the type read from the url encoded form
  * @version $Id$
  * @since 2.3M1
@@ -65,7 +65,7 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
 
     /**
      * Helper function to provide an instance of the read object from the object factory.
-     * 
+     *
      * @param factory the object factory
      * @return an instance of the read type T, as built by the object factory.
      */
@@ -118,7 +118,7 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
     /**
      * Helper function to save a parameter in the read object. To implement in subclasses to provide type specific
      * behaviour.
-     * 
+     *
      * @param readObject the request to fill with data
      * @param key the key of the field
      * @param value the value of the field

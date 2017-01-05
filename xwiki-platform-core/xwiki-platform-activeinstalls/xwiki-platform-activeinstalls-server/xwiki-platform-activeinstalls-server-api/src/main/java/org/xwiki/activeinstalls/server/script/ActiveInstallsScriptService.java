@@ -93,7 +93,7 @@ public class ActiveInstallsScriptService implements ScriptService
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see #countInstalls(String, String, java.util.Map)
      */
     public JsonObject countInstalls(String indexType, String fullQuery)
@@ -178,7 +178,7 @@ public class ActiveInstallsScriptService implements ScriptService
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see #searchInstalls(String, String, java.util.Map)
      */
     public JsonObject searchInstalls(String indexType, String fullQuery)

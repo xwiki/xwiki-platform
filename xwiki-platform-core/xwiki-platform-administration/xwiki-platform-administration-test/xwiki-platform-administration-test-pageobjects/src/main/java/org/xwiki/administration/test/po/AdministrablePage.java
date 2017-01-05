@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Extends the ViewPage to add support for Administration action.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */

@@ -22,7 +22,7 @@ package org.xwiki.annotation.maintainer.internal;
 /**
  * String chunks storage based implementation of the difference interface. It stores the original text and the updated
  * one and returns them when functions are called.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -45,7 +45,7 @@ public class ChunksXDelta extends AbstractXDelta
 
     /**
      * Creates a new XDelta from the passed values.
-     * 
+     *
      * @param position the position where the edit takes place
      * @param original the original string at {@code position}
      * @param edited the new string at {@code position}

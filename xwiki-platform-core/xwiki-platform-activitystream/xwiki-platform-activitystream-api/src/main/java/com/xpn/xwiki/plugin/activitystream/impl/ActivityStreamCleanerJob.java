@@ -35,7 +35,7 @@ import com.xpn.xwiki.plugin.scheduler.AbstractJob;
 
 /**
  * This job deletes all the events older than a configured number of days in the activitystream datastore.
- * 
+ *
  * @version $Id$
  */
 public class ActivityStreamCleanerJob extends AbstractJob implements Job

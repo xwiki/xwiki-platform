@@ -34,7 +34,7 @@ public abstract class AbstractTypedStringEntityReferenceSerializer implements Ty
      * <p>
      * Override to add the protocol in front of the serialization.
      * </p>
-     * 
+     *
      * @see TypedStringEntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference)
      */
     @Override

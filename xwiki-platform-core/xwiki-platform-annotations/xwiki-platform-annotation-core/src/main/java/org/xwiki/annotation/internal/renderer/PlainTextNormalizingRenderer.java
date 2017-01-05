@@ -37,7 +37,7 @@ import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 
 /**
  * Plain text renderer that renders the current document with normalized spaces.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

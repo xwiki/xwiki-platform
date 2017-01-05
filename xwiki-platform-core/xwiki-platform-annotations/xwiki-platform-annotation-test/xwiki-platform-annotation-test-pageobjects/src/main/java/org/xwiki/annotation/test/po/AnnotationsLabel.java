@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Implements the Annotation window that appears when selecting an annotation
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

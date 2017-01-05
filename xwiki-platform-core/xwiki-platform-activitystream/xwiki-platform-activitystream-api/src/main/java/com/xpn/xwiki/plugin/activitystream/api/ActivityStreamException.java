@@ -23,7 +23,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Exception to use in the activity stream plugin. It extends {@link XWikiException}.
- * 
+ *
  * @version $Id$
  */
 @SuppressWarnings("serial")

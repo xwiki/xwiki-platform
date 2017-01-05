@@ -26,7 +26,7 @@ import org.xwiki.annotation.Annotation;
 
 /**
  * Mock document loaded from test files with that handles updates and updated annotations.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

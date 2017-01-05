@@ -28,7 +28,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 /**
  * Default implementation of the typed entity reference serializer, which will serialize full references (e.g. {@code
  * wiki:Space.Page}).
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

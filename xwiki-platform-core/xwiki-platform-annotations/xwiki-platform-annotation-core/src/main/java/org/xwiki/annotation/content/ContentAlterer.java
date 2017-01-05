@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Role;
 /**
  * Service that provides functionality for filtering a sequence of characters and producing an altered content from an
  * original content.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -39,7 +39,7 @@ public interface ContentAlterer
 
     /**
      * Provides altering of an already altered content, such allowing for multiple alterers to be composed.
-     * 
+     *
      * @param alteredContent the already altered content to apply filtering on
      * @return AlteredContent the composed altered content
      */

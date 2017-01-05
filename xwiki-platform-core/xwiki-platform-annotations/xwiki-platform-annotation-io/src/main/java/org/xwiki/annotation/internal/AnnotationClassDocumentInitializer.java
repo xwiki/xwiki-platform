@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 /**
  * When the wiki is initialized, make sure that the configured annotation class contains the minimum required properties
  * for the Annotation Application to function properly.
- * 
+ *
  * @version $Id$
  * @since 6.2RC1
  */

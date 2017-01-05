@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 
 /**
  * Default implementation of the annotation maintainer, using a default implementation of the diff service.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents the actions possible on the XWiki.ResetPasswordComplete page, where a user lands by using a reset password
  * link provided by mail by the XWiki.ResetPassword page.
- * 
+ *
  * @version $Id$
  */
 public class ResetPasswordCompletePage extends ViewPage
@@ -50,7 +50,7 @@ public class ResetPasswordCompletePage extends ViewPage
 
     /**
      * To be called the first time the page is opened, using a password reset link.
-     * 
+     *
      * @return true if the reset link is valid and the form to change the password is being displayed, false otherwise.
      */
     public boolean isResetLinkValid()

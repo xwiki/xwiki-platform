@@ -29,7 +29,7 @@ import org.xwiki.annotation.maintainer.AnnotationState;
 /**
  * Stores data and provides functions for manipulating mock documents loaded from test files. Use the
  * {@link TestDocumentFactory} to load such documents from files.
- * 
+ *
  * @see TestDocumentFactory
  * @version $Id$
  * @since 2.3M1
@@ -43,7 +43,7 @@ public class MockDocument
 
     /**
      * Sets the properties of this document.
-     * 
+     *
      * @param key the key of the property
      * @param value the value of the property to set
      */

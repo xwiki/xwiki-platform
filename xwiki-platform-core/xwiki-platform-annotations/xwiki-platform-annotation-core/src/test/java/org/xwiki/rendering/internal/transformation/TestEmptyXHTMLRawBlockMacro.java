@@ -35,7 +35,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Test macro that generates an empty xhtml raw block.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

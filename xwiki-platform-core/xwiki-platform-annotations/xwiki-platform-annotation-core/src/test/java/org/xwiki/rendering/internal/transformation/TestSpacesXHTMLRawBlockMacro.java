@@ -35,7 +35,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Test macro that generates an raw xhtml block with only spaces inside.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

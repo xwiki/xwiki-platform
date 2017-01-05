@@ -23,7 +23,7 @@ import org.junit.runner.*;
 
 /**
  * Runs all functional tests found in the classpath. This allows to start/stop XWiki only once.
- * 
+ *
  * @version $Id$
  * @since 5.2M2
  */

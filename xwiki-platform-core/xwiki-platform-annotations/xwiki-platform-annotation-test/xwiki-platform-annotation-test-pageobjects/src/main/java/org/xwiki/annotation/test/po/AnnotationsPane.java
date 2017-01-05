@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Pane that opens when you click on the Annotation menu entry.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
@@ -34,10 +34,10 @@ public class AnnotationsPane extends BaseElement
 {
     @FindBy(id = "annotationsdisplay")
     private WebElement checkBox;
-    
+
     private void clickOnAnnotationMenu()
     {
-        String dropDownMenuXPath = "//div[@id='tmMoreActions']//ul[contains(@class, 'dropdown-menu')]"; 
+        String dropDownMenuXPath = "//div[@id='tmMoreActions']//ul[contains(@class, 'dropdown-menu')]";
 
         // Open the page menu
         getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]")).click();
@@ -91,7 +91,7 @@ public class AnnotationsPane extends BaseElement
 
     /**
      * Checks if the checkBox within AnnotationsPane is visible
-     * 
+     *
      * @return returns true if the Show Annotations checkbox is displayed
      */
     public boolean checkIfShowAnnotationsCheckboxExists()

@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * For example, something like: {@code DOCUMENT://XWiki.TagClass[0]#tags} will result in parsing {@code
  * XWiki.TagClass[0]#tags} as a document reference, while {OBJECT_PROPERTY://XWiki.TagClass[0]#tags} will result in
  * parsing {@code XWiki.TagClass[0]#tags} as an object property reference.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -43,7 +43,7 @@ public abstract class AbstractTypedStringEntityReferenceResolver implements Type
      * serialized reference (e.g. DOCUMENT://Page). In case no type is specified, the second part parameter will be used
      * as the default type.
      * </p>
-     * 
+     *
      * @see TypedStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType)
      */
     @Override
@@ -68,7 +68,7 @@ public abstract class AbstractTypedStringEntityReferenceResolver implements Type
     /**
      * Helper function to get the type of the serialized entity from its serialization as a protocol at the beginning of
      * the serialization (e.g. DOCUMENT://Page).
-     * 
+     *
      * @param entityReferenceRepresentation the string representation of the entity to resolve
      * @return the entity type specified as a prefix or null if no entity such exists
      */

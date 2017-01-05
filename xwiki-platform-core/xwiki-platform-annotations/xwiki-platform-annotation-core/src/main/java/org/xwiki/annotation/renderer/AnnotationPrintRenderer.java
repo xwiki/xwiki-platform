@@ -27,7 +27,7 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 
 /**
  * An annotations print renderer is a {@link PrintRenderer} that also renders annotations on the content.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -36,7 +36,7 @@ public interface AnnotationPrintRenderer extends PrintRenderer
 {
     /**
      * Sets the annotations to render on the content.
-     * 
+     *
      * @param annotations the collection of annotations to render
      */
     void setAnnotations(Collection<Annotation> annotations);

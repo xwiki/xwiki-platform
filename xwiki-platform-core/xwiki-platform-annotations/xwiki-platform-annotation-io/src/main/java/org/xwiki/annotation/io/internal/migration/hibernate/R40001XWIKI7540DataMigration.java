@@ -64,7 +64,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * AnnotationClass) need to be converted to use the updated XWikiComments class instead. Also, all the comments in a
  * document that was modified by this migration need to be sorted by date and given new object numbers so that the
  * comments order is not affected.
- * 
+ *
  * @version $Id$
  * @since 4.0M2
  */
@@ -119,7 +119,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
      * <p>
      * Note: We can not do this in {@link #shouldExecute(XWikiDBVersion)} because we need to read the database and we
      * can not do that until the previous migrations are executed.
-     * 
+     *
      * @return true if the migration can be executed, false otherwise.
      * @throws DataMigrationException if the annotation or comments class can not be properly retrieved
      */
@@ -188,7 +188,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Inner class that retrieves the documents, objects and properties that need to be migrated.
-     * 
+     *
      * @version $Id$
      */
     private class GetWorkToBeDoneHibernateCallback implements HibernateCallback<Object>
@@ -218,7 +218,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 
         /**
          * Pre-process the results into data structures that can be easily worked with.
-         * 
+         *
          * @param queryResults an array containing multiple [comment, property] arrays
          * @throws HibernateException if underlying Hibernate operations fail
          */
@@ -253,7 +253,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Inner class that is in charge of migrating each document.
-     * 
+     *
      * @version $Id$
      */
     private class DoWorkOnDocumentHibernateCallback implements HibernateCallback<Object>
@@ -294,7 +294,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         /**
          * Sort the objects by date and assign new object IDs. For objects that are annotations (using
          * AnnotationCode.AnnotationClass) convert them to XWiki.XWikiComments.
-         * 
+         *
          * @param session the Hibernate Session
          * @throws HibernateException if underlying Hibernate operations fail
          */

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNull;
 
 /**
  * Tests the {@link IndexedObjectReference} implementation of object names.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

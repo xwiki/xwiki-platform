@@ -26,7 +26,7 @@ import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 /**
  * Partial implementation of a reader that reads an annotation update request, extending the request reader with the
  * read of the annotation fields.
- * 
+ *
  * @param <T> the type read from the url encoded form
  * @version $Id$
  * @since 2.3M1

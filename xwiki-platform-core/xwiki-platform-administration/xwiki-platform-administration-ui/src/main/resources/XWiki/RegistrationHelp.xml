@@ -107,7 +107,7 @@ Here is the definition of a field which is used in the registration page
 
 {{code language=none}}
 ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
-#set($field = 
+#set($field =
   {'name' : 'xwikiname',
     'label' : $services.localization.render('core.register.username'),
     'params' : {
@@ -116,8 +116,8 @@ Here is the definition of a field which is used in the registration page
       'size' : '20'
     },
     'validate' : {
-      'mandatory' : { 
-        'failureMessage' : $services.localization.render('XWiki.Registration.fieldMandatory') 
+      'mandatory' : {
+        'failureMessage' : $services.localization.render('XWiki.Registration.fieldMandatory')
       },
       'programmaticValidation' : {
         'code' : '#nameAvailable($request.get("xwikiname"))',

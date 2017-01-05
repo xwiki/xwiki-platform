@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions possible on the XWiki.ResetPassword page.
- * 
+ *
  * @version $Id$
  * @since 7.0M2
  */

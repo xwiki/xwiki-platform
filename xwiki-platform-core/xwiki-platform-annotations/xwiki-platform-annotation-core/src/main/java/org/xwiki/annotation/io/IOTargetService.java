@@ -26,7 +26,7 @@ import org.xwiki.rendering.block.XDOM;
  * This service provides functions to operate with annotations targets. It operates with string serialized references to
  * such targets. This interface does not restrict the implementation of the annotation targets, they can be anything
  * referencable through a string.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

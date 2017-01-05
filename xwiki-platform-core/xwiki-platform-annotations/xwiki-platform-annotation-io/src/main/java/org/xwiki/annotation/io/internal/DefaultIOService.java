@@ -55,7 +55,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * targets manipulated by this implementation are XWiki references, such as xwiki:Space.Page for documents or with an
  * object and property reference if the target is an object property. Use the reference module to generate the
  * references passed to this module, so that they can be resolved to XWiki content back by this implementation.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -105,7 +105,7 @@ public class DefaultIOService implements IOService
      * <p>
      * This implementation saves the added annotation in the document where the target of the annotation is.
      * </p>
-     * 
+     *
      * @see org.xwiki.annotation.io.IOService#addAnnotation(String, org.xwiki.annotation.Annotation)
      */
     @Override
@@ -169,7 +169,7 @@ public class DefaultIOService implements IOService
      * This implementation retrieves all the objects of the annotation class in the document where target points to, and
      * which have the target set to {@code target}.
      * </p>
-     * 
+     *
      * @see org.xwiki.annotation.io.IOService#getAnnotations(String)
      */
     @Override
@@ -256,7 +256,7 @@ public class DefaultIOService implements IOService
      * This implementation deletes the annotation object with the object number indicated by {@code annotationID} from
      * the document indicated by {@code target}, if its stored target matches the passed target.
      * </p>
-     * 
+     *
      * @see org.xwiki.annotation.io.IOService#removeAnnotation(String, String)
      */
     @Override
@@ -310,7 +310,7 @@ public class DefaultIOService implements IOService
      * their ids against the ids in the passed collection of annotations. If they match, they are updated with the new
      * data in the annotations in annotation.
      * </p>
-     * 
+     *
      * @see org.xwiki.annotation.io.IOService#updateAnnotations(String, java.util.Collection)
      */
     @Override
@@ -356,7 +356,7 @@ public class DefaultIOService implements IOService
 
     /**
      * Helper function to load an annotation object from an xwiki object.
-     * 
+     *
      * @param object the xwiki object to load an annotation from
      * @param deprecatedContext XWikiContext to make operations on xwiki data
      * @return the Annotation instance for the annotation stored in BaseObject
@@ -391,7 +391,7 @@ public class DefaultIOService implements IOService
 
     /**
      * Helper function to update object from an annotation.
-     * 
+     *
      * @param object the object to update
      * @param annotation the annotation to marshal in the object
      * @param deprecatedContext the XWikiContext execute object operations
@@ -426,7 +426,7 @@ public class DefaultIOService implements IOService
     /**
      * Helper function to set a field on an object only if the new value is not null. If you wish to reset the value of
      * a field, pass the empty string for the new value.
-     * 
+     *
      * @param object the object to set the value of the field
      * @param fieldName the name of the field to set
      * @param newValue the new value to set to the field. It will be ignored if it's {@code null}

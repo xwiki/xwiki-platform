@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions possible on the main Administration Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
@@ -169,7 +169,7 @@ public class AdministrationPage extends ViewPage
 
     /**
      * Opens the "Page Elements" administration section.
-     * 
+     *
      * @return the "Page Elements" administration section
      */
     public PageElementsAdministrationSectionPage clickPageElementsSection()

@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * This component defines a filter to be used by alterers. It defines a set of accepted characters.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

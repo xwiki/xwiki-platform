@@ -62,9 +62,9 @@
     </xsl:copy>
     <!-- Write the table of contents after the last child -->
     <xsl:for-each select="//*[@id = 'xwikicontent']/*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
-      <!-- Transforming the flat headings structure into an hierarchical structure based on nested ordered lists is hard 
-        to do with XSLT 1.0 (a complete solution would have to generate empty list items when heading levels are missing: when there 
-        is a level 3 heading after a level 1 heading). A solution using XSLT 2.0 is described here http://www.xmlplease.com/tocxhtml 
+      <!-- Transforming the flat headings structure into an hierarchical structure based on nested ordered lists is hard
+        to do with XSLT 1.0 (a complete solution would have to generate empty list items when heading levels are missing: when there
+        is a level 3 heading after a level 1 heading). A solution using XSLT 2.0 is described here http://www.xmlplease.com/tocxhtml
         . Let's use the simplest solution for now: indenting -->
       <xsl:element name="div">
         <xsl:attribute name="style">margin-left: <xsl:value-of select="(round(substring(local-name(), 2)) - 1) * 12" />pt</xsl:attribute>
@@ -81,9 +81,9 @@
     <xsl:call-template name="addPageBreakBefore" />
   </xsl:template>
 
-  <!-- Embedded images are placed in the same folder as the HTML input file during office conversion. Remove the query string 
-    from the image URL because the src attribute must match the image file name. Normally the office export URL factory removes 
-    the query string but some URLs are modified outside of the URL factory (e.g. the rendering module can add the image dimensions 
+  <!-- Embedded images are placed in the same folder as the HTML input file during office conversion. Remove the query string
+    from the image URL because the src attribute must match the image file name. Normally the office export URL factory removes
+    the query string but some URLs are modified outside of the URL factory (e.g. the rendering module can add the image dimensions
     to the query string). -->
   <xsl:template match="//xhtml:img/@src[contains(., '?') and not(contains(., '://'))]">
     <xsl:attribute name="{local-name()}">

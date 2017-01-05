@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests the default implementation of {@link IOTargetService}, and integration with target resolvers, up to the
  * document access bridge access.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -316,7 +316,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         assertEquals("defcontent", ioTargetService.getSource(reference));
         assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
     }
-    
+
     @Test
     public void testGetterWhenTargetIsTypedIndexedRelativeObjectProperty() throws Exception
     {
@@ -340,5 +340,5 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         String reference = "OBJECT_PROPERTY://Classes.Class[3].property";
         assertEquals("defcontent", ioTargetService.getSource(reference));
         assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
-    }    
+    }
 }

@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Service to provide functions to check access rights to annotations actions (viewing, adding annotations, editing).
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -32,7 +32,7 @@ public interface AnnotationRightService
 {
     /**
      * Checks if the specified user can view the annotations on the specific target.
-     * 
+     *
      * @param target the target of the annotations to view
      * @param userName the name of the user to view the annotations
      * @return {@code true} if the user can view the annotations on the passed target, {@code false} otherwise
@@ -42,7 +42,7 @@ public interface AnnotationRightService
     /**
      * Checks if the specified user can view the passed target annotated (which implies view on the target itself and
      * the ability to view the annotations).
-     * 
+     *
      * @param target the target to view annotated
      * @param userName the name of the user to view the annotated target
      * @return {@code true} if the user can see the target annotated, {@code false} otherwise.
@@ -51,7 +51,7 @@ public interface AnnotationRightService
 
     /**
      * Checks if the user can add annotations on the specified target.
-     * 
+     *
      * @param target the target on which to add annotations
      * @param userName the name of the user to add annotations
      * @return {@code true} if the user can annotate the target, {@code false} otherwise
@@ -60,7 +60,7 @@ public interface AnnotationRightService
 
     /**
      * Checks if the user can edit the specified annotation.
-     * 
+     *
      * @param target the target of the annotation to edit
      * @param userName the name of the user to edit the annotation
      * @param annotationId the id of the annotation to be edited

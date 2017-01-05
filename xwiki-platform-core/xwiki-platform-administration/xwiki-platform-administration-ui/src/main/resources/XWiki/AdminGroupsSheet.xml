@@ -98,7 +98,7 @@
                   &lt;option value="both"&gt;$services.localization.render('xe.admin.groups.both')&lt;/option&gt;
                 &lt;/select&gt;
               #else
-                &lt;input type="hidden" value="local" name="wiki" /&gt; 
+                &lt;input type="hidden" value="local" name="wiki" /&gt;
               #end
               &lt;/td&gt;
             &lt;/tr&gt;

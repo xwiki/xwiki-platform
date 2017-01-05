@@ -147,7 +147,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 
     /**
      * Add annotation to a given page.
-     * 
+     *
      * @param wiki the wiki of the document to add annotation on
      * @param space the space of the document to add annotation on
      * @param page the name of the document to add annotation on
@@ -191,7 +191,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 
     /**
      * Builds a simple map from a field collection.
-     * 
+     *
      * @param fields the collection of fields to build a map for
      * @return a map of the fields, as string key and Object value pair
      */

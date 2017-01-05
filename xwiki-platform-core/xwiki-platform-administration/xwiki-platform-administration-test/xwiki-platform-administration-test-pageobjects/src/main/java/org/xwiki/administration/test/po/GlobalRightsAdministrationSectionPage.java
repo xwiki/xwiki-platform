@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.EditRightsPane;
 
 /**
  * Represents the actions possible on the Global Rights Administration Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */

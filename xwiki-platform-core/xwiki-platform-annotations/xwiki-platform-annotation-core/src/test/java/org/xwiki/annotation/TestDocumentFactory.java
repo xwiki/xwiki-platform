@@ -31,7 +31,7 @@ import org.xwiki.annotation.maintainer.AnnotationState;
 
 /**
  * Factory to create test documents from corpus files.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -69,7 +69,7 @@ public class TestDocumentFactory
 
     /**
      * Helper method to load a document from the corpus file with the same name.
-     * 
+     *
      * @param doc the document to load the file in
      * @param docName the name of the document to load from the corpus file
      * @throws IOException if something goes wrong parsing the file
@@ -111,7 +111,7 @@ public class TestDocumentFactory
 
     /**
      * Helper function to save a parsed key in the configuration file to the mock document.
-     * 
+     *
      * @param currentKey the read key
      * @param currentValue the value for the read key
      * @param doc the mock document read from corpus
@@ -139,7 +139,7 @@ public class TestDocumentFactory
 
     /**
      * Parses an annotation from its string representation, as read from the corpus file.
-     * 
+     *
      * @param annotation the string representation of the annotation, as in the corpus file
      * @param docName the name of the document where the annotation is created
      * @return an {@link Annotation} object corresponding to the data in the {@code annotation} string

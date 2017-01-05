@@ -37,7 +37,7 @@ import org.xwiki.model.reference.ObjectReference;
  * className). In this case, {@link #getObjectNumber()} will return {@code null} and {@code className} is obtained by
  * calling {@link #getClassName()}.
  * </dl>
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -56,7 +56,7 @@ public class IndexedObjectReference extends ObjectReference
     /**
      * Constructor which would raise exceptions if the source entity reference does not have the appropriate type or
      * parent, etc.
-     * 
+     *
      * @param reference the raw reference to build this object reference from
      */
     public IndexedObjectReference(EntityReference reference)
@@ -67,7 +67,7 @@ public class IndexedObjectReference extends ObjectReference
     /**
      * Builds an indexed object reference for the object of class {@code className} with index {@code objectNumber} in
      * the document referenced by {@code parent}.
-     * 
+     *
      * @param className the name of the class of the object
      * @param objectNumber the number of the object in the document, or {@code null} if the default object should be
      *            referenced
@@ -104,9 +104,9 @@ public class IndexedObjectReference extends ObjectReference
      * <p>
      * Overridden to always compute the class name and the object number.
      * </p>
-     * 
+     *
      * @see org.xwiki.model.reference.EntityReference#setName(java.lang.String)
-     */ 
+     */
     @Override
     protected void setName(String name)
     {

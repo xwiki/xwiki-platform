@@ -44,7 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * When the wiki is initialized or the configuration document is updated, make sure that the configured annotation class
  * contains the minimum required properties for the Annotation Application to function properly.
- * 
+ *
  * @version $Id$
  * @since 4.0M2
  */

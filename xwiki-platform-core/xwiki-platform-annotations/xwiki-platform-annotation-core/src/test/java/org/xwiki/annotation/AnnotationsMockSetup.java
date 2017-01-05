@@ -38,7 +38,7 @@ import org.xwiki.component.manager.ComponentRepositoryException;
 /**
  * Mock setup for the annotations tests, mocking the {@link IOService} and {@link IOTargetService} to provide documents
  * functions for the data in the test files.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -68,7 +68,7 @@ public class AnnotationsMockSetup
     /**
      * Builds an annotation mock setup registering mocked {@link IOService} and {@link IOTargetService} to manipulate
      * documents from the test description files.
-     * 
+     *
      * @param componentManager the component manager to register the services with
      * @param docFactory the document factory used to load documents from the test files
      * @throws ComponentRepositoryException if the components cannot be registered
@@ -95,7 +95,7 @@ public class AnnotationsMockSetup
      * Sets up the expectations for the {@link IOService} and {@link IOTargetService} to return correctly the values in
      * the test files for {@code docName}. Call this function when operating with mocked documents to provide all the
      * information in the test file (document source, rendered contents, annotations).
-     * 
+     *
      * @param docName the name of the document to setup expectations for
      * @throws IOServiceException if something wrong happens while mocking the documents access
      * @throws IOException if something wrong happens while mocking the documents access

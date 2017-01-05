@@ -90,7 +90,7 @@
       #end
       #set ($value = $jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong())
       #set ($branchCount = $mathtool.add($branchCount, $value))
-      #set ($discard = $count.put($branch, $branchCount))    
+      #set ($discard = $count.put($branch, $branchCount))
     #end
   #end
   #foreach ($branchEntry in $count.entrySet())

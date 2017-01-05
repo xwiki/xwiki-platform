@@ -93,6 +93,10 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
             return true;
         }
 
+        if (el == null) {
+            return false;
+        }
+
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
         if ((this.object == null) || ((BaseProperty) el).getObject() == null) {

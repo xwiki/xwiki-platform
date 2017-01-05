@@ -99,6 +99,11 @@ public class XARWikiWriter implements Closeable
         return this.name;
     }
 
+    private String escapeXARPath(String pathElement)
+    {
+        return pathElement.replace("%", "%25").replace("/", "%2F").replace("\\", "%5C");
+    }
+
     private void addSpacePath(StringBuilder path, EntityReference spaceReference)
     {
         EntityReference parent = spaceReference.getParent();
@@ -106,7 +111,7 @@ public class XARWikiWriter implements Closeable
             addSpacePath(path, parent);
         }
 
-        path.append(spaceReference.getName()).append('/');
+        path.append(escapeXARPath(spaceReference.getName())).append('/');
     }
 
     public OutputStream newEntry(LocalDocumentReference reference) throws FilterException
@@ -117,7 +122,7 @@ public class XARWikiWriter implements Closeable
         addSpacePath(path, reference.getParent());
 
         // Add document name
-        path.append(reference.getName());
+        path.append(escapeXARPath(reference.getName()));
 
         // Add language
         if (reference.getLocale() != null && !reference.getLocale().equals(Locale.ROOT)) {

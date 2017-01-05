@@ -122,7 +122,7 @@ public class ServletRequestTest
         final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
         this.mockery.checking(new Expectations() {{
             oneOf(httpRequest).getParameterValues("key");
-                will(returnValue("value"));
+                will(returnValue(new String[] {"value"}));
             oneOf(httpRequest).getAttribute("key");
                 will(returnValue(null));
         }});

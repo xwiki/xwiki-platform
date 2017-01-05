@@ -12,9 +12,9 @@
     #set ($obfuscate = $xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0))
   #end
   #if ($obfuscate == 1)
-$!value.replaceAll('^(.).*@', '$1...@')##
-  #elseif ($value !='')
-<a href="mailto:$!value">$!value</a>##
+$!escapetool.xml($value.replaceAll('^(.).*@', '$1...@'))##
+  #elseif ($value != '')
+<a href="mailto:$!{escapetool.xml($value)}">$!{escapetool.xml($value)}</a>##
   #end
 #elseif ($type == 'hidden')
   #set ($id = $escapetool.xml("${prefix}${name}"))

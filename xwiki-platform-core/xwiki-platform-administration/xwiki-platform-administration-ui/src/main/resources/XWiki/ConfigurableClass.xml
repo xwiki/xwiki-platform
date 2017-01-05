@@ -167,7 +167,7 @@ $doc.dropPermissions()##
           &lt;/noscript&gt;
           &lt;script type="text/javascript"&gt;
             document.observe("xwiki:dom:loaded", function() {
-              new XWiki.DocumentLock('$escapetool.javascript($app.fullName)').lock();
+              XWiki.DocumentLock &amp;&amp; new XWiki.DocumentLock('$escapetool.javascript($app.fullName)').lock();
             });
           &lt;/script&gt;
         {{/html}}
@@ -728,7 +728,8 @@ $doc.dropPermissions()##
   var inputs = $('admin-page-content').select('input');
   for (var i = 0; i &lt; inputs.length; i++) {
     if (inputs[i].getAttribute('type') != undefined &amp;&amp; inputs[i].getAttribute('type').toLowerCase() == 'submit') {
-      inputs[i].up('.bottombuttons').remove();
+      var bottombuttons = inputs[i].up('.bottombuttons');
+      bottombuttons &amp;&amp; bottombuttons.remove();
     }
   }
 

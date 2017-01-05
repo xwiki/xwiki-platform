@@ -65,7 +65,7 @@ public class XARWikiWriter implements Closeable
         this.xarPackage.setPackageAuthor(xarProperties.getPackageAuthor());
         this.xarPackage.setPackageVersion(xarProperties.getPackageVersion());
         this.xarPackage.setPackageBackupPack(xarProperties.isPackageBackupPack());
-        this.xarPackage.setPreserveVersion(xarProperties.isPreserveVersion());
+        this.xarPackage.setPackagePreserveVersion(xarProperties.isPreserveVersion());
         this.xarPackage.setPackageExtensionId(xarProperties.getPackageExtensionId());
 
         OutputTarget target = this.xarProperties.getTarget();
@@ -75,9 +75,8 @@ public class XARWikiWriter implements Closeable
                 this.zipStream =
                     new ZipArchiveOutputStream(new File(((FileOutputTarget) target).getFile(), name + ".xar"));
             } else if (target instanceof OutputStreamOutputTarget) {
-                this.zipStream =
-                    new ZipArchiveOutputStream(new CloseShieldOutputStream(
-                        ((OutputStreamOutputTarget) target).getOutputStream()));
+                this.zipStream = new ZipArchiveOutputStream(
+                    new CloseShieldOutputStream(((OutputStreamOutputTarget) target).getOutputStream()));
             } else {
                 throw new FilterException(String.format("Unsupported output target [%s]. Only [%s] is supported",
                     target, OutputStreamOutputTarget.class));
@@ -165,6 +164,7 @@ public class XARWikiWriter implements Closeable
         }
     }
 
+    @Override
     public void close() throws IOException
     {
         // Add package.xml descriptor

@@ -61,7 +61,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         {
             if (this.content != null) {
                 try (InputStream is = new Base64InputStream(openStream())) {
-                    proxyFilter.onWikiAttachment(this.name, is, size != null ? size : null, this.parameters);
+                    proxyFilter.onWikiAttachment(this.name, is, this.size, this.parameters);
                 } catch (IOException e) {
                     throw new FilterException(e);
                 } finally {
@@ -70,7 +70,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                     }
                 }
             } else {
-                proxyFilter.onWikiAttachment(this.name, null, null, this.parameters);
+                proxyFilter.onWikiAttachment(this.name, null, this.size, this.parameters);
             }
         }
 
@@ -81,6 +81,18 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             } else {
                 return new FileInputStream(this.content.getFile());
             }
+        }
+
+        @Override
+        protected void finalize() throws Throwable
+        {
+            // Make sure to get rid of the file (if any)
+            if (this.content != null && !this.content.isInMemory() && this.content.getFile() != null
+                && this.content.getFile().exists()) {
+                this.content.getFile().delete();
+            }
+
+            super.finalize();
         }
     }
 

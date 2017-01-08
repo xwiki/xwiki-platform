@@ -524,6 +524,7 @@ ul.activityList {
 }
 
 .activitySnapshot img {
+  border-radius: 4px;
   height: 30px;
   width: 30px;
 }
@@ -1461,9 +1462,9 @@ $xwiki.ssx.use('Main.Activity')##
 #macro(activitySnapshot $eventUser $eventType)
   &lt;span class="activitySnapshot"&gt;
     #if ($eventUser != 'XWiki.XWikiGuest')
-      &lt;a href="$xwiki.getURL($eventUser)"&gt;#smallUserAvatar("$!eventUser")&lt;/a&gt;
+      &lt;a href="$xwiki.getURL($eventUser)"&gt;#mediumUserAvatar("$!eventUser")&lt;/a&gt;
     #else
-      #smallUserAvatar("$!eventUser")
+      #mediumUserAvatar("$!eventUser")
     #end
     &lt;img class="activityActionAvatar" src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
   &lt;/span&gt;

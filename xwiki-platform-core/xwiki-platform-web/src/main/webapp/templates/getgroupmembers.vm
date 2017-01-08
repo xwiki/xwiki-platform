@@ -48,7 +48,7 @@ $response.setContentType('application/json')
       'ajax': true,
       'form_token': $services.csrf.token
     })),
-    '_avatar': "#mediumUserAvatar($member)",
+    '_avatar': "#largeUserAvatar($member)",
     '_avatar_url': $xwiki.getURL($memberReference)
   })
   #set ($data = {})

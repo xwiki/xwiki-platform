@@ -53,6 +53,7 @@ ul.commentreplies, .reply {
   width: 30px;
 }
 .commentavatar img {
+  border-radius: 4px;
   max-width: 50px;
   max-height: 50px;
 }

@@ -60,6 +60,7 @@ ul.users {
 }
 /* User avatars are resized on the server but the default no-avatar image is not so it's safer to limit the size here */
 .user .user-avatar-wrapper img {
+  border-radius: 4px;
   max-height: 30px;
   max-width: 30px;
 }

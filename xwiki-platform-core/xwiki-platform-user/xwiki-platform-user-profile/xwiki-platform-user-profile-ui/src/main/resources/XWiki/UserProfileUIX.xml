@@ -110,15 +110,20 @@
       </scope>
     </class>
     <property>
-      <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
-  #if ($xcontext.user != 'XWiki.XWikiGuest')
-    #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
-    &lt;li class="navbar-avatar"&gt;
-      &lt;a href="$xwiki.getURL($xcontext.user)" class="icon-navbar"&gt;&lt;span class="sr-only"&gt;$services.localization.render('homepage')&lt;/span&gt;#smallUserAvatar($xcontext.user)&lt;/a&gt;
-    &lt;/li&gt;
-  #end
-{{/html}}{{/velocity}}
-</content>
+      <content>{{velocity}}
+{{html clean="false"}}
+#if ($xcontext.user != 'XWiki.XWikiGuest')
+  &lt;li class="navbar-avatar"&gt;
+    &lt;a href="$xwiki.getURL($xcontext.user)" class="icon-navbar"&gt;
+      &lt;span class="sr-only"&gt;$services.localization.render('homepage')&lt;/span&gt;
+      ## Use a mix of server side and client side resizing to improve the page loading time without affecting too
+      ## much the image quality.
+      #mediumUserAvatar($xcontext.user)
+    &lt;/a&gt;
+  &lt;/li&gt;
+#end
+{{/html}}
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.topmenu.right</extensionPointId>

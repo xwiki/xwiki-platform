@@ -145,7 +145,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #if ($attachment)
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       #set ($attachmentDocument = $attachment.getDocument())
-[[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=160]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
+[[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=180]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
     #else
       * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.filesize))

@@ -40,7 +40,7 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 /**

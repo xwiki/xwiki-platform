@@ -80,7 +80,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * The object used to process images.
      */
-    private final ImageProcessor imageProcessor = Utils.getComponent(ImageProcessor.class);
+    private ImageProcessor imageProcessor;
 
     /**
      * Creates a new instance of this plugin.
@@ -115,6 +115,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
         super.init(context);
 
         initCache(context);
+
+        String imageProcessorHint = context.getWiki().Param("xwiki.plugin.image.processorHint", "thumbnailator");
+        this.imageProcessor = Utils.getComponent(ImageProcessor.class, imageProcessorHint);
 
         String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
         if (!StringUtils.isBlank(defaultQualityParam)) {

@@ -114,7 +114,7 @@ solr.field.doccontent=Contenu du document
 solr.field.doccontentraw=Contenu brut du document
 solr.field.filename=Nom du fichier joint
 solr.field.locale=Langage
-solr.field.locale.emptyValue=Pas de langage
+solr.field.locale.emptyValue=Sans langue
 solr.field.locale.emptyValue.hint=Certains documents n'ont aucune langue définie parce qu'ils contiennent des scripts (qui ne sont pas rédigés dans une langue naturelle) ou parce qu'ils sont évalués en fonction de la langue de l'utilisateur (comme cette page).
 solr.field.mimetype=Type de fichier
 solr.field.name=Page
@@ -167,5 +167,7 @@ solr.sortBy.score=Pertinence
 solr.sortBy.title_sort=Titre
 solr.sortOrder.asc=Ascendant
 solr.sortOrder.desc=Descendant
+solr.uix.attachmentdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pièces jointes ?
+solr.uix.docdoesnotexist.title=Est-ce que vous recherchez plutôt une de ces pages ?
 </content>
 </xwikidoc>

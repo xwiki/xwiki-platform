@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Informe um nome para a sua aplicação.
+appWithinMinutes.wizardStep.name.name=Nome
+appWithinMinutes.wizardStep.name.title=De um nome para sua aplicação
+appWithinMinutes.wizardStep.presentation.description=Personalize a página inicial da sua aplicação.
+appWithinMinutes.wizardStep.presentation.name=Apresentação
+appWithinMinutes.wizardStep.presentation.title=Personalize a página inicial da sua aplicação
+appWithinMinutes.wizardStep.structure.description=Crie a estrutura da sua aplicação informando que tipos de campo ela vai conter.
+appWithinMinutes.wizardStep.structure.name=Estrutura
+appWithinMinutes.wizardStep.structure.title=Defina a estrutura para a sua aplicação
 platform.appwithinminutes.appHomePageActionsHeading=Ações
 platform.appwithinminutes.appHomePageAddEntryHint=Adicionar nova entrada
 platform.appwithinminutes.appHomePageAddEntryLabel=Adicionar

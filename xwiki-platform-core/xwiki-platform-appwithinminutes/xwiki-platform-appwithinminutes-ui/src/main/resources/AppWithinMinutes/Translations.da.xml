@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Angiv et navn til denne Minut-app.
+appWithinMinutes.wizardStep.name.name=Navn
+appWithinMinutes.wizardStep.name.title=Navngiv din Minut-app
+appWithinMinutes.wizardStep.presentation.description=Gør startsiden for din Minut-app personlig.
+appWithinMinutes.wizardStep.presentation.name=Præsentation
+appWithinMinutes.wizardStep.presentation.title=Design din Minut-apps startside
+appWithinMinutes.wizardStep.structure.description=Specificér strukturen for din Minut-app ved at angive hvilke datafelter den skal indeholde.
+appWithinMinutes.wizardStep.structure.name=Struktur
+appWithinMinutes.wizardStep.structure.title=Definér struktur for dine data
 platform.appwithinminutes.appHomePageActionsHeading=Handlinger
 platform.appwithinminutes.appHomePageAddEntryHint=Tilføj nyt element
 platform.appwithinminutes.appHomePageAddEntryLabel=Tilføj

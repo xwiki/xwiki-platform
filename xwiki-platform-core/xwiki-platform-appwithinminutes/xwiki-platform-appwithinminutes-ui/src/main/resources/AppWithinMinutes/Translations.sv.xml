@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Mata in applikationens namn.
+appWithinMinutes.wizardStep.name.name=Namn
+appWithinMinutes.wizardStep.name.title=Namnge din applikation
+appWithinMinutes.wizardStep.presentation.description=Anpassa din applikations hemsida
+appWithinMinutes.wizardStep.presentation.name=Presentation
+appWithinMinutes.wizardStep.presentation.title=Anpassa din applikations hemsida
+appWithinMinutes.wizardStep.structure.description=Ange strukturen på din applikation genom att specificera vilka typer av fält den skall innehålla
+appWithinMinutes.wizardStep.structure.name=Struktur
+appWithinMinutes.wizardStep.structure.title=Definiera strukturen på din applikation
 platform.appwithinminutes.appHomePageActionsHeading=Operationer
 platform.appwithinminutes.appHomePageAddEntryHint=Lägg till ny post
 platform.appwithinminutes.appHomePageAddEntryLabel=Lägg till

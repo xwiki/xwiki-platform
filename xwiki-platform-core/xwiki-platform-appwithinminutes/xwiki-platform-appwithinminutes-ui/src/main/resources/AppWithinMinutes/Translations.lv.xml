@@ -43,6 +43,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Ievadiet lietotnes nosaukumu.
+appWithinMinutes.wizardStep.name.name=Nosaukums
+appWithinMinutes.wizardStep.name.title=Nosauciet savu lietotni
+appWithinMinutes.wizardStep.presentation.description=Pielāgojiet lietotnes sākuma lapu.
+appWithinMinutes.wizardStep.presentation.name=Izskats
+appWithinMinutes.wizardStep.presentation.title=Pielāgojiet lietotnes izskatu
+appWithinMinutes.wizardStep.structure.description=Izveidojiet lietotnes struktūru, norādot, kādus laukus tā saturēs.
+appWithinMinutes.wizardStep.structure.name=Struktūra
+appWithinMinutes.wizardStep.structure.title=Norādiet lietotnes struktūru
 platform.appwithinminutes.appHomePageActionsHeading=Darbības
 platform.appwithinminutes.appHomePageAddEntryHint=Pievienot jaunu ierakstu
 platform.appwithinminutes.appHomePageAddEntryLabel=Pievienot

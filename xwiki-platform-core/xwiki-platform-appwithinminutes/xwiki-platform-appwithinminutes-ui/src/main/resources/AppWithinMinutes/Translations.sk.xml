@@ -43,6 +43,14 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.description=Pomenujte svoju aplikáciu
+appWithinMinutes.wizardStep.name.name=Meno
+appWithinMinutes.wizardStep.name.title=Pomenujte svoju aplikáciu
+appWithinMinutes.wizardStep.presentation.description=Prispôsobiť úvodnú stránku aplikácie.
+appWithinMinutes.wizardStep.presentation.name=Prezentácia
+appWithinMinutes.wizardStep.presentation.title=Prispôsobiť úvodnú stránku aplikácie.
+appWithinMinutes.wizardStep.structure.name=Štruktúra
+appWithinMinutes.wizardStep.structure.title=Definujte štruktúru aplikácie
 platform.appwithinminutes.appHomePageActionsHeading=Akcie
 platform.appwithinminutes.appHomePageAddEntryHint=Pridať nový vstup
 platform.appwithinminutes.appHomePageAddEntryLabel=Pridať

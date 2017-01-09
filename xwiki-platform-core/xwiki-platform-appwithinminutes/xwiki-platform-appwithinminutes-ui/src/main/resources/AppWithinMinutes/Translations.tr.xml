@@ -43,6 +43,14 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language tr generated from http://www.l10n.xwiki.org
+appWithinMinutes.wizardStep.name.name=Ad
+appWithinMinutes.wizardStep.name.title=başvurunuzu Ad
+appWithinMinutes.wizardStep.presentation.description=uygulamanınana sayfasını kişiselleştirin .
+appWithinMinutes.wizardStep.presentation.name=Sunum
+appWithinMinutes.wizardStep.presentation.title=uygulamanızınana sayfa özelleştirme
+appWithinMinutes.wizardStep.structure.description=o içerecektir alanların ne tür belirterek uygulamanınyapısını oluşturun .
+appWithinMinutes.wizardStep.structure.name=Yapı
+appWithinMinutes.wizardStep.structure.title=uygulamanızınyapısını tanımlayın
 platform.appwithinminutes.appHomePageActionsHeading=Eylemleri
 platform.appwithinminutes.appHomePageAddEntryHint=Yeni girdi ekle
 platform.appwithinminutes.appHomePageAddEntryLabel=Ekle

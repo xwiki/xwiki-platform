@@ -49,5 +49,9 @@ XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Semanal
 XWiki.WatchListClass_interval_realtime=Em tempo real
 rendering.macro.watchlist.description=Apresenta o conteúdo dos itens acompanhados.
 rendering.macro.watchlist.name=Lista de Acompanhamentos
+watchlist.notifications.icons.tooltip.page=Seguir esta página
+watchlist.notifications.icons.tooltip.pageAndChildren=Seguir esta página e filhas
+watchlist.notifications.icons.tooltip.space=Seguir a página pai e suas filhas
+watchlist.notifications.icons.tooltip.wiki=Seguir esta wiki
 </content>
 </xwikidoc>

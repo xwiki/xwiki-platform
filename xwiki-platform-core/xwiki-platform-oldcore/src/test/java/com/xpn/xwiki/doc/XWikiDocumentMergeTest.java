@@ -256,7 +256,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.previousDocument.addAttachment(attachment);
@@ -274,7 +274,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.previousDocument.addAttachment(attachment);
@@ -291,7 +291,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.currentDocument.addAttachment(attachment);
@@ -307,7 +307,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.previousDocument.addAttachment(attachment);
@@ -315,7 +315,7 @@ public class XWikiDocumentMergeTest
 
         attachment = (XWikiAttachment) attachment.clone();
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-        attachment.setFilesize(9);
+        attachment.setSize(9);
 
         this.currentDocument.addAttachment(attachment);
 
@@ -330,7 +330,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.nextDocument.addAttachment(attachment);
@@ -342,7 +342,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
 
         Assert.assertNotNull(newAttachment);
-        Assert.assertEquals(10, newAttachment.getFilesize());
+        Assert.assertEquals(10, newAttachment.getSize());
         Assert.assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, newAttachment.getContent(null));
     }
 
@@ -352,7 +352,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.currentDocument.addAttachment(attachment);
@@ -373,7 +373,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
-        attachment.setFilesize(10);
+        attachment.setSize(10);
         attachment.setFilename("file");
 
         this.currentDocument.addAttachment(attachment);
@@ -381,7 +381,7 @@ public class XWikiDocumentMergeTest
 
         attachment = (XWikiAttachment) attachment.clone();
         attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-        attachment.setFilesize(9);
+        attachment.setSize(9);
 
         this.nextDocument.addAttachment(attachment);
 
@@ -392,7 +392,7 @@ public class XWikiDocumentMergeTest
         XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
 
         Assert.assertNotNull(newAttachment);
-        Assert.assertEquals(9, newAttachment.getFilesize());
+        Assert.assertEquals(9, newAttachment.getSize());
         Assert.assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, newAttachment.getContent(null));
     }
 

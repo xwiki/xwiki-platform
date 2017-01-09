@@ -202,7 +202,9 @@ public class BaseAttachmentsResource extends XWikiResource
                     Attachment attachment = objectFactory.createAttachment();
                     attachment.setId(String.format("%s@%s", pageId, xwikiAttachment.getFilename()));
                     attachment.setName(xwikiAttachment.getFilename());
-                    attachment.setSize(xwikiAttachment.getFilesize());
+                    attachment.setLongSize(xwikiAttachment.getSize());
+                    // Retro compatibility
+                    attachment.setSize((int) xwikiAttachment.getSize());
                     attachment.setMimeType(mimeType);
                     attachment.setAuthor(xwikiAttachment.getAuthor());
                     if (withPrettyNames) {

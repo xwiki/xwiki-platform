@@ -202,7 +202,7 @@ public class XWikiAttachment implements Cloneable
         attachment.setDate(getDate());
         attachment.setFilename(getFilename());
         attachment.setMimeType(getMimeType());
-        attachment.setFilesize(getFilesize());
+        attachment.setSize(getSize());
         attachment.setRCSVersion(getRCSVersion());
         attachment.setMetaDataDirty(isMetaDataDirty());
         if (getAttachment_content() != null) {
@@ -226,7 +226,9 @@ public class XWikiAttachment implements Cloneable
     @Deprecated
     public int getFilesize()
     {
-        return (int) getSize();
+        long longSize = getSize();
+
+        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
@@ -268,14 +270,29 @@ public class XWikiAttachment implements Cloneable
      * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
      * @since 2.3M2
+     * @deprecated since 9.0RC1, use {@link #getContentLongSize(XWikiContext)} instead
      */
+    @Deprecated
     public int getContentSize(XWikiContext context) throws XWikiException
+    {
+        long longSize = getContentLongSize(context);
+
+        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+    }
+
+    /**
+     * @param context current XWikiContext
+     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
+     * @throws XWikiException
+     * @since 9.0RC1
+     */
+    public long getContentLongSize(XWikiContext context) throws XWikiException
     {
         if (this.attachment_content == null && context != null) {
             this.doc.loadAttachmentContent(this, context);
         }
 
-        return this.attachment_content.getSize();
+        return this.attachment_content.getLongSize();
     }
 
     public String getFilename()
@@ -1005,8 +1022,8 @@ public class XWikiAttachment implements Cloneable
     {
         boolean modified = false;
 
-        if (getFilesize() != attachment.getFilesize()) {
-            setFilesize(attachment.getFilesize());
+        if (getSize() != attachment.getSize()) {
+            setSize(attachment.getSize());
             modified = true;
         }
 
@@ -1030,7 +1047,7 @@ public class XWikiAttachment implements Cloneable
     public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
     {
         try {
-            if (getFilesize() == otherAttachment.getFilesize()) {
+            if (getSize() == otherAttachment.getSize()) {
                 InputStream is = getContentInputStream(xcontext);
 
                 try {

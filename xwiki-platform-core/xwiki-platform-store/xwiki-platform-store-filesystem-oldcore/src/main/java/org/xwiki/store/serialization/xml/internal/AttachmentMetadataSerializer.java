@@ -102,7 +102,7 @@ public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAtt
         final XWikiAttachment out = new XWikiAttachment();
 
         out.setFilename(docel.element(FILENAME).getText());
-        out.setFilesize(Integer.parseInt(docel.element(FILESIZE).getText()));
+        out.setSize(Long.parseLong(docel.element(FILESIZE).getText()));
         out.setAuthor(docel.element(AUTHOR).getText());
         out.setVersion(docel.element(VERSION).getText());
         out.setComment(docel.element(COMMENT).getText());
@@ -122,7 +122,7 @@ public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAtt
         writer.writeOpen(docel);
 
         writer.write(new DOMElement(FILENAME).addText(attach.getFilename()));
-        writer.write(new DOMElement(FILESIZE).addText(attach.getFilesize() + ""));
+        writer.write(new DOMElement(FILESIZE).addText(attach.getSize() + ""));
         writer.write(new DOMElement(AUTHOR).addText(attach.getAuthor()));
         writer.write(new DOMElement(VERSION).addText(attach.getVersion()));
         writer.write(new DOMElement(COMMENT).addText(attach.getComment()));

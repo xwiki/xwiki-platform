@@ -1069,7 +1069,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         att.setId(xAtt.getId());
         att.setImage(xAtt.isImage(context));
         att.setMimeType(xAtt.getMimeType(context));
-        att.setFilesize(xAtt.getFilesize());
+        att.setSize(xAtt.getSize());
         att.setDownloadUrl(context.getWiki().getExternalAttachmentURL(xAtt.getDoc().getFullName(), xAtt.getFilename(),
             context));
 

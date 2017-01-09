@@ -72,8 +72,8 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         // for sorting (the reason it is multiValued is because it is 'reused' on document rows and documents can have
         // multiple attachments).
         solrDocument.setField(FieldUtils.ATTACHMENT_DATE_SORT, attachment.getDate());
-        solrDocument.setField(FieldUtils.ATTACHMENT_SIZE, attachment.getFilesize());
-        solrDocument.setField(FieldUtils.ATTACHMENT_SIZE_SORT, attachment.getFilesize());
+        solrDocument.setField(FieldUtils.ATTACHMENT_SIZE, attachment.getSize());
+        solrDocument.setField(FieldUtils.ATTACHMENT_SIZE_SORT, attachment.getSize());
         // We need to index the attachment version (revision) to be able to detect when the search index is out of date
         // (not in sync with the database).
         solrDocument.setField(FieldUtils.ATTACHMENT_VERSION, attachment.getVersion());

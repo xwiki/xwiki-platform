@@ -58,7 +58,7 @@ public class AttachmentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
     /**
      * Show content differences only for text files under 50KB.
      */
-    private static final int TEXT_FILE_SIZE_LIMIT = 50000;
+    private static final long TEXT_FILE_SIZE_LIMIT = 50000;
 
     /**
      * Computes the differences, in unified format, between two versions of an attachment and adds the result to the
@@ -85,8 +85,8 @@ public class AttachmentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
                 getContentAsString(nextAttachment));
         } else {
             // The size difference is useful when the content difference is not shown.
-            maybeAddDiff(attachmentDiff, "size", previousAttachment == null ? null : previousAttachment.getFilesize(),
-                nextAttachment == null ? null : nextAttachment.getFilesize());
+            maybeAddDiff(attachmentDiff, "size", previousAttachment == null ? null : previousAttachment.getSize(),
+                nextAttachment == null ? null : nextAttachment.getSize());
             if (attachmentDiff.isEmpty() && !contentEquals(previousAttachment, nextAttachment)) {
                 // If the files have the same size but the content is different then show an empty list.
                 attachmentDiff.put(CONTENT, Collections.<UnifiedDiffBlock<String, Character>>emptyList());
@@ -106,7 +106,7 @@ public class AttachmentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
 
     private boolean isSmallTextFile(XWikiAttachment attachment)
     {
-        if (attachment != null && attachment.getFilesize() < TEXT_FILE_SIZE_LIMIT) {
+        if (attachment != null && attachment.getSize() < TEXT_FILE_SIZE_LIMIT) {
             String mediaType = attachment.getMimeType(xcontextProvider.get());
             for (String mediaTypePattern : TEXT_MEDIA_TYPE_PATTERNS) {
                 if (mediaType.equals(mediaTypePattern) || mediaType.startsWith(mediaTypePattern)

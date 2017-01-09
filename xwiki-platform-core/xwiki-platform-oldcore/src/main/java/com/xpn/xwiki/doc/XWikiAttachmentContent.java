@@ -278,7 +278,7 @@ public class XWikiAttachmentContent implements Cloneable
                 xac.file = fi;
                 xac.setContentDirty(true);
                 if (xac.attachment != null) {
-                    xac.attachment.setSize(xac.getLongSize());
+                    xac.attachment.setFilesize(xac.getSize());
                 }
             }
         });
@@ -317,23 +317,10 @@ public class XWikiAttachmentContent implements Cloneable
     /**
      * @return the true size of the content of the attachment.
      * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
      */
-    @Deprecated
     public int getSize()
     {
-        long longSize = getLongSize();
-
-        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
-    }
-
-    /**
-     * @return the true size of the content of the attachment.
-     * @since 9.0RC1
-     */
-    public long getLongSize()
-    {
-        return this.file != null ? this.file.getSize() : 0;
+        return (this.file != null) ? (int) this.file.getSize() : 0;
     }
 
     /**

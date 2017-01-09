@@ -109,12 +109,17 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     }
 
     @Override
-    public long getLongSize()
+    public int getSize()
     {
         if (this.getFileItem() != null) {
-            return super.getLongSize();
+            return super.getSize();
         }
 
-        return this.storageFile.length();
+        long size = this.storageFile.length();
+        // The most important thing is that it doesn't roll over into the negative space.
+        if (size > ((long) Integer.MAX_VALUE)) {
+            return Integer.MAX_VALUE;
+        }
+        return (int) size;
     }
 }

@@ -171,7 +171,6 @@
           <element name="id" type="string"></element>
           <element name="name" type="string"></element>
           <element name="size" type="int"></element>
-          <element name="longSize" type="long"></element>
           <element name="version" type="string"></element>
           <element name="pageId" type="string"></element>
           <element name="pageVersion" type="string"></element>

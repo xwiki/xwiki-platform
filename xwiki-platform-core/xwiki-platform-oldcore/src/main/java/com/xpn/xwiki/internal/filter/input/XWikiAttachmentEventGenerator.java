@@ -105,7 +105,7 @@ public class XWikiAttachmentEventGenerator
         if (properties.isWithWikiAttachmentsContent()) {
             try {
                 content = attachment.getContentInputStream(xcontext);
-                size = Long.valueOf(attachment.getSize());
+                size = Long.valueOf(attachment.getFilesize());
             } catch (XWikiException e) {
                 this.logger.error("Failed to get content of attachment [{}]", attachment.getReference(), e);
 

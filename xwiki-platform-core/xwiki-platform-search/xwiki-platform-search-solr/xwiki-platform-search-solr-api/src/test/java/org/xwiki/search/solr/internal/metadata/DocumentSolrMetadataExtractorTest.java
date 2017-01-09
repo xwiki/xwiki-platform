@@ -523,7 +523,7 @@ public class DocumentSolrMetadataExtractorTest
         when(attachment.getFilename()).thenReturn(fileName);
         when(attachment.getMimeType(this.xcontext)).thenReturn(mimeType);
         when(attachment.getDate()).thenReturn(date);
-        when(attachment.getSize()).thenReturn((long)content.length);
+        when(attachment.getFilesize()).thenReturn(content.length);
         when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content));
 
         String authorFullName = "XWiki." + authorAlias;

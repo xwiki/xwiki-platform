@@ -72,7 +72,7 @@ public class DavAttachment extends AbstractDavFile
             getProperties()
                 .add(
                     new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, attachment
-                        .getSize()));
+                        .getFilesize()));
         }
     }
 
@@ -90,7 +90,7 @@ public class DavAttachment extends AbstractDavFile
             throw new IOException("Access rights violation.");
         }
         outputContext.setContentLanguage(attachment.getDoc().getLanguage());
-        outputContext.setContentLength(attachment.getSize());
+        outputContext.setContentLength(attachment.getFilesize());
         outputContext.setContentType(getContext().getMimeType(attachment));
         outputContext.setETag(DavConstants.modificationDateFormat.format(getModificationTime()));
         outputContext.setModificationTime(getModificationTime());

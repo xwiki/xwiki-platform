@@ -45,6 +45,8 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class BasePage extends BaseElement
 {
+    private static final By DRAWER_MATCHER = By.id("tmDrawer");
+
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -288,16 +290,60 @@ public class BasePage extends BaseElement
      */
     public void toggleDrawer()
     {
-        By drawer = By.id("tmDrawer");
-        if (getDriver().findElementWithoutWaiting(drawer).isDisplayed()) {
+        if (isElementVisible(DRAWER_MATCHER)) {
             // The drawer is visible, so we close it by clicking outside the drawer
             this.mainContainerDiv.click();
-            getDriver().waitUntilElementDisappears(drawer);
+            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
         } else {
             // The drawer is not visible, so we open it
             this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(drawer);
+            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
         }
+    }
+
+    /**
+     * @return true if the drawer used to be hidden
+     * @since 8.4.5
+     * @since 9.0RC1
+     */
+    public boolean showDrawer()
+    {
+        if (isElementVisible(DRAWER_MATCHER)) {
+            // The drawer is not visible, so we open it
+            this.drawerActivator.click();
+            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return true if the drawer used to be displayed
+     * @since 8.4.5
+     * @since 9.0RC1
+     */
+    public boolean hideDrawer()
+    {
+        if (isElementVisible(DRAWER_MATCHER)) {
+            // The drawer is visible, so we close it by clicking outside the drawer
+            this.mainContainerDiv.click();
+            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @since 8.4.5
+     * @since 9.0RC1
+     */
+    public boolean isDrawerVisible()
+    {
+        return isElementVisible(DRAWER_MATCHER);
     }
 
     /**
@@ -432,7 +478,17 @@ public class BasePage extends BaseElement
      */
     public String getCurrentUser()
     {
-        return this.userLink.getText();
+        // We need to show the drawer because #getText() does not allow getting hidden text (but allow finding the
+        // element and its attributes...)
+        boolean hide = showDrawer();
+
+        String user = this.userLink.getText();
+
+        if (hide) {
+            hideDrawer();
+        }
+
+        return user;
     }
 
     /**

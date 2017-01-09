@@ -108,4 +108,13 @@ public class BaseElement
             // Ignore.
         }
     }
+
+    /**
+     * @since 8.4.5
+     * @since 9.0RC1
+     */
+    protected boolean isElementVisible(By by)
+    {
+        return getDriver().findElementWithoutWaiting(by).isDisplayed();
+    }
 }

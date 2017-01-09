@@ -108,7 +108,7 @@ public class XWikiAttachment implements Cloneable
 
     private XWikiDocument doc;
 
-    private int filesize;
+    private long size;
 
     private String mimeType;
 
@@ -142,7 +142,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment()
     {
-        this.filesize = 0;
+        this.size = 0;
         this.filename = "";
         this.comment = "";
         this.date = new Date();
@@ -221,24 +221,46 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @return the cached filesize in byte of the attachment, stored as metadata
+     * @deprecated since 9.0RC1, use {@link #getSize()} instead
      */
+    @Deprecated
     public int getFilesize()
     {
-        return this.filesize;
+        return (int) getSize();
     }
 
     /**
      * Set cached filesize of the attachment that will be stored as metadata
      *
      * @param filesize in byte
+     * @deprecated since 9.0RC1, use {@link #setSize(long)} instead
      */
+    @Deprecated
     public void setFilesize(int filesize)
     {
-        if (filesize != this.filesize) {
+        setSize(filesize);
+    }
+
+    /**
+     * @return the number of bytes in this attachment content
+     * @since 9.0RC1
+     */
+    public long getSize()
+    {
+        return this.size;
+    }
+
+    /**
+     * @param size the number of bytes in this attachment content
+     * @since 9.0RC1
+     */
+    public void setSize(long size)
+    {
+        if (size != this.size) {
             setMetaDataDirty(true);
         }
 
-        this.filesize = filesize;
+        this.size = size;
     }
 
     /**

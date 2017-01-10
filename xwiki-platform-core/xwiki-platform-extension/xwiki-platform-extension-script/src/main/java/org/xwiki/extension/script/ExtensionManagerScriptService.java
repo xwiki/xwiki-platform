@@ -326,7 +326,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param id the identifier of the extension to install
      * @param version the version to install
      * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
-     *            will be installed globally
+     *            will be installed in root namespace (globally)
      * @return the {@link InstallRequest}
      */
     public InstallRequest createInstallRequest(String id, String version, String namespace)
@@ -394,7 +394,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param id the identifier of the extension to install
      * @param version the version to install
      * @param namespace the (optional) namespace where to install the extension; if {@code null} or empty, the extension
-     *            will be installed globally
+     *            will be installed in root namespace (globally)
      * @return the {@link InstallRequest}
      */
     public InstallRequest createInstallPlanRequest(String id, String version, String namespace)
@@ -518,10 +518,12 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     /**
      * Create an {@link UninstallRequest} instance based on passed parameters.
+     * <p>
+     * Only uninstall from the provided namespace.
      * 
      * @param id the identifier of the extension to uninstall
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
-     *            extension will be uninstalled globally
+     *            extension will be removed from root namespace
      * @return the {@link UninstallRequest}
      */
     public UninstallRequest createUninstallRequest(String id, String namespace)
@@ -573,9 +575,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * <p>
      * Only uninstall from the provided namespace.
      * 
-     * @param id the identifier of the extension that is going to be removed
+     * @param id the identifier of the extension to uninstall
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
-     *            extension will be removed from all namespaces
+     *            extension will be removed from root namespace
      * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
      *         {@code null} in case of failure
      */

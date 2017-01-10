@@ -569,7 +569,7 @@ public class DocumentSolrMetadataExtractorTest
         assertEquals(Arrays.asList("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
         assertEquals(Arrays.asList("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
         assertEquals(Arrays.asList(logoDate, todoDate), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_DATE));
-        assertEquals(Arrays.asList(3, 7), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
+        assertEquals(Arrays.asList(3L, 7L), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
         assertEquals(Arrays.asList("foo\n", "bar bar\n"), solrDocument.getFieldValues("attcontent_en_US"));
         assertEquals(Arrays.asList("wiki:XWiki.Alice", "wiki:XWiki.Bob"),
             solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR));

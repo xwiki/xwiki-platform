@@ -36,7 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,15 +47,21 @@ import org.xwiki.query.internal.DefaultQueryExecutorManager;
 import org.xwiki.query.internal.DefaultQueryManager;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Basic test for the {@link SolrQueryExecutor}.
@@ -64,6 +69,7 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  */
 @ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class, ContextComponentManagerProvider.class})
+@ReferenceComponentList
 public class SolrQueryExecutorTest
 {
     private static final String ITERABLE_PARAM_NAME = "multiParam";
@@ -159,37 +165,71 @@ public class SolrQueryExecutorTest
             new DefaultParameterizedType(null, DocumentReferenceResolver.class, SolrDocument.class);
         DocumentReferenceResolver<SolrDocument> resolver = this.componentManager.getInstance(resolverType);
 
-        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        AuthorizationManager authorizationManager = this.componentManager.getInstance(AuthorizationManager.class);
+
+        DocumentReference currentUserReference = new DocumentReference("xwiki", "XWiki", "currentuser");
+        this.oldCore.getXWikiContext().setUserReference(currentUserReference);
+
+        DocumentReference currentAuthorReference = new DocumentReference("xwiki", "XWiki", "currentauthor");
+        XWikiDocument currentDocument = new XWikiDocument(currentAuthorReference);
+        currentDocument.setContentAuthorReference(currentAuthorReference);
+        this.oldCore.getXWikiContext().setDoc(currentDocument);
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
-        when(documentAccessBridge.exists(aliceReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, currentAuthorReference, aliceReference)).thenReturn(true);
         SolrDocument alice = new SolrDocument();
         when(resolver.resolve(alice)).thenReturn(aliceReference);
 
         DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
-        when(documentAccessBridge.isDocumentViewable(bobReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, currentUserReference, bobReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, currentAuthorReference, bobReference)).thenReturn(true);
         SolrDocument bob = new SolrDocument();
         when(resolver.resolve(bob)).thenReturn(bobReference);
 
         DocumentReference carolReference = new DocumentReference("wiki", "Users", "Carol");
-        when(documentAccessBridge.exists(carolReference)).thenReturn(true);
-        when(documentAccessBridge.isDocumentViewable(carolReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, currentUserReference, carolReference)).thenReturn(true);
         SolrDocument carol = new SolrDocument();
         when(resolver.resolve(carol)).thenReturn(carolReference);
 
-        SolrDocumentList results = new SolrDocumentList();
-        results.addAll(Arrays.asList(alice, bob, carol));
-        results.setNumFound(3);
+        SolrDocumentList sourceResults = new SolrDocumentList();
+        sourceResults.addAll(Arrays.asList(alice, bob, carol));
+        sourceResults.setNumFound(3);
 
         QueryResponse response = mock(QueryResponse.class);
-        when(response.getResults()).thenReturn(results);
         when(this.solr.query(any(SolrParams.class))).thenReturn(response);
 
         DefaultQuery query = new DefaultQuery("", null);
-        query.checkCurrentUser(true);
-        assertEquals(Arrays.asList(response), this.componentManager.getComponentUnderTest().execute(query));
 
-        assertEquals(1, results.getNumFound());
-        assertEquals(Arrays.asList(carol), results);
+        // No right check
+
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+
+        SolrDocumentList results =
+            ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Arrays.asList(alice, bob, carol), results);
+
+        // Check current user right
+
+        query.checkCurrentUser(true);
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+
+        results = ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Arrays.asList(bob, carol), results);
+
+        // Check both current user and author rights
+
+        query.checkCurrentAuthor(true);
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+
+        results = ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Arrays.asList(bob), results);
+
+        // Check current author right
+
+        query.checkCurrentUser(false);
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+
+        results = ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Arrays.asList(alice, bob), results);
     }
 }

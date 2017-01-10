@@ -36,7 +36,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,6 +45,8 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -80,11 +81,8 @@ public class SolrQueryExecutor implements QueryExecutor
     @Inject
     protected Logger logger;
 
-    /**
-     * XWiki model bridge.
-     */
     @Inject
-    protected DocumentAccessBridge documentAccessBridge;
+    protected AuthorizationManager authorization;
 
     /**
      * Provider for the {@link SolrInstance} that allows communication with the Solr server.
@@ -110,12 +108,6 @@ public class SolrQueryExecutor implements QueryExecutor
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
-        // TODO: make it less restrictive, see http://jira.xwiki.org/browse/XWIKI-9386
-        if (query instanceof SecureQuery && ((SecureQuery) query).isCurrentAuthorChecked()
-            && !this.documentAccessBridge.hasProgrammingRights()) {
-            throw new QueryException("Solr query require programming right", query, null);
-        }
-
         this.progress.startStep(query, "query.solr.progress.execute", "Execute Solr query [{}]", query);
         this.progress.pushLevelProgress(3, query);
 
@@ -138,8 +130,20 @@ public class SolrQueryExecutor implements QueryExecutor
             // A better way would be using a PostFilter as described in this article:
             // http://java.dzone.com/articles/custom-security-filtering-solr
             // Basically, we would be asking
-            if (!(query instanceof SecureQuery) || ((SecureQuery) query).isCurrentUserChecked()) {
-                this.filterResponse(response);
+            List<DocumentReference> usersToCheck = new ArrayList<>(2);
+            if (query instanceof SecureQuery) {
+                if (((SecureQuery) query).isCurrentUserChecked()) {
+                    usersToCheck.add(xcontextProvider.get().getUserReference());
+                }
+                if (((SecureQuery) query).isCurrentAuthorChecked()) {
+                    usersToCheck.add(xcontextProvider.get().getAuthorReference());
+                }
+            } else {
+                usersToCheck.add(xcontextProvider.get().getUserReference());
+                usersToCheck.add(xcontextProvider.get().getAuthorReference());
+            }
+            if (!usersToCheck.isEmpty()) {
+                filterResponse(response, usersToCheck);
             }
 
             return (List<T>) Arrays.asList(response);
@@ -227,7 +231,7 @@ public class SolrQueryExecutor implements QueryExecutor
      * 
      * @param response the Solr response to filter
      */
-    protected void filterResponse(QueryResponse response)
+    protected void filterResponse(QueryResponse response, List<DocumentReference> usersToCheck)
     {
         SolrDocumentList results = response.getResults();
         long numFound = results.getNumFound();
@@ -237,8 +241,7 @@ public class SolrQueryExecutor implements QueryExecutor
             try {
                 DocumentReference resultDocumentReference = this.solrDocumentReferenceResolver.resolve(result);
 
-                if (!documentAccessBridge.exists(resultDocumentReference)
-                    || !documentAccessBridge.isDocumentViewable(resultDocumentReference)) {
+                if (!isAllowed(resultDocumentReference, usersToCheck)) {
 
                     // Remove the current incompatible result.
                     results.remove(result);
@@ -262,5 +265,16 @@ public class SolrQueryExecutor implements QueryExecutor
             numFound = 0;
         }
         results.setNumFound(numFound);
+    }
+
+    protected boolean isAllowed(DocumentReference resultDocumentReference, List<DocumentReference> usersToCheck)
+    {
+        for (DocumentReference user : usersToCheck) {
+            if (!this.authorization.hasAccess(Right.VIEW, user, resultDocumentReference)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

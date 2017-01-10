@@ -25,7 +25,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class Attachment  implements IsSerializable {
     private boolean isImage;
     private long id;
-    private int size;
+    private long size;
     private String filename;
     private String author;
     private String versionName;
@@ -45,10 +45,23 @@ public class Attachment  implements IsSerializable {
     /**
      *
      * @return the Attachment size
+     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
      */
+    @Deprecated
     public int getFilesize() {
-        return size;
+        long longSize = getLongSize();
+
+        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
+
+    /**
+    *
+    * @return the Attachment size
+    * @since 9.0RC1
+    */
+   public long getLongSize() {
+       return size;
+   }
 
     /**
      *
@@ -107,10 +120,17 @@ public class Attachment  implements IsSerializable {
         this.id = id;
     }
 
+    /**
+     * @deprecated since 9.0RC1, use {@link #setLongSize(long)} instead
+     */
+    @Deprecated
     public void setFilesize(int size) {
-        this.size = size;
+        setLongSize(size);
     }
 
+    public void setLongSize(long size) {
+        this.size = size;
+    }
 
     public void setFilename(String filename) {
         this.filename = filename;

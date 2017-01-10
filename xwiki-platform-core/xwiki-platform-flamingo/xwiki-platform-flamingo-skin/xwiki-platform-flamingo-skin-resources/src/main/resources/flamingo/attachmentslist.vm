@@ -59,7 +59,7 @@
     <div class="meta">
     <span class="publisher">$services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attach.author)}])</span>
     <span class="date">$services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attach.date)}])</span>
-    <span class="size">(#dynamicsize($attach.filesize))</span>
+    <span class="size">(#dynamicsize($attach.longSize))</span>
     </div>
     </div>
     </div> ## row

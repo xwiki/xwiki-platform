@@ -95,7 +95,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         Assert.assertEquals(1, document.getAttachmentList().size());
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(10, attachment.getFilesize());
+        Assert.assertEquals(10, attachment.getLongSize());
         Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
@@ -198,7 +198,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         Assert.assertEquals(1, document.getAttachmentList().size());
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(10, attachment.getFilesize());
+        Assert.assertEquals(10, attachment.getLongSize());
         Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
@@ -353,7 +353,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         Assert.assertEquals(1, document.getAttachmentList().size());
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(10, attachment.getFilesize());
+        Assert.assertEquals(10, attachment.getLongSize());
         Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 

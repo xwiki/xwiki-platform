@@ -121,7 +121,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
         Assert.assertEquals("Directory/File.txt", newAttachment.getFilename());
-        Assert.assertEquals(zipFileContent.length(), newAttachment.getFilesize());
+        Assert.assertEquals(zipFileContent.length(), newAttachment.getLongSize());
         Assert.assertEquals(zipFileContent.length(), newAttachment.getContentSize(context));
         Assert.assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
     }

@@ -102,7 +102,7 @@
 
 #macro (getAttachmentTextContent $attachment $return)
   #set ($content = $NULL)
-  #if ($attachment && $attachment.filesize < 50000)
+  #if ($attachment && $attachment.longSize < 50000)
     #set ($mimeType = $attachment.mimeType)
     #set ($textMimeTypes = ['text/', 'application/xml', 'application/javascript', 'application/ecmascript',
       'application/json', 'application/x-sh', '+xml'])
@@ -132,20 +132,20 @@
     ## Size
     ##
     #set ($oldSize = '')
-    #if ($oldAttachment.filesize)
-      #set ($oldSize = "#dynamicsize($oldAttachment.filesize)")
+    #if ($oldAttachment.longSize)
+      #set ($oldSize = "#dynamicsize($oldAttachment.longSize)")
       #set ($oldSize = $oldSize.trim())
     #end
     #set ($newSize = '')
-    #if ($newAttachment.filesize)
-      #set ($newSize = "#dynamicsize($newAttachment.filesize)")
+    #if ($newAttachment.longSize)
+      #set ($newSize = "#dynamicsize($newAttachment.longSize)")
       #set ($newSize = $newSize.trim())
     #end
     #if ($oldSize == $newSize)
       ## Sometimes the change is too small to have an effect on the displaed value (e.g. you add one byte to a one MB
       ## file). In this case fallback on the raw size values (in bytes).
-      #set ($oldSize = $oldAttachment.filesize)
-      #set ($newSize = $newAttachment.filesize)
+      #set ($oldSize = $oldAttachment.longSize)
+      #set ($newSize = $newAttachment.longSize)
     #end
     #set ($sizeLabel = $services.localization.render('web.history.changes.attachment.size'))
     #maybeDisplayPropertyDiff($sizeLabel $oldSize $newSize)

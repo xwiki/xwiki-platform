@@ -198,7 +198,7 @@
       $services.localization.render('extension.history.source.authorDateAndSize', [
         $xwiki.getUserName($attachment.author),
         $xwiki.formatDate($attachment.date),
-        "#dynamicsize($attachment.filesize)"
+        "#dynamicsize($attachment.longSize)"
       ])
     </div>
   </li>

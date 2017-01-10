@@ -276,7 +276,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.addField(FieldUtils.FILENAME, attachment.getFilename());
         solrDocument.addField(FieldUtils.MIME_TYPE, attachment.getMimeType(xcontext));
         solrDocument.addField(FieldUtils.ATTACHMENT_DATE, attachment.getDate());
-        solrDocument.addField(FieldUtils.ATTACHMENT_SIZE, attachment.getFilesize());
+        solrDocument.addField(FieldUtils.ATTACHMENT_SIZE, attachment.getLongSize());
 
         String attachmentTextContent = getContentAsText(attachment);
         solrDocument.addField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, locale), attachmentTextContent);

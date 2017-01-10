@@ -148,7 +148,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
 [[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=180]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
     #else
       * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
-      * v$attachment.getVersion() (#dynamicsize($attachment.filesize))
+      * v$attachment.getVersion() (#dynamicsize($attachment.longSize))
       * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
       * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
     #end

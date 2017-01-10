@@ -76,10 +76,23 @@ public class Attachment extends Api
 
     /**
      * @return the Attachment size
+     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
      */
+    @Deprecated
     public int getFilesize()
     {
-        return this.attachment.getFilesize();
+        long longSize = getLongSize();
+
+        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+    }
+
+    /**
+     * @return the number of bytes in this attachment content
+     * @since 9.0RC1
+     */
+    public long getLongSize()
+    {
+        return this.attachment.getLongSize();
     }
 
     /**

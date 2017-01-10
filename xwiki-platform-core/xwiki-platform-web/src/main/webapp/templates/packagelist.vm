@@ -24,7 +24,7 @@
           $services.localization.render('core.importer.packageInformationExtract', [
             $xwiki.getUserName($attach.author, true),
             $!xwiki.formatDate($attach.date)
-          ]) - <span class="size">(#dynamicsize($attach.filesize))</span>
+          ]) - <span class="size">(#dynamicsize($attach.longSize))</span>
         </div>
       </div>
     </li>

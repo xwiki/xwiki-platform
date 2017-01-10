@@ -108,7 +108,7 @@ public class XWikiAttachment implements Cloneable
 
     private XWikiDocument doc;
 
-    private int filesize;
+    private long size;
 
     private String mimeType;
 
@@ -132,20 +132,28 @@ public class XWikiAttachment implements Cloneable
 
     private AttachmentReference reference;
 
+    private boolean forceSetFilesize;
+
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
         this();
 
         setDoc(doc);
         setFilename(filename);
+
+        // We know it's not Hibernate
+        this.forceSetFilesize = true;
     }
 
     public XWikiAttachment()
     {
-        this.filesize = 0;
+        this.size = 0;
         this.filename = "";
         this.comment = "";
         this.date = new Date();
+
+        // It might be Hibernate
+        this.forceSetFilesize = false;
     }
 
     public AttachmentReference getReference()
@@ -202,7 +210,7 @@ public class XWikiAttachment implements Cloneable
         attachment.setDate(getDate());
         attachment.setFilename(getFilename());
         attachment.setMimeType(getMimeType());
-        attachment.setFilesize(getFilesize());
+        attachment.setLongSize(getLongSize());
         attachment.setRCSVersion(getRCSVersion());
         attachment.setMetaDataDirty(isMetaDataDirty());
         if (getAttachment_content() != null) {
@@ -220,25 +228,56 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @return the cached filesize in byte of the attachment, stored as metadata
+     * @return the number of bytes in this attachment content
+     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
      */
+    @Deprecated
     public int getFilesize()
     {
-        return this.filesize;
+        long longSize = getLongSize();
+
+        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
-     * Set cached filesize of the attachment that will be stored as metadata
+     * Set cached filesize of the attachment that will be stored as metadata.
      *
-     * @param filesize in byte
+     * @param filesize the number of bytes in this attachment content
+     * @deprecated since 9.0RC1, use {@link #setLongSize(long)} instead
      */
+    @Deprecated
     public void setFilesize(int filesize)
     {
-        if (filesize != this.filesize) {
+        // There is no way to tell Hibernate to not call #setFilesize and we don't want to break the size if it's bigger
+        // than an int (#setFilesize is usually called after setLongSize by Hibernate)
+        if (filesize >= 0 || filesize < Integer.MAX_VALUE || this.forceSetFilesize) {
+            setLongSize(filesize);
+        }
+    }
+
+    /**
+     * @return the metadata holding the number of bytes in this attachment content
+     * @since 9.0RC1
+     */
+    public long getLongSize()
+    {
+        return this.size;
+    }
+
+    /**
+     * The size is automatically calculated from the attachment content so this method is mostly internal API that
+     * should not be used.
+     * 
+     * @param size the metadata holding the number of bytes in this attachment content
+     * @since 9.0RC1
+     */
+    public void setLongSize(long size)
+    {
+        if (size != this.size) {
             setMetaDataDirty(true);
         }
 
-        this.filesize = filesize;
+        this.size = size;
     }
 
     /**
@@ -246,14 +285,29 @@ public class XWikiAttachment implements Cloneable
      * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
      * @since 2.3M2
+     * @deprecated since 9.0RC1, use {@link #getContentLongSize(XWikiContext)} instead
      */
+    @Deprecated
     public int getContentSize(XWikiContext context) throws XWikiException
+    {
+        long longSize = getContentLongSize(context);
+
+        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+    }
+
+    /**
+     * @param context current XWikiContext
+     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
+     * @throws XWikiException
+     * @since 9.0RC1
+     */
+    public long getContentLongSize(XWikiContext context) throws XWikiException
     {
         if (this.attachment_content == null && context != null) {
             this.doc.loadAttachmentContent(this, context);
         }
 
-        return this.attachment_content.getSize();
+        return this.attachment_content.getLongSize();
     }
 
     public String getFilename()
@@ -983,8 +1037,8 @@ public class XWikiAttachment implements Cloneable
     {
         boolean modified = false;
 
-        if (getFilesize() != attachment.getFilesize()) {
-            setFilesize(attachment.getFilesize());
+        if (getLongSize() != attachment.getLongSize()) {
+            setLongSize(attachment.getLongSize());
             modified = true;
         }
 
@@ -1008,7 +1062,7 @@ public class XWikiAttachment implements Cloneable
     public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
     {
         try {
-            if (getFilesize() == otherAttachment.getFilesize()) {
+            if (getLongSize() == otherAttachment.getLongSize()) {
                 InputStream is = getContentInputStream(xcontext);
 
                 try {

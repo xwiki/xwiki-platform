@@ -46,18 +46,20 @@ public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractM
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
+        boolean needsUpdate = super.updateDocument(document);
 
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("name", "Name", 30);
-        needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20, ContentType.PURE_TEXT);
-        needsUpdate |= bclass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
-        needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
-        needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
-
-        needsUpdate = setClassDocumentFields(document, document.getDocumentReference().getName());
+        needsUpdate |= setClassDocumentFields(document, document.getDocumentReference().getName());
 
         return needsUpdate;
+    }
+
+    @Override
+    protected void createClass(BaseClass xlass)
+    {
+        xlass.addTextField("name", "Name", 30);
+        xlass.addTextAreaField("code", "Code", 50, 20, ContentType.PURE_TEXT);
+        xlass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
+        xlass.addBooleanField("parse", "Parse content", "yesno");
+        xlass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
     }
 }

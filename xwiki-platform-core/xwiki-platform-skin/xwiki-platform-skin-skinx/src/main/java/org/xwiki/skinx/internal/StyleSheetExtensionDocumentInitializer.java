@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin;
 
@@ -48,16 +47,8 @@ public class StyleSheetExtensionDocumentInitializer extends AbstractSkinExtensio
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xlass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addStaticListField("contentType", "Content Type", "CSS|LESS");
-
-        needsUpdate |= super.updateDocument(document);
-
-        return needsUpdate;
+        xlass.addStaticListField("contentType", "Content Type", "CSS|LESS");
     }
 }

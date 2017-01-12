@@ -94,9 +94,8 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
             synchronized (this) {
                 if (this.reference.extractReference(EntityType.WIKI) == null) {
                     // Convert to main wiki reference
-                    EntityReference mainWikiEntityReference =
-                        this.resolver.resolve(this.reference,
-                            new WikiReference(this.wikiDescriptorManager.getMainWikiId()));
+                    EntityReference mainWikiEntityReference = this.resolver.resolve(this.reference,
+                        new WikiReference(this.wikiDescriptorManager.getMainWikiId()));
 
                     this.reference = mainWikiEntityReference;
                 }
@@ -222,5 +221,29 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     protected int intFromBoolean(Boolean value)
     {
         return value == null ? -1 : (value.booleanValue() ? 1 : 0);
+    }
+
+    @Override
+    public boolean updateDocument(XWikiDocument document)
+    {
+        // Get document class
+        BaseClass currentClass = document.getXClass();
+
+        // Generate the class from scratch
+        BaseClass newClass = new BaseClass();
+        newClass.setDocumentReference(currentClass.getDocumentReference());
+        createClass(newClass);
+
+        // Make sure the current class contains required properties
+        return currentClass.apply(newClass, false);
+    }
+
+    /**
+     * @param xlass the class to create
+     * @since 9.0RC1
+     */
+    protected void createClass(BaseClass xlass)
+    {
+        // Override
     }
 }

@@ -27,13 +27,14 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.watchlist.internal.DefaultWatchListNotifier;
 import org.xwiki.watchlist.internal.job.WatchListJob;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.scheduler.JobState;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
@@ -85,12 +86,11 @@ public abstract class AbstractWatchListJobDocumentInitializer extends AbstractMa
     private Logger logger;
 
     /**
-     * @param spaceName the space name of the document
-     * @param documentName the document name of the document
+     * @param reference the reference of the document
      */
-    public AbstractWatchListJobDocumentInitializer(String spaceName, String documentName)
+    public AbstractWatchListJobDocumentInitializer(EntityReference reference)
     {
-        super(spaceName, documentName);
+        super(reference);
     }
 
     @Override

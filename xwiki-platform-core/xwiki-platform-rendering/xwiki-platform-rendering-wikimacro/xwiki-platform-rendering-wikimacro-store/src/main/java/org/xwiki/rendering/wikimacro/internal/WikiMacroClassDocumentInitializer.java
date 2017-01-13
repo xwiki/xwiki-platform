@@ -23,9 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -39,8 +39,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named(WikiMacroConstants.WIKI_MACRO_CLASS)
 @Singleton
-public class WikiMacroClassDocumentInitializer extends AbstractMandatoryDocumentInitializer implements
-    WikiMacroConstants
+public class WikiMacroClassDocumentInitializer extends AbstractMandatoryClassInitializer implements WikiMacroConstants
 {
     private static final String PROPERTY_PIPE = "|";
 
@@ -49,37 +48,27 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryDocument
      */
     public WikiMacroClassDocumentInitializer()
     {
-        super(WIKI_MACRO_CLASS_SPACE, WIKI_MACRO_CLASS_PAGE);
+        super(new LocalDocumentReference(WIKI_MACRO_CLASS_SPACE, WIKI_MACRO_CLASS_PAGE));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
-        needsUpdate |= bclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
+        xclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
+        xclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
         // The Macro description is using plain text (same as for Java Macros).
-        needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5,
+        xclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5,
             TextAreaClass.ContentType.PURE_TEXT);
-        needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
-        needsUpdate |= bclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
-        needsUpdate |= bclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
+        xclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
+        xclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
+        xclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
             "Current User|Current Wiki|Global", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
-        needsUpdate |= bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
+        xclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
             "Optional|Mandatory|No content", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
         // The Macro content description is using plain text (same as for Java Macros).
-        needsUpdate |= bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
-            "Content description (Not applicable for \"No content\" type)", 40, 5,
-            TextAreaClass.ContentType.PURE_TEXT);
+        xclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
+            "Content description (Not applicable for \"No content\" type)", 40, 5, TextAreaClass.ContentType.PURE_TEXT);
         // The code property contains wiki markup
-        needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20,
-            TextAreaClass.EditorType.TEXT);
-
-        needsUpdate |= setClassDocumentFields(document, "XWiki Wiki Macro Class");
-
-        return needsUpdate;
+        xclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, TextAreaClass.EditorType.TEXT);
     }
 }

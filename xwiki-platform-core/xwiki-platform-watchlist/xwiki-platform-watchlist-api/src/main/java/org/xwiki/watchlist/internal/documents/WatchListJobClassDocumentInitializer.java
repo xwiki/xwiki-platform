@@ -26,8 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -38,7 +37,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named(WatchListJobClassDocumentInitializer.DOCUMENT_FULL_NAME)
 @Singleton
-public class WatchListJobClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class WatchListJobClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Class document name.
@@ -53,8 +52,8 @@ public class WatchListJobClassDocumentInitializer extends AbstractMandatoryDocum
     /**
      * Class document reference.
      */
-    public static final LocalDocumentReference DOCUMENT_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
-        DOCUMENT_NAME);
+    public static final LocalDocumentReference DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
 
     /**
      * Email template field name.
@@ -71,7 +70,7 @@ public class WatchListJobClassDocumentInitializer extends AbstractMandatoryDocum
      */
     public WatchListJobClassDocumentInitializer()
     {
-        super(DOCUMENT_REFERENCE);
+        super(DOCUMENT_REFERENCE, "XWiki WatchList Notifier Class");
     }
 
     @Override
@@ -82,19 +81,9 @@ public class WatchListJobClassDocumentInitializer extends AbstractMandatoryDocum
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-        BaseClass bclass = document.getXClass();
-
-        // Class properties
-        needsUpdate |=
-            bclass.addTextField(TEMPLATE_FIELD, "Document holding the notification message template to use", 80);
-        needsUpdate |= bclass.addDateField(LAST_FIRE_TIME_FIELD, "Last notifier fire time", "dd/MM/yyyy HH:mm:ss", 1);
-
-        // Handle the fields and the sheet of the document containing the class.
-        needsUpdate |= setClassDocumentFields(document, "XWiki WatchList Notifier Class");
-
-        return needsUpdate;
+        xclass.addTextField(TEMPLATE_FIELD, "Document holding the notification message template to use", 80);
+        xclass.addDateField(LAST_FIRE_TIME_FIELD, "Last notifier fire time", "dd/MM/yyyy HH:mm:ss", 1);
     }
 }

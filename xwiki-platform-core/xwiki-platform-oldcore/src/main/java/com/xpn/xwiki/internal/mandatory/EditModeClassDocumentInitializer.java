@@ -24,9 +24,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -38,30 +37,19 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.EditModeClass")
 @Singleton
-public class EditModeClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class EditModeClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public EditModeClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, XWikiConstant.EDIT_MODE_CLASS.getName());
+        super(XWikiConstant.EDIT_MODE_CLASS);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
-
-        if (document.isNew()) {
-            needsUpdate |= setClassDocumentFields(document, "XWiki Edit Mode Class");
-            document.setContent("Class that should be used to specify the edit mode of a page.");
-        }
-
-        return needsUpdate;
+        xclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
     }
 }

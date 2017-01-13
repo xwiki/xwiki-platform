@@ -24,8 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
@@ -38,7 +37,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named("Crypto.CertificateClass")
 @Singleton
-public class CertificateClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class CertificateClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
@@ -49,21 +48,14 @@ public class CertificateClassDocumentInitializer extends AbstractMandatoryDocume
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        BaseClass bclass = document.getXClass();
+        xclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SUBJECT, "Subject", 64);
+        xclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, "Key Identifier", 64);
+        xclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER, "Issuer", 64);
+        xclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SERIAL, "Serial", 64);
 
-        boolean needsUpdate = bclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SUBJECT, "Subject",
-            64);
-        needsUpdate |= bclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, "Key Identifier", 64);
-        needsUpdate |= bclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER, "Issuer", 64);
-        needsUpdate |= bclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SERIAL, "Serial", 64);
-
-        needsUpdate |= bclass.addTextAreaField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
-            "Certificate", 64, 10, TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
-
-        needsUpdate |= setClassDocumentFields(document, "Certificate Class");
-
-        return needsUpdate;
+        xclass.addTextAreaField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, "Certificate", 64, 10,
+            TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
     }
 }

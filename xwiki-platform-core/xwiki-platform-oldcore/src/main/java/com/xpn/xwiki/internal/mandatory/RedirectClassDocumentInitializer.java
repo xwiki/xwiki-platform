@@ -24,10 +24,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -39,7 +38,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.RedirectClass")
 @Singleton
-public class RedirectClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class RedirectClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The local reference of the redirect class.
@@ -56,22 +55,8 @@ public class RedirectClassDocumentInitializer extends AbstractMandatoryDocumentI
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        // Force the class document to use the 2.1 syntax default syntax, the same syntax used in the custom displayer.
-        if (!Syntax.XWIKI_2_1.equals(document.getSyntax())) {
-            document.setSyntax(Syntax.XWIKI_2_1);
-            needsUpdate = true;
-        }
-
-        needsUpdate |= bclass.addTextField("location", "Location", 30);
-
-        needsUpdate |= setClassDocumentFields(document, "Redirect Class");
-
-        return needsUpdate;
+        xclass.addTextField("location", "Location", 30);
     }
 }

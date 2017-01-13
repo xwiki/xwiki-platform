@@ -21,8 +21,7 @@ package org.xwiki.skinx.internal;
 
 import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
@@ -32,7 +31,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
  * @version $Id$
  * @since 7.3M1
  */
-public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
@@ -44,22 +43,12 @@ public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractM
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = super.updateDocument(document);
-
-        needsUpdate |= setClassDocumentFields(document, document.getDocumentReference().getName());
-
-        return needsUpdate;
-    }
-
-    @Override
-    protected void createClass(BaseClass xlass)
-    {
-        xlass.addTextField("name", "Name", 30);
-        xlass.addTextAreaField("code", "Code", 50, 20, ContentType.PURE_TEXT);
-        xlass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
-        xlass.addBooleanField("parse", "Parse content", "yesno");
-        xlass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
+        xclass.addTextField("name", "Name", 30);
+        xclass.addTextAreaField("code", "Code", 50, 20, ContentType.PURE_TEXT);
+        xclass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
+        xclass.addBooleanField("parse", "Parse content", "yesno");
+        xclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
     }
 }

@@ -23,13 +23,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -41,7 +39,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("WikiManager.WikiUserClass")
 @Singleton
-public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class WikiUserClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the mandatory document.
@@ -56,8 +54,8 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
     /**
      * Reference to the server class.
      */
-    public static final EntityReference CONFIGURATION_CLASS = new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
-            new EntityReference(DOCUMENT_SPACE, EntityType.SPACE));
+    public static final LocalDocumentReference CONFIGURATION_CLASS =
+        new LocalDocumentReference(DOCUMENT_SPACE, DOCUMENT_NAME);
 
     /**
      * Default list separators of WikiManager.XWikiServerClass fields.
@@ -78,8 +76,8 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
      * List of possible values for <code>membershipType</code> for the XWiki class WikiManager.WikiUserClass.
      */
     public static final String FIELDL_MEMBERSHIPTYPE = MembershipType.OPEN.name().toLowerCase()
-            + DEFAULT_FIELDS_SEPARATOR + MembershipType.REQUEST.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
-            + MembershipType.INVITE.name().toLowerCase();
+        + DEFAULT_FIELDS_SEPARATOR + MembershipType.REQUEST.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
+        + MembershipType.INVITE.name().toLowerCase();
 
     /**
      * Display type of field <code>membershipType</code> for the XWiki class WikiManager.WikiUserClass.
@@ -104,44 +102,24 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
     /**
      * List of possible values for <code>userScope</code> for the XWiki class WikiManager.WikiUserClass.
      */
-    public static final String FIELDL_USERSCOPE = UserScope.GLOBAL_ONLY.name().toLowerCase()
-            + DEFAULT_FIELDS_SEPARATOR + UserScope.LOCAL_ONLY.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
-            + UserScope.LOCAL_AND_GLOBAL.name().toLowerCase();
+    public static final String FIELDL_USERSCOPE = UserScope.GLOBAL_ONLY.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
+        + UserScope.LOCAL_ONLY.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
+        + UserScope.LOCAL_AND_GLOBAL.name().toLowerCase();
 
     /**
      * Constructor.
      */
     public WikiUserClassDocumentInitializer()
     {
-        super(DOCUMENT_SPACE, DOCUMENT_NAME);
+        super(CONFIGURATION_CLASS);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        // Add missing class fields
-        BaseClass baseClass = document.getXClass();
-
-        needsUpdate |= baseClass.addStaticListField(FIELD_MEMBERSHIPTYPE, FIELDPN_MEMBERSHIPTYPE,
-                MembershipType.values().length, false, FIELDL_MEMBERSHIPTYPE, FIELDDT_MEMBERSHIPTYPE);
-        needsUpdate |= baseClass.addStaticListField(FIELD_USERSCOPE, FIELDPN_USERSCOPE,
-                UserScope.values().length, false, FIELDL_USERSCOPE, FIELDDT_USERSCOPE);
-
-        // Check if the document is hidden
-        if (!document.isHidden()) {
-            document.setHidden(true);
-            needsUpdate = true;
-        }
-
-        // Mark this document as Wiki Class.
-        if (document.isNew()) {
-            needsUpdate |= setClassDocumentFields(document, "Wiki User Class");
-            document.setContent(document.getContent() + "\n\nClass that represents the wiki configuration"
-                    + " about users.");
-        }
-
-        return needsUpdate;
+        xclass.addStaticListField(FIELD_MEMBERSHIPTYPE, FIELDPN_MEMBERSHIPTYPE, MembershipType.values().length, false,
+            FIELDL_MEMBERSHIPTYPE, FIELDDT_MEMBERSHIPTYPE);
+        xclass.addStaticListField(FIELD_USERSCOPE, FIELDPN_USERSCOPE, UserScope.values().length, false,
+            FIELDL_USERSCOPE, FIELDDT_USERSCOPE);
     }
 }

@@ -25,6 +25,8 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
+import com.xpn.xwiki.XWiki;
+
 /**
  * @version $Id$
  * @since 6.4M3
@@ -34,17 +36,17 @@ public interface RatingsManager
 {
     public static final String RATINGS_CLASSPAGE = "RatingsClass";
 
-    public static final String RATINGS_CLASSNAME = "XWiki." + RATINGS_CLASSPAGE;
+    public static final String RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + RATINGS_CLASSPAGE;
 
-    public static final LocalDocumentReference RATINGS_CLASSREFERENCE = new LocalDocumentReference("XWiki",
-        RATINGS_CLASSPAGE);
+    public static final LocalDocumentReference RATINGS_CLASSREFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, RATINGS_CLASSPAGE);
 
     public static final String AVERAGE_RATINGS_CLASSPAGE = "AverageRatingsClass";
 
-    public static final String AVERAGE_RATINGS_CLASSNAME = "XWiki." + AVERAGE_RATINGS_CLASSPAGE;
+    public static final String AVERAGE_RATINGS_CLASSNAME = XWiki.SYSTEM_SPACE + '.' + AVERAGE_RATINGS_CLASSPAGE;
 
-    public static final LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE = new LocalDocumentReference("XWiki",
-        AVERAGE_RATINGS_CLASSPAGE);
+    public static final LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE =
+        new LocalDocumentReference("XWiki", AVERAGE_RATINGS_CLASSPAGE);
 
     public static final String RATING_CLASS_FIELDNAME_DATE = "date";
 
@@ -70,13 +72,13 @@ public interface RatingsManager
 
     public static final String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
 
-    public static final LocalDocumentReference RATINGS_CONFIG_GLOBAL_REFERENCE = new LocalDocumentReference("XWiki",
-        "RatingsConfig");
+    public static final LocalDocumentReference RATINGS_CONFIG_GLOBAL_REFERENCE =
+        new LocalDocumentReference("XWiki", "RatingsConfig");
 
     public static final String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
 
-    public static final LocalDocumentReference RATINGS_CONFIG_CLASSREFERENCE = new LocalDocumentReference("XWiki",
-        "RatingsConfigClass");
+    public static final LocalDocumentReference RATINGS_CONFIG_CLASSREFERENCE =
+        new LocalDocumentReference("XWiki", "RatingsConfigClass");
 
     public static final String RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT = "managerHint";
 

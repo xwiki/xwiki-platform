@@ -23,12 +23,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Update XWiki.TagClass document with all required informations.
@@ -39,32 +39,19 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 @Component
 @Named("XWiki.TagClass")
 @Singleton
-public class TagClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class TagClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public TagClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "TagClass");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "TagClass"));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |=
-            bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, true, "", "input", "|,");
-        StaticListClass tagClass = (StaticListClass) bclass.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
-        if (!tagClass.isRelationalStorage()) {
-            tagClass.setRelationalStorage(true);
-            needsUpdate = true;
-        }
-        needsUpdate |= setClassDocumentFields(document, "XWiki Tag Class");
-
-        return needsUpdate;
+        xclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, true, "", "input", "|,");
     }
 }

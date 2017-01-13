@@ -23,9 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
@@ -38,34 +39,22 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named("XWiki.Mail")
 @Singleton
-public class MailMandatoryDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class MailMandatoryDocumentInitializer extends AbstractMandatoryClassInitializer
 {
-    private static final String SPACE = "XWiki";
-
-    private static final String PAGE = "Mail";
-
     /**
      * Create/update the {@code XWiki.Mail} class and document.
      */
     public MailMandatoryDocumentInitializer()
     {
-        super(SPACE, PAGE);
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "Mail"));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("subject", "Subject", 40);
-        needsUpdate |= bclass.addTextField("language", "Language", 5);
-        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
-        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
-
-        needsUpdate |= setClassDocumentFields(document, "Mail Class");
-
-        return needsUpdate;
+        xclass.addTextField("subject", "Subject", 40);
+        xclass.addTextField("language", "Language", 5);
+        xclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
+        xclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
     }
 }

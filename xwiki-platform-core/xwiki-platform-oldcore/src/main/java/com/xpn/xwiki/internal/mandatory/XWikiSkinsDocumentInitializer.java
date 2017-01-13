@@ -25,9 +25,11 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -40,7 +42,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.XWikiSkins")
 @Singleton
-public class XWikiSkinsDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Used to bind a class to a document sheet.
@@ -54,28 +56,28 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryDocumentInit
      */
     public XWikiSkinsDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "XWikiSkins");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiSkins"));
+    }
+
+    @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField("name", "Name", 30);
+        xclass.addTextField("baseskin", "Base Skin", 30);
+        xclass.addTextField("logo", "Logo", 30);
+        xclass.addStaticListField("outputSyntax", "Output Syntax", "html/5.0=HTML 5|xhtml/1.0=XHTML 1.0");
+        xclass.addTemplateField("style.css", "Style");
+        xclass.addTemplateField("header.vm", "Header");
+        xclass.addTemplateField("footer.vm", "Footer");
+        xclass.addTemplateField("viewheader.vm", "View Header");
+        xclass.addTemplateField("view.vm", "View");
+        xclass.addTemplateField("edit.vm", "Edit");
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("name", "Name", 30);
-        needsUpdate |= bclass.addTextField("baseskin", "Base Skin", 30);
-        needsUpdate |= bclass.addTextField("logo", "Logo", 30);
-        needsUpdate |= bclass.addStaticListField("outputSyntax", "Output Syntax",
-            "html/5.0=HTML 5|xhtml/1.0=XHTML 1.0");
-        needsUpdate |= bclass.addTemplateField("style.css", "Style");
-        needsUpdate |= bclass.addTemplateField("header.vm", "Header");
-        needsUpdate |= bclass.addTemplateField("footer.vm", "Footer");
-        needsUpdate |= bclass.addTemplateField("viewheader.vm", "View Header");
-        needsUpdate |= bclass.addTemplateField("view.vm", "View");
-        needsUpdate |= bclass.addTemplateField("edit.vm", "Edit");
-        needsUpdate |= setClassDocumentFields(document, "XWiki Skin Class");
+        boolean needsUpdate = super.updateDocument(document);
 
         // Use XWikiSkinsSheet to display documents having XWikiSkins objects if no other class sheet is specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {

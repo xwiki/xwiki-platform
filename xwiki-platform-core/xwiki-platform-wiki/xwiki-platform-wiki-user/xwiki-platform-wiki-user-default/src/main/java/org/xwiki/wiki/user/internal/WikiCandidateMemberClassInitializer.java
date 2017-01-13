@@ -25,8 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -38,7 +37,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("WikiManager.WikiCandidateMemberClass")
 @Singleton
-public class WikiCandidateMemberClassInitializer extends AbstractMandatoryDocumentInitializer
+public class WikiCandidateMemberClassInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the mandatory document.
@@ -165,36 +164,16 @@ public class WikiCandidateMemberClassInitializer extends AbstractMandatoryDocume
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        // Add missing class fields
-        BaseClass baseClass = document.getXClass();
-
-        needsUpdate |= baseClass.addTextField(FIELD_USER, FIELDPN_USERNAME, 30);
-        needsUpdate |= baseClass.addDateField(FIELD_DATE_OF_CREATION, FIELDPN_DATE);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_USER_COMMENT, FIELDPN_USERCOMMENT, 40, 3);
-        needsUpdate |= baseClass.addStaticListField(FIELD_STATUS, FIELDPN_STATUS, FIELDL_STATUS);
-        needsUpdate |= baseClass.addDateField(FIELD_DATE_OF_CLOSURE, FIELDPN_RESOLUTIONDATE);
-        needsUpdate |= baseClass.addTextField(FIELD_ADMIN, FIELDPN_REVIEWER, 30);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_ADMIN_COMMENT, FIELDPN_REVIEWERCOMMENT, 40, 3);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_ADMIN_PRIVATE_COMMENT, FIELDPN_REVIEWERPRIVATECOMMENT, 40, 3);
-        needsUpdate |= baseClass.addStaticListField(FIELD_TYPE, FIELDPN_TYPE, FIELDL_TYPE);
-
-        // Check if the document is hidden
-        if (!document.isHidden()) {
-            document.setHidden(true);
-            needsUpdate = true;
-        }
-
-        // Mark this document as Wiki Class.
-        if (document.isNew()) {
-            needsUpdate |= setClassDocumentFields(document, "Wiki Candidate Member Class");
-            document.setContent(document.getContent() + "\n\nClass that represents a candidacy to become a member "
-                    + "of the wiki.");
-        }
-
-        return needsUpdate;
+        xclass.addTextField(FIELD_USER, FIELDPN_USERNAME, 30);
+        xclass.addDateField(FIELD_DATE_OF_CREATION, FIELDPN_DATE);
+        xclass.addTextAreaField(FIELD_USER_COMMENT, FIELDPN_USERCOMMENT, 40, 3);
+        xclass.addStaticListField(FIELD_STATUS, FIELDPN_STATUS, FIELDL_STATUS);
+        xclass.addDateField(FIELD_DATE_OF_CLOSURE, FIELDPN_RESOLUTIONDATE);
+        xclass.addTextField(FIELD_ADMIN, FIELDPN_REVIEWER, 30);
+        xclass.addTextAreaField(FIELD_ADMIN_COMMENT, FIELDPN_REVIEWERCOMMENT, 40, 3);
+        xclass.addTextAreaField(FIELD_ADMIN_PRIVATE_COMMENT, FIELDPN_REVIEWERPRIVATECOMMENT, 40, 3);
+        xclass.addStaticListField(FIELD_TYPE, FIELDPN_TYPE, FIELDL_TYPE);
     }
 }

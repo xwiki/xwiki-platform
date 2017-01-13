@@ -20,7 +20,6 @@
 package org.xwiki.watchlist.internal.documents;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -28,7 +27,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -37,12 +35,10 @@ import org.xwiki.watchlist.internal.WatchListNotificationCache;
 import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Document initializer for {@value #DOCUMENT_FULL_NAME}.
@@ -53,7 +49,7 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 @Named(WatchListClassDocumentInitializer.DOCUMENT_FULL_NAME)
 @Singleton
 @Priority(10000)
-public class WatchListClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class WatchListClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Class document name.
@@ -117,64 +113,39 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
      */
     public WatchListClassDocumentInitializer()
     {
-        super(DOCUMENT_REFERENCE);
+        super(DOCUMENT_REFERENCE, "XWiki WatchList Notification Rules Class");
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-        BaseClass bclass = document.getXClass();
-
         // Interval property
-        needsUpdate |= bclass.addStaticListField(INTERVAL_PROPERTY, "Email Notifications Interval", "");
-
-        // Check that the interval property contains all the available intervals
-        StaticListClass intervalClass = (StaticListClass) bclass.get(INTERVAL_PROPERTY);
-        List<String> intervalValues = ListClass.getListFromString(intervalClass.getValues());
-
-        // Look for missing or outdated intervals in the interval list
-        Collection<String> availableIntervals = notificationCacheProvider.get().getIntervals();
-        if (!CollectionUtils.disjunction(availableIntervals, intervalValues).isEmpty()) {
-            needsUpdate = true;
-            intervalClass.setValues(StringUtils.join(availableIntervals, ListClass.DEFAULT_SEPARATOR));
-        }
+        Collection<String> availableIntervals = this.notificationCacheProvider.get().getIntervals();
+        String values = StringUtils.join(availableIntervals, ListClass.DEFAULT_SEPARATOR);
+        xclass.addStaticListField(INTERVAL_PROPERTY, "Email Notifications Interval", values);
 
         // Watched elements properties
-        needsUpdate |= this.addWatchedElementField(bclass, WIKIS_PROPERTY, "Wiki List");
-        needsUpdate |= this.addWatchedElementField(bclass, SPACES_PROPERTY, "Space List");
-        needsUpdate |= this.addWatchedElementField(bclass, DOCUMENTS_PROPERTY, "Document List");
-        needsUpdate |= this.addWatchedElementField(bclass, USERS_PROPERTY, "User List");
+        addWatchedElementField(xclass, WIKIS_PROPERTY, "Wiki List");
+        addWatchedElementField(xclass, SPACES_PROPERTY, "Space List");
+        addWatchedElementField(xclass, DOCUMENTS_PROPERTY, "Document List");
+        addWatchedElementField(xclass, USERS_PROPERTY, "User List");
 
         // Automatic watching property
-        String automaticWatchValues =
-            String.format("%s%s%s", AUTOMATICWATCH_DEFAULT_VALUE, ListClass.DEFAULT_SEPARATOR,
-                StringUtils.join(AutomaticWatchMode.values(), ListClass.DEFAULT_SEPARATOR));
-        needsUpdate |= bclass.addStaticListField(AUTOMATICWATCH_PROPERTY, "Automatic Watching", automaticWatchValues);
-
-        // Handle the fields and the sheet of the document containing the class.
-        needsUpdate |= setClassDocumentFields(document, "XWiki WatchList Notification Rules Class");
-
-        return needsUpdate;
+        String automaticWatchValues = String.format("%s%s%s", AUTOMATICWATCH_DEFAULT_VALUE, ListClass.DEFAULT_SEPARATOR,
+            StringUtils.join(AutomaticWatchMode.values(), ListClass.DEFAULT_SEPARATOR));
+        xclass.addStaticListField(AUTOMATICWATCH_PROPERTY, "Automatic Watching", automaticWatchValues);
     }
 
     /**
-     * @param bclass the class to add to
+     * @param xclass the class to add to
      * @param name the name of the property to add
      * @param prettyName the pretty name of the property to add
-     * @return true if the property was added; false otherwise
      */
-    private boolean addWatchedElementField(BaseClass bclass, String name, String prettyName)
+    private void addWatchedElementField(BaseClass xclass, String name, String prettyName)
     {
-        boolean needsUpdate = false;
-
-        needsUpdate = bclass.addDBListField(name, prettyName, 80, true, null);
-        if (needsUpdate) {
-            // Set the input display type in order to easily debug from the object editor.
-            DBListClass justAddedProperty = (DBListClass) bclass.get(name);
-            justAddedProperty.setDisplayType(ListClass.DISPLAYTYPE_INPUT);
-        }
-
-        return needsUpdate;
+        xclass.addDBListField(name, prettyName, 80, true, null);
+        // Set the input display type in order to easily debug from the object editor.
+        DBListClass justAddedProperty = (DBListClass) xclass.get(name);
+        justAddedProperty.setDisplayType(ListClass.DISPLAYTYPE_INPUT);
     }
 }

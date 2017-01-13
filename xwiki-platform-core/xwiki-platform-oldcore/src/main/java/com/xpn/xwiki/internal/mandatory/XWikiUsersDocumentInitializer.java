@@ -25,14 +25,13 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.EmailClass;
-import com.xpn.xwiki.objects.classes.TimezoneClass;
 
 /**
  * Update XWiki.XWikiUsers document with all required informations.
@@ -43,7 +42,7 @@ import com.xpn.xwiki.objects.classes.TimezoneClass;
 @Component
 @Named("XWiki.XWikiUsers")
 @Singleton
-public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the field containing the user email.
@@ -67,61 +66,42 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
      */
     public XWikiUsersDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "XWikiUsers");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers"));
+    }
+
+    @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField("first_name", "First Name", 30);
+        xclass.addTextField("last_name", "Last Name", 30);
+        xclass.addEmailField(EMAIL_FIELD, "e-Mail", 30);
+        xclass.addPasswordField("password", "Password", 10);
+        xclass.addPasswordField("validkey", "Validation Key", 10);
+        xclass.addBooleanField("active", "Active", "active");
+        xclass.addTextField("default_language", "Default Language", 30);
+        xclass.addTextField("company", "Company", 30);
+        xclass.addTextField("blog", "Blog", 60);
+        xclass.addTextField("blogfeed", "Blog Feed", 60);
+        xclass.addTextAreaField("comment", "Comment", 40, 5);
+        xclass.addStaticListField("imtype", "IM Type", "---|AIM|Yahoo|Jabber|MSN|Skype|ICQ");
+        xclass.addTextField("imaccount", "imaccount", 30);
+        xclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
+        xclass.addStaticListField("usertype", "User type", "Simple|Advanced");
+        xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
+        xclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
+        xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
+
+        // New fields for the XWiki 1.0 skin
+        xclass.addTextField("skin", "skin", 30);
+        xclass.addTextField("avatar", "Avatar", 30);
+        xclass.addTextField("phone", "Phone", 30);
+        xclass.addTextAreaField("address", "Address", 40, 3);
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        // Force the class document to use the 2.1 syntax default syntax, the same syntax used in the custom displayer.
-        if (!Syntax.XWIKI_2_1.equals(document.getSyntax())) {
-            document.setSyntax(Syntax.XWIKI_2_1);
-            needsUpdate = true;
-        }
-
-        needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
-        needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-
-        // Email. Handle upgrade since in the past we were using a standard text field with a custom displayer and
-        // we're now using an Email Class. Thus we need to remove any existing field to upgrade it.
-        if (!(bclass.getField(EMAIL_FIELD) instanceof EmailClass)) {
-            bclass.removeField(EMAIL_FIELD);
-            bclass.addEmailField(EMAIL_FIELD, "e-Mail", 30);
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addPasswordField("password", "Password", 10);
-        needsUpdate |= bclass.addPasswordField("validkey", "Validation Key", 10);
-        needsUpdate |= bclass.addBooleanField("active", "Active", "active");
-        needsUpdate |= bclass.addTextField("default_language", "Default Language", 30);
-        needsUpdate |= bclass.addTextField("company", "Company", 30);
-        needsUpdate |= bclass.addTextField("blog", "Blog", 60);
-        needsUpdate |= bclass.addTextField("blogfeed", "Blog Feed", 60);
-        needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
-        needsUpdate |= bclass.addStaticListField("imtype", "IM Type", "---|AIM|Yahoo|Jabber|MSN|Skype|ICQ");
-        needsUpdate |= bclass.addTextField("imaccount", "imaccount", 30);
-        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
-        needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
-        needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
-        needsUpdate |= bclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
-
-        // Timezone. Handle upgrade since in the past we were using a standard text field with a custom displayer and
-        // we're now using a Timezone Class. Thus we need to remove any existing field to upgrade it.
-        if (!(bclass.getField(TIMEZONE_FIELD) instanceof TimezoneClass)) {
-            bclass.removeField(TIMEZONE_FIELD);
-            bclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
-            needsUpdate = true;
-        }
-
-        // New fields for the XWiki 1.0 skin
-        needsUpdate |= bclass.addTextField("skin", "skin", 30);
-        needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
-        needsUpdate |= bclass.addTextField("phone", "Phone", 30);
-        needsUpdate |= bclass.addTextAreaField("address", "Address", 40, 3);
-        needsUpdate |= setClassDocumentFields(document, "XWiki User Class");
+        boolean needsUpdate = super.updateDocument(document);
 
         // Use XWikiUserSheet to display documents having XWikiUsers objects if no other class sheet is specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {

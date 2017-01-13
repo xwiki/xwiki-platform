@@ -25,9 +25,11 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -40,7 +42,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.XWikiGroups")
 @Singleton
-public class XWikiGroupsDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiGroupsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Used to bind a class to a document sheet.
@@ -54,26 +56,27 @@ public class XWikiGroupsDocumentInitializer extends AbstractMandatoryDocumentIni
      */
     public XWikiGroupsDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "XWikiGroups");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiGroups"));
+    }
+
+    @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField("member", "Member", 30);
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("member", "Member", 30);
-        needsUpdate |= setClassDocumentFields(document, "XWiki Group Class");
+        boolean needUpdate = super.updateDocument(document);
 
         // Use XWikiGroupSheet to display documents having XWikiGroups objects if no other class sheet is specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {
             String wikiName = document.getDocumentReference().getWikiReference().getName();
             DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "XWikiGroupSheet");
-            needsUpdate |= this.classSheetBinder.bind(document, sheet);
+            needUpdate |= this.classSheetBinder.bind(document, sheet);
         }
 
-        return needsUpdate;
+        return needUpdate;
     }
 }

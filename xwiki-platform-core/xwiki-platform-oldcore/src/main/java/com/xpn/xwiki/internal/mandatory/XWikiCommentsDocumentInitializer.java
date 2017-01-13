@@ -23,9 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
@@ -38,33 +39,25 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Component
 @Named("XWiki.XWikiComments")
 @Singleton
-public class XWikiCommentsDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiCommentsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public XWikiCommentsDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "XWikiComments");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiComments"));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("author", "Author", 30);
-        needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
-        needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
-        needsUpdate |= bclass.addDateField("date", "Date");
+        xclass.addTextField("author", "Author", 30);
+        xclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
+        xclass.addNumberField("replyto", "Reply To", 5, "integer");
+        xclass.addDateField("date", "Date");
         // Use the Text editor for backwards compatibility (e.g. the annotation module which uses the comment class
         // doesn't expect the WYSIWYG editor).
-        needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5, EditorType.TEXT);
-
-        needsUpdate |= setClassDocumentFields(document, "XWiki Comment Class");
-
-        return needsUpdate;
+        xclass.addTextAreaField("comment", "Comment", 40, 5, EditorType.TEXT);
     }
 }

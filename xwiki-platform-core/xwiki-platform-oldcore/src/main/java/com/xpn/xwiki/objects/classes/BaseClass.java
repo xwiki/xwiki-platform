@@ -586,13 +586,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
+        return addBooleanField(fieldName, fieldPrettyName, displayType, null);
+    }
+
+    public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType, Boolean def)
+    {
         if (get(fieldName) == null) {
-            BooleanClass boolean_class = new BooleanClass();
-            boolean_class.setName(fieldName);
-            boolean_class.setPrettyName(fieldPrettyName);
-            boolean_class.setDisplayType(displayType);
-            boolean_class.setObject(this);
-            put(fieldName, boolean_class);
+            BooleanClass booleanClass = new BooleanClass();
+            booleanClass.setName(fieldName);
+            booleanClass.setPrettyName(fieldPrettyName);
+            booleanClass.setDisplayType(displayType);
+            booleanClass.setObject(this);
+            if (def != null) {
+                booleanClass.setDefaultValue(def ? 1 : 0);
+            }
+
+            put(fieldName, booleanClass);
 
             return true;
         }
@@ -734,7 +743,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         boolean result = false;
 
         TextAreaClass textAreaClass;
-        PropertyInterface field  = get(fieldName);
+        PropertyInterface field = get(fieldName);
         if (field instanceof TextAreaClass) {
             textAreaClass = (TextAreaClass) field;
         } else {

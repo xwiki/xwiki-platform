@@ -24,8 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -37,30 +36,20 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING)
 @Singleton
-public class TranslationDocumentClassInitializer extends AbstractMandatoryDocumentInitializer
+public class TranslationDocumentClassInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public TranslationDocumentClassInitializer()
     {
-        super(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_SPACE,
-            TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_NAME);
+        super(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |=
-            bclass.addStaticListField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope",
-                "GLOBAL|WIKI|USER|ON_DEMAND");
-
-        needsUpdate |= setClassDocumentFields(document, "Translation Document Class");
-
-        return needsUpdate;
+        xclass.addStaticListField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope",
+            "GLOBAL|WIKI|USER|ON_DEMAND");
     }
 }

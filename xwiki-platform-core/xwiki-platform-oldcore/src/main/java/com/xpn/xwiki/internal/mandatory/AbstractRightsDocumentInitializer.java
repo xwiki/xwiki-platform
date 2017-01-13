@@ -19,17 +19,11 @@
  */
 package com.xpn.xwiki.internal.mandatory;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.LevelsClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * XWiki.XWikiPreferences class.
@@ -37,56 +31,23 @@ import com.xpn.xwiki.objects.classes.UsersClass;
  * @version $Id$
  * @since 4.3M1
  */
-public abstract class AbstractRightsDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public abstract class AbstractRightsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * @param pageName the document name of the rights class
+     * @param title the title of the document
      */
     public AbstractRightsDocumentInitializer(String pageName)
     {
-        super(new EntityReference(pageName, EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE)));
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, pageName));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        PropertyInterface groupsProp = bclass.get("groups");
-        if ((groupsProp != null) && !(groupsProp instanceof GroupsClass)) {
-            bclass.removeField("groups");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addGroupsField("groups", "Groups");
-
-        PropertyInterface levelsProp = bclass.get("levels");
-        if ((levelsProp != null) && !(levelsProp instanceof LevelsClass)) {
-            bclass.removeField("levels");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addLevelsField("levels", "Levels");
-
-        PropertyInterface usersProp = bclass.get("users");
-        if ((usersProp != null) && !(usersProp instanceof UsersClass)) {
-            bclass.removeField("users");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addUsersField("users", "Users");
-
-        PropertyInterface allowProp = bclass.get("allow");
-        if ((allowProp != null) && (allowProp instanceof NumberClass)) {
-            bclass.removeField("allow");
-            needsUpdate = true;
-        }
-        needsUpdate |= bclass.addBooleanField("allow", "Allow/Deny", "allow");
-        BooleanClass afield = (BooleanClass) bclass.get("allow");
-        if (afield.getDefaultValue() != 1) {
-            afield.setDefaultValue(1);
-            needsUpdate = true;
-        }
-
-        return needsUpdate;
+        xclass.addGroupsField("groups", "Groups");
+        xclass.addLevelsField("levels", "Levels");
+        xclass.addUsersField("users", "Users");
+        xclass.addBooleanField("allow", "Allow/Deny", "allow", Boolean.TRUE);
     }
 }

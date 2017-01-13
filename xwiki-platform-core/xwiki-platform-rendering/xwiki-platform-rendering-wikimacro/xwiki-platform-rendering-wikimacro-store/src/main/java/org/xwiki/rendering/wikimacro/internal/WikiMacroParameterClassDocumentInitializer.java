@@ -23,9 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -37,31 +37,23 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named(WikiMacroConstants.WIKI_MACRO_PARAMETER_CLASS)
 @Singleton
-public class WikiMacroParameterClassDocumentInitializer extends AbstractMandatoryDocumentInitializer implements
-    WikiMacroConstants
+public class WikiMacroParameterClassDocumentInitializer extends AbstractMandatoryClassInitializer
+    implements WikiMacroConstants
 {
     /**
      * Default constructor.
      */
     public WikiMacroParameterClassDocumentInitializer()
     {
-        super(WIKI_MACRO_PARAMETER_CLASS_SPACE, WIKI_MACRO_PARAMETER_CLASS_PAGE);
+        super(new LocalDocumentReference(WIKI_MACRO_PARAMETER_CLASS_SPACE, WIKI_MACRO_PARAMETER_CLASS_PAGE));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField(PARAMETER_NAME_PROPERTY, "Parameter name", 30);
-        needsUpdate |= bclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
-        needsUpdate |= bclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
-        needsUpdate |= bclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
-
-        needsUpdate |= setClassDocumentFields(document, "XWiki Wiki Macro Parameter Class");
-
-        return needsUpdate;
+        xclass.addTextField(PARAMETER_NAME_PROPERTY, "Parameter name", 30);
+        xclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
+        xclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
+        xclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
     }
 }

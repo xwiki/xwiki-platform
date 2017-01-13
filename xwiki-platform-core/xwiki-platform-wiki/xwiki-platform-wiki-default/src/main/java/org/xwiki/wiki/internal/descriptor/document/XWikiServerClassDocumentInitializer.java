@@ -29,8 +29,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.XWikiServerClass")
 @Singleton
-public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiServerClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the mandatory document.
@@ -52,7 +52,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     /**
      * Reference to the server class.
      */
-    public static final LocalDocumentReference SERVER_CLASS = 
+    public static final LocalDocumentReference SERVER_CLASS =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
 
     /**
@@ -118,8 +118,8 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     /**
      * List of possible values for <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDL_VISIBILITY = FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS_SEPARATOR
-        + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS_SEPARATOR;
+    public static final String FIELDL_VISIBILITY =
+        FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS_SEPARATOR + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS_SEPARATOR;
 
     /**
      * Pretty name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
@@ -214,7 +214,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
      */
     public XWikiServerClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
+        super(SERVER_CLASS);
     }
 
     @Override
@@ -225,26 +225,23 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     }
 
     @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField(FIELD_WIKIPRETTYNAME, FIELDPN_WIKIPRETTYNAME, 30);
+        xclass.addUsersField(FIELD_OWNER, FIELDPN_OWNER, false);
+        xclass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
+        xclass.addTextField(FIELD_SERVER, FIELDPN_SERVER, 30);
+        xclass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
+        xclass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
+        xclass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
+        xclass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE, DEFAULT_SECURE);
+        xclass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
+    }
+
+    @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        // Add missing class fields
-        BaseClass baseClass = document.getXClass();
-
-        needsUpdate |= baseClass.addTextField(FIELD_WIKIPRETTYNAME, FIELDPN_WIKIPRETTYNAME, 30);
-        needsUpdate |= baseClass.addUsersField(FIELD_OWNER, FIELDPN_OWNER, false);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
-        needsUpdate |= baseClass.addTextField(FIELD_SERVER, FIELDPN_SERVER, 30);
-        needsUpdate |= baseClass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
-        needsUpdate |= baseClass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
-        needsUpdate |= baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
-        needsUpdate |= baseClass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE);
-        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_SECURE, DEFAULT_SECURE);
-        needsUpdate |= baseClass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
-
-        // Add missing document fields
-        needsUpdate |= setClassDocumentFields(document, "XWiki Server Class");
+        boolean needsUpdate = super.updateDocument(document);
 
         // Use XWikiServerClassSheet to display documents having XWikiServerClass objects if no other class sheet is
         // specified.
@@ -256,5 +253,4 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
 
         return needsUpdate;
     }
-
 }

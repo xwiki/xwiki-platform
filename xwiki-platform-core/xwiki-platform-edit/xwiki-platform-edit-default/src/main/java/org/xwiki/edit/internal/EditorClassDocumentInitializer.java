@@ -26,8 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
@@ -40,7 +39,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Component
 @Named("XWiki.EditorClass")
 @Singleton
-public class EditorClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class EditorClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The local reference of the editor class.
@@ -57,21 +56,13 @@ public class EditorClassDocumentInitializer extends AbstractMandatoryDocumentIni
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("dataType", "Data Type", 30);
-        needsUpdate |= bclass.addTextField("roleHint", "Role Hint", 30);
-        needsUpdate |= bclass.addTextAreaField("code", "Code", 40, 20, EditorType.TEXT);
-        needsUpdate |= bclass.addTextField("icon", "Icon", 30);
-        needsUpdate |= bclass.addTextField("category", "Category", 30);
-        needsUpdate |= bclass.addStaticListField("scope", "Scope", "wiki=Current Wiki|user=Current User|global=Global");
-
-        needsUpdate |= setClassDocumentFields(document, "Editor Class");
-
-        return needsUpdate;
+        xclass.addTextField("dataType", "Data Type", 30);
+        xclass.addTextField("roleHint", "Role Hint", 30);
+        xclass.addTextAreaField("code", "Code", 40, 20, EditorType.TEXT);
+        xclass.addTextField("icon", "Icon", 30);
+        xclass.addTextField("category", "Category", 30);
+        xclass.addStaticListField("scope", "Scope", "wiki=Current Wiki|user=Current User|global=Global");
     }
 }

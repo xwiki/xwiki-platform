@@ -28,8 +28,8 @@ import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 // The role hint is not a document name since it can change based the configuration
 @Named(AnnotationClassDocumentInitializer.HINT)
 @Singleton
-public class AnnotationClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class AnnotationClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     static final String HINT = "annotationclass";
 
@@ -69,6 +69,22 @@ public class AnnotationClassDocumentInitializer extends AbstractMandatoryDocumen
     }
 
     @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField(Annotation.AUTHOR_FIELD, "Author", 30);
+        xclass.addDateField(Annotation.DATE_FIELD, "Date");
+
+        xclass.addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5, ContentType.PURE_TEXT);
+        xclass.addTextAreaField(Annotation.SELECTION_LEFT_CONTEXT_FIELD, "Selection Left Context", 40, 5,
+            ContentType.PURE_TEXT);
+        xclass.addTextAreaField(Annotation.SELECTION_RIGHT_CONTEXT_FIELD, "Selection Right Context", 40, 5,
+            ContentType.PURE_TEXT);
+        xclass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40, 5, ContentType.PURE_TEXT);
+        xclass.addTextField(Annotation.TARGET_FIELD, "Target", 30);
+        xclass.addTextField(Annotation.STATE_FIELD, "State", 30);
+    }
+
+    @Override
     public boolean updateDocument(XWikiDocument document)
     {
         if (!this.configuration.isInstalled()) {
@@ -76,26 +92,6 @@ public class AnnotationClassDocumentInitializer extends AbstractMandatoryDocumen
             return false;
         }
 
-        BaseClass annotationClass = document.getXClass();
-
-        boolean needsUpdate = false;
-
-        needsUpdate |= annotationClass.addTextField(Annotation.AUTHOR_FIELD, "Author", 30);
-        needsUpdate |= annotationClass.addDateField(Annotation.DATE_FIELD, "Date");
-
-        needsUpdate |=
-            annotationClass.addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5, ContentType.PURE_TEXT);
-        needsUpdate |= annotationClass.addTextAreaField(Annotation.SELECTION_LEFT_CONTEXT_FIELD,
-            "Selection Left Context", 40, 5, ContentType.PURE_TEXT);
-        needsUpdate |= annotationClass.addTextAreaField(Annotation.SELECTION_RIGHT_CONTEXT_FIELD,
-            "Selection Right Context", 40, 5, ContentType.PURE_TEXT);
-        needsUpdate |= annotationClass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40,
-            5, ContentType.PURE_TEXT);
-        needsUpdate |= annotationClass.addTextField(Annotation.TARGET_FIELD, "Target", 30);
-        needsUpdate |= annotationClass.addTextField(Annotation.STATE_FIELD, "State", 30);
-
-        needsUpdate |= setClassDocumentFields(document, "Annotation Class");
-
-        return needsUpdate;
+        return super.updateDocument(document);
     }
 }

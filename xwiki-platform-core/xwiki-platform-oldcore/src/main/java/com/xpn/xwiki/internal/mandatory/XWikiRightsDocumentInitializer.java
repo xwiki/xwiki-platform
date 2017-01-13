@@ -24,8 +24,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
 /**
  * Update XWiki.XWikiRights document with all required informations.
  *
@@ -43,15 +41,5 @@ public class XWikiRightsDocumentInitializer extends AbstractRightsDocumentInitia
     public XWikiRightsDocumentInitializer()
     {
         super("XWikiRights");
-    }
-
-    @Override
-    public boolean updateDocument(XWikiDocument document)
-    {
-        boolean needsUpdate = super.updateDocument(document);
-
-        needsUpdate |= setClassDocumentFields(document, "XWiki Rights Class");
-
-        return needsUpdate;
     }
 }

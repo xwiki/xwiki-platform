@@ -25,9 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ratings.RatingsManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -39,34 +37,21 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named(RatingsManager.AVERAGE_RATINGS_CLASSNAME)
 @Singleton
-public class AverageRatingClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class AverageRatingClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public AverageRatingClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, RatingsManager.AVERAGE_RATINGS_CLASSPAGE);
+        super(RatingsManager.AVERAGE_RATINGS_CLASSREFERENCE);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |=
-            bclass
-                .addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES, "Number of Votes", 5, "integer");
-        needsUpdate |=
-            bclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE, "Average Vote", 5, "float");
-        needsUpdate |=
-            bclass.addTextField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD, "Average Vote method",
-                10);
-
-        needsUpdate = setClassDocumentFields(document, "XWiki Average Ratings Class");
-
-        return needsUpdate;
+        xclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES, "Number of Votes", 5, "integer");
+        xclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE, "Average Vote", 5, "float");
+        xclass.addTextField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD, "Average Vote method", 10);
     }
 }

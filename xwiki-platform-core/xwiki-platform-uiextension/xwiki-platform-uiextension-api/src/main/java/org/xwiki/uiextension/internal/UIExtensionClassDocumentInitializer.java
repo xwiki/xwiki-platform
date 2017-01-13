@@ -23,11 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
@@ -41,7 +40,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Component
 @Named("XWiki.UIExtensionClass")
 @Singleton
-public class UIExtensionClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class UIExtensionClassDocumentInitializer extends AbstractMandatoryClassInitializer
     implements WikiUIExtensionConstants
 {
     /**
@@ -49,34 +48,19 @@ public class UIExtensionClassDocumentInitializer extends AbstractMandatoryDocume
      */
     public UIExtensionClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "UIExtensionClass");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "UIExtensionClass"));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        // Force the class document to use the 2.1 syntax default syntax, the same syntax used in the custom displayer.
-        if (!Syntax.XWIKI_2_1.equals(document.getSyntax())) {
-            document.setSyntax(Syntax.XWIKI_2_1);
-            needsUpdate = true;
-        }
-
-        needsUpdate |= bclass.addTextField(EXTENSION_POINT_ID_PROPERTY, "Extension Point ID", 30);
-        needsUpdate |= bclass.addTextField(ID_PROPERTY, "Extension ID", 30);
+        xclass.addTextField(EXTENSION_POINT_ID_PROPERTY, "Extension Point ID", 30);
+        xclass.addTextField(ID_PROPERTY, "Extension ID", 30);
         // The content property supports wiki syntax, but it uses script macros most of the time.
-        needsUpdate |= bclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10, EditorType.TEXT);
+        xclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10, EditorType.TEXT);
         // The parameters property doesn't support wiki syntax.
-        needsUpdate |=
-            bclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10, ContentType.PURE_TEXT);
-        needsUpdate |= bclass.addStaticListField(SCOPE_PROPERTY, "Extension Scope", 1, false,
+        xclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10, ContentType.PURE_TEXT);
+        xclass.addStaticListField(SCOPE_PROPERTY, "Extension Scope", 1, false,
             "wiki=Current Wiki|user=Current User|global=Global", "select");
-
-        needsUpdate |= setClassDocumentFields(document, "UI Extension Class");
-
-        return needsUpdate;
     }
 }

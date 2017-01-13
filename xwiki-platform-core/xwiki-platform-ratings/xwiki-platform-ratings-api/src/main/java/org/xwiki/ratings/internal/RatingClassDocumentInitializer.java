@@ -25,9 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ratings.RatingsManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -39,30 +37,22 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named(RatingsManager.RATINGS_CLASSNAME)
 @Singleton
-public class RatingClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class RatingClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public RatingClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, RatingsManager.RATINGS_CLASSPAGE);
+        super(RatingsManager.RATINGS_CLASSREFERENCE);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, "Author", 30);
-        needsUpdate |= bclass.addNumberField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, "Vote", 5, "integer");
-        needsUpdate |= bclass.addDateField(RatingsManager.RATING_CLASS_FIELDNAME_DATE, "Date");
-        needsUpdate |= bclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, "Parent", 30);
-
-        needsUpdate = setClassDocumentFields(document, "XWiki Ratings Class");
-
-        return needsUpdate;
+        xclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, "Author", 30);
+        xclass.addNumberField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, "Vote", 5, "integer");
+        xclass.addDateField(RatingsManager.RATING_CLASS_FIELDNAME_DATE, "Date");
+        xclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, "Parent", 30);
     }
 }

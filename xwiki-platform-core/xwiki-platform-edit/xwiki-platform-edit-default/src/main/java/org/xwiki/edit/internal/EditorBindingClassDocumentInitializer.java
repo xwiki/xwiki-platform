@@ -26,8 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -39,13 +38,13 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.EditorBindingClass")
 @Singleton
-public class EditorBindingClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class EditorBindingClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The local reference of the editor binding class.
      */
-    public static final LocalDocumentReference REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
-        "EditorBindingClass");
+    public static final LocalDocumentReference REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "EditorBindingClass");
 
     /**
      * Default constructor.
@@ -56,17 +55,9 @@ public class EditorBindingClassDocumentInitializer extends AbstractMandatoryDocu
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField("dataType", "Data Type", 30);
-        needsUpdate |= bclass.addTextField("roleHint", "Role Hint", 30);
-
-        needsUpdate |= setClassDocumentFields(document, "Editor Binding Class");
-
-        return needsUpdate;
+        xclass.addTextField("dataType", "Data Type", 30);
+        xclass.addTextField("roleHint", "Role Hint", 30);
     }
 }

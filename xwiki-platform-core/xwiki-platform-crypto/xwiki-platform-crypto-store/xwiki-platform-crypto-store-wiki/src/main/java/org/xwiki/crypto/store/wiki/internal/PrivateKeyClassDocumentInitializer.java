@@ -24,8 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
@@ -38,7 +37,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named("Crypto.PrivateKeyClass")
 @Singleton
-public class PrivateKeyClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class PrivateKeyClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
@@ -49,15 +48,9 @@ public class PrivateKeyClassDocumentInitializer extends AbstractMandatoryDocumen
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        BaseClass bclass = document.getXClass();
-
-        boolean needsUpdate = bclass.addTextAreaField(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, "Private Key", 64, 10,
+        xclass.addTextAreaField(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, "Private Key", 64, 10,
             TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
-
-        needsUpdate |= setClassDocumentFields(document, "Private Key Class");
-
-        return needsUpdate;
     }
 }

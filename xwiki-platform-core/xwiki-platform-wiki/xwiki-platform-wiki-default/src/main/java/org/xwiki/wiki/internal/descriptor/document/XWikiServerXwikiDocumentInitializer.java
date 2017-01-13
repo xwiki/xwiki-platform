@@ -29,12 +29,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -71,7 +72,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
      */
     public XWikiServerXwikiDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, DOCUMENT_NAME));
     }
 
     @Override
@@ -84,7 +85,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
+        boolean needsUpdate = super.updateDocument(document);
 
         // Add a descriptor if none already exist
         if (document.getXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS) == null) {
@@ -118,10 +119,6 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
             }
         }
 
-        // Note: We don't set a title since there's a sheet computing a proper title.
-        needsUpdate |= setDocumentFields(document, "");
-
         return needsUpdate;
     }
-
 }

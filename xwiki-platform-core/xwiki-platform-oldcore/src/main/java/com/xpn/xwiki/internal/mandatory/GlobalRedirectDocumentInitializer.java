@@ -21,13 +21,14 @@ package com.xpn.xwiki.internal.mandatory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -40,38 +41,41 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.GlobalRedirect")
 @Singleton
-public class GlobalRedirectDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class GlobalRedirectDocumentInitializer extends AbstractMandatoryClassInitializer
 {
-    /**
-     * Used to access current XWikiContext.
-     */
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    @Named("xwikicfg")
+    private ConfigurationSource configuration;
 
     /**
      * Default constructor.
      */
     public GlobalRedirectDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "GlobalRedirect");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "GlobalRedirect"));
+    }
+
+    @Override
+    protected boolean isMainWikiOnly()
+    {
+        return true;
+    }
+
+    @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField("pattern", "Pattern", 30);
+        xclass.addTextField("destination", "Destination", 30);
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-
         // Only on main wiki and only when enabled in the configuration
-        if (xcontext.isMainWiki() && "1".equals(xcontext.getWiki().Param("xwiki.preferences.redirect"))) {
-            BaseClass bclass = document.getXClass();
-
-            needsUpdate |= bclass.addTextField("pattern", "Pattern", 30);
-            needsUpdate |= bclass.addTextField("destination", "Destination", 30);
-            needsUpdate |= setClassDocumentFields(document, "XWiki Global Redirect Class");
+        if (this.configuration.getProperty("xwiki.preferences.redirect", false)) {
+            return false;
         }
 
-        return needsUpdate;
+        return super.updateDocument(document);
     }
 }

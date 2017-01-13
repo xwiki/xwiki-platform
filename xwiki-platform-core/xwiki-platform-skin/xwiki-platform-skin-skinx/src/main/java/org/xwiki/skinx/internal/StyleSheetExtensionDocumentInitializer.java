@@ -47,8 +47,8 @@ public class StyleSheetExtensionDocumentInitializer extends AbstractSkinExtensio
     }
 
     @Override
-    protected void createClass(BaseClass xlass)
+    protected void createClass(BaseClass xclass)
     {
-        xlass.addStaticListField("contentType", "Content Type", "CSS|LESS");
+        xclass.addStaticListField("contentType", "Content Type", "CSS|LESS");
     }
 }

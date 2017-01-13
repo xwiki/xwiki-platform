@@ -24,8 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
@@ -38,7 +37,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named("Crypto.SignatureClass")
 @Singleton
-public class SignatureClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class SignatureClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
@@ -49,17 +48,10 @@ public class SignatureClassDocumentInitializer extends AbstractMandatoryDocument
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        BaseClass bclass = document.getXClass();
-
-        boolean needsUpdate = bclass.addTextField(DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE, "Reference", 64);
-
-        needsUpdate |= bclass.addTextAreaField(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE, "Signature",
-            64, 10, TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
-
-        needsUpdate |= setClassDocumentFields(document, "Signature Class");
-
-        return needsUpdate;
+        xclass.addTextField(DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE, "Reference", 64);
+        xclass.addTextAreaField(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE, "Signature", 64, 10,
+            TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
     }
 }

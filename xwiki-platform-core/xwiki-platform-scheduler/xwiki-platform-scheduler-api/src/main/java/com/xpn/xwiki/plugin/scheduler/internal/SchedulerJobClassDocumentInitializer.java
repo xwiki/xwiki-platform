@@ -29,8 +29,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component
 @Named("XWiki.SchedulerJobSheet")
 @Singleton
-public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the sheet used to display instances of the class.
@@ -53,8 +53,8 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocum
     /**
      * Local reference of the XWiki Scheduler Job Class representing a job that can be scheduled by this plugin.
      */
-    public static final LocalDocumentReference XWIKI_JOB_CLASSREFERENCE = new LocalDocumentReference(
-        XWiki.SYSTEM_SPACE, "SchedulerJobClass");
+    public static final LocalDocumentReference XWIKI_JOB_CLASSREFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "SchedulerJobClass");
 
     private static final String FIELD_JOBNAME = "jobName";
 
@@ -86,45 +86,40 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocum
      */
     public SchedulerJobClassDocumentInitializer()
     {
-        // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
-        // getDocumentReference() returns the actual main wiki document reference.
-        super(XWiki.SYSTEM_SPACE, XWIKI_JOB_CLASSREFERENCE.getName());
+        super(XWIKI_JOB_CLASSREFERENCE);
+    }
+
+    @Override
+    protected void createClass(BaseClass xclass)
+    {
+        xclass.addTextField(FIELD_JOBNAME, "Job Name", 60);
+        xclass.addTextAreaField(FIELD_JOBDESCRIPTION, "Job Description", 45, 10);
+        xclass.addTextField(FIELD_JOBCLASS, "Job Class", 60);
+        xclass.addTextField(FIELD_STATUS, "Status", 30);
+        xclass.addTextField(FIELD_CRON, "Cron Expression", 30);
+
+        // This field contains groovy script and is thus of tpye PureText.
+        // TODO: In the future, add the ability to provide wiki markup so that all script languages can be supported
+        // and not only Groovy. When this is done, convert this field to "Text".
+        xclass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10, TextAreaClass.ContentType.PURE_TEXT);
+        xclass.addTextField(FIELD_CONTEXTUSER, "Job execution context user", 30);
+        xclass.addTextField(FIELD_CONTEXTLANG, "Job execution context lang", 30);
+        xclass.addTextField(FIELD_CONTEXTDATABASE, "Job execution context database", 30);
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        boolean needsUpdate = false;
-
-        // Add missing class fields
-        BaseClass baseClass = document.getXClass();
-
-        needsUpdate |= baseClass.addTextField(FIELD_JOBNAME, "Job Name", 60);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_JOBDESCRIPTION, "Job Description", 45, 10);
-        needsUpdate |= baseClass.addTextField(FIELD_JOBCLASS, "Job Class", 60);
-        needsUpdate |= baseClass.addTextField(FIELD_STATUS, "Status", 30);
-        needsUpdate |= baseClass.addTextField(FIELD_CRON, "Cron Expression", 30);
-
-        // This field contains groovy script and is thus of tpye PureText.
-        // TODO: In the future, add the ability to provide wiki markup so that all script languages can be supported
-        // and not only Groovy. When this is done, convert this field to "Text".
-        needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10,
-            TextAreaClass.ContentType.PURE_TEXT);
-        needsUpdate |= baseClass.addTextField(FIELD_CONTEXTUSER, "Job execution context user", 30);
-        needsUpdate |= baseClass.addTextField(FIELD_CONTEXTLANG, "Job execution context lang", 30);
-        needsUpdate |= baseClass.addTextField(FIELD_CONTEXTDATABASE, "Job execution context database", 30);
-
-        // Add missing document fields
-        needsUpdate |= setClassDocumentFields(document, "XWiki Scheduler Job Class");
+        super.updateDocument(document);
 
         // Use SchedulerJobSheet to display documents having SchedulerJobClass objects if no other class sheet is
         // specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {
             String wikiName = document.getDocumentReference().getWikiReference().getName();
             DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, SHEET_NAME);
-            needsUpdate |= this.classSheetBinder.bind(document, sheet);
+            return this.classSheetBinder.bind(document, sheet);
         }
 
-        return needsUpdate;
+        return false;
     }
 }

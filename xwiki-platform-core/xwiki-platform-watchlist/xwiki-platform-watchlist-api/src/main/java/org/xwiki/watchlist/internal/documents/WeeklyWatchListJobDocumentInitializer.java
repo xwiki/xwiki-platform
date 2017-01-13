@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Document initializer for {@value #DOCUMENT_FULL_NAME}.
@@ -51,7 +52,7 @@ public class WeeklyWatchListJobDocumentInitializer extends AbstractWatchListJobD
      */
     public WeeklyWatchListJobDocumentInitializer()
     {
-        super(SCHEDULER_SPACE, DOCUMENT_NAME);
+        super(new LocalDocumentReference(SCHEDULER_SPACE, DOCUMENT_NAME));
     }
 
     @Override

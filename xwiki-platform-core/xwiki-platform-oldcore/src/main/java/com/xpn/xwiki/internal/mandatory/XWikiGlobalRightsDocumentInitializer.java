@@ -24,8 +24,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
 /**
  * Update XWiki.XWikiGlobalRights document with all required informations.
  *
@@ -43,15 +41,5 @@ public class XWikiGlobalRightsDocumentInitializer extends AbstractRightsDocument
     public XWikiGlobalRightsDocumentInitializer()
     {
         super("XWikiGlobalRights");
-    }
-
-    @Override
-    public boolean updateDocument(XWikiDocument document)
-    {
-        boolean needsUpdate = super.updateDocument(document);
-
-        needsUpdate |= setClassDocumentFields(document, "XWiki Global Rights Class");
-
-        return needsUpdate;
     }
 }

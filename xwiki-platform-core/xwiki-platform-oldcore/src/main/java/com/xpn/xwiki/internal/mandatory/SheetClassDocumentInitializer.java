@@ -23,9 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -39,33 +40,22 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Named("XWiki.SheetClass")
 @Singleton
 @Deprecated
-public class SheetClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class SheetClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * Default constructor.
      */
     public SheetClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "SheetClass");
+        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "SheetClass"));
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
         // Note: Ideally we don't want a special field in the sheet class but XWiki classes must have at
         // least one field or they're not saved. Thus we are introducing a "defaultEditMode" which will
         // tell what edit mode to use. If empty it'll default to "inline".
-        needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
-
-        if (document.isNew()) {
-            needsUpdate |= setClassDocumentFields(document, "XWiki Sheet Class");
-            document.setContent(document.getContent() + "\n\nClass that should be used to recognize sheet pages.");
-        }
-
-        return needsUpdate;
+        xclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
     }
 }

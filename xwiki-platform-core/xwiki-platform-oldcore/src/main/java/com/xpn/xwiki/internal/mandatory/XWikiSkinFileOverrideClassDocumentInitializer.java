@@ -27,29 +27,29 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Update XWiki.XWikiSkinFileOverrideClass document with all required properties. This XClass is used to override a skin
  * file by attaching an instance of it to the skin document.
- *  
+ * 
  * @version $Id$
- * @since 7.0RC1 
+ * @since 7.0RC1
  */
 @Component
 @Named("XWiki.XWikiSkinFileOverrideClass")
 @Singleton
-public class XWikiSkinFileOverrideClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiSkinFileOverrideClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The reference to the mandatory document.
      */
-    public static final EntityReference DOCUMENT_REFERENCE
-        = new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiSkinFileOverrideClass");
+    public static final EntityReference DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiSkinFileOverrideClass");
 
     /**
-     * The name of the property storing the path of the file to overwrite. 
+     * The name of the property storing the path of the file to overwrite.
      */
     public static final String PROPERTY_PATH = "path";
 
@@ -57,26 +57,19 @@ public class XWikiSkinFileOverrideClassDocumentInitializer extends AbstractManda
      * The name of the property holding the content.
      */
     public static final String PROPERTY_CONTENT = "content";
-    
+
     /**
-     * Default constructor. 
+     * Default constructor.
      */
     public XWikiSkinFileOverrideClassDocumentInitializer()
     {
-        super(DOCUMENT_REFERENCE);        
+        super(DOCUMENT_REFERENCE);
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        BaseClass bclass = document.getXClass();
-
-        needsUpdate |= bclass.addTextField(PROPERTY_PATH, "Path", 255);
-        needsUpdate |= bclass.addTemplateField(PROPERTY_CONTENT, "Content");
-        needsUpdate |= setClassDocumentFields(document, "XWiki Skin File Override Class");
-        
-        return needsUpdate;
+        xclass.addTextField(PROPERTY_PATH, "Path", 255);
+        xclass.addTemplateField(PROPERTY_CONTENT, "Content");
     }
 }

@@ -23,11 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -39,7 +37,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("WikiManagerCode.WikiTemplateClass")
 @Singleton
-public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the mandatory document.
@@ -54,8 +52,7 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
     /**
      * Reference to the server class.
      */
-    public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
-            new EntityReference(DOCUMENT_SPACE, EntityType.SPACE));
+    public static final LocalDocumentReference SERVER_CLASS = new LocalDocumentReference(DOCUMENT_SPACE, DOCUMENT_NAME);
 
     /**
      * Name of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
@@ -84,7 +81,7 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
     {
         // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
         // getDocumentReference() returns the actual main wiki document reference.
-        super(DOCUMENT_SPACE, DOCUMENT_NAME);
+        super(SERVER_CLASS);
     }
 
     @Override
@@ -95,29 +92,9 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
     }
 
     @Override
-    public boolean updateDocument(XWikiDocument document)
+    protected void createClass(BaseClass xclass)
     {
-        boolean needsUpdate = false;
-
-        // Add missing class fields
-        BaseClass baseClass = document.getXClass();
-
-        needsUpdate |= baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE);
-        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
-
-        // Check if the document is hidden
-        if (!document.isHidden()) {
-            document.setHidden(true);
-            needsUpdate = true;
-        }
-
-        // Mark this document as Wiki Class.
-        if (document.isNew()) {
-            needsUpdate |= setClassDocumentFields(document, "Wiki Template Class");
-            document.setContent(document.getContent() + "\n\nClass that represents the wiki descriptor property group"
-                    + " for the template feature.");
-        }
-
-        return needsUpdate;
+        xclass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE,
+            DEFAULT_ISWIKITEMPLATE);
     }
 }

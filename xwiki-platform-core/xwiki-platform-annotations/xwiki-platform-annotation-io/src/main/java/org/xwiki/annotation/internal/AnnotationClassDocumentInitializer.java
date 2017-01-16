@@ -79,7 +79,8 @@ public class AnnotationClassDocumentInitializer extends AbstractMandatoryClassIn
             ContentType.PURE_TEXT);
         xclass.addTextAreaField(Annotation.SELECTION_RIGHT_CONTEXT_FIELD, "Selection Right Context", 40, 5,
             ContentType.PURE_TEXT);
-        xclass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40, 5, ContentType.PURE_TEXT);
+        xclass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40, 5,
+            ContentType.PURE_TEXT);
         xclass.addTextField(Annotation.TARGET_FIELD, "Target", 30);
         xclass.addTextField(Annotation.STATE_FIELD, "State", 30);
     }

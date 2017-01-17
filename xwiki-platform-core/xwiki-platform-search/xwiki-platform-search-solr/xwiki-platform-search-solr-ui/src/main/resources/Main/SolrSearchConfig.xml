@@ -70,8 +70,7 @@
   'facetFields': ['type', 'wiki', 'space_facet', 'locale', 'author', 'creator', 'date',
     'creationdate', 'class', 'mimetype', 'attauthor', 'attdate', 'attsize'],
   'facetQuery': {
-    'type': 'DOCUMENT',
-    'locale': ["$xcontext.locale", '']
+    'type': 'DOCUMENT'
   },
   'facetEnabled': true,
   'facetDisplayers': {

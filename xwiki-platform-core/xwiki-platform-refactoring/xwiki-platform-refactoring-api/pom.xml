@@ -56,7 +56,16 @@
       <artifactId>xwiki-platform-job-script</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

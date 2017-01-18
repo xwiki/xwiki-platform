@@ -38,7 +38,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RefactoringJobs.DELETE)
-public class DeleteJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
+public class DeleteJob extends AbstractCheckBrokenExtensionJob<EntityRequest, EntityJobStatus<EntityRequest>>
 {
     @Override
     public String getType()

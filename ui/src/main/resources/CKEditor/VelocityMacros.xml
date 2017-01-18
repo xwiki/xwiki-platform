@@ -119,7 +119,8 @@
   #set ($content = "#renderContentSheet")
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
-    'spellcheck': false
+    'spellcheck': false,
+    'data-sourceDocumentSyntax': $sourceDocument.syntax.toIdString()
   }))
   &lt;textarea
     #foreach ($entry in $parameters.attributes.entrySet())

@@ -19,10 +19,6 @@
  */
 CKEDITOR.editorConfig = function(config) {
   CKEDITOR.tools.extend(config, {
-    // We can't use the Advanced Content Filter (ACF) because wiki syntax can generate any HTML element (e.g. by using
-    // the HTML macro) and any attribute (e.g. by using the parameter syntax). So we cannot really limit the allowed
-    // HTML content.
-    allowedContent: true,
     // Modify the strike and underline core styles to match what the XWiki Rendering is generating and expecting.
     // See CKEDITOR-52: Unable to un-strike or un-underline saved content
     coreStyles_strike: {

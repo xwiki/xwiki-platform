@@ -1,0 +1,59 @@
+###
+### Template used by the delete page to display extensions that could be broken by a bad delete or move action.
+### TODO: handle move action too
+### TODO: use translation keys
+###
+#set ($jobId = "$!request.jobId")
+#if ($jobId != '')
+  #set ($job = $services.job.getJobStatus($jobId.split('/')))
+  #set ($question = $job.question)
+  <div class="box warningmessage" style="margin-top: 10px;">
+    <p><strong>$services.icon.renderHTML('warning') You are about about to delete pages that belong to extensions.</strong></p>
+    <p>If you delete these pages, the extensions will not work anymore.</p>
+    <p>The recommended way of removing an extension is by uninstalling it with the <a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&section=XWiki.InstalledExtensions')">Extension Manager</a>.</p>
+    <p>Do you wish to continue?</p>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <p class="panel-title">Pages to remove</p>
+      </div>
+      <div class="panel-body">
+        <p><a href="#" class="btSelectAllTree">select all</a> / <a href="#" class="btUnselectAllTree">none</a></p>
+        <div class="deleteTree">
+          <ul>
+            <li data-jstree='{"icon": "fa fa-folder", "selected": true}'>Pages that don't belong to any extension:
+              <ul>
+                ## TODO: remove this hardcoded example and improve BrokenExtensionsQuestion
+                <li data-jstree='{"icon": "fa fa-file-o"}' data-page="xwiki:XWiki.gdelhumeau">Guillaume Delhumeau (XWiki.gdelhumeau)</li>
+              </ul>
+            </li>
+          #set ($extensions = [])
+          #foreach ($value in $question.brokenExtensions.entrySet())
+            #set ($discard = $extensions.add({'extension': $value.key, 'pages': $value.value, 'name': $value.key.name}))
+          #end
+          #foreach ($ext in $sorttool.sort($extensions, 'name'))
+            #set ($extension = $ext.extension)
+            #set ($pages = $ext.pages)
+            <li data-jstree='{"icon": "fa fa-cube"}'>$extension.name
+              <ul>
+                #foreach ($page in $pages)
+                  #set ($pageDoc = $xwiki.getDocument($page))
+                  #set ($serializedName = $services.model.serialize($page, 'default'))
+                  #set ($title = $pageDoc.getRenderedTitle('html/5.0'))
+                  #if ("$!title" == '')
+                    #set ($title = $pageDoc.name)
+                  #end
+                  <li data-jstree='{"icon": "fa fa-file-o"}' data-page="$services.model.serialize($page, 'default')">$title ($services.model.serialize($page, 'local'))</li>
+                #end
+              </ul>
+            </li>
+          #end
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p>
+      <button class="btn btn-danger btConfirmDelete">Delete</button>
+      <button class="btn btn-default btCancelDelete">Cancel</button>
+    </p>
+  </div>
+#end

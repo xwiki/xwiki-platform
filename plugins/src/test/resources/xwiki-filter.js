@@ -73,15 +73,17 @@ describe('XWiki Filter Plugin for CKEditor', function() {
   it('submits only significant content', function() {
     editor.config.fullPage = true;
     editor.config.fullData = false;
-    jQuery(editor.document.$).find('body').attr('data-foo', 'bar').after('<style/>');
+    jQuery(editor.document.$).find('body').attr('data-foo', 'bar').after('<style/>').append('<script/>');
     var data = editor.getData();
     expect(data).not.toContain('<head');
     expect(data).not.toContain('data-foo="bar"');
     expect(data).not.toContain('<style');
+    expect(data).not.toContain('<script');
     editor.config.fullData = true;
     data = editor.getData();
     expect(data).toContain('<head');
     expect(data).toContain(' data-foo="bar"');
     expect(data).toContain('<style');
+    expect(data).toContain('<script');
   });
 });

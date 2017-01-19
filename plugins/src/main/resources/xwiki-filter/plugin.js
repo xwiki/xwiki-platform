@@ -102,6 +102,15 @@
               // Discard the attributes of the BODY element.
               element.attributes = {};
             }
+          },
+          script: function(element) {
+            // Browser extensions can inject script tags into the editing area. Remove them when saving the content.
+            // Note that we cannot rely on the Advanced Content Filter for this because it handles only the content that
+            // is added by editor features or through copy pasting. The browser extensions can bypass it.
+            // See CKEDITOR-133: Use of Greasemonkey in Firefox can interfere with CKEditor content.
+            if (!editor.config.fullData) {
+              return false;
+            }
           }
         }
       };

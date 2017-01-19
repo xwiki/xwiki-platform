@@ -1,0 +1,96 @@
+###
+### Template
+###
+$response.setContentType("application/json")
+
+#set ($offset = "$!request.offset")
+#if ($offset == '')
+  #set ($offset = '0')
+#end
+#set ($offset = $numbertool.toNumber($offset))
+#set ($limit = 2)
+
+#macro(paginationNode $data $howMany)
+  #set ($discard = $data.add({
+    'id': "pagination:$!{request.id}",
+    'text': "$howMany more ...",
+    'icon': 'fa fa-eye',
+    'children': false,
+    'data': {
+     'type': 'pagination',
+     'validChildren': [],
+     'offset': $limit
+    },
+    'li_attr': {
+      'class': 'paginationNode'
+    }
+  }))
+#end
+
+#macro(displayPages $question)
+  #foreach ($value in $question.brokenExtensions.entrySet())
+    #set ($extension = $value.key)
+    #if ("extension_$extension.id.id" == "$!request.id")
+      #set ($pages = $value.value)
+      #foreach ($page in $pages)
+        #if ($velocityCount > $offset + $limit)
+          #set ($howMany = $pages.size() - $velocityCount + 1)
+          #paginationNode($data, $howMany)
+          #break
+        #end
+        #if ($velocityCount > $offset)
+          #set ($pageDoc = $xwiki.getDocument($page))
+          #set ($title = $pageDoc.getRenderedTitle('html/5.0'))
+          #if ("$!title" == '')
+            #set ($title = $pageDoc.name)
+          #end
+          #set ($discard = $data.add({
+            'id': $services.model.serialize($page, 'default'),
+            'text': "$title ($services.model.serialize($page, 'local'))",
+            'icon': 'fa fa-file-o',
+            'children': false
+          }))
+        #end
+      #end
+    #end
+  #end
+#end
+
+#macro(displayExtensions $question)
+  #set ($extensions = [])
+  #foreach ($value in $question.brokenExtensions.entrySet())
+    #set ($discard = $extensions.add({'extension': $value.key, 'pages': $value.value, 'name': $value.key.name}))
+  #end
+  #set ($extensions = $sorttool.sort($extensions, 'name'))
+  #foreach ($ext in $extensions)
+    #if ($velocityCount > $offset + $limit)
+      #set ($howMany = $extensions.size() - $velocityCount)
+      #paginationNode($data, $howMany)
+      #break
+    #end
+    #if ($velocityCount > $offset)
+      #set ($extension = $ext.extension)
+      #set ($extData = {
+        'id': "extension_$extension.id.id",
+        'text': "$extension.name",
+        'icon': 'fa fa-cube',
+        'children': true
+      })
+      #set ($discard = $data.add($extData))
+    #end
+  #end
+#end
+
+
+#set ($jobId = "$!request.jobId")
+#if ($jobId != '')
+  #set ($job = $services.job.getJobStatus($jobId.split('/')))
+  #set ($question = $job.question)
+  #set ($data = [])
+  #if ("$!request.data" == 'children' && "$!request.id" != '#')
+    #displayPages()
+  #else
+    #displayExtensions()
+  #end
+  $jsontool.serialize($data)
+#end

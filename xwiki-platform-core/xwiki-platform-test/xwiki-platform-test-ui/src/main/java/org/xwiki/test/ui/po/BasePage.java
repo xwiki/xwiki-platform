@@ -308,7 +308,7 @@ public class BasePage extends BaseElement
      */
     public boolean showDrawer()
     {
-        if (isElementVisible(DRAWER_MATCHER)) {
+        if (!isElementVisible(DRAWER_MATCHER)) {
             // The drawer is not visible, so we open it
             this.drawerActivator.click();
             getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);

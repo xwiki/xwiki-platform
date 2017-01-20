@@ -28,8 +28,19 @@
         // content: CKEDITOR.htmlParser.node[]
         toHtml: function(startImageComment, content) {
           if (content.length === 1 && content[0].name === 'img') {
+            var image = content[0];
+            // Protect the image rendering markers by saving their data on the image element itself.
             var reference = startImageComment.value.substring('startimage:'.length);
-            content[0].attributes['data-reference'] = CKEDITOR.tools.unescapeComment(reference);
+            image.attributes['data-reference'] = CKEDITOR.tools.unescapeComment(reference);
+            // Handle free-standing images.
+            if (image.hasClass('wikimodel-freestanding')) {
+              image.attributes['data-freestanding'] = true;
+              // This is an internal class that should not be visible when editing the image.
+              image.removeClass('wikimodel-freestanding');
+              // The alt attribute is auto-generated for free-standing images. We remove it in order to be consistent
+              // with the wiki syntax where it's not specified.
+              delete image.attributes.alt;
+            }
           } else {
             // Unexpected HTML structure inside image markers. Keep the markers.
             return false;
@@ -41,12 +52,20 @@
         },
         // image: CKEDITOR.htmlParser.element
         toDataFormat: function(image) {
+          // Put back the image rendering markers.
           var reference = CKEDITOR.tools.escapeComment(image.attributes['data-reference']);
           var startImageComment = new CKEDITOR.htmlParser.comment('startimage:' + reference);
           var stopImageComment = new CKEDITOR.htmlParser.comment('stopimage');
           startImageComment.insertBefore(image);
           stopImageComment.insertAfter(image);
           delete image.attributes['data-reference'];
+          // Handle free-standing images.
+          var freeStanding = image.attributes['data-freestanding'] === 'true';
+          delete image.attributes['data-freestanding'];
+          // Free-standing images don't have white-space in their reference and have only the src attribute set.
+          if (freeStanding && !/\s+/.test(reference) && isFreeStandingImage(image)) {
+            image.addClass('wikimodel-freestanding');
+          }
         }
       });
     },
@@ -126,5 +145,15 @@
       // Insert the new element before the hidden parent.
       path[2].element.children.splice(path[1].position, 0, pickerDefinition);
     }
+  };
+
+  // Free-standing images have only the source attribute set.
+  var isFreeStandingImage = function(image) {
+    for (var attribute in image.attributes) {
+      if (image.attributes.hasOwnProperty(attribute) && attribute !== 'src' && image.attributes[attribute] !== '') {
+        return false;
+      }
+    }
+    return true;
   };
 })();

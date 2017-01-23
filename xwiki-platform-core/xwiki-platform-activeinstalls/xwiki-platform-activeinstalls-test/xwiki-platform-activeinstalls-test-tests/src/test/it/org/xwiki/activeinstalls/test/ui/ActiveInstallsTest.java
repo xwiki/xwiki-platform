@@ -59,6 +59,7 @@ public class ActiveInstallsTest extends AbstractTest
                 count = ElasticSearchRunner.esSetup.countAll();
                 Thread.sleep(100L);
             }
+            assertEquals("AS ping wasn't sent by the XWiki instance", 1, count);
 
             // In order to verify backward compatibility with the previous Active Install format, we also add an index
             // in the older format.

@@ -1,25 +1,39 @@
 ###
-### Template
+### Return the list of pages and extensions that are going to be deleted by a delete job
 ###
 $response.setContentType("application/json")
 
+###
+### Globals
+###
 #set ($offset = "$!request.offset")
 #if ($offset == '')
   #set ($offset = '0')
 #end
 #set ($offset = $numbertool.toNumber($offset))
-#set ($limit = 2)
+#set ($limit = 15)
 
-#macro(paginationNode $data $howMany)
+#**
+ * Display a pagination node.
+ * @param $data the collection where the node will be added
+ * @param $howMany the number of nodes that remains
+ * @param $newOffset the offset to use to display the next batch of nodes
+ *#
+#macro(paginationNode $data $howMany $newOffset)
+  #set ($id = "$!{request.id}")
+  #if ($id == '')
+    #set ($id = '#')
+  #end
   #set ($discard = $data.add({
-    'id': "pagination:$!{request.id}",
+    'id': "pagination:$id",
     'text': "$howMany more ...",
     'icon': 'fa fa-eye',
     'children': false,
     'data': {
      'type': 'pagination',
      'validChildren': [],
-     'offset': $limit
+     'canDelete': true,
+     'offset': $newOffset
     },
     'li_attr': {
       'class': 'paginationNode'
@@ -27,15 +41,20 @@ $response.setContentType("application/json")
   }))
 #end
 
-#macro(displayPages $question)
+#**
+ * Add page node in the collection.
+ * @param $question the question beeing asked
+ * @param $data the collection where the nodes will be added
+ *#
+#macro(displayPages $question $data)
   #foreach ($value in $question.brokenExtensions.entrySet())
     #set ($extension = $value.key)
-    #if ("extension_$extension.id.id" == "$!request.id")
+    #if ($extension.id.id == "$!request.id")
       #set ($pages = $value.value)
       #foreach ($page in $pages)
         #if ($velocityCount > $offset + $limit)
           #set ($howMany = $pages.size() - $velocityCount + 1)
-          #paginationNode($data, $howMany)
+          #paginationNode($data, $howMany, $velocityCount)
           #break
         #end
         #if ($velocityCount > $offset)
@@ -48,7 +67,10 @@ $response.setContentType("application/json")
             'id': $services.model.serialize($page, 'default'),
             'text': "$title ($services.model.serialize($page, 'local'))",
             'icon': 'fa fa-file-o',
-            'children': false
+            'children': false,
+            'data': {
+              'type': 'page'
+            }
           }))
         #end
       #end
@@ -56,7 +78,12 @@ $response.setContentType("application/json")
   #end
 #end
 
-#macro(displayExtensions $question)
+#**
+ * Add extension nodes in the collection.
+ * @param $question the question beeing asked
+ * @param $data the collection where the nodes will be added
+ *#
+#macro(displayExtensions $question $data)
   #set ($extensions = [])
   #foreach ($value in $question.brokenExtensions.entrySet())
     #set ($discard = $extensions.add({'extension': $value.key, 'pages': $value.value, 'name': $value.key.name}))
@@ -64,33 +91,37 @@ $response.setContentType("application/json")
   #set ($extensions = $sorttool.sort($extensions, 'name'))
   #foreach ($ext in $extensions)
     #if ($velocityCount > $offset + $limit)
-      #set ($howMany = $extensions.size() - $velocityCount)
-      #paginationNode($data, $howMany)
+      #set ($howMany = $extensions.size() - $velocityCount + 1)
+      #paginationNode($data, $howMany, $velocityCount)
       #break
     #end
     #if ($velocityCount > $offset)
       #set ($extension = $ext.extension)
-      #set ($extData = {
-        'id': "extension_$extension.id.id",
+      #set ($discard = $data.add({
+        'id': "$extension.id.id",
         'text': "$extension.name",
         'icon': 'fa fa-cube',
-        'children': true
-      })
-      #set ($discard = $data.add($extData))
+        'children': true,
+        'data': {
+          'type': 'extension'
+        }
+      }))
     #end
   #end
 #end
 
-
+#**
+ * Controller
+ *#
 #set ($jobId = "$!request.jobId")
 #if ($jobId != '')
   #set ($job = $services.job.getJobStatus($jobId.split('/')))
   #set ($question = $job.question)
   #set ($data = [])
   #if ("$!request.data" == 'children' && "$!request.id" != '#')
-    #displayPages()
+    #displayPages($question, $data)
   #else
-    #displayExtensions()
+    #displayExtensions($question, $data)
   #end
   $jsontool.serialize($data)
 #end

@@ -55,13 +55,14 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         $('.btConfirmDelete').click(function(event){
           event.preventDefault();
           var selectedNodes = $('.deleteTree').jstree().get_selected(true);
-          var selectedPages = [];
+          var selection = [];
           for (var i = 0; i < selectedNodes.length; ++i) {
-            if (selectedNodes[i].data.page) {
-              selectedPages.push(selectedNodes[i].data.page);
+            var node = selectedNodes[i];
+            if (node.data.type == 'extension' || node.data.type == 'page') {
+              selection.push({type: node.data.type, id: node.id});
             }
           }
-          console.log(selectedPages);
+          console.log(selection);
           // TODO: send the answer
         });
       });

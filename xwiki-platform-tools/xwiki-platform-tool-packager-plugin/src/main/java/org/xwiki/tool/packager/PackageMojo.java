@@ -197,7 +197,12 @@ public class PackageMojo extends AbstractExtensionMojo
         File webappsDirectory = new File(this.outputPackageDirectory, "webapps");
         for (Artifact warArtifact : resolveWarArtifacts()) {
             getLog().info("  ... Unzipping WAR: " + warArtifact.getFile());
-            unzip(warArtifact.getFile(), new File(webappsDirectory, getContextPath(warArtifact)));
+            File warDirectory = new File(webappsDirectory, getContextPath(warArtifact));
+            unzip(warArtifact.getFile(), warDirectory);
+            // Only generate the extension.xed descriptor for the distribution war
+            if (warArtifact.getArtifactId().equals("xwiki-platform-web")) {
+                generateDistributionXED(warDirectory, warArtifact);
+            }
         }
 
         // Step 3: Copy all JARs dependencies to the expanded WAR directory in WEB-INF/lib
@@ -853,6 +858,18 @@ public class PackageMojo extends AbstractExtensionMojo
         } catch (IOException e) {
             throw new MojoExecutionException(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
                 e);
+        }
+    }
+
+    private void generateDistributionXED(File warDirectory, Artifact warArtifact) throws MojoExecutionException
+    {
+        // Generate the XED file for the distribution
+        try {
+            File xedFile = new File(warDirectory, "META-INF/extension.xed");
+            xedFile.getParentFile().mkdirs();
+            saveExtension(xedFile, warArtifact);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to generate distribution's extension.xed descriptor", e);
         }
     }
 

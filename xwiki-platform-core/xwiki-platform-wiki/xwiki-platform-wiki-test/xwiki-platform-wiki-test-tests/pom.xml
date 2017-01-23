@@ -63,6 +63,19 @@
       <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Needed to provision wiki
+         TODO: maybe but this dependency in xwiki-platform-wiki-creationjob instead -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-jar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Needed to provision wiki -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -118,7 +131,8 @@
         </executions>
       </plugin>
       <!-- We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension to
-       install on a subwiki by default (which is something we test) -->
+       install on a subwiki by default (which is something we test)
+       Otherwise the wiki creation form will display the flavor picker and the functional tests do not handle it. -->
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
@@ -137,12 +151,12 @@
               <goal>replace</goal>
             </goals>
             <configuration>
-              <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml</filesToInclude>
+              <filesToInclude>webapps/xwiki/META-INF/extension.xed</filesToInclude>
               <replacements>
                 <replacement>
-                  <token>&lt;/properties&gt;</token>
-                  <value>&lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
-    &lt;/properties&gt;</value>
+                  <token>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;</token>
+                  <value>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;
+                    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.enterprise:xwiki-enterprise-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;</value>
                 </replacement>
               </replacements>
             </configuration>

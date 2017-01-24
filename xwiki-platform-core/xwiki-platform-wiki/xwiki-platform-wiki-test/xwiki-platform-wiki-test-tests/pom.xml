@@ -57,6 +57,16 @@
       <artifactId>xwiki-commons-extension-repository-maven</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- For snapshots too -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -156,7 +166,8 @@
                 <replacement>
                   <token>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;</token>
                   <value>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;
-                    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.enterprise:xwiki-enterprise-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;</value>
+                    &lt;xwiki.extension.distribution.wikiui&gt;fakeextension&lt;/xwiki.extension.distribution.wikiui&gt;
+                    &lt;xwiki.extension.distribution.wikiui.version&gt;1.0&lt;/xwiki.extension.distribution.wikiui.version&gt;</value>
                 </replacement>
               </replacements>
             </configuration>

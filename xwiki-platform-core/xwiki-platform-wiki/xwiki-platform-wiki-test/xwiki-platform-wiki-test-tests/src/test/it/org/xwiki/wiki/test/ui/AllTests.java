@@ -75,8 +75,8 @@ public class AllTests
         // Populate maven repository
         ExtensionId extensionId = new ExtensionId("fakeextension", "1.0");
         File extensionFile = repositoryUtil.getExtensionPackager().getExtensionFile(extensionId);
-        FileUtils.copyFile(extensionFile, 
-                new File(repositoryUtil.getMavenRepository(), "fakeextension/1.0/fakeextension-1.0.xar"));
+        FileUtils.copyFile(extensionFile,
+                new File(repositoryUtil.getMavenRepository(), "maven/fakeextension/1.0/fakeextension-1.0.xar"));
     }
 }
 

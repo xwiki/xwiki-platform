@@ -19,20 +19,8 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import java.io.File;
-import java.util.List;
-
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.test.RepositoryUtils;
-import org.xwiki.test.integration.XWikiExecutor;
-import org.xwiki.test.integration.XWikiExecutorSuite;
 import org.xwiki.test.ui.PageObjectSuite;
-import org.xwiki.test.ui.PersistentTestContext;
 
 /**
  * Runs all functional tests found in the classpath.
@@ -43,40 +31,4 @@ import org.xwiki.test.ui.PersistentTestContext;
 @RunWith(PageObjectSuite.class)
 public class AllTests
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AllTests.class);
-
-    private static RepositoryUtils repositoryUtil;
-
-    @XWikiExecutorSuite.PreStart
-    public void preStart(List<XWikiExecutor> executors) throws Exception
-    {
-        XWikiExecutor executor = executors.get(0);
-
-        repositoryUtil = new RepositoryUtils();
-
-        LOGGER.info("Adding repository to xwiki.properties");
-
-        PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
-
-        // Put maven as extensions repository
-        properties.setProperty(
-                "extension.repositories","maven-test:maven:" + repositoryUtil.getMavenRepository().toURI());
-        // Disable core extension resolve because Jetty is not ready when it starts
-        properties.setProperty("extension.core.resolve", false);
-
-        executor.saveXWikiProperties(properties);
-    }
-
-    @PageObjectSuite.PostStart
-    public void postStart(PersistentTestContext context) throws Exception
-    {
-        repositoryUtil.setup();
-
-        // Populate maven repository
-        ExtensionId extensionId = new ExtensionId("fakeextension", "1.0");
-        File extensionFile = repositoryUtil.getExtensionPackager().getExtensionFile(extensionId);
-        FileUtils.copyFile(extensionFile, 
-                new File(repositoryUtil.getMavenRepository(), "fakeextension/1.0/fakeextension-1.0.xar"));
-    }
 }
-

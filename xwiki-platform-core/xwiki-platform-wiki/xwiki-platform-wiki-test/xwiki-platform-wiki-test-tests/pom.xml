@@ -156,7 +156,7 @@
                 <replacement>
                   <token>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;</token>
                   <value>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;
-                    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.enterprise:xwiki-enterprise-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;</value>
+                    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;</value>
                 </replacement>
               </replacements>
             </configuration>

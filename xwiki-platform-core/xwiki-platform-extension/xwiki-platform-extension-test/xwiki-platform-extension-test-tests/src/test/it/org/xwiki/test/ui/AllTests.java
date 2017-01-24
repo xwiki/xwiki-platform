@@ -60,10 +60,8 @@ public class AllTests
         PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
 
         // Put self and Maven as extensions repository
-        properties.setProperty(
-            "extension.repositories",
-            Arrays.asList("self:xwiki:http://localhost:8080/xwiki/rest", "maven-test:maven:"
-                + repositoryUtil.getMavenRepository().toURI()));
+        properties.setProperty("extension.repositories", Arrays.asList("self:xwiki:http://localhost:8080/xwiki/rest",
+            "maven-test:maven:" + repositoryUtil.getMavenRepository().toURI()));
         // Disable core extension resolve because Jetty is not ready when it starts
         properties.setProperty("extension.core.resolve", false);
 
@@ -90,21 +88,20 @@ public class AllTests
         context.getProperties().put(ExtensionTestUtils.PROPERTY_KEY, extensionTestUtil);
 
         // Populate maven repository
-        File extensionFile =
-            repositoryTestUtil.getTestExtension(new ExtensionId("emptyjar", "1.0"), "jar").getFile().getFile();
-        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
-            "maven/extension/1.0/extension-1.0.jar"));
-        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
-            "maven/extension/2.0/extension-2.0.jar"));
-        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
-            "maven/oldextension/0.9/oldextension-0.9.jar"));
-        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
-            "maven/dependency/version/dependency-version.jar"));
+        File extensionFile = repositoryUtil.getExtensionPackager().getExtensionFile(new ExtensionId("emptyjar", "1.0"));
+        FileUtils.copyFile(extensionFile,
+            new File(repositoryUtil.getMavenRepository(), "maven/extension/1.0/extension-1.0.jar"));
+        FileUtils.copyFile(extensionFile,
+            new File(repositoryUtil.getMavenRepository(), "maven/extension/2.0/extension-2.0.jar"));
+        FileUtils.copyFile(extensionFile,
+            new File(repositoryUtil.getMavenRepository(), "maven/oldextension/0.9/oldextension-0.9.jar"));
+        FileUtils.copyFile(extensionFile,
+            new File(repositoryUtil.getMavenRepository(), "maven/dependency/version/dependency-version.jar"));
 
         // Used in the Extension Manager functional tests.
-        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
+        FileUtils.copyFile(extensionFile, new File(repositoryUtil.getMavenRepository(),
             "org/xwiki/commons/xwiki-commons-diff-api/2.7/xwiki-commons-diff-api-2.7.jar"));
-        FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
+        FileUtils.copyFile(extensionFile, new File(repositoryUtil.getMavenRepository(),
             "org/xwiki/platform/xwiki-platform-display-api/100.1/xwiki-platform-display-api-100.1.jar"));
     }
 }

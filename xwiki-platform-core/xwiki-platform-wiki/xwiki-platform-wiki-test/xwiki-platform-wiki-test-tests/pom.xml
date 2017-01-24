@@ -166,7 +166,7 @@
                 <replacement>
                   <token>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;</token>
                   <value>&lt;maven.artifactid&gt;xwiki-platform-web&lt;/maven.artifactid&gt;
-                    &lt;xwiki.extension.distribution.wikiui&gt;maven:fakeextension&lt;/xwiki.extension.distribution.wikiui&gt;
+                    &lt;xwiki.extension.distribution.wikiui&gt;fakeextension&lt;/xwiki.extension.distribution.wikiui&gt;
                     &lt;xwiki.extension.distribution.wikiui.version&gt;1.0&lt;/xwiki.extension.distribution.wikiui.version&gt;</value>
                 </replacement>
               </replacements>

@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Provider;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -37,6 +39,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -45,7 +48,9 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.url.URLContextManager;
+import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -114,6 +119,9 @@ public class HtmlPackager
      */
     private Environment environment = Utils.getComponent((Type) Environment.class);
 
+    private EntityReferenceSerializer<String> pathEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
+
     /**
      * Modify the name of the package for which packager append ".zip".
      *
@@ -176,12 +184,13 @@ public class HtmlPackager
      * @param pageName the name (used with {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page to
      *            render.
      * @param zos the ZIP output stream.
+     * @param exportContext the context object for the export
      * @param context the XWiki context.
      * @throws XWikiException error when rendering document.
      * @throws IOException error when rendering document.
      */
-    private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context)
-        throws XWikiException, IOException
+    private void renderDocument(String pageName, ZipOutputStream zos, FilesystemExportContext exportContext,
+        XWikiContext context) throws XWikiException, IOException
     {
         DocumentReferenceResolver<String> resolver =
             Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -193,16 +202,13 @@ public class HtmlPackager
             return;
         }
 
-        String zipname = doc.getDocumentReference().getWikiReference().getName();
-        for (EntityReference space : doc.getDocumentReference().getSpaceReferences()) {
-            zipname += POINT + space.getName();
-        }
-        zipname += POINT + doc.getDocumentReference().getName();
+        // Compute the location of the page inside the zip. We put pages inside directories for scalability as
+        // otherwise on some OS we wouldn't be able to unzip if there are pages having a path longer than 255 chars...
+        String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(docReference);
         String language = doc.getLanguage();
         if (language != null && language.length() != 0) {
             zipname += POINT + language;
         }
-
         zipname += ".html";
 
         ZipEntry zipentry = new ZipEntry(zipname);
@@ -216,6 +222,11 @@ public class HtmlPackager
             XWikiDocument tdoc = doc.getTranslatedDocument(context);
             context.put(CONTEXT_TDOC, tdoc);
 
+            // Since we're putting the document in subdirectories inside the zip (under the top level "pages" directory
+            // and since we're also putting all resources used by that document inside some top level directory, we
+            // need to adjust all the computed relative URLs
+            exportContext.setDocParentLevels(computeDocumentDepth(doc.getDocumentReference()));
+
             String content = evaluateDocumentContent(context);
 
             zos.write(content.getBytes(context.getWiki().getEncoding()));
@@ -223,6 +234,17 @@ public class HtmlPackager
         } finally {
             context.setWikiId(originalDatabase);
         }
+    }
+
+    private int computeDocumentDepth(EntityReference reference)
+    {
+        int depth = 0;
+        EntityReference currentReference = reference;
+        while (currentReference != null) {
+            currentReference = currentReference.getParent();
+            depth++;
+        }
+        return depth;
     }
 
     private String evaluateDocumentContent(XWikiContext context) throws IOException
@@ -273,12 +295,16 @@ public class HtmlPackager
 
             try {
                 // Set the URL Factories/Serializer to use
-                urlf.init(this.pages, tempdir, renderContext);
+                Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
+                    new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
+                FilesystemExportContext exportContext = exportContextProvider.get();
+                urlf.init(this.pages, tempdir, exportContext, renderContext);
                 renderContext.setURLFactory(urlf);
+                // Use the filesystem URL format for all code using the url module to generate URLs (webjars, etc).
                 Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
 
                 for (String pageName : this.pages) {
-                    renderDocument(pageName, zos, renderContext);
+                    renderDocument(pageName, zos, exportContext, renderContext);
                 }
             } finally {
                 execution.popContext();

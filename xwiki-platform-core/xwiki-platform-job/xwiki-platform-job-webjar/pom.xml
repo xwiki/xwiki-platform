@@ -54,7 +54,7 @@
           <configuration>
             <archive>
               <!-- Cancel custom MANIFEST file (since it's not generated for "webjar" packaging) -->
-              <manifestFile combine.self="override"/>
+              <manifestFile combine.self="override" />
             </archive>
           </configuration>
         </plugin>

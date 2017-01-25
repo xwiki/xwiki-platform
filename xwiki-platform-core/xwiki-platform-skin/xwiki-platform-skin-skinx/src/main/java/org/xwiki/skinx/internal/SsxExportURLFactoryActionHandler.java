@@ -23,11 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.web.SsxAction;
 import com.xpn.xwiki.web.sx.Extension;
-import com.xpn.xwiki.web.sx.SxSource;
 
 /**
  * Handles SSX URL rewriting, by extracting and rendering the SSX content in a file on disk and generating a URL
@@ -56,23 +54,5 @@ public class SsxExportURLFactoryActionHandler extends AbstractSxExportURLFactory
     @Override public Extension getExtensionType()
     {
         return SsxAction.CSSX;
-    }
-
-    @Override
-    protected String getContent(SxSource sxSource, FilesystemExportContext exportContext)
-    {
-        // There can be some calls to URLs inside the SSX content. For example:
-        //   background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.png')");
-        // In order for these URLs to be resolved correctly they need to be relative to where the CSS file is located
-        // on disk. Thus we adjust the CSS path by 3 levels since we're locating the SSX files in "ssx/<space>/<page>".
-        // TODO: Fixme since this won't work with nested pages
-        exportContext.pushCSSParentLevels(3);
-
-        try {
-            return super.getContent(sxSource, exportContext);
-        } finally {
-            // Put back the CSS level
-            exportContext.popCSSParentLevels();
-        }
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blog</artifactId>
-    <version>9.0-SNAPSHOT</version>
+    <version>9.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-blog-api</artifactId>
   <name>XWiki Platform - Blog - API</name>

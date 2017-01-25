@@ -129,7 +129,7 @@ public class ExportURLFactoryMockitoTest
         when(this.relativeEntityReferenceResolver.resolve("Main", EntityType.SPACE)).thenReturn(
             new EntityReference("Main", EntityType.SPACE));
 
-        this.factory.init(Arrays.asList("Main.WebHome"), null, new FilesystemExportContext(), this.context);
+        this.factory.init(Arrays.asList(pageReference), null, new FilesystemExportContext(), this.context);
         assertEquals(new URL("http://localhost:8080/xwiki/bin/Main/SomeOtherPage"),
             this.factory.createURL("Main", "SomeOtherPage", "view", null, null, "xwiki", this.context));
     }
@@ -151,7 +151,7 @@ public class ExportURLFactoryMockitoTest
         // Simulate locating the doc in pages/Main/WebHome (ie 3 levels deep)
         exportContext.setDocParentLevels(3);
 
-        this.factory.init(Arrays.asList("Main.WebHome"), null, exportContext, this.context);
+        this.factory.init(Arrays.asList(pageReference), null, exportContext, this.context);
         assertEquals(new URL("file://../../../pages/Main/WebHome.html"),
             this.factory.createURL("Main", "WebHome", "view", null, null, "xwiki", this.context));
     }

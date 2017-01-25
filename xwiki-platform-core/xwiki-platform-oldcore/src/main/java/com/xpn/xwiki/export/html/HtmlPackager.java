@@ -110,9 +110,9 @@ public class HtmlPackager
     private String description = "";
 
     /**
-     * The pages to export. A {@link Set} of page name.
+     * The references to the pages to export.
      */
-    private Set<String> pages = new HashSet<String>();
+    private Set<DocumentReference> pageReferences = new HashSet<>();
 
     /**
      * Used to get the temporary directory.
@@ -162,40 +162,73 @@ public class HtmlPackager
      * Add a page to export.
      *
      * @param page the name of the page to export.
+     * @deprecated since 8.4.5/9.0, use {@link #addPageReference(DocumentReference)} instead
      */
+    @Deprecated
     public void addPage(String page)
     {
-        this.pages.add(page);
+        this.pageReferences.add(resolvePage(page));
     }
 
     /**
      * Add a range of pages to export.
      *
      * @param pages a range of pages to export.
+     * @deprecated since 8.4.5/9.0, use {@link #addPageReferences(Collection)} instead
      */
+    @Deprecated
     public void addPages(Collection<String> pages)
     {
-        this.pages.addAll(pages);
+        for (String page : pages) {
+            this.pageReferences.add(resolvePage(page));
+        }
+    }
+
+    /**
+     * Add a page to export.
+     *
+     * @param pageReference the reference of the page to export.
+     * @since 8.4.5
+     * @since 9.0
+     */
+    public void addPageReference(DocumentReference pageReference)
+    {
+        this.pageReferences.add(pageReference);
+    }
+
+    /**
+     * Add a range of pages to export.
+     *
+     * @param pageReferences a range of page references to export.
+     * @since 8.4.5
+     * @since 9.0
+     */
+    public void addPageReferences(Collection<DocumentReference> pageReferences)
+    {
+        this.pageReferences.addAll(pageReferences);
+    }
+
+    private DocumentReference resolvePage(String pageName)
+    {
+        DocumentReferenceResolver<String> resolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        return resolver.resolve(pageName);
     }
 
     /**
      * Add rendered document to ZIP stream.
      *
-     * @param pageName the name (used with {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page to
-     *            render.
+     * @param pageReference the reference of the page to render.
      * @param zos the ZIP output stream.
      * @param exportContext the context object for the export
      * @param context the XWiki context.
      * @throws XWikiException error when rendering document.
      * @throws IOException error when rendering document.
      */
-    private void renderDocument(String pageName, ZipOutputStream zos, FilesystemExportContext exportContext,
-        XWikiContext context) throws XWikiException, IOException
+    private void renderDocument(DocumentReference pageReference, ZipOutputStream zos,
+        FilesystemExportContext exportContext, XWikiContext context) throws XWikiException, IOException
     {
-        DocumentReferenceResolver<String> resolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        DocumentReference docReference = resolver.resolve(pageName);
-        XWikiDocument doc = context.getWiki().getDocument(docReference, context);
+        XWikiDocument doc = context.getWiki().getDocument(pageReference, context);
 
         if (doc.isNew()) {
             // Skip non-existing documents.
@@ -204,7 +237,7 @@ public class HtmlPackager
 
         // Compute the location of the page inside the zip. We put pages inside directories for scalability as
         // otherwise on some OS we wouldn't be able to unzip if there are pages having a path longer than 255 chars...
-        String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(docReference);
+        String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(pageReference);
         String language = doc.getLanguage();
         if (language != null && language.length() != 0) {
             zipname += POINT + language;
@@ -298,13 +331,13 @@ public class HtmlPackager
                 Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
                     new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
                 FilesystemExportContext exportContext = exportContextProvider.get();
-                urlf.init(this.pages, tempdir, exportContext, renderContext);
+                urlf.init(this.pageReferences, tempdir, exportContext, renderContext);
                 renderContext.setURLFactory(urlf);
                 // Use the filesystem URL format for all code using the url module to generate URLs (webjars, etc).
                 Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
 
-                for (String pageName : this.pages) {
-                    renderDocument(pageName, zos, exportContext, renderContext);
+                for (DocumentReference pageReference : this.pageReferences) {
+                    renderDocument(pageReference, zos, exportContext, renderContext);
                 }
             } finally {
                 execution.popContext();
@@ -351,6 +384,9 @@ public class HtmlPackager
         // Copy generated files in the ZIP file.
         addDirToZip(tempdir, TrueFileFilter.TRUE, zos, "", null);
 
+        // Generate an index page
+        generateIndexPage(zos, context);
+
         zos.setComment(this.description);
 
         // Finish ZIP file
@@ -359,6 +395,38 @@ public class HtmlPackager
 
         // Delete temporary directory
         deleteDirectory(tempdir);
+    }
+
+    private void generateIndexPage(ZipOutputStream zos, XWikiContext context) throws IOException
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<!DOCTYPE HTML>\n"
+            + "<html lang=\"en-US\">\n"
+            + "    <head>\n"
+            + "        <meta charset=\"UTF-8\">\n"
+            + "        <title>Export Index</title>\n"
+            + "    </head>\n"
+            + "    <body>\n"
+            + "      <ul>\n");
+
+        for (DocumentReference reference : this.pageReferences) {
+            builder.append("        <li><a href=\"");
+            builder.append("pages/");
+            builder.append(this.pathEntityReferenceSerializer.serialize(reference));
+            builder.append(".html");
+            builder.append("\">");
+            builder.append(reference.toString());
+            builder.append("</a></li>\n");
+        }
+
+        builder.append("      </ul>\n"
+            + "    </body>\n"
+            + "</html>\n");
+
+        ZipEntry zipentry = new ZipEntry("index.html");
+        zos.putNextEntry(zipentry);
+        zos.write(builder.toString().getBytes(context.getWiki().getEncoding()));
+        zos.closeEntry();
     }
 
     /**

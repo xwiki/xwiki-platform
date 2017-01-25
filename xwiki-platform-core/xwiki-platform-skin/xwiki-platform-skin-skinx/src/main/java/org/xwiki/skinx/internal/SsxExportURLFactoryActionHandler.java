@@ -65,6 +65,7 @@ public class SsxExportURLFactoryActionHandler extends AbstractSxExportURLFactory
         //   background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.png')");
         // In order for these URLs to be resolved correctly they need to be relative to where the CSS file is located
         // on disk. Thus we adjust the CSS path by 3 levels since we're locating the SSX files in "ssx/<space>/<page>".
+        // TODO: Fixme since this won't work with nested pages
         exportContext.pushCSSParentLevels(3);
 
         try {

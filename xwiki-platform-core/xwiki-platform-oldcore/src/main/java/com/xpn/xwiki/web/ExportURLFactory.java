@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
@@ -137,15 +138,17 @@ public class ExportURLFactory extends XWikiServletURLFactory
      *
      * @param exportedPages the pages that will be exported.
      * @param exportDir the directory where to copy exported objects (attachments).
+     * @param exportContext the context for the export
      * @param context the XWiki context.
+     * @since 8.4.5
+     * @since 9.0
      */
-    public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)
+    public void init(Collection<String> exportedPages, File exportDir, FilesystemExportContext exportContext,
+        XWikiContext context)
     {
         super.init(context);
 
-        Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
-            new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
-        this.exportContext = exportContextProvider.get();
+        this.exportContext = exportContext;
 
         if (exportDir != null) {
             getFilesystemExportContext().setExportDir(exportDir);
@@ -156,28 +159,37 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
         if (exportedPages != null) {
             for (String pageName : exportedPages) {
-                XWikiDocument doc = new XWikiDocument();
+                DocumentReferenceResolver<String> currentDocumentReferenceResolver =
+                        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
 
-                doc.setFullName(pageName);
+                DocumentReference pageReference = currentDocumentReferenceResolver.resolve(pageName);
 
-                String absolutePageName = "";
-
-                if (doc.getDatabase() != null) {
-                    absolutePageName += doc.getDatabase().toLowerCase();
-                } else {
-                    absolutePageName += context.getWikiId().toLowerCase();
-                }
-
-                absolutePageName += XWikiDocument.DB_SPACE_SEP;
-
-                absolutePageName += doc.getFullName();
-
-                getFilesystemExportContext().addExportedPage(absolutePageName);
+                getFilesystemExportContext().addExportedPage(
+                        this.pathEntityReferenceSerializer.serialize(pageReference));
 
                 // Backward-compatibility, also set the exportedPages deprecated variable.
-                this.exportedPages.addAll(getFilesystemExportContext().getExportedPages());
+                EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+                        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+                this.exportedPages.add(defaultEntityReferenceSerializer.serialize(pageReference));
             }
         }
+    }
+
+    /**
+     * Init the url factory.
+     *
+     * @param exportedPages the pages that will be exported.
+     * @param exportDir the directory where to copy exported objects (attachments).
+     * @param context the XWiki context.
+     * @deprecated starting with 8.4.5/9.0, use {@link #init(Collection, File, FilesystemExportContext, XWikiContext)}
+     */
+    @Deprecated
+    public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)
+    {
+        Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
+            new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
+
+        init(exportedPages, exportDir, exportContextProvider.get(), context);
     }
 
     @Override
@@ -441,6 +453,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 StringBuffer newpath = new StringBuffer();
 
                 newpath.append("file://");
+
+                // Adjust depending on the exported location of the current doc.
+                newpath.append(StringUtils.repeat("../", getFilesystemExportContext().getDocParentLevel()));
+
+                newpath.append("pages/");
                 newpath.append(serializedReference);
                 newpath.append(".html");
 
@@ -548,6 +565,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     private void adjustCSSPath(StringBuilder path)
     {
-        path.append(StringUtils.repeat("../", getFilesystemExportContext().getCSSParentLevel()));
+        path.append(StringUtils.repeat("../", getFilesystemExportContext().getCSSParentLevel()
+            + getFilesystemExportContext().getDocParentLevel()));
     }
 }

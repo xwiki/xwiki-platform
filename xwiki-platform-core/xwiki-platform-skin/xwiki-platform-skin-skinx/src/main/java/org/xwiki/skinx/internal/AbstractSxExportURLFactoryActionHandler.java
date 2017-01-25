@@ -138,6 +138,12 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
 
         // Rewrite the URL
         StringBuilder path = new StringBuilder("file://");
+
+        // Adjust based on current document's location. We need to account for the fact that the current document
+        // is stored in subdirectories inside the top level "pages" directory. Since the SX files are also in top
+        // subdirectories, we need to compute the path to them.
+        path.append(StringUtils.repeat("../", exportContext.getDocParentLevel()));
+
         path.append(getSxPrefix());
         path.append(URL_PATH_SEPARATOR);
         for (String spaceName : spaceNames) {

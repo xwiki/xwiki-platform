@@ -42,6 +42,11 @@ public class FilesystemExportContext
     private Stack<Integer> cssParentDepth = new Stack<>();
 
     /**
+     * @see #getDocParentLevel()
+     */
+    private int docParentDepth;
+
+    /**
      * @see #getExportedPages()
      */
     private Set<String> exportedPages = new HashSet<>();
@@ -70,6 +75,16 @@ public class FilesystemExportContext
     }
 
     /**
+     * @return the number of relative parent levels in the path to find the root of the pages directory
+     * @since 8.4.5
+     * @since 9.0
+     */
+    public int getDocParentLevel()
+    {
+        return this.docParentDepth;
+    }
+
+    /**
      * Pushes a new CSS parent's levels.
      *
      * @param depth the number of relative parent levels in the path to find the CSS file
@@ -77,6 +92,18 @@ public class FilesystemExportContext
     public void pushCSSParentLevels(int depth)
     {
         this.cssParentDepth.push(depth);
+    }
+
+    /**
+     * Set the current document's nesting level.
+     *
+     * @param depth the number of relative parent levels in the path to find the root of the pages directory
+     * @since 8.4.5
+     * @since 9.0
+     */
+    public void setDocParentLevels(int depth)
+    {
+        this.docParentDepth = depth;
     }
 
     /**

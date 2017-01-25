@@ -65,6 +65,8 @@ public class FilesystemResourceReferenceSerializer
      */
     private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars";
 
+    private static final String PARENT = "..";
+
     private static final String WEBJAR_PATH = "webjars";
 
     @Inject
@@ -85,9 +87,20 @@ public class FilesystemResourceReferenceSerializer
 
         List<String> pathSegments = new ArrayList<>();
 
-        // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
-        for (int i = 0; i < exportContext.getCSSParentLevel(); i++) {
-            pathSegments.add("..");
+        // If the webjar URL is computed inside a CSS file then we need to be relative to that CSS's path, i.e only
+        // take into accoutn the CSS Parent levels. However if the webjar URL is not inside a CSS we need to take into
+        // account the doc parent level.
+
+        // Adjust path depending on where the current doc is stored
+        if (exportContext.getCSSParentLevel() == 0) {
+            for (int i = 0; i < exportContext.getDocParentLevel(); i++) {
+                pathSegments.add(PARENT);
+            }
+        } else {
+            // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
+            for (int i = 0; i < exportContext.getCSSParentLevel(); i++) {
+                pathSegments.add(PARENT);
+            }
         }
 
         pathSegments.add(WEBJAR_PATH);

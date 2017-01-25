@@ -24,9 +24,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 
+import javax.inject.Provider;
+
 import org.apache.commons.io.FileUtils;
 import org.jmock.Mock;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -42,6 +46,8 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 
     /** The tested instance. */
     private ExportURLFactory urlFactory;
+
+    private FilesystemExportContext exportContext;
 
     @Override
     protected void setUp() throws Exception
@@ -70,7 +76,11 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
         new File(this.tmpDir, "attachment").mkdir();
 
         this.urlFactory = new ExportURLFactory();
-        this.urlFactory.init(null, this.tmpDir, getContext());
+
+        Provider<FilesystemExportContext> exportContextProvider = getComponentManager().getInstance(
+            new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
+        this.exportContext = exportContextProvider.get();
+        this.urlFactory.init(null, this.tmpDir, exportContext, getContext());
     }
 
     /**
@@ -83,6 +93,11 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
         // Prepare the exported document and attachment.
         XWikiDocument doc = new XWikiDocument(
             new DocumentReference("xwiki", Arrays.asList(" Space1 ", "Space2"), "New  Page"));
+
+        // Simulate the doc depth (there are 4 levels since the doc will be placed in
+        // pages/xwiki/Space1/Space2/New%20%20Page).
+        this.exportContext.setDocParentLevels(4);
+
         XWikiAttachment attachment = new XWikiAttachment(doc, "img .jpg");
         attachment.setContent(new ByteArrayInputStream("test".getBytes()));
         doc.getAttachmentList().add(attachment);
@@ -90,7 +105,7 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 
         URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space1 .Space2", "Pa ge", "view", "", "x",
             getContext());
-        assertEquals(new URL("file://attachment/x/+Space1+/Space2/Pa+ge/img+%252Ejpg"), url);
+        assertEquals(new URL("file://../../../../attachment/x/+Space1+/Space2/Pa+ge/img+%252Ejpg"), url);
     }
 
     /** When the test is over, delete the folder where the exported attachments were placed. */

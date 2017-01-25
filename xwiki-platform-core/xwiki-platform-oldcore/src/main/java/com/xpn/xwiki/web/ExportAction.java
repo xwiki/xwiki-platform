@@ -39,6 +39,7 @@ import org.xwiki.filter.output.OutputFilterStream;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceSet;
@@ -108,7 +109,7 @@ public class ExportAction extends XWikiAction
             name = context.getDoc().getFullName();
         }
 
-        Collection<String> pageList = resolvePagesToExport(request.getParameterValues("pages"), context);
+        Collection<DocumentReference> pageList = resolvePagesToExport(request.getParameterValues("pages"), context);
         if (pageList.isEmpty()) {
             return null;
         }
@@ -123,18 +124,19 @@ public class ExportAction extends XWikiAction
             packager.setDescription(description);
         }
 
-        packager.addPages(pageList);
+        packager.addPageReferences(pageList);
 
         packager.export(context);
 
         return null;
     }
 
-    private Collection<String> resolvePagesToExport(String[] pages, XWikiContext context) throws XWikiException
+    private Collection<DocumentReference> resolvePagesToExport(String[] pages, XWikiContext context)
+        throws XWikiException
     {
-        List<String> pageList = new ArrayList<>();
+        List<DocumentReference> pageList = new ArrayList<>();
         if (pages == null || pages.length == 0) {
-            pageList.add(context.getDoc().getFullName());
+            pageList.add(context.getDoc().getDocumentReference());
         } else {
             Map<String, Object[]> wikiQueries = new HashMap<String, Object[]>();
             for (int i = 0; i < pages.length; ++i) {
@@ -171,6 +173,9 @@ public class ExportAction extends XWikiAction
                 params.add(pattern);
             }
 
+            DocumentReferenceResolver<String> resolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+
             String database = context.getWikiId();
             try {
                 for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
@@ -184,9 +189,10 @@ public class ExportAction extends XWikiAction
                     List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
-                        if (context.getWiki().getRightService()
-                            .hasAccessLevel("view", context.getUser(), pageReference, context)) {
-                            pageList.add(pageReference);
+                        if (context.getWiki().getRightService().hasAccessLevel(
+                            "view", context.getUser(), pageReference, context))
+                        {
+                            pageList.add(resolver.resolve(pageReference));
                         }
                     }
                 }
@@ -284,11 +290,9 @@ public class ExportAction extends XWikiAction
                 entities.includes(new WikiReference(context.getWikiId()));
             } else {
                 // Find all page references and add them for processing
-                Collection<String> pageList = resolvePagesToExport(pages, context);
-                DocumentReferenceResolver<String> resolver =
-                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-                for (String pageName : pageList) {
-                    entities.includes(resolver.resolve(pageName));
+                Collection<DocumentReference> pageList = resolvePagesToExport(pages, context);
+                for (DocumentReference page : pageList) {
+                    entities.includes(page);
                 }
             }
 

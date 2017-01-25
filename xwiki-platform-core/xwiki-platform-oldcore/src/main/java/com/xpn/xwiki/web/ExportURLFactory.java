@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -143,7 +145,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @since 8.4.5
      * @since 9.0
      */
-    public void init(Collection<String> exportedPages, File exportDir, FilesystemExportContext exportContext,
+    public void init(Collection<DocumentReference> exportedPages, File exportDir, FilesystemExportContext exportContext,
         XWikiContext context)
     {
         super.init(context);
@@ -158,12 +160,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         if (exportedPages != null) {
-            for (String pageName : exportedPages) {
-                DocumentReferenceResolver<String> currentDocumentReferenceResolver =
-                        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-
-                DocumentReference pageReference = currentDocumentReferenceResolver.resolve(pageName);
-
+            for (DocumentReference pageReference : exportedPages) {
                 getFilesystemExportContext().addExportedPage(
                         this.pathEntityReferenceSerializer.serialize(pageReference));
 
@@ -189,7 +186,15 @@ public class ExportURLFactory extends XWikiServletURLFactory
         Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
             new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
 
-        init(exportedPages, exportDir, exportContextProvider.get(), context);
+        DocumentReferenceResolver<String> resolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+
+        List<DocumentReference> references = new ArrayList<>();
+        for (String exportedPage : exportedPages) {
+            references.add(resolver.resolve(exportedPage));
+        }
+
+        init(references, exportDir, exportContextProvider.get(), context);
     }
 
     @Override

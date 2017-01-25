@@ -125,9 +125,7 @@
 
       // See http://docs.ckeditor.com/#!/api/CKEDITOR.plugins.widget.definition
       editor.widgets.add('xwiki-macro', {
-        requiredContent: 'div(macro)[data-macro]; span(macro)[data-macro]',
-        template: '<span class="macro" data-macro=""><span class="macro-placeholder">macro:name</span></span>',
-        dialog: 'xwiki-macro',
+        requiredContent: 'div(macro,macro-placeholder)[data-macro];span(macro,macro-placeholder)[data-macro]',
         pathName: 'macro',
         upcast: function(element) {
           return (element.name == 'div' || element.name == 'span') &&
@@ -135,7 +133,10 @@
         },
         downcast: unWrapMacroOutput,
         init: function() {
-          this.setData(macroPlugin.parseMacroCall(this.element.getAttribute('data-macro')));
+          var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
+          // Preserve the macro type (in-line vs. block) as much as possible when editing a macro.
+          data.inline = this.inline;
+          this.setData(data);
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
@@ -147,35 +148,57 @@
           $(this.element.$).find('.macro-placeholder').text(this.pathName);
         },
         edit: function(event) {
+          // Prevent the default behavior because we want to use our custom dialog.
+          event.cancel();
+          // Our custom edit dialog allows the user to change the macro, which means the user can change from an in-line
+          // macro to a block macro (or the other way around). As a consequence we may have to replace the existing
+          // macro widget (in-line widgets and block widgets are handled differently by the editor).
+          this.insert();
+        },
+        insert: function() {
           var widget = this;
-          // Override the next call to openDialog in order to hook our custom dialog.
-          var openDialog = this.editor.openDialog;
-          this.editor.openDialog = function(dialogName, callback) {
-            // Restore the original function.
-            this.openDialog = openDialog;
-            // Create a fake CKEditor dialog in order for the widget to add its listeners.
-            var dialog = {};
-            CKEDITOR.event.implementOn(dialog);
-            widget.fire('dialog', dialog);
-            // Show our custom dialog.
-            require(['macroWizard'], function(macroWizard) {
-              macroWizard(widget.data).done(function(macroCall) {
-                // Prevent the editor from recording a history entry where the macro data is updated but the macro
-                // output is not refreshed. The lock is removed by the call to setLoading(false) after the macro output
-                // is refreshed.
-                editor.fire('lockSnapshot', {dontUpdate: true});
-                widget.setData(macroCall);
-                dialog.fire('ok');
-                setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
-              }).fail(function() {
-                dialog.fire('cancel');
-              }).always(function() {
-                dialog.fire('hide');
-              });
+          // Show our custom insert/edit dialog.
+          require(['macroWizard'], function(macroWizard) {
+            macroWizard(widget.data).done(function(data) {
+              // Prevent the editor from recording a history entry where the macro data is updated but the macro
+              // output is not refreshed. The lock is removed by the call to setLoading(false) after the macro output
+              // is refreshed.
+              editor.fire('lockSnapshot', {dontUpdate: true});
+              var expectedElementName = data.inline ? 'span' : 'div';
+              if (widget.element && widget.element.getName() === expectedElementName) {
+                // We have edited a macro and the macro type (inline vs. block) didn't change.
+                // We can safely update the existing macro widget.
+                widget.setData(data);
+              } else {
+                // We are either inserting a new macro or we are changing the macro type (e.g. from in-line to block).
+                // Changing the macro type may require changes to the HTML structure (e.g. split the parent paragraph)
+                // in order to preserve the HTML validity, so we have to replace the existing macro widget.
+                createMacroWidget(data);
+              }
+              // Refresh all the macros because a change in one macro can affect the output of the other macros.
+              setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
             });
-          };
+          });
         }
       });
+
+      // Macro widget template is different depending on whether the macro is in-line or not.
+      var blockMacroWidgetTemplate =
+        '<div class="macro" data-macro="">' +
+          '<div class="macro-placeholder">macro:name</div>' +
+        '</div>';
+      var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
+      var createMacroWidget = function(data) {
+        var widgetDefinition = editor.widgets.registered['xwiki-macro'];
+        var macroWidgetTemplate = data.inline ? inlineMacroWidgetTemplate : blockMacroWidgetTemplate;
+        var element = CKEDITOR.dom.element.createFromHtml(macroWidgetTemplate);
+        var wrapper = editor.widgets.wrapElement(element, widgetDefinition.name);
+        // Isolate the widget in a separate DOM document fragment.
+        var documentFragment = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
+        documentFragment.append(wrapper);
+        editor.widgets.initOn(element, widgetDefinition, data);
+        editor.widgets.finalizeCreation(documentFragment);
+      };
 
       editor.addCommand('xwiki-refresh', {
         async: true,

@@ -69,6 +69,7 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
 
   sortMacroParameters = function(macroDescriptor, macroCall) {
     var parameter, parameters = [];
+    // Add the actual macro parameters (those specified in the macro descriptor).
     if (macroDescriptor.parameterDescriptorMap) {
       for (var parameterId in macroDescriptor.parameterDescriptorMap) {
         if (macroDescriptor.parameterDescriptorMap.hasOwnProperty(parameterId)) {
@@ -79,6 +80,7 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
         }
       }
     }
+    // Handle the macro content as a special macro parameter.
     if (macroDescriptor.contentDescriptor) {
       parameter = $.extend({
         id: '$content',
@@ -328,11 +330,18 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
         }
       });
       submitButton.click(function(event) {
-        var macroEditorAPI = modal.find('.macro-editor').xwikiMacroEditor();
+        var macroEditor = modal.find('.macro-editor');
+        var macroEditorAPI = macroEditor.xwikiMacroEditor();
         if (macroEditorAPI.validate()) {
           var output = modal.data('input');
           delete output.action;
+          // Preserve the in-line/block mode if possible. Note that we consider the macro in-line if no value is
+          // specified, because the caret is placed in an in-line context most of the time (e.g. inside a paragraph) in
+          // order to allow the user to type text).
+          var inline = (!output.macroCall || output.macroCall.inline !== false) &&
+            macroEditor.data('macroDescriptor').supportsInlineMode;
           output.macroCall = macroEditorAPI.getMacroCall();
+          output.macroCall.inline = inline;
           modal.data('output', output).modal('hide');
         }
       });

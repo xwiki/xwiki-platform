@@ -159,6 +159,9 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
 
     protected String getContent(SxSource sxSource, FilesystemExportContext exportContext)
     {
+        // Note: the exportContext parameter is not used by default but it's here so that classes extending this class
+        // could overwrite this method and have access to the export context.
+
         return sxSource.getContent();
     }
 

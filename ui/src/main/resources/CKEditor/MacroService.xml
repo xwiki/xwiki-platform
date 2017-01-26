@@ -45,7 +45,7 @@
   #if ($request.data == 'list')
     #getMacroList($request.syntaxId)
   #elseif ($request.data == 'descriptor')
-    #getMacroDescriptor($request.macroId)
+    #maybeGetMacroDescriptor($request.macroId)
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))
@@ -78,10 +78,22 @@
   #set ($data = $sorttool.sort($data, 'name'))
 #end
 
-#macro (getMacroDescriptor $macroIdAsString)
-  #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
+#macro (maybeGetMacroDescriptor $macroIdAsString)
   #set ($macroIdFactory = $services.component.getInstance('org.xwiki.rendering.macro.MacroIdFactory'))
   #set ($macroId = $macroIdFactory.createMacroId($macroIdAsString))
+  #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
+  #if ($macroManager.exists($macroId))
+    #getMacroDescriptor($macroId)
+  #elseif ($macroId.syntax)
+    ## Try the macro id without the syntax.
+    #set ($macroId = $macroIdFactory.createMacroId($macroId.id))
+    #if ($macroManager.exists($macroId))
+      #getMacroDescriptor($macroId)
+    #end
+  #end
+#end
+
+#macro (getMacroDescriptor $macroId)
   #set ($macro = $macroManager.getMacro($macroId))
   #set ($macroDescriptor = $macro.descriptor)
   #set ($data = $jsontool.parse($jsontool.serialize($macroDescriptor)))
@@ -97,10 +109,15 @@
     #set ($data.contentDescriptor.description = "#maybeTranslate(""${macroTranslationKey}.content.description""
       $data.contentDescriptor.description)")
   #end
+  ## Make sure the keys in the parameter descriptor map are all lowercase.
+  ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
+  ## descriptor map keys
+  #set ($parameterDescriptorMap = $collectionstool.orderedMap)
   #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
     #set ($parameterDescriptor = $data.parameterDescriptorMap.get($entry.key))
+    #set ($discard = $parameterDescriptorMap.put($entry.key.toLowerCase(), $parameterDescriptor))
     ## Translate the parameter name and description.
-    #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$entry.key")
+    #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$parameterDescriptor.id")
     #set ($parameterDescriptor.name = "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)")
     #set ($parameterDescriptor.description = "#maybeTranslate(""${parameterTranslationKey}.description"" $parameterDescriptor.description)")
     #set ($parameterType = $entry.value.parameterType)
@@ -123,8 +140,13 @@
           'label': "#maybeTranslate(""${parameterTranslationKey}.value.$parameterValue"" $parameterValue)"
         }))
       #end
+    #elseif (($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
+        &amp;&amp; $data.parametersBeanClass.endsWith('.WikiMacroParameters'))
+      #set ($parameterDescriptor.type = 'boolean')
+      #set ($parameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
     #end
   #end
+  #set ($data.parameterDescriptorMap = $parameterDescriptorMap)
 #end
 
 #macro (maybeTranslate $key $defaultValue)

@@ -160,6 +160,14 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
     return output;
   },
 
+  booleanValue = function(value) {
+    if (typeof value === 'string') {
+      return value === 'true';
+    } else {
+      return !!value;
+    }
+  },
+
   displayMacroParameterField = function(parameter) {
     var field;
     if (parameter.id === '$content') {
@@ -172,7 +180,7 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
         '</div>'
       );
       field.children('input').attr('name', parameter.id);
-      var checked = typeof parameter.value === 'boolean' ? parameter.value : parameter.defaultValue;
+      var checked = booleanValue(parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue);
       field.children('input[type=checkbox]').prop('checked', checked);
     } else if (parameter.type === 'enum') {
       field = $('<select/>');
@@ -245,7 +253,8 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
       macroCall.content = formData.$content;
     }
     for (var parameterId in formData) {
-      var parameterDescriptor = macroDescriptor.parameterDescriptorMap[parameterId];
+      // The parameter descriptor map keys are lower case for easy lookup (macro parameter names are case insensitive).
+      var parameterDescriptor = macroDescriptor.parameterDescriptorMap[parameterId.toLowerCase()];
       if (parameterDescriptor) {
         var value = formData[parameterId];
         if ($.isArray(value)) {

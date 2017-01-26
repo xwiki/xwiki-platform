@@ -142,10 +142,11 @@ public class XWikiMacroService implements MacroService
             }
 
             // We use a linked hash map to preserve the order of the macro parameters.
-            Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<String, ParameterDescriptor>();
-            for (Map.Entry<String, org.xwiki.rendering.macro.descriptor.ParameterDescriptor> entry : descriptor
-                .getParameterDescriptorMap().entrySet()) {
-                parameterDescriptorMap.put(entry.getKey(), createMacroParameterDescriptor(entry.getValue()));
+            Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<>();
+            for (org.xwiki.rendering.macro.descriptor.ParameterDescriptor parameterDescriptor : descriptor
+                .getParameterDescriptorMap().values()) {
+                parameterDescriptorMap.put(parameterDescriptor.getId(),
+                    createMacroParameterDescriptor(parameterDescriptor));
             }
 
             MacroDescriptor result = new MacroDescriptor();
@@ -251,8 +252,8 @@ public class XWikiMacroService implements MacroService
 
             return descriptors;
         } catch (Exception e) {
-            throw new RuntimeException("Exception while retrieving the list of macro descriptors for syntax ["
-                + syntaxId + "].", e);
+            throw new RuntimeException(
+                "Exception while retrieving the list of macro descriptors for syntax [" + syntaxId + "].", e);
         } finally {
             // Reset the context's current wiki.
             if (oldWikiId != newWikiId) {

@@ -58,6 +58,7 @@ public class MailStateTest
         assertEquals(MailState.PREPARE_SUCCESS, state);
     }
 
+    @Test
     public void parseWhenPrepareErrorsState()
     {
         MailState state = MailState.parse("prepare_error");

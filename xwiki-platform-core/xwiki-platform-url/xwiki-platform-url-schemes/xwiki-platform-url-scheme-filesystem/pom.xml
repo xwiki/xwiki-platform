@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>URLs to XWiki Resources exported on the filesystem format</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filesystem URL Scheme</xwiki.extension.name>
   </properties>

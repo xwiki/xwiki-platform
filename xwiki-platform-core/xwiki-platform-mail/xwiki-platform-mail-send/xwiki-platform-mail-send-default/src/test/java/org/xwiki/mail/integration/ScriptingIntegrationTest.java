@@ -199,7 +199,7 @@ public class ScriptingIntegrationTest
         assertNull(this.scriptService.getLastError());
 
         // Wait for all mails to be sent
-        result.getStatusResult().waitTillProcessed(10000L);
+        result.getStatusResult().waitTillProcessed(30000L);
         assertTrue(result.getStatusResult().isProcessed());
 
         // Verify that all mails have been sent properly

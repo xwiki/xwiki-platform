@@ -195,7 +195,7 @@ public class MailTest extends AbstractTest
         ViewPage vp = getUtil().createPage(getTestClassName(), "SendInvalidMail", velocity, "");
 
         // Verify that the page is not empty (and thus an error message is displayed). Note that it's difficult to
-        // asssert what is displayed because it could vary from system to system. This is why we only assert that
+        // assert what is displayed because it could vary from system to system. This is why we only assert that
         // something is displayed and that it matches the defined pattern.
         assertTrue(vp.getContent().matches("(?s)MSGID.*SUMMARY.*DESCRIPTION.*"));
     }
@@ -236,7 +236,7 @@ public class MailTest extends AbstractTest
         assertEquals("", vp.getContent());
 
         // Verify that the mail has been received.
-        this.mail.waitForIncomingEmail(10000L, 1);
+        this.mail.waitForIncomingEmail(30000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
         assertReceivedMessages(1,
             "Subject: Status for John on " + getTestClassName() + ".SendMail",
@@ -293,7 +293,7 @@ public class MailTest extends AbstractTest
         assertEquals("", vp.getContent());
 
         // Verify that the mails have been received (first mail above + the 2 mails sent to the group)
-        this.mail.waitForIncomingEmail(10000L, 3);
+        this.mail.waitForIncomingEmail(30000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
         assertReceivedMessages(2,
             "Subject: Status for John on " + getTestClassName() + ".SendMailGroupAndUsers",

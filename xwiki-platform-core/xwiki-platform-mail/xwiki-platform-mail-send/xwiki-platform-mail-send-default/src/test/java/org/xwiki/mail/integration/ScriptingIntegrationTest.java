@@ -210,8 +210,8 @@ public class ScriptingIntegrationTest
         assertFalse("There should not be any mails in the ready state!",
             result.getStatusResult().getByState(MailState.PREPARE_SUCCESS).hasNext());
 
-        // Verify that the mails have been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 3);
+        // Verify that the mails have been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(3, messages.length);
@@ -280,8 +280,8 @@ public class ScriptingIntegrationTest
         assertFalse("There should not be any mails in the ready state!",
             result.getStatusResult().getByState(MailState.PREPARE_SUCCESS).hasNext());
 
-        // Verify that the mail has been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 1);
+        // Verify that the mail has been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(1, messages.length);

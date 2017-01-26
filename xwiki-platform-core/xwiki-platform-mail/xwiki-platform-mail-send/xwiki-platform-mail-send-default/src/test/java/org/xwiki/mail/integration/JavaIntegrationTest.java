@@ -217,8 +217,8 @@ public class JavaIntegrationTest
         // Note: we don't test status reporting from the listener since this is already tested in the
         // ScriptingIntegrationTest test class.
 
-        // Verify that the mails have been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 3);
+        // Verify that the mails have been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         // Note: we're receiving 9 messages since we sent 3 with 3 recipients (2 BCC and 1 to)!
@@ -289,8 +289,8 @@ public class JavaIntegrationTest
         // Step 4: Send the mail and wait for it to be sent
         this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
-        // Verify that the mail has been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 1);
+        // Verify that the mail has been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals("subject", messages[0].getHeader("Subject", null));
@@ -329,8 +329,8 @@ public class JavaIntegrationTest
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
         this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);
 
-        // Verify that the mails have been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 1);
+        // Verify that the mails have been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals("<custom@domain>", messages[0].getMessageID());

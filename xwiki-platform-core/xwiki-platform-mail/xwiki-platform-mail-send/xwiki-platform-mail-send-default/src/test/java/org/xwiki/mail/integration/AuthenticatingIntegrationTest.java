@@ -213,8 +213,8 @@ public class AuthenticatingIntegrationTest
         // Step 4: Send the mail
         this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
-        // Verify that the mail has been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 1);
+        // Verify that the mail has been received (wait maximum 30 seconds).
+        this.mail.waitForIncomingEmail(30000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(1, messages.length);

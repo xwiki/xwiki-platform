@@ -48,7 +48,7 @@ public abstract class AbstractExtendedURLResourceReferenceSerializer
      * Transforms a Resource Reference into some other representation.
      *
      * @param reference the Resource Reference to transform
-     * @param formatId the id of the URL format to use (e.g. "standard", "referene", etc)
+     * @param formatId the id of the URL format to use (e.g. "standard", "reference", etc)
      * @return the new representation
      * @throws SerializeResourceReferenceException if there was an error while serializing the XWiki Resource object
      * @throws UnsupportedResourceReferenceException if the passed representation points to an unsupported Resource

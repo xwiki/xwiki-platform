@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,13 +44,13 @@ public class WikiMacroParameters implements RawProperties
      */
     public WikiMacroParameters()
     {
-        this.parametersMap = new HashMap<String, Object>();
+        this.parametersMap = new LinkedHashMap<>();
     }
 
     @Override
     public void set(String propertyName, Object value)
     {
-        this.parametersMap.put(propertyName, value);
+        this.parametersMap.put(propertyName != null ? propertyName.toLowerCase() : null, value);
     }
 
     /**
@@ -71,6 +71,6 @@ public class WikiMacroParameters implements RawProperties
      */
     public Object get(String propertyName)
     {
-        return this.parametersMap.get(propertyName);
+        return this.parametersMap.get(propertyName != null ? propertyName.toLowerCase() : null);
     }
 }

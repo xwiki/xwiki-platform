@@ -226,7 +226,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 
             // Make sure to use provided metadatas
             MetaDataBlock metaDataBlock =
-                new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
+                new MetaDataBlock(Collections.<Block>singletonList(wikiMacroMarker), xdom.getMetaData());
 
             // Make sure the context XDOM contains the wiki macro content
             wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
@@ -352,17 +352,17 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         // Note that we currently verify automatically mandatory parameters in Macro Transformation but for the moment
         // this is only checked for Java-based macros. Hence why we need to check here too.
         Map<String, ParameterDescriptor> parameterDescriptors = getDescriptor().getParameterDescriptorMap();
-        for (String parameterName : parameterDescriptors.keySet()) {
-            ParameterDescriptor parameterDescriptor = parameterDescriptors.get(parameterName);
-            Object parameterValue = parameters.get(parameterName);
+        for (ParameterDescriptor parameterDescriptor : parameterDescriptors.values()) {
+            Object parameterValue = parameters.get(parameterDescriptor.getId());
             if (parameterDescriptor.isMandatory() && (null == parameterValue)) {
-                throw new MacroParameterException(String.format("Parameter [%s] is mandatory", parameterName));
+                throw new MacroParameterException(
+                    String.format("Parameter [%s] is mandatory", parameterDescriptor.getId()));
             }
 
             // Set default parameter value if applicable.
             Object parameterDefaultValue = parameterDescriptor.getDefaultValue();
             if (parameterValue == null && parameterDefaultValue != null) {
-                parameters.set(parameterName, parameterDefaultValue);
+                parameters.set(parameterDescriptor.getId(), parameterDefaultValue);
             }
         }
 
@@ -405,7 +405,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     }
 
     @Override
-    public int compareTo(Macro< ? > macro)
+    public int compareTo(Macro<?> macro)
     {
         return getPriority() - macro.getPriority();
     }

@@ -159,7 +159,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         Map<String, ParameterDescriptor> descriptors = new LinkedHashMap<String, ParameterDescriptor>();
 
         for (WikiMacroParameterDescriptor descriptor : this.parameterDescriptors) {
-            descriptors.put(descriptor.getId(), descriptor);
+            descriptors.put(descriptor.getId().toLowerCase(), descriptor);
         }
 
         return descriptors;

@@ -77,7 +77,8 @@
         $xwiki.get($entry.key).importString))
     #end
   #end
-  $!output##
+  ## Unescape {{ which happened in CKEditor.ContentSheet for protecting the {{html}} macro.
+  $!output.replace('&amp;amp;#123;&amp;amp;#123;', '{{')##
 #end
 
 #macro (importCSS $groupId $artifactId $version $path $evaluate)

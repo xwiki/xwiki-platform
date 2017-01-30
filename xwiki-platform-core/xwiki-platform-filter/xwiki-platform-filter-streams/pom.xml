@@ -32,6 +32,5 @@
   <name>XWiki Platform - Filter - Streams</name>
   <modules>
     <module>xwiki-platform-filter-stream-xar</module>
-    <module>xwiki-platform-filter-stream-confluencexml</module>
   </modules>
 </project>

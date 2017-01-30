@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -34,6 +33,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public abstract class AbstractMandatoryClassInitializer extends AbstractMandatoryDocumentInitializer
 {
+    private static final LocalDocumentReference CLASSSHEET_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "ClassSheet");
+
+    private static final LocalDocumentReference XWIKICLASSES_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiClasses");
+
     /**
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
@@ -97,16 +102,22 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
         // Set the parent since it is different from the current document's space homepage.
         if (document.getParentReference() == null) {
             needsUpdate = true;
-            document.setParentReference(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiClasses"));
+            document.setParentReference(XWIKICLASSES_REFERENCE);
         }
 
-        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
-        if (this.documentSheetBinder.getSheets(document).isEmpty()) {
-            String wikiName = document.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "ClassSheet");
-            needsUpdate |= this.documentSheetBinder.bind(document, sheet);
-        }
+        // Set the sheet of the document
+        needsUpdate |= setDocumentSheet(document);
 
         return needsUpdate;
+    }
+
+    protected boolean setDocumentSheet(XWikiDocument document)
+    {
+        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
+        if (this.documentSheetBinder.getSheets(document).isEmpty()) {
+            return this.documentSheetBinder.bind(document, CLASSSHEET_REFERENCE);
+        }
+
+        return false;
     }
 }

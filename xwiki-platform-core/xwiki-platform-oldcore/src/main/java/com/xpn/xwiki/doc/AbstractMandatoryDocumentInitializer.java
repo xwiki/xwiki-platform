@@ -66,7 +66,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     private EntityReference reference;
 
     private String title;
-
+    
     /**
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not

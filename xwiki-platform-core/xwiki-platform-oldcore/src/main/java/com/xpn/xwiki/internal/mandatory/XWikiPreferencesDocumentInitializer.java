@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
@@ -50,6 +49,9 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
      * The name of the field containing the time zone.
      */
     private static final String TIMEZONE_FIELD = "timezone";
+
+    private static final LocalDocumentReference SHEET_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AdminSheet");
 
     /**
      * Used to bind a class to a document sheet.
@@ -196,23 +198,13 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
             needsUpdate = true;
         }
 
-        boolean withoutDocumentSheets = this.documentSheetBinder.getSheets(document).isEmpty();
-        if (withoutDocumentSheets) {
-            // Bind a document sheet to prevent the default class sheet from being used.
-            this.documentSheetBinder.bind(document, document.getDocumentReference());
-        }
-        if (withoutDocumentSheets) {
-            // Unbind the document sheet we bound earlier.
-            this.documentSheetBinder.unbind(document, document.getDocumentReference());
-        }
-
-        // Use AdminSheet to display documents having XWikiPreferences objects if no other class sheet is specified.
-        if (this.classSheetBinder.getSheets(document).isEmpty()) {
-            String wikiName = document.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "AdminSheet");
-            needsUpdate |= this.classSheetBinder.bind(document, sheet);
-        }
-
         return needsUpdate;
+    }
+
+    @Override
+    protected boolean setDocumentSheet(XWikiDocument document)
+    {
+        // Use AdminSheet to display documents having XWikiPreferences objects.
+        return this.classSheetBinder.bind(document, SHEET_REFERENCE);
     }
 }

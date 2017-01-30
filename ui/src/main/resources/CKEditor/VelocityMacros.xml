@@ -43,7 +43,10 @@
 #macro (convert $text $toHTML $fromHTML)
   #if ($toHTML)
     ## The $source variable is used inside the content sheet.
-    #set ($source = {'syntax': $doc.syntax})
+    #set ($source = {
+      'documentReference': $doc.documentReference,
+      'syntax': $doc.syntax
+    })
     #if ($fromHTML)
       #set ($source.html = $text)
     #else

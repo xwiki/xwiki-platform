@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
@@ -156,6 +157,19 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     @Override
     public boolean bind(DocumentModelBridge document, DocumentReference sheetReference)
     {
+        return bind(document,
+            this.compactEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference()));
+    }
+
+    @Override
+    public boolean bind(DocumentModelBridge document, EntityReference sheetReference)
+    {
+        return bind(document,
+            this.defaultEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference()));
+    }
+
+    private boolean bind(DocumentModelBridge document, String sheetReferenceString)
+    {
         EntityReference sheetBindingClassReference =
             this.relativeReferenceResolver.resolve(getSheetBindingClass(), EntityType.DOCUMENT);
         List<BaseObject> sheetBindingObjects = ((XWikiDocument) document).getXObjects(sheetBindingClassReference);
@@ -164,27 +178,26 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
                 // The list of XWiki objects can contain null values due to a design flaw in the old XWiki core.
                 if (sheetBindingObject != null) {
                     String boundSheetStringRef = sheetBindingObject.getStringValue(SHEET_PROPERTY);
-                    DocumentReference boundSheetReference =
-                        this.documentReferenceResolver.resolve(boundSheetStringRef, document.getDocumentReference());
-                    if (boundSheetReference.equals(sheetReference)) {
+                    if (StringUtils.equals(boundSheetStringRef, sheetReferenceString)) {
                         return false;
                     }
                 }
             }
         }
-        String relativeSheetStringReference =
-            this.compactEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference());
+
         try {
             BaseObject sheetBindingObject =
                 ((XWikiDocument) document).newXObject(sheetBindingClassReference, getXWikiContext());
-            sheetBindingObject.setStringValue(SHEET_PROPERTY, relativeSheetStringReference);
+            sheetBindingObject.setStringValue(SHEET_PROPERTY, sheetReferenceString);
         } catch (XWikiException e) {
             String docStringReference =
                 this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-            String sheetStringReference = this.defaultEntityReferenceSerializer.serialize(sheetReference);
-            this.logger.warn("Failed to bind sheet [{}] to document [{}].", sheetStringReference, docStringReference);
+
+            this.logger.warn("Failed to bind sheet [{}] to document [{}].", sheetReferenceString, docStringReference);
+
             return false;
         }
+
         return true;
     }
 

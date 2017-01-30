@@ -24,6 +24,7 @@ import java.util.List;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * The interface used to bind sheets to documents and classes.
@@ -64,6 +65,21 @@ public interface SheetBinder
      *         the specified sheet was already bound to the given document)
      */
     boolean bind(DocumentModelBridge document, DocumentReference sheetReference);
+
+    /**
+     * Binds a sheet to a XWiki document. This method doesn't perform any checks on the specified sheet. The sheet may
+     * not even exist or may not be viewable by all users. The changes are not persisted until the document is saved.
+     * 
+     * @param document a XWiki document
+     * @param sheetReference a reference to a sheet
+     * @return {@code true} if the sheet was successfully bound to the given document, {@code false} otherwise (e.g. if
+     *         the specified sheet was already bound to the given document)
+     * @since 9.0
+     */
+    default boolean bind(DocumentModelBridge document, EntityReference sheetReference)
+    {
+        return false;
+    }
 
     /**
      * Removes the binding between a sheet and a XWiki document. The changes are not persisted until the document is

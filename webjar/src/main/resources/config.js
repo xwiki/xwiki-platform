@@ -37,6 +37,11 @@ CKEDITOR.editorConfig = function(config) {
     entities_latin: false,
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,
+    // The maximum image width is limited from the skin to 100% of the available page width (responsive images).
+    // Prefilling the image dimensions leads to a stretched image (horizontally) because the browser uses the prefilled
+    // height but limits the width.
+    // CKEDITOR-141: Image larger than the screen inserted with CKEditor gets distorted by default
+    image2_prefillDimensions: false,
     // Simplify the link dialog.
     linkShowAdvancedTab: false,
     linkShowTargetTab: false,

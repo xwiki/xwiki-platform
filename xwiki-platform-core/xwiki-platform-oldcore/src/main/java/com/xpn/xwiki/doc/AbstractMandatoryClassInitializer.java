@@ -64,7 +64,7 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
         boolean needUpdate = super.updateDocument(document);
 
         // Class related document fields
-        needUpdate |= setClassDocumentFields(document);
+        needUpdate |= updateClassDocumentFields(document);
 
         // Get document class
         BaseClass currentClass = document.getXClass();
@@ -92,10 +92,11 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
     /**
      * Update document with standard class related properties.
      *
-     * @param document the document
+     * @param document the document to update
      * @return true if the document has been modified, false otherwise
+     * @since 9.0
      */
-    protected boolean setClassDocumentFields(XWikiDocument document)
+    protected boolean updateClassDocumentFields(XWikiDocument document)
     {
         boolean needsUpdate = false;
 
@@ -106,12 +107,19 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
         }
 
         // Set the sheet of the document
-        needsUpdate |= setDocumentSheet(document);
+        needsUpdate |= updateDocumentSheet(document);
 
         return needsUpdate;
     }
 
-    protected boolean setDocumentSheet(XWikiDocument document)
+    /**
+     * Update document sheet. By default set the class sheet.
+     * 
+     * @param document the document to update
+     * @return true if the document has been modified, false otherwise
+     * @since 9.0
+     */
+    protected boolean updateDocumentSheet(XWikiDocument document)
     {
         // Use ClassSheet to display the class document if no other sheet is explicitly specified.
         if (this.documentSheetBinder.getSheets(document).isEmpty()) {

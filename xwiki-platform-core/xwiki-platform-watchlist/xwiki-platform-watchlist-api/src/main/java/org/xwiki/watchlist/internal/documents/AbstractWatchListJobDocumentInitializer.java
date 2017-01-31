@@ -108,7 +108,7 @@ public abstract class AbstractWatchListJobDocumentInitializer extends AbstractMa
             needsUpdate |= createWatchListJobObject(document, getMessageTemplateDocument(), context);
 
             // Set basic document fields.
-            needsUpdate |= setDocumentFields(document, getDocumentTitle());
+            needsUpdate |= updateDocumentFields(document, getDocumentTitle());
         } catch (Exception e) {
             logger.error("Failed to initialize document [{}]", getDocumentReference(), e);
         }

@@ -91,9 +91,9 @@ public abstract class AbstractMandatoryDocumentInitializer extends AbstractManda
      */
     protected boolean setClassDocumentFields(XWikiDocument document, String title)
     {
-        boolean needsUpdate = setClassDocumentFields(document);
+        boolean needsUpdate = updateClassDocumentFields(document);
 
-        needsUpdate |= setDocumentFields(document, title);
+        needsUpdate |= updateDocumentFields(document, title);
 
         return needsUpdate;
     }

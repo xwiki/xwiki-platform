@@ -94,7 +94,8 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
             try (Statement selectStatement = connection.createStatement()) {
                 try (ResultSet result =
                     selectStatement.executeQuery("select DISTINCT XWD_WEB from xwikidoc"
-                        + " where XWD_WEB like '%.%' OR XWD_WEB like '%\\\\%' OR XWD_WEB like '%:%'")) {
+                        + " where XWD_WEB like '%.%' OR XWD_WEB like '%\\\\%' OR XWD_WEB like '%:%'"))
+                {
                     convert(connection, result);
                 }
             }
@@ -105,7 +106,8 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
     {
         if (result.next()) {
             try (PreparedStatement statement =
-                connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?")) {
+                connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?"))
+            {
                 do {
                     addBatch(statement, result.getString(1));
                 } while (result.next());

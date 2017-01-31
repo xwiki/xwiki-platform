@@ -115,12 +115,26 @@
     },
 
     setLoading: function(editor, loading) {
-      var sourceButton, editable = editor.editable();
-      if (editable) {
+      var sourceButton;
+      if (editor.editable()) {
         editor.setReadOnly(loading);
         sourceButton = editor.container.findOne('.cke_button__source_icon');
       }
       if (loading) {
+        // A bug in Internet Explorer 11 prevents the user from typing into the Source text area if the WYSIWYG text
+        // area is focused and the selection is collapsed before switching to Source mode. In order to avoid this
+        // problem we have to either remove the focus from the WYSIWYG text area or to make sure the selection is not
+        // collapsed before the switch. We didn't manage to remove the focus because we don't know what other focusable
+        // elements are available on the page. Thus the solution we applied was to select all the content before the
+        // switch so that the selection is not collapsed.
+        // CKEDITOR-102: Unable to edit a page in Source mode on IE11
+        // https://connect.microsoft.com/IE/feedback/details/1613994/ie-10-11-iframe-removal-causes-loss-of-the-ability-to-focus-input-elements
+        // https://dev.ckeditor.com/ticket/7386
+        if (editor.document && editor.document != CKEDITOR.document && CKEDITOR.env.ie && !CKEDITOR.env.edge) {
+          // We apply the fix only if the WYSIWYG text area is using an iframe and if the browser is Internet Explorer
+          // except Edge (that doesn't have the problem).
+          editor.document.$.execCommand('SelectAll', false, null);
+        }
         editor.ui.space('contents').setStyle('visibility', 'hidden');
         if (sourceButton) {
           sourceButton.addClass('loading');

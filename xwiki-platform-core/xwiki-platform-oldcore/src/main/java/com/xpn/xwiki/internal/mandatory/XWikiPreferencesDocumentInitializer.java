@@ -202,7 +202,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
     }
 
     @Override
-    protected boolean setDocumentSheet(XWikiDocument document)
+    protected boolean updateDocumentSheet(XWikiDocument document)
     {
         // Use AdminSheet to display documents having XWikiPreferences objects.
         return this.classSheetBinder.bind(document, SHEET_REFERENCE);

@@ -115,7 +115,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
-        return setDocumentFields(document, getTitle());
+        return updateDocumentFields(document, getTitle());
     }
 
     protected boolean updateTitle(XWikiDocument document)
@@ -158,7 +158,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      * @param title the page title to set (if null or blank the title won't be set)
      * @return true if the document has been modified, false otherwise
      */
-    protected boolean setDocumentFields(XWikiDocument document, String title)
+    protected boolean updateDocumentFields(XWikiDocument document, String title)
     {
         boolean needsUpdate = false;
 

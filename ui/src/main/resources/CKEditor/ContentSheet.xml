@@ -197,6 +197,13 @@ a[data-linktype="create"]::after {
 .macro-placeholder {
   font-family: monospace;
   font-size: smaller;
+}
+
+/* Prevent the horizontal scroll bar on IE11. We already limit the image width from the skin (in order to have
+  responsive images) but this is not enough for IE11 because the image element has a wrapper.
+  See CKEDITOR-143: Horizontal scroll bar displayed when inserting a large image on IE11 */
+.cke_widget_image {
+  max-width: 100%;
 }</code>
     </property>
     <property>

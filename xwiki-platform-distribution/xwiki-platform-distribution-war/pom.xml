@@ -203,18 +203,6 @@
     </plugins>
   </build>
   <profiles>
-    <!-- Add Legacy modules -->
-    <profile>
-      <id>legacy</id>
-      <properties>
-        <!-- Set legacy list of plugins -->
-        <xwiki.cfg.plugins>${platform.xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins>
-        <!-- Set legacy dependencies -->
-        <war.dependencies.artifactId>xwiki-platform-distribution-war-legacydependencies</war.dependencies.artifactId>
-        <!-- We depend on legacy artifacts on purpose -->
-        <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
-      </properties>
-    </profile>
     <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime. It's needed because instrumented jars in

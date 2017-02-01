@@ -89,8 +89,10 @@
     <platform.xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.default},\
   com.xpn.xwiki.plugin.watchlist.WatchListPlugin
     </platform.xwiki.cfg.plugins.legacy>
+    <xwiki.cfg.plugins.default>${platform.xwiki.cfg.plugins.default}</xwiki.cfg.plugins.default>
+    <xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins.legacy>
     <!-- Indicate the default list. -->
-    <xwiki.cfg.plugins>${platform.xwiki.cfg.plugins.default}</xwiki.cfg.plugins>
+    <xwiki.cfg.plugins>${xwiki.cfg.plugins.default}</xwiki.cfg.plugins>
 
     <xwiki.cfg.defaultskin>flamingo</xwiki.cfg.defaultskin>
     <xwiki.cfg.defaultbaseskin>flamingo</xwiki.cfg.defaultbaseskin>
@@ -444,6 +446,18 @@
     </extensions>
   </build>
   <profiles>
+    <!-- Add Legacy modules -->
+    <profile>
+      <id>legacy</id>
+      <properties>
+        <!-- Set legacy list of plugins -->
+        <xwiki.cfg.plugins>${xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins>
+        <!-- Set legacy dependencies -->
+        <war.dependencies.artifactId>xwiki-platform-distribution-war-legacydependencies</war.dependencies.artifactId>
+        <!-- We depend on legacy artifacts on purpose -->
+        <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
+      </properties>
+    </profile>
     <!-- Database Profiles used in several module builds -->
     <profile>
       <id>hsqldb</id>

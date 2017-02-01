@@ -42,9 +42,9 @@
   <properties>
     <!-- Flavors known to be valid with the current distribution -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor/${project.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${project.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${project.version}
+        org.xwiki.platform:xwiki-platform-distribution-flavor/${platform.version},
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${platform.version},
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
 
     <!-- Hibernate configuration -->

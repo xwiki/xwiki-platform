@@ -36,7 +36,7 @@ import org.jmock.lib.action.CustomAction;
 import org.junit.runner.RunWith;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -92,13 +92,10 @@ public class IntegrationTest
                 allowing(mockGadgetSource).getGadgets(with("nested_velocity"),
                     with(any(MacroTransformationContext.class)));
                 will(
-                    returnValue(
-                        Arrays
-                            .asList(
-                                new Gadget("0", Arrays.<Block>asList(new WordBlock("title")),
-                                    Arrays.<Block>asList(new MacroBlock("velocity",
-                                        Collections.<String, String>emptyMap(), "someVelocityCodeHere", true)),
-                                    "1,1"))));
+                    returnValue(Arrays.asList(new Gadget("0", Arrays.asList(new WordBlock("title")),
+                        Arrays.asList(new MacroMarkerBlock("velocity", Collections.emptyMap(), "someVelocityCodeHere",
+                            Collections.singletonList(new WordBlock("someVelocityOutputHere")), true)),
+                        "1,1"))));
 
                 // Mock gadget for macrodashboard1.test
                 allowing(mockGadgetSource).getGadgets(with(aNull(String.class)),

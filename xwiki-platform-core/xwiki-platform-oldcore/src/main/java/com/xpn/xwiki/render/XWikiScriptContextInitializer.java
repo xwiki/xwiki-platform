@@ -88,9 +88,10 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
         }
 
         // Current document
+        Document docAPI = null;
         XWikiDocument doc = xcontext.getDoc();
         if (doc != null) {
-            setDocument(scriptContext, "doc", doc, xcontext);
+            docAPI = setDocument(scriptContext, "doc", doc, xcontext);
 
             XWikiDocument tdoc = (XWikiDocument) xcontext.get("tdoc");
             if (tdoc == null) {
@@ -102,21 +103,25 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                     tdoc = doc;
                 }
             }
-            setDocument(scriptContext, "tdoc", tdoc, xcontext);
+            Document tdocAPI = setDocument(scriptContext, "tdoc", tdoc, xcontext);
 
             XWikiDocument cdoc = (XWikiDocument) xcontext.get("cdoc");
             if (cdoc == null) {
-                cdoc = tdoc;
-                if (cdoc == null) {
-                    cdoc = doc;
+                Document cdocAPI = tdocAPI;
+                if (cdocAPI == null) {
+                    cdocAPI = docAPI;
                 }
+                scriptContext.setAttribute("cdoc", cdocAPI, ScriptContext.ENGINE_SCOPE);
+            } else {
+                setDocument(scriptContext, "cdoc", cdoc, xcontext);
             }
-            setDocument(scriptContext, "cdoc", cdoc, xcontext);
         }
 
         // Current secure document
         XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
-        if (sdoc != null) {
+        if (sdoc == null) {
+            scriptContext.setAttribute("sdoc", docAPI, ScriptContext.ENGINE_SCOPE);
+        } else {
             setDocument(scriptContext, "sdoc", sdoc, xcontext);
         }
 
@@ -124,14 +129,16 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
         scriptContext.setAttribute("locale", xcontext.getLocale(), ScriptContext.ENGINE_SCOPE);
     }
 
-    private void setDocument(ScriptContext scriptContext, String key, XWikiDocument document, XWikiContext xcontext)
+    private Document setDocument(ScriptContext scriptContext, String key, XWikiDocument document, XWikiContext xcontext)
     {
         // Change the Document instance only if it's not already wrapping the same XWikiDocument (otherwise we might
         // loose modifications made in a previous script and not yet saved)
-        Document previousDoc = (Document) scriptContext.getAttribute(key);
-        if (previousDoc == null || !previousDoc.same(document)) {
-            Document apiDocument = document.newDocument(xcontext);
+        Document apiDocument = (Document) scriptContext.getAttribute(key);
+        if (apiDocument == null || !apiDocument.same(document)) {
+            apiDocument = document.newDocument(xcontext);
             scriptContext.setAttribute(key, apiDocument, ScriptContext.ENGINE_SCOPE);
         }
+
+        return apiDocument;
     }
 }

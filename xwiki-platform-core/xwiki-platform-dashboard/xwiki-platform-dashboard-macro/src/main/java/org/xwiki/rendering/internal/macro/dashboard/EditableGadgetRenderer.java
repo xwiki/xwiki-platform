@@ -32,7 +32,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.dashboard.Gadget;
@@ -131,7 +131,7 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
         metadataBlock.setParameter(CLASS, METADATA);
 
         // look at the content of the gadget and store whether it's a macro or not
-        boolean isMacro = gadget.getContent().size() == 1 && gadget.getContent().get(0) instanceof MacroBlock;
+        boolean isMacro = gadget.getContent().size() == 1 && gadget.getContent().get(0) instanceof MacroMarkerBlock;
         GroupBlock isMacroBlock = new GroupBlock();
         isMacroBlock.setParameter(CLASS, "isMacro");
         isMacroBlock.addChild(new WordBlock(Boolean.toString(isMacro)));

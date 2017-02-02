@@ -28,6 +28,19 @@
       editor.on('mode', jQuery.proxy(this.onMode, this));
     },
 
+    afterInit: function(editor) {
+      // The default source command is not asynchronous so it becomes (re)enabled right after the editing mode is
+      // changed. In our case switching between WYSIWYG and Source mode is asynchronous because we need to convert the
+      // edited content on the server side. Thus we need to prevent the source command from being enabled while the
+      // conversion takes place.
+      // CKEDITOR-66: Switch to source corrupt page when connection lost or when connection is very slow
+      var sourceCommand = editor.getCommand('source');
+      var oldCheckAllowed = sourceCommand.checkAllowed;
+      sourceCommand.checkAllowed = function() {
+        return !this.running && oldCheckAllowed.apply(this, arguments);
+      };
+    },
+
     onBeforeSetMode: function(event) {
       if (this.isModeSupported(event.data)) {
         this.setLoading(event.editor, true);
@@ -115,7 +128,9 @@
     },
 
     setLoading: function(editor, loading) {
-      var sourceButton;
+      var sourceButton, sourceCommand = editor.getCommand('source');
+      // Prevent the source command from being enabled while the conversion takes place.
+      sourceCommand.running = loading;
       if (editor.editable()) {
         editor.setReadOnly(loading);
         sourceButton = editor.container.findOne('.cke_button__source_icon');
@@ -148,9 +163,7 @@
           editor.fire('lockSnapshot');
         }
         // Disable the switch while the conversion takes place.
-        setTimeout(function() {
-          editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
-        }, 0);
+        sourceCommand.setState(CKEDITOR.TRISTATE_DISABLED);
       } else {
         editor.ui.space('contents').removeStyle('visibility');
         if (sourceButton) {
@@ -160,7 +173,7 @@
           // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.
           editor.fire('unlockSnapshot');
         }
-        editor.getCommand('source').setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
+        sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
       }
     }
   });

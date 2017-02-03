@@ -87,6 +87,11 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     private static final String MACRO_CONTEXT_KEY = "context";
 
     /**
+     * The key under which macro descriptor will be available inside macro context.
+     */
+    private static final String MACRO_DESCRIPTOR_KEY = "descriptor";
+
+    /**
      * The key under which macro can directly return the resulting {@link List} of {@link Block}.
      */
     private static final String MACRO_RESULT_KEY = "result";
@@ -171,9 +176,10 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         XDOM xdom = prepareWikiMacroContent(context);
 
         // Prepare macro context.
-        Map<String, Object> macroBinding = new HashMap<String, Object>();
+        Map<String, Object> macroBinding = new HashMap<>();
         macroBinding.put(MACRO_PARAMS_KEY, parameters);
         macroBinding.put(MACRO_CONTENT_KEY, macroContent);
+        macroBinding.put(MACRO_DESCRIPTOR_KEY, getDescriptor());
         macroBinding.put(MACRO_CONTEXT_KEY, context);
         macroBinding.put(MACRO_RESULT_KEY, null);
 

@@ -185,7 +185,7 @@ public class DefaultWikiMacroManagerTest
     }
 
     @Test(expected = InsufficientPrivilegesException.class)
-    public void tegisterWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
+    public void registerWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
     {
         DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
 

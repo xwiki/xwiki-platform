@@ -359,6 +359,64 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         Assert.assertEquals("<p>default_value</p>", printer.toString());
     }
 
+    /**
+     * Makes sure getParameterNames return parameters with source case.
+     */
+    @Test
+    public void testDefaultParameterNames() throws Exception
+    {
+        // Velocity Manager mock.
+        final VelocityManager mockVelocityManager = getMockery().mock(VelocityManager.class);
+        DefaultComponentDescriptor<VelocityManager> descriptorVM = new DefaultComponentDescriptor<VelocityManager>();
+        descriptorVM.setRole(VelocityManager.class);
+        getComponentManager().registerComponent(descriptorVM, mockVelocityManager);
+
+        // Initialize velocity engine.
+        final VelocityEngine vEngine = getComponentManager().getInstance(VelocityEngine.class);
+        Properties properties = new Properties();
+        properties.setProperty("resource.loader", "file");
+        vEngine.initialize(properties);
+
+        // Hack into velocity context.
+        Execution execution = getComponentManager().getInstance(Execution.class);
+        Map<?, ?> xwikiContext = (Map<?, ?>) execution.getContext().getProperty("xwikicontext");
+        final VelocityContext vContext = new VelocityContext();
+        vContext.put("xcontext", xwikiContext);
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockVelocityManager).getCurrentVelocityContext();
+                will(returnValue(vContext));
+                oneOf(mockVelocityManager).evaluate(with(any(Writer.class)), with(any(String.class)),
+                    with(any(Reader.class)));
+                will(new Action()
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        return vEngine.evaluate(vContext, (Writer) invocation.getParameter(0),
+                            (String) invocation.getParameter(1), (Reader) invocation.getParameter(2));
+                    }
+
+                    @Override
+                    public void describeTo(Description description)
+                    {
+                    }
+                });
+            }
+        });
+
+        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.parameterNames{{/velocity}}", Syntax.XWIKI_2_0);
+
+        Converter converter = getComponentManager().getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro1 paRam1=\"value1\" paraM2=\"value2\"/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
+
+        Assert.assertEquals("[paRam1, paraM2]", printer.toString());
+    }
+
     @Test
     public void testGetCurrentMacroBlock() throws Exception
     {

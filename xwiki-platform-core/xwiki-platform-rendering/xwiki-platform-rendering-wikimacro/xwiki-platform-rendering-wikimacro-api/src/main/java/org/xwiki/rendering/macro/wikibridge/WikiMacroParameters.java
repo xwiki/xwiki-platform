@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro.wikibridge;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,20 +38,15 @@ public class WikiMacroParameters implements RawProperties
     /**
      * A map holding all the parameter and their values.
      */
-    private Map<String, Object> parametersMap;
+    private Map<String, Object> parametersMap = new LinkedHashMap<>();
 
-    /**
-     * Creates a new {@link WikiMacroParameters} instance.
-     */
-    public WikiMacroParameters()
-    {
-        this.parametersMap = new LinkedHashMap<>();
-    }
+    private Set<String> parameterNames = new LinkedHashSet<>();
 
     @Override
     public void set(String propertyName, Object value)
     {
         this.parametersMap.put(propertyName != null ? propertyName.toLowerCase() : null, value);
+        this.parameterNames.add(propertyName);
     }
 
     /**
@@ -60,7 +56,7 @@ public class WikiMacroParameters implements RawProperties
      */
     public Set<String> getParameterNames()
     {
-        return Collections.unmodifiableSet(this.parametersMap.keySet());
+        return Collections.unmodifiableSet(this.parameterNames);
     }
 
     /**

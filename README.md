@@ -19,8 +19,42 @@ Starting with XWiki 8.2 this is the default WYSIWYG content editor. On older ver
 
 You need Maven 3.1+ in order to build this extension.
 
-## Releasing
+## Release Steps
 
-Beware there are a number of files with the version number of this extension hardcoded in them.
-See this commit for the locations of the relevant lines which must be changed for each release.
-https://github.com/xwiki-contrib/application-ckeditor/commit/1167d91039d6d9c4b9c5873fdc9b44d6d400e48c
+    ## Release the new version in JIRA and create the next version.
+
+    ## Update the version hard-coded in the wiki pages.
+    ## This is required because on older versions of XWiki the WebJar version is not automatically detected.
+    ## If you are releasing the version X.Y then search for X.Y-SNAPSHOT in the UI module sources and replace
+    ## each occurrence that refers to the CKEditor webjar with X.Y (i.e. replace the snapshot with the final
+    ## version). Normally, you should get 3 occurrences, 2 in EditSheet and 1 in VelocityMacros.
+    ## Commit the changes with the message "[release] Update version before release".
+
+    ## Update the translations.
+    ## * download the translation pack from l10n and unpack
+    ##   http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Contrib.CKEditorIntegration&app=Contrib
+    ## * copy the translation pages to the UI module sources
+    ## * apply XAR format and review the changes
+    ## * commit only the significant changes
+
+    ## Prepare the tag for the new version.
+    mvn org.apache.maven.plugins:maven-release-plugin:2.5:prepare -DautoVersionSubmodules
+
+    ## Select Java 7 in order to silence the enforcer (even if we don't have Java code ATM,
+    ## a WebJar is a Jar and we support older versions of XWiki that run on Java 7).
+    sudo update-alternatives --config java
+    sudo update-alternatives --config javac
+
+    ## Perform the release
+    mvn org.apache.maven.plugins:maven-release-plugin:2.5:perform
+
+    ## Restore the Java version.
+    sudo update-alternatives --config java
+    sudo update-alternatives --config javac
+
+    ## Finish the release on http://nexus.xwiki.org (Staging Repositories)
+
+    ## Update the documentation page on http://extensions.xwiki.org
+    ## Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
+
+    ## Announce the release

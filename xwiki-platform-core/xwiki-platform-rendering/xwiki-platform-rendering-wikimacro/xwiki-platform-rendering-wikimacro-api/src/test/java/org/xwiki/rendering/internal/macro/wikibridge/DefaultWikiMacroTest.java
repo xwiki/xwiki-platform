@@ -347,16 +347,15 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         List<WikiMacroParameterDescriptor> parameterDescriptors =
             Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", false, "default_value"));
 
-        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.param1{{/velocity}}", Syntax.XWIKI_2_0,
+        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.param1 $xcontext.macro.params.paraM1{{/velocity}}", Syntax.XWIKI_2_0,
             parameterDescriptors);
 
         Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
+        converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
 
-        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        Assert.assertEquals("<p>default_value</p>", printer.toString());
+        Assert.assertEquals("default_value default_value", printer.toString());
     }
 
     /**

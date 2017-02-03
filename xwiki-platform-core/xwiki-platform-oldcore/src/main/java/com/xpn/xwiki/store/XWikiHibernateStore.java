@@ -633,7 +633,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             obj.setDocumentReference(doc.getDocumentReference());
                             /* If the object doesn't have a GUID, create it before saving */
                             if (StringUtils.isEmpty(obj.getGuid())) {
-                                obj.setGuid(UUID.randomUUID().toString());
+                                obj.setGuid(null);
                             }
                             saveXWikiCollection(obj, context, false);
                         }

@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
 {
-    private String guid = UUID.randomUUID().toString();
+    private String guid;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -205,8 +205,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     public BaseObject duplicate()
     {
         BaseObject object = clone();
-        // Set a new GUID for the duplicate
-        object.setGuid(UUID.randomUUID().toString());
+        // Reset GUID for the duplicate
+        object.setGuid(null);
 
         return object;
     }
@@ -345,11 +345,30 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
     }
 
+    /**
+     * @return the unique identifier of the object, never null
+     */
     public String getGuid()
     {
+        if (this.guid == null) {
+            return generateGuid();
+        }
+
         return this.guid;
     }
 
+    private synchronized String generateGuid()
+    {
+        if (this.guid == null) {
+            this.guid = UUID.randomUUID().toString();
+        }
+
+        return this.guid;
+    }
+
+    /**
+     * @param guid the unique identifier of the object, if null a new one will be generated
+     */
     public void setGuid(String guid)
     {
         this.guid = guid;

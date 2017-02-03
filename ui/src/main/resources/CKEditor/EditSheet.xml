@@ -160,7 +160,7 @@
 #set ($bootstrap3typeaheadPath = $services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-typeahead.min'))
 #if ("$!ckeditorPath" == '')
   ## Before XWiki 6.3RC1
-  #set ($ckeditorPath = $services.webjars.url('application-ckeditor-webjar/1.12/ckeditor.js'))
+  #set ($ckeditorPath = $services.webjars.url('application-ckeditor-webjar/1.13-SNAPSHOT/ckeditor.js'))
   #set ($bootstrap3typeaheadPath = $services.webjars.url('bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js'))
 #elseif ($ckeditorPath.indexOf('?') &gt;= 0)
   ## Before XWiki 7.1M1 the WebJar resource path was included in the query string which means we have to specify the
@@ -809,7 +809,7 @@ require(['jquery', 'xwiki-ckeditor', 'autosave'], function($, ckeditorPromise) {
 #set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono-lisa'))
 #if ("$!ckeditorSkinPath" == '')
   ## Before 6.3RC1
-  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.12/skins/moono-lisa'))
+  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.13-SNAPSHOT/skins/moono-lisa'))
 #end
 #if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
   ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving

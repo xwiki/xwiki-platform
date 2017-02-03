@@ -52,9 +52,17 @@ You need Maven 3.1+ in order to build this extension.
     sudo update-alternatives --config java
     sudo update-alternatives --config javac
 
+    ## Update the version hard-coded in the wiki pages.
+    ## Put back the snapshot version in the wiki pags, but using the next version. So if you released X.Y
+    ## then look for X.Y in the UI module sources and replace it with <X.Y+1>-SNAPSHOT. As in the second step,
+    ## there should be only 3 occurrence normally.
+    ## Commit the changes with the message "[release] Update version after release".
+
     ## Finish the release on http://nexus.xwiki.org (Staging Repositories)
 
     ## Update the documentation page on http://extensions.xwiki.org
     ## Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
 
     ## Announce the release
+
+    ## Update the version used in XWiki Enterprise

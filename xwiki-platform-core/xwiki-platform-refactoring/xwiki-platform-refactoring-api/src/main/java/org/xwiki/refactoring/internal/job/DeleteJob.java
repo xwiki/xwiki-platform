@@ -28,6 +28,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -92,7 +93,12 @@ public class DeleteJob extends AbstractCheckBrokenExtensionJob<EntityRequest, En
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        if (!this.modelBridge.exists(documentReference)) {
+        EntitySelection entitySelection = this.extensionPages.get(documentReference);
+        entitySelection = entitySelection != null ? entitySelection : this.freePages.get(documentReference);
+
+        if (entitySelection != null && !entitySelection.isSelected()) {
+            this.logger.info("Skipping [{}] because it has been unselected.", documentReference);
+        } else if (!this.modelBridge.exists(documentReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);
         } else if (!hasAccess(Right.DELETE, documentReference)) {
             this.logger.error("You are not allowed to delete [{}].", documentReference);

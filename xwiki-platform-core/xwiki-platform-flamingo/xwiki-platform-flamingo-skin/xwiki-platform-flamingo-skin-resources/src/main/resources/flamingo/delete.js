@@ -65,6 +65,21 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
           console.log(selection);
           // TODO: send the answer
         });
+        $('.btCancelDelete').click(function(event){
+          event.preventDefault();
+          var notif = new XWiki.widgets.Notification('Canceling the action.', 'inprogress');
+          $.ajax(new XWiki.Document(xm.documentReference).getURL('get'), {
+            data: {
+              xpage: 'refactoring/delete_question',
+              jobId: jobId,
+              cancel: true
+            }
+          }).done(function (data) {
+            notif.hide();
+            new XWiki.widgets.Notification('Action canceled.', 'done');
+            window.location = new XWiki.Document(xm.documentReference).getURL();
+          });
+        });
       });
     }
 

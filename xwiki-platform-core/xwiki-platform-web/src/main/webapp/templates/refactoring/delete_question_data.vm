@@ -47,33 +47,38 @@ $response.setContentType("application/json")
  * @param $data the collection where the nodes will be added
  *#
 #macro(displayPages $question $data)
-  #foreach ($value in $question.brokenExtensions.entrySet())
-    #set ($extension = $value.key)
-    #if ($extension.id.id == "$!request.id")
-      #set ($pages = $value.value)
-      #foreach ($page in $pages)
-        #if ($velocityCount > $offset + $limit)
-          #set ($howMany = $pages.size() - $velocityCount + 1)
-          #paginationNode($data, $howMany, $velocityCount)
-          #break
-        #end
-        #if ($velocityCount > $offset)
-          #set ($pageDoc = $xwiki.getDocument($page))
-          #set ($title = $pageDoc.getRenderedTitle('html/5.0'))
-          #if ("$!title" == '')
-            #set ($title = $pageDoc.name)
-          #end
-          #set ($discard = $data.add({
-            'id': $services.model.serialize($page, 'default'),
-            'text': "$title ($services.model.serialize($page, 'local'))",
-            'icon': 'fa fa-file-o',
-            'children': false,
-            'data': {
-              'type': 'page'
-            }
-          }))
-        #end
+  #set ($pages = [])
+  #if ("$!request.id" == 'freePages')
+    #set ($pages = $question.freePages)
+  #else
+    #foreach ($entry in $question.extensions.entrySet())
+      #if ($entry.key.id == "$!request.id")
+        #set ($pages = $entry.value.pages)
       #end
+    #end
+  #end
+  #foreach ($page in $pages)
+    #set ($pageReference = $page.entityReference)
+    #if ($velocityCount > $offset + $limit)
+      #set ($howMany = $pages.size() - $velocityCount + 1)
+      #paginationNode($data, $howMany, $velocityCount)
+      #break
+    #end
+    #if ($velocityCount > $offset)
+      #set ($pageDoc = $xwiki.getDocument($pageReference))
+      #set ($title = $pageDoc.getRenderedTitle('html/5.0'))
+      #if ("$!title" == '')
+        #set ($title = $pageDoc.name)
+      #end
+      #set ($discard = $data.add({
+        'id': $services.model.serialize($pageReference, 'default'),
+        'text': "$title ($services.model.serialize($pageReference, 'local'))",
+        'icon': 'fa fa-file-o',
+        'children': false,
+        'data': {
+          'type': 'page'
+        }
+      }))
     #end
   #end
 #end
@@ -85,8 +90,8 @@ $response.setContentType("application/json")
  *#
 #macro(displayExtensions $question $data)
   #set ($extensions = [])
-  #foreach ($value in $question.brokenExtensions.entrySet())
-    #set ($discard = $extensions.add({'extension': $value.key, 'pages': $value.value, 'name': $value.key.name}))
+  #foreach ($entry in $question.extensions.entrySet())
+    #set ($discard = $extensions.add({'extension': $entry.value.extension, 'pages': $entry.value.pages, 'name': $entry.value.extension.name}))
   #end
   #set ($extensions = $sorttool.sort($extensions, 'name'))
   #foreach ($ext in $extensions)
@@ -121,6 +126,17 @@ $response.setContentType("application/json")
   #if ("$!request.data" == 'children' && "$!request.id" != '#')
     #displayPages($question, $data)
   #else
+  #if ($offset == 0 && !$question.freePages.isEmpty())
+    #set ($discard = $data.add({
+      'id': 'freePages',
+      'text': "Pages that do not belong to any extension",
+      'icon': 'fa fa-folder',
+      'children': true,
+      'data': {
+        'type': 'pages'
+      }
+    }))
+    #end
     #displayExtensions($question, $data)
   #end
   $jsontool.serialize($data)

@@ -22,12 +22,12 @@ package org.xwiki.refactoring.internal.job;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
@@ -36,7 +36,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
-import org.xwiki.refactoring.job.ExtensionBreakingQuestion;
+import org.xwiki.refactoring.job.question.EntitySelection;
+import org.xwiki.refactoring.job.question.extension.ExtensionBreakingQuestion;
+import org.xwiki.refactoring.job.question.extension.ExtensionSelection;
 
 /**
  * @version $Id$
@@ -44,7 +46,11 @@ import org.xwiki.refactoring.job.ExtensionBreakingQuestion;
 public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S extends EntityJobStatus<? super R>> extends
     AbstractEntityJob<R, S>
 {
-    protected Map<XarInstalledExtension, List<DocumentReference>> brokenExtensions = new HashMap<>();
+    protected Map<ExtensionId, ExtensionSelection> brokenExtensions = new HashMap<>();
+
+    protected Map<DocumentReference, EntitySelection> freePages = new HashMap<>();
+
+    protected Map<DocumentReference, EntitySelection> extensionPages = new HashMap<>();
 
     @Inject
     @Named("xar")
@@ -57,10 +63,12 @@ public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S
 
         try {
             this.progressManager.startStep(this);
-            if (this.request.isInteractive() && checkBrokenExtensions(entityReferences) && !confirmAction()) {
-                return;
+            if (this.request.isInteractive()) {
+                checkBrokenExtensions(entityReferences);
+                if (this.status.isCanceled()) {
+                    return;
+                }
             }
-
             this.progressManager.startStep(this);
             super.process(entityReferences);
 
@@ -70,7 +78,7 @@ public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S
     }
 
 
-    protected boolean checkBrokenExtensions(Collection<EntityReference> entityReferences)
+    protected void checkBrokenExtensions(Collection<EntityReference> entityReferences)
     {
         this.progressManager.pushLevelProgress(entityReferences.size(), this);
 
@@ -88,7 +96,17 @@ public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S
             this.progressManager.popLevelProgress(this);
         }
 
-        return !this.brokenExtensions.isEmpty();
+        // Ask question if there are some broken extensions
+        if (!this.brokenExtensions.isEmpty()) {
+            ExtensionBreakingQuestion question = new ExtensionBreakingQuestion(this.brokenExtensions,
+                    new ArrayList<>(this.freePages.values()));
+            try {
+                this.status.ask(question);
+            } catch (InterruptedException e) {
+                this.logger.warn("Confirm question has been interrupted.");
+                this.status.cancel();
+            }
+        }
     }
 
     protected void checkBrokenExtensions(EntityReference entityReference)
@@ -129,28 +147,24 @@ public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S
 
     private void checkBrokenExtensionsForDocument(DocumentReference documentReference)
     {
-        // do something
         XarInstalledExtensionRepository repository = (XarInstalledExtensionRepository) installedExtensionRepository;
+        Collection<XarInstalledExtension> extensions = repository.getXarInstalledExtensions(documentReference);
 
-        for (XarInstalledExtension extension : repository.getXarInstalledExtensions(documentReference)) {
-            List pages = this.brokenExtensions.get(extension);
-            if (pages == null) {
-                pages = new ArrayList();
-                this.brokenExtensions.put(extension, pages);
-            }
-            pages.add(documentReference);
+        if (extensions.isEmpty()) {
+            this.freePages.put(documentReference, new EntitySelection(documentReference));
+            return;
         }
-    }
 
-    private boolean confirmAction()
-    {
-        ExtensionBreakingQuestion question = new ExtensionBreakingQuestion(this.brokenExtensions);
-        try {
-            this.status.ask(question);
-            return question.isConfirm();
-        } catch (InterruptedException e) {
-            this.logger.warn("Confirm question has been interrupted.");
-            return false;
+        EntitySelection entitySelection = new EntitySelection(documentReference);
+        this.extensionPages.put(documentReference, entitySelection);
+
+        for (XarInstalledExtension extension : extensions) {
+            ExtensionSelection extensionSelection = this.brokenExtensions.get(extension.getId());
+            if (extensionSelection == null) {
+                extensionSelection = new ExtensionSelection(extension);
+                this.brokenExtensions.put(extension.getId(), extensionSelection);
+            }
+            extensionSelection.addPage(entitySelection);
         }
     }
 }

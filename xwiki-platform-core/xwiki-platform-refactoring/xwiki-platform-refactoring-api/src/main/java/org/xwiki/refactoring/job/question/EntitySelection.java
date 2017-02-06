@@ -17,41 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.job;
+package org.xwiki.refactoring.job.question;
 
-import java.util.List;
-import java.util.Map;
-
-import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
+ * Represent an entity with an information about either or not the entity is selected to perform some refactoring.
+ *
  * @version $Id$
+ * @since 9.1RC1
  */
-public class ExtensionBreakingQuestion
+@Unstable
+public class EntitySelection
 {
-    private Map<XarInstalledExtension, List<DocumentReference>> brokenExtensions;
+    private EntityReference entityReference;
 
-    private boolean confirm = false;
+    private boolean isSelected = false;
 
-    public ExtensionBreakingQuestion(
-            Map<XarInstalledExtension, List<DocumentReference>> brokenExtensions)
+    public EntitySelection(EntityReference entityReference)
     {
-        this.brokenExtensions = brokenExtensions;
+        this.entityReference = entityReference;
     }
 
-    public Map<XarInstalledExtension, List<DocumentReference>> getBrokenExtensions()
+    public EntitySelection(EntityReference entityReference, boolean isSelected)
     {
-        return brokenExtensions;
+        this.entityReference = entityReference;
+        this.isSelected = isSelected;
     }
 
-    public boolean isConfirm()
+    public EntityReference getEntityReference()
     {
-        return confirm;
+        return entityReference;
     }
 
-    public void setConfirm(boolean confirm)
+    public boolean isSelected()
     {
-        this.confirm = confirm;
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected)
+    {
+        isSelected = selected;
     }
 }

@@ -6,30 +6,36 @@
 #set ($jobId = "$!request.jobId")
 #if ($jobId != '')
   #set ($job = $services.job.getJobStatus($jobId.split('/')))
-  #set ($question = $job.question)
-  ## TODO: move that to the skin!
-  <style>
-    .jstree-xwiki .paginationNode .jstree-checkbox {
-      display: none;
-    }
-  </style>
-  <div class="box warningmessage" style="margin-top: 10px;">
-    <p><strong>$services.icon.renderHTML('warning') You are about about to delete pages that belong to extensions.</strong></p>
-    <p>If you delete these pages, the extensions will not work anymore.</p>
-    <p>The recommended way of removing an extension is by uninstalling it with the <a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&section=XWiki.InstalledExtensions')">Extension Manager</a>.</p>
-    <p>Do you wish to continue?</p>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <p class="panel-title">Pages to remove</p>
+  #if ("$!request.cancel" == 'true')
+    #set ($discard = $job.question.selectAll(false))
+    #set ($discard = $job.answered())
+    #set ($discard = $job.cancel())
+  #else
+    #set ($question = $job.question)
+    ## TODO: move that to the skin!
+    <style>
+      .jstree-xwiki .paginationNode .jstree-checkbox {
+        display: none;
+      }
+    </style>
+    <div class="box warningmessage" style="margin-top: 10px;">
+      <p><strong>$services.icon.renderHTML('warning') You are about about to delete pages that belong to extensions.</strong></p>
+      <p>If you delete these pages, the extensions will not work anymore.</p>
+      <p>The recommended way of removing an extension is by uninstalling it with the <a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&section=XWiki.InstalledExtensions')">Extension Manager</a>.</p>
+      <p>Do you wish to continue?</p>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">Pages to remove</p>
+        </div>
+        <div class="panel-body">
+          <p><a href="#" class="btSelectAllTree">select all</a> / <a href="#" class="btUnselectAllTree">none</a></p>
+          <div class="deleteTree" data-url="$doc.getURL('get', "xpage=refactoring/delete_question_data&jobId=$jobId")">
+        </div>
       </div>
-      <div class="panel-body">
-        <p><a href="#" class="btSelectAllTree">select all</a> / <a href="#" class="btUnselectAllTree">none</a></p>
-        <div class="deleteTree" data-url="$doc.getURL('get', "xpage=refactoring/delete_question_data&jobId=$jobId")">
-      </div>
+      <p>
+        <button class="btn btn-danger btConfirmDelete">Delete</button>
+        <button class="btn btn-default btCancelDelete">Cancel</button>
+      </p>
     </div>
-    <p>
-      <button class="btn btn-danger btConfirmDelete">Delete</button>
-      <button class="btn btn-default btCancelDelete">Cancel</button>
-    </p>
-  </div>
+  #end
 #end

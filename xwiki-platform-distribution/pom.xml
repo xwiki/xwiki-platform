@@ -122,6 +122,19 @@
     <mysql.version>5.1.38</mysql.version>
     <derby.version>10.11.1.1</derby.version>
     <pgsql.version>9.4-1201-jdbc41</pgsql.version>
+
+    <!-- Set HSQLDB by default -->
+    <xwiki.db>hsqldb</xwiki.db>
+    <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
+    <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>
+    <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
+    <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
+    <xwiki.db.connection.username>sa</xwiki.db.connection.username>
+    <xwiki.db.connection.password />
+    <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
+    <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
+    <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
+    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
   </properties>
   <build>
     <pluginManagement>
@@ -458,28 +471,6 @@
         <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
       </properties>
     </profile>
-    <!-- Database Profiles used in several module builds -->
-    <profile>
-      <id>hsqldb</id>
-      <!-- Activate this profile by default. Note that it you wish to run with another profile you'll need to explicitly
-           add this profile -->
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <xwiki.db>hsqldb</xwiki.db>
-        <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>
-        <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
-        <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
-        <xwiki.db.connection.username>sa</xwiki.db.connection.username>
-        <xwiki.db.connection.password />
-        <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
-        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
-        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-      </properties>
-    </profile>
     <profile>
       <id>mysql</id>
       <properties>
@@ -521,6 +512,8 @@
         <xwiki.db.jdbc.artifactId>derby</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${derby.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:derby:database;create=true</xwiki.db.connection.url>
+        <xwiki.db.connection.username />
+        <xwiki.db.connection.password />
         <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
         <xwiki.db.dialect>org.hibernate.dialect.DerbyDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>

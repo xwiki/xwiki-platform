@@ -54,10 +54,10 @@ public class ExtensionSelection
         return pages;
     }
 
-    public void selectAllPages(boolean selectAllPages)
+    public void selectAllPages()
     {
         for (EntitySelection page : pages) {
-            page.setSelected(selectAllPages);
+            page.setSelected(true);
         }
     }
 

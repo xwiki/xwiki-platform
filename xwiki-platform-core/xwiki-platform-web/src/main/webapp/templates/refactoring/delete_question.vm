@@ -7,9 +7,28 @@
 #if ($jobId != '')
   #set ($job = $services.job.getJobStatus($jobId.split('/')))
   #if ("$!request.cancel" == 'true')
-    #set ($discard = $job.question.selectAll(false))
-    #set ($discard = $job.answered())
     #set ($discard = $job.cancel())
+    #set ($discard = $job.answered())
+  #elseif ("$!request.selection" != '')
+    ## Parse the selection
+    #set ($selection = $jsontool.parse($request.selection))
+    #set ($question = $job.question)
+    #if ($selection.allExtensions)
+      #set ($discard = $question.selectAllExtensions())
+    #end
+    #if ($selection.allFreePages)
+      #set ($discard = $question.selectAllFreePages())
+    #end
+    #foreach ($extension in $selection.extensions)
+      #set ($extensionSelection = $question.getExtension($extension))
+      #set ($discard = $extensionSelection.selectAllPages())
+    #end
+    #foreach ($page in $selection.pages)
+      #set ($pageRef = $services.model.resolveDocument($page, 'default'))
+      #set ($pageSelection = $question.get($pageRef))
+      #set ($discard = $pageSelection.setSelected(true))
+    #end
+    #set ($discard = $job.answered())
   #else
     #set ($question = $job.question)
     ## TODO: move that to the skin!

@@ -19,8 +19,10 @@
  */
 package org.xwiki.refactoring.job.question;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -33,27 +35,25 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class AbstractEntityQuestion
 {
-    private List<EntitySelection> entities;
+    private Map<EntityReference, EntitySelection> entities = new HashMap<>();
 
-    private boolean selectAll = false;
-
-    public AbstractEntityQuestion(List<EntitySelection> entities)
-    {
-        this.entities = entities;
-    }
-
-    public List<EntitySelection> getEntities()
+    public Map<EntityReference, EntitySelection> getEntities()
     {
         return entities;
     }
 
-    public boolean isSelectAll()
+    public EntitySelection addEntity(EntityReference entityReference)
     {
-        return selectAll;
+        EntitySelection entitySelection = entities.get(entityReference);
+        if (entitySelection == null) {
+            entitySelection = new EntitySelection(entityReference);
+            entities.put(entitySelection.getEntityReference(), entitySelection);
+        }
+        return entitySelection;
     }
 
-    public void setSelectAll(boolean selectAll)
+    public EntitySelection get(EntityReference entityReference)
     {
-        this.selectAll = selectAll;
+        return entities.get(entityReference);
     }
 }

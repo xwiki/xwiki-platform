@@ -93,9 +93,7 @@ public class DeleteJob extends AbstractCheckBrokenExtensionJob<EntityRequest, En
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        EntitySelection entitySelection = this.extensionPages.get(documentReference);
-        entitySelection = entitySelection != null ? entitySelection : this.freePages.get(documentReference);
-
+        EntitySelection entitySelection = this.extensionBreakingQuestion.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
             this.logger.info("Skipping [{}] because it has been unselected.", documentReference);
         } else if (!this.modelBridge.exists(documentReference)) {

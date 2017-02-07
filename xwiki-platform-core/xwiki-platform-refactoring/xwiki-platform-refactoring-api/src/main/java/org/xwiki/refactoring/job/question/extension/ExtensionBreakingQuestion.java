@@ -19,28 +19,28 @@
  */
 package org.xwiki.refactoring.job.question.extension;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.AbstractEntityQuestion;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
+ * @since 9.1RC1
  */
 @Unstable
 public class ExtensionBreakingQuestion extends AbstractEntityQuestion
 {
-    private Map<ExtensionId, ExtensionSelection> extensions;
+    private Map<ExtensionId, ExtensionSelection> extensions = new HashMap<>();
 
-    public ExtensionBreakingQuestion(Map<ExtensionId, ExtensionSelection> extensions,
-            List<EntitySelection> entities)
-    {
-        super(entities);
-        this.extensions = extensions;
-    }
+    private List<EntitySelection> freePages = new ArrayList<>();
 
     public Map<ExtensionId, ExtensionSelection> getExtensions()
     {
@@ -52,13 +52,45 @@ public class ExtensionBreakingQuestion extends AbstractEntityQuestion
      */
     public List<EntitySelection> getFreePages()
     {
-        return getEntities();
+        return freePages;
     }
 
-    public void selectAll(boolean selectAll)
+    public void selectAllExtensions()
     {
         for (ExtensionSelection extension : extensions.values()) {
-            extension.selectAllPages(selectAll);
+            extension.selectAllPages();
         }
+    }
+
+    public void selectAllFreePages()
+    {
+        for (EntitySelection entitySelection : freePages) {
+            entitySelection.setSelected(true);
+        }
+    }
+
+    public void addFreePage(EntityReference entityReference)
+    {
+        freePages.add(addEntity(entityReference));
+    }
+
+    public void addPageFromExtension(XarInstalledExtension extension, EntityReference pageReference)
+    {
+        ExtensionSelection extensionSelection = extensions.get(extension.getId());
+        if (extensionSelection == null) {
+            extensionSelection = new ExtensionSelection(extension);
+            extensions.put(extension.getId(), extensionSelection);
+        }
+        extensionSelection.addPage(this.addEntity(pageReference));
+    }
+
+    public ExtensionSelection get(ExtensionId extensionId)
+    {
+        return extensions.get(extensionId);
+    }
+
+    public ExtensionSelection getExtension(String extensionId)
+    {
+        return extensions.get(new ExtensionId(extensionId));
     }
 }

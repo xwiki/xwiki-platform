@@ -40,12 +40,6 @@ public class EntitySelection
         this.entityReference = entityReference;
     }
 
-    public EntitySelection(EntityReference entityReference, boolean isSelected)
-    {
-        this.entityReference = entityReference;
-        this.isSelected = isSelected;
-    }
-
     public EntityReference getEntityReference()
     {
         return entityReference;

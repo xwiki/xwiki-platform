@@ -296,56 +296,50 @@
     #set($docName = $item)
     #set($docLanguage = '')
   #end
-  #set($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
-  #set($row = {'doc_viewable': $viewable})
-  #if(!$viewable)
-    #set($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+  #set ($docReference = $services.model.resolveDocument($docName))
+  #set ($row = {
+    'doc_viewable': $services.security.authorization.hasAccess('view', $docReference),
+    'doc_fullName': $services.model.serialize($docReference, 'local'),
+    'doc_space': $services.model.serialize($docReference.parent, 'local'),
+    'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
+    'doc_url': $xwiki.getURL($docReference),
+    'doc_space_url': $xwiki.getURL($docReference.parent),
+    'doc_wiki': $docReference.wikiReference.name,
+    'doc_wiki_url': $xwiki.getURL($docReference.wikiReference),
+    'doc_hasadmin': $xwiki.hasAdminRights(),
+    'doc_hasedit': $services.security.authorization.hasAccess('edit', $docReference),
+    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $docReference),
+    'doc_edit_url': $xwiki.getURL($docReference, 'edit'),
+    'doc_copy_url': $xwiki.getURL($docReference, 'view', 'xpage=copy'),
+    'doc_delete_url': $xwiki.getURL($docReference, 'delete'),
+    'doc_rename_url': $xwiki.getURL($docReference, 'view', 'xpage=rename&amp;step=1')
+  })
+  #set ($isTranslation = "$!docLanguage" != '' &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+  ## Display the language after the document name so that not all translated documents have the same name displayed.
+  #set ($row.doc_name = "$docReference.name#if ($isTranslation) ($docLanguage)#end")
+  #set ($row.doc_hascopy = $row.doc_viewable)
+  #set ($row.doc_hasrename = $row.doc_hasdelete)
+  #set ($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
+  #if ($docReference.name == 'WebHome')
+    ## For nested pages, use the page administration.
+    #set ($webPreferencesReference = $services.model.createDocumentReference('WebPreferences', $docReference.lastSpaceReference))
+    #set ($row.doc_rights_url = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&amp;section=PageRights'))
   #else
-    #set($itemDoc = $xwiki.getDocument($docName))
+    ## For terminal pages, use the old rights editor.
+    ## TODO: We should create a page administration for terminal pages too.
+    #set ($row.doc_rights_url = $xwiki.getURL($docReference, 'edit', 'editor=rights'))
+  #end
+  #if ($row.doc_viewable)
+    #set ($itemDoc = $xwiki.getDocument($docReference))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
     ## result is a translation.
-    #if("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
-      #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
-      #set($isTranslation = true)
+    #if ($isTranslation)
+      #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
     #else
-      #set($translatedDoc = $itemDoc.translatedDocument)
-      #set($isTranslation = false)
+      #set ($translatedDoc = $itemDoc.translatedDocument)
     #end
-    #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
     #set($discard = $itemDoc.use($className))
-    #if($isTranslation)
-      ## Display the language after the document name so that not all translated documents have the same name displayed
-      #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
-    #else
-      #set($discard = $row.put('doc_name', $itemDoc.name))
-    #end
-    #set($discard = $row.put('doc_fullName', $fullname))
-    #set($discard = $row.put('doc_space', $itemDoc.space))
-    #set($discard = $row.put('doc_location', "#hierarchy($itemDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})"))
-    #set($discard = $row.put('doc_url', $xwiki.getURL($itemDoc.documentReference)))
-    #set($discard = $row.put('doc_space_url', $xwiki.getURL($itemDoc.documentReference.extractReference('SPACE'))))
-    #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
-    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($itemDoc.documentReference.extractReference('WIKI'))))
-    #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
-    #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
-    #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
-    #set($discard = $row.put('doc_hasrename', $row.doc_hasdelete))
-    #set($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
     #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
-    #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
-    #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
-    #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
-    ## Compute the 'edit rights' URL
-    #if($itemDoc.name == 'WebHome')
-      ## For nested pages, use the page administration
-      #set($webPreferencesReference = $services.model.createEntityReference('WebPreferences', 'DOCUMENT', $itemDoc.documentReference.lastSpaceReference))
-      #set($editRightsURL = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&amp;section=PageRights'))
-    #else
-      ## For terminal pages, use the old rights editor
-      ## TODO: we should create a page administration for terminal pages too
-      #set($editRightsURL = $itemDoc.getURL('edit', 'editor=rights'))
-    #end
-    #set($discard = $row.put('doc_rights_url', $editRightsURL))
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))

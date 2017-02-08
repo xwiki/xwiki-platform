@@ -1585,128 +1585,126 @@ ${Msz}Mb##
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table) {
-  // This callback method code has been generated from velocity.
-  var tr = new Element("tr");
-  if (row["doc_viewable"]) {
-  #foreach($colname in $collist)
-    #set($colprop = $colprops.get($colname))
-    // $colname
-    #if("$!colprop.type"!="hidden")
-      #if($colname.indexOf("doc.")==0)
-        #set($jscolname = $colname.replaceAll("doc.", "doc_"))
-      #else
-        #set($jscolname = $colname)
-      #end
-      ## Is the td element bound to a link ?
-      #if("$!colprop.link" != "" && "$!colname" != "_actions")
-        #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
-        var td = new Element("td", {'class':"$tdClass"});
-        var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
-        ## Automatic: the link url is in JSON results, with key column name + "_url"
-        #if("$!colprop.link"=="auto")
-          link.href = row["${jscolname}_url"] || row["doc_url"];
-        #elseif($colprop.link=="field")
-          if (row["${jscolname}_url"]) {
-            link.href = row["${jscolname}_url"];
-          }
-        ## Property editor
-        #elseif($colprop.link=="editor")
-          #if($colprop.get("class"))
-            #set($propClassName = $colprop.get("class"))
-          #else
-            #set($propClassName = $className)
-          #end
-          td.observe("click", function(event){
-            var tag = event.element().down("span");
-            if (!tag)
-             tag = event.element();
-            editProperty(row["doc_fullName"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
-          });
-        ## Author
-        #elseif($colprop.link == "author")
-          link.href = row["doc_author_url"];
-        ## Space URL
-        #elseif($colprop.link == "space")
-          link.href = row["doc_space_url"];
-        ## Wiki URL
-        #elseif($colprop.link == "wiki")
-          link.href = row["doc_wiki_url"];
-        #else
-          link.href = row["doc_url"];
+  // This callback method has been generated from Velocity.
+  ## Translate the column descriptor.
+  #foreach ($entry in $colprops.entrySet())
+    #if ("$!entry.value.displayName" == '' && "$!transprefix" != '')
+      #set ($entry.value.displayName = $services.localization.render("${transprefix}$entry.key"))
+    #end
+  #end
+  #set ($actionsDescriptor = $colprops.get('_actions'))
+  #if ($actionsDescriptor)
+    #if (!$actionsDescriptor.labels)
+      #set ($actionsDescriptor.labels = {})
+    #end
+    #foreach ($action in $actionsDescriptor.actions)
+      #if (!$actionsDescriptor.labels.get($action))
+        #if ("$!transprefix" != '' && $services.localization.get("${transprefix}_actions.$action"))
+          #set ($discard = $actionsDescriptor.labels.put($action,
+            $services.localization.render("${transprefix}_actions.$action")))
+        #elseif ($services.localization.get("platform.livetable._actions.$action"))
+          #set ($discard = $actionsDescriptor.labels.put($action,
+            $services.localization.render("platform.livetable._actions.$action")))
         #end
-        #if($colprop.html && $colprop.html==true)
-          link.innerHTML = row["${jscolname}"];
-        #else
-          row["${jscolname}"] != undefined && link.update((row["${jscolname}"] + '').escapeHTML());
-        #end
-        td.appendChild(link);
-        tr.appendChild(td);
-      #elseif("$colname" == "_actions")
-        var adminActions = ['admin', 'rename', 'rights'];
-        var td = new Element("td", {'class' : 'actions'});
-        #foreach($action in $colprop.get("actions"))
-          if (row["doc_has${action}"] || '${action}' == 'view' || (row["doc_has${action}"] === undefined && (row["doc_hasadmin"] || adminActions.indexOf('${action}') < 0))) {
-            #if($velocityCount > 1)
-              td.insert(" ");
-            #end
-            #if($transprefix != '' && $services.localization.render("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
-              #set($text = $services.localization.render("${transprefix}_actions.${action}"))
-            #elseif($services.localization.render("platform.livetable._actions.${action}") != "platform.livetable._actions.${action}")
-              #set($text = $services.localization.render("platform.livetable._actions.${action}"))
-            #else
-              #set($text = "$action")
-            #end
-            var link = new Element("a", {"href": row["doc_${action}_url"], "class":"action action${action}"}).update("$text");
-            #if("$!colprop.ajaxActions.get($action)" == 'true')
-              link.observe('click', function(event) {
-                event.stop();
-                new Ajax.Request(this.href, {
-                  onSuccess : function() {
-                    $colprop.actionCallbacks.get($action)
-                  }
-                });
-              }.bindAsEventListener(link));
-            #end
-            td.insert(link);
-          }
-        #end
-        tr.appendChild(td);
-      #else
-        #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
-        var fieldel = new Element("td", {'class':"$tdClass"});
-        #if($colprop.html && $colprop.html==true)
-          fieldel.innerHTML = row["${jscolname}"];
-        #else
-          row["${jscolname}"] != undefined && fieldel.update((row["${jscolname}"] + '').escapeHTML());
-        #end
-        tr.appendChild(fieldel);
       #end
     #end
   #end
-  } else {
-    var documentReference = XWiki.Model.resolve(row['doc_fullName'] || '', XWiki.EntityType.DOCUMENT);
-    var pageName = documentReference.name;
-    var spaceName = documentReference.parent ? documentReference.parent.name : '';
-    #foreach($colname in $collist)
-      // $colname
-      #set($colprop = $colprops.get($colname))
-      #if("$!colprop.type"!="hidden")
-        #if($colname.indexOf("doc.")==0)
-         #set($jscolname = $colname.replaceAll("doc.", "doc_"))
-        #else
-         #set($jscolname = $colname)
-        #end
-        #if($jscolname == "doc_name")
-          tr.insert(new Element("td").update(pageName + "*"));
-        #elseif($jscolname == "doc_space")
-          tr.insert(new Element("td").update(spaceName));
-        #else
-          tr.insert(new Element("td").update(" "));
-        #end
-      #end
-    #end
+  var columns = $jsontool.serialize($collist);
+  var columnDescriptors = $jsontool.serialize($colprops);
+  var className = $jsontool.serialize($classname);
+  if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
+  ## NOTE: Don't use Velocity code below this line!
+  var tr = new Element('tr');
+  columns.forEach(function(column) {
+    var descriptor = columnDescriptors[column] || {};
+    if (descriptor.type === 'hidden') {
+      return;
+    }
+    // The column's display name to be used when displaying the reponsive version.
+    var displayName = descriptor.displayName || column;
+    var fieldName = column.replace(/^doc\./, 'doc_');
+    if (column === '_actions') {
+      var adminActions = ['admin', 'rename', 'rights'];
+      var td = new Element('td', {
+        'class': 'actions',
+        'data-title': displayName
+      });
+      (descriptor.actions || []).forEach(function(action, index) {
+        if (row['doc_has' + action] || action === 'view' || (row['doc_has' + action] === undefined &&
+            (row['doc_hasadmin'] || adminActions.indexOf(action) < 0))) {
+          if (index > 0) {
+            td.insert(' ');
+          }
+          var link = new Element('a', {
+            'href': row['doc_' + action + '_url'],
+            'class': 'action action' + action
+          }).update((descriptor.labels || {})[action] || action);
+          if (descriptor.ajaxActions && descriptor.ajaxActions[action]) {
+            link.observe('click', function(event) {
+              event.stop();
+              new Ajax.Request(this.href, {
+                onSuccess: function() {
+                  eval((descriptor.actionCallbacks || {})[action]);
+                }
+              });
+            }.bindAsEventListener(link));
+          }
+          td.insert(link);
+        }
+      });
+      tr.appendChild(td);
+    } else {
+      var td = new Element('td', {
+        'class': [
+          fieldName,
+          'link' + (descriptor.link || ''),
+          'type' + (descriptor.type || '')
+        ].join(' '),
+        'data-title': displayName
+      });
+      var container = td;
+      if (descriptor.link && row['doc_viewable']) {
+        var link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
+        // Automatic: the link URL is in JSON results, with the '_url' sufix.
+        if (descriptor.link === 'auto') {
+          link.href = row[fieldName + '_url'] || row['doc_url'];
+        } else if (descriptor.link === 'field') {
+          if (row[fieldName + '_url']) {
+            link.href = row[fieldName + '_url'];
+          }
+        // Property editor
+        } else if (descriptor.link === 'editor') {
+          var propertyClassName = descriptor['class'] || className;
+          td.observe('click', function(event) {
+            var tag = event.element().down('span') || event.element();
+            editProperty(row['doc_fullName'], propertyClassName, column, function(value) {
+              tag.innerHTML = value;
+            });
+          });
+        // Author, space or wiki link.
+        } else if (row['doc_' + descriptor.link + '_url']) {
+          link.href = row['doc_' + descriptor.link + '_url'];
+        } else {
+          link.href = row['doc_url'];
+        }
+        td.appendChild(link);
+        container = link;
+      }
+      // The value can be passed as a string..
+      if (descriptor.html + '' === 'true') {
+        container.innerHTML = row[fieldName] || '';
+      } else if (row[fieldName] !== undefined) {
+        var text = row[fieldName] + '';
+        if (fieldName === 'doc_name' && !row['doc_viewable']) {
+          text += '*';
+        }
+        container.update(text.escapeHTML());
+      }
+      tr.appendChild(td);
+    }
+  });
   return tr;
 }
 #end

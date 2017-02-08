@@ -39,7 +39,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RefactoringJobs.DELETE)
-public class DeleteJob extends AbstractCheckBrokenExtensionJob<EntityRequest, EntityJobStatus<EntityRequest>>
+public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
 {
     @Override
     public String getType()
@@ -93,7 +93,7 @@ public class DeleteJob extends AbstractCheckBrokenExtensionJob<EntityRequest, En
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        EntitySelection entitySelection = this.extensionBreakingQuestion.get(documentReference);
+        EntitySelection entitySelection = concernedEntities.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
             this.logger.info("Skipping [{}] because it has been unselected.", documentReference);
         } else if (!this.modelBridge.exists(documentReference)) {

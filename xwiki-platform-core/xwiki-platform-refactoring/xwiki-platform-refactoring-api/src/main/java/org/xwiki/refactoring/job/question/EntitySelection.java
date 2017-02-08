@@ -39,7 +39,7 @@ public class EntitySelection
     /**
      * Indicate if the entity is selected or not by the user.
      */
-    private boolean isSelected;
+    private boolean isSelected = true;
 
     /**
      * Construct an EntitySelection.

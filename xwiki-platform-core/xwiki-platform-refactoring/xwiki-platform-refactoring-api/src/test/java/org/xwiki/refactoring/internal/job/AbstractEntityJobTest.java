@@ -24,12 +24,13 @@ import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Base class for writing unit tests for jobs extending {@link AbstractEntityJob}.
@@ -43,11 +44,14 @@ public abstract class AbstractEntityJobTest
 
     protected ModelBridge modelBridge;
 
+    protected ObservationManager observationManager;
+
     @Before
     public void configure() throws Exception
     {
         this.authorization = getMocker().getInstance(AuthorizationManager.class);
         this.modelBridge = getMocker().getInstance(ModelBridge.class);
+        this.observationManager = getMocker().getInstance(ObservationManager.class);
 
         EntityReferenceProvider defaultEntityReferenceProvider = getMocker().getInstance(EntityReferenceProvider.class);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(

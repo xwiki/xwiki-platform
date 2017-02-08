@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.job.question.extension;
+package org.xwiki.extension.xar.internal.delete.question;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.job.question.EntityQuestion;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.stability.Unstable;
 
@@ -35,8 +34,13 @@ import org.xwiki.stability.Unstable;
  * @since 9.1RC1
  */
 @Unstable
-public class ExtensionBreakingQuestion extends EntityQuestion
+public class ExtensionBreakingQuestion
 {
+    /**
+     * The map of entities concerned by the refactoring, where the entity reference if the key.
+     */
+    private Map<EntityReference, EntitySelection> concernedEntities;
+
     /**
      * Map of extensions to select, where the extension id is the key.
      */
@@ -46,6 +50,33 @@ public class ExtensionBreakingQuestion extends EntityQuestion
      * List of pages that do not belong to any extensions.
      */
     private List<EntitySelection> freePages = new ArrayList<>();
+
+    /**
+     * Construct an ExtensionBreakingQuestion.
+     * @param concernedEntities the entities concerned by the refactoring
+     */
+    public ExtensionBreakingQuestion(Map<EntityReference, EntitySelection> concernedEntities)
+    {
+        this.concernedEntities = concernedEntities;
+    }
+
+    /**
+     * @param entityReference the reference of an entity
+     * @return the EntitySelection corresponding to the entity, or null if the entity is not concerned
+     *   by the refactoring
+     */
+    public EntitySelection get(EntityReference entityReference)
+    {
+        return concernedEntities.get(entityReference);
+    }
+
+    /**
+     * @return the map of entities concerned by the refactoring, where the entity reference if the key.
+     */
+    public Map<EntityReference, EntitySelection> getConcernedEntities()
+    {
+        return concernedEntities;
+    }
 
     /**
      * @return the map of extensions to select, where the extension id is the key
@@ -84,27 +115,26 @@ public class ExtensionBreakingQuestion extends EntityQuestion
     }
 
     /**
-     * Add the reference of a page concerned by the refactoring action.
-     * @param entityReference reference of the page
+     * @param entitySelection entity selection of a page that do not belong to any extension
      */
-    public void addFreePage(EntityReference entityReference)
+    public void markAsFreePage(EntitySelection entitySelection)
     {
-        freePages.add(addEntity(entityReference));
+        freePages.add(entitySelection);
     }
 
     /**
-     * Add the reference of a page concerned by the refactoring action, that belong to a particular extension.
+     * Mark an entity selection representing a page that it belongs to an extension.
+     * @param entitySelection entity selection of the page
      * @param extension extension that contain the page
-     * @param pageReference reference of the page
      */
-    public void addPageFromExtension(XarInstalledExtension extension, EntityReference pageReference)
+    public void pageBelongsToExtension(EntitySelection entitySelection, XarInstalledExtension extension)
     {
         ExtensionSelection extensionSelection = getExtension(extension.getId().getId());
         if (extensionSelection == null) {
             extensionSelection = new ExtensionSelection(extension);
             extensions.put(extension.getId().getId(), extensionSelection);
         }
-        extensionSelection.addPage(this.addEntity(pageReference));
+        extensionSelection.addPage(entitySelection);
     }
 
     /**
@@ -115,5 +145,15 @@ public class ExtensionBreakingQuestion extends EntityQuestion
     public ExtensionSelection getExtension(String extensionId)
     {
         return extensions.get(extensionId);
+    }
+
+    /**
+     * Unselect all entities.
+     */
+    public void unselectAll()
+    {
+        for (EntitySelection entitySelection : concernedEntities.values()) {
+            entitySelection.setSelected(false);
+        }
     }
 }

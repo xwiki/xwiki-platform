@@ -35,10 +35,16 @@ import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.question.extension.ExtensionBreakingQuestion;
 
 /**
+ * Abstract job that verify if some pages belong to extension before actually perform the refactoring action.
+ *
+ * @param <R> the request type
+ * @param <S> the job status type
+ *
  * @version $Id$
+ * @since 9.1RC1
  */
-public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S extends EntityJobStatus<? super R>> extends
-    AbstractEntityJob<R, S>
+public abstract class AbstractCheckBrokenExtensionJob<R extends EntityRequest, S extends EntityJobStatus<? super R>>
+        extends AbstractEntityJob<R, S>
 {
     protected ExtensionBreakingQuestion extensionBreakingQuestion = new ExtensionBreakingQuestion();
 

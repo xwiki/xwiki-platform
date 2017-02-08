@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.job.question.AbstractEntityQuestion;
+import org.xwiki.refactoring.job.question.EntityQuestion;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.stability.Unstable;
 
@@ -36,13 +35,22 @@ import org.xwiki.stability.Unstable;
  * @since 9.1RC1
  */
 @Unstable
-public class ExtensionBreakingQuestion extends AbstractEntityQuestion
+public class ExtensionBreakingQuestion extends EntityQuestion
 {
-    private Map<ExtensionId, ExtensionSelection> extensions = new HashMap<>();
+    /**
+     * Map of extensions to select, where the extension id is the key.
+     */
+    private Map<String, ExtensionSelection> extensions = new HashMap<>();
 
+    /**
+     * List of pages that do not belong to any extensions.
+     */
     private List<EntitySelection> freePages = new ArrayList<>();
 
-    public Map<ExtensionId, ExtensionSelection> getExtensions()
+    /**
+     * @return the map of extensions to select, where the extension id is the key
+     */
+    public Map<String, ExtensionSelection> getExtensions()
     {
         return extensions;
     }
@@ -55,6 +63,9 @@ public class ExtensionBreakingQuestion extends AbstractEntityQuestion
         return freePages;
     }
 
+    /**
+     * Select all the pages from all extensions.
+     */
     public void selectAllExtensions()
     {
         for (ExtensionSelection extension : extensions.values()) {
@@ -62,6 +73,9 @@ public class ExtensionBreakingQuestion extends AbstractEntityQuestion
         }
     }
 
+    /**
+     * Select all pages that do not belong to any extension.
+     */
     public void selectAllFreePages()
     {
         for (EntitySelection entitySelection : freePages) {
@@ -69,28 +83,37 @@ public class ExtensionBreakingQuestion extends AbstractEntityQuestion
         }
     }
 
+    /**
+     * Add the reference of a page concerned by the refactoring action.
+     * @param entityReference reference of the page
+     */
     public void addFreePage(EntityReference entityReference)
     {
         freePages.add(addEntity(entityReference));
     }
 
+    /**
+     * Add the reference of a page concerned by the refactoring action, that belong to a particular extension.
+     * @param extension extension that contain the page
+     * @param pageReference reference of the page
+     */
     public void addPageFromExtension(XarInstalledExtension extension, EntityReference pageReference)
     {
-        ExtensionSelection extensionSelection = extensions.get(extension.getId());
+        ExtensionSelection extensionSelection = getExtension(extension.getId().getId());
         if (extensionSelection == null) {
             extensionSelection = new ExtensionSelection(extension);
-            extensions.put(extension.getId(), extensionSelection);
+            extensions.put(extension.getId().getId(), extensionSelection);
         }
         extensionSelection.addPage(this.addEntity(pageReference));
     }
 
-    public ExtensionSelection get(ExtensionId extensionId)
-    {
-        return extensions.get(extensionId);
-    }
-
+    /**
+     * @param extensionId id of the extension
+     * @return the ExtensionSelection corresponding to the extension, or null of the extension is not concerned y the
+     *   refactoring action
+     */
     public ExtensionSelection getExtension(String extensionId)
     {
-        return extensions.get(new ExtensionId(extensionId));
+        return extensions.get(extensionId);
     }
 }

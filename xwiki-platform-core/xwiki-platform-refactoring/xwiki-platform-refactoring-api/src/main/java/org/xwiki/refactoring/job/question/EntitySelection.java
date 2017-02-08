@@ -31,25 +31,45 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class EntitySelection
 {
+    /**
+     * Reference to the entity to select for the refactoring.
+     */
     private EntityReference entityReference;
 
-    private boolean isSelected = false;
+    /**
+     * Indicate if the entity is selected or not by the user.
+     */
+    private boolean isSelected;
 
+    /**
+     * Construct an EntitySelection.
+     * @param entityReference the reference of the entity concerned by the refactoring
+     */
     public EntitySelection(EntityReference entityReference)
     {
         this.entityReference = entityReference;
     }
 
+    /**
+     * @return the reference of the entity to select
+     */
     public EntityReference getEntityReference()
     {
         return entityReference;
     }
 
+    /**
+     * @return if the user has selected the entity
+     */
     public boolean isSelected()
     {
         return isSelected;
     }
 
+    /**
+     * Change the state of the entity.
+     * @param selected either or not the user has selected the entity
+     */
     public void setSelected(boolean selected)
     {
         isSelected = selected;

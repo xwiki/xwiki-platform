@@ -51,11 +51,7 @@ $response.setContentType("application/json")
   #if ("$!request.id" == 'freePages')
     #set ($pages = $question.freePages)
   #else
-    #foreach ($entry in $question.extensions.entrySet())
-      #if ($entry.key.id == "$!request.id")
-        #set ($pages = $entry.value.pages)
-      #end
-    #end
+    #set ($pages = $question.getExtension($request.id).pages)
   #end
   #foreach ($page in $pages)
     #set ($pageReference = $page.entityReference)

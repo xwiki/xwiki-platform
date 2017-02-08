@@ -33,15 +33,26 @@ import org.xwiki.stability.Unstable;
  * @since 9.1RC1
  */
 @Unstable
-public class AbstractEntityQuestion
+public class EntityQuestion
 {
+    /**
+     * The map of entities concerned by the refactoring, where the entity reference if the key.
+     */
     private Map<EntityReference, EntitySelection> entities = new HashMap<>();
 
+    /**
+     * @return the map of entities concerned by the refactoring, where the entity reference if the key.
+     */
     public Map<EntityReference, EntitySelection> getEntities()
     {
         return entities;
     }
 
+    /**
+     * Add an entity reference concerned by the refactoring. Ensure the reference is stored only once.
+     * @param entityReference the reference of the entity concerned by the refactoring
+     * @return the unique entity selection corresponding to the entity
+     */
     public EntitySelection addEntity(EntityReference entityReference)
     {
         EntitySelection entitySelection = entities.get(entityReference);
@@ -52,6 +63,11 @@ public class AbstractEntityQuestion
         return entitySelection;
     }
 
+    /**
+     * @param entityReference the reference of an entity
+     * @return the EntitySelection corresponding to the entity, or null if the entity is not concerned
+     *   by the refactoring
+     */
     public EntitySelection get(EntityReference entityReference)
     {
         return entities.get(entityReference);

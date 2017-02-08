@@ -35,25 +35,44 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class ExtensionSelection
 {
+    /**
+     * The XAR extension to select.
+     */
     private XarInstalledExtension extension;
 
+    /**
+     * The pages that belong to that extension.
+     */
     private List<EntitySelection> pages = new ArrayList<>();
 
+    /**
+     * Construct an ExtensionSelection.
+     * @param extension the extension concerned by the refactoring
+     */
     public ExtensionSelection(XarInstalledExtension extension)
     {
         this.extension = extension;
     }
 
+    /**
+     * @return the extension to select
+     */
     public XarInstalledExtension getExtension()
     {
         return extension;
     }
 
+    /**
+     * @return the pages that belong to the extension
+     */
     public List<EntitySelection> getPages()
     {
         return pages;
     }
 
+    /**
+     * Select all pages that belong to the extension.
+     */
     public void selectAllPages()
     {
         for (EntitySelection page : pages) {
@@ -61,7 +80,12 @@ public class ExtensionSelection
         }
     }
 
-    public void addPage(EntitySelection entitySelection)
+    /**
+     * Add a page that belong to the extension (should only be used by ExtensionBreakingExtension that also make sure
+     * there is only one entity selection per page).
+     * @param entitySelection entity selection of the page to add
+     */
+    protected void addPage(EntitySelection entitySelection)
     {
         pages.add(entitySelection);
     }

@@ -195,7 +195,31 @@
                     }
                   }
                 },
-                "ignore": [
+                "ignore" : [
+                  {
+                    "code": "java.annotation.removed",
+                    "annotationType": "org.xwiki.stability.Unstable",
+                    "justification": "These are marker annotations that have no semantical consequences."
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "annotationType": "org.xwiki.stability.Unstable",
+                    "justification": "Not a breakage. Indicates API readiness only and has no semantic consequences."
+                  },
+                  // The "externalClassExposedInAPI" check is used to detect code smells. It's documented as:
+                  // "This is reported for classes from dependencies that are exposed in the API (for example as a
+                  // return value). This is generally discouraged practice because it makes updating the dependency
+                  // version a more complex task (you want a bugfix but you don’t want the changed API to leak to your
+                  // users)."
+                  // In the case of XWiki it's not a problem because we release all modules together using the same
+                  // versioning. However we still want to detect this for non XWiki classes.
+                  {
+                    "regex": true,
+                    "code": "java\.class\.externalClassExposedInAPI",
+                    "package": "org\.xwiki\..*",
+                    "justification": "Dragging of other XWiki types to the API is OK."
+                  },
+                  // Add more ignores below...
                 ]
               }
             }

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -62,7 +62,7 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
                 getEntities(entityReferences);
 
                 // Send the event
-                DocumentDeletingEvent event = new DocumentDeletingEvent();
+                DocumentsDeletingEvent event = new DocumentsDeletingEvent();
                 observationManager.notify(event, this, concernedEntities);
 
                 // Stop the job if some listener has canceled the action

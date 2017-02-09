@@ -118,7 +118,6 @@ public class DocumentsDeletingListener extends AbstractEventListener
 
         for (XarInstalledExtension extension : extensions) {
             question.pageBelongsToExtension(entitySelection, extension);
-
         }
     }
 }

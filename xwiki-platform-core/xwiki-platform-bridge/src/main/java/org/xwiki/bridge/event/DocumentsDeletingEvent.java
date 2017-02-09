@@ -22,7 +22,17 @@ package org.xwiki.bridge.event;
 import org.xwiki.observation.event.AbstractCancelableEvent;
 
 /**
+ * An event triggered before a list of documents is deleted.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the refactoring job that is performing the delete action</li>
+ * <li>data: Map&lt;EntityReference, EntitySelection&gt; a map containing all entities that are going to be deleted</li>
+ * </ul>
+ *
  * @version $Id$
+ * @since 9.1RC1
  */
 public class DocumentsDeletingEvent extends AbstractCancelableEvent
 {
@@ -31,14 +41,4 @@ public class DocumentsDeletingEvent extends AbstractCancelableEvent
      * changes.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructor initializing the event filter with an
-     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other document delete event.
-     */
-    public DocumentsDeletingEvent()
-    {
-        super();
-    }
 }

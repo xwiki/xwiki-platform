@@ -55,8 +55,6 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
       var jobUrl =
         new XWiki.Document(xm.documentReference).getURL('get', 'xpage=refactoring/delete_question&jobId='+jobId);
       $.ajax(jobUrl).done(function (data) {
-        // TODO: handle the timeout
-
         /**
          * Represent the selected pages & extensions the user can chose to delete
          */
@@ -160,6 +158,20 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
             window.location = new XWiki.Document(xm.documentReference).getURL();
           });
         });
+
+        // Handle the timeout
+        // On the server, the timeout is 5 minutes.
+        // We remove 10 seconds to be safe because the connexion between the server and the browsers
+        // might be slow
+        var timeout = (5 * 60 * 1000) - (10 * 1000);
+        setTimeout(function() {
+          // Remove everything and replace it by an error message
+          $('#delete-progress-bar-container').remove();
+          questionPanel.html('<div class="box errormessage"><p>' +
+            '$escapetool.javascript($services.localization.render("core.delete.warningExtensions.timeout"))' +
+            '</p></div>'
+          );
+        }, timeout);
       });
     };
 

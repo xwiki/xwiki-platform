@@ -47,7 +47,7 @@
           <div class="deleteTree" data-url="$doc.getURL('get', "xpage=refactoring/delete_question_data&jobId=$jobId")">
         </div>
       </div>
-      <p>
+      <p class="deleteWarningButtons">
         <button class="btn btn-danger btConfirmDelete">$escapetool.xml($services.localization.render('delete'))</button>
         <button class="btn btn-default btCancelDelete">$escapetool.xml($services.localization.render('cancel'))</button>
       </p>

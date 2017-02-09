@@ -52,6 +52,7 @@ import org.xwiki.filter.instance.internal.XWikiDocumentFilter;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -264,12 +265,25 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
         this.document = new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference,
             this.properties != null ? this.properties.getDefaultReference() : null), this.currentLocale);
 
+        // Find default author
+        DocumentReference defaultAuthorReference;
+        if (this.properties.isAuthorSet()) {
+            defaultAuthorReference = this.properties.getAuthor();
+        } else {
+            XWikiContext xcontext = xcontextProvider.get();
+            defaultAuthorReference = xcontext != null ? xcontext.getUserReference() : null;
+        }
+        this.document.setAuthorReference(defaultAuthorReference);
+        this.document.setContentAuthorReference(defaultAuthorReference);
+        this.document.setCreatorReference(defaultAuthorReference);
+
         this.document
             .setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters, null));
 
         if (this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
             this.document.setCreator(
-                getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters, null));
+                getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters,
+                    this.document.getCreator()));
         }
         this.document.setDefaultLocale(this.currentDefaultLocale);
 
@@ -284,9 +298,11 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
         this.document.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
         if (parameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
-            this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+            this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters,
+                this.document.getAuthor()));
         }
-        this.document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
+        this.document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters,
+            this.document.getContentAuthor()));
 
         String revisions =
             getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, this.currentLocaleParameters, null);

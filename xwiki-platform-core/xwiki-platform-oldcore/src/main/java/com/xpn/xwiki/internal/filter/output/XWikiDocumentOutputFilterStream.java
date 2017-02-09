@@ -52,6 +52,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -90,6 +91,9 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
     @Inject
     private EntityOutputFilterStream<BaseObject> objectFilter;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     private WrappingListener contentListener = new WrappingListener();
 
@@ -227,11 +231,20 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
             this.entity.setLocale(this.currentLocale);
         }
 
+        // Find default author
+        DocumentReference defaultAuthorReference;
+        if (this.properties.isAuthorSet()) {
+            defaultAuthorReference = this.properties.getAuthor();
+        } else {
+            XWikiContext xcontext = xcontextProvider.get();
+            defaultAuthorReference = xcontext != null ? xcontext.getUserReference() : null;
+        }
+
         this.entity
             .setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters, null));
 
-        this.entity.setCreatorReference(
-            getUserReference(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters, null));
+        this.entity.setCreatorReference(getUserReference(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
+            this.currentLocaleParameters, defaultAuthorReference));
         this.entity.setDefaultLocale(this.currentDefaultLocale);
 
         this.entity.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
@@ -244,10 +257,11 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
         this.entity.setHidden(getBoolean(WikiDocumentFilter.PARAMETER_HIDDEN, parameters, false));
 
         this.entity.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
-        this.entity
-            .setAuthorReference(getUserReference(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
-        this.entity
-            .setContentAuthorReference(getUserReference(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
+
+        this.entity.setAuthorReference(
+            getUserReference(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, defaultAuthorReference));
+        this.entity.setContentAuthorReference(
+            getUserReference(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, defaultAuthorReference));
 
         String revisions =
             getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, this.currentLocaleParameters, null);

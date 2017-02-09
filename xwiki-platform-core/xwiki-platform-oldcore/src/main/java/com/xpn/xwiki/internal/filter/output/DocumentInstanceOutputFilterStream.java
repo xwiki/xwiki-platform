@@ -39,11 +39,13 @@ import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.logging.marker.TranslationMarker;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -211,36 +213,28 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
                     document.loadAttachmentsContent(xcontext);
                     document.apply(inputDocument);
+
+                    // Get the authors from the input document
+                    if (this.properties.isAuthorPreserved()) {
+                        setAuthors(document, inputDocument);
+                    }
                 }
             }
 
             document.setMinorEdit(inputDocument.isMinorEdit());
 
-            // Author
+            // Authors
 
-            if (this.properties.isAuthorPreserved()
-                && this.currentRevisionParameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
-                document.setAuthorReference(inputDocument.getAuthorReference());
-            } else if (this.properties.isAuthorSet()) {
-                document.setAuthorReference(this.properties.getAuthor());
-            } else {
-                document.setAuthorReference(xcontext.getUserReference());
-            }
-
-            // Content author
-
-            if (this.properties.isAuthorPreserved()
-                && this.currentRevisionParameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR)) {
-                document.setContentAuthorReference(inputDocument.getContentAuthorReference());
-            } else {
+            if (!this.properties.isAuthorPreserved()) {
+                if (this.properties.isAuthorSet()) {
+                    setAuthorReference(document, this.properties.getAuthor());
+                } else {
+                    setAuthorReference(document, xcontext.getUserReference());
+                }
                 document.setContentAuthorReference(document.getAuthorReference());
-            }
-
-            // Creator
-
-            if (document.isNew() && !this.properties.isAuthorPreserved()
-                || !this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
-                document.setCreatorReference(document.getAuthorReference());
+                if (document.isNew()) {
+                    document.setCreatorReference(document.getAuthorReference());
+                }
             }
 
             // Save history
@@ -281,6 +275,30 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             if (this.properties.isStoppedWhenSaveFail()) {
                 throw new FilterException("Failed to save document", e);
             }
+        }
+    }
+
+    private void setAuthorReference(XWikiDocument document, DocumentReference authorReference)
+    {
+        // Document author
+        document.setAuthorReference(authorReference);
+
+        // Attachments author
+        for (XWikiAttachment attachment : document.getAttachmentList()) {
+            attachment.setAuthorReference(authorReference);
+        }
+    }
+
+    private void setAuthors(XWikiDocument document, XWikiDocument inputDocument)
+    {
+        // Document author
+        document.setAuthorReference(inputDocument.getAuthorReference());
+        document.setContentAuthorReference(inputDocument.getContentAuthorReference());
+
+        // Attachments author
+        for (XWikiAttachment currentAttachment : document.getAttachmentList()) {
+            currentAttachment
+                .setAuthorReference(inputDocument.getAttachment(currentAttachment.getFilename()).getAuthorReference());
         }
     }
 }

@@ -1,6 +1,8 @@
 require.config({
   paths: {
     jsTree: "$!services.webjars.url('jstree', 'jstree.min.js')",
+    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
+    'tree-finder': "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'finder.min.js')",
     tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
   },
   shim: {
@@ -24,7 +26,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     };
 
     /**
-     * Calles when the job is terminated
+     * Called when the job is terminated
      */
     var whenTerminated = function() {
       updateProgressBar(1);

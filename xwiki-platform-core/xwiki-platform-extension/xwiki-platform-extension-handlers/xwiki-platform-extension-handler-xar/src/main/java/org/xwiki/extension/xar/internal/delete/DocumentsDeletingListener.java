@@ -102,7 +102,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
                 boolean ack = job.getStatus().ask(question, 5, TimeUnit.MINUTES);
                 if (!ack) {
                     // Without any confirmation, we must cancel the operation.
-                    String message = "The question has been asked, however no answer has been sent.";
+                    String message = "The question has been asked, however no answer has been received.";
                     this.logger.warn(message);
                     CancelableEvent cancelableEvent = (CancelableEvent) event;
                     cancelableEvent.cancel(message);

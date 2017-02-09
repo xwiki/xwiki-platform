@@ -186,10 +186,21 @@
           <analysisConfiguration><![CDATA[
             {
               "revapi": {
+                "filter": {
+                  // We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
+                  // since they're already covered by their own builds and we release all of them together.
+                  "archives": {
+                      "exclude": ["org\\.xwiki\\.commons:.*:.*", "org\\.xwiki\\.rendering:.*:.*"]
+                    }
+                },
                 "java": {
                   "filter": {
                     "packages": {
                       "regex": true,
+                      // Note that we currently don't include non-XWiki classes in the checks, the reason being that
+                      // third-party deps break backward-compat or source compat all the time and we would need to have
+                      // excludes all the time. So we currently trust them that the breakages are not real breakages
+                      // that will affect us. We should probably improve this in the future.
                       "include": ["org\\.xwiki\\..*"],
                       "exclude": ["org\\.xwiki\\..*\\.internal(\\..*)?", "org\\.xwiki\\..*\\.test(\\..*)?"]
                     }

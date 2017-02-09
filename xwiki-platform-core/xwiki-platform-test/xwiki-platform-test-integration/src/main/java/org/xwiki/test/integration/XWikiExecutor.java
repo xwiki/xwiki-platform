@@ -378,16 +378,19 @@ public class XWikiExecutor
 
         // Check the exit value and fail the test if the process has not properly finished.
         if (handler.getExitValue() != 0 || !handler.hasResult()) {
-            String message =
-                String.format("Process failed to close properly after [%d] seconds, process ended [%b].", timeout,
-                    handler.hasResult());
-            if (handler.hasResult()) {
-                message =
-                    String.format("%s Exit code [%d], message [%s].", message, handler.getExitValue(), handler
-                        .getException().getMessage());
+            if (handler.getExitValue() == 143) {
+                LOGGER.warn("XWiki instance was killed with SIGTERM (usually mean it took to long to stop by itself)");
+            } else {
+                String message =
+                    String.format("Process failed to close properly after [%d] seconds, process ended [%b].", timeout,
+                        handler.hasResult());
+                if (handler.hasResult()) {
+                    message = String.format("%s Exit code [%d], message [%s].", message, handler.getExitValue(),
+                        handler.getException().getMessage());
+                }
+                message = String.format("%s Failing test.", message);
+                throw new RuntimeException(message);
             }
-            message = String.format("%s Failing test.", message);
-            throw new RuntimeException(message);
         }
     }
 

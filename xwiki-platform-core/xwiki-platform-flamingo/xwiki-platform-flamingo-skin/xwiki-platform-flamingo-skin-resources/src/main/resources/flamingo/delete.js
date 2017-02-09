@@ -52,17 +52,20 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
      * Called when a question is being asked because some page should not be deleted
      */
     var handleQuestion = function() {
-      var jobUrl = new XWiki.Document(xm.documentReference).getURL('get', 'xpage=refactoring/delete_question&jobId='+jobId);
+      var jobUrl =
+        new XWiki.Document(xm.documentReference).getURL('get', 'xpage=refactoring/delete_question&jobId='+jobId);
       $.ajax(jobUrl).done(function (data) {
         /**
          * Represent the selected pages & extensions the user can chose to delete
          */
         var selection = {
-          // Selected extensions to be removed (all contained pages will be removed, even those the user haven't seen because of the pagination)
+          // Selected extensions to be removed (all contained pages will be removed, even those the user haven't seen
+          // because of the pagination)
           extensions: [],
           // Pages that have been manually marked by the user to be removed
           pages: [],
-          // Either or not all pages that don't belong to any extension should be removed (even those the user haven't seen because of the pagination)
+          // Either or not all pages that don't belong to any extension should be removed (even those the user haven't
+          // seen because of the pagination)
           allFreePages: false,
           // Either or not all extensions should be removed (even those the user haven't seen because of the pagination)
           allExtensions: false
@@ -84,21 +87,29 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         // Called when the user click on "select all"
         $('.btSelectAllTree').click(function(event){
           event.preventDefault();
+          // The following comment tells jshint not to worry about the camel case, since we cannot control
+          // the method name of jstree (must be a bug from jshint).
+          /*jshint camelcase:false */
           $('.deleteTree').jstree().check_all();
+          /*jshint camelcase:true */
           selection.allExtensions = true;
         });
 
         // Called when the user click on "select none"
         $('.btUnselectAllTree').click(function(event){
           event.preventDefault();
-           $('.deleteTree').jstree().uncheck_all();
+          /*jshint camelcase:false */
+          $('.deleteTree').jstree().uncheck_all();
+          /*jshint camelcase:true */
         });
 
         // Called when the user click on "delete"
         $('.btConfirmDelete').click(function(event){
           event.preventDefault();
-          // Get the selection
+          /*jshint camelcase:false */
+	        // Get the selection
           var selectedNodes = $('.deleteTree').jstree().get_selected(true);
+          /*jshint camelcase:true */
           selection.allFreePages = false;
           for (var i = 0; i < selectedNodes.length; ++i) {
             var node = selectedNodes[i];
@@ -124,24 +135,31 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         });
 
         // Called when the user click on "cancel"
-        $('.btCancelDelete').click(function(event){
+        $('.btCancelDelete').click( function(event) {
           event.preventDefault();
-          var notif = new XWiki.widgets.Notification('Canceling the action.', 'inprogress');
+          $('.btConfirmDelete').prop('disabled', 'disabled');
+          var notif = new XWiki.widgets.Notification(
+            "$escapetool.javascript($services.localization.render('core.delete.warningExtensions.canceling'))",
+            'inprogress'
+          );
           $.ajax(new XWiki.Document(xm.documentReference).getURL('get'), {
             data: {
               xpage: 'refactoring/delete_question',
               jobId: jobId,
               cancel: true
             }
-          }).done(function (data) {
+          }).done(function () {
             notif.hide();
-            new XWiki.widgets.Notification('Action canceled.', 'done');
+            new XWiki.widgets.Notification(
+              "$escapetool.javascript($services.localization.render('core.delete.warningExtensions.canceled'))",
+              'done'
+            );
             // Redirect to the page with the "view" mode
             window.location = new XWiki.Document(xm.documentReference).getURL();
           });
         });
       });
-    }
+    };
 
     /**
      * Get the current status of the job (it is called recursively until the job is terminated or a question is asked)

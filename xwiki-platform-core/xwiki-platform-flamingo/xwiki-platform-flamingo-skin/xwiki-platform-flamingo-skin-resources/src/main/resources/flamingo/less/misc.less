@@ -379,3 +379,14 @@
 .panellayoutcontainer-1col, .panellayoutcontainer-2col, .panellayoutcontainer-3col, .panellayoutcontainer-4col {
   .clearfix();
 }
+
+// Delete Job -----------------------------------------------------------------
+// Warning message when pages belong to extensions
+.deleteWarningExtensions {
+  margin-top: @line-height-computed;
+
+  // Do not display checkbox on pagination nodes in the tree:
+  .jstree-xwiki .paginationNode .jstree-checkbox {
+    display: none;
+  }
+}

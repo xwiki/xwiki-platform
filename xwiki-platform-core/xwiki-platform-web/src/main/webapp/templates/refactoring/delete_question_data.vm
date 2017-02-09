@@ -26,7 +26,7 @@ $response.setContentType("application/json")
   #end
   #set ($discard = $data.add({
     'id': "pagination:$id",
-    'text': "$howMany more ...",
+    'text': "$escapetool.javascript($services.localization.render('core.delete.warningExtensions.tree.paginationNode', [$howMany]))",
     'icon': 'fa fa-eye',
     'children': false,
     'data': {
@@ -125,7 +125,7 @@ $response.setContentType("application/json")
   #if ($offset == 0 && !$question.freePages.isEmpty())
     #set ($discard = $data.add({
       'id': 'freePages',
-      'text': "Pages that do not belong to any extension",
+      'text': "$escapetool.javascript($services.localization.render('core.delete.warningExtensions.tree.freePages'))",
       'icon': 'fa fa-folder',
       'children': true,
       'data': {

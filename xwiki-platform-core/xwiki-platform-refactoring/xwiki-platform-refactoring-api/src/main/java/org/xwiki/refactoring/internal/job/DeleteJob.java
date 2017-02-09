@@ -95,6 +95,7 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
     {
         EntitySelection entitySelection = concernedEntities.get(documentReference);
         if (entitySelection != null && !entitySelection.isSelected()) {
+            // TODO: handle entitySelection == null which means something is wrong
             this.logger.info("Skipping [{}] because it has been unselected.", documentReference);
         } else if (!this.modelBridge.exists(documentReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);

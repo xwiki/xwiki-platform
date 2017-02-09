@@ -1,7 +1,6 @@
 ###
 ### Template used by the delete page to display extensions that could be broken by a bad delete or move action.
 ### TODO: handle move action too
-### TODO: use translation keys
 ###
 #set ($jobId = "$!request.jobId")
 #if ($jobId != '')

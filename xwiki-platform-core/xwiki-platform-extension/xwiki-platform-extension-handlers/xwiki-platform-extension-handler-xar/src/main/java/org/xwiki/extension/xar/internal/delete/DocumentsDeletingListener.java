@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -95,9 +96,12 @@ public class DocumentsDeletingListener extends AbstractEventListener
             // Conservative choice: we let the user enable the pages to delete.
             question.unselectAll();
             try {
-                // The user can modify the question so it could disable some EntitySelection...
-                job.getStatus().ask(question);
+                // The user can modify the question so it could disable some EntitySelection.
+                // We add a timeout because when a refactoring job is running, it prevents others to run.
+                // 5 minutes is probably enough for the user to decide if the process should go on.
+                job.getStatus().ask(question, 5, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
+                // Without any confirmation, we must cancel the operation.
                 this.logger.warn("Confirm question has been interrupted.");
                 CancelableEvent cancelableEvent = (CancelableEvent) event;
                 cancelableEvent.cancel("Question has been interrupted.");

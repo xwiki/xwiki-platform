@@ -55,6 +55,8 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
       var jobUrl =
         new XWiki.Document(xm.documentReference).getURL('get', 'xpage=refactoring/delete_question&jobId='+jobId);
       $.ajax(jobUrl).done(function (data) {
+        // TODO: handle the timeout
+
         /**
          * Represent the selected pages & extensions the user can chose to delete
          */

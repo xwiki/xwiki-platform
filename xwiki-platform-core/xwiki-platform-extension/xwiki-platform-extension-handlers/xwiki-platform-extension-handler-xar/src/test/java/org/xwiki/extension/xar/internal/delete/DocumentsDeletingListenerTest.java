@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +46,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -125,14 +129,14 @@ public class DocumentsDeletingListenerTest
                 assertFalse(selection.isSelected());
             }
             return null;
-        }).when(status).ask(any());
+        }).when(status).ask(any(), anyLong(), any());
 
         // Test
         DocumentsDeletingEvent event = new DocumentsDeletingEvent();
         mocker.getComponentUnderTest().onEvent(event, job, concernedEntities);
 
         // Check
-        verify(status, times(1)).ask(any());
+        verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
     }
 
     @Test
@@ -154,5 +158,36 @@ public class DocumentsDeletingListenerTest
                 "XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
         verifyZeroInteractions(status);
         verifyZeroInteractions(repository);
+    }
+
+    @Test
+    public void testCancel() throws Exception
+    {
+        Request request = mock(Request.class);
+        Job job = mock(Job.class);
+        JobStatus status = mock(JobStatus.class);
+        when(job.getRequest()).thenReturn(request);
+        when(request.isInteractive()).thenReturn(true);
+        when(job.getStatus()).thenReturn(status);
+
+        Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
+        DocumentReference doc1 = new DocumentReference("a", "b", "c1");
+        concernedEntities.put(doc1, new EntitySelection(doc1));
+
+        XarInstalledExtension ext1 = mock(XarInstalledExtension.class);
+        when(ext1.getId()).thenReturn(new ExtensionId("ext1"));
+        when(repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1));
+
+        InterruptedException e = new InterruptedException();
+        doThrow(e).when(status).ask(any(), anyLong(), any());
+
+        // Test
+        DocumentsDeletingEvent event = mock(DocumentsDeletingEvent.class);
+        mocker.getComponentUnderTest().onEvent(event, job, concernedEntities);
+
+        // Check
+        verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
+        verify(event).cancel(eq("Question has been interrupted."));
+        verify(mocker.getMockedLogger()).warn("Confirm question has been interrupted.");
     }
 }

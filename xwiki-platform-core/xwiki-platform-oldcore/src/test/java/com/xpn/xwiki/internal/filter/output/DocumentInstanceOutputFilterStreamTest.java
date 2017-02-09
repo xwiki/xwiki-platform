@@ -260,7 +260,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithunexistingobjectproperty() throws FilterException, XWikiException, ParseException
+    public void testDocumentwithunexistingobjectproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -290,7 +290,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithnumberversion() throws FilterException, XWikiException, ParseException
+    public void testDocumentwithnumberversion() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -310,7 +310,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithoutauthorandcreator() throws FilterException, XWikiException, ParseException
+    public void testDocumentwithoutauthorandcreator() throws FilterException, XWikiException
     {
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
         this.oldcore.getXWikiContext().setUserReference(contextUser);
@@ -334,7 +334,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithattachmentwithoutdate() throws FilterException, XWikiException, ParseException
+    public void testDocumentwithattachmentwithoutdate() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -363,7 +363,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithunknownclassproperty() throws FilterException, XWikiException, ParseException
+    public void testDocumentwithunknownclassproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 

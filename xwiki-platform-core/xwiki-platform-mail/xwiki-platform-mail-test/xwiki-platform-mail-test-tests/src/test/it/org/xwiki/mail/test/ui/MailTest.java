@@ -169,13 +169,7 @@ public class MailTest extends AbstractTest
         // Let's wait till we have at least 3 rows. Note that we wait because we could have received the mails above
         // but the mail status in the database may not have been updated yet.
         // Note: Since this tests was flickering at this point, we've increased the default timeout.
-        int timeout = getDriver().getTimeout();
-        getDriver().setTimeout(timeout * 5);
-        try {
-            liveTableElement.waitUntilRowCountGreaterThan(3);
-        } finally {
-            getDriver().setTimeout(timeout);
-        }
+        liveTableElement.waitUntilRowCountGreaterThan(3, getDriver().getTimeout() * 5);
 
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         assertTrue(liveTableElement.getRowCount() > 0);

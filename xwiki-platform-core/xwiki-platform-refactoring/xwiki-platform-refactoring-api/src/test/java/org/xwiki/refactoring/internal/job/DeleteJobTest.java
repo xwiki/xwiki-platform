@@ -33,8 +33,11 @@ import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DeleteJob}.
@@ -128,7 +131,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     public void deleteUnsupportedEntity() throws Exception
     {
         run(createRequest(new WikiReference("foo")));
-        verify(this.mocker.getMockedLogger()).error("Unsupported entity type [{}].", EntityType.WIKI);
+        verify(this.mocker.getMockedLogger(), times(2)).error("Unsupported entity type [{}].", EntityType.WIKI);
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 

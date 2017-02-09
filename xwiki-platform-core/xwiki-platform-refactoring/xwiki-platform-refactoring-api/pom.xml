@@ -56,7 +56,6 @@
       <artifactId>xwiki-platform-job-script</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

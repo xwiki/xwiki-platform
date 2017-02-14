@@ -137,10 +137,10 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             // make this content expire now because cacheControl is not implemented in this version of restlet
             return Response.ok(response).expires(new Date()).build();
         } catch (AnnotationServiceException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return Response.ok(getErrorResponse(e)).build();
         } catch (XWikiException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return Response.ok(getErrorResponse(e)).build();
         }
     }
@@ -181,10 +181,10 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
             return response;
         } catch (AnnotationServiceException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         } catch (XWikiException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
     }

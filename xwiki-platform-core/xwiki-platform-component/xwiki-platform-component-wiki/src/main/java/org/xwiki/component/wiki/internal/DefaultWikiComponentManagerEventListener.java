@@ -138,7 +138,7 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                     }
                 } catch (Exception e) {
                     this.logger.warn("Failed to register the wiki component located in the document [{}]: {}",
-                        reference, ExceptionUtils.getRootCauseMessage(e));
+                        reference, e);
                 }
             }
         }

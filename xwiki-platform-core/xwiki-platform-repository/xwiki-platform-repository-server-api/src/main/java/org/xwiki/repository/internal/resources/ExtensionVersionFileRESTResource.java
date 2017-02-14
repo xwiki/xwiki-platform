@@ -217,7 +217,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 repository = repositoryFactory.createRepository(repositoryDescriptor);
             } catch (Exception e) {
                 // Ignore invalid repository
-                this.logger.warning("Invalid repository in download link [" + extensionResource + "]");
+                getLogger().warn("Invalid repository in download link [{}]", extensionResource);
             }
 
         }

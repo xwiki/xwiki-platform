@@ -50,7 +50,6 @@ import org.xwiki.rest.model.jaxb.ObjectFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Base class for all XWiki-related JAX-RS resources. This class provides to subclasses a set of protected fields to
@@ -317,5 +316,14 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     protected XWikiContext getXWikiContext()
     {
         return this.xcontextProvider.get();
+    }
+
+    /**
+     * @return the logger
+     * @since 9.1RC1
+     */
+    protected Logger getLogger()
+    {
+        return this.slf4Jlogger;
     }
 }

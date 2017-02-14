@@ -324,8 +324,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             deprecatedContext.setDoc(currentDocument);
         } catch (Exception e) {
             // Just log it.
-            logger.log(Level.SEVERE,
-                String.format("Failed to update the context for page [%s].", documentReference), e);
+            getLogger().error("Failed to update the context for page [{}].", documentReference, e);
         }
     }
 }

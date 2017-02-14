@@ -97,10 +97,10 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
             return response;
         } catch (XWikiException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         } catch (AnnotationServiceException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
     }
@@ -148,10 +148,10 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
             return response;
         } catch (XWikiException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         } catch (AnnotationServiceException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
     }

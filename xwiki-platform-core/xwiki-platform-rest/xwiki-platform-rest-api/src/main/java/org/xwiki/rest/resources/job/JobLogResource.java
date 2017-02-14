@@ -41,6 +41,13 @@ public interface JobLogResource
      */
     String NAME = "joblog";
 
+    /**
+     * @param jobId the identifier of the job
+     * @param level the level of the log to filter (exact level)
+     * @param fromLevel the level of the log to filter from
+     * @return the job log
+     * @throws XWikiRestException when failing to get the job log
+     */
     @GET
     JobLog getJobLog(@PathParam("jobId") String jobId, @QueryParam("level") String level,
         @QueryParam("fromLevel") String fromLevel) throws XWikiRestException;

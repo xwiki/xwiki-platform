@@ -19,39 +19,31 @@
  */
 package org.xwiki.rest.internal.resources.job;
 
-import java.util.Collection;
-
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.event.LogEvent;
 import org.xwiki.rest.XWikiJobResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobLog;
 import org.xwiki.rest.resources.job.JobLogResource;
 
 /**
  * @version $Id$
- * @since 7.2M3 
+ * @since 7.2M3
  */
 @Named("org.xwiki.rest.internal.resources.job.JobLogResourceImpl")
 public class JobLogResourceImpl extends XWikiJobResource implements JobLogResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public JobLog getJobLog(String jobId, String level, String fromLevel) throws XWikiRestException
     {
         JobStatus jobStatus = getRealJobStatus(jobId);
 
-        Collection<LogEvent> log;
-        if (level != null) {
-            log = jobStatus.getLog().getLogs(LogLevel.valueOf(level.toUpperCase()));
-        } else if (fromLevel != null) {
-            log = jobStatus.getLog().getLogsFrom(LogLevel.valueOf(fromLevel.toUpperCase()));
-        } else {
-            log = jobStatus.getLog();
-        }
-        return DomainObjectFactory.createLog(objectFactory, uriInfo.getAbsolutePath(), log);
+        return this.factory.toRestJobLog(jobStatus.getLog(), this.uriInfo.getAbsolutePath(), level, fromLevel);
     }
 }

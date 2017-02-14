@@ -20,43 +20,37 @@
 package org.xwiki.rest.resources.job;
 
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
 
 /**
  * @version $Id$
- * @since 7.2M3
+ * @since 9.1RC1
  */
-@Path("/" + JobStatusResource.NAME + "/{jobId: .+}")
-public interface JobStatusResource
+@Path("/" + JobsResource.NAME)
+public interface JobsResource
 {
     /**
      * The entry name of the resource.
-     * 
-     * @since 8.0
      */
-    String NAME = "jobstatus";
+    String NAME = "jobs";
 
     /**
-     * Find and return the status of the running job (of the stored status if the job is finished).
+     * Start a new Job.
      * 
-     * @param jobId the identifier of the job
-     * @param request if {@code True} the job request should be serialized in the status (since 9.1RC1)
-     * @param progress if {@code True} the job progress should be serialized in the status (since 9.1RC1)
-     * @param log if {@code True} the job log should be serialized in the status (since 9.1RC1)
-     * @param logFromLevel the level of the log to filter from
-     * @return the job status
-     * @throws XWikiRestException when failing to search job
+     * @param jobType the type of the job to start
+     * @param async true if the REST request should return without waiting for the end of the job
+     * @param jobRequest the request controlling job behavior
+     * @return the newly created job status
+     * @throws XWikiRestException when failing to start job
+     * @since 9.0RC1
      */
-    @GET
-    JobStatus getJobStatus(@PathParam("jobId") String jobId,
-        @QueryParam("request") @DefaultValue("false") boolean request,
-        @QueryParam("progress") @DefaultValue("true") boolean progress,
-        @QueryParam("log") @DefaultValue("false") boolean log, @QueryParam("log_fromLevel") String logFromLevel)
-        throws XWikiRestException;
+    @PUT
+    JobStatus executeJob(@QueryParam("jobType") String jobType,
+        @QueryParam("async") @DefaultValue("true") boolean async, JobRequest jobRequest) throws XWikiRestException;
 }

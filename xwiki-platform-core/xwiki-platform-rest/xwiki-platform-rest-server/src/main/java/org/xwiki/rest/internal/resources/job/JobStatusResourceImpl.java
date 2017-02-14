@@ -19,14 +19,15 @@
  */
 package org.xwiki.rest.internal.resources.job;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiJobResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
-import org.xwiki.rest.resources.job.JobStatusResource;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobStatus;
+import org.xwiki.rest.resources.job.JobStatusResource;
 
 /**
  * @version $Id$
@@ -36,9 +37,14 @@ import org.xwiki.rest.model.jaxb.JobStatus;
 @Named("org.xwiki.rest.internal.resources.job.JobStatusResourceImpl")
 public class JobStatusResourceImpl extends XWikiJobResource implements JobStatusResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
-    public JobStatus getJobStatus(String jobId) throws XWikiRestException
+    public JobStatus getJobStatus(String jobId, boolean request, boolean progress, boolean log, String logFromLevel)
+        throws XWikiRestException
     {
-        return DomainObjectFactory.createJobStatus(objectFactory, uriInfo.getAbsolutePath(), getRealJobStatus(jobId));
+        return this.factory.toRestJobStatus(getRealJobStatus(jobId), uriInfo.getAbsolutePath(), request, progress, log,
+            logFromLevel);
     }
 }

@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.HistorySummary;
@@ -64,7 +64,7 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public class DomainObjectFactory
 {
-    public static ModelFactory getModelUtils()
+    public static ModelFactory getModelFactory()
     {
         return com.xpn.xwiki.web.Utils.getComponent(ModelFactory.class);
     }
@@ -94,7 +94,7 @@ public class DomainObjectFactory
     @Deprecated
     public static Wiki createWiki(ObjectFactory objectFactory, URI baseUri, String wikiName)
     {
-        return getModelUtils().toRestWiki(baseUri, wikiName);
+        return getModelFactory().toRestWiki(baseUri, wikiName);
     }
 
     /**
@@ -104,7 +104,7 @@ public class DomainObjectFactory
     public static Space createSpace(ObjectFactory objectFactory, URI baseUri, String wikiName, List<String> spaces,
         Document home)
     {
-        return getModelUtils().toRestSpace(baseUri, wikiName, spaces, home);
+        return getModelFactory().toRestSpace(baseUri, wikiName, spaces, home);
     }
 
     /**
@@ -114,7 +114,7 @@ public class DomainObjectFactory
     public static Translations createTranslations(ObjectFactory objectFactory, URI baseUri, Document doc)
         throws XWikiException
     {
-        return getModelUtils().toRestTranslations(baseUri, doc);
+        return getModelFactory().toRestTranslations(baseUri, doc);
     }
 
     /**
@@ -124,7 +124,7 @@ public class DomainObjectFactory
     public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi,
         Boolean withPrettyNames) throws XWikiException
     {
-        return getModelUtils().toRestPageSummary(baseUri, doc, withPrettyNames);
+        return getModelFactory().toRestPageSummary(baseUri, doc, withPrettyNames);
     }
 
     /**
@@ -134,7 +134,7 @@ public class DomainObjectFactory
     public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion,
         XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
-        return getModelUtils().toRestPage(baseUri, self, doc, useVersion, withPrettyNames, false, false, false);
+        return getModelFactory().toRestPage(baseUri, self, doc, useVersion, withPrettyNames, false, false, false);
     }
 
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
@@ -192,7 +192,7 @@ public class DomainObjectFactory
         com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi,
         Boolean withPrettyNames)
     {
-        return getModelUtils().toRestAttachment(baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl,
+        return getModelFactory().toRestAttachment(baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl,
             withPrettyNames, false);
     }
 
@@ -206,7 +206,7 @@ public class DomainObjectFactory
         com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi,
         Boolean withPrettyNames)
     {
-        return getModelUtils().toRestAttachment(baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl,
+        return getModelFactory().toRestAttachment(baseUri, xwikiAttachment, xwikiRelativeUrl, xwikiAbsoluteUrl,
             withPrettyNames, true);
     }
 
@@ -262,11 +262,11 @@ public class DomainObjectFactory
      *             instead
      */
     @Deprecated
-    public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri,
-        XWikiContext xwikiContext, Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi,
-        Boolean withPrettyNames) throws XWikiException
+    public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
+        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames)
+        throws XWikiException
     {
-        return getModelUtils().toRestObjectSummary(baseUri, doc, xwikiObject, useVersion, withPrettyNames);
+        return getModelFactory().toRestObjectSummary(baseUri, doc, xwikiObject, useVersion, withPrettyNames);
     }
 
     /**
@@ -275,77 +275,53 @@ public class DomainObjectFactory
      *             instead
      */
     @Deprecated
-    public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
-        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames)
-        throws XWikiException
+    public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext, Document doc,
+        BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
-        return getModelUtils().toRestObject(baseUri, doc, xwikiObject, useVersion, withPrettyNames);
+        return getModelFactory().toRestObject(baseUri, doc, xwikiObject, useVersion, withPrettyNames);
     }
 
+    /**
+     * @deprecated since 9.1RC1, use
+     *             {@link ModelFactory#toRestJobStatus(org.xwiki.job.event.status.JobStatus, boolean, boolean, boolean)}
+     *             instead
+     */
+    @Deprecated
     public static JobStatus createJobStatus(ObjectFactory objectFactory, URI self,
-        org.xwiki.job.event.status.JobStatus jobStatus)
+        org.xwiki.job.event.status.JobStatus jobStatus) throws XWikiRestException
     {
-        JobStatus status = objectFactory.createJobStatus();
-        status.setId(StringUtils.join(jobStatus.getRequest().getId(), "/"));
-        status.setState(jobStatus.getState().name());
-        status.setProgress(createJobProgress(objectFactory, jobStatus.getProgress()));
-        if (jobStatus.getStartDate() != null) {
-            Calendar calendarStartDate = Calendar.getInstance();
-            calendarStartDate.setTime(jobStatus.getStartDate());
-            status.setStartDate(calendarStartDate);
-        }
-        if (jobStatus.getEndDate() != null) {
-            Calendar calendarEndDate = Calendar.getInstance();
-            calendarEndDate.setTime(jobStatus.getEndDate());
-            status.setEndDate(calendarEndDate);
-        }
-        if (self != null) {
-            Link link = objectFactory.createLink();
-            link.setHref(self.toString());
-            link.setRel(Relations.SELF);
-            status.getLinks().add(link);
-        }
-
-        return status;
+        return getModelFactory().toRestJobStatus(jobStatus, self, false, true, false, null);
     }
 
+    /**
+     * @deprecated since 9.1RC1, use {@link ModelFactory#toRestJobProgress(org.xwiki.job.event.status.JobProgress)}
+     *             instead
+     */
+    @Deprecated
     public static JobProgress createJobProgress(ObjectFactory objectFactory,
         org.xwiki.job.event.status.JobProgress jobProgress)
     {
-        JobProgress progress = objectFactory.createJobProgress();
-        progress.setOffset(jobProgress.getOffset());
-        progress.setCurrentLevelOffset(jobProgress.getCurrentLevelOffset());
-        return progress;
+        return getModelFactory().toRestJobProgress(jobProgress);
     }
 
+    /**
+     * @deprecated since 9.1RC1, use
+     *             {@link ModelFactory#toRestJobStatus(org.xwiki.job.event.status.JobStatus, boolean, boolean, boolean)}
+     *             instead
+     */
+    @Deprecated
     public static JobLog createLog(ObjectFactory objectFactory, URI self, Collection<LogEvent> logs)
     {
-        JobLog log = objectFactory.createJobLog();
-        for (LogEvent logEvent : logs) {
-            org.xwiki.rest.model.jaxb.LogEvent event = objectFactory.createLogEvent();
-            event.setLevel(logEvent.getLevel().name());
-            Calendar calendarDate = Calendar.getInstance();
-            calendarDate.setTimeInMillis(logEvent.getTimeStamp());
-            event.setDate(calendarDate);
-            event.setFormattedMessage(logEvent.getFormattedMessage());
-            log.getLogEvents().add(event);
-        }
-        if (self != null) {
-            Link link = objectFactory.createLink();
-            link.setHref(self.toString());
-            link.setRel(Relations.SELF);
-            log.getLinks().add(link);
-        }
-        return log;
+        return getModelFactory().toRestJobLog(logs, self);
     }
 
     /**
      * @deprecated since 7.3M1, use {@link ModelFactory#toRestClass(URI, String, com.xpn.xwiki.api.Class)}
      */
-    public static org.xwiki.rest.model.jaxb.Class createClass(ObjectFactory objectFactory, URI baseUri,
-        String wikiName, com.xpn.xwiki.api.Class xwikiClass)
+    public static org.xwiki.rest.model.jaxb.Class createClass(ObjectFactory objectFactory, URI baseUri, String wikiName,
+        com.xpn.xwiki.api.Class xwikiClass)
     {
-        return getModelUtils().toRestClass(baseUri, xwikiClass);
+        return getModelFactory().toRestClass(baseUri, xwikiClass);
     }
 
     /**

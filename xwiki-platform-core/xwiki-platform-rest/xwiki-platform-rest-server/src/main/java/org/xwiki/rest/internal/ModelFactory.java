@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
@@ -32,17 +33,30 @@ import java.util.Vector;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.DefaultRequest;
+import org.xwiki.job.Request;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogQueue;
+import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attribute;
 import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.rest.model.jaxb.JobId;
+import org.xwiki.rest.model.jaxb.JobLog;
+import org.xwiki.rest.model.jaxb.JobProgress;
+import org.xwiki.rest.model.jaxb.JobRequest;
+import org.xwiki.rest.model.jaxb.JobStatus;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.MapEntry;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
@@ -115,6 +129,9 @@ public class ModelFactory
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private JAXBConverter jaxbConverter;
 
     public ModelFactory()
     {
@@ -199,8 +216,8 @@ public class ModelFactory
         objectSummary.setPageAuthor(doc.getAuthor());
         if (withPrettyNames) {
             XWikiContext xwikiContext = this.xcontextProvider.get();
-            objectSummary.setPageAuthorName(xwikiContext.getWiki().getUserName(doc.getAuthor(), null, false,
-                xwikiContext));
+            objectSummary
+                .setPageAuthorName(xwikiContext.getWiki().getUserName(doc.getAuthor(), null, false, xwikiContext));
         }
         objectSummary.setWiki(doc.getWiki());
         objectSummary.setSpace(doc.getSpace());
@@ -229,15 +246,13 @@ public class ModelFactory
 
         String propertiesUri;
         if (useVersion) {
-            propertiesUri =
-                Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(),
-                    xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+            propertiesUri = Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
+                xwikiObject.getNumber()).toString();
         } else {
-            propertiesUri =
-                Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
-                    xwikiObject.getNumber()).toString();
+            propertiesUri = Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
+                xwikiObject.getNumber()).toString();
         }
 
         Link propertyLink = objectFactory.createLink();
@@ -318,15 +333,13 @@ public class ModelFactory
             String propertyUri;
 
             if (useVersion) {
-                propertyUri =
-                    Utils.createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
-                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(),
-                        xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
+                propertyUri = Utils.createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(),
+                    xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
             } else {
-                propertyUri =
-                    Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
-                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
-                        xwikiObject.getNumber(), propertyClass.getName()).toString();
+                propertyUri = Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
+                    xwikiObject.getNumber(), propertyClass.getName()).toString();
             }
             Link propertyLink = this.objectFactory.createLink();
             propertyLink.setHref(propertyUri);
@@ -348,15 +361,14 @@ public class ModelFactory
         String objectUri;
 
         if (useVersion) {
-            objectUri =
-                Utils.createURI(baseUri, ObjectAtPageVersionResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(),
-                    xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+            objectUri = Utils.createURI(baseUri, ObjectAtPageVersionResource.class, doc.getWiki(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
+                xwikiObject.getNumber()).toString();
         } else {
-            objectUri =
-                Utils.createURI(baseUri, ObjectResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiObject.getClassName(),
-                    xwikiObject.getNumber()).toString();
+            objectUri = Utils
+                .createURI(baseUri, ObjectResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()),
+                    doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber())
+                .toString();
         }
         Link objectLink = objectFactory.createLink();
         objectLink.setHref(objectUri);
@@ -463,9 +475,8 @@ public class ModelFactory
                 pageTranslationLink.setRel(Relations.PAGE);
                 translation.getLinks().add(pageTranslationLink);
 
-                String historyUri =
-                    Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces, doc.getName())
-                        .toString();
+                String historyUri = Utils
+                    .createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces, doc.getName()).toString();
                 Link historyLink = this.objectFactory.createLink();
                 historyLink.setHref(historyUri);
                 historyLink.setRel(Relations.HISTORY);
@@ -487,9 +498,8 @@ public class ModelFactory
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
-            String historyUri =
-                Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces, doc.getName(),
-                    language).toString();
+            String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces,
+                doc.getName(), language).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -543,18 +553,16 @@ public class ModelFactory
         pageSummary.getLinks().add(spaceLink);
 
         if (parentExist) {
-            String parentUri =
-                Utils.createURI(baseUri, PageResource.class, parentReference.getWikiReference().getName(), spaces,
-                    parentReference.getName()).toString();
+            String parentUri = Utils.createURI(baseUri, PageResource.class,
+                parentReference.getWikiReference().getName(), spaces, parentReference.getName()).toString();
             Link parentLink = this.objectFactory.createLink();
             parentLink.setHref(parentUri);
             parentLink.setRel(Relations.PARENT);
             pageSummary.getLinks().add(parentLink);
         }
 
-        String historyUri =
-            Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
+        String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(),
+            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
         Link historyLink = this.objectFactory.createLink();
         historyLink.setHref(historyUri);
         historyLink.setRel(Relations.HISTORY);
@@ -572,9 +580,8 @@ public class ModelFactory
         if (!doc.getComments().isEmpty()) {
             String commentsUri;
             if (useVersion) {
-                commentsUri =
-                    Utils.createURI(baseUri, CommentsVersionResource.class, doc.getWiki(), spaces, doc.getName(),
-                        doc.getVersion()).toString();
+                commentsUri = Utils.createURI(baseUri, CommentsVersionResource.class, doc.getWiki(), spaces,
+                    doc.getName(), doc.getVersion()).toString();
             } else {
                 commentsUri =
                     Utils.createURI(baseUri, CommentsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
@@ -589,13 +596,11 @@ public class ModelFactory
         if (!doc.getAttachmentList().isEmpty()) {
             String attachmentsUri;
             if (useVersion) {
-                attachmentsUri =
-                    Utils.createURI(baseUri, AttachmentsAtPageVersionResource.class, doc.getWiki(), spaces,
-                        doc.getName(), doc.getVersion()).toString();
+                attachmentsUri = Utils.createURI(baseUri, AttachmentsAtPageVersionResource.class, doc.getWiki(), spaces,
+                    doc.getName(), doc.getVersion()).toString();
             } else {
-                attachmentsUri =
-                    Utils.createURI(baseUri, AttachmentsResource.class, doc.getWiki(), spaces, doc.getName())
-                        .toString();
+                attachmentsUri = Utils
+                    .createURI(baseUri, AttachmentsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
             }
 
             Link attachmentsLink = this.objectFactory.createLink();
@@ -608,9 +613,8 @@ public class ModelFactory
             String objectsUri;
 
             if (useVersion) {
-                objectsUri =
-                    Utils.createURI(baseUri, ObjectsAtPageVersionResource.class, doc.getWiki(), spaces, doc.getName(),
-                        doc.getVersion()).toString();
+                objectsUri = Utils.createURI(baseUri, ObjectsAtPageVersionResource.class, doc.getWiki(), spaces,
+                    doc.getName(), doc.getVersion()).toString();
             } else {
                 objectsUri =
                     Utils.createURI(baseUri, ObjectsResource.class, doc.getWiki(), spaces, doc.getName()).toString();
@@ -645,9 +649,8 @@ public class ModelFactory
         PageSummary pageSummary = this.objectFactory.createPageSummary();
         toRestPageSummary(pageSummary, baseUri, doc, false, withPrettyNames);
 
-        String pageUri =
-            Utils.createURI(baseUri, PageResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()),
-                doc.getName()).toString();
+        String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
+            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
         Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -713,17 +716,13 @@ public class ModelFactory
             page.setAttachments(objectFactory.createAttachments());
 
             for (com.xpn.xwiki.api.Attachment attachment : doc.getAttachmentList()) {
-                URL url =
-                    xcontext.getURLFactory().createAttachmentURL(attachment.getFilename(), doc.getSpace(),
-                        doc.getName(), "download", null, doc.getWiki(), xcontext);
+                URL url = xcontext.getURLFactory().createAttachmentURL(attachment.getFilename(), doc.getSpace(),
+                    doc.getName(), "download", null, doc.getWiki(), xcontext);
                 String attachmentXWikiAbsoluteUrl = url.toString();
                 String attachmentXWikiRelativeUrl = xcontext.getURLFactory().getURL(url, xcontext);
 
-                page.getAttachments()
-                    .getAttachments()
-                    .add(
-                        toRestAttachment(baseUri, attachment, attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl,
-                            withPrettyNames, false));
+                page.getAttachments().getAttachments().add(toRestAttachment(baseUri, attachment,
+                    attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl, withPrettyNames, false));
             }
         }
 
@@ -781,9 +780,8 @@ public class ModelFactory
                 property.getAttributes().add(attribute);
             }
 
-            String propertyUri =
-                Utils.createURI(baseUri, ClassPropertyResource.class, wikiName, xwikiClass.getName(),
-                    xwikiPropertyClass.getName()).toString();
+            String propertyUri = Utils.createURI(baseUri, ClassPropertyResource.class, wikiName, xwikiClass.getName(),
+                xwikiPropertyClass.getName()).toString();
             Link propertyLink = this.objectFactory.createLink();
             propertyLink.setHref(propertyUri);
             propertyLink.setRel(Relations.SELF);
@@ -843,9 +841,8 @@ public class ModelFactory
         attachment.setXwikiRelativeUrl(xwikiRelativeUrl);
         attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
 
-        String pageUri =
-            Utils.createURI(baseUri, PageResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()),
-                doc.getName()).toString();
+        String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
+            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
         Link pageLink = objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -853,14 +850,14 @@ public class ModelFactory
 
         String attachmentUri;
         if (versionURL) {
-            attachmentUri =
-                Utils.createURI(baseUri, AttachmentVersionResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiAttachment.getFilename(),
-                    xwikiAttachment.getVersion()).toString();
+            attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, doc.getWiki(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiAttachment.getFilename(),
+                xwikiAttachment.getVersion()).toString();
         } else {
             attachmentUri =
-                Utils.createURI(baseUri, AttachmentResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiAttachment.getFilename())
+                Utils
+                    .createURI(baseUri, AttachmentResource.class, doc.getWiki(),
+                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), xwikiAttachment.getFilename())
                     .toString();
         }
 
@@ -892,5 +889,164 @@ public class ModelFactory
         } else {
             return "";
         }
+    }
+
+    public JobRequest toRestJobRequest(Request request) throws XWikiRestException
+    {
+        JobRequest restJobRequest = this.objectFactory.createJobRequest();
+
+        restJobRequest.setId(toRestJobId(request.getId()));
+        restJobRequest.setInteractive(request.isInteractive());
+        restJobRequest.setRemote(request.isRemote());
+        restJobRequest.setVerbose(request.isVerbose());
+
+        for (String key : request.getPropertyNames()) {
+            restJobRequest.getProperties().add(toRestMapEntry(key, request.getProperty(key)));
+        }
+
+        return restJobRequest;
+    }
+
+    public JobId toRestJobId(List<String> id)
+    {
+        if (id == null) {
+            return null;
+        }
+
+        JobId restJobId = this.objectFactory.createJobId();
+
+        restJobId.withElements(id);
+
+        return restJobId;
+    }
+
+    public MapEntry toRestMapEntry(String key, java.lang.Object value) throws XWikiRestException
+    {
+        MapEntry restMapEntry = this.objectFactory.createMapEntry();
+
+        restMapEntry.setKey(key);
+        try {
+            restMapEntry.setValue(this.jaxbConverter.serializeAny(value));
+        } catch (ParserConfigurationException e) {
+            throw new XWikiRestException("Failed to serialize property [" + key + "] with value [" + value + "]", e);
+        }
+
+        return restMapEntry;
+    }
+
+    public Request tJobRequest(JobRequest restJobRequest)
+    {
+        DefaultRequest request = new DefaultRequest();
+
+        if (restJobRequest.getId() != null) {
+            request.setId(restJobRequest.getId().getElements());
+        }
+
+        request.setInteractive(restJobRequest.isInteractive());
+        request.setVerbose(restJobRequest.isVerbose());
+
+        for (MapEntry restEntry : restJobRequest.getProperties()) {
+            request.setProperty(restEntry.getKey(), this.jaxbConverter.unserializeAny(restEntry.getValue()));
+        }
+
+        return request;
+    }
+
+    public JobStatus toRestJobStatus(org.xwiki.job.event.status.JobStatus jobStatus, URI self, boolean request,
+        boolean progress, boolean log, String logFromLevel) throws XWikiRestException
+    {
+        JobStatus status = this.objectFactory.createJobStatus();
+        status.setId(StringUtils.join(jobStatus.getRequest().getId(), "/"));
+        status.setState(jobStatus.getState().name());
+        if (jobStatus.getStartDate() != null) {
+            Calendar calendarStartDate = Calendar.getInstance();
+            calendarStartDate.setTime(jobStatus.getStartDate());
+            status.setStartDate(calendarStartDate);
+        }
+        if (jobStatus.getEndDate() != null) {
+            Calendar calendarEndDate = Calendar.getInstance();
+            calendarEndDate.setTime(jobStatus.getEndDate());
+            status.setEndDate(calendarEndDate);
+        }
+
+        // Request
+        if (request) {
+            status.setRequest(toRestJobRequest(jobStatus.getRequest()));
+        }
+
+        // Progress
+        if (progress) {
+            status.setProgress(toRestJobProgress(jobStatus.getProgress()));
+        }
+
+        // Log
+        if (log) {
+            status.setLog(toRestJobLog(jobStatus.getLog(), self, null, logFromLevel));
+        }
+
+        // Link
+        if (self != null) {
+            Link link = objectFactory.createLink();
+            link.setHref(self.toString());
+            link.setRel(Relations.SELF);
+            status.getLinks().add(link);
+        }
+
+        return status;
+    }
+
+    public JobProgress toRestJobProgress(org.xwiki.job.event.status.JobProgress progress)
+    {
+        JobProgress restJobProgress = this.objectFactory.createJobProgress();
+
+        restJobProgress.setOffset(progress.getOffset());
+        restJobProgress.setCurrentLevelOffset(progress.getCurrentLevelOffset());
+
+        // TODO: add support for steps
+
+        return restJobProgress;
+    }
+
+    public JobLog toRestJobLog(LogQueue logQueue, URI self, String level, String fromLevel)
+    {
+        // Filter log
+        Collection<LogEvent> logs;
+        if (level != null) {
+            logs = logQueue.getLogs(LogLevel.valueOf(level.toUpperCase()));
+        } else if (fromLevel != null) {
+            logs = logQueue.getLogsFrom(LogLevel.valueOf(fromLevel.toUpperCase()));
+        } else {
+            logs = logQueue;
+        }
+
+        return toRestJobLog(logs, self);
+    }
+
+    public JobLog toRestJobLog(Collection<LogEvent> logs, URI self)
+    {
+        JobLog log = this.objectFactory.createJobLog();
+
+        // Serialize log
+        for (LogEvent logEvent : logs) {
+            // TODO: add support for log arguments
+            // TODO: add support for log Marker
+            org.xwiki.rest.model.jaxb.LogEvent event = this.objectFactory.createLogEvent();
+            event.setLevel(logEvent.getLevel().name());
+            Calendar calendarDate = Calendar.getInstance();
+            calendarDate.setTimeInMillis(logEvent.getTimeStamp());
+            event.setDate(calendarDate);
+            event.setFormattedMessage(logEvent.getFormattedMessage());
+            log.getLogEvents().add(event);
+        }
+
+        // Set link
+        if (self != null) {
+            Link link = this.objectFactory.createLink();
+            link.setHref(self.toString());
+            link.setRel(Relations.SELF);
+            log.getLinks().add(link);
+        }
+
+        return log;
     }
 }

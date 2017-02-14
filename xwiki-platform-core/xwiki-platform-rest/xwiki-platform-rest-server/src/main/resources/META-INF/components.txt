@@ -1,4 +1,5 @@
 org.xwiki.rest.internal.ModelFactory
+org.xwiki.rest.internal.JAXBConverter
 org.xwiki.rest.internal.resources.RootResourceImpl
 org.xwiki.rest.internal.resources.SyntaxesResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikisResourceImpl
@@ -24,6 +25,7 @@ org.xwiki.rest.internal.resources.comments.CommentsResourceImpl
 org.xwiki.rest.internal.resources.comments.CommentsVersionResourceImpl
 org.xwiki.rest.internal.resources.comments.CommentVersionResourceImpl
 org.xwiki.rest.internal.resources.job.JobStatusResourceImpl
+org.xwiki.rest.internal.resources.job.JobsResourceImpl
 org.xwiki.rest.internal.resources.job.JobLogResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentHistoryResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl

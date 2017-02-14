@@ -79,10 +79,8 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
                 String pageFullName = Utils.getPageId(wikiName, spaces, pageName);
 
                 if (!Utils.getXWikiApi(componentManager).exists(pageFullName)) {
-                    logger.warning(String
-                            .format("[Page '%s' appears to be in space '%s' but no information is available.]",
-                                    pageName,
-                                    spaceId));
+                    getLogger().warn("Page [{}] appears to be in space [{}] but no information is available.", pageName,
+                        spaceId);
                 } else {
                     Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
 

@@ -307,14 +307,28 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-          <element name="id" type="string"></element>
-          <element name="state" type="string"></element>
-          <element name="progress" type="xwiki:JobProgress"></element>
-          <element name="startDate" type="dateTime"></element>
-          <element name="endDate" type="dateTime"></element>
+        	<element name="id" type="string" minOccurs="0" maxOccurs="1"></element>
+        	<element name="request" type="xwiki:JobRequest" minOccurs="0" maxOccurs="1"></element>
+        	<element name="state" type="string"></element>
+        	<element name="progress" type="xwiki:JobProgress" minOccurs="0" maxOccurs="1"></element>
+        	<element name="log" type="xwiki:Log" minOccurs="0" maxOccurs="1"></element>
+        	<element name="startDate" type="dateTime"></element>
+        	<element name="endDate" type="dateTime"></element>
         </sequence>
       </extension>
     </complexContent>
+  </complexType>
+
+  <complexType name="JobRequest">
+    <sequence>
+    	<element name="id" type="xwiki:JobId" maxOccurs="1"
+    		minOccurs="0">
+    	</element>
+    	<element name="interactive" type="boolean"></element>
+    	<element name="remote" type="boolean"></element>
+    	<element name="verbose" type="boolean"></element>
+    	<element name="property" type="xwiki:MapEntry" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
   </complexType>
 
   <!--
@@ -550,4 +564,21 @@
   <element name="jobStatus" type="xwiki:JobStatus"></element>
 
   <element name="jobLog" type="xwiki:Log"></element>
+
+  <element name="jobRequest" type="xwiki:JobRequest"></element>
+
+
+  <complexType name="MapEntry">
+  	<sequence>
+  		<element name="key" type="string"></element>
+        <element name="value" type="anyType"></element>
+  	</sequence>
+  </complexType>
+
+
+    <complexType name="JobId">
+    	<sequence>
+    		<element name="element" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
 </schema>

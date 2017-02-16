@@ -644,6 +644,8 @@
       {{translation key="core.register.userAlreadyExists"/}}
     #elseif($reg == -4)
       {{translation key="core.register.invalidUsername"/}}
+    #elseif($reg == -11)
+      {{translation key="core.register.mailSenderWronglyConfigured"/}}
     #else
       {{translation key="core.register.registerFailed" parameters="$reg"/}}
     #end

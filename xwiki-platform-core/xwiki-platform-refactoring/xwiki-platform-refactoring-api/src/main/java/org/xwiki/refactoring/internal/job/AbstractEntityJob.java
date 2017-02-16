@@ -118,8 +118,17 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         EntityReference commonParent = getCommonParent();
         if (commonParent != null) {
             // Build a JobGroupPath based on the common location of the concerned entities.
-            // The intent is to prevent having jobs concerning A.B.C and A.B.D running in parallel while accepting
-            // having jobs concerning A.B.C and E.F.G running in parallel.
+            // The intent is to prevent having jobs concerning the same entities to run in parallel.
+            //
+            // Examples:
+            // - A.B.C and A.B cannot run in parallel
+            // But:
+            // - A.B.C and A.B.Z can run in parallel
+            // - A.B.C and E.F.G can run in parallel
+            //
+            // Example of use case:
+            // - user A renames A.B.C to A.B.D
+            // - user B deletes A.B.C in the same time
             this.groupPath = ROOT_GROUP;
             for (EntityReference reference : commonParent.getReversedReferenceChain()) {
                 this.groupPath = new JobGroupPath(reference.getName(), this.groupPath);

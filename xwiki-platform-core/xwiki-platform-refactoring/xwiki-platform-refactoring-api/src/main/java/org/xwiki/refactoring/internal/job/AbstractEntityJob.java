@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 
@@ -114,12 +115,67 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         super.initialize(request);
 
         // Build the job group path.
-        String targetWiki = getTargetWiki();
-        if (targetWiki != null) {
-            this.groupPath = new JobGroupPath(targetWiki, ROOT_GROUP);
+        EntityReference commonParent = getCommonParent();
+        if (commonParent != null) {
+            // Build a JobGroupPath based on the common location of the concerned entities.
+            // The intent is to prevent having jobs concerning A.B.C and A.B.D running in parallel while accepting
+            // having jobs concerning A.B.C and E.F.G running in parallel.
+            this.groupPath = ROOT_GROUP;
+            for (EntityReference reference : commonParent.getReversedReferenceChain()) {
+                this.groupPath = new JobGroupPath(reference.getName(), this.groupPath);
+            }
         } else {
             this.groupPath = ROOT_GROUP;
         }
+    }
+
+    /**
+     * Return the deepest common parent shared by all concerned entities. For example, if we have:
+     * <ul>
+     *     <li>"A.B.C"</li>
+     *     <li>"A.B.D"</li>
+     * </ul>
+     * the results will be "A.B".
+     *
+     * @return the deepest common parent
+     * @since 9.1RC1
+     */
+    protected EntityReference getCommonParent()
+    {
+        return getCommonParent(this.request.getEntityReferences());
+    }
+
+    /**
+     * Return the deepest common parents shared by all concerned entities. For example, if we have:
+     * <ul>
+     *     <li>A.B.C</li>
+     *     <li>A.B.D</li>
+     * </ul>
+     * the results will be A.B.
+     *
+     * @param entityReferences a collection of entities
+     * @return the deepest common parent or null if there is no common ancestor
+     * @since 9.1RC1
+     */
+    protected EntityReference getCommonParent(Collection<EntityReference> entityReferences)
+    {
+        if (entityReferences == null || entityReferences.isEmpty()) {
+            return null;
+        }
+
+        Iterator<EntityReference> iterator = entityReferences.iterator();
+        EntityReference commonParent = iterator.next();
+        while (iterator.hasNext()) {
+            EntityReference entity = iterator.next();
+            while (!entity.hasParent(commonParent)) {
+                commonParent = commonParent.getParent();
+                if (commonParent == null) {
+                    return null;
+                }
+            }
+        }
+
+        return commonParent;
     }
 
     @Override
@@ -167,40 +223,6 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
      * @param entityReference the entity to process
      */
     protected abstract void process(EntityReference entityReference);
-
-    /**
-     * @return the wiki where the operation takes place, or {@code null} if the operation is cross wiki
-     */
-    protected String getTargetWiki()
-    {
-        return getTargetWiki(this.request.getEntityReferences());
-    }
-
-    /**
-     * @return the wiki name if all the given entity references are from the same wiki, {@code null} otherwise
-     */
-    protected String getTargetWiki(Collection<EntityReference> entityReferences)
-    {
-        if (entityReferences == null) {
-            return null;
-        }
-
-        String targetWiki = null;
-        for (EntityReference entityReference : entityReferences) {
-            EntityReference wikiReference = entityReference.extractReference(EntityType.WIKI);
-            if (wikiReference != null) {
-                if (targetWiki == null) {
-                    targetWiki = wikiReference.getName();
-                } else if (!targetWiki.equals(wikiReference.getName())) {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        return targetWiki;
-    }
 
     protected boolean hasAccess(Right right, EntityReference reference)
     {

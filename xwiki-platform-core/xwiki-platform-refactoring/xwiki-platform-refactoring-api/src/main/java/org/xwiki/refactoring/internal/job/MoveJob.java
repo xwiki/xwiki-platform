@@ -299,10 +299,10 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
     }
 
     @Override
-    protected String getTargetWiki()
+    protected EntityReference getCommonParent()
     {
         List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
         entityReferences.add(this.request.getDestination());
-        return getTargetWiki(entityReferences);
+        return getCommonParent(entityReferences);
     }
 }

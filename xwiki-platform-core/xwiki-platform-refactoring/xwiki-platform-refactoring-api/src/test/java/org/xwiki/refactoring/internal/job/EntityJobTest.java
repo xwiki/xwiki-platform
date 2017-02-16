@@ -132,6 +132,16 @@ public class EntityJobTest
         request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, bobReference));
         initialize(job, request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring")), job.getGroupPath());
+
+        DocumentReference carolReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Carol");
+        request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, carolReference));
+        initialize(job, request);
+        assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "Path", "To")), job.getGroupPath());
+
+        DocumentReference daveReference = new DocumentReference("chess", Arrays.asList("Path", "To2"), "Dave");
+        request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, carolReference, daveReference));
+        initialize(job, request);
+        assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "Path")), job.getGroupPath());
     }
 
     @Test

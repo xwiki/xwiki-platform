@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Videos.WebHome" locale="">
+  <web>Help.Videos</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1485358073000</creationDate>
+  <parent>Help.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1486484551000</date>
+  <contentUpdateDate>1486484438000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Videos</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity output="false"}}
+#set ($docextras = [])
+
+#set ($videoCards = [{
+  'title': 'Homepage Overview',
+  'topics': [
+    'Discover the elements displayed on your homepage',
+    'Start browsing your wiki'
+  ],
+  'url': 'https://www.youtube.com/embed/p5g6aDGOqWY',
+  'duration': '4 min'
+}, {
+  'title': 'Homepage Customization',
+  'topics': [
+    'Learn how to change your wiki color theme',
+    'Learn how to add panels and columns to your wiki look',
+    'Learn how to add widgets to a wiki'
+  ],
+  'url': 'https://www.youtube.com/embed/zX1Itoh3E68',
+  'duration': '5 min'
+}, {
+  'title': 'Page and Content Creation',
+  'topics': [
+    'Discover how to create a page',
+    'Learn how to use the WYSIWYG editor',
+    'Discover the view and edit modes'
+  ],
+  'url': 'https://www.youtube.com/embed/onenEu21FIk',
+  'duration': '6 min'
+}, {
+  'title': 'Importing Office Documents to XWiki',
+  'topics': [
+    'Discover how to import Office Documents to your wiki',
+    'Learn how to use a "Table of content" macro'
+  ],
+  'url': 'https://www.youtube.com/embed/csQVSRMVclM',
+  'duration': '4 min'
+}, {
+  'title': 'App Within Minutes',
+  'topics': [
+    'Discover how to create an application',
+    'Learn how to use your application'
+  ],
+  'url': 'https://www.youtube.com/embed/Pv4jPCaU99g',
+  'duration': '7 min'
+}, {
+  'title': 'Add / Remove Extensions',
+  'topics': [
+    'Discover how to add/remove extensions using the Extension Manager',
+    'Discover the XWiki Administration UI'
+  ],
+  'url': 'https://www.youtube.com/embed/Q4NHu6J5pX4',
+  'duration': '3 min'
+}])
+
+#macro (helpVideoCard $data)
+  &lt;div class="videoCard"&gt;
+    &lt;iframe src="$data.url" allowfullscreen&gt;&lt;/iframe&gt;  
+    &lt;div class="videoCard-body"&gt;
+      &lt;div class="videoCard-title"&gt;
+        $escapetool.xml($data.title)
+      &lt;/div&gt;
+      &lt;ul&gt;
+        #foreach ($topic in $data.topics)
+          &lt;li&gt;$topic&lt;/li&gt;
+        #end
+      &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;div class="videoCard-footer"&gt;
+      $services.icon.renderHTML('play')
+      &lt;a href="$data.url"&gt;Watch&lt;/a&gt;
+      &lt;span class="videoCard-duration"&gt;
+        $escapetool.xml($data.duration)
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html clean="false"}}
+#set ($discard = $xwiki.ssx.use('Help.Videos.WebHome'))
+&lt;div class="row"&gt;
+  #foreach ($card in $videoCards)
+    ## See http://getbootstrap.com/css/#grid-responsive-resets .
+    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
+      &lt;div class="clearfix visible-sm-block "&gt;&lt;/div&gt;
+    #end
+    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 3 == 0)
+      &lt;div class="clearfix visible-md-block visible-lg-block"&gt;&lt;/div&gt;
+    #end
+    &lt;div class="col-xs-12 col-sm-6 col-md-4"&gt;
+      #helpVideoCard($card)
+    &lt;/div&gt;
+  #end
+&lt;/div&gt;
+{{/html}}
+
+[[View more videos&gt;&gt;https://www.youtube.com/playlist?list=PLhe7KI1rstRQeLSHxcTozZ0HJSk-mIYzt]]
+{{/velocity}}</content>
+  <object>
+    <name>Help.Videos.WebHome</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>6f2e4f36-4c3a-4997-b343-675fd4b53a08</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.videoCard {
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.3);
+  margin: 1px 0 29px;
+
+  iframe {
+    border: 0 none;
+    width: 100%;
+  }
+
+  ul {
+    font-size: .8em;
+    list-style-position: inside;
+    margin: 6px 0;
+    padding-left: 0;
+  }
+}
+
+.videoCard-body {
+  padding: 6px 10px;
+}
+
+.videoCard-footer {
+  border-top: 1px solid #eaeaea;
+  font-size: .9em;
+  padding: 8px 10px;
+}
+
+.videoCard-duration {
+  border-left: 1px solid #eaeaea;
+  color: @text-muted;
+  float: right;
+  padding-left: 10px;
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

@@ -44,7 +44,7 @@
         </div>
         <div class="panel-body">
           <p><a href="#" class="btSelectAllTree">$escapetool.xml($services.localization.render('core.delete.warningExtensions.tree.selectAll'))</a> / <a href="#" class="btUnselectAllTree">$escapetool.xml($services.localization.render('core.delete.warningExtensions.tree.selectNone'))</a></p>
-          <div class="deleteTree" data-url="$doc.getURL('get', "xpage=refactoring/delete_question_data&jobId=$jobId")">
+          <div class="deleteTree" data-url="$escapetool.xml($doc.getURL('get', "xpage=refactoring/delete_question_data&jobId=$jobId"))">
         </div>
       </div>
       <p class="deleteWarningButtons">

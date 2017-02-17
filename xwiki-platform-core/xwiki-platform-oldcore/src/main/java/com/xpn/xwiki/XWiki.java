@@ -3438,7 +3438,13 @@ public class XWiki implements EventListener
             // Send validation mail, if needed.
             if ((result > 0) && (withValidation)) {
                 // Send the validation email
-                sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
+                try {
+                    sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
+                } catch (XWikiException e) {
+                    LOGGER.warn("User created. Failed to send the mail to the created user.", e);
+                    return -11;
+                }
+                
             }
 
             return result;

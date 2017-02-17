@@ -46,7 +46,7 @@
   'title': 'Use templates',
   'description': 'Templates are predefined pages that can be copied when creating a new page.',
   'tip': "&lt;a href=""http://platform.xwiki.org/xwiki/bin/view/Features/DocumentLifecycle#HCreate"" class=""wikiexternallink""&gt;Creating pages&lt;/a&gt; based on templates makes it faster to adapt predefined content to your needs.",
-  'thumbnail': 'Template.gif',
+  'thumbnail': 'Template',
   'actions': [{
     'label': 'Try it!',
     'type': 'success',
@@ -56,7 +56,7 @@
   'title': 'Create your template',
   'description': 'Integrate structure and macros in an existing page, and transform it in a template.',
   'tip': "&lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application#HCreatetheTemplateProvider"" class=""wikiexternallink""&gt;Template Providers&lt;/a&gt; expose templates on the Create Page dialog so that the users can use them.",
-  'thumbnail': 'Administration.gif',
+  'thumbnail': 'Administration',
   'actions': [{
     'label': 'Learn more',
     'url': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application#HCreatetheTemplateProvider'

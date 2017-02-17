@@ -52,7 +52,7 @@
   'title': 'Use Macros',
   'description': 'Macros are reusable pieces of functionality that can be integrated inside pages.',
   'tip': "The &lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration"" class=""wikiexternallink""&gt;WYSIWYG Editor&lt;/a&gt; allows you to insert macros and to customize their parameters when editing pages. Look for the $services.icon.renderHTML('cog') button on the tool bar.",
-  'thumbnail': 'Macro.gif',
+  'thumbnail': 'Macro',
   'actions': [{
     'label': 'Try it!',
     'type': 'success',
@@ -62,7 +62,7 @@
   'title': 'Browse Macros',
   'description': 'Choose from community contributed macros and install them inside your wiki.',
   'tip': "The &lt;a href=""$xwiki.getURL('XWiki.WikiMacros')""&gt;Macro Index&lt;/a&gt; lists the macros that are already installed and ready to be used inside your pages.",
-  'thumbnail': 'EM.gif',
+  'thumbnail': 'EM',
   'actions': [{
     'label': 'Browse',
     'url': $browseMacrosURL

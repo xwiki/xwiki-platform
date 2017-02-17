@@ -41,6 +41,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #set ($discard = $xwiki.ssx.use('Help.Code.VelocityMacros'))
+#set ($discard = $xwiki.jsx.use('Help.Code.VelocityMacros'))
 #set ($docextras = [])
 
 #macro (helpActionCard $data)
@@ -61,19 +62,21 @@
         #end
       &lt;/div&gt;
       &lt;div class="col-xs-12 col-md-5"&gt;
-        #helpImagePopup($data.title $data.thumbnail)
+        #helpVideoPopup($data.title $data.thumbnail)
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 #end
 
-#macro (helpImagePopup $title $imageName)
-  #set ($id = $stringtool.substringBeforeLast($imageName, '.'))
+#macro (helpVideoPopup $title $fileNamePrefix)
+  #set ($id = $stringtool.substringBeforeLast($fileNamePrefix, '.'))
   &lt;a href="#" data-toggle="modal" data-target="#${id}Modal"&gt;
-    &lt;img src="$doc.getAttachmentURL($imageName)" alt="$escapetool.xml($imageName)" class="thumbnail" /&gt;
+    &lt;video class="thumbnail" controls&gt;
+      #helpVideoSources($fileNamePrefix)
+    &lt;/video&gt;
   &lt;/a&gt;
-  &lt;div class="modal fade" id="${id}Modal" tabindex="-1" role="dialog" aria-labelledby="${id}ModalLabel"&gt;
-    &lt;div class="modal-dialog" role="document"&gt;
+  &lt;div class="modal fade video-modal" id="${id}Modal" tabindex="-1" role="dialog" aria-labelledby="${id}ModalLabel"&gt;
+    &lt;div class="modal-dialog modal-lg" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
           &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
@@ -81,8 +84,10 @@
           &lt;/button&gt;
           &lt;h4 class="modal-title" id="${id}ModalLabel"&gt;$!escapetool.xml($title)&lt;/h4&gt;
         &lt;/div&gt;
-        &lt;div class="modal-body" style="text-align: center"&gt;
-          &lt;img src="$doc.getAttachmentURL($imageName)" alt="$escapetool.xml($imageName)" /&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;video controls autoplay&gt;
+            #helpVideoSources($fileNamePrefix)
+          &lt;/video&gt;
         &lt;/div&gt;
         &lt;div class="modal-footer"&gt;
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
@@ -90,6 +95,23 @@
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
+#end
+
+#macro (helpVideoSources $fileNamePrefix)
+  #set ($attachments = [])
+  #set ($attachment = $doc.getAttachment($fileNamePrefix))
+  #if ($attachment)
+    #set ($discard = $attachments.add($attachment))
+  #else
+    #foreach ($attachment in $doc.attachmentList)
+      #if ($stringtool.startsWith($attachment.filename, $fileName))
+        #set ($discard = $attachments.add($attachment))
+      #end
+    #end
+  #end
+  #foreach ($attachment in $attachments)
+    &lt;source src="$doc.getAttachmentURL($attachment.filename)" type="$escapetool.xml($attachment.mimeType)" /&gt;
+  #end
 #end
 
 #macro (helpExampleCard $data)
@@ -151,6 +173,108 @@
   &lt;/div&gt;
 #end
 {{/velocity}}</content>
+  <object>
+    <name>Help.Code.VelocityMacros</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>d0a6a2ec-d449-4fb4-9169-b4e49ab826e8</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  $(document).on('show.bs.modal', '.video-modal', function(event) {
+    $(this).find('.modal-body &gt; video').each(function() {
+      // Play it from the start.
+      this.currentTime = 0;
+      this.play();
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
   <object>
     <name>Help.Code.VelocityMacros</name>
     <number>0</number>
@@ -273,6 +397,14 @@
     color: @text-muted;
     font-size: 300%;
   }
+}
+
+.video-modal .modal-body {
+  text-align: center;
+}
+
+#xwikicontent video {
+  max-width: 100%;
 }</code>
     </property>
     <property>

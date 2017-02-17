@@ -52,7 +52,7 @@
   'title': 'Create your application',
   'description': 'Define the structure of your data, customize it and create the application you want.',
   'tip': "&lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/App+Within+Minutes+Application"" class=""wikiexternallink""&gt;App Within Minutes&lt;/a&gt; helps you build applications without having technical knowledge.",
-  'thumbnail': 'AWM.gif',
+  'thumbnail': 'AWM',
   'actions': [{
     'label': 'Try it!',
     'type': 'success',
@@ -65,7 +65,7 @@
   'title': 'Browse applications',
   'description': 'Choose from community contributed applications and install them inside your wiki.',
   'tip': "&lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/Extension+Manager+Application"" class=""wikiexternallink""&gt;Extension Manager&lt;/a&gt; helps you manage (install, update, uninstall) your applications.",
-  'thumbnail': 'EM.gif',
+  'thumbnail': 'EM',
   'actions': [{
     'label': 'Browse',
     'url': $browseAppsURL

@@ -20,21 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Help.Applications.Movies.WebHome" locale="">
-  <web>Help.Applications.Movies</web>
+<xwikidoc version="1.3" reference="Help.Applications.Contributors.WebHome" locale="">
+  <web>Help.Applications.Contributors</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1487081953000</creationDate>
+  <creationDate>1487344263000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1487346237000</date>
-  <contentUpdateDate>1487346162000</contentUpdateDate>
+  <date>1487346228000</date>
+  <contentUpdateDate>1487344420000</contentUpdateDate>
   <version>1.1</version>
-  <title>Movies</title>
+  <title>Contributors</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -42,30 +42,28 @@
   <content>{{velocity}}
 #set ($columnsProperties = {
   'longText1': {"type":"text","filterable":false,"sortable":false,"html":true},
-  'doc.title': {"type":"text","size":20,"displayName":"Title","link":"view"},
+  'doc.title': {"type":"text","size":20,"displayName":"Name","link":"view"},
   'staticList1': {"type":"list","size":10},
   'date1': {"type":"text","size":10,"html":true},
-  'databaseList1': {"type":"list","size":10},
-  'boolean1': {"type":"text","size":10},
   '_actions': {"sortable":false,"filterable":false,"html":true,"actions":["edit","delete"]}
 })
 #set ($options = {
-  'className': 'Help.Applications.Movies.Code.MoviesClass',
-  'translationPrefix': 'movies.livetable.',
+  'className': 'Help.Applications.Contributors.Code.ContributorsClass',
+  'translationPrefix': 'contributors.livetable.',
   'tagCloud': true,
   'rowCount': 15,
   'maxPages': 10,
   'selectedColumn': 'longText1',
   'defaultOrder': 'asc'
 })
-#set ($columns = ['longText1', 'doc.title', 'staticList1', 'date1', 'databaseList1', 'boolean1', '_actions'])
-#livetable('movies' $columns $columnsProperties $options)
+#set ($columns = ['longText1', 'doc.title', 'staticList1', 'date1', '_actions'])
+#livetable('contributors' $columns $columnsProperties $options)
 {{/velocity}}</content>
   <object>
-    <name>Help.Applications.Movies.WebHome</name>
+    <name>Help.Applications.Contributors.WebHome</name>
     <number>0</number>
     <className>AppWithinMinutes.LiveTableClass</className>
-    <guid>36669c2d-b2b4-4b0e-9997-b594491b83e5</guid>
+    <guid>e525e7b9-42c3-4d21-90f9-14e11b024b88</guid>
     <class>
       <name>AppWithinMinutes.LiveTableClass</name>
       <customClass/>
@@ -131,16 +129,16 @@
       </description>
     </class>
     <property>
-      <class>Help.Applications.Movies.Code.MoviesClass</class>
+      <class>Help.Applications.Contributors.Code.ContributorsClass</class>
     </property>
     <property>
-      <columns>longText1 title1 staticList1 date1 databaseList1 boolean1 _actions</columns>
+      <columns>longText1 title1 staticList1 date1 _actions</columns>
     </property>
     <property>
       <dataSpace/>
     </property>
     <property>
-      <description>Simple application to manage a list of movies.</description>
+      <description>Simple application to manage a list of contributors.</description>
     </property>
   </object>
 </xwikidoc>

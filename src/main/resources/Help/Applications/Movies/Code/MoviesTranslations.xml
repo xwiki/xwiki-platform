@@ -31,13 +31,13 @@
   <parent>MoviesClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1487084144000</date>
-  <contentUpdateDate>1487084124000</contentUpdateDate>
+  <date>1487346057000</date>
+  <contentUpdateDate>1487346057000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
 Help.Applications.Movies.Code.MoviesClass_title1=Title
@@ -54,6 +54,9 @@ Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=Thriller
 Help.Applications.Movies.Code.MoviesClass_date1=Release Date
 Help.Applications.Movies.Code.MoviesClass_number1=Runtime (minutes)
 Help.Applications.Movies.Code.MoviesClass_boolean1=Seen
+Help.Applications.Movies.Code.MoviesClass_databaseList1=Director
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=Charlie Chaplin
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=Frank Capra
 Help.Applications.Movies.Code.MoviesClass_content1=Storyline
 
 # Live table generic keys
@@ -81,6 +84,7 @@ movies.livetable.staticList1=Genre
 movies.livetable.date1=Release Date
 movies.livetable.number1=Runtime (minutes)
 movies.livetable.boolean1=Seen
+movies.livetable.databaseList1=Director
 movies.livetable.content1=Storyline
 
 # Other keys

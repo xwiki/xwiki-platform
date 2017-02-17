@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Applications.Contributors.Code.ContributorsTranslations" locale="">
+  <web>Help.Applications.Contributors.Code</web>
+  <name>ContributorsTranslations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1487344048000</creationDate>
+  <parent>ContributorsClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1487344406000</date>
+  <contentUpdateDate>1487344406000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+Help.Applications.Contributors.Code.ContributorsClass_longText1=Picture
+Help.Applications.Contributors.Code.ContributorsClass_title1=Name
+Help.Applications.Contributors.Code.ContributorsClass_date1=Birthdate
+Help.Applications.Contributors.Code.ContributorsClass_staticList1=Type
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=Actor
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=Composer
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=Director
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=Editor
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=Hairdresser
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=Make-up Artist
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=Producer
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=Writer
+Help.Applications.Contributors.Code.ContributorsClass_content1=Bio
+
+# Live table generic keys
+contributors.livetable.doc.title=Page Title
+contributors.livetable.doc.name=Page Name
+contributors.livetable.doc.space=Space
+contributors.livetable.doc.fullname=Page full name
+contributors.livetable.doc.location=Location
+contributors.livetable.doc.author=Last Author
+contributors.livetable.doc.creator=Creator
+contributors.livetable.doc.date=Date
+contributors.livetable.doc.creationDate=Creation Date
+contributors.livetable._avatar=Avatar
+contributors.livetable._images=Images
+contributors.livetable._attachments=Attachments
+contributors.livetable._actions=Actions
+contributors.livetable._actions.edit=Edit
+contributors.livetable._actions.delete=Delete
+contributors.livetable.emptyvalue=-
+
+# Live table specific keys
+contributors.livetable.longText1=Picture
+contributors.livetable.title1=Name
+contributors.livetable.date1=Birthdate
+contributors.livetable.staticList1=Type
+contributors.livetable.content1=Bio
+
+# Other keys
+contributors.entry.name=Contributors
+
+# Deprecated keys
+contributors.dataSpace.title=Data
+</content>
+  <object>
+    <name>Help.Applications.Contributors.Code.ContributorsTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>086bbef6-6328-4945-a224-1b06b43e227b</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

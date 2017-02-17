@@ -46,5 +46,13 @@ public interface DistributionStep
 
     void setState(State stepState);
 
-    Block execute();
+    /**
+     * @since 9.1RC1
+     */
+    Block executeInteractive();
+
+    /**
+     * @since 9.1RC1
+     */
+    void executeNonInteractive() throws Exception;
 }

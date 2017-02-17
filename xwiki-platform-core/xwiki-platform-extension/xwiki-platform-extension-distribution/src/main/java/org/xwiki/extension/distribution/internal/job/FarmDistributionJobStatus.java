@@ -29,8 +29,10 @@ import org.xwiki.observation.ObservationManager;
 /**
  * @version $Id$
  * @since 5.0M1
+ * @deprecated since 9.1RC1, use {@link DistributionJobStatus} instead
  */
-public class FarmDistributionJobStatus extends DistributionJobStatus<DistributionRequest>
+@Deprecated
+public class FarmDistributionJobStatus extends DistributionJobStatus
 {
     /**
      * Serialization identifier.
@@ -43,8 +45,8 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
         super(request, observationManager, loggerManager, steps);
     }
 
-    public FarmDistributionJobStatus(JobStatus status,
-        ObservationManager observationManager, LoggerManager loggerManager)
+    public FarmDistributionJobStatus(JobStatus status, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
         super(status, observationManager, loggerManager);
     }

@@ -142,7 +142,7 @@ public class DistributionInternalScriptService implements ScriptService
         return this.distributionManager.getDistributionExtension();
     }
 
-    /** 
+    /**
      * @return if the main wiki has a default UI configured
      */
     public boolean hasMainDefaultUIExtension()
@@ -178,15 +178,15 @@ public class DistributionInternalScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki(wiki) ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
-            .getWikiUIExtensionId();
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getMainUIExtensionId()
+            : this.distributionManager.getWikiUIExtensionId();
     }
 
     /**
      * @return the previous status of the distribution job for the current wiki (e.g. from last time the distribution
      *         was upgraded)
      */
-    public DistributionJobStatus< ? > getPreviousJobStatus()
+    public DistributionJobStatus getPreviousJobStatus()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -198,7 +198,7 @@ public class DistributionInternalScriptService implements ScriptService
      * @return the previous status of the distribution job for the specified wiki (e.g. from last time the distribution
      *         was upgraded)
      */
-    public DistributionJobStatus< ? > getPreviousJobStatus(String wiki)
+    public DistributionJobStatus getPreviousJobStatus(String wiki)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -217,11 +217,11 @@ public class DistributionInternalScriptService implements ScriptService
     /**
      * @return the status of the current distribution job
      */
-    public DistributionJobStatus< ? > getJobStatus()
+    public DistributionJobStatus getJobStatus()
     {
         DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
-        return job != null ? (DistributionJobStatus< ? >) job.getStatus() : null;
+        return job != null ? (DistributionJobStatus) job.getStatus() : null;
     }
 
     /**
@@ -243,7 +243,7 @@ public class DistributionInternalScriptService implements ScriptService
                 State jobState = jobStatus.getState();
 
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
-                    Block block = job.getCurrentStep().execute();
+                    Block block = job.getCurrentStep().executeInteractive();
 
                     WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -263,8 +263,8 @@ public class DistributionInternalScriptService implements ScriptService
      */
     public Map<DocumentReference, DocumentStatus> getModifiedDocuments()
     {
-        return ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
-            this.xcontextProvider.get().getWikiId());
+        return ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments()
+            .get(this.xcontextProvider.get().getWikiId());
     }
 
     /**
@@ -274,11 +274,10 @@ public class DistributionInternalScriptService implements ScriptService
     public Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> getModifiedDocumentsTree()
     {
         Map<DocumentReference, DocumentStatus> documents =
-            ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
-                this.xcontextProvider.get().getWikiId());
+            ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments()
+                .get(this.xcontextProvider.get().getWikiId());
 
-        Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree =
-            new TreeMap<String, Map<String, Map<String, Map<String, DocumentStatus>>>>();
+        Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree = new TreeMap<>();
 
         if (documents != null) {
             for (Map.Entry<DocumentReference, DocumentStatus> document : documents.entrySet()) {
@@ -291,19 +290,19 @@ public class DistributionInternalScriptService implements ScriptService
 
                 Map<String, Map<String, Map<String, DocumentStatus>>> spaces = tree.get(wiki);
                 if (spaces == null) {
-                    spaces = new TreeMap<String, Map<String, Map<String, DocumentStatus>>>();
+                    spaces = new TreeMap<>();
                     tree.put(wiki, spaces);
                 }
 
                 Map<String, Map<String, DocumentStatus>> pages = spaces.get(space);
                 if (pages == null) {
-                    pages = new TreeMap<String, Map<String, DocumentStatus>>();
+                    pages = new TreeMap<>();
                     spaces.put(space, pages);
                 }
 
                 Map<String, DocumentStatus> locales = pages.get(page);
                 if (locales == null) {
-                    locales = new TreeMap<String, DocumentStatus>();
+                    locales = new TreeMap<>();
                     pages.put(page, locales);
                 }
 

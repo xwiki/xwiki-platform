@@ -28,8 +28,20 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.namespace.Namespace;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
+import org.xwiki.extension.job.ExtensionRequest;
+import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.job.internal.UpgradePlanJob;
+import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * List and allow to upgrade outdated extensions.
@@ -40,7 +52,7 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 @Component
 @Named(OutdatedExtensionsDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
+public class OutdatedExtensionsDistributionStep extends AbstractExtensionDistributionStep
 {
     public static final String ID = "extension.outdatedextensions";
 
@@ -78,9 +90,10 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
                     } else {
                         for (String installedNamespace : installedNamespaces) {
                             if (!extension.isValid(installedNamespace)) {
-                                this.logger.debug("Enabling outdate extension step on main wiki "
-                                    + "because extension [{}] is invalid on namespace [{}]", extension.getId(),
-                                    installedNamespace);
+                                this.logger.debug(
+                                    "Enabling outdate extension step on main wiki "
+                                        + "because extension [{}] is invalid on namespace [{}]",
+                                    extension.getId(), installedNamespace);
 
                                 setState(null);
                                 break;
@@ -89,15 +102,16 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
                     }
                 }
             } else {
-                String currentNamespace = getNamespace();
+                Namespace currentNamespace = getNamespace();
                 Collection<InstalledExtension> installedExtensions =
-                    this.installedRepository.getInstalledExtensions(currentNamespace);
+                    this.installedRepository.getInstalledExtensions(currentNamespace.toString());
 
                 // Upgrade outdated extensions only when there is invalid extensions
                 for (InstalledExtension extension : installedExtensions) {
-                    if (!extension.isValid(currentNamespace)) {
-                        this.logger.debug("Enabling outdate extension step on wiki [{}]"
-                            + "because extension [{}] is invalid", getWiki(), extension.getId());
+                    if (!extension.isValid(currentNamespace.toString())) {
+                        this.logger.debug(
+                            "Enabling outdate extension step on wiki [{}]" + "because extension [{}] is invalid",
+                            getWiki(), extension.getId());
 
                         setState(null);
                         break;
@@ -105,5 +119,87 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
                 }
             }
         }
+    }
+
+    @Override
+    public void executeNonInteractive() throws Exception
+    {
+        if (isMainWiki()) {
+            Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions();
+
+            // Upgrade outdated extensions only when there is invalid extensions
+            for (InstalledExtension extension : installedExtensions) {
+                Collection<String> installedNamespaces = extension.getNamespaces();
+                if (installedNamespaces == null) {
+                    if (!extension.isValid(null)) {
+                        // Upgrade/repair invalid extensions
+                        repair(extension.getId(), null);
+                    }
+                } else {
+                    for (String installedNamespace : installedNamespaces) {
+                        if (!extension.isValid(installedNamespace)) {
+                            // Upgrade/repair invalid extensions
+                            repair(extension.getId(), installedNamespace);
+                        }
+                    }
+                }
+            }
+        } else {
+            String currentNamespace = getNamespace().toString();
+
+            Collection<InstalledExtension> installedExtensions =
+                this.installedRepository.getInstalledExtensions(currentNamespace);
+
+            // Upgrade outdated extensions only when there is invalid extensions
+            for (InstalledExtension extension : installedExtensions) {
+                if (!extension.isValid(currentNamespace)) {
+                    // Upgrade/repair invalid extensions
+                    repair(extension.getId(), currentNamespace);
+                }
+            }
+        }
+
+        // Complete task
+        setState(State.COMPLETED);
+    }
+
+    private void repair(ExtensionId invalidExtension, String namespace) throws JobException, InterruptedException
+    {
+        // Find valid extension version
+        ExtensionPlan plan = createRepairPlan(invalidExtension, namespace);
+
+        // Install valid extension version
+        if (plan.getTree().size() > 0) {
+            ExtensionPlanAction action = plan.getTree().iterator().next().getAction();
+            install(action.getExtension().getId(), namespace);
+        }
+    }
+
+    private ExtensionPlan createRepairPlan(ExtensionId invalidExtension, String namespace)
+        throws JobException, InterruptedException
+    {
+        // Install the default UI
+        InstallRequest installRequest = new InstallRequest();
+        installRequest
+            .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, invalidExtension.getId(), namespace));
+        installRequest.addExtension(invalidExtension);
+        installRequest.addNamespace(namespace);
+
+        // Don't take any risk
+        installRequest.setUninstallAllowed(false);
+
+        // Indicate if it's allowed to do modification on root namespace
+        installRequest.setRootModificationsAllowed(true);
+
+        installRequest.setInteractive(false);
+
+        // Set user to use as author (for example) to be superadmin
+        installRequest.setExtensionProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+            XWikiRightService.SUPERADMIN_USER_FULLNAME);
+
+        Job job = this.jobExecutor.execute(UpgradePlanJob.JOBTYPE, installRequest);
+        job.join();
+
+        return (ExtensionPlan) job.getStatus();
     }
 }

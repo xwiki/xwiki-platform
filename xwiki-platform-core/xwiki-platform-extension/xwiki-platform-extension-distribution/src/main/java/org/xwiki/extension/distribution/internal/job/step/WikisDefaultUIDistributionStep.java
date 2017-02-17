@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
@@ -44,7 +45,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named(WikisDefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
+public class WikisDefaultUIDistributionStep extends AbstractExtensionDistributionStep
 {
     public static final String ID = "extension.defaultui.wikis";
 
@@ -71,37 +72,76 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            if (isMainWiki()) {
-                WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
+            WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
 
-                Collection<String> wikiIds;
-                try {
-                    wikiIds = wikiDescriptorManager.getAllIds();
-                } catch (WikiManagerException e) {
-                    this.logger.error("Failed to get the list of wikis", e);
-                    setState(null);
-                    return;
-                }
+            Collection<String> wikiIds;
+            try {
+                wikiIds = wikiDescriptorManager.getAllIds();
+            } catch (WikiManagerException e) {
+                this.logger.error("Failed to get the list of wikis", e);
 
-                ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
+                setState(null);
 
-                for (String wikiId : wikiIds) {
-                    if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
-                        String namespace = "wiki:" + wikiId;
+                return;
+            }
 
-                        // Only if the UI is not already installed
-                        if (wikiExtensionUI != null) {
-                            InstalledExtension installedExtension =
-                                this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
-                            if (installedExtension == null
-                                || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
-                                setState(null);
-                                return;
-                            }
+            ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
+
+            for (String wikiId : wikiIds) {
+                if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
+                    String namespace = "wiki:" + wikiId;
+
+                    // Only if the UI is not already installed
+                    if (wikiExtensionUI != null) {
+                        InstalledExtension installedExtension =
+                            this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
+                        if (installedExtension == null
+                            || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
+                            setState(null);
+
+                            return;
                         }
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void executeNonInteractive() throws Exception
+    {
+        WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
+
+        Collection<String> wikiIds;
+        try {
+            wikiIds = wikiDescriptorManager.getAllIds();
+        } catch (WikiManagerException e) {
+            this.logger.error("Failed to get the list of wikis", e);
+
+            setState(null);
+
+            return;
+        }
+
+        ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
+
+        for (String wikiId : wikiIds) {
+            if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
+                String namespace = new Namespace("wiki", wikiId).toString();
+
+                // Only if the UI is not already installed
+                if (wikiExtensionUI != null) {
+                    InstalledExtension installedExtension =
+                        this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
+                    if (installedExtension == null
+                        || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
+                        install(wikiExtensionUI, namespace);
+                    }
+                }
+            }
+        }
+
+        // Complete task
+        setState(State.COMPLETED);
     }
 }

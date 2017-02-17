@@ -25,8 +25,10 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**
@@ -38,7 +40,7 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 @Component
 @Named(DefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DefaultUIDistributionStep extends AbstractDistributionStep
+public class DefaultUIDistributionStep extends AbstractExtensionDistributionStep
 {
     public static final String ID = "extension.defaultui";
 
@@ -56,19 +58,32 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            String namespace = getNamespace();
+            Namespace namespace = getNamespace();
 
             ExtensionId extensionUI = this.distributionJob.getStatus().getDistributionExtensionUI();
 
             // Only if the UI is not already installed
             if (extensionUI != null) {
                 InstalledExtension installedExtension =
-                    this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
+                    this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace.toString());
                 if (installedExtension == null
                     || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
                     setState(null);
                 }
             }
         }
+    }
+
+    @Override
+    public void executeNonInteractive() throws Exception
+    {
+        // Get the default UI
+        ExtensionId extensionUI = this.distributionJob.getStatus().getDistributionExtensionUI();
+
+        // Install the default UI
+        install(extensionUI);
+
+        // Complete task
+        setState(State.COMPLETED);
     }
 }

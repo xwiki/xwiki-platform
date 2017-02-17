@@ -22,14 +22,17 @@ package org.xwiki.extension.distribution.internal.job;
 import java.util.List;
 
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
 /**
  * @version $Id$
  * @since 5.0M1
+ * @deprecated since 9.1RC1, use {@link DistributionJobStatus} instead
  */
-public class WikiDistributionJobStatus extends DistributionJobStatus<DistributionRequest>
+@Deprecated
+public class WikiDistributionJobStatus extends DistributionJobStatus
 {
     /**
      * Serialization identifier.
@@ -42,7 +45,7 @@ public class WikiDistributionJobStatus extends DistributionJobStatus<Distributio
         super(request, observationManager, loggerManager, steps);
     }
 
-    public WikiDistributionJobStatus(WikiDistributionJobStatus status, ObservationManager observationManager,
+    public WikiDistributionJobStatus(JobStatus status, ObservationManager observationManager,
         LoggerManager loggerManager)
     {
         super(status, observationManager, loggerManager);

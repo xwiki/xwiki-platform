@@ -41,7 +41,7 @@ import org.xwiki.platform.flavor.FlavorManager;
 public class FlavorDistributionStep extends AbstractDistributionStep
 {
     /**
-     * ID of the distribution step. 
+     * ID of the distribution step.
      */
     public static final String ID = "extension.flavor";
 
@@ -67,7 +67,8 @@ public class FlavorDistributionStep extends AbstractDistributionStep
     {
         if (getState() == null) {
             ExtensionId flavor = flavorManager.getFlavorOfWiki(getWiki());
-            if (flavor != null && installedRepository.getInstalledExtension(flavor).isValid(getNamespace())) {
+            if (flavor != null
+                && installedRepository.getInstalledExtension(flavor).isValid(getNamespace().toString())) {
                 setState(State.COMPLETED);
             }
         }

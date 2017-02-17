@@ -46,7 +46,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 public class WikisFlavorDistributionStep extends AbstractDistributionStep
 {
     /**
-     * ID of the distribution step. 
+     * ID of the distribution step.
      */
     public static final String ID = "extension.flavor.wikis";
 
@@ -74,11 +74,11 @@ public class WikisFlavorDistributionStep extends AbstractDistributionStep
     {
         if (getState() == null) {
             setState(State.COMPLETED);
-            
+
             if (!isMainWiki()) {
                 return;
             }
-            
+
             WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
 
             Collection<String> wikiIds;

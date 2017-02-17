@@ -25,7 +25,7 @@ import org.xwiki.job.Job;
 
 public interface DistributionJob extends Job
 {
-    DistributionJobStatus< ? > getPreviousStatus();
+    DistributionJobStatus getPreviousStatus();
 
     ExtensionId getUIExtensionId();
 
@@ -35,7 +35,7 @@ public interface DistributionJob extends Job
     DistributionRequest getRequest();
 
     @Override
-    DistributionJobStatus< ? > getStatus();
+    DistributionJobStatus getStatus();
 
     /**
      * Wait until the job is fully initialized.

@@ -22,6 +22,7 @@ package org.xwiki.extension.distribution.internal.job.step;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.job.annotation.Serializable;
@@ -55,11 +56,10 @@ public abstract class AbstractDistributionStep implements DistributionStep
         this.distributionJob = distributionJob;
 
         // Remember previous state
-        DistributionJobStatus< ? > previousStatus = this.distributionJob.getPreviousStatus();
+        DistributionJobStatus previousStatus = this.distributionJob.getPreviousStatus();
 
-        if (previousStatus != null
-            && previousStatus.getDistributionExtension().equals(
-                this.distributionJob.getStatus().getDistributionExtension())) {
+        if (previousStatus != null && previousStatus.getDistributionExtension()
+            .equals(this.distributionJob.getStatus().getDistributionExtension())) {
             DistributionStep previousStep = previousStatus.getStep(getId());
 
             if (previousStep != null) {
@@ -102,11 +102,11 @@ public abstract class AbstractDistributionStep implements DistributionStep
         return this.wikiDescriptorManagerProvider.get().getMainWikiId().equals(getWiki());
     }
 
-    protected String getNamespace()
+    protected Namespace getNamespace()
     {
         String wiki = getWiki();
 
-        return wiki == null ? null : "wiki:" + getWiki();
+        return wiki == null ? null : new Namespace("wiki", getWiki());
     }
 
     protected String getTemplate()
@@ -114,9 +114,21 @@ public abstract class AbstractDistributionStep implements DistributionStep
         return "distribution/" + getId() + ".wiki";
     }
 
+    protected boolean isInteractive()
+    {
+        return this.distributionJob.getRequest().isInteractive();
+    }
+
     @Override
-    public Block execute()
+    public Block executeInteractive()
     {
         return this.renderer.executeNoException(getTemplate());
+    }
+
+    @Override
+    public void executeNonInteractive() throws Exception
+    {
+        // Complete task
+        setState(State.COMPLETED);
     }
 }

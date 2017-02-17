@@ -20,11 +20,12 @@
 package org.xwiki.extension.distribution.internal.job;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.Condition;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
@@ -33,19 +34,23 @@ import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * @version $Id$
  * @since 5.0M1
  */
-public abstract class AbstractDistributionJob<R extends DistributionRequest, S extends DistributionJobStatus<R>>
-    extends AbstractJob<R, S> implements DistributionJob
+public abstract class AbstractDistributionJob<R extends DistributionRequest>
+    extends AbstractJob<R, DistributionJobStatus> implements DistributionJob
 {
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
     protected DistributionManager distributionManager;
+
+    @Inject
+    protected Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     /**
      * Condition to wait for ready state.
@@ -58,48 +63,62 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         return "distribution";
     }
 
-    protected abstract S createNewDistributionStatus(R request, List<DistributionStep> steps);
+    protected String getWiki()
+    {
+        return getRequest().getWiki();
+    }
+
+    protected boolean isMainWiki()
+    {
+        return this.wikiDescriptorManagerProvider.get().getMainWikiId().equals(getWiki());
+    }
+
+    protected DistributionJobStatus createNewDistributionStatus(DistributionRequest request,
+        List<DistributionStep> steps)
+    {
+        return new DistributionJobStatus(request, this.observationManager, this.loggerManager, steps);
+    }
 
     protected abstract List<DistributionStep> createSteps();
 
     @Override
-    protected S createNewStatus(R request)
+    protected DistributionJobStatus createNewStatus(R request)
     {
         List<DistributionStep> steps = createSteps();
 
-        // Add Welcome step
-        try {
-            DistributionStep welcomeStep =
-                this.componentManager
-                    .<DistributionStep> getInstance(DistributionStep.class, WelcomeDistributionStep.ID);
-            welcomeStep.setState(State.COMPLETED);
+        if (getRequest().isInteractive()) {
+            // Add Welcome step
+            try {
+                DistributionStep welcomeStep = this.componentManager
+                    .<DistributionStep>getInstance(DistributionStep.class, WelcomeDistributionStep.ID);
+                welcomeStep.setState(State.COMPLETED);
 
-            steps.add(0, welcomeStep);
-        } catch (ComponentLookupException e1) {
-            this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
-        }
+                steps.add(0, welcomeStep);
+            } catch (ComponentLookupException e1) {
+                this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+            }
 
-        // Add Report step
-        try {
-            DistributionStep welcomeStep =
-                this.componentManager.<DistributionStep> getInstance(DistributionStep.class, ReportDistributionStep.ID);
-            welcomeStep.setState(State.COMPLETED);
+            // Add Report step
+            try {
+                DistributionStep welcomeStep = this.componentManager
+                    .<DistributionStep>getInstance(DistributionStep.class, ReportDistributionStep.ID);
+                welcomeStep.setState(State.COMPLETED);
 
-            steps.add(welcomeStep);
-        } catch (ComponentLookupException e1) {
-            this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID);
+                steps.add(welcomeStep);
+            } catch (ComponentLookupException e1) {
+                this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID);
+            }
         }
 
         // Create status
 
-        S status = createNewDistributionStatus(request, steps);
+        DistributionJobStatus status = createNewDistributionStatus(request, steps);
 
         if (this.distributionManager.getDistributionExtension() != null) {
-            DistributionJobStatus< ? > previousStatus = getPreviousStatus();
+            DistributionJobStatus previousStatus = getPreviousStatus();
 
-            if (previousStatus != null
-                && previousStatus.getDistributionExtension() != null
-                && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
+            if (previousStatus != null && previousStatus.getDistributionExtension() != null
+                && !Objects.equals(previousStatus.getDistributionExtension(),
                     this.distributionManager.getDistributionExtension())) {
                 status.setPreviousDistributionExtension(previousStatus.getDistributionExtension());
                 status.setPreviousDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
@@ -110,11 +129,6 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         }
 
         return status;
-    }
-
-    protected S getDistributionJobStatus()
-    {
-        return getStatus();
     }
 
     protected DistributionStep getStep(List<DistributionStep> steps, String stepId)
@@ -131,7 +145,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     @Override
     protected void runInternal() throws Exception
     {
-        List<DistributionStep> steps = getDistributionJobStatus().getSteps();
+        List<DistributionStep> steps = getStatus().getSteps();
 
         this.progressManager.pushLevelProgress(steps.size(), this);
 
@@ -158,35 +172,41 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
             for (int index = 0; index < steps.size(); ++index) {
                 this.progressManager.startStep(this);
 
-                getDistributionJobStatus().setCurrentStateIndex(index);
+                getStatus().setCurrentStateIndex(index);
 
                 DistributionStep step = steps.get(index);
 
+                // Prepare step
                 step.prepare();
 
+                // Execute step
                 if (step.getState() == null) {
-                    DistributionQuestion question = new DistributionQuestion(step);
+                    if (getRequest().isInteractive()) {
+                        DistributionQuestion question = new DistributionQuestion(step);
 
-                    // Waiting to start
-                    signalReady();
-                    getStatus().ask(question);
+                        // Waiting to start
+                        signalReady();
+                        getStatus().ask(question);
 
-                    if (question.getAction() != null) {
-                        switch (question.getAction()) {
-                            case CANCEL:
-                                for (; index < steps.size(); ++index) {
-                                    steps.get(index).setState(DistributionStep.State.CANCELED);
-                                }
-                            case SKIP:
-                                index = steps.size() - 1;
-                                break;
-                            default:
-                                break;
+                        if (question.getAction() != null) {
+                            switch (question.getAction()) {
+                                case CANCEL:
+                                    for (; index < steps.size(); ++index) {
+                                        steps.get(index).setState(DistributionStep.State.CANCELED);
+                                    }
+                                case SKIP:
+                                    index = steps.size() - 1;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                    }
 
-                    // Save the status so that we remember the answer even if the DW is stopped before the end
-                    this.store.storeAsync(this.status);
+                        // Save the status so that we remember the answer even if the DW is stopped before the end
+                        this.store.storeAsync(this.status);
+                    } else {
+                        step.executeNonInteractive();
+                    }
                 }
 
                 this.progressManager.endStep(this);
@@ -224,19 +244,15 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     }
 
     @Override
-    public void awaitReady()
+    public void awaitReady() throws InterruptedException
     {
         if (getStatus() == null || getStatus().getState() == JobStatus.State.RUNNING) {
-            try {
-                this.lock.lockInterruptibly();
+            this.lock.lockInterruptibly();
 
-                try {
-                    this.readyCondition.await();
-                } finally {
-                    this.lock.unlock();
-                }
-            } catch (InterruptedException e) {
-                this.logger.warn("The distribution job has been interrupted");
+            try {
+                this.readyCondition.await();
+            } finally {
+                this.lock.unlock();
             }
         }
     }

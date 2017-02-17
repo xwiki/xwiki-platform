@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 /**
- * 
  * @version $Id$
  * @since 5.0RC1
  */

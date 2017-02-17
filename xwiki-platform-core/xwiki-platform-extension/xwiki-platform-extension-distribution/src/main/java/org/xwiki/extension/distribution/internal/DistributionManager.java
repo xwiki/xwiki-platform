@@ -22,11 +22,9 @@ package org.xwiki.extension.distribution.internal;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.DefaultDistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
-import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
-import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
-import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
+import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 
 /**
  * @version $Id$
@@ -101,14 +99,14 @@ public interface DistributionManager
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
      * @since 5.0RC1
      */
-    FarmDistributionJobStatus getPreviousFarmJobStatus();
+    DistributionJobStatus getPreviousFarmJobStatus();
 
     /**
      * @param wiki the wiki form which to get the distribution status
      * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
      * @since 5.0RC1
      */
-    WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki);
+    DistributionJobStatus getPreviousWikiJobStatus(String wiki);
 
     /**
      * @param wiki the wiki for which to delete the status
@@ -131,7 +129,7 @@ public interface DistributionManager
      * @return the distribution job object that can be used to get information like the job status
      * @since 5.0RC1
      */
-    FarmDistributionJob startFarmJob();
+    DefaultDistributionJob startFarmJob();
 
     /**
      * Starts the distribution job.
@@ -140,20 +138,20 @@ public interface DistributionManager
      * @return the distribution job object that can be used to get information like the job status
      * @since 5.0RC1
      */
-    WikiDistributionJob startWikiJob(String wiki);
+    DistributionJob startWikiJob(String wiki);
 
     /**
      * @return the distribution job object that can be used to get information like the job status
      * @since 5.0RC1
      */
-    FarmDistributionJob getFarmJob();
+    DefaultDistributionJob getFarmJob();
 
     /**
      * @param wiki the wiki for which to get the job
      * @return the distribution job object that can be used to get information like the job status
      * @since 5.0RC1
      */
-    WikiDistributionJob getWikiJob(String wiki);
+    DistributionJob getWikiJob(String wiki);
 
     /**
      * @return the current distribution job

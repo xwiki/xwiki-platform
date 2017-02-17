@@ -37,7 +37,7 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 4.2M3
  */
-public class DistributionJobStatus<R extends DistributionRequest> extends DefaultJobStatus<DistributionRequest>
+public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 {
     /**
      * Serialization identifier.
@@ -70,24 +70,23 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(ObjectUtils.cloneIfPossible((R) status.getRequest()), null, observationManager, loggerManager);
+        super(ObjectUtils.cloneIfPossible((DistributionRequest) status.getRequest()), null, observationManager,
+            loggerManager);
 
         if (status instanceof DistributionJobStatus) {
-            DistributionJobStatus<R> distributionJobStatus = (DistributionJobStatus<R>) status;
+            DistributionJobStatus distributionJobStatus = (DistributionJobStatus) status;
 
             this.previousDistributionExtension = distributionJobStatus.previousDistributionExtension;
             this.previousDistributionExtensionUi = distributionJobStatus.previousDistributionExtensionUi;
             this.distributionExtension = distributionJobStatus.distributionExtension;
             this.distributionExtensionUi = distributionJobStatus.distributionExtensionUi;
-            this.stepList =
-                distributionJobStatus.stepList != null
-                    ? new ArrayList<DistributionStep>(distributionJobStatus.stepList)
-                    : new ArrayList<DistributionStep>();
+            this.stepList = distributionJobStatus.stepList != null ? new ArrayList<>(distributionJobStatus.stepList)
+                : new ArrayList<>();
         }
     }
 
-    public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
-        List<DistributionStep> steps)
+    public DistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager, List<DistributionStep> steps)
     {
         super(request, null, observationManager, loggerManager);
 
@@ -96,7 +95,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     public List<DistributionStep> getSteps()
     {
-        return this.stepList != null ? this.stepList : Collections.<DistributionStep> emptyList();
+        return this.stepList != null ? this.stepList : Collections.<DistributionStep>emptyList();
     }
 
     public DistributionStep getStep(String stepId)

@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -39,13 +38,10 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.DefaultDistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionRequest;
-import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
-import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
-import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.job.Job;
@@ -135,10 +131,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
     private ExtensionId wikiUIExtensionId;
 
-    private FarmDistributionJob farmDistributionJob;
+    private DefaultDistributionJob farmDistributionJob;
 
-    private Map<String, WikiDistributionJob> wikiDistributionJobs =
-        new ConcurrentHashMap<String, WikiDistributionJob>();
+    private Map<String, DistributionJob> wikiDistributionJobs = new ConcurrentHashMap<String, DistributionJob>();
 
     @Override
     public void initialize() throws InitializationException
@@ -155,9 +150,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 String mainUIVersion =
                     this.distributionExtension.getProperty("xwiki.extension.distribution.ui.version");
 
-                this.mainUIExtensionId =
-                    new ExtensionId(mainUIId, mainUIVersion != null ? new DefaultVersion(mainUIVersion)
-                        : this.distributionExtension.getId().getVersion());
+                this.mainUIExtensionId = new ExtensionId(mainUIId, mainUIVersion != null
+                    ? new DefaultVersion(mainUIVersion) : this.distributionExtension.getId().getVersion());
             }
 
             String wikiUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
@@ -166,9 +160,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 String wikiUIVersion =
                     this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui.version");
 
-                this.wikiUIExtensionId =
-                    new ExtensionId(wikiUIId, wikiUIVersion != null ? new DefaultVersion(wikiUIVersion)
-                        : this.distributionExtension.getId().getVersion());
+                this.wikiUIExtensionId = new ExtensionId(wikiUIId, wikiUIVersion != null
+                    ? new DefaultVersion(wikiUIVersion) : this.distributionExtension.getId().getVersion());
             }
         }
     }
@@ -179,10 +172,10 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public FarmDistributionJob startFarmJob()
+    public DefaultDistributionJob startFarmJob()
     {
         try {
-            this.farmDistributionJob = this.componentManager.getInstance(Job.class, "distribution");
+            this.farmDistributionJob = this.componentManager.getInstance(Job.class, DefaultDistributionJob.HINT);
 
             XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -218,7 +211,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             this.farmDistributionJob.awaitReady();
 
             return this.farmDistributionJob;
-        } catch (ComponentLookupException e) {
+        } catch (Exception e) {
             this.logger.error("Failed to create farm distribution job", e);
         }
 
@@ -231,10 +224,10 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public WikiDistributionJob startWikiJob(String wiki)
+    public DistributionJob startWikiJob(String wiki)
     {
         try {
-            WikiDistributionJob wikiJob = this.componentManager.getInstance(Job.class, "wikidistribution");
+            DistributionJob wikiJob = this.componentManager.getInstance(Job.class, DefaultDistributionJob.HINT);
             this.wikiDistributionJobs.put(wiki, wikiJob);
 
             final DistributionRequest request = new DistributionRequest();
@@ -256,7 +249,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                         throw new RuntimeException("Failed to initialize wiki distribution job execution context", e);
                     }
 
-                    WikiDistributionJob job = wikiDistributionJobs.get(request.getWiki());
+                    DistributionJob job = wikiDistributionJobs.get(request.getWiki());
                     job.initialize(request);
                     job.run();
                 }
@@ -270,14 +263,14 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             wikiJob.awaitReady();
 
             return wikiJob;
-        } catch (ComponentLookupException e) {
+        } catch (Exception e) {
             this.logger.error("Failed to create distribution job for wiki [" + wiki + "]", e);
         }
 
         return null;
     }
 
-    private DistributionState getDistributionState(DistributionJobStatus<?> previousStatus)
+    private DistributionState getDistributionState(DistributionJobStatus previousStatus)
     {
         return DistributionJobStatus.getDistributionState(
             previousStatus != null ? previousStatus.getDistributionExtension() : null,
@@ -287,7 +280,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public DistributionState getFarmDistributionState()
     {
-        FarmDistributionJobStatus previousStatus = null;
+        DistributionJobStatus previousStatus = null;
 
         try {
             previousStatus = getPreviousFarmJobStatus();
@@ -323,19 +316,18 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public FarmDistributionJobStatus getPreviousFarmJobStatus()
+    public DistributionJobStatus getPreviousFarmJobStatus()
     {
         JobStatus jobStatus = this.jobStore.getJobStatus(getFarmJobId());
 
-        FarmDistributionJobStatus farmJobStatus;
+        DistributionJobStatus farmJobStatus;
         if (jobStatus != null) {
-            if (jobStatus instanceof FarmDistributionJobStatus) {
-                farmJobStatus = (FarmDistributionJobStatus) jobStatus;
+            if (jobStatus instanceof DistributionJobStatus) {
+                farmJobStatus = (DistributionJobStatus) jobStatus;
             } else {
                 // RETRO-COMPATIBILITY: the status used to be a DistributionJobStatus
-                farmJobStatus =
-                    new FarmDistributionJobStatus(jobStatus, this.observationManagerProvider.get(),
-                        this.loggerManagerProvider.get());
+                farmJobStatus = new DistributionJobStatus(jobStatus, this.observationManagerProvider.get(),
+                    this.loggerManagerProvider.get());
             }
         } else {
             farmJobStatus = null;
@@ -345,19 +337,19 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki)
+    public DistributionJobStatus getPreviousWikiJobStatus(String wiki)
     {
-        return (WikiDistributionJobStatus) this.jobStore.getJobStatus(getWikiJobId(wiki));
+        return (DistributionJobStatus) this.jobStore.getJobStatus(getWikiJobId(wiki));
     }
 
     @Override
-    public FarmDistributionJob getFarmJob()
+    public DefaultDistributionJob getFarmJob()
     {
         return this.farmDistributionJob;
     }
 
     @Override
-    public WikiDistributionJob getWikiJob(String wiki)
+    public DistributionJob getWikiJob(String wiki)
     {
         return this.wikiDistributionJobs.get(wiki);
     }
@@ -414,12 +406,11 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public void copyPreviousWikiJobStatus(String sourceWiki, String targetWiki)
     {
-        WikiDistributionJobStatus sourceStatus = getPreviousWikiJobStatus(sourceWiki);
+        DistributionJobStatus sourceStatus = getPreviousWikiJobStatus(sourceWiki);
 
         if (sourceStatus != null) {
-            WikiDistributionJobStatus targetStatus =
-                new WikiDistributionJobStatus(sourceStatus, this.observationManagerProvider.get(),
-                    this.loggerManagerProvider.get());
+            DistributionJobStatus targetStatus = new DistributionJobStatus(sourceStatus,
+                this.observationManagerProvider.get(), this.loggerManagerProvider.get());
 
             DistributionRequest request = targetStatus.getRequest();
             request.setId(getWikiJobId(targetWiki));

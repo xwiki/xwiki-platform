@@ -43,26 +43,78 @@ import org.xwiki.text.StringUtils;
  * @since 4.2M3
  */
 @Component
-@Named("distribution")
+@Named(DefaultDistributionJob.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class FarmDistributionJob extends AbstractDistributionJob<DistributionRequest, FarmDistributionJobStatus>
+public class DefaultDistributionJob extends AbstractDistributionJob<DistributionRequest>
 {
+    /**
+     * The role hint of the component.
+     */
+    public static final String HINT = "distribution";
+
     @Override
     protected List<DistributionStep> createSteps()
     {
-        List<DistributionStep> steps = new ArrayList<DistributionStep>(4);
+        List<DistributionStep> steps = new ArrayList<>();
 
-        // Step 1: Create admin user if needed
-        try {
-            steps.add(
-                this.componentManager.<DistributionStep>getInstance(DistributionStep.class, FirstAdminUserStep.ID));
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get first admin step instance", e);
+        boolean isMainWiki = isMainWiki();
+
+        // Create admin user if needed
+        if (isMainWiki) {
+            try {
+                steps.add(
+                    this.componentManager.<DistributionStep>getInstance(DistributionStep.class, FirstAdminUserStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get first admin step instance", e);
+            }
         }
 
-        // Step 2: Install/upgrade main wiki UI
-        ExtensionId mainUI = getUIExtensionId();
-        if (mainUI != null && StringUtils.isNotBlank(mainUI.getId())) {
+        // Install/upgrade main wiki UI
+        addDefaultUIStep(steps, isMainWiki);
+
+        // Upgrade other wikis
+        if (isMainWiki) {
+            ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
+            if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
+                // ... but only if the wiki extension ID is defined
+                try {
+                    steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        WikisDefaultUIDistributionStep.ID));
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Failed to get all in one default UI step instance", e);
+                }
+            } else {
+                // Display the wikis flavor step
+                try {
+                    steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        WikisFlavorDistributionStep.ID));
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Failed to get all in one flavor step instance", e);
+                }
+            }
+        }
+
+        // Upgrade outdated extensions
+        try {
+            steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                OutdatedExtensionsDistributionStep.ID));
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to get outdated extensions step instance", e);
+        }
+
+        return steps;
+    }
+
+    private void addDefaultUIStep(List<DistributionStep> steps, boolean isMainWiki)
+    {
+        ExtensionId ui;
+        if (isMainWiki) {
+            ui = getUIExtensionId();
+        } else {
+            ui = this.distributionManager.getWikiUIExtensionId();
+        }
+
+        if (StringUtils.isNotBlank(ui.getId())) {
             // ... but only if the main extension ID is defined
             try {
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
@@ -79,54 +131,25 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
                 this.logger.error("Failed to get flavor step instance", e);
             }
         }
-
-        // Step 3: Upgrade other wikis
-        ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
-        if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
-            // ... but only if the wiki extension ID is defined
-            try {
-                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
-                    WikisDefaultUIDistributionStep.ID));
-            } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get all in one default UI step instance", e);
-            }
-        } else {
-            // Display the wikis flavor step
-            try {
-                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
-                    WikisFlavorDistributionStep.ID));
-            } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get all in one flavor step instance", e);
-            }
-        }
-
-        // Step 4: Upgrade outdated extensions
-        try {
-            steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
-                OutdatedExtensionsDistributionStep.ID));
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get outdated extensions step instance", e);
-        }
-
-        return steps;
     }
 
     @Override
-    public DistributionJobStatus<?> getPreviousStatus()
+    public DistributionJobStatus getPreviousStatus()
     {
-        return this.distributionManager.getPreviousFarmJobStatus();
+        if (isMainWiki()) {
+            return this.distributionManager.getPreviousFarmJobStatus();
+        } else {
+            return this.distributionManager.getPreviousWikiJobStatus(getRequest().getWiki());
+        }
     }
 
     @Override
     public ExtensionId getUIExtensionId()
     {
-        return this.distributionManager.getMainUIExtensionId();
-    }
-
-    @Override
-    protected FarmDistributionJobStatus createNewDistributionStatus(DistributionRequest request,
-        List<DistributionStep> steps)
-    {
-        return new FarmDistributionJobStatus(request, this.observationManager, this.loggerManager, steps);
+        if (isMainWiki()) {
+            return this.distributionManager.getMainUIExtensionId();
+        } else {
+            return this.distributionManager.getWikiUIExtensionId();
+        }
     }
 }

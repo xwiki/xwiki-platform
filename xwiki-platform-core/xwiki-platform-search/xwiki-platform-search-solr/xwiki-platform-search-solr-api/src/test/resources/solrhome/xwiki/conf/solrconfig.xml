@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>6.2.1</luceneMatchVersion>
+  <luceneMatchVersion>6.4.1</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -83,7 +83,7 @@
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
   -->
-  
+
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
        specific jar file.  This will cause a serious error to be logged 
        if it can't be loaded.
@@ -127,9 +127,6 @@
        are experimental, so if you choose to customize the index format, it's a good
        idea to convert back to the official format e.g. via IndexWriter.addIndexes(IndexReader)
        before upgrading to a newer version to avoid unnecessary reindexing.
-       A "compressionMode" string element can be added to <codecFactory> to choose 
-       between the existing compression modes in the default codec: "BEST_SPEED" (default)
-       or "BEST_COMPRESSION".
   -->
   <codecFactory class="solr.SchemaCodecFactory"/>
 
@@ -170,12 +167,11 @@
          Even older versions of Lucene used LogDocMergePolicy.
       -->
     <!--
-        <mergePolicyFactory class="org.apache.solr.index.TieredMergePolicyFactory">
+        <mergePolicyFactory class="solr.TieredMergePolicyFactory">
           <int name="maxMergeAtOnce">10</int>
           <int name="segmentsPerTier">10</int>
-          <double name="noCFSRatio">0.1</double>
         </mergePolicyFactory>
-      -->
+     -->
 
     <!-- Expert: Merge Scheduler
          The Merge Scheduler in Lucene controls how merges are
@@ -276,17 +272,9 @@
          uncommitted changes to the index, so use of a hard autoCommit
          is recommended (see below).
          "dir" - the target directory for transaction logs, defaults to the
-                solr data directory.
-         "numVersionBuckets" - sets the number of buckets used to keep
-                track of max version values when checking for re-ordered
-                updates; increase this value to reduce the cost of
-                synchronizing access to version buckets during high-volume
-                indexing, this requires 8 bytes (long) * numVersionBuckets
-                of heap space per Solr core.
-    -->
+                solr data directory.  -->
     <updateLog>
       <str name="dir">${solr.ulog.dir:}</str>
-      <int name="numVersionBuckets">${solr.ulog.numVersionBuckets:65536}</int>
     </updateLog>
 
     <!-- AutoCommit
@@ -311,7 +299,7 @@
          have some sort of hard autoCommit to limit the log size.
       -->
     <autoCommit>
-      <maxTime>${solr.autoCommit.maxTime:15000}</maxTime>
+      <maxTime>15000</maxTime>
       <openSearcher>false</openSearcher>
     </autoCommit>
 
@@ -320,10 +308,11 @@
          but does not ensure that data is synced to disk.  This is
          faster and more near-realtime friendly than a hard commit.
       -->
-
-    <autoSoftCommit>
-      <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
-    </autoSoftCommit>
+    <!--
+      <autoSoftCommit> 
+        <maxTime>1000</maxTime> 
+      </autoSoftCommit>
+     -->
 
     <!-- Update Related Event Listeners
          
@@ -467,14 +456,6 @@
                    initialSize="512"
                    autowarmCount="0"/>
 
-    <!-- custom cache currently used by block join -->
-    <cache name="perSegFilter"
-           class="solr.search.LRUCache"
-           size="10"
-           initialSize="0"
-           autowarmCount="10"
-           regenerator="solr.NoOpRegenerator" />
-
     <!-- Field Value Cache
          
          Cache used to hold field values that are quickly accessible
@@ -596,17 +577,6 @@
          will block until the first searcher is done warming.
       -->
     <useColdSearcher>false</useColdSearcher>
-
-    <!-- Max Warming Searchers
-         
-         Maximum number of searchers that may be warming in the
-         background concurrently.  An error is returned if this limit
-         is exceeded.
-
-         Recommend values of 1-2 for read-only slaves, higher for
-         masters w/o cache warming.
-      -->
-    <maxWarmingSearchers>2</maxWarmingSearchers>
 
   </query>
 
@@ -822,20 +792,9 @@
   </requestHandler>
 
 
-  <!-- A Robust Example
-       
-       This example SearchHandler declaration shows off usage of the
-       SearchHandler with many defaults declared
+  <!--These useParams values are available in params.json-->
+  <requestHandler name="/browse" class="solr.SearchHandler" useParams="query,facets,velocity,browse"/>
 
-       Note that multiple instances of the same Request Handler
-       (SearchHandler) can be registered multiple times with different
-       names (and different init parameters)
-    -->
-  <requestHandler name="/browse" class="solr.SearchHandler" useParams="query,facets,velocity,browse">
-    <lst name="defaults">
-      <str name="echoParams">explicit</str>
-    </lst>
-  </requestHandler>
 
   <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell,/browse">
     <lst name="defaults">
@@ -843,13 +802,11 @@
     </lst>
   </initParams>
 
-  <!-- This enabled schemaless mode 
   <initParams path="/update/**">
     <lst name="defaults">
-      <str name="update.chain">add-unknown-fields-to-the-schema</str>
+      <str name="update.chain">files-update-processor</str>
     </lst>
   </initParams>
-  -->
 
   <!-- Solr Cell Update Request Handler
 
@@ -860,77 +817,13 @@
                   startup="lazy"
                   class="solr.extraction.ExtractingRequestHandler" >
     <lst name="defaults">
+      <str name="xpath">/xhtml:html/xhtml:body/descendant:node()</str>
+      <str name="capture">content</str>
+      <str name="fmap.meta">attr_meta_</str>
+      <str name="uprefix">attr_</str>
       <str name="lowernames">true</str>
-      <str name="fmap.meta">ignored_</str>
-      <str name="fmap.content">_text_</str>
     </lst>
   </requestHandler>
-
-  <!-- Field Analysis Request Handler
-
-       RequestHandler that provides much the same functionality as
-       analysis.jsp. Provides the ability to specify multiple field
-       types and field names in the same request and outputs
-       index-time and query-time analysis for each of them.
-
-       Request parameters are:
-       analysis.fieldname - field name whose analyzers are to be used
-
-       analysis.fieldtype - field type whose analyzers are to be used
-       analysis.fieldvalue - text for index-time analysis
-       q (or analysis.q) - text for query time analysis
-       analysis.showmatch (true|false) - When set to true and when
-           query analysis is performed, the produced tokens of the
-           field value analysis will be marked as "matched" for every
-           token that is produces by the query analysis
-   -->
-  <requestHandler name="/analysis/field"
-                  startup="lazy"
-                  class="solr.FieldAnalysisRequestHandler" />
-
-
-  <!-- Document Analysis Handler
-
-       http://wiki.apache.org/solr/AnalysisRequestHandler
-
-       An analysis handler that provides a breakdown of the analysis
-       process of provided documents. This handler expects a (single)
-       content stream with the following format:
-
-       <docs>
-         <doc>
-           <field name="id">1</field>
-           <field name="name">The Name</field>
-           <field name="text">The Text Value</field>
-         </doc>
-         <doc>...</doc>
-         <doc>...</doc>
-         ...
-       </docs>
-
-    Note: Each document must contain a field which serves as the
-    unique key. This key is used in the returned response to associate
-    an analysis breakdown to the analyzed document.
-
-    Like the FieldAnalysisRequestHandler, this handler also supports
-    query analysis by sending either an "analysis.query" or "q"
-    request parameter that holds the query text to be analyzed. It
-    also supports the "analysis.showmatch" parameter which when set to
-    true, all field tokens that match the query tokens will be marked
-    as a "match". 
-  -->
-  <requestHandler name="/analysis/document"
-                  class="solr.DocumentAnalysisRequestHandler"
-                  startup="lazy" />
-
-  <!-- Echo the request contents back to the client -->
-  <requestHandler name="/debug/dump" class="solr.DumpRequestHandler" >
-    <lst name="defaults">
-      <str name="echoParams">explicit</str>
-      <str name="echoHandler">true</str>
-    </lst>
-  </requestHandler>
-
   <!-- Search Components
 
        Search components are registered to SolrCore and used by 
@@ -992,7 +885,7 @@
     <!-- a spellchecker built from a field of the main index -->
     <lst name="spellchecker">
       <str name="name">default</str>
-      <str name="field">_text_</str>
+      <str name="field">text</str>
       <str name="classname">solr.DirectSolrSpellChecker</str>
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="distanceMeasure">internal</str>
@@ -1014,7 +907,6 @@
     </lst>
 
     <!-- a spellchecker that can break or combine words.  See "/spell" handler below for usage -->
-    <!--
     <lst name="spellchecker">
       <str name="name">wordbreak</str>
       <str name="classname">solr.WordBreakSolrSpellChecker</str>
@@ -1023,7 +915,44 @@
       <str name="breakWords">true</str>
       <int name="maxChanges">10</int>
     </lst>
-    -->
+
+    <!-- a spellchecker that uses a different distance measure -->
+    <!--
+       <lst name="spellchecker">
+         <str name="name">jarowinkler</str>
+         <str name="field">spell</str>
+         <str name="classname">solr.DirectSolrSpellChecker</str>
+         <str name="distanceMeasure">
+           org.apache.lucene.search.spell.JaroWinklerDistance
+         </str>
+       </lst>
+     -->
+
+    <!-- a spellchecker that use an alternate comparator 
+
+         comparatorClass be one of:
+          1. score (default)
+          2. freq (Frequency first, then score)
+          3. A fully qualified class name
+      -->
+    <!--
+       <lst name="spellchecker">
+         <str name="name">freq</str>
+         <str name="field">lowerfilt</str>
+         <str name="classname">solr.DirectSolrSpellChecker</str>
+         <str name="comparatorClass">freq</str>
+      -->
+
+    <!-- A spellchecker that reads the list of words from a file -->
+    <!--
+       <lst name="spellchecker">
+         <str name="classname">solr.FileBasedSpellChecker</str>
+         <str name="name">file</str>
+         <str name="sourceLocation">spellings.txt</str>
+         <str name="characterEncoding">UTF-8</str>
+         <str name="spellcheckIndexDir">spellcheckerFile</str>
+       </lst>
+      -->
   </searchComponent>
 
   <!-- A request handler for demonstrating the spellcheck component.  
@@ -1046,6 +975,7 @@
            collations (re-written queries) can include a combination of
            corrections from both spellcheckers -->
       <str name="spellcheck.dictionary">default</str>
+      <str name="spellcheck.dictionary">wordbreak</str>
       <str name="spellcheck">on</str>
       <str name="spellcheck.extendedResults">true</str>
       <str name="spellcheck.count">10</str>
@@ -1348,8 +1278,6 @@
     -->
   <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy">
     <str name="template.base.dir">${velocity.template.base.dir:}</str>
-    <str name="solr.resource.loader.enabled">${velocity.solr.resource.loader.enabled:true}</str>
-    <str name="params.resource.loader.enabled">${velocity.params.resource.loader.enabled:false}</str>
   </queryResponseWriter>
 
   <!-- XSLT response writer transforms the XML output by any xslt file found
@@ -1410,4 +1338,5 @@
       EditorialMarkerFactory will do exactly that:
      <transformer name="qecBooster" class="org.apache.solr.response.transform.EditorialMarkerFactory" />
     -->
+
 </config>

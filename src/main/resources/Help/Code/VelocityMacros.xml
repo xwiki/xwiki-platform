@@ -148,7 +148,7 @@
     &lt;/h6&gt;
     #if ($data.description)
       &lt;p class="noitems"&gt;
-        $escapetool.xml($data.description)
+        $data.description
       &lt;/p&gt;
     #end
     #if (($data.examples &amp;&amp; $data.documentation) || !$data.thumbnail)

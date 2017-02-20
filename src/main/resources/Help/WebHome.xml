@@ -75,17 +75,17 @@
 }])
 
 #set ($featureCards = [{
+  'icon': 'fa fa-pencil',
+  'title': 'Page Editing',
+  'description': "Use a powerful &lt;a href=""http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing"" class=""wikiexternallink""&gt;WYSIWYG&lt;/a&gt; content editor or &lt;a href=""$xwiki.getURL('XWiki.XWikiSyntax')""&gt;syntax&lt;/a&gt; to create rich wiki pages.",
+  'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing',
+  'examples': $xwiki.getURL('Sandbox.WebHome', 'edit', 'editor=wysiwyg')
+}, {
   'icon': 'fa fa-file-text-o',
   'title': 'Templates',
   'description': 'Templates are predefined pages that are copied when creating a new page.',
   'documentation': 'Help.Templates.WebHome',
   'examples': $xwiki.getURL('Help.Templates.WebHome', 'view', $NULL, 'HExamples')
-}, {
-  'icon': 'fa fa-pencil',
-  'title': 'Page Editing',
-  'description': 'Use a powerful WYSIWYG content editor to create rich wiki pages.',
-  'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing',
-  'examples': $xwiki.getURL('Sandbox.WebHome', 'edit', 'editor=wysiwyg')
 }, {
   'icon': 'fa fa-file-excel-o',
   'title': 'Macros',
@@ -110,12 +110,6 @@
   'description': 'View previous versions of a page, compare different versions or rollback to any past version.',
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/VersionControl',
   'examples': $xwiki.getURL('Help.History.WebHome', 'view', $NULL, 'History')
-}, {
-  'icon': 'fa fa-file-code-o',
-  'title': 'Text Syntax',
-  'description': 'Use simple syntax to format text, create tables, links, display images, etc.',
-  'documentation': 'XWiki.XWikiSyntax',
-  'examples': $xwiki.getURL('Sandbox.WebHome', 'edit', 'editor=wiki')
 }, {
   'icon': 'fa fa-download',
   'title': 'Import / Export',

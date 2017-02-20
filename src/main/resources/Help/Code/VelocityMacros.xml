@@ -71,7 +71,7 @@
 #macro (helpVideoPopup $title $fileNamePrefix)
   #set ($id = $stringtool.substringBeforeLast($fileNamePrefix, '.'))
   &lt;a href="#" data-toggle="modal" data-target="#${id}Modal"&gt;
-    &lt;video class="thumbnail" controls&gt;
+    &lt;video class="thumbnail" autoplay loop muted&gt;
       #helpVideoSources($fileNamePrefix)
     &lt;/video&gt;
   &lt;/a&gt;
@@ -151,16 +151,20 @@
         $escapetool.xml($data.description)
       &lt;/p&gt;
     #end
-    #if ($data.examples &amp;&amp; $data.documentation)
+    #if (($data.examples &amp;&amp; $data.documentation) || !$data.thumbnail)
       &lt;ul class="noitems"&gt;
-        &lt;li&gt;
-          &lt;a href="$examplesURL"&gt;See examples&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li&gt;
-          &lt;a href="$documentationURL"#if ($externalDocumentation) class="wikiexternallink"#end&gt;
-            Learn more
-          &lt;/a&gt;
-        &lt;/li&gt;
+        #if ($data.examples)
+          &lt;li&gt;
+            &lt;a href="$examplesURL"&gt;See examples&lt;/a&gt;
+          &lt;/li&gt;
+        #end
+        #if ($data.documentation)
+          &lt;li&gt;
+            &lt;a href="$documentationURL"#if ($externalDocumentation) class="wikiexternallink"#end&gt;
+              Learn more
+            &lt;/a&gt;
+          &lt;/li&gt;
+        #end
       &lt;/ul&gt;
     #end
     #if ($data.thumbnail)

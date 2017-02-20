@@ -50,7 +50,9 @@
   'actions': [{
     'label': 'Try it!',
     'type': 'success',
-    'url': $xwiki.getURL('Sandbox.New Page.WebHome', 'create')
+    'url': $xwiki.getURL('Sandbox.WebHome', 'create', $escapetool.url({
+      'title': "New Page $datetool.get('dd MMM yyyy, HH:mm')"
+    }))
   }]
 }, {
   'title': 'Create your template',

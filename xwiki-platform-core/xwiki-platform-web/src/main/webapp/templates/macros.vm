@@ -1695,7 +1695,7 @@ function (row, i, table) {
       // The value can be passed as a string..
       if (descriptor.html + '' === 'true') {
         container.innerHTML = row[fieldName] || '';
-      } else if (row[fieldName] !== undefined) {
+      } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
         var text = row[fieldName] + '';
         if (fieldName === 'doc_name' && !row['doc_viewable']) {
           text += '*';

@@ -178,22 +178,27 @@ public class XWiki extends Api
      */
     public JobStatus getCurrentInitializerJobStatus()
     {
-        // Get XWiki intiializer job
-        XWikiInitializerJobStatus xwikiStatus = getJobStatus();
+        // Get XWiki initializer job
+        JobStatus jobStatus = getJobStatus();
 
-        if (xwikiStatus == null) {
+        if (jobStatus == null) {
             return null;
         }
 
         // The XWiki initialization is not done yet
-        if (xwikiStatus.getState() != State.FINISHED) {
-            return xwikiStatus;
+        if (jobStatus.getState() != State.FINISHED) {
+            return jobStatus;
         }
 
-        // Get current wiki initializer job
-        Job wikiJob = this.xwiki.getWikiInitializerJob(this.context.getWikiId());
+        // If XWiki initialization did not failed
+        if (this.xwiki != null) {
+            // Get current wiki initializer job
+            Job wikiJob = this.xwiki.getWikiInitializerJob(this.context.getWikiId());
 
-        return wikiJob != null ? wikiJob.getStatus() : null;
+            jobStatus = wikiJob != null ? wikiJob.getStatus() : null;
+        }
+
+        return jobStatus;
     }
 
     /**

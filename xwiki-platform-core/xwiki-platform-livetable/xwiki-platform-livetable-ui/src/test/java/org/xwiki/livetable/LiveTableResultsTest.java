@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.syntax.Syntax;
@@ -56,6 +57,8 @@ public class LiveTableResultsTest extends PageTest
 {
     private QueryManagerScriptService queryService;
 
+    private ModelScriptService modelService;
+
     private Map<String, Object> results;
 
     @Before
@@ -69,6 +72,9 @@ public class LiveTableResultsTest extends PageTest
 
         queryService = mock(QueryManagerScriptService.class);
         oldcore.getMocker().registerComponent(ScriptService.class, "query", queryService);
+
+        modelService = mock(ModelScriptService.class);
+        oldcore.getMocker().registerComponent(ScriptService.class, "model", modelService);
 
         TagPluginApi tagPluginApi = mock(TagPluginApi.class);
         doReturn(tagPluginApi).when(oldcore.getSpyXWiki()).getPluginApi(eq("tag"), any(XWikiContext.class));
@@ -102,6 +108,14 @@ public class LiveTableResultsTest extends PageTest
 
         when(query.count()).thenReturn(17L);
         when(query.execute()).thenReturn(Arrays.<Object>asList("A.B", "X.Y"));
+
+        DocumentReference abReference = new DocumentReference("wiki", "A", "B");
+        when(modelService.resolveDocument("A.B")).thenReturn(abReference);
+        when(modelService.serialize(abReference.getParent(), "local")).thenReturn("A");
+
+        DocumentReference xyReference = new DocumentReference("wiki", "X", "Y");
+        when(modelService.resolveDocument("X.Y")).thenReturn(xyReference);
+        when(modelService.serialize(xyReference.getParent(), "local")).thenReturn("X");
 
         renderPage();
 

@@ -71,7 +71,7 @@
   'icon': 'fa fa-play-circle',
   'title': 'Videos',
   'description': 'View our collection of video tutorials.',
-  'examples': 'Help.Videos.WebHome'
+  'documentation': 'Help.Videos.WebHome'
 }])
 
 #set ($featureCards = [{

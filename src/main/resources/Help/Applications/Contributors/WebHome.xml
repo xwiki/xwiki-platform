@@ -138,7 +138,7 @@
       <dataSpace/>
     </property>
     <property>
-      <description>Simple application to manage a list of contributors.</description>
+      <description>Simple application to manage a list of contributors. If you want to know where the movies are defined, check the [[Movies&gt;&gt;Help.Applications.Movies.WebHome]] application.</description>
     </property>
   </object>
 </xwikidoc>

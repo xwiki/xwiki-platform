@@ -140,7 +140,7 @@
       <dataSpace/>
     </property>
     <property>
-      <description>Simple application to manage a list of movies.</description>
+      <description>Simple application to manage a list of movies. If you want to know where the movie directors are defined, check the [[Contributors&gt;&gt;Help.Applications.Contributors.WebHome]] application.</description>
     </property>
   </object>
 </xwikidoc>

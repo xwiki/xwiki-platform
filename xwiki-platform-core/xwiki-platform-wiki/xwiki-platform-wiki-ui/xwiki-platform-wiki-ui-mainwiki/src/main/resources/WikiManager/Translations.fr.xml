@@ -68,6 +68,7 @@ platform.wiki.browse.emptyvalue=Sans objet
 platform.wiki.browse.membershipType=Type d'adhésion
 platform.wiki.browse.owner=Gestionnaire
 platform.wiki.browse.wikiprettyname=Nom
+platform.wiki.create.button=Créer un wiki
 platform.wiki.create.error=Échec de la création du wiki "{0}"\: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Une base de données avec cet identifiant existe déjà
 platform.wiki.create.error.wikiname.empty=L'identifiant ne peut pas être vide

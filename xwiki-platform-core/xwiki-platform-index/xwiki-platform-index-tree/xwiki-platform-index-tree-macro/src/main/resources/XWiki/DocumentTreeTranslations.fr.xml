@@ -44,6 +44,7 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 index.documentTree.empty=Aucune page trouvée
+index.documentTree.more={0} autres... 
 rendering.macro.documentTree.description=Affiche l'arborescence des documents XWiki
 rendering.macro.documentTree.name=Arborescence
 rendering.macro.documentTree.parameter.checkboxes.description=Pour afficher une case à cocher en face de chaque noeud de l'arbre afin de permettre à l'utilisateur de sélectionner plusieurs noeuds de l'arbre.

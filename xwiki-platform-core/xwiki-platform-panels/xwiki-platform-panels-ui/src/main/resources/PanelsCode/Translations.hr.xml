@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="Panels.Translations" locale="fr">
-  <web>Panels</web>
+<xwikidoc reference="PanelsCode.Translations" locale="hr">
+  <web>PanelsCode</web>
   <name>Translations</name>
-  <language>fr</language>
+  <language>hr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Panels.WebHome</parent>
@@ -31,9 +31,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1393442253000</creationDate>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
+  <creationDate>1413990648000</creationDate>
+  <date>1413991189000</date>
+  <contentUpdateDate>1413991189000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <defaultTemplate/>
@@ -42,16 +42,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-panels._actions=Actions
-panels.available=Liste des Panels
-panels.category=Catégorie
-panels.children.title=Pages enfants
-panels.description=Description
-panels.documentInformation.configureSyntaxes=Configurer d'autres syntaxes
-panels.emptyvalue=\ 
-panels.name=Nom
-panels.siblings.title=Pages sœurs
-panels.type=Type
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+admin.panels.applications=Ploča aplikacija
+platform.panels.applications.ajax.csrf=CSRF validacija neuspješna. Pokušajte ponovo učitati stranicu.
+platform.panels.applications.ajax.error=Vaša promjena nije mogla biti spremljena.
+platform.panels.applications.ajax.noright=Nemate pravo izmjene PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.success=Konfiguracija je spremljena.
+platform.panels.applications.blacklistedapps=Aplikacije koje nisu u tabli
+platform.panels.applications.displayedapps=Aplikacije koje su u tabli
+platform.panels.applications.helper=Ovdje možete odabrati aplikacije su raspoložive u tabli s aplikacijama (pretpostavljeno na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako želite ukloniti neke od njih, morate jedino povući i ispustiti ikonu iz jedne kućice u drugu. Možete i preurediti poredak aplikacija po vašoj želji. Ne zaboravite spremiti vaše izmjene\!
+platform.panels.applications.revert=Vrati nazad
+platform.panels.applications.save=Spremi
 </content>
 </xwikidoc>

@@ -129,13 +129,13 @@
 &lt;div class="row"&gt;
   #foreach ($card in $exampleCards)
     ## See http://getbootstrap.com/css/#grid-responsive-resets .
-    #if ($foreach.index > 0 &amp;&amp; $foreach.index % 2 == 0)&#xd;
-      &lt;div class="clearfix visible-sm-block ">&lt;/div>&#xd;
-    #end&#xd;
-    #if ($foreach.index > 0 &amp;&amp; $foreach.index % 3 == 0)&#xd;
-      &lt;div class="clearfix visible-md-block visible-lg-block">&lt;/div>&#xd;
-    #end&#xd;
-    &lt;div class="col-xs-12 col-sm-6 col-md-4">&#xd;
+    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
+      &lt;div class="clearfix visible-sm-block "&gt;&lt;/div&gt;
+    #end
+    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 3 == 0)
+      &lt;div class="clearfix visible-md-block visible-lg-block"&gt;&lt;/div&gt;
+    #end
+    &lt;div class="col-xs-12 col-sm-6 col-md-4"&gt;
       #helpExampleCard($card)
     &lt;/div&gt;
   #end

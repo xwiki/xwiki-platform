@@ -74,6 +74,34 @@
   'documentation': 'Help.Videos.WebHome'
 }])
 
+#if ($xwiki.exists('Help.History.WebHome'))
+  #set ($historyURL = $xwiki.getURL('Help.History.WebHome', 'view', $NULL, 'History'))
+#else
+  ## We need to generate the page history because the Extension Manager doesn't import it.
+  #set ($historyURL = $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
+    'content': 'Check',
+    'comment': 'Initial version',
+    'form_token': $services.csrf.token,
+    'xredirect': $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
+      'title': 'Page History',
+      'content': 'Check mate',
+      'form_token': $services.csrf.token,
+      'xredirect': $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
+        'title': 'History',
+        'content': 'Check the **history**.',
+        'comment': 'Minor change',
+        'minorEdit': 1,
+        'form_token': $services.csrf.token,
+        'xredirect': $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
+          'content': "Check the **history** tab.$util.newline${util.newline}Compare the versions.",
+          'form_token': $services.csrf.token,
+          'xredirect': $xwiki.getURL('Help.History.WebHome', 'view', $NULL, 'History')
+        }))
+      }))
+    }))
+  })))
+#end
+
 #set ($featureCards = [{
   'icon': 'fa fa-pencil',
   'title': 'Page Editing',
@@ -101,7 +129,7 @@
 }, {
   'icon': 'fa fa-sitemap',
   'title': 'Content Organization',
-  'description': 'Organize your content in hierarchical pages, grouped in several (sub)wikis',
+  'description': 'Organize your content in hierarchical pages, grouped in several (sub)wikis.',
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/ContentOrganization/',
   'examples': $xwiki.getURL('Main.AllDocs', 'view', 'view=tree')
 }, {
@@ -109,7 +137,7 @@
   'title': 'Version Control',
   'description': 'View previous versions of a page, compare different versions or rollback to any past version.',
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/VersionControl',
-  'examples': $xwiki.getURL('Help.History.WebHome', 'view', $NULL, 'History')
+  'examples': $historyURL
 }, {
   'icon': 'fa fa-download',
   'title': 'Import / Export',

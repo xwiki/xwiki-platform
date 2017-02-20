@@ -74,28 +74,40 @@
 
 #set ($exampleCards = [{
   'title': 'Blog',
+  'description': 'Blog Application allows you to publish your information and share it to the world.',
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Blog+Application',
-  'icon': 'fa fa-rss'
+  'icon': 'fa fa-rss', 
+  'thumbnail': 'Help.Applications.WebHome@blog.png'
 }, {
   'title': 'Forum',
+  'description': 'Forum Application allows you to create new categories and discuss topics within them.',
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/ForumApplication',
-  'icon': 'fa fa-comments'
+  'icon': 'fa fa-comments',
+  'thumbnail': 'Help.Applications.WebHome@forum.png'
 }, {
   'title': 'Menu',
+  'description': 'Menu Application helps you create navigation menus and displayed them in your instance.',
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Menu+Application',
-  'icon': 'fa fa-list-ul'
+  'icon': 'fa fa-list-ul',
+  'thumbnail': 'Help.Applications.WebHome@menu.png'
 }, {
   'title': 'Ideas',
+  'description': 'Ideas Application encourage you to submit ideas that can be voted by your team. ',
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Ideas',
-  'icon': 'fa fa-lightbulb-o'
+  'icon': 'fa fa-lightbulb-o',
+  'thumbnail': 'Help.Applications.WebHome@ideas.png'
 }, {
   'title': 'Meetings',
+  'description': 'Meetings Application manages your meetings mentioning the date, location, participants, etc. ',
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Meeting+Application',
-  'icon': 'fa fa-calendar'
+  'icon': 'fa fa-calendar',
+  'thumbnail': 'Help.Applications.WebHome@meeting.png'
 }, {
   'title': 'File Manager',
+  'description': 'File Manager manages your files, providing a viewer of supported files, tag cloud and allowing filtering.',
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/File+Manager+Application',
-  'icon': 'fa fa-folder'
+  'icon': 'fa fa-folder',
+  'thumbnail': 'Help.Applications.WebHome@filemanager.png'
 }])
 {{/velocity}}
 
@@ -117,19 +129,13 @@
 &lt;div class="row"&gt;
   #foreach ($card in $exampleCards)
     ## See http://getbootstrap.com/css/#grid-responsive-resets .
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
-      &lt;div class="clearfix visible-xs-block "&gt;&lt;/div&gt;
-    #end
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 3 == 0)
-      &lt;div class="clearfix visible-sm-block"&gt;&lt;/div&gt;
-    #end
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 4 == 0)
-      &lt;div class="clearfix visible-md-block"&gt;&lt;/div&gt;
-    #end
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 6 == 0)
-      &lt;div class="clearfix visible-lg-block"&gt;&lt;/div&gt;
-    #end
-    &lt;div class="col-xs-6 col-sm-4 col-md-3 col-lg-2"&gt;
+    #if ($foreach.index > 0 &amp;&amp; $foreach.index % 2 == 0)&#xd;
+      &lt;div class="clearfix visible-sm-block ">&lt;/div>&#xd;
+    #end&#xd;
+    #if ($foreach.index > 0 &amp;&amp; $foreach.index % 3 == 0)&#xd;
+      &lt;div class="clearfix visible-md-block visible-lg-block">&lt;/div>&#xd;
+    #end&#xd;
+    &lt;div class="col-xs-12 col-sm-6 col-md-4">&#xd;
       #helpExampleCard($card)
     &lt;/div&gt;
   #end

@@ -208,7 +208,6 @@ public class RefactoringScriptService implements ScriptService
     {
         EntityRequest request = new EntityRequest();
         initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
-        request.setInteractive(true);
         return request;
     }
 

@@ -19,12 +19,17 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.refactoring.job.EntityRequest;
+import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
 
@@ -178,7 +183,7 @@ public class DeleteAction extends XWikiAction
 
     protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context) throws XWikiException
     {
-        Job deleteJob = startDeleteJob(entityReference);
+        Job deleteJob = startDeleteJob(entityReference, context);
 
         // If the user have asked for an asynchronous delete action...
         if (isAsync(context.getRequest())) {
@@ -209,16 +214,18 @@ public class DeleteAction extends XWikiAction
         return StringUtils.join(jobId, "/");
     }
 
-    private Job startDeleteJob(EntityReference entityReference) throws XWikiException
+    private Job startDeleteJob(EntityReference entityReference, XWikiContext context) throws XWikiException
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        Job deleteJob = refactoring.delete(entityReference);
-        if (deleteJob != null) {
-            return deleteJob;
-        } else {
-            throw new XWikiException(String.format("Failed to schedule the delete job for [%s]", entityReference),
-                refactoring.getLastError());
+        EntityRequest deleteRequest = refactoring.createDeleteRequest(Arrays.asList(entityReference));
+        deleteRequest.setInteractive(isAsync(context.getRequest()));
+
+        try {
+            JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);
+            return jobExecutor.execute(RefactoringJobs.DELETE, deleteRequest);
+        } catch (JobException e) {
+            throw new XWikiException(String.format("Failed to schedule the delete job for [%s]", entityReference), e);
         }
     }
 }

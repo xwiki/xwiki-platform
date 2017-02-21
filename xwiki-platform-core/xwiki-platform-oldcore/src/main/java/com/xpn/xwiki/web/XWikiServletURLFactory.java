@@ -49,9 +49,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
 
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver;
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
-    private EntityResourceActionLister actionLister;
+    private EntityResourceActionLister actionLister = Utils.getComponent(EntityResourceActionLister.class);
 
     /**
      * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
@@ -236,7 +237,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
-        EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
         // For how to encode the various parts of the URL, see http://stackoverflow.com/a/29948396/153102
         addAction(path, spaceReference, action, context);
@@ -282,7 +283,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // (and showViewAction = false)
         if ((!"view".equals(action) || (showViewAction))
             || (!showViewAction && spaceReference != null && "view".equals(action)
-            && getActionLister().listActions().contains(
+            && this.actionLister.listActions().contains(
                 spaceReference.extractFirstReference(EntityType.SPACE).getName())))
         {
             path.append(action).append("/");
@@ -437,7 +438,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
-        EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
         addAction(path, null, "skin", context);
         addSpaces(path, spaceReference, "skin", context);
@@ -510,7 +511,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
-        EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
         addAction(path, spaceReference, action, context);
         addSpaces(path, spaceReference, action, context);
@@ -571,7 +572,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
-        EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
         addAction(path, spaceReference, action, context);
         addSpaces(path, spaceReference, action, context);
@@ -769,21 +770,5 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         encodedURLAsString = encodedURLAsString.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
 
         return new URL(encodedURLAsString);
-    }
-
-    private EntityReferenceResolver<String> getRelativeEntityReferenceResolver()
-    {
-        if (this.relativeEntityReferenceResolver == null) {
-            this.relativeEntityReferenceResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-        }
-        return this.relativeEntityReferenceResolver;
-    }
-
-    private EntityResourceActionLister getActionLister()
-    {
-        if (this.actionLister == null) {
-            this.actionLister = Utils.getComponent(EntityResourceActionLister.class);
-        }
-        return this.actionLister;
     }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal.factory.template;
 
 import java.io.Writer;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -90,11 +88,6 @@ public class DefaultMailTemplateManagerTest
         BaseObject object = mock(BaseObject.class);
 
         when(document.getXObjects(any())).thenReturn(Collections.singletonList(object));
-
-        // Needed so that xcontext.setURLFactory(new ExternalServletURLFactory(xcontext)); will not fail even
-        // though we don't want this line to have any behavior.
-        when(xwikiContext.getURL()).thenReturn(new URL("http:/localhost:8080/dummy"));
-        when(xwikiContext.getRequest()).thenReturn(mock(XWikiRequest.class));
     }
 
     @Test

@@ -136,8 +136,10 @@ public class MailTest extends AbstractTest
         // - "$request"
         // Note: We also use the $name and $doc bindings to show that the user can add new bindings ($doc is not bound
         // by default since there isn't always a notion of current doc in all places where mail sending is done).
+        // Note: We use $xwiki.getURL() in the content to verify that we generate full external URLs.
         String velocityContent = "Hello $name from $escapetool.xml($services.model.resolveDocument("
-            + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString()";
+            + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString() -"
+            + "url: $xwiki.getURL('Main.WebHome')";
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
             "subject", "#if ($xwiki.exists($doc.documentReference))Status for $name on $doc.fullName#{else}wrong#end",
             "language", "en",
@@ -243,7 +245,8 @@ public class MailTest extends AbstractTest
             "Subject: Status for John on " + getTestClassName() + ".SendMail",
             "Hello John from superadmin - Served from http://localhost:8080/xwiki/bin/view/MailTest/SendMail",
             "<strong>Hello John from superadmin - Served from "
-                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMail</strong>",
+                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMail</strong> - "
+                + "url: http://localhost:8080/xwiki/bin/view/Main/",
             "X-MailType: Test",
             "Content-Type: text/plain; name=something.txt",
             "Content-ID: <something.txt>",
@@ -299,7 +302,8 @@ public class MailTest extends AbstractTest
         assertReceivedMessages(2,
             "Subject: Status for John on " + getTestClassName() + ".SendMailGroupAndUsers",
             "Hello John from superadmin - Served from "
-                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMailGroupAndUsers");
+                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMailGroupAndUsers"
+                + "url: http://localhost:8080/xwiki/bin/view/Main/");
     }
 
     private void assertReceivedMessages(int expectedMatchingCount, String... expectedLines)

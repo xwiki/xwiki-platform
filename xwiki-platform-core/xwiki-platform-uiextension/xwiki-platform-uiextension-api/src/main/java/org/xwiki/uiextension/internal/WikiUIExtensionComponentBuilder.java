@@ -104,11 +104,10 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private void checkRights(XWikiDocument extensionsDoc, WikiComponentScope scope) throws WikiComponentException
     {
         if (scope == WikiComponentScope.GLOBAL
-            && !this.authorization.hasAccess(Right.PROGRAM, extensionsDoc.getContentAuthorReference(), null)) {
+            && !this.authorization.hasAccess(Right.PROGRAM, extensionsDoc.getAuthorReference(), null)) {
             throw new WikiComponentException("Registering global UI extensions requires programming rights");
-        } else if (scope == WikiComponentScope.WIKI
-            && !this.authorization.hasAccess(Right.ADMIN, extensionsDoc.getContentAuthorReference(), extensionsDoc
-                .getDocumentReference().getWikiReference())) {
+        } else if (scope == WikiComponentScope.WIKI && !this.authorization.hasAccess(Right.ADMIN,
+            extensionsDoc.getAuthorReference(), extensionsDoc.getDocumentReference().getWikiReference())) {
             throw new WikiComponentException(
                 "Registering UI extensions at wiki level requires wiki administration rights");
         }

@@ -43,6 +43,8 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.ExternalServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity on
@@ -93,7 +95,14 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         String content =
             this.documentBridge.getProperty(templateReference, mailClassReference, objectNumber, property).toString();
+
+        // Save the current URL Factory since we'll replace it with a URL factory that generates external URLs (ie
+        // full URLs).
+        XWikiContext xcontext = this.xwikiContextProvider.get();
+        XWikiURLFactory originalURLFactory = xcontext.getURLFactory();
+
         try {
+            xcontext.setURLFactory(new ExternalServletURLFactory(xcontext));
             StringWriter writer = new StringWriter();
             velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
             return writer.toString();
@@ -101,6 +110,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
             throw new MessagingException(String.format(
                 "Failed to evaluate property [%s] for Document [%s] and locale [%s]",
                     property, templateReference, localeValue), e);
+        } finally {
+            xcontext.setURLFactory(originalURLFactory);
         }
     }
 

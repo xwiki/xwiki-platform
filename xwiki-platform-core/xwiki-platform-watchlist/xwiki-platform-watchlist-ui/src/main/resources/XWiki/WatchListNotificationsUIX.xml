@@ -592,8 +592,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, x
       <name>org.xwiki.platform.watchlist.ui.watchlistNotificationUix</name>
     </property>
     <property>
-      <parameters>order:10000
-separator:true</parameters>
+      <parameters>order=10000
+separator=true</parameters>
     </property>
     <property>
       <scope>wiki</scope>

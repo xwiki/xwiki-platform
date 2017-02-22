@@ -138,7 +138,7 @@ public class MailTest extends AbstractTest
         // by default since there isn't always a notion of current doc in all places where mail sending is done).
         // Note: We use $xwiki.getURL() in the content to verify that we generate full external URLs.
         String velocityContent = "Hello $name from $escapetool.xml($services.model.resolveDocument("
-            + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString() -"
+            + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString() - "
             + "url: $xwiki.getURL('Main.WebHome')";
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
             "subject", "#if ($xwiki.exists($doc.documentReference))Status for $name on $doc.fullName#{else}wrong#end",
@@ -301,7 +301,7 @@ public class MailTest extends AbstractTest
         assertReceivedMessages(2,
             "Subject: Status for John on " + getTestClassName() + ".SendMailGroupAndUsers",
             "Hello John from superadmin - Served from "
-                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMailGroupAndUsers"
+                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMailGroupAndUsers - "
                 + "url: http://localhost:8080/xwiki/bin/view/Main/");
     }
 

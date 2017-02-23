@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,21 +16,43 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.notifications.events;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>9.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-notifications</artifactId>
-  <name>XWiki Platform - Notifications - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Modules related to the notifications</description>
-  <modules>
-    <module>xwiki-platform-notifications-api</module>
-    <module>xwiki-platform-notifications-ui</module>
-  </modules>
-</project>
+import java.util.List;
+
+import org.xwiki.stability.Unstable;
+
+/**
+ * Special event matcher used by a listener which need to listened to all notification events.
+ *
+ * @version $Id$
+ * @since 9.2RC1
+ */
+@Unstable
+public final class AllNotificationEvent implements NotificationEvent
+{
+    /**
+     * Unique instance of the event matcher.
+     */
+    public static final AllNotificationEvent ALL_NOTIFICATION_EVENT = new AllNotificationEvent();
+
+    /**
+     * Use {@link #ALL_NOTIFICATION_EVENT} instead.
+     */
+    private AllNotificationEvent()
+    {
+    }
+
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent != null ? otherEvent instanceof NotificationEvent : false;
+    }
+
+    @Override
+    public List<String> getAudience()
+    {
+        return null;
+    }
+}

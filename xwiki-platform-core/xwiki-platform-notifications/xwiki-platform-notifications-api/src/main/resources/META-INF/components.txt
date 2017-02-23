@@ -1,0 +1,3 @@
+org.xwiki.notifications.internal.DefaultNotificationConverter
+org.xwiki.notifications.internal.DefaultNotificationManager
+org.xwiki.notifications.internal.NotificationEventListener

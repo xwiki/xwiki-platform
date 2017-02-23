@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,21 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.notifications;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>9.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-notifications</artifactId>
-  <name>XWiki Platform - Notifications - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Modules related to the notifications</description>
-  <modules>
-    <module>xwiki-platform-notifications-api</module>
-    <module>xwiki-platform-notifications-ui</module>
-  </modules>
-</project>
+import org.xwiki.component.annotation.Role;
+import org.xwiki.eventstream.Event;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.stability.Unstable;
+
+/**
+ * Display a notification.
+ *
+ * The name of the implementation must be the canonical name of the event class.
+ *
+ * @version $Id$
+ * @since 9.2RC1
+ */
+@Role
+@Unstable
+public interface NotificationDisplayer
+{
+    /**
+     * Render a notification.
+     *
+     * @param eventNotification the notification stored in the event stream
+     * @return the XDOM to display in the notification in the page
+     * @throws NotificationException if error occurs
+     */
+    XDOM renderNotification(Event eventNotification) throws NotificationException;
+}

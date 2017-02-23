@@ -17,37 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.eventstream;
 
-import java.util.Date;
-
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.internal.DefaultEvent;
-import org.xwiki.notifications.NotificationConverter;
-import org.xwiki.notifications.NotificationException;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.events.NotificationEvent;
+import org.xwiki.stability.Unstable;
 
 /**
- * Default converter for any type of NotificationEvent.
+ * Convert a notification to an Event that could be stored in the event stream.
  *
  * @version $Id$
  * @since 9.2RC1
  */
-@Component
-@Singleton
-public class DefaultNotificationConverter implements NotificationConverter
+@Unstable
+@Role
+public interface NotificationConverter
 {
-    @Override
-    public Event convert(NotificationEvent notificationEvent, String source, Object data) throws NotificationException
-    {
-        org.xwiki.eventstream.Event convertedEvent = new DefaultEvent();
-        convertedEvent.setType(notificationEvent.getClass().getCanonicalName());
-        convertedEvent.setApplication(source);
-        convertedEvent.setBody((String) data);
-        convertedEvent.setDate(new Date());
-        return convertedEvent;
-    }
+    /**
+     * Convert a notification event to a stream event.
+     *
+     * @param notificationEvent the event to convert
+     * @param source the source received with the event
+     * @param data the data received with the event
+     * @return the converted stream event, ready to be stored
+     * @throws Exception if error happens
+     */
+    Event convert(NotificationEvent notificationEvent, String source, Object data) throws Exception;
 }

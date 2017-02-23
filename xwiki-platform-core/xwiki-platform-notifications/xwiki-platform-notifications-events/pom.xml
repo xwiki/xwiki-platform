@@ -27,35 +27,28 @@
     <artifactId>xwiki-platform-notifications</artifactId>
     <version>9.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-api</artifactId>
-  <name>XWiki Platform - Notifications - API</name>
-  <description>Add a notifications menu to Flamingo</description>
+  <artifactId>xwiki-platform-notifications-events</artifactId>
+  <name>XWiki Platform - Notifications - Events</name>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.82</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-events</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-simple</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

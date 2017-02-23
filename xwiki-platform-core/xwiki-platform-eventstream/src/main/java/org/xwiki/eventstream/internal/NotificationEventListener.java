@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.eventstream.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.notifications.NotificationConverter;
+import org.xwiki.eventstream.NotificationConverter;
 import org.xwiki.notifications.events.AllNotificationEvent;
 import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.observation.AbstractEventListener;

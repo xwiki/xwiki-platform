@@ -17,20 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.internal;
+
+import java.util.List;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationPreference;
 
 /**
  * @version $Id$
+ * @since 9.2RC1
  */
-public class NotificationException extends Exception
+@Role
+public interface ModelBridge
 {
-    public NotificationException(String message)
-    {
-        super(message);
-    }
-
-    public NotificationException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+    List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference) throws
+            NotificationException;
 }

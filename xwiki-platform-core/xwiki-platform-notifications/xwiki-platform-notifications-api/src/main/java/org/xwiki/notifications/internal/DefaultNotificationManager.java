@@ -19,14 +19,24 @@
  */
 package org.xwiki.notifications.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStream;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
+import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
+import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -36,11 +46,91 @@ import org.xwiki.notifications.NotificationManager;
 @Singleton
 public class DefaultNotificationManager implements NotificationManager
 {
+    @Inject
+    private EventStream eventStream;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private ModelBridge modelBridge;
+
     @Override
-    public List<Event> getNotifications() throws NotificationException
+    public List<Event> getNotifications(int offset, int limit) throws NotificationException
     {
-        // TODO: retrieve the notifications event in the event stream, filter them according to the user preferences
-        // and return them
-        return null;
+        return getNotifications(documentAccessBridge.getCurrentUserReference(), offset, limit);
+    }
+
+    @Override
+    public List<Event> getNotifications(String userId, int offset, int limit) throws NotificationException
+    {
+        return getNotifications(documentReferenceResolver.resolve(userId), offset, limit);
+    }
+
+    private List<Event> getNotifications(DocumentReference user, int offset, int limit) throws NotificationException
+    {
+        try {
+            String hql = "where 1=1";
+
+            List<String> types = new ArrayList<>();
+            for (NotificationPreference preference : getPreferences(user)) {
+                if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
+                    types.add(preference.getEventType());
+                }
+            }
+            if (!types.isEmpty()) {
+                hql += " AND event.type IN :types";
+            }
+
+            List<String> apps = new ArrayList<>();
+            for (NotificationPreference preference : getPreferences(user)) {
+                if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
+                    apps.add(preference.getApplicationId());
+                }
+            }
+            if (!apps.isEmpty()) {
+                hql += " AND event.application IN :apps";
+            }
+
+            Query query = queryManager.createQuery(hql, Query.HQL);
+            query.setOffset(offset);
+            query.setLimit(limit);
+
+            if (!types.isEmpty()) {
+                query.bindValue("types", types);
+            }
+
+            if (!apps.isEmpty()) {
+                query.bindValue("apps", apps);
+            }
+
+            return eventStream.searchEvents(query);
+
+        } catch (Exception e) {
+            throw new NotificationException("Fail to get the list of notifications.", e);
+        }
+    }
+
+    @Override
+    public List<NotificationPreference> getPreferences() throws NotificationException
+    {
+        return getPreferences(documentAccessBridge.getCurrentUserReference());
+    }
+
+    @Override
+    public List<NotificationPreference> getPreferences(String userId) throws NotificationException
+    {
+        return getPreferences(documentReferenceResolver.resolve(userId));
+    }
+
+    private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException
+    {
+       return modelBridge.getNotificationsPreferences(user);
     }
 }

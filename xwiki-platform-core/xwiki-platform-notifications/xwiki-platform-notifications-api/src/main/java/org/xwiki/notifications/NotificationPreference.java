@@ -19,18 +19,40 @@
  */
 package org.xwiki.notifications;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * @version $Id$
+ * @since 9.2RC1
  */
-public class NotificationException extends Exception
+@Unstable
+public class NotificationPreference
 {
-    public NotificationException(String message)
+    private String eventType;
+
+    private String applicationId;
+
+    private boolean isNotificationEnabled;
+
+    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled)
     {
-        super(message);
+        this.eventType = eventType;
+        this.applicationId = applicationId;
+        this.isNotificationEnabled = isNotificationEnabled;
     }
 
-    public NotificationException(String message, Throwable cause)
+    public String getEventType()
     {
-        super(message, cause);
+        return eventType;
+    }
+
+    public String getApplicationId()
+    {
+        return applicationId;
+    }
+
+    public boolean isNotificationEnabled()
+    {
+        return isNotificationEnabled;
     }
 }

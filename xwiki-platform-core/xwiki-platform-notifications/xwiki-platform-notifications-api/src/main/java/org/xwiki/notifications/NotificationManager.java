@@ -39,5 +39,25 @@ public interface NotificationManager
      * @return a list of notifications concerning the current user
      * @throws NotificationException if error happens
      */
-    List<Event> getNotifications() throws NotificationException;
+    List<Event> getNotifications(int offset, int limit) throws NotificationException;
+
+    /**
+     * @param userId id of the user
+     * @return a list of notifications concerning a given user
+     * @throws NotificationException if error happens
+     */
+    List<Event> getNotifications(String userId, int offset, int limit) throws NotificationException;
+
+    /**
+     * @return the list of notifications preferences for the current user
+     * @throws NotificationException
+     */
+    List<NotificationPreference> getPreferences() throws NotificationException;
+
+    /**
+     * @param userId id of the user
+     * @return the list of notifications preferences for a given user
+     * @throws NotificationException
+     */
+    List<NotificationPreference> getPreferences(String userId) throws NotificationException;
 }

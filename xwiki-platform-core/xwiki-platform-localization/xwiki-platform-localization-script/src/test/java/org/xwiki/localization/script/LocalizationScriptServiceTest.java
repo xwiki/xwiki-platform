@@ -60,7 +60,7 @@ public class LocalizationScriptServiceTest
 
     private LocalizationManager localizationManager;
 
-    private LocalizationScriptService lss;
+    private LocalizationScriptService localizationScriptService;
 
     private Translation translation;
 
@@ -77,9 +77,9 @@ public class LocalizationScriptServiceTest
 
         localizationContext = mocker.getInstance(LocalizationContext.class);
         localizationManager = mocker.getInstance(LocalizationManager.class);
-        lss = (LocalizationScriptService) mocker.getComponentUnderTest();
+        localizationScriptService = (LocalizationScriptService) mocker.getComponentUnderTest();
         translation = mock(Translation.class);
-        
+
         doAnswer(new Answer<Object>()
         {
             @Override
@@ -98,31 +98,31 @@ public class LocalizationScriptServiceTest
     @Test
     public void render() throws Exception
     {
-        assertEquals("print result", lss.render("key"));
+        assertEquals("print result", localizationScriptService.render("key"));
     }
 
     @Test
     public void renderWithSyntax() throws Exception
     {
-        assertEquals("print result", lss.render("key", Syntax.PLAIN_1_0));
+        assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0));
     }
 
     @Test
     public void renderWithSyntaxAndParameters() throws Exception
     {
-        assertEquals("print result", lss.render("key", Syntax.PLAIN_1_0, Arrays.asList()));
+        assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0, Arrays.asList()));
     }
 
     @Test
     public void renderWithParameters() throws Exception
     {
-        assertEquals("print result", lss.render("key", Arrays.asList()));
+        assertEquals("print result", localizationScriptService.render("key", Arrays.asList()));
     }
 
     @Test
     public void getCurrentLocale() throws Exception
     {
         when(localizationContext.getCurrentLocale()).thenReturn(Locale.ENGLISH);
-        assertEquals(Locale.ENGLISH, lss.getCurrentLocale());
+        assertEquals(Locale.ENGLISH, localizationScriptService.getCurrentLocale());
     }
 }

@@ -37,7 +37,6 @@
     <module>xwiki-platform-extension-distribution</module>
     <module>xwiki-platform-extension-handlers</module>
     <module>xwiki-platform-extension-script</module>
-    <module>xwiki-platform-extension-rest</module>
     <module>xwiki-platform-extension-ui</module>
   </modules>
   <profiles>

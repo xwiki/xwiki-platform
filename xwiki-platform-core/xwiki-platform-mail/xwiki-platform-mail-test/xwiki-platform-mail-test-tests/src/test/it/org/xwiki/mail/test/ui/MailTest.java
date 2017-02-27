@@ -245,8 +245,8 @@ public class MailTest extends AbstractTest
             "Subject: Status for John on " + getTestClassName() + ".SendMail",
             "Hello John from superadmin - Served from http://localhost:8080/xwiki/bin/view/MailTest/SendMail",
             "<strong>Hello John from superadmin - Served from "
-                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMail</strong> - "
-                + "url: http://localhost:8080/xwiki/bin/view/Main/",
+                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMail - "
+                + "url: http://localhost:8080/xwiki/bin/view/Main/</strong>",
             "X-MailType: Test",
             "Content-Type: text/plain; name=something.txt",
             "Content-ID: <something.txt>",

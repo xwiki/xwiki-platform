@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
@@ -141,6 +142,8 @@ public class ActivityEventImpl implements ActivityEvent
      * Named parameters.
      */
     protected Map<String, String> parameters;
+
+    protected Set<String> target;
 
     @Override
     public String getDisplayTitle(XWikiContext context)
@@ -473,5 +476,17 @@ public class ActivityEventImpl implements ActivityEvent
         if (hidden != null) {
             this.hidden = hidden;
         }
+    }
+
+    @Override
+    public void setTarget(Set<String> target)
+    {
+        this.target = target;
+    }
+
+    @Override
+    public Set<String> getTarget()
+    {
+        return target;
     }
 }

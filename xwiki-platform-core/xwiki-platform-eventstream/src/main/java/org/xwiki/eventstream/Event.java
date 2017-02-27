@@ -20,9 +20,12 @@
 package org.xwiki.eventstream;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -334,4 +337,19 @@ public interface Event
      * @see #getParameters()
      */
     void setParameters(Map<String, String> parameters);
+
+    /**
+     * @param target a list of entities (users, groups) that are interested by this event
+     */
+    default void setTarget(Set<String> target) {
+        LoggerFactory.getLogger(Event.class)
+                .warn("org.xwiki.eventstream.Event#setTarget() has been called without being reimplemented.");
+    }
+
+    /**
+     * @return a list of entities (users, groups) that are interested by this event
+     */
+    default Set<String> getTarget() {
+        return Collections.emptySet();
+    }
 }

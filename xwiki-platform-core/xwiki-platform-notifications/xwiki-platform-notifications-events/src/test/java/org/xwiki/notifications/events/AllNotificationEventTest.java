@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.events;
 
-import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
@@ -43,7 +43,7 @@ public class AllNotificationEventTest
         Event notificationEvent = new NotificationEvent()
         {
             @Override
-            public List<String> getAudience()
+            public Set<String> getTarget()
             {
                 return null;
             }

@@ -27,46 +27,18 @@
     <artifactId>xwiki-platform-notifications</artifactId>
     <version>9.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-api</artifactId>
-  <name>XWiki Platform - Notifications - API</name>
-  <description>Add a notifications menu to Flamingo</description>
+  <artifactId>xwiki-platform-notifications-default</artifactId>
+  <name>XWiki Platform - Notifications - Default implementation</name>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-observation-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-events</artifactId>
+      <artifactId>xwiki-platform-notifications-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-template-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.events;
 
-import java.util.List;
+import java.util.Set;
 
 import org.xwiki.stability.Unstable;
 
@@ -51,7 +51,7 @@ public final class AllNotificationEvent implements NotificationEvent
     }
 
     @Override
-    public List<String> getAudience()
+    public Set<String> getTarget()
     {
         return null;
     }

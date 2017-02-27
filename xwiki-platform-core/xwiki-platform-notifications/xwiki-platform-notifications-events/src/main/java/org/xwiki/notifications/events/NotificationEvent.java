@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.events;
 
-import java.util.List;
+import java.util.Set;
 
 import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
@@ -39,5 +39,5 @@ public interface NotificationEvent extends Event
     /**
      * @return the list of users and groups represented by their id that are targeted by this notification
      */
-    List<String> getAudience();
+    Set<String> getTarget();
 }

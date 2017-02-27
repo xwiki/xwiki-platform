@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.activitystream.api;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -353,5 +354,15 @@ public interface ActivityEvent
      * @return name-value pair parameters associated with this event.
      */
     Map<String, String> getParameters();
+
+    /**
+     * @param target a list of entities (users, groups) that are interested by this event
+     */
+    void setTarget(Set<String> target);
+
+    /**
+     * @return a list of entities (users, groups) that are interested by this event
+     */
+    Set<String> getTarget();
 
 }

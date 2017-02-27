@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -39,14 +40,14 @@ public interface NotificationManager
      * @return a list of notifications concerning the current user
      * @throws NotificationException if error happens
      */
-    List<Event> getNotifications(int offset, int limit) throws NotificationException;
+    List<Event> getEvents(int offset, int limit) throws NotificationException;
 
     /**
      * @param userId id of the user
      * @return a list of notifications concerning a given user
      * @throws NotificationException if error happens
      */
-    List<Event> getNotifications(String userId, int offset, int limit) throws NotificationException;
+    List<Event> getEvents(String userId, int offset, int limit) throws NotificationException;
 
     /**
      * @return the list of notifications preferences for the current user
@@ -60,4 +61,6 @@ public interface NotificationManager
      * @throws NotificationException
      */
     List<NotificationPreference> getPreferences(String userId) throws NotificationException;
+
+    XDOM render(Event event) throws NotificationException;
 }

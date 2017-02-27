@@ -17,36 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.internal;
+package org.xwiki.notifications.internal;
 
-import java.util.Date;
-
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.NotificationConverter;
-import org.xwiki.notifications.events.NotificationEvent;
+import org.xwiki.notifications.NotificationDisplayer;
+import org.xwiki.notifications.NotificationException;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.velocity.VelocityManager;
 
 /**
- * Default converter for any type of NotificationEvent.
- *
  * @version $Id$
- * @since 9.2RC1
  */
 @Component
 @Singleton
-public class DefaultNotificationConverter implements NotificationConverter
+public class DefaultNotificationDisplayer implements NotificationDisplayer
 {
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private VelocityManager velocityManager;
+
     @Override
-    public Event convert(NotificationEvent notificationEvent, String source, Object data) throws Exception
+    public XDOM renderNotification(Event eventNotification) throws NotificationException
     {
-        org.xwiki.eventstream.Event convertedEvent = new DefaultEvent();
-        convertedEvent.setType(notificationEvent.getClass().getCanonicalName());
-        convertedEvent.setApplication(source);
-        convertedEvent.setBody((String) data);
-        convertedEvent.setDate(new Date());
-        convertedEvent.setTarget(notificationEvent.getTarget());
-        return convertedEvent;
+        try {
+            velocityManager.getCurrentVelocityContext().put("event", eventNotification);
+            return templateManager.execute("notification/default.vm");
+        } catch (Exception e) {
+            throw new NotificationException("Failed to render the notification.", e);
+        } finally {
+            velocityManager.getCurrentVelocityContext().remove("event");
+        }
     }
 }

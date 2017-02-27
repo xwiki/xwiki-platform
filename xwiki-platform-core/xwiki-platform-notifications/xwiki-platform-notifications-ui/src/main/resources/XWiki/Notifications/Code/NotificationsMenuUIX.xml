@@ -32,7 +32,7 @@
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1446733949000</date>
   <contentUpdateDate>1446732984000</contentUpdateDate>
-  <parent>XWiki.WebHome</parent>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
   <version>1.1</version>
   <title/>
   <comment/>

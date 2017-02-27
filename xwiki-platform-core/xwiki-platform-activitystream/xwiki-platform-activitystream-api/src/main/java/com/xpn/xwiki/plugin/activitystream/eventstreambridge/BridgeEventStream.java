@@ -202,6 +202,7 @@ public class BridgeEventStream implements EventStream
         result.setWiki(this.serializer.serialize(e.getWiki()));
 
         result.setParameters(e.getParameters());
+        result.setTarget(e.getTarget());
 
         return result;
     }

@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.NotificationConverter;
@@ -80,12 +79,10 @@ public class NotificationEventListener extends AbstractEventListener
                     = converter.convert((NotificationEvent) event, (String) source, data);
 
             // Save the event in the event stream
-            // TODO: handle the audience
             eventStream.addEvent(convertedEvent);
-        } catch (ComponentLookupException e) {
-            logger.warn("Failed to lookup a converter for the event [{}].", eventType, e);
+
         } catch (Exception e) {
-            logger.warn("Failed to convert the event [{}].", eventType, e);
+            logger.warn("Failed to save the event [{}].", eventType, e);
         }
     }
 }

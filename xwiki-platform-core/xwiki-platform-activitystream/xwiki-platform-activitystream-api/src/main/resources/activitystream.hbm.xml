@@ -59,5 +59,10 @@
       <index column="name" type="string" length="255"/>
       <element column="value" type="string" length="2000"/>
     </map-->
+
+    <set name="target" table="activitystream_events_targets" lazy="false">
+      <key column="eventId" />
+      <element column="value" type="string" length="255" />
+    </set>
   </class>
 </hibernate-mapping>

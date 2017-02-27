@@ -1,0 +1,4 @@
+## Default renderer for any kind of notification.
+## Each application should create its own.
+## TODO: write the documentation
+Notification of type [$event.type] from app [$event.application] posted at [$event.date] by [[$event.user]] and concerning [[$event.document>>$event.document]].

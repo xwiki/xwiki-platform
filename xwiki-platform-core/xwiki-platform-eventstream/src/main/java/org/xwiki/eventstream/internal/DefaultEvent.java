@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
@@ -96,6 +97,9 @@ public class DefaultEvent implements Event
 
     /** @see #getParameters() */
     private Map<String, String> parameters;
+
+    /** @see #getTarget() */
+    private Set<String> target;
     
     @Override
     public String getId()
@@ -335,6 +339,18 @@ public class DefaultEvent implements Event
             // Fallback to empty parameters map.
             this.parameters = new HashMap<String, String>();
         }
+    }
+
+    @Override
+    public void setTarget(Set<String> target)
+    {
+        this.target = target;
+    }
+
+    @Override
+    public Set<String> getTarget()
+    {
+        return Collections.unmodifiableSet(this.target);
     }
 
     @Override

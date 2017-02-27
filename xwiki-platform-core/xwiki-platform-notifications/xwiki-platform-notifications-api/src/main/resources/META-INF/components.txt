@@ -1,1 +1,3 @@
+org.xwiki.notifications.internal.DefaultNotificationDisplayer
 org.xwiki.notifications.internal.DefaultNotificationManager
+org.xwiki.notifications.script.NotificationScriptService

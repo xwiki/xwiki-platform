@@ -27,15 +27,18 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -61,19 +64,22 @@ public class DefaultNotificationManager implements NotificationManager
     @Inject
     private ModelBridge modelBridge;
 
+    @Inject
+    private ComponentManager componentManager;
+
     @Override
-    public List<Event> getNotifications(int offset, int limit) throws NotificationException
+    public List<Event> getEvents(int offset, int limit) throws NotificationException
     {
-        return getNotifications(documentAccessBridge.getCurrentUserReference(), offset, limit);
+        return getEvents(documentAccessBridge.getCurrentUserReference(), offset, limit);
     }
 
     @Override
-    public List<Event> getNotifications(String userId, int offset, int limit) throws NotificationException
+    public List<Event> getEvents(String userId, int offset, int limit) throws NotificationException
     {
-        return getNotifications(documentReferenceResolver.resolve(userId), offset, limit);
+        return getEvents(documentReferenceResolver.resolve(userId), offset, limit);
     }
 
-    private List<Event> getNotifications(DocumentReference user, int offset, int limit) throws NotificationException
+    private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
     {
         try {
             String hql = "where 1=1";
@@ -95,7 +101,7 @@ public class DefaultNotificationManager implements NotificationManager
                 }
             }
             if (!apps.isEmpty()) {
-                hql += " AND event.application IN :apps";
+                hql += " OR event.application IN :apps";
             }
 
             Query query = queryManager.createQuery(hql, Query.HQL);
@@ -127,6 +133,24 @@ public class DefaultNotificationManager implements NotificationManager
     public List<NotificationPreference> getPreferences(String userId) throws NotificationException
     {
         return getPreferences(documentReferenceResolver.resolve(userId));
+    }
+
+    @Override
+    public XDOM render(Event event) throws NotificationException
+    {
+        try {
+            NotificationDisplayer displayer;
+            if (componentManager.hasComponent(NotificationDisplayer.class, event.getClass().getCanonicalName())) {
+                displayer =
+                        componentManager.getInstance(NotificationDisplayer.class, event.getClass().getCanonicalName());
+            } else {
+                // Fallback to the default displayer
+                displayer = componentManager.getInstance(NotificationDisplayer.class);
+            }
+            return displayer.renderNotification(event);
+        } catch (Exception e) {
+            throw new NotificationException("Failed to render the notification.", e);
+        }
     }
 
     private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -82,27 +83,41 @@ public class DefaultNotificationManager implements NotificationManager
     private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
     {
         try {
-            String hql = "where 1=1";
+            String hql = "";
+            String appender = "where ";
+
+            List<NotificationPreference> preferences = getPreferences(user);
 
             List<String> types = new ArrayList<>();
-            for (NotificationPreference preference : getPreferences(user)) {
+            for (NotificationPreference preference : preferences) {
                 if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
                     types.add(preference.getEventType());
                 }
             }
             if (!types.isEmpty()) {
-                hql += " AND event.type IN :types";
+                hql += appender + "event.type IN :types";
+                appender = " ";
             }
 
             List<String> apps = new ArrayList<>();
-            for (NotificationPreference preference : getPreferences(user)) {
+            for (NotificationPreference preference : preferences) {
                 if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
                     apps.add(preference.getApplicationId());
                 }
             }
             if (!apps.isEmpty()) {
-                hql += " OR event.application IN :apps";
+                hql += appender + " OR event.application IN :apps";
             }
+
+            // No notification is returned if nothing is saved in the user settings
+            // TODO: handle some defaults preferences that can be set in the administration
+            if (preferences.isEmpty() || (types.isEmpty() && apps.isEmpty())) {
+                return Collections.emptyList();
+            }
+
+            hql += " order by event.date DESC";
+
+            // TODO: idea: handle the items of the watchlist too
 
             Query query = queryManager.createQuery(hql, Query.HQL);
             query.setOffset(offset);

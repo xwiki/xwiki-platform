@@ -37,5 +37,10 @@
       <artifactId>xwiki-platform-notifications-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed to have a nice toggle buttons on watchlist notifications area. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-switch</artifactId>
+    </dependency>
   </dependencies>
 </project>

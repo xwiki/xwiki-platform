@@ -389,6 +389,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Needed to have a nice toggle button instead of plain checkboxes in the UI -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-switch</artifactId>
+      <version>3.3.2</version>
+      <scope>runtime</scope>
+    </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

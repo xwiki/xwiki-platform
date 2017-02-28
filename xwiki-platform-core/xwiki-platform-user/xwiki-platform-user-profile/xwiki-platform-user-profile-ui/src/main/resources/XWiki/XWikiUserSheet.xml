@@ -59,6 +59,11 @@
   #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'glyphicon': 'eye-open'}))
 #end
 #if($isMyProfile)
+  ## TODO: add a plug-in system instead, maybe using UIX
+  #set ($notificationsSheet = $services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet'))
+  #if ($xwiki.exists($notificationsSheet))
+    #set($discard = $categories.add({'id':'notifications', 'sheet':'XWiki.Notifications.Code.XWikiUserNotificationsSheet', 'glyphicon': 'bell'}))
+  #end
   #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'glyphicon': 'globe'}))
 #end
 #set($userWikiSheet = 'WikiManager.UserWikiSheet')

@@ -1,4 +1,21 @@
 ## Default renderer for any kind of notification.
 ## Each application should create its own.
-## TODO: write the documentation
-Notification of type [$event.type] from app [$event.application] posted at [$event.date] by [[$event.user]] and concerning [[$event.document>>$event.document]].
+## The variable "$event" contains the event to display.
+## See: org.xwiki.eventstream.Event
+#set ($app  = "$!event.application")
+#set ($icon = 'bell')
+#if ($app == 'xwiki')
+  #set ($app = 'XWiki')
+  #set ($icon = 'file')
+#end
+#set ($document = $xwiki.getDocument($event.document))
+<div class="clearfix">
+  <div class="col-xs-2 notification-icon">
+    $services.icon.renderHTML($icon)
+  </div>
+  <div class="col-xs-10">
+    <p><strong>$app</strong></p>
+    <p><strong>[$!escapetool.xml($event.type)]</strong> <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a></p>
+    <p><small>$escapetool.xml($xwiki.formatDate($event.date))</small></p>
+  </div>
+</div>

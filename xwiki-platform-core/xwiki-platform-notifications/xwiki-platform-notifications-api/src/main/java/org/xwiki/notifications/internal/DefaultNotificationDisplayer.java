@@ -27,11 +27,16 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
 /**
+ * Default implementation for (@link {@link org.xwiki.notifications.NotificationDisplayer}. The displayer try to execute
+ * a template called "notifications/${eventType}.vm" and fallback to "notification/default.vm".
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component
 @Singleton
@@ -48,7 +53,14 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
     {
         try {
             velocityManager.getCurrentVelocityContext().put("event", eventNotification);
-            return templateManager.execute("notification/default.vm");
+
+            String templateName = String.format("notification/%s.vm",
+                    eventNotification.getType().replaceAll("\\/", "."));
+            Template template = templateManager.getTemplate(templateName);
+
+            return (template != null) ? templateManager.execute(template)
+                    : templateManager.execute("notification/default.vm");
+
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         } finally {

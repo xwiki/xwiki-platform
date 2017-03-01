@@ -207,7 +207,9 @@ require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPr
     }).selectpicker('val', values);
     // Synchronize the value of the hidden text input with the selected items.
     select.on('changed.bs.select', function (event) {
-      input.val(select.selectpicker('val').join(','));
+      // bootstrap-select returns null when nothing is selected.
+      var values = select.selectpicker('val') || [];
+      input.val(values.join(','));
     });
   };
 

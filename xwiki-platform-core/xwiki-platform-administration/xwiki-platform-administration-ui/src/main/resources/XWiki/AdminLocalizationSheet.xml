@@ -191,6 +191,8 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
    * Serialize an array of locales to a string that the XWiki server can handle
    */
   var serializeArray = function (array) {
+    // bootstrap-select returns null when nothing is selected.
+    array = array || [];
     var result = '';
     var separator = '';
     for (var i = 0; i &lt; array.length; ++i) {

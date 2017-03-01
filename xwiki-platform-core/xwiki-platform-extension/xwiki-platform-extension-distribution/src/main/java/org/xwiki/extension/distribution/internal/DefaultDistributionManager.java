@@ -183,6 +183,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setId(getFarmJobId());
             request.setWiki(xcontext.getMainXWiki());
             request.setUserReference(xcontext.getUserReference());
+            request.setInteractive(true);
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -234,6 +235,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setId(getWikiJobId(wiki));
             request.setWiki(wiki);
             request.setUserReference(this.xcontextProvider.get().getUserReference());
+            request.setInteractive(true);
 
             Thread distributionJobThread = new Thread(new Runnable()
             {

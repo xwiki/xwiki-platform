@@ -44,7 +44,7 @@
 }
 
 /* gadget handles on the dashboard */
-.gadget .action {
+.gadget-actions .action {
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;
@@ -54,11 +54,11 @@
   width: 16px;
 }
 
-.gadget .remove.action {
+.gadget-actions .remove.action {
   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
-.gadget .edit.action {
+.gadget-actions .edit.action {
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 

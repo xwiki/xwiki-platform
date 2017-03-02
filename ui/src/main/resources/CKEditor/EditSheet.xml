@@ -302,6 +302,7 @@ define('xwiki-ckeditor', [
         dispatcher: sourceDocument.getURL('get', 'sheet=CKEditor.ResourceDispatcher&amp;outputSyntax=plain')
       },
       height: $(element).height(),
+      language: $('html').attr('xml:lang'),
       'xwiki-source': {
         htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
       }

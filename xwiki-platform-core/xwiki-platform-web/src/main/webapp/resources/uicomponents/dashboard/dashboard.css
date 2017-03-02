@@ -105,6 +105,7 @@
 
 /* Hide gadget title, when wider than gadget width */
 .gadget-title {
+  line-height: 1.3em; // Increased value to prevent cutting off the type descenders
   overflow: hidden;
   text-overflow: ellipsis;
 }

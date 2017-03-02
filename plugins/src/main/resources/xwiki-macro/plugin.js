@@ -20,6 +20,14 @@
 (function() {
   'use strict';
   var $ = jQuery;
+
+  // Macro widget template is different depending on whether the macro is in-line or not.
+  var blockMacroWidgetTemplate =
+    '<div class="macro" data-macro="">' +
+      '<div class="macro-placeholder">macro:name</div>' +
+    '</div>';
+  var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
+
   CKEDITOR.plugins.add('xwiki-macro', {
     requires: 'widget,notification,xwiki-marker,xwiki-source',
     init : function(editor) {
@@ -160,45 +168,11 @@
           // Show our custom insert/edit dialog.
           require(['macroWizard'], function(macroWizard) {
             macroWizard(widget.data).done(function(data) {
-              // Prevent the editor from recording a history entry where the macro data is updated but the macro
-              // output is not refreshed. The lock is removed by the call to setLoading(false) after the macro output
-              // is refreshed.
-              editor.fire('lockSnapshot', {dontUpdate: true});
-              var expectedElementName = data.inline ? 'span' : 'div';
-              if (widget.element && widget.element.getName() === expectedElementName) {
-                // We have edited a macro and the macro type (inline vs. block) didn't change.
-                // We can safely update the existing macro widget.
-                widget.setData(data);
-              } else {
-                // We are either inserting a new macro or we are changing the macro type (e.g. from in-line to block).
-                // Changing the macro type may require changes to the HTML structure (e.g. split the parent paragraph)
-                // in order to preserve the HTML validity, so we have to replace the existing macro widget.
-                createMacroWidget(data);
-              }
-              // Refresh all the macros because a change in one macro can affect the output of the other macros.
-              setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
+              macroPlugin.insertOrUpdateMacroWidget(editor, data, widget);
             });
           });
         }
       });
-
-      // Macro widget template is different depending on whether the macro is in-line or not.
-      var blockMacroWidgetTemplate =
-        '<div class="macro" data-macro="">' +
-          '<div class="macro-placeholder">macro:name</div>' +
-        '</div>';
-      var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
-      var createMacroWidget = function(data) {
-        var widgetDefinition = editor.widgets.registered['xwiki-macro'];
-        var macroWidgetTemplate = data.inline ? inlineMacroWidgetTemplate : blockMacroWidgetTemplate;
-        var element = CKEDITOR.dom.element.createFromHtml(macroWidgetTemplate);
-        var wrapper = editor.widgets.wrapElement(element, widgetDefinition.name);
-        // Isolate the widget in a separate DOM document fragment.
-        var documentFragment = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
-        documentFragment.append(wrapper);
-        editor.widgets.initOn(element, widgetDefinition, data);
-        editor.widgets.finalizeCreation(documentFragment);
-      };
 
       editor.addCommand('xwiki-refresh', {
         async: true,
@@ -221,6 +195,82 @@
           }
           editor.fire('afterCommandExec', {name: this.name, command: this});
         }
+      });
+
+      // Register the dedicated insert macro buttons.
+      ((editor.config['xwiki-macro'] || {}).insertButtons || []).forEach(function(definition) {
+        macroPlugin.maybeRegisterDedicatedInsertMacroButton(editor, definition);
+      });
+    },
+
+    insertOrUpdateMacroWidget: function(editor, data, widget) {
+      // Prevent the editor from recording a history entry where the macro data is updated but the macro output is not
+      // refreshed. The lock is removed by the call to setLoading(false) after the macro output is refreshed.
+      editor.fire('lockSnapshot', {dontUpdate: true});
+      var expectedElementName = data.inline ? 'span' : 'div';
+      if (widget && widget.element && widget.element.getName() === expectedElementName) {
+        // We have edited a macro and the macro type (inline vs. block) didn't change.
+        // We can safely update the existing macro widget.
+        widget.setData(data);
+      } else {
+        // We are either inserting a new macro or we are changing the macro type (e.g. from in-line to block). Changing
+        // the macro type may require changes to the HTML structure (e.g. split the parent paragraph) in order to
+        // preserve the HTML validity, so we have to replace the existing macro widget.
+        this.createMacroWidget(editor, data);
+      }
+      // Refresh all the macros because a change in one macro can affect the output of the other macros.
+      setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
+    },
+
+    createMacroWidget: function(editor, data) {
+      var widgetDefinition = editor.widgets.registered['xwiki-macro'];
+      var macroWidgetTemplate = data.inline ? inlineMacroWidgetTemplate : blockMacroWidgetTemplate;
+      var element = CKEDITOR.dom.element.createFromHtml(macroWidgetTemplate);
+      var wrapper = editor.widgets.wrapElement(element, widgetDefinition.name);
+      // Isolate the widget in a separate DOM document fragment.
+      var documentFragment = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
+      documentFragment.append(wrapper);
+      editor.widgets.initOn(element, widgetDefinition, data);
+      editor.widgets.finalizeCreation(documentFragment);
+    },
+
+    maybeRegisterDedicatedInsertMacroButton: function(editor, definition) {
+      if (definition) {
+        if (typeof definition === 'string') {
+          definition = {
+            macroCall: {
+              name: definition
+            }
+          };
+        } else if (typeof definition !== 'object' || typeof definition.macroCall !== 'object' ||
+            definition.macroCall === null || typeof definition.macroCall.name !== 'string') {
+          return;
+        }
+        definition.commandId = definition.commandId || 'xwiki-macro-' + definition.macroCall.name;
+        this.registerDedicatedInsertMacroButton(editor, definition);
+      }
+    },
+
+    registerDedicatedInsertMacroButton: function(editor, definition) {
+      var macroPlugin = this;
+      editor.addCommand(definition.commandId, {
+        async: true,
+        modes: {wysiwyg: 1},
+        exec: function(editor) {
+          var command = this;
+          require(['macroWizard'], function(macroWizard) {
+            macroWizard(definition.macroCall).done(function(data) {
+              macroPlugin.insertOrUpdateMacroWidget(editor, data);
+            }).always(function() {
+              editor.fire('afterCommandExec', {name: command.name, command: command});
+            });
+          });
+        }
+      });
+      editor.ui.addButton(definition.commandId, {
+        label: 'Insert ' +  definition.macroCall.name + ' macro',
+        command: definition.commandId,
+        toolbar: 'insert,50'
       });
     },
 

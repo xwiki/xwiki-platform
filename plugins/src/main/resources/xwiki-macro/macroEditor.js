@@ -61,7 +61,8 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
 
   maybeSetParameterValue = function(parameter, macroCall) {
     var parameterCall = macroCall.parameters[parameter.id.toLowerCase()];
-    if (parameterCall) {
+    // Check if the macro parameter is set.
+    if (parameterCall !== null && parameterCall !== undefined) {
       parameter.value = (typeof parameterCall === 'object' && typeof parameterCall.name === 'string') ?
         parameterCall.value : parameterCall;
     }

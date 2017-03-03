@@ -31,6 +31,9 @@ CKEDITOR.editorConfig = function(config) {
     },
     // Add support for overwriting the default configuration from a wiki page.
     customConfig: new XWiki.Document('Config', 'CKEditor').getURL('get', 'outputSyntax=plain'),
+    // Enable the native (in-browser) spell checker because we don't bundle any spell checker plugin. Most of the spell
+    // checker plugins are relying on an external service which leads to security and privacy concerns.
+    disableNativeSpellChecker: false,
     // Don't convert Latin characters to the corresponding named HTML entities in the HTML output because the HTML
     // cleaner used on the server side doesn't recognize some of them (XCOMMONS-929).
     // See CKEDITOR-38: CKEditor converts Umlaute to HTML equivalents

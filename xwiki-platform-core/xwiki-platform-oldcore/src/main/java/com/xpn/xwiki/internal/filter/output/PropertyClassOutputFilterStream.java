@@ -138,7 +138,7 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
 
             // Make sure the property is known
             if (propertyClass == null) {
-                this.logger.warn("Unknown property meta class field [{}] for property type [%s]", name,
+                this.logger.warn("Unknown property meta class field [{}] for property type [{}]", name,
                     this.entity.getClassType());
 
                 return;

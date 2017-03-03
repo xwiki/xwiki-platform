@@ -11,13 +11,9 @@
     </wikiSpace>
     <wikiSpace name="space">
       <wikiDocument name="page">
-        <wikiDocumentLocale>
-          <wikiDocumentRevision revision="1">
-            <wikiObject name="otherspace.otherclass">
-              <wikiObjectProperty name="prop" value="propvalue"/>
-            </wikiObject>
-          </wikiDocumentRevision>
-        </wikiDocumentLocale>
+        <wikiObject name="otherspace.otherclass">
+          <wikiObjectProperty name="prop" value="propvalue"/>
+        </wikiObject>
       </wikiDocument>
     </wikiSpace>
   </wiki>

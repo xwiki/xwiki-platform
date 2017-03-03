@@ -391,4 +391,32 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         Assert.assertEquals(1, documentObject.getFieldList().size());
         Assert.assertEquals(1, documentObject.getIntValue("prop1"));
     }
+
+    @Test
+    public void testDocumentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithobjectwithoutnumberandclass", outputProperties);
+
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(document.isNew());
+
+        // Objects
+
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        Assert.assertEquals(1, objects.size());
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
+        Assert.assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        Assert.assertEquals(0, documentObject.getNumber());
+        Assert.assertEquals(1, documentObject.getFieldList().size());
+        Assert.assertEquals("propvalue", documentObject.getStringValue("prop"));
+    }
 }

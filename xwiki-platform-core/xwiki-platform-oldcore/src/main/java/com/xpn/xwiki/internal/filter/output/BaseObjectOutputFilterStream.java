@@ -83,6 +83,11 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
         return (BasePropertyOutputFilterStream) this.propertyFilter;
     }
 
+    private void setCurrentXClass(BaseClass xclass)
+    {
+        getBasePropertyOutputFilterStream().setCurrentXClass(xclass);
+    }
+
     // Events
 
     @Override
@@ -109,7 +114,7 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
                     }
                 }
 
-                getBasePropertyOutputFilterStream().setCurrentXClass(xclass);
+                setCurrentXClass(xclass);
                 getBaseClassOutputFilterStream().setEntity(null);
             }
         }
@@ -144,6 +149,14 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
                 }
             }
             this.entity.setXClassReference(classReference);
+            
+            // Get the class in the current instance
+            XWikiContext xcontext = this.xcontextProvider.get();
+            try {
+                setCurrentXClass(xcontext.getWiki().getXClass(this.entity.getXClassReference(), xcontext));
+            } catch (XWikiException e) {
+                // TODO: log something ?
+            }
 
             this.entity.setNumber(number);
 

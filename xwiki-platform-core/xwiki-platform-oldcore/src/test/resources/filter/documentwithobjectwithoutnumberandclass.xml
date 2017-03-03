@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="otherspace">
+      <wikiDocument name="otherclass">
+        <wikiClass>
+          <wikiClassProperty name="prop" type="String"/>
+        </wikiClass>
+      </wikiDocument>
+    </wikiSpace>
+    <wikiSpace name="space">
+      <wikiDocument name="page">
+        <wikiDocumentLocale>
+          <wikiDocumentRevision revision="1">
+            <wikiObject name="otherspace.otherclass">
+              <wikiObjectProperty name="prop" value="propvalue"/>
+            </wikiObject>
+          </wikiDocumentRevision>
+        </wikiDocumentLocale>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

@@ -135,6 +135,8 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
                 EntityReference reference = this.resolver.resolve(namespace.getValue(), EntityType.DOCUMENT);
 
                 checkUserRight(reference, request);
+
+                return;
             }
 
             // Entity
@@ -143,6 +145,8 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
                 EntityReference reference = this.resolver.resolve(namespace.getValue(), entityType);
 
                 checkAccess(reference, entityRight, request);
+
+                return;
             }
         }
 

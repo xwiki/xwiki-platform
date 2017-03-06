@@ -548,51 +548,6 @@ public class MockitoOldcoreRule implements MethodRule
                 return null;
             }
         }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
-
-                spyXWiki.deleteDocument(document, true, context);
-
-                return null;
-            }
-        }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), anyXWikiContext());
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
-
-                DocumentReference reference = document.getDocumentReference();
-
-                List<Locale> locales = document.getTranslationLocales(context);
-
-                for (Locale locale : locales) {
-                    XWikiDocument translation = spyXWiki.getDocument(new DocumentReference(reference, locale), context);
-                    spyXWiki.deleteDocument(translation, context);
-                }
-
-                spyXWiki.deleteDocument(document, context);
-
-                return null;
-            }
-        }).when(getSpyXWiki()).deleteAllDocuments(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
-
-                spyXWiki.deleteAllDocuments(document, true, context);
-
-                return null;
-            }
-        }).when(getSpyXWiki()).deleteAllDocuments(anyXWikiDocument(), anyXWikiContext());
         doAnswer(new Answer<BaseClass>()
         {
             @Override
@@ -640,10 +595,33 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
-                return getSpyXWiki().getDocument(invocation.getArgumentAt(0, XWikiDocument.class),
-                    invocation.getArgumentAt(1, XWikiContext.class));
+                // The store is based on the contex for the wiki
+                DocumentReference reference = invocation.getArgumentAt(0, XWikiDocument.class).getDocumentReference();
+                XWikiContext xcontext = invocation.getArgumentAt(1, XWikiContext.class);
+                if (!xcontext.getWikiReference().equals(reference.getWikiReference())) {
+                    reference = reference.setWikiReference(xcontext.getWikiReference());
+                }
+
+                return getSpyXWiki().getDocument(reference, xcontext);
             }
         });
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                // The store is based on the contex for the wiki
+                DocumentReference reference = invocation.getArgumentAt(0, XWikiDocument.class).getDocumentReference();
+                XWikiContext xcontext = invocation.getArgumentAt(1, XWikiContext.class);
+                if (!xcontext.getWikiReference().equals(reference.getWikiReference())) {
+                    reference = reference.setWikiReference(xcontext.getWikiReference());
+                }
+
+                documents.remove(reference);
+
+                return null;
+            }
+        }).when(getMockStore()).deleteXWikiDoc(anyXWikiDocument(), anyXWikiContext());
 
         // Users
 

@@ -19,32 +19,14 @@
  */
 package org.xwiki.eventstream;
 
-import java.util.List;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.notifications.events.NotificationEvent;
-import org.xwiki.stability.Unstable;
-
 /**
- * Convert a notification to an Event that could be stored in the event stream.
- *
  * @version $Id$
- * @since 9.2RC1
  */
-@Unstable
-@Role
-public interface NotificationConverter
+public interface EventStatus
 {
-    /**
-     * Convert a notification event to a stream event.
-     *
-     * @param notificationEvent the event to convert
-     * @param source the source received with the event
-     * @param data the data received with the event
-     * @return the converted stream event, ready to be stored
-     * @throws Exception if error happens
-     */
-    Event convert(NotificationEvent notificationEvent, String source, Object data) throws Exception;
+    Event getEvent();
 
-    List<NotificationEvent> getSupportedEvents();
+    String getEntityId();
+
+    boolean isRead();
 }

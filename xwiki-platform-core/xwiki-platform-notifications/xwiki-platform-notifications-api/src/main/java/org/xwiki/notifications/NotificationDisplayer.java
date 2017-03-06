@@ -19,15 +19,16 @@
  */
 package org.xwiki.notifications;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
+import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.stability.Unstable;
 
 /**
  * Display a notification.
- *
- * The name of the implementation must be the canonical name of the event class.
  *
  * @version $Id$
  * @since 9.2RC1
@@ -44,4 +45,9 @@ public interface NotificationDisplayer
      * @throws NotificationException if error occurs
      */
     XDOM renderNotification(Event eventNotification) throws NotificationException;
+
+    /**
+     * @return the list of the events that this displayer support
+     */
+    List<NotificationEvent> getSupportedEvents();
 }

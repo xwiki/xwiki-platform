@@ -19,14 +19,21 @@
  */
 package org.xwiki.notifications.script;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStatus;
+import org.xwiki.eventstream.EventStatusManager;
+import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.rendering.block.XDOM;
@@ -43,6 +50,15 @@ public class NotificationScriptService implements ScriptService
     @Inject
     private NotificationManager notificationManager;
 
+    @Inject
+    private EventStatusManager eventStatusManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     public List<Event> getEvents(int offset, int limit) throws NotificationException
     {
         return notificationManager.getEvents(offset, limit);
@@ -56,5 +72,19 @@ public class NotificationScriptService implements ScriptService
     public XDOM render(Event event) throws NotificationException
     {
         return notificationManager.render(event);
+    }
+
+    public List<EventStatus> getEventStatuses(List<Event> events) throws Exception
+    {
+        return eventStatusManager.getEventStatus(events,
+                Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+    }
+
+    public void saveEventStatus(String eventId, boolean isRead) throws Exception
+    {
+        DefaultEvent event = new DefaultEvent();
+        event.setId(eventId);
+        String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
+        eventStatusManager.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
     }
 }

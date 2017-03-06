@@ -107,7 +107,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * The events to match.
      */
-    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+    public static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
     {
         {
             add(new DocumentCreatedEvent());
@@ -124,6 +124,11 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             add(new AnnotationUpdatedEvent());
         }
     };
+
+    /**
+     * Used to retrieve some configuration about the activity stream.
+     */
+    private ActivityStreamConfiguration configuration;
 
     /**
      * Set fields related to the document which fired the event in the given event object.
@@ -233,6 +238,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     @Override
     public void init(XWikiContext context) throws XWikiException
     {
+        // Lookup the configuration
+        configuration = Utils.getComponent(ActivityStreamConfiguration.class);
         // Listent to Events.
         ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
         if (observationManager.getListener(getName()) == null) {
@@ -260,19 +267,11 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * 'platform.plugin.activitystream.uselocalstore' configuration option. If the option is not found the method
      * returns true (default behavior).
      *
-     * @param context the XWiki context
      * @return true if the activity stream is configured to store events in the main wiki, false otherwise
      */
-    private boolean useLocalStore(XWikiContext context)
+    private boolean useLocalStore()
     {
-        if (!useMainStore(context)) {
-            // If the main store is disabled, force local store.
-            return true;
-        }
-
-        ActivityStreamPlugin plugin =
-            (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context);
-        return Integer.parseInt(plugin.getActivityStreamPreference("uselocalstore", "1", context)) == 1;
+        return configuration.useLocalStore();
     }
 
     /**
@@ -280,19 +279,11 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * returns false, otherwise if retrieves the 'platform.plugin.activitystream.usemainstore' configuration option. If
      * the option is not found the method returns true (default behavior).
      *
-     * @param context the XWiki context
      * @return true if the activity stream is configured to store events in the main wiki, false otherwise
      */
-    private boolean useMainStore(XWikiContext context)
+    private boolean useMainStore()
     {
-        if (context.isMainWiki()) {
-            // We're in the main database, we don't have to store the data twice.
-            return false;
-        }
-
-        ActivityStreamPlugin plugin =
-            (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context);
-        return Integer.parseInt(plugin.getActivityStreamPreference("usemainstore", "1", context)) == 1;
+        return configuration.useMainStore();
     }
 
     /**
@@ -306,7 +297,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         prepareEvent(event, doc, context);
 
-        if (useLocalStore(context)) {
+        if (useLocalStore()) {
             // store event in the local database
             XWikiHibernateStore localHibernateStore = context.getWiki().getHibernateStore();
             try {
@@ -319,7 +310,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
         }
 
-        if (useMainStore(context)) {
+        if (useMainStore()) {
             // store event in the main database
             String oriDatabase = context.getWikiId();
             context.setWikiId(context.getMainXWiki());
@@ -415,7 +406,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         ActivityEventImpl act = null;
         String eventId = event.getEventId();
 
-        if (useLocalStore(context)) {
+        if (useLocalStore()) {
             // load event from the local database
             XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
             try {
@@ -447,7 +438,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     // Do nothing.
                 }
             }
-        } else if (useMainStore(context)) {
+        } else if (useMainStore()) {
             // load event from the main database
             String oriDatabase = context.getWikiId();
             context.setWikiId(context.getMainXWiki());
@@ -494,7 +485,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
         String oriDatabase = context.getWikiId();
 
-        if (useLocalStore(context)) {
+        if (useLocalStore()) {
             XWikiHibernateStore hibstore;
 
             // delete event from the local database
@@ -535,7 +526,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
         }
 
-        if (useMainStore(context)) {
+        if (useMainStore()) {
             // delete event from the main database
             context.setWikiId(context.getMainXWiki());
             XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();

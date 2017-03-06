@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.internal;
+package com.xpn.xwiki.plugin.activitystream.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,6 +32,7 @@ import org.xwiki.notifications.events.AllNotificationEvent;
 import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
  * Store the notification inside the event stream.
@@ -50,6 +51,12 @@ public class NotificationEventListener extends AbstractEventListener
     private ComponentManager componentManager;
 
     @Inject
+    private NotificationConverter defaultConverter;
+
+    @Inject
+    private RemoteObservationManagerContext remoteObservationManagerContext;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -63,26 +70,44 @@ public class NotificationEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        String eventType = event.getClass().getCanonicalName();
-        try {
-            // Lookup the correct converter
-            NotificationConverter converter;
-            if (componentManager.hasComponent(NotificationConverter.class, eventType)) {
-                converter = componentManager.getInstance(NotificationConverter.class, eventType);
-            } else {
-                // Fallback to the default converter
-                converter = componentManager.getInstance(NotificationConverter.class);
-            }
-
-            // Convert the event
-            org.xwiki.eventstream.Event convertedEvent
-                    = converter.convert((NotificationEvent) event, (String) source, data);
-
-            // Save the event in the event stream
-            eventStream.addEvent(convertedEvent);
-
-        } catch (Exception e) {
-            logger.warn("Failed to save the event [{}].", eventType, e);
+        if (remoteObservationManagerContext.isRemoteState()) {
+            return;
         }
+
+        // Don't handle events that are already saved by the Activity Stream implementation.
+        for (Event ignoredEvent : ActivityStreamImpl.LISTENER_EVENTS) {
+            if (ignoredEvent.matches(event)) {
+                return;
+            }
+        }
+
+        try {
+            // Save the event in the event stream
+            eventStream.addEvent(convertEvent(event, source, data));
+        } catch (Exception e) {
+            logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), e);
+        }
+    }
+
+    /**
+     * Convert an Event from the Observation module to an Event from the EventStream module, ready to be saved.
+     */
+    private org.xwiki.eventstream.Event convertEvent(Event event, Object source, Object data) throws Exception
+    {
+        for (NotificationConverter converter
+                : componentManager.<NotificationConverter>getInstanceList(NotificationConverter.class)) {
+            if (converter == defaultConverter) {
+                continue;
+            }
+            for (NotificationEvent ev : converter.getSupportedEvents()) {
+                if (ev.matches(event)) {
+                    // Convert the event
+                    return converter.convert((NotificationEvent) event, (String) source, data);
+                }
+            }
+        }
+
+        // Use the default notification converter if no other converter match the current event
+        return defaultConverter.convert((NotificationEvent) event, (String) source, data);
     }
 }

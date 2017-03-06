@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
@@ -37,6 +38,7 @@ import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.block.XDOM;
@@ -67,6 +69,9 @@ public class DefaultNotificationManager implements NotificationManager
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private NotificationDisplayer defaultDisplayer;
 
     @Override
     public List<Event> getEvents(int offset, int limit) throws NotificationException
@@ -154,18 +159,26 @@ public class DefaultNotificationManager implements NotificationManager
     public XDOM render(Event event) throws NotificationException
     {
         try {
-            NotificationDisplayer displayer;
-            if (componentManager.hasComponent(NotificationDisplayer.class, event.getClass().getCanonicalName())) {
-                displayer =
-                        componentManager.getInstance(NotificationDisplayer.class, event.getClass().getCanonicalName());
-            } else {
-                // Fallback to the default displayer
-                displayer = componentManager.getInstance(NotificationDisplayer.class);
-            }
-            return displayer.renderNotification(event);
+            return getDisplayer(event).renderNotification(event);
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         }
+    }
+
+    private NotificationDisplayer getDisplayer(Event event) throws ComponentLookupException
+    {
+        for (NotificationDisplayer displayer
+                : componentManager.<NotificationDisplayer>getInstanceList(NotificationDisplayer.class)) {
+            if (displayer == defaultDisplayer) {
+                continue;
+            }
+            for (NotificationEvent ev : displayer.getSupportedEvents()) {
+                if (ev.matches(event)) {
+                    return displayer;
+                }
+            }
+        }
+        return defaultDisplayer;
     }
 
     private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException

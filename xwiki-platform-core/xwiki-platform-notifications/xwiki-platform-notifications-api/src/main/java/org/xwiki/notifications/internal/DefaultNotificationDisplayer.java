@@ -19,6 +19,9 @@
  */
 package org.xwiki.notifications.internal;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -26,6 +29,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.events.AllNotificationEvent;
+import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
@@ -42,6 +47,8 @@ import org.xwiki.velocity.VelocityManager;
 @Singleton
 public class DefaultNotificationDisplayer implements NotificationDisplayer
 {
+    private static final List<NotificationEvent> EVENTS = Arrays.asList(AllNotificationEvent.ALL_NOTIFICATION_EVENT);
+
     @Inject
     private TemplateManager templateManager;
 
@@ -66,5 +73,11 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
         } finally {
             velocityManager.getCurrentVelocityContext().remove("event");
         }
+    }
+
+    @Override
+    public List<NotificationEvent> getSupportedEvents()
+    {
+        return EVENTS;
     }
 }

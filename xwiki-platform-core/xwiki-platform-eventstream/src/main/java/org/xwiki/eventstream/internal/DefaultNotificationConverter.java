@@ -19,13 +19,16 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.NotificationConverter;
+import org.xwiki.notifications.events.AllNotificationEvent;
 import org.xwiki.notifications.events.NotificationEvent;
 
 /**
@@ -38,6 +41,8 @@ import org.xwiki.notifications.events.NotificationEvent;
 @Singleton
 public class DefaultNotificationConverter implements NotificationConverter
 {
+    private static final List<NotificationEvent> EVENTS = Arrays.asList(AllNotificationEvent.ALL_NOTIFICATION_EVENT);
+
     @Override
     public Event convert(NotificationEvent notificationEvent, String source, Object data) throws Exception
     {
@@ -48,5 +53,11 @@ public class DefaultNotificationConverter implements NotificationConverter
         convertedEvent.setDate(new Date());
         convertedEvent.setTarget(notificationEvent.getTarget());
         return convertedEvent;
+    }
+
+    @Override
+    public List<NotificationEvent> getSupportedEvents()
+    {
+        return EVENTS;
     }
 }

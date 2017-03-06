@@ -35,8 +35,7 @@ XWiki.DateTimePicker = Class.create({
     this.timePickerEnabled = this._isTimePickerEnabled();
   },
   _isTimePickerEnabled : function() {
-    var formattedDate = this.formatter.format(new Date(1876, 1, 1, 23, 59, 0, 0));
-    return formattedDate.indexOf('23') >= 0 && formattedDate.indexOf('59') >= 0;
+    return this.formatter.getHourFormat() != null;
   },
   _getDate : function() {
     if (!this.input._timestamp) {

@@ -43,6 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -196,14 +197,24 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 document = inputDocument;
             } else {
                 if (this.properties.isPreviousDeleted() && !this.documentDeleted) {
-                    // Put previous version in recycle bin
-                    if (xcontext.getWiki().hasRecycleBin(xcontext)) {
-                        xcontext.getWiki().getRecycleBinStore().saveToRecycleBin(document, xcontext.getUser(),
-                            new Date(), xcontext, true);
-                    }
+                    // Save current context wiki
+                    WikiReference currentWiki = xcontext.getWikiReference();
+                    try {
+                        // Make sure the store is executed in the right context
+                        xcontext.setWikiReference(document.getDocumentReference().getWikiReference());
 
-                    // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
-                    xcontext.getWiki().getStore().deleteXWikiDoc(document, xcontext);
+                        // Put previous version in recycle bin
+                        if (xcontext.getWiki().hasRecycleBin(xcontext)) {
+                            xcontext.getWiki().getRecycleBinStore().saveToRecycleBin(document, xcontext.getUser(),
+                                new Date(), xcontext, true);
+                        }
+
+                        // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
+                        xcontext.getWiki().getStore().deleteXWikiDoc(document, xcontext);
+                    } finally {
+                        // Restore current context wiki
+                        xcontext.setWikiReference(currentWiki);
+                    }
 
                     this.documentDeleted = true;
                     document = inputDocument;

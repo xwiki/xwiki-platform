@@ -160,6 +160,27 @@ var Externals = (function (Externals) {
       DEFAULT_MINIMAL_DAYS_IN_FIRST_WEEK : this.minimalDaysInFirstWeek;
   };
 
+  Externals.SimpleDateFormat.prototype.getHourFormat = function () {
+    var result;
+    var searchString = this.formatString;
+    while ((result = regex.exec(searchString))) {
+      var matchedString = result[0];
+      var quotedString = result[1];
+      var patternLetters = result[2];
+      var otherLetters = result[3];
+      var otherCharacters = result[4];
+      if (patternLetters) {
+        // Replace pattern letters
+        var patternLetter = patternLetters.charAt(0);
+        if (patternLetter == 'k' || patternLetter == 'K' || patternLetter == 'h' || patternLetter == 'H') {
+          return patternLetters;
+        }
+      }
+      searchString = searchString.substr(result.index + result[0].length);
+    }
+    return null;
+  };
+
   Externals.SimpleDateFormat.prototype.format = function(date) {
     var formattedString = "";
     var result;

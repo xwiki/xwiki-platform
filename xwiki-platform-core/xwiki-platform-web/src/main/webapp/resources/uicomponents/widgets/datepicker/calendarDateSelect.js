@@ -26,6 +26,15 @@ Element.buildAndAppend = function(type, options, style) {
 };
 var nil = null;
 
+var formatNumber = function(data, numberOfLetters) {
+  var dataString = "" + data;
+  // Pad with 0s as necessary
+  while (dataString.length < numberOfLetters) {
+    dataString = "0" + dataString;
+  }
+  return dataString;
+};
+
 /*!
 #set ($currentLocale = $services.localization.getCurrentLocale())
 #set ($dateFormatSymbols = $datetool.getDateFormatSymbols($currentLocale))
@@ -55,6 +64,32 @@ Date.prototype.getAMPMHour = function() {
 }
 Date.prototype.getAMPM = function() {
   return (this.getHours() < 12) ? "AM" : "PM";
+}
+Date.prototype.displayHour = function(hourFormat) {
+  var hour = this.getHours();
+  var patternLetter = hourFormat.charAt(0);
+  var numberOfLetters = hourFormat.length;
+  var rawData = "";
+  switch (patternLetter) {
+    case "H":
+      rawData = hour;
+      break;
+    case "k":
+      rawData = hour || 24;
+      break;
+    case "K":
+      rawData = hour % 12;
+      break;
+    case "h":
+      rawData = (hour % 12) || 12;
+      break;
+  }
+  var formattedString = formatNumber(rawData, numberOfLetters);
+  // append AM or PM marker if the pattern is an AM / PM one
+  if (patternLetter == 'h' || patternLetter == 'K') {
+    formattedString += " " + this.getAMPM();
+  }
+  return formattedString;
 }
 Date.prototype.stripTime = function() {
   return new Date(this.getFullYear(), this.getMonth(), this.getDate());
@@ -144,6 +179,7 @@ Externals.CalendarDateSelect.prototype = {
       embedded: false,
       popup: nil,
       time: false,
+      hour_format: 'h',
       buttons: true,
       clear_button: true,
       year_range: 10,
@@ -267,8 +303,9 @@ Externals.CalendarDateSelect.prototype = {
       buttons_div.build("span", {innerHTML:"@", className: "at_sign"});
 
       var t = new Date();
+      var hour_format = this.options.get('hour_format');
       this.hour_select = new SelectBox(buttons_div,
-        blank_time.concat($R(0,23).map(function(x) {t.setHours(x); return $A([t.getAMPMHour()+ " " + t.getAMPM(),x])} )),
+        blank_time.concat($R(0,23).map(function(x) {t.setHours(x); return $A([t.displayHour(hour_format),x])} )),
         {
           calendar_date_select: this,
           onchange: function() { this.calendar_date_select.updateSelectedDate( { hour: this.value });},

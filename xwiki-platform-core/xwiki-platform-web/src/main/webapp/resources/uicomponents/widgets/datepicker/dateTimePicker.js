@@ -54,6 +54,7 @@ XWiki.DateTimePicker = Class.create({
     if (!this.input.calendar_date_select && !this.input.calendar_date_select_closing) {
       new Externals.CalendarDateSelect(this.input, {
         time: this.timePickerEnabled,
+        hour_format: this.formatter.getHourFormat(),
         date: this._getDate(),
         clear_button: false,
         formatter: this,

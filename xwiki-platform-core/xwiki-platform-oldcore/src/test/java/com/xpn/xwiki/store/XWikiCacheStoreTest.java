@@ -79,10 +79,11 @@ public class XWikiCacheStoreTest
     {
         // Set current wiki
         this.oldcore.getXWikiContext().setWikiId("wiki");
+        this.oldcore.getSpyXWiki().saveDocument(new XWikiDocument(new DocumentReference("wiki", "space", "page")),
+            this.oldcore.getXWikiContext());
 
         // Save a document
         DocumentReference reference = new DocumentReference("otherwiki", "space", "page");
-        this.oldcore.getSpyXWiki().saveDocument(new XWikiDocument(reference), this.oldcore.getXWikiContext());
 
         XWikiCacheStore store = new XWikiCacheStore(this.oldcore.getMockStore(), this.oldcore.getXWikiContext());
 

@@ -157,12 +157,6 @@ public class XarExtensionHandlerTest
             .checkAccess(eq(Right.PROGRAM), any(), any());
     }
 
-    private void setHasProgrammingRight() throws AccessDeniedException
-    {
-        doNothing().when(this.oldcore.getMockAuthorizationManager()).checkAccess(eq(Right.PROGRAM),
-            eq(this.contextUser), any());
-    }
-
     private void setHasNoAdminRight() throws AccessDeniedException
     {
         doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
@@ -636,8 +630,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testUpgradeOnRoot() throws Throwable
     {
-        setHasProgrammingRight();
-
         when(this.oldcore.getSpyXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class)))
             .thenReturn(Arrays.asList("wiki1", "wiki2"));
 
@@ -892,8 +884,6 @@ public class XarExtensionHandlerTest
     {
         install(this.collisionextension1, "wiki", this.contextUser);
 
-        setHasProgrammingRight();
-
         install(this.collisionextension2, null, this.contextUser);
     }
 
@@ -907,8 +897,6 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        setHasProgrammingRight();
-
         doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
             .getVirtualWikisDatabaseNames(any(XWikiContext.class));
 

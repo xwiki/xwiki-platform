@@ -53,11 +53,12 @@
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
-    #set ($xwql = "from doc.object(XWiki.Notifications.Code.NotificationsTypeClass) obj where doc.fullName &lt;&gt; 'XWiki.Notifications.Code.NotificationsTypeTemplate'")
+    ## TODO: introduce a script service instead that also handle descriptors as components and from all wikis
+    #set ($xwql = "from doc.object(XWiki.Notifications.Code.NotificationDescriptorClass) obj where doc.fullName &lt;&gt; 'XWiki.Notifications.Code.NotificationDescriptorTemplate'")
     #set ($types = [])
     #foreach ($type in $services.query.xwql($xwql).execute())
       #set ($docType = $xwiki.getDocument($type))
-      #set ($docObj  = $docType.getObject('XWiki.Notifications.Code.NotificationsTypeClass'))
+      #set ($docObj  = $docType.getObject('XWiki.Notifications.Code.NotificationDescriptorClass'))
       #set ($discard = $types.add({
         'applicationId'   : $docObj.getValue('applicationId'),
         'applicationName' : $docObj.getValue('applicationName'),

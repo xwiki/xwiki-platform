@@ -69,7 +69,6 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
-import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.Utils;
 
@@ -107,7 +106,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * The events to match.
      */
-    public static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+    protected static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
     {
         {
             add(new DocumentCreatedEvent());

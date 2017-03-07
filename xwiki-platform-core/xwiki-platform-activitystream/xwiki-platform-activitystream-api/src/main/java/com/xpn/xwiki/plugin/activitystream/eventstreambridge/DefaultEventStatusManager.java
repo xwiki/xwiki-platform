@@ -67,8 +67,8 @@ public class DefaultEventStatusManager implements EventStatusManager
         List<EventStatus> results = new ArrayList<>();
 
         // Get the ActivityEventStatus from the database and convert them
-        Query query = queryManager.createQuery("select eventStatus from ActivityEventStatus eventStatus "
-                + "where eventStatus.activityEvent.id in :events and eventStatus.entityId in :entityIds", Query.HQL);
+        Query query = queryManager.createQuery("select eventStatus from ActivityEventStatusImpl eventStatus "
+                + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);
         query.bindValue("eventIds", getEventIds(events, entityIds));
         query.bindValue("entityIds", entityIds);
         for (ActivityEventStatus activityEventStatus : query.<ActivityEventStatus>execute()) {
@@ -95,7 +95,7 @@ public class DefaultEventStatusManager implements EventStatusManager
     {
         List<String> eventIds = new ArrayList<>();
         for (Event event : events) {
-            entityIds.add(event.getId());
+            eventIds.add(event.getId());
         }
         return eventIds;
     }
@@ -114,8 +114,7 @@ public class DefaultEventStatusManager implements EventStatusManager
     @Override
     public void saveEventStatus(EventStatus eventStatus) throws Exception
     {
-        ActivityEventStatus status = eventConverter.convertEventStatusToActivi
-        tyStatus(eventStatus);
+        ActivityEventStatus status = eventConverter.convertEventStatusToActivityStatus(eventStatus);
 
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);

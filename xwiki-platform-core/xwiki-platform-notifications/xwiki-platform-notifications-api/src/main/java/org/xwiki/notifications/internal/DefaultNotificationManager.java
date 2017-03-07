@@ -87,6 +87,7 @@ public class DefaultNotificationManager implements NotificationManager
 
     private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
     {
+        // TODO: create a role so extensions can inject their own complex query parts
         try {
             String hql = "";
             String appender = "where ";

@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationsTypeSheet" locale="">
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationDescriptorSheet" locale="">
   <web>XWiki.Notifications.Code</web>
-  <name>NotificationsTypeSheet</name>
+  <name>NotificationDescriptorSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -35,7 +35,7 @@
   <contentUpdateDate>1488293329000</contentUpdateDate>
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <version>1.1</version>
-  <title>#if($doc.name == 'NotificationsTypeSheet')NotificationsType Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
+  <title>NotificationDescriptorSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -44,7 +44,7 @@
 ## You can modify this page to customize the presentation of your object.
 ## At first you should keep the default presentation and just save the document.
 
-#set($class = $doc.getObject('XWiki.Notifications.Code.NotificationsTypeClass').xWikiClass)
+#set($class = $doc.getObject('XWiki.Notifications.Code.NotificationDescriptorSheet').xWikiClass)
 #foreach($prop in $class.properties)
   ; $prop.prettyName
   : $doc.display($prop.getName())

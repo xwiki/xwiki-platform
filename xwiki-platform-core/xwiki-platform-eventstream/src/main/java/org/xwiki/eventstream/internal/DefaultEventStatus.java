@@ -43,19 +43,19 @@ public class DefaultEventStatus implements EventStatus
     @Override
     public Event getEvent()
     {
-        return null;
+        return event;
     }
 
     @Override
     public String getEntityId()
     {
-        return null;
+        return entityId;
     }
 
     @Override
     public boolean isRead()
     {
-        return false;
+        return isRead;
     }
 
     public void setEvent(Event event)

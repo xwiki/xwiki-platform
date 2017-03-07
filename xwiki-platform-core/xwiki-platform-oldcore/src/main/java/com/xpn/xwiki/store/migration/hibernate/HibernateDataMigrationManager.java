@@ -21,6 +21,8 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -68,6 +70,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      */
     private static final String LIQUIBASE_RESOURCE = "liquibase-xwiki/";
 
+    private static final String XWIKIDBVERSION_TABLE_NAME = "xwikidbversion";
+
     /**
      * @return store system for execute store-specific actions.
      * @throws DataMigrationException if the store could not be reached
@@ -93,38 +97,64 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiContext context = getXWikiContext();
         final XWikiHibernateBaseStore store = getStore();
 
-        // Try retrieving a version from the database
-        ver = store.failSafeExecuteRead(context,
-            new HibernateCallback<XWikiDBVersion>()
-            {
-                @Override
-                public XWikiDBVersion doInHibernate(Session session) throws HibernateException
-                {
-                    // Retrieve the version from the database
-                    return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
-                }
-            });
-
-        // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
-        if (ver == null) {
-            ver = store.failSafeExecuteRead(getXWikiContext(),
+        // Check if the version table exists. If not, then consider we have an empty DB
+        if (isXWikiVersionTableCreated(store.getSession(context))) {
+            // Try retrieving a version from the database
+            ver = store.failSafeExecuteRead(context,
                 new HibernateCallback<XWikiDBVersion>()
                 {
                     @Override
                     public XWikiDBVersion doInHibernate(Session session) throws HibernateException
                     {
-                        if (((Number) session.createCriteria(XWikiDocument.class)
-                            .setProjection(Projections.rowCount())
-                            .uniqueResult()).longValue() > 0)
-                        {
-                            return new XWikiDBVersion(0);
-                        }
-                        return null;
+                        // Retrieve the version from the database.
+                        return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
                     }
                 });
+
+            // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
+            if (ver == null) {
+                ver = store.failSafeExecuteRead(getXWikiContext(),
+                    new HibernateCallback<XWikiDBVersion>()
+                    {
+                        @Override
+                        public XWikiDBVersion doInHibernate(Session session) throws HibernateException
+                        {
+                            if (((Number) session.createCriteria(XWikiDocument.class)
+                                .setProjection(Projections.rowCount())
+                                .uniqueResult()).longValue() > 0)
+                            {
+                                return new XWikiDBVersion(0);
+                            }
+                            return null;
+                        }
+                    });
+            }
         }
 
         return ver;
+    }
+
+    private boolean isXWikiVersionTableCreated(Session session) throws DataMigrationException
+    {
+        boolean tExists = false;
+        // Note: passing null to the first parameter means we're looking in all catalogs and passing null to the second
+        // parameters means we're searching in all schemas.
+        // An improvement could be to restrict to the catalog/schema, depending on the DB used. However since
+        // we're supposed to have only one DB Version table in the DB, it shouldn't matter that much and it's simpler
+        // even though it probably takes a bit longer (but this is called only once at startup so it doesn't matter).
+        try (ResultSet rs = session.connection().getMetaData().getTables(null, null, XWIKIDBVERSION_TABLE_NAME, null)) {
+            while (rs.next()) {
+                String tName = rs.getString("TABLE_NAME");
+                if (tName != null && tName.equals(XWIKIDBVERSION_TABLE_NAME)) {
+                    tExists = true;
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataMigrationException(String.format("Error while finding if table [%s] exists",
+                XWIKIDBVERSION_TABLE_NAME), e);
+        }
+        return tExists;
     }
 
     @Override

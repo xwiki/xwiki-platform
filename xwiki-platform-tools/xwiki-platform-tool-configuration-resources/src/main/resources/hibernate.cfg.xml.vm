@@ -191,7 +191,7 @@
            - if you want the main wiki database to be different than "xwiki" (or "public" in schema mode)
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:postgresql:xwiki</property>
+    <property name="connection.url">jdbc:postgresql://localhost:5432/xwiki</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">org.postgresql.Driver</property>

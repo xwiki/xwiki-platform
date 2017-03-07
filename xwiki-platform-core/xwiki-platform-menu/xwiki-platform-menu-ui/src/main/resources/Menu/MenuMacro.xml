@@ -854,6 +854,11 @@ $xwiki.getDocument('MenuTemplate').content
       }
     }
   }
+}
+
+.menu .wikiexternallink {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 center;
+  padding: 0;
 }</code>
     </property>
     <property>

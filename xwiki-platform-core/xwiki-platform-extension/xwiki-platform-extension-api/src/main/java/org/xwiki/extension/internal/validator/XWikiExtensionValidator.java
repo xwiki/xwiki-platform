@@ -75,10 +75,10 @@ public class XWikiExtensionValidator extends AbstractExtensionValidator
         ExtensionValidator validator = getExtensionValidator(extension.getType());
         if (validator != null) {
             validator.checkInstall(extension, namespace, request);
+        } else {
+            // Fallback on programming right
+            super.checkInstallInternal(extension, namespace, request);
         }
-
-        // Fallback on programming right
-        super.checkInstallInternal(extension, namespace, request);
     }
 
     @Override
@@ -89,9 +89,9 @@ public class XWikiExtensionValidator extends AbstractExtensionValidator
         ExtensionValidator validator = getExtensionValidator(extension.getType());
         if (validator != null) {
             validator.checkUninstall(extension, namespace, request);
+        } else {
+            // Fallback on programming right
+            super.checkUninstallInternal(extension, namespace, request);
         }
-
-        // Fallback on programming right
-        super.checkUninstallInternal(extension, namespace, request);
     }
 }

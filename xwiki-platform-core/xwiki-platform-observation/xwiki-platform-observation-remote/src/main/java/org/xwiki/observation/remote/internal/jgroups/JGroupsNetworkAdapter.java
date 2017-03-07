@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 
+import org.jgroups.Global;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.conf.ConfiguratorFactory;
@@ -86,15 +87,15 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
         this.logger.debug("Send JGroups remote event [" + remoteEvent + "]");
 
         // Send the message to the whole group
-        Message message = new Message(null, null, remoteEvent);
+        Message message = new Message(null, remoteEvent);
 
         // Send message to JGroups channels
         for (Map.Entry<String, JChannel> entry : this.channels.entrySet()) {
             try {
                 entry.getValue().send(message);
             } catch (Exception e) {
-                this.logger.error("Failed to send message [" + remoteEvent + "] to the channel [" + entry.getKey()
-                    + "]", e);
+                this.logger
+                    .error("Failed to send message [" + remoteEvent + "] to the channel [" + entry.getKey() + "]", e);
             }
         }
     }
@@ -205,9 +206,9 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
             // Fallback on JGroups standard configuration locations
             is = ConfiguratorFactory.getConfigStream(channelFile);
 
-            if (is == null && !JChannel.DEFAULT_PROTOCOL_STACK.equals(channelFile)) {
+            if (is == null && !Global.DEFAULT_PROTOCOL_STACK.equals(channelFile)) {
                 // Fallback on default JGroups configuration
-                is = ConfiguratorFactory.getConfigStream(JChannel.DEFAULT_PROTOCOL_STACK);
+                is = ConfiguratorFactory.getConfigStream(Global.DEFAULT_PROTOCOL_STACK);
             }
         }
 

@@ -136,6 +136,14 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
                     name, this.entity.getClassType()), e);
             }
 
+            // Make sure the property is known
+            if (propertyClass == null) {
+                this.logger.warn("Unknown property meta class field [{}] for property type [{}]", name,
+                    this.entity.getClassType());
+
+                return;
+            }
+
             BaseProperty<?> field = propertyClass.fromString(value);
 
             this.entity.safeput(name, field);

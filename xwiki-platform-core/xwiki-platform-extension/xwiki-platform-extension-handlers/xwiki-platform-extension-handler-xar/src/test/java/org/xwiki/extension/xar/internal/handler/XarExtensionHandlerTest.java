@@ -40,7 +40,6 @@ import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
@@ -49,13 +48,11 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -74,6 +71,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -153,9 +151,13 @@ public class XarExtensionHandlerTest
 
         this.installedExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, "xar");
+
+        // Programming right is not required for XAR extensions
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
+            .checkAccess(eq(Right.PROGRAM), any(), any());
     }
 
-    private void mockHasNoAdminRight() throws AccessDeniedException
+    private void setHasNoAdminRight() throws AccessDeniedException
     {
         doThrow(AccessDeniedException.class).when(this.oldcore.getMockAuthorizationManager())
             .checkAccess(eq(Right.ADMIN), eq(this.contextUser), any());
@@ -881,6 +883,7 @@ public class XarExtensionHandlerTest
     public void testUninstallExtensionWithCommonDocumentOnRootAndWiki() throws Throwable
     {
         install(this.collisionextension1, "wiki", this.contextUser);
+
         install(this.collisionextension2, null, this.contextUser);
     }
 
@@ -947,7 +950,7 @@ public class XarExtensionHandlerTest
     @Test(expected = InstallException.class)
     public void testInstallOnRootWithoutAdminRights() throws Throwable
     {
-        mockHasNoAdminRight();
+        setHasNoAdminRight();
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
@@ -959,7 +962,7 @@ public class XarExtensionHandlerTest
     @Test(expected = InstallException.class)
     public void testInstallOnWikiWithoutAdminRights() throws Throwable
     {
-        mockHasNoAdminRight();
+        setHasNoAdminRight();
 
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
@@ -984,7 +987,7 @@ public class XarExtensionHandlerTest
 
         verifyHasAdminRight(2);
 
-        mockHasNoAdminRight();
+        setHasNoAdminRight();
 
         uninstall(this.localXarExtensiontId1, null);
 
@@ -998,7 +1001,7 @@ public class XarExtensionHandlerTest
 
         verifyHasAdminRight(2);
 
-        mockHasNoAdminRight();
+        setHasNoAdminRight();
 
         uninstall(this.localXarExtensiontId1, "wiki");
 
@@ -1110,6 +1113,21 @@ public class XarExtensionHandlerTest
 
         Assert.assertFalse(pageWiki2.isNew());
         Assert.assertEquals("1.1", pageWiki2.getVersion());
+    }
+
+    @Test
+    public void testInstallOnWikiWithOnlyAdminRight() throws Throwable
+    {
+        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        BaseObject object = new BaseObject();
+        object.setXClassReference(new DocumentReference("wiki", "space", "class"));
+        existingDocument.addXObject(object);
+        existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
+        this.oldcore.getSpyXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
+
+        // install
+
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
     }
 
     @Test

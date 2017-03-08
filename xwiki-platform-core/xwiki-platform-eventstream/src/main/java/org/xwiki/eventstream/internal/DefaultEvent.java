@@ -350,7 +350,8 @@ public class DefaultEvent implements Event
     @Override
     public Set<String> getTarget()
     {
-        return Collections.unmodifiableSet(this.target);
+        return this.target != null ? Collections.unmodifiableSet(this.target)
+                : Collections.emptySet();
     }
 
     @Override

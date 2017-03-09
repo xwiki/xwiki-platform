@@ -25,12 +25,13 @@ import java.util.Locale;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
-import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -38,93 +39,90 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-@MockingRequirement(value = LocalizationScriptService.class, exceptions = {Provider.class})
-@ComponentList({ContextComponentManagerProvider.class})
-public class LocalizationScriptServiceTest extends AbstractMockingComponentTestCase<LocalizationScriptService>
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+public class LocalizationScriptServiceTest
 {
-    public void prepareRenderTest() throws Exception
+
+    @Rule
+    public MockitoComponentMockingRule<ScriptService> mocker =
+        new MockitoComponentMockingRule<ScriptService>(LocalizationScriptService.class);
+
+    private BlockRenderer renderer;
+
+    private ComponentManager componentManager;
+
+    private LocalizationContext localizationContext;
+
+    private LocalizationManager localizationManager;
+
+    private LocalizationScriptService localizationScriptService;
+
+    private Translation translation;
+
+    @Before
+    public void setUp() throws Exception
     {
-        final BlockRenderer renderer = registerMockComponent(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
+        componentManager = mock(ComponentManager.class);
+        Provider<ComponentManager> componentManagerProvider = mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(componentManagerProvider.get()).thenReturn(componentManager);
 
-        final LocalizationManager localizationManager = getComponentManager().getInstance(LocalizationManager.class);
-        final LocalizationContext localizationContext = getComponentManager().getInstance(LocalizationContext.class);
-        final Translation translation = getMockery().mock(Translation.class);
-        getMockery().checking(new Expectations()
+        renderer = mock(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString());
+        when(componentManager.getInstance(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString())).thenReturn(renderer);
+
+        localizationContext = mocker.getInstance(LocalizationContext.class);
+        localizationManager = mocker.getInstance(LocalizationManager.class);
+        localizationScriptService = (LocalizationScriptService) mocker.getComponentUnderTest();
+        translation = mock(Translation.class);
+
+        doAnswer(new Answer<Object>()
         {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
             {
-                oneOf(renderer).render(with(equal(new WordBlock("message"))), with(any(WikiPrinter.class)));
-                will(new CustomAction("render")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        WikiPrinter printer = (WikiPrinter) invocation.getParameter(1);
-                        printer.print("print result");
-
-                        return null;
-                    }
-                });
-
-                oneOf(translation).render(Locale.ROOT, ArrayUtils.EMPTY_OBJECT_ARRAY);
-                will(returnValue(new WordBlock("message")));
-
-                oneOf(localizationManager).getTranslation("key", Locale.ROOT);
-                will(returnValue(translation));
-
-                oneOf(localizationContext).getCurrentLocale();
-                will(returnValue(Locale.ROOT));
+                WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
+                printer.print("print result");
+                return null;
             }
-        });
+        }).when(renderer).render(eq(new WordBlock("message")), any(WikiPrinter.class));
+        when(translation.render(Locale.ROOT, ArrayUtils.EMPTY_OBJECT_ARRAY)).thenReturn(new WordBlock("message"));
+        when(localizationManager.getTranslation("key", Locale.ROOT)).thenReturn(translation);
+        when(localizationContext.getCurrentLocale()).thenReturn(Locale.ROOT);
     }
 
     @Test
     public void render() throws Exception
     {
-        prepareRenderTest();
-
-        Assert.assertEquals("print result", getMockedComponent().render("key"));
+        assertEquals("print result", localizationScriptService.render("key"));
     }
 
     @Test
     public void renderWithSyntax() throws Exception
     {
-        prepareRenderTest();
-
-        Assert.assertEquals("print result", getMockedComponent().render("key", Syntax.PLAIN_1_0));
+        assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0));
     }
 
     @Test
     public void renderWithSyntaxAndParameters() throws Exception
     {
-        prepareRenderTest();
-
-        Assert.assertEquals("print result", getMockedComponent().render("key", Syntax.PLAIN_1_0, Arrays.asList()));
+        assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0, Arrays.asList()));
     }
 
     @Test
     public void renderWithParameters() throws Exception
     {
-        prepareRenderTest();
-
-        Assert.assertEquals("print result", getMockedComponent().render("key", Arrays.asList()));
+        assertEquals("print result", localizationScriptService.render("key", Arrays.asList()));
     }
 
     @Test
     public void getCurrentLocale() throws Exception
     {
-        final LocalizationContext localizationContext = getComponentManager().getInstance(LocalizationContext.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(localizationContext).getCurrentLocale();
-                will(returnValue(Locale.ENGLISH));
-            }
-        });
-
-        Assert.assertEquals(Locale.ENGLISH, getMockedComponent().getCurrentLocale());
+        when(localizationContext.getCurrentLocale()).thenReturn(Locale.ENGLISH);
+        assertEquals(Locale.ENGLISH, localizationScriptService.getCurrentLocale());
     }
 }

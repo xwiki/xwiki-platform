@@ -55,7 +55,7 @@
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>16.6.29</version>
+      <version>17.2.1</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>

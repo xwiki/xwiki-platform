@@ -21,22 +21,27 @@ package org.xwiki.rest.internal.resources.job;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.Request;
 import org.xwiki.rest.XWikiJobResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
 import org.xwiki.rest.resources.job.JobsResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+
+import com.xpn.xwiki.job.JobRequestContext;
 
 /**
  * @version $Id$
- * @since 7.2M3
+ * @since 9.1RC1
  */
 @Component
 @Named("org.xwiki.rest.internal.resources.job.JobsResourceImpl")
@@ -45,11 +50,20 @@ public class JobsResourceImpl extends XWikiJobResource implements JobsResource
     @Inject
     private ModelFactory factory;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     @Override
     public JobStatus executeJob(String jobType, boolean async, JobRequest restJobRequest) throws XWikiRestException
     {
+        // Restrict generic Job starting to programming right for now
+        // TODO: provide extension point to decide of the access depending on the job
+        if (!this.authorization.hasAccess(Right.PROGRAM, null)) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+
         // Parse JobRequest
-        Request request = this.factory.tJobRequest(restJobRequest);
+        DefaultRequest request = this.factory.toJobRequest(restJobRequest);
         if (request == null) {
             request = new DefaultRequest();
         }
@@ -57,6 +71,9 @@ public class JobsResourceImpl extends XWikiJobResource implements JobsResource
         // Start job
         Job job;
         try {
+            // Give a few context related values to the job
+            JobRequestContext.set(request, this.xcontextProvider.get());
+
             job = this.jobExecutor.execute(jobType, request);
         } catch (JobException e) {
             throw new XWikiRestException("Failed to start job", e);

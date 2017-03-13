@@ -43,7 +43,7 @@
 #********************************************************
     List the notifications of the current user as JSON
 ********************************************************#
-#if ("$xcontext.action" == 'get')
+#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method)
   #set ($notifications = [])
   #set ($offset = 0)
   #if ("$!request.offset" != '')
@@ -62,6 +62,17 @@
   #end
   #set ($discard = $response.setContentType('application/json'))
   $jsontool.serialize($notifications)
+#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method)
+#********************************************************
+             Mark a notification as read
+********************************************************#
+  #set ($eventId = "$!request.eventId")
+  #set ($read = "$!request.read")
+  #if ($eventId.isEmpty() || $read.isEmpty())
+    #set ($discard = $response.setStatus(400))
+  #else
+    #set ($discard = $services.notification.saveEventStatus($eventId, $read.equals('true')))
+  #end
 #end
 {{/velocity}}
 </content>
@@ -167,15 +178,34 @@
       for (var i = 0; i &lt; data.length; ++i) {
         // Create the notification entry
         var notif = $('&lt;div&gt;').addClass('notification-event');
+        var readButton = $('&lt;button&gt;');
         if (!data[i].read) {
           notif.addClass('notification-event-unread');
+          // Add the "mark as read" button
+          notif.append(readButton);
         }
         // Put the content
-        notif.html(data[i].html);
+        notif.append(data[i].html);
         // Store the data in the DOM element so that any javascript code can retrieve it
-        notif.data(data[i]);
+        notif.data('notif', data[i]);
         // Add the notification entry
         area.append(notif);
+        if (!data[i].read) {
+          // Style the read button
+          readButton.addClass('notification-event-read-button').addClass('btn btn-default btn-xs');
+          // Insert the cross icon
+          readButton.html('$services.icon.renderHTML("check")');
+          // On click
+          readButton.click(function() {
+            var notif = $(this).parent();
+            notif.removeClass('notification-event-unread');
+            $.post(url, {
+              eventId: notif.data('notif').id,
+              read: true
+            });
+            $(this).remove();
+          });
+        }
       }
       // If there is other notifications to load
       if (data.length == notificationsLimit) {
@@ -211,7 +241,7 @@
       <name>Notifications Displayer</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -347,7 +377,14 @@
 .notifications-load-more p {
   margin: 0;
   padding: 0.7em;
-}</code>
+}
+
+.notification-event-read-button {
+  position: absolute;
+  right: 5px;
+  z-index: 1;
+}
+</code>
     </property>
     <property>
       <contentType>CSS</contentType>
@@ -436,18 +473,22 @@
     </class>
     <property>
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
-#set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-#set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-&lt;div class="notifications-header clearfix"&gt;
-  &lt;div class="col-xs-6"&gt;
-    &lt;p&gt;&lt;strong&gt;Notifications&lt;/strong&gt;&lt;/p&gt;
-  &lt;/div&gt;
-  &lt;div class="col-xs-6 text-right"&gt;
-    &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')"&gt;$services.icon.renderHTML('cog') Settings&lt;/a&gt;&lt;/p&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="notifications-area loading"&gt;
-&lt;/div&gt;
+#if ("$!xcontext.userReference" != '')
+  &lt;li&gt;
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    &lt;div class="notifications-header clearfix"&gt;
+      &lt;div class="col-xs-6"&gt;
+        &lt;p&gt;&lt;strong&gt;Notifications&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-6 text-right"&gt;
+        &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')"&gt;$services.icon.renderHTML('cog') Settings&lt;/a&gt;&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="notifications-area loading"&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+#end
 {{/html}}{{/velocity}}
 </content>
     </property>

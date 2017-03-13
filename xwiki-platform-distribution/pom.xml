@@ -394,25 +394,6 @@
                       <resource>META-INF/cxf/bus-extensions.txt</resource>
                     </resources>
                   </exception>
-                  <!-- Remove when http://jira.xwiki.org/browse/XCOMMONS-859 is closed -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>annotations</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>net.jcip</groupId>
-                        <artifactId>jcip-annotations</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>net.jcip.annotations.GuardedBy</class>
-                      <class>net.jcip.annotations.Immutable</class>
-                      <class>net.jcip.annotations.NotThreadSafe</class>
-                      <class>net.jcip.annotations.ThreadSafe</class>
-                    </classes>
-                  </exception>
                 </exceptions>
                 <ignoredResourcePatterns>
                   <!-- Exclude XWiki's Component registration file -->

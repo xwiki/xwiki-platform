@@ -60,6 +60,10 @@
   </distributionManagement>
   <properties>
     <ckeditor.version>4.6.2</ckeditor.version>
+    <!-- Use a more recent version of Selenium. -->
+    <selenium.version>3.3.1</selenium.version>
+    <!-- Selenium 3+ communicates with Firefox through the Gecko Driver. -->
+    <geckodriver.version>0.15.0</geckodriver.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor-dev-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
@@ -99,12 +103,26 @@
             <!-- Download the CKEditor sources for the version (tag) we want to use. -->
             <execution>
               <id>download-ckeditor-sources</id>
-              <phase>generate-resources</phase>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
               <goals>
                 <goal>wget</goal>
               </goals>
               <configuration>
                 <url>https://github.com/ckeditor/ckeditor-dev/archive/${ckeditor.version}.zip</url>
+                <unpack>true</unpack>
+              </configuration>
+            </execution>
+            <!-- Download the Gecko Driver used to communicate with Firefox. -->
+            <execution>
+              <id>download-gecko-driver</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
+              <goals>
+                <goal>wget</goal>
+              </goals>
+              <configuration>
+                <url>https://github.com/mozilla/geckodriver/releases/download/v${geckodriver.version}/geckodriver-v${geckodriver.version}-linux64.tar.gz</url>
                 <unpack>true</unpack>
               </configuration>
             </execution>
@@ -179,6 +197,7 @@
   <modules>
     <module>base</module>
     <module>plugins</module>
+    <module>test</module>
     <module>ui</module>
     <module>webjar</module>
   </modules>

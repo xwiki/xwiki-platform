@@ -60,6 +60,12 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>download-ckeditor-sources</id>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
       </plugin>
       <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
       <plugin>

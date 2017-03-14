@@ -34,7 +34,9 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstallFailedEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.event.ExtensionInstallingEvent;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
@@ -253,6 +255,9 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
     {
         this.progressManager.pushLevelProgress(2, this);
 
+        this.observationManager.notify(new ExtensionInstallingEvent(localExtension.getId(), namespace), localExtension);
+
+        InstalledExtension installedExtension = null;
         try {
             this.progressManager.startStep(this);
 
@@ -283,12 +288,16 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
             this.progressManager.startStep(this);
 
-            InstalledExtension installedExtension =
-                this.installedRepository.installExtension(localExtension, namespace, dependency);
-
-            this.observationManager.notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace),
-                installedExtension);
+            installedExtension = this.installedRepository.installExtension(localExtension, namespace, dependency);
         } finally {
+            if (installedExtension != null) {
+                this.observationManager.notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace),
+                    installedExtension);
+            } else {
+                this.observationManager.notify(new ExtensionInstallFailedEvent(localExtension.getId(), namespace),
+                    localExtension);
+            }
+
             this.progressManager.popLevelProgress(this);
         }
     }

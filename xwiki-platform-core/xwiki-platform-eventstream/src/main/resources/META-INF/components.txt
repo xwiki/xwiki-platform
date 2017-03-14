@@ -1,2 +1,4 @@
 org.xwiki.eventstream.internal.DefaultEventFactory
-org.xwiki.eventstream.internal.DefaultNotificationConverter
+org.xwiki.eventstream.internal.DefaultRecordableEventConverter
+org.xwiki.eventstream.internal.DefaultRecordableEventDescriptorManager
+org.xwiki.eventstream.script.EventStreamScriptService

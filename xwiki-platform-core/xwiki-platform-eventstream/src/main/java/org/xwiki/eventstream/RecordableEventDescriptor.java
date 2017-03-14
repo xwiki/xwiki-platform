@@ -17,27 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.events;
+package org.xwiki.eventstream;
 
-import java.util.Set;
-
-import org.xwiki.observation.event.Event;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Represent an event that should be stored and displayed as a notification to the user.
- *
- * The <em>source</em> parameter must be the id of the application that send the event.
- * The <em>data</em> parameter is up to event.
+ * Provide a description for a specific implementation of RecordableEvent so that users can knows what the event is
+ * about.
  *
  * @version $Id$
  * @since 9.2RC1
  */
+@Role
 @Unstable
-public interface NotificationEvent extends Event
+public interface RecordableEventDescriptor
 {
     /**
-     * @return the list of users and groups represented by their id that are targeted by this notification
+     * @return the class of the event described by the descriptor
      */
-    Set<String> getTarget();
+    Class<RecordableEvent> getEventType();
+
+    /**
+     * @return the name of the application that provide this event
+     */
+    String getApplicationName();
+
+    /**
+     * @return the translation key of the description of the event type
+     */
+    String getDescription();
 }

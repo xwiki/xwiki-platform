@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,10 +35,13 @@ import org.xwiki.notifications.NotificationPreference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
+ * Default implementation for {@link ModelBridge}.
+ *
  * @version $Id$
  */
 @Component
@@ -62,13 +66,16 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument doc = xwiki.getDocument(userReference, context);
-            for (BaseObject obj : doc.getXObjects(notificationPreferencesClass)) {
-                if (obj != null) {
-                    preferences.add(new NotificationPreference(
-                            obj.getStringValue("eventType"),
-                            obj.getStringValue("applicationId"),
-                            obj.getIntValue("notificationEnabled", 0) == 1
-                    ));
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesClass);
+            if (preferencesObj != null) {
+                for (BaseObject obj : preferencesObj) {
+                    if (obj != null) {
+                        preferences.add(new NotificationPreference(
+                                obj.getStringValue("eventType"),
+                                obj.getStringValue("applicationId"),
+                                obj.getIntValue("notificationEnabled", 0) == 1
+                        ));
+                    }
                 }
             }
         } catch (Exception e) {
@@ -77,5 +84,57 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    @Override
+    public Date getUserStartDate(DocumentReference userReference) throws NotificationException
+    {
+        try {
+            XWikiContext context = contextProvider.get();
+            XWiki xwiki = context.getWiki();
+            XWikiDocument document =  xwiki.getDocument(userReference, context);
+
+            final DocumentReference notificationStartDateClass = new DocumentReference("NotificationsStartDateClass",
+                    new SpaceReference("Code", new SpaceReference("Notifications",
+                            new SpaceReference("XWiki", userReference.getWikiReference()))));
+
+            BaseObject obj = document.getXObject(notificationStartDateClass);
+            if (obj != null) {
+                Date date = obj.getDateValue("startDate");
+                if (date != null) {
+                    return date;
+                }
+            }
+
+            // Fallback to the creation date of the user
+            return document.getCreationDate();
+        } catch (XWikiException e) {
+            throw new NotificationException(
+                    String.format("Failed to get the document [%s].", userReference), e);
+        }
+    }
+
+    @Override
+    public void setStartDateForUser(DocumentReference userReference, Date startDate)
+            throws NotificationException
+    {
+        try {
+            XWikiContext context = contextProvider.get();
+            XWiki xwiki = context.getWiki();
+            XWikiDocument document =  xwiki.getDocument(userReference, context);
+
+            final DocumentReference notificationStartDateClass = new DocumentReference("NotificationsStartDateClass",
+                    new SpaceReference("Code", new SpaceReference("Notifications",
+                            new SpaceReference("XWiki", userReference.getWikiReference()))));
+
+            BaseObject obj = document.getXObject(notificationStartDateClass, true, context);
+            obj.setDateValue("startDate", startDate);
+
+            xwiki.saveDocument(document, "Update start date for the notifications.", context);
+
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to set the user start date for [%s].", userReference), e);
+        }
     }
 }

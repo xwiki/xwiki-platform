@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.eventstream;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>9.2-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-notifications</artifactId>
-  <name>XWiki Platform - Notifications - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Modules related to the notifications</description>
-  <modules>
-    <module>xwiki-platform-notifications-api</module>
-    <module>xwiki-platform-notifications-default</module>
-    <module>xwiki-platform-notifications-ui</module>
-  </modules>
-</project>
+import org.xwiki.stability.Unstable;
+
+/**
+ * An event that should be stored by the Event Stream.
+ *
+ * The <em>source</em> parameter must be the id of the application that send the event.
+ * The <em>data</em> parameter is up to event.
+ *
+ * @version $Id$
+ * @since 9.2RC1
+ */
+@Unstable
+public interface RecordableEvent extends org.xwiki.observation.event.Event
+{
+}

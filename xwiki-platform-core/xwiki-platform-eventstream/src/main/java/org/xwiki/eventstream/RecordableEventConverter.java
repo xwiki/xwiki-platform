@@ -17,37 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.eventstream;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.RecordableEvent;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.stability.Unstable;
 
 /**
- * Display a notification.
+ * Convert a {@link RecordableEvent} to an {@link Event} that could be stored in the event stream.
  *
  * @version $Id$
  * @since 9.2RC1
  */
 @Role
 @Unstable
-public interface NotificationDisplayer
+public interface RecordableEventConverter
 {
     /**
-     * Render a notification.
+     * Convert a notification event to a stream event.
      *
-     * @param eventNotification the notification stored in the event stream
-     * @return the XDOM to display in the notification in the page
-     * @throws NotificationException if error occurs
+     * @param recordableEvent the event to convert
+     * @param source the source received with the event
+     * @param data the data received with the event
+     * @return the converted stream event, ready to be stored
+     * @throws Exception if error happens
      */
-    XDOM renderNotification(Event eventNotification) throws NotificationException;
+    Event convert(RecordableEvent recordableEvent, String source, Object data) throws Exception;
 
     /**
-     * @return the list of the events that this displayer support
+     * @return the list of events supported by this converter
      */
     List<RecordableEvent> getSupportedEvents();
 }

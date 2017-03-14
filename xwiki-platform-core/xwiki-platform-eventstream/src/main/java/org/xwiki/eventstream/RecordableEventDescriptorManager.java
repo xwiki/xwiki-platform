@@ -17,44 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.events;
+package org.xwiki.eventstream;
 
-import java.util.Set;
+import java.util.List;
 
-import org.junit.Test;
-import org.xwiki.bridge.event.DocumentDeletingEvent;
-import org.xwiki.observation.event.Event;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
+ * Retrieve all RecordableEventDescriptors that are present in the wiki.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
-public class AllNotificationEventTest
+@Role
+@Unstable
+public interface RecordableEventDescriptorManager
 {
-    @Test
-    public void matches() throws Exception
-    {
-        Event event = new DocumentDeletingEvent();
-
-        assertFalse(AllNotificationEvent.ALL_NOTIFICATION_EVENT.matches(event));
-
-        Event notificationEvent = new NotificationEvent()
-        {
-            @Override
-            public Set<String> getTarget()
-            {
-                return null;
-            }
-
-            @Override
-            public boolean matches(Object o)
-            {
-                return false;
-            }
-        };
-
-        assertTrue(AllNotificationEvent.ALL_NOTIFICATION_EVENT.matches(notificationEvent));
-    }
+    /**
+     * @return all the available implementation of RecordableEventDescriptor
+     */
+    List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException;
 }

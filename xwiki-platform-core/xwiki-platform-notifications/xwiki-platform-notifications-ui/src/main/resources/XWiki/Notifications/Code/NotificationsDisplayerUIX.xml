@@ -61,11 +61,11 @@
     }))
   #end
   #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize($notifications)
-#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method)
+  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true)})
 #********************************************************
              Mark a notification as read
 ********************************************************#
+#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'read' == $request.action)
   #set ($eventId = "$!request.eventId")
   #set ($read = "$!request.read")
   #if ($eventId.isEmpty() || $read.isEmpty())
@@ -73,6 +73,11 @@
   #else
     #set ($discard = $services.notification.saveEventStatus($eventId, $read.equals('true')))
   #end
+#********************************************************
+           Change the start date of the user
+********************************************************#
+#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'setStartDate' == $request.action)
+  #set ($discard = $services.notification.setStartDate($datetool.date))
 #end
 {{/velocity}}
 </content>
@@ -175,22 +180,42 @@
       area.removeClass('loading');
       $('.notifications-load-more').remove();
       // Display each entry
-      for (var i = 0; i &lt; data.length; ++i) {
+      console.log(data);
+      if (data.notifications.length == 0 &amp;&amp; offset == 0) {
+        area.html($('&lt;p&gt;').addClass('text-center').text('Nothing!'));
+      } else if (offset == 0 ) {
+        var markAllReadButton = $('&lt;button&gt;').addClass('btn btn-default btn-xs')
+          .html('$services.icon.renderHTML("trash") Clear')
+          .click(function (event) {
+            var n = new XWiki.widgets.Notification('Clearing the notifications', 'inprogress');
+            $.post(url, {
+              action: 'setStartDate'
+            }).success(function (){
+              n.hide();
+              new XWiki.widgets.Notification('Notifications are cleared', 'done');
+              area.html($('&lt;p&gt;').addClass('text-center').text('Nothing!'));
+            });
+          });
+        area.append($('&lt;div&gt;').addClass('col-xs-12 btn-group btn-group-justified').append(
+          $('&lt;div&gt;').addClass('btn-group').append(markAllReadButton)
+        ));
+     }
+      for (var i = 0; i &lt; data.notifications.length; ++i) {
         // Create the notification entry
         var notif = $('&lt;div&gt;').addClass('notification-event');
         var readButton = $('&lt;button&gt;');
-        if (!data[i].read) {
+        if (!data.notifications[i].read) {
           notif.addClass('notification-event-unread');
           // Add the "mark as read" button
           notif.append(readButton);
         }
         // Put the content
-        notif.append(data[i].html);
+        notif.append(data.notifications[i].html);
         // Store the data in the DOM element so that any javascript code can retrieve it
-        notif.data('notif', data[i]);
+        notif.data('notif', data.notifications[i]);
         // Add the notification entry
         area.append(notif);
-        if (!data[i].read) {
+        if (!data.notifications[i].read) {
           // Style the read button
           readButton.addClass('notification-event-read-button').addClass('btn btn-default btn-xs');
           // Insert the cross icon
@@ -200,6 +225,7 @@
             var notif = $(this).parent();
             notif.removeClass('notification-event-unread');
             $.post(url, {
+              action: 'read',
               eventId: notif.data('notif').id,
               read: true
             });
@@ -208,7 +234,7 @@
         }
       }
       // If there is other notifications to load
-      if (data.length == notificationsLimit) {
+      if (data.notifications.length == notificationsLimit) {
         var loadMore = $('&lt;div&gt;').html('&lt;p&gt;Load older notifications&lt;/p&gt;').addClass('text-center').addClass('notifications-load-more');
         area.append(loadMore);
         loadMore.click(function(event) {
@@ -485,7 +511,7 @@
         &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')"&gt;$services.icon.renderHTML('cog') Settings&lt;/a&gt;&lt;/p&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-    &lt;div class="notifications-area loading"&gt;
+    &lt;div class="notifications-area loading clearfix"&gt;
     &lt;/div&gt;
   &lt;/li&gt;
 #end

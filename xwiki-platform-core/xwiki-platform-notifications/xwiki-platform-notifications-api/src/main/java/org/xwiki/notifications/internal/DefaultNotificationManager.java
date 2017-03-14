@@ -21,7 +21,9 @@ package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,14 +34,16 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
-import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.text.StringUtils;
@@ -73,6 +77,9 @@ public class DefaultNotificationManager implements NotificationManager
     @Inject
     private NotificationDisplayer defaultDisplayer;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public List<Event> getEvents(int offset, int limit) throws NotificationException
     {
@@ -87,58 +94,16 @@ public class DefaultNotificationManager implements NotificationManager
 
     private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
     {
-        // TODO: create a role so extensions can inject their own complex query parts
         try {
-            String hql = "";
-            String appender = "where ";
-
-            List<NotificationPreference> preferences = getPreferences(user);
-
-            List<String> types = new ArrayList<>();
-            for (NotificationPreference preference : preferences) {
-                if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
-                    types.add(preference.getEventType());
-                }
-            }
-            if (!types.isEmpty()) {
-                hql += appender + "event.type IN :types";
-                appender = " ";
-            }
-
-            List<String> apps = new ArrayList<>();
-            for (NotificationPreference preference : preferences) {
-                if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
-                    apps.add(preference.getApplicationId());
-                }
-            }
-            if (!apps.isEmpty()) {
-                hql += appender + " OR event.application IN :apps";
-            }
-
-            // No notification is returned if nothing is saved in the user settings
-            // TODO: handle some defaults preferences that can be set in the administration
-            if (preferences.isEmpty() || (types.isEmpty() && apps.isEmpty())) {
+            Query query = getQuery(user, false);
+            if (query == null) {
                 return Collections.emptyList();
             }
 
-            hql += " order by event.date DESC";
-
-            // TODO: idea: handle the items of the watchlist too
-
-            Query query = queryManager.createQuery(hql, Query.HQL);
             query.setOffset(offset);
             query.setLimit(limit);
 
-            if (!types.isEmpty()) {
-                query.bindValue("types", types);
-            }
-
-            if (!apps.isEmpty()) {
-                query.bindValue("apps", apps);
-            }
-
             return eventStream.searchEvents(query);
-
         } catch (Exception e) {
             throw new NotificationException("Fail to get the list of notifications.", e);
         }
@@ -166,6 +131,48 @@ public class DefaultNotificationManager implements NotificationManager
         }
     }
 
+    @Override
+    public long getEventsCount(boolean onlyUnread) throws NotificationException
+    {
+        return getEventsCount(onlyUnread, documentAccessBridge.getCurrentUserReference());
+    }
+
+    @Override
+    public long getEventsCount(boolean onlyUnread, String userId) throws NotificationException
+    {
+        return getEventsCount(onlyUnread, documentReferenceResolver.resolve(userId));
+    }
+
+    @Override
+    public void setStartDate(String userId, Date startDate) throws NotificationException
+    {
+        modelBridge.setStartDateForUser(documentReferenceResolver.resolve(userId), startDate);
+    }
+
+    private long getEventsCount(boolean onlyUnread, DocumentReference userReference) throws NotificationException
+    {
+        try {
+            Query baseQuery = getQuery(userReference, onlyUnread);
+            if (baseQuery == null) {
+                return 0;
+            }
+
+            // Currently, event stream module does not provide an API to get the number of events, so implement
+            // it here for now.
+            // TODO: move this code to the event stream module
+
+            Query query = queryManager.createQuery("select count(*) from ActivityEventImpl event "
+                    + baseQuery.getStatement(), baseQuery.getLanguage());
+            for (Map.Entry<String, Object> entry : baseQuery.getNamedParameters().entrySet()) {
+                query.bindValue(entry.getKey(), entry.getValue());
+            }
+
+            return (query.<Long>execute()).get(0);
+        } catch (QueryException e) {
+            throw new NotificationException("Failed to retrieve the number of unread events.", e);
+        }
+    }
+
     private NotificationDisplayer getDisplayer(Event event) throws ComponentLookupException
     {
         for (NotificationDisplayer displayer
@@ -173,7 +180,7 @@ public class DefaultNotificationManager implements NotificationManager
             if (displayer == defaultDisplayer) {
                 continue;
             }
-            for (NotificationEvent ev : displayer.getSupportedEvents()) {
+            for (RecordableEvent ev : displayer.getSupportedEvents()) {
                 if (ev.matches(event)) {
                     return displayer;
                 }
@@ -185,5 +192,68 @@ public class DefaultNotificationManager implements NotificationManager
     private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException
     {
        return modelBridge.getNotificationsPreferences(user);
+    }
+
+    private Query getQuery(DocumentReference user, boolean onlyUnread) throws NotificationException, QueryException
+    {
+        // TODO: create a role so extensions can inject their own complex query parts
+        String hql = "where event.date >= :startDate AND (";
+
+        List<NotificationPreference> preferences = getPreferences(user);
+
+        List<String> types = new ArrayList<>();
+        for (NotificationPreference preference : preferences) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
+                types.add(preference.getEventType());
+            }
+        }
+        if (!types.isEmpty()) {
+            hql += "event.type IN :types";
+        }
+
+        List<String> apps = new ArrayList<>();
+        for (NotificationPreference preference : preferences) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
+                apps.add(preference.getApplicationId());
+            }
+        }
+        if (!apps.isEmpty()) {
+            hql += (types.isEmpty() ? "" : " OR ") + "event.application IN :apps";
+        }
+
+        // No notification is returned if nothing is saved in the user settings
+        // TODO: handle some defaults preferences that can be set in the administration
+        if (preferences.isEmpty() || (types.isEmpty() && apps.isEmpty())) {
+            return null;
+        }
+
+        hql += ")";
+
+        if (onlyUnread) {
+            hql += " AND (event not in (select status.activityEvent from ActivityEventStatusImpl status " +
+                    "where status.activityEvent = event and status.entityId = :user and status.read = true))";
+        }
+
+        hql += " order by event.date DESC";
+
+        // TODO: idea: handle the items of the watchlist too
+
+        Query query = queryManager.createQuery(hql, Query.HQL);
+
+        query.bindValue("startDate", modelBridge.getUserStartDate(user));
+
+        if (!types.isEmpty()) {
+            query.bindValue("types", types);
+        }
+
+        if (!apps.isEmpty()) {
+            query.bindValue("apps", apps);
+        }
+
+        if (onlyUnread) {
+            query.bindValue("user", serializer.serialize(user));
+        }
+
+        return query;
     }
 }

@@ -17,37 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.eventstream.script;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.RecordableEvent;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.script.service.ScriptService;
 
 /**
- * Display a notification.
+ * Script services for the Event Stream Module.
  *
  * @version $Id$
  * @since 9.2RC1
  */
-@Role
-@Unstable
-public interface NotificationDisplayer
+@Component
+@Singleton
+@Named("eventstream")
+public class EventStreamScriptService implements ScriptService
 {
-    /**
-     * Render a notification.
-     *
-     * @param eventNotification the notification stored in the event stream
-     * @return the XDOM to display in the notification in the page
-     * @throws NotificationException if error occurs
-     */
-    XDOM renderNotification(Event eventNotification) throws NotificationException;
+    @Inject
+    private RecordableEventDescriptorManager recordableEventDescriptorManager;
 
     /**
-     * @return the list of the events that this displayer support
+     * @return the list of the available RecordableEventDescriptors
+     * @throws EventStreamException if an error happen
      */
-    List<RecordableEvent> getSupportedEvents();
+    public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
+    {
+        return recordableEventDescriptorManager.getAllRecordableEventDescriptors();
+    }
 }

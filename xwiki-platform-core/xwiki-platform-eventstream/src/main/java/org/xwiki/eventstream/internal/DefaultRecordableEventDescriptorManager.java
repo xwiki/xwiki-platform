@@ -19,45 +19,38 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.NotificationConverter;
-import org.xwiki.notifications.events.AllNotificationEvent;
-import org.xwiki.notifications.events.NotificationEvent;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.RecordableEventDescriptorManager;
 
 /**
- * Default converter for any type of NotificationEvent.
+ * Default implementation of {@link org.xwiki.eventstream.RecordableEventDescriptorManager}.
  *
  * @version $Id$
  * @since 9.2RC1
  */
 @Component
 @Singleton
-public class DefaultNotificationConverter implements NotificationConverter
+public class DefaultRecordableEventDescriptorManager implements RecordableEventDescriptorManager
 {
-    private static final List<NotificationEvent> EVENTS = Arrays.asList(AllNotificationEvent.ALL_NOTIFICATION_EVENT);
+    @Inject
+    private ComponentManager componentManager;
 
     @Override
-    public Event convert(NotificationEvent notificationEvent, String source, Object data) throws Exception
+    public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
     {
-        org.xwiki.eventstream.Event convertedEvent = new DefaultEvent();
-        convertedEvent.setType(notificationEvent.getClass().getCanonicalName());
-        convertedEvent.setApplication(source);
-        convertedEvent.setBody((String) data);
-        convertedEvent.setDate(new Date());
-        convertedEvent.setTarget(notificationEvent.getTarget());
-        return convertedEvent;
-    }
-
-    @Override
-    public List<NotificationEvent> getSupportedEvents()
-    {
-        return EVENTS;
+        try {
+            return componentManager.getInstanceList(RecordableEventDescriptorManager.class);
+        } catch (ComponentLookupException e) {
+            throw new EventStreamException("Failed to retrieve the list of RecordableEventDescriptor.", e);
+        }
     }
 }

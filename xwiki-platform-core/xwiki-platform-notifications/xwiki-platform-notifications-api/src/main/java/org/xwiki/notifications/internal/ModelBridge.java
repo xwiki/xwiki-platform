@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.internal;
 
+import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
@@ -27,6 +28,8 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 
 /**
+ * Internal role that request to the model and avoid a direct dependency to oldcore.
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -35,4 +38,8 @@ public interface ModelBridge
 {
     List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference) throws
             NotificationException;
+
+    Date getUserStartDate(DocumentReference userReference) throws NotificationException;
+
+    void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
 }

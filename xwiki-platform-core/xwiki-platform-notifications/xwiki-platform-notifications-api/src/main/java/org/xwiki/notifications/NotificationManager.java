@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications;
 
+import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
@@ -63,4 +64,10 @@ public interface NotificationManager
     List<NotificationPreference> getPreferences(String userId) throws NotificationException;
 
     XDOM render(Event event) throws NotificationException;
+
+    long getEventsCount(boolean onlyUnread) throws NotificationException;
+
+    long getEventsCount(boolean onlyUnread, String userId) throws NotificationException;
+
+    void setStartDate(String userId, Date startDate) throws NotificationException;
 }

@@ -19,32 +19,21 @@
  */
 package org.xwiki.eventstream;
 
-import java.util.List;
+import java.util.Set;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.notifications.events.NotificationEvent;
 import org.xwiki.stability.Unstable;
 
 /**
- * Convert a notification to an Event that could be stored in the event stream.
+ * An event that specify which entities are concerned or interested by it.
  *
  * @version $Id$
  * @since 9.2RC1
  */
 @Unstable
-@Role
-public interface NotificationConverter
+public interface TargetableEvent extends org.xwiki.observation.event.Event
 {
     /**
-     * Convert a notification event to a stream event.
-     *
-     * @param notificationEvent the event to convert
-     * @param source the source received with the event
-     * @param data the data received with the event
-     * @return the converted stream event, ready to be stored
-     * @throws Exception if error happens
+     * @return the list of users and groups represented by their id that are targeted by this notification
      */
-    Event convert(NotificationEvent notificationEvent, String source, Object data) throws Exception;
-
-    List<NotificationEvent> getSupportedEvents();
+    Set<String> getTarget();
 }

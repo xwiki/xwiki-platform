@@ -17,42 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.events;
-
-import java.util.Set;
+package org.xwiki.eventstream;
 
 import org.xwiki.stability.Unstable;
 
 /**
- * Special event matcher used by a listener which need to listened to all notification events.
+ * Special event matcher used by a listener which need to listened to all recordable events.
  *
  * @version $Id$
  * @since 9.2RC1
  */
 @Unstable
-public final class AllNotificationEvent implements NotificationEvent
+public final class AllRecordableEvent implements RecordableEvent
 {
     /**
      * Unique instance of the event matcher.
      */
-    public static final AllNotificationEvent ALL_NOTIFICATION_EVENT = new AllNotificationEvent();
+    public static final AllRecordableEvent ALL_RECORDABLE_EVENT = new AllRecordableEvent();
 
     /**
-     * Use {@link #ALL_NOTIFICATION_EVENT} instead.
+     * Use {@link #ALL_RECORDABLE_EVENT} instead.
      */
-    private AllNotificationEvent()
+    private AllRecordableEvent()
     {
     }
 
     @Override
     public boolean matches(Object otherEvent)
     {
-        return otherEvent != null ? otherEvent instanceof NotificationEvent : false;
-    }
-
-    @Override
-    public Set<String> getTarget()
-    {
-        return null;
+        return otherEvent != null ? otherEvent instanceof RecordableEvent : false;
     }
 }

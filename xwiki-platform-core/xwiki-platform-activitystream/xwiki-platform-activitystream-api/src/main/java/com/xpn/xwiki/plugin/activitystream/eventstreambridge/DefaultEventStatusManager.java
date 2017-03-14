@@ -66,6 +66,11 @@ public class DefaultEventStatusManager implements EventStatusManager
     {
         List<EventStatus> results = new ArrayList<>();
 
+        // Don't perform any query if the list of events or entities is actually empty
+        if (events.isEmpty() || entityIds.isEmpty()) {
+            return results;
+        }
+
         // Get the ActivityEventStatus from the database and convert them
         Query query = queryManager.createQuery("select eventStatus from ActivityEventStatusImpl eventStatus "
                 + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);

@@ -26,10 +26,10 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.AllRecordableEvent;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.NotificationConverter;
-import org.xwiki.notifications.events.AllNotificationEvent;
-import org.xwiki.notifications.events.NotificationEvent;
+import org.xwiki.eventstream.RecordableEvent;
+import org.xwiki.eventstream.RecordableEventConverter;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -41,8 +41,8 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
  */
 @Component
 @Singleton
-@Named("NotificationEventListener")
-public class NotificationEventListener extends AbstractEventListener
+@Named("RecordableEventListener")
+public class RecordableEventListener extends AbstractEventListener
 {
     @Inject
     private EventStream eventStream;
@@ -51,7 +51,7 @@ public class NotificationEventListener extends AbstractEventListener
     private ComponentManager componentManager;
 
     @Inject
-    private NotificationConverter defaultConverter;
+    private RecordableEventConverter defaultConverter;
 
     @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;
@@ -62,9 +62,9 @@ public class NotificationEventListener extends AbstractEventListener
     /**
      * Construct a NotificationEventListener.
      */
-    public NotificationEventListener()
+    public RecordableEventListener()
     {
-        super("NotificationEventListener", AllNotificationEvent.ALL_NOTIFICATION_EVENT);
+        super("RecordableEventListener", AllRecordableEvent.ALL_RECORDABLE_EVENT);
     }
 
     @Override
@@ -94,20 +94,20 @@ public class NotificationEventListener extends AbstractEventListener
      */
     private org.xwiki.eventstream.Event convertEvent(Event event, Object source, Object data) throws Exception
     {
-        for (NotificationConverter converter
-                : componentManager.<NotificationConverter>getInstanceList(NotificationConverter.class)) {
+        for (RecordableEventConverter converter
+                : componentManager.<RecordableEventConverter>getInstanceList(RecordableEventConverter.class)) {
             if (converter == defaultConverter) {
                 continue;
             }
-            for (NotificationEvent ev : converter.getSupportedEvents()) {
+            for (RecordableEvent ev : converter.getSupportedEvents()) {
                 if (ev.matches(event)) {
                     // Convert the event
-                    return converter.convert((NotificationEvent) event, (String) source, data);
+                    return converter.convert((RecordableEvent) event, (String) source, data);
                 }
             }
         }
 
         // Use the default notification converter if no other converter match the current event
-        return defaultConverter.convert((NotificationEvent) event, (String) source, data);
+        return defaultConverter.convert((RecordableEvent) event, (String) source, data);
     }
 }

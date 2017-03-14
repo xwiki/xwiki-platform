@@ -20,6 +20,7 @@
 package org.xwiki.notifications.script;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -36,6 +37,7 @@ import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
+import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.service.ScriptService;
 
@@ -59,9 +61,17 @@ public class NotificationScriptService implements ScriptService
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private ModelBridge modelBridge;
+
     public List<Event> getEvents(int offset, int limit) throws NotificationException
     {
         return notificationManager.getEvents(offset, limit);
+    }
+
+    public long getEventsCount(boolean onlyUnread) throws NotificationException
+    {
+        return notificationManager.getEventsCount(onlyUnread);
     }
 
     public List<Event> getEvents(String userId, int offset, int limit) throws NotificationException
@@ -86,5 +96,15 @@ public class NotificationScriptService implements ScriptService
         event.setId(eventId);
         String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
         eventStatusManager.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
+    }
+
+    public void setStartDate(Date startDate) throws NotificationException
+    {
+        modelBridge.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
+    }
+
+    public void setStartDate(String userId, Date startDate) throws NotificationException
+    {
+        notificationManager.setStartDate(userId, startDate);
     }
 }

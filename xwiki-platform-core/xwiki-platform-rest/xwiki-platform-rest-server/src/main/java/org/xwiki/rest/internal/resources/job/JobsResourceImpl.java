@@ -72,7 +72,9 @@ public class JobsResourceImpl extends XWikiJobResource implements JobsResource
         Job job;
         try {
             // Give a few context related values to the job
-            JobRequestContext.set(request, this.xcontextProvider.get());
+            if (request.getProperty(JobRequestContext.KEY) == null) {
+                JobRequestContext.set(request, this.xcontextProvider.get());
+            }
 
             job = this.jobExecutor.execute(jobType, request);
         } catch (JobException e) {

@@ -43,6 +43,7 @@ import org.xwiki.extension.xar.internal.job.diff.DocumentUnifiedDiffBuilder;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
 import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
@@ -123,7 +124,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
                 InstalledExtension installedExtension = getInstalledExtension(extensionId, namespace);
                 // Make sure the specified extension is installed on the specified namespace.
                 if (installedExtension != null && installedExtension.isInstalled(namespace)) {
-                    diff(extensionId.getId(), namespace);
+                    diff(extensionId.getId(), namespace, new HashSet<>());
                 }
 
                 this.progressManager.endStep(this);
@@ -142,7 +143,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         }
     }
 
-    private void diff(String feature, String namespace)
+    private void diff(String feature, String namespace, Set<LocalDocumentReference> alreadydone)
     {
         if (this.comparedFeatures.contains(feature)) {
             // We already looked at this feature.
@@ -153,7 +154,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         InstalledExtension installedExtension =
             this.installedExtensionRepository.getInstalledExtension(feature, namespace);
         if (installedExtension != null) {
-            diff(installedExtension, namespace);
+            diff(installedExtension, namespace, alreadydone);
 
             Collection<? extends ExtensionDependency> dependencies = installedExtension.getDependencies();
 
@@ -162,7 +163,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
                 for (ExtensionDependency dependency : dependencies) {
                     this.progressManager.startStep(this);
 
-                    diff(dependency.getId(), namespace);
+                    diff(dependency.getId(), namespace, new HashSet<>(alreadydone));
                 }
             } finally {
                 this.progressManager.popLevelProgress(this);
@@ -170,7 +171,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         }
     }
 
-    private void diff(InstalledExtension installedExtension, String namespace)
+    private void diff(InstalledExtension installedExtension, String namespace, Set<LocalDocumentReference> alreadydone)
     {
         Collection<ExtensionId> excludedExtensions = getRequest().getExcludedExtensions();
         if (XarExtensionHandler.TYPE.equals(installedExtension.getType())
@@ -182,7 +183,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
             try {
                 WikiReference wikiReference = new WikiReference(XarHandlerUtils.getWikiFromNamespace(namespace));
                 diff(new XarFile(new File(installedExtension.getFile().getAbsolutePath())), wikiReference,
-                    installedExtension.getId());
+                    installedExtension.getId(), alreadydone);
             } catch (UnsupportedNamespaceException e) {
                 this.logger.error("Failed to extract the wiki id from the namespace [{}].", namespace, e);
             } catch (IOException e) {
@@ -193,7 +194,8 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         }
     }
 
-    private void diff(XarFile xarFile, WikiReference wikiReference, ExtensionId extensionId)
+    private void diff(XarFile xarFile, WikiReference wikiReference, ExtensionId extensionId,
+        Set<LocalDocumentReference> alreadydone)
     {
         Collection<XarEntry> xarEntries = xarFile.getEntries();
         this.progressManager.pushLevelProgress(xarEntries.size(), this);
@@ -201,11 +203,16 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
             for (XarEntry xarEntry : xarEntries) {
                 this.progressManager.startStep(this);
 
-                try {
-                    diff(this.packager.getXWikiDocument(xarFile.getInputStream(xarEntry), wikiReference), extensionId);
-                } catch (Exception e) {
-                    // Skip this document and continue.
-                    this.logger.error("Failed to parse document [{}] from XAR.", xarEntry.getDocumentName(), e);
+                if (!alreadydone.contains(xarEntry)) {
+                    try {
+                        diff(this.packager.getXWikiDocument(xarFile.getInputStream(xarEntry), wikiReference),
+                            extensionId);
+                    } catch (Exception e) {
+                        // Skip this document and continue.
+                        this.logger.error("Failed to parse document [{}] from XAR.", xarEntry.getDocumentName(), e);
+                    }
+
+                    alreadydone.add(xarEntry);
                 }
             }
         } finally {
@@ -241,9 +248,8 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
 
     private void maybeAddDocumentDiff(DocumentUnifiedDiff documentDiff)
     {
-        int differencesCount =
-            documentDiff.size() + documentDiff.getAttachmentDiffs().size() + documentDiff.getObjectDiffs().size()
-                + documentDiff.getClassPropertyDiffs().size();
+        int differencesCount = documentDiff.size() + documentDiff.getAttachmentDiffs().size()
+            + documentDiff.getObjectDiffs().size() + documentDiff.getClassPropertyDiffs().size();
         if (getRequest().isVerbose()) {
             if (documentDiff.getNextReference() == null) {
                 this.logger.info("The document [{}] has been deleted", documentDiff.getPreviousReference());

@@ -42,6 +42,10 @@
   <content>admin.colorthemes.local=Local
 admin.colorthemes.global=Global
 
+administration.title=Administration
+administration.title.page=Page Administration
+administration.title.wiki=Wiki Administration
+administration.title.global=Global Administration
 administration.sectionTitle=Administration: {0}
 administration.sectionTitle.page=Page Administration: {0}
 administration.sectionTitle.wiki=Wiki Administration: {0}

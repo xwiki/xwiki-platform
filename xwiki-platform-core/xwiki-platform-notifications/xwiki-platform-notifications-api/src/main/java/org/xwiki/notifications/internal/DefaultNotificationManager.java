@@ -100,7 +100,7 @@ public class DefaultNotificationManager implements NotificationManager
     private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
     {
         try {
-            Query query = getQuery(user, false);
+            Query query = getQuery(user, false, true);
             if (query == null) {
                 return Collections.emptyList();
             }
@@ -157,7 +157,7 @@ public class DefaultNotificationManager implements NotificationManager
     private long getEventsCount(boolean onlyUnread, DocumentReference userReference) throws NotificationException
     {
         try {
-            Query baseQuery = getQuery(userReference, onlyUnread);
+            Query baseQuery = getQuery(userReference, onlyUnread, false);
             if (baseQuery == null) {
                 return 0;
             }
@@ -199,7 +199,8 @@ public class DefaultNotificationManager implements NotificationManager
        return modelBridge.getNotificationsPreferences(user);
     }
 
-    private Query getQuery(DocumentReference user, boolean onlyUnread) throws NotificationException, QueryException
+    private Query getQuery(DocumentReference user, boolean onlyUnread, boolean withOrder) throws NotificationException,
+            QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
         String hql = "where event.date >= :startDate AND event.user <> :user AND (";
@@ -244,7 +245,10 @@ public class DefaultNotificationManager implements NotificationManager
                     "where status.activityEvent = event and status.entityId = :user and status.read = true))";
         }
 
-        hql += " order by event.date DESC";
+        // HSQLDB do not support adding "order by" when we do "select count(*)"
+        if (withOrder) {
+            hql += " order by event.date DESC";
+        }
 
         // TODO: idea: handle the items of the watchlist too
 

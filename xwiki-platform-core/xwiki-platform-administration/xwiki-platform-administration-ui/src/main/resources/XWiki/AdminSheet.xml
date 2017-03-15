@@ -96,11 +96,7 @@
   },
   {
     'id' : 'extensionmanager',
-    'children': [
-       {'id' : 'XWiki.Extensions', 'order' : 100},
-       {'id' : 'XWiki.ExtensionHistory', 'order' : 200},
-       {'id' : 'XWiki.ExtensionUpdater', 'order' : 300}
-    ]
+    'children': []
   },
   {
     'id' : 'applications',

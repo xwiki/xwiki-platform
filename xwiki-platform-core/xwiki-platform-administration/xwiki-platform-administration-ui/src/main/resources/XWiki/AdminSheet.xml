@@ -340,7 +340,10 @@
   #elseif ($crtCategoryId != '')
     #set ($sectionName = $services.localization.render("admin.${crtItemId}"))
   #elseif ($editor == 'globaladmin')
-    #set ($sectionName = $services.localization.render('xe.admin.global'))
+    #set ($sectionName = $services.wiki.getById($xcontext.database).prettyName)
+    #if ("$!sectionName" == '')
+      #set ($sectionName = $xcontext.database)
+    #end
   #else
     #set ($sectionName = $currentSpace)
   #end
@@ -349,8 +352,18 @@
 #template('hierarchy.vm')
 {{/html}}
 
+## Determine the administration level.
+#if ($editor != 'globaladmin')
+  #set ($level = 'page')
+#elseif ($xcontext.isMainWiki())
+  #set ($level = 'global')
+#else
+  #set ($level = 'wiki')
+#end
 (% id="document-title" %)(((
-  = $services.localization.render('admin.section.title', [$sectionName]) =
+  = $services.localization.render("admin.section.title.$level", [$sectionName]) =
+
+  ----
 )))
 
   #verticalNavigation($adminMenu {'translationPrefix' : 'admin.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'admin-menu'})

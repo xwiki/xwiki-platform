@@ -362,6 +362,17 @@
 #end
 (% id="document-title" %)(((
   = $services.localization.render("admin.section.title.$level", [$sectionName]) =
+  ## Display the category/section description below the title.
+  #set ($categoryOrSectionId = $crtCategory.id)
+  #if ("$!crtSection.id" != '')
+    #set ($categoryOrSectionId = $crtSection.id)
+  #end
+  #set ($descriptionTranslationKey = "admin.$!{categoryOrSectionId.toLowerCase()}.description")
+  #if ($services.localization.get($descriptionTranslationKey))
+    (% class = "noitems" %)(((
+      $services.localization.render($descriptionTranslationKey)
+    )))
+  #end
 
   ----
 )))

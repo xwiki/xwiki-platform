@@ -353,15 +353,18 @@
 {{/html}}
 
 ## Determine the administration level.
-#if ($editor != 'globaladmin')
-  #set ($level = 'page')
-#elseif ($xcontext.isMainWiki())
-  #set ($level = 'global')
-#else
-  #set ($level = 'wiki')
+#set ($level = '')
+#if ($doc.name == 'WebPreferences')
+  #set ($level = '.page')
+#elseif ($doc.fullName == 'XWiki.XWikiPreferences')
+  #if ($xcontext.isMainWiki())
+    #set ($level = '.global')
+  #else
+    #set ($level = '.wiki')
+  #end
 #end
 (% id="document-title" %)(((
-  = $services.localization.render("admin.section.title.$level", [$sectionName]) =
+  = $services.localization.render("administration.sectionTitle$level", [$sectionName]) =
   ## Display the category/section description below the title.
   #set ($categoryOrSectionId = $crtCategory.id)
   #if ("$!crtSection.id" != '')

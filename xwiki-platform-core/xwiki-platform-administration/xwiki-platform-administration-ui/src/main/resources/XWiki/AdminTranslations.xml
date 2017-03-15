@@ -42,9 +42,10 @@
   <content>admin.colorthemes.local=Local
 admin.colorthemes.global=Global
 
-admin.section.title.page=Page Administration: {0}
-admin.section.title.wiki=Wiki Administration: {0}
-admin.section.title.global=Global Administration: {0}</content>
+administration.sectionTitle=Administration: {0}
+administration.sectionTitle.page=Page Administration: {0}
+administration.sectionTitle.wiki=Wiki Administration: {0}
+administration.sectionTitle.global=Global Administration: {0}</content>
   <object>
     <name>XWiki.AdminTranslations</name>
     <number>0</number>

@@ -26,12 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
@@ -78,6 +80,10 @@ public class DefaultNotificationManager implements NotificationManager
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    @Named("user")
+    private ConfigurationSource userPreferencesSource;
 
     @Override
     public List<Event> getEvents(int offset, int limit) throws NotificationException
@@ -196,7 +202,7 @@ public class DefaultNotificationManager implements NotificationManager
     private Query getQuery(DocumentReference user, boolean onlyUnread) throws NotificationException, QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
-        String hql = "where event.date >= :startDate AND (";
+        String hql = "where event.date >= :startDate AND event.user <> :user AND (";
 
         List<NotificationPreference> preferences = getPreferences(user);
 
@@ -228,6 +234,11 @@ public class DefaultNotificationManager implements NotificationManager
 
         hql += ")";
 
+        // Don't show hidden events unless the user want to display hidden pages
+        if (userPreferencesSource.getProperty("displayHiddenDocuments", 0) == 0) {
+            hql += " AND event.hidden <> true";
+        }
+
         if (onlyUnread) {
             hql += " AND (event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                     "where status.activityEvent = event and status.entityId = :user and status.read = true))";
@@ -240,6 +251,7 @@ public class DefaultNotificationManager implements NotificationManager
         Query query = queryManager.createQuery(hql, Query.HQL);
 
         query.bindValue("startDate", modelBridge.getUserStartDate(user));
+        query.bindValue("user", serializer.serialize(user));
 
         if (!types.isEmpty()) {
             query.bindValue("types", types);
@@ -247,10 +259,6 @@ public class DefaultNotificationManager implements NotificationManager
 
         if (!apps.isEmpty()) {
             query.bindValue("apps", apps);
-        }
-
-        if (onlyUnread) {
-            query.bindValue("user", serializer.serialize(user));
         }
 
         return query;

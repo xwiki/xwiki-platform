@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -45,7 +44,7 @@ import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -122,7 +121,7 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public XDOM render(Event event) throws NotificationException
+    public Block render(Event event) throws NotificationException
     {
         try {
             return getDisplayer(event).renderNotification(event);
@@ -180,8 +179,8 @@ public class DefaultNotificationManager implements NotificationManager
             if (displayer == defaultDisplayer) {
                 continue;
             }
-            for (RecordableEvent ev : displayer.getSupportedEvents()) {
-                if (ev.matches(event)) {
+            for (String ev : displayer.getSupportedEvents()) {
+                if (StringUtils.equals(ev, event.getType())) {
                     return displayer;
                 }
             }
@@ -208,7 +207,7 @@ public class DefaultNotificationManager implements NotificationManager
             }
         }
         if (!types.isEmpty()) {
-            hql += "event.type IN :types";
+            hql += "event.type IN (:types)";
         }
 
         List<String> apps = new ArrayList<>();
@@ -218,7 +217,7 @@ public class DefaultNotificationManager implements NotificationManager
             }
         }
         if (!apps.isEmpty()) {
-            hql += (types.isEmpty() ? "" : " OR ") + "event.application IN :apps";
+            hql += (types.isEmpty() ? "" : " OR ") + "event.application IN (:apps)";
         }
 
         // No notification is returned if nothing is saved in the user settings

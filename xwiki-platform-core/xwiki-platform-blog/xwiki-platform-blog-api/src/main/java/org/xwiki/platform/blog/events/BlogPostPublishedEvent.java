@@ -17,36 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.platform.blog.events;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.eventstream.RecordableEvent;
 
 /**
- * Provide a description for a specific implementation of RecordableEvent so that users can knows what the event is
- * about.
- *
  * @version $Id$
- * @since 9.2RC1
  */
-@Role
-@Unstable
-public interface RecordableEventDescriptor
+public class BlogPostPublishedEvent implements RecordableEvent
 {
-    /**
-     * @return the name of the event described by the descriptor, as it is stored in the event stream.
-     */
-    String getEventType();
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        if (otherEvent instanceof BlogPostPublishedEvent) {
+            return true;
+        }
 
-    /**
-     * @return the name of the application that provide this event
-     */
-    String getApplicationName();
-
-    /**
-     * @return the translation key of the description of the event type
-     */
-    String getDescription();
-
-    String getIcon();
+        return false;
+    }
 }

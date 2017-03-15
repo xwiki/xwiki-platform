@@ -53,27 +53,22 @@
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
-    ## TODO: introduce a script service instead that also handle descriptors as components and from all wikis
-    #set ($xwql = "from doc.object(XWiki.Notifications.Code.NotificationDescriptorClass) obj where doc.fullName &lt;&gt; 'XWiki.Notifications.Code.NotificationDescriptorTemplate'")
     #set ($types = [])
-    #foreach ($type in $services.query.xwql($xwql).execute())
-      #set ($docType = $xwiki.getDocument($type))
-      #set ($docObj  = $docType.getObject('XWiki.Notifications.Code.NotificationDescriptorClass'))
+    #foreach ($descriptor in $services.eventstream.allRecordableEventDescriptors)
       #set ($discard = $types.add({
-        'applicationId'   : $docObj.getValue('applicationId'),
-        'applicationName' : $docObj.getValue('applicationName'),
-        'applicationIcon' : $docObj.getValue('applicationIcon'),
-        'description'     : $docObj.getValue('description'),
-        'eventType'       : $docObj.getValue('eventType')
+        'applicationName' : $services.localization.render($descriptor.applicationName),
+        'applicationIcon' : $services.icon.renderHTML($descriptor.icon),
+        'description'     : $services.localization.render($descriptor.description),
+        'eventType'       : $descriptor.eventType
       }))
     #end
     #set ($lastApp = '')
     #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
-      #if ($lastApp != $type.applicationId)
-        #set ($lastApp = $type.applicationId)
+      #if ($lastApp != $type.applicationName)
+        #set ($lastApp = $type.applicationName)
         &lt;tr&gt;
           &lt;th colspan="2"&gt;
-            $services.icon.renderHTML($type.applicationIcon) $escapetool.xml($type.applicationName)
+            $type.applicationIcon $escapetool.xml($type.applicationName)
           &lt;/th&gt;
         &lt;/tr&gt;
       #end
@@ -83,7 +78,7 @@
         #set ($checked = 'checked="checked"')
       #end
       &lt;tr data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-objnumber="$!preference.number"&gt;
-        &lt;td&gt;$escapetool.xml($services.localization.render($type.description))&lt;/td&gt;
+        &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
         &lt;td&gt;&lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;&lt;/td&gt;
       &lt;/tr&gt;
     #end

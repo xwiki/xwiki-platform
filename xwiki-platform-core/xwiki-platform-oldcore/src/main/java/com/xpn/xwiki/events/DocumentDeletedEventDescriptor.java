@@ -17,36 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package com.xpn.xwiki.events;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
- * Provide a description for a specific implementation of RecordableEvent so that users can knows what the event is
- * about.
- *
  * @version $Id$
  * @since 9.2RC1
  */
-@Role
-@Unstable
-public interface RecordableEventDescriptor
+@Component
+@Singleton
+@Named(DocumentDeletedEventDescriptor.EVENT_TYPE)
+public class DocumentDeletedEventDescriptor implements RecordableEventDescriptor
 {
-    /**
-     * @return the name of the event described by the descriptor, as it is stored in the event stream.
-     */
-    String getEventType();
+    public final static String EVENT_TYPE = "delete";
 
-    /**
-     * @return the name of the application that provide this event
-     */
-    String getApplicationName();
+    @Override
+    public String getEventType()
+    {
+        // Match the name used by Activity Stream.
+        return EVENT_TYPE;
+    }
 
-    /**
-     * @return the translation key of the description of the event type
-     */
-    String getDescription();
+    @Override
+    public String getApplicationName()
+    {
+        return "XWiki";
+    }
 
-    String getIcon();
+    @Override
+    public String getDescription()
+    {
+        return "Someone deletes a new page";
+    }
+
+    @Override
+    public String getIcon()
+    {
+        return "page";
+    }
 }

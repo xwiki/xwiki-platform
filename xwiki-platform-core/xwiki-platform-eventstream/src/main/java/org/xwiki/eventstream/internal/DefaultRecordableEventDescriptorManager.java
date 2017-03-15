@@ -48,7 +48,7 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
     {
         try {
-            return componentManager.getInstanceList(RecordableEventDescriptorManager.class);
+            return componentManager.getInstanceList(RecordableEventDescriptor.class);
         } catch (ComponentLookupException e) {
             throw new EventStreamException("Failed to retrieve the list of RecordableEventDescriptor.", e);
         }

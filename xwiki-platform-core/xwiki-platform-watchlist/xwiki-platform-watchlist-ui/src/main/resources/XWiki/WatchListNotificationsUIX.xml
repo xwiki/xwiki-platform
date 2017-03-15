@@ -576,18 +576,21 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, x
   ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
   ##
-  ## Display the 3 toggle buttons
+  ## Display the headers
   ##
   &lt;li&gt;
-    &lt;div class="notifications-header clearfix"&gt;
+    &lt;div class="clearfix"&gt;
       &lt;div class="col-xs-6"&gt;
-        &lt;p&gt;&lt;strong&gt;Watchlist&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('rendering.macro.watchlist.name'))&lt;/strong&gt;&lt;/p&gt;
       &lt;/div&gt;
       &lt;div class="col-xs-6 text-right"&gt;
-        &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')"&gt;$services.icon.renderHTML('cog') Settings&lt;/a&gt;
+        &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=watchlist')"&gt;$services.icon.renderHTML('cog') $escapetool.xml($services.localization.render('watchlist.settings'))&lt;/a&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/li&gt;
+  ##
+  ## Display the 3 toggle buttons
+  ##
   &lt;li class="notifications-watchlist-item"&gt;
     #macro(displayCheckedIfWatched $scope)#if($services.watchlist.isWatched($scope))checked="checked"#end#end
     &lt;pre&gt;&lt;input type="checkbox" id="tmWatchDocument" #displayCheckedIfWatched('DOCUMENT')/&gt; &lt;input type="checkbox" id="tmWatchSpace" #displayCheckedIfWatched('SPACE')/&gt; &lt;input type="checkbox" id="tmWatchWiki" #displayCheckedIfWatched('WIKI')/&gt;&lt;/pre&gt;

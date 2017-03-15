@@ -1,5 +1,8 @@
 com.xpn.xwiki.DefaultSkinAccessBridge
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
+com.xpn.xwiki.events.DocumentCreatedEventDescriptor
+com.xpn.xwiki.events.DocumentDeletedEventDescriptor
+com.xpn.xwiki.events.DocumentUpdatedEventDescriptor
 com.xpn.xwiki.internal.WikiInitializerJob
 com.xpn.xwiki.internal.XWikiInitializerJob
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener

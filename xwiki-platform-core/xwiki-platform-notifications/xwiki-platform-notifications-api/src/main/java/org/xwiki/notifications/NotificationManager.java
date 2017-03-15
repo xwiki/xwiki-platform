@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -63,7 +63,7 @@ public interface NotificationManager
      */
     List<NotificationPreference> getPreferences(String userId) throws NotificationException;
 
-    XDOM render(Event event) throws NotificationException;
+    Block render(Event event) throws NotificationException;
 
     long getEventsCount(boolean onlyUnread) throws NotificationException;
 

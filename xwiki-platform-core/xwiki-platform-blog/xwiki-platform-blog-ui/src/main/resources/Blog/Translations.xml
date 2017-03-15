@@ -39,11 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>blog.templateProvider.blogpost.name=Blog Post
+  <content>blog.applicationName=Blog
+blog.templateProvider.blogpost.name=Blog Post
 blog.templateProvider.blogpost.description=Communicate news
 blog.categories.all=All
 blog.changeVisibility.changing=Changing the visibility
-blog.changeVisibility.success=The visibility of the blog entry has been successfully changed</content>
+blog.changeVisibility.success=The visibility of the blog entry has been successfully changed
+blog.events.blogpostpublished.description=Someone publishes a new blog post
+</content>
   <object>
     <name>Blog.Translations</name>
     <number>0</number>

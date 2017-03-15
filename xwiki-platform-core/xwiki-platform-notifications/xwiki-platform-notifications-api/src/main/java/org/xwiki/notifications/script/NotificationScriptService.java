@@ -38,8 +38,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.internal.ModelBridge;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
@@ -47,6 +48,7 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Singleton
 @Named("notification")
+@Unstable
 public class NotificationScriptService implements ScriptService
 {
     @Inject
@@ -79,7 +81,7 @@ public class NotificationScriptService implements ScriptService
         return notificationManager.getEvents(userId, offset, limit);
     }
 
-    public XDOM render(Event event) throws NotificationException
+    public Block render(Event event) throws NotificationException
     {
         return notificationManager.render(event);
     }

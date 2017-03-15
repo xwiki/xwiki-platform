@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,26 +16,48 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package com.xpn.xwiki.events;
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Descriptors.WebHome" locale="">
-  <web>XWiki.Notifications.Descriptors</web>
-  <name>WebHome</name>
-  <language/>
-  <defaultLanguage/>
-  <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1488301082000</creationDate>
-  <parent>XWiki.Notifications.WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1488301092000</date>
-  <contentUpdateDate>1488301082000</contentUpdateDate>
-  <version>1.1</version>
-  <title>Descriptors</title>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
-  <content>{{children /}}</content>
-</xwikidoc>
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.RecordableEventDescriptor;
+
+/**
+ * @version $id: $
+ * @since 9.2RC1
+ */
+@Component
+@Singleton
+@Named(DocumentCreatedEventDescriptor.EVENT_TYPE)
+public class DocumentCreatedEventDescriptor implements RecordableEventDescriptor
+{
+    public final static String EVENT_TYPE = "create";
+
+    @Override
+    public String getEventType()
+    {
+        // Match the name used by Activity Stream.
+        return EVENT_TYPE;
+    }
+
+    @Override
+    public String getApplicationName()
+    {
+        return "XWiki";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "Someone creates a new page";
+    }
+
+    @Override
+    public String getIcon()
+    {
+        return "page";
+    }
+}

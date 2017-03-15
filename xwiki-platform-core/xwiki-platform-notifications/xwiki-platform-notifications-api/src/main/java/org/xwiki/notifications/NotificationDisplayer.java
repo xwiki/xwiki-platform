@@ -23,8 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.RecordableEvent;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -41,13 +40,13 @@ public interface NotificationDisplayer
      * Render a notification.
      *
      * @param eventNotification the notification stored in the event stream
-     * @return the XDOM to display in the notification in the page
+     * @return the rendering of the notification in the page
      * @throws NotificationException if error occurs
      */
-    XDOM renderNotification(Event eventNotification) throws NotificationException;
+    Block renderNotification(Event eventNotification) throws NotificationException;
 
     /**
-     * @return the list of the events that this displayer support
+     * @return the list of the event types that this displayer support
      */
-    List<RecordableEvent> getSupportedEvents();
+    List<String> getSupportedEvents();
 }

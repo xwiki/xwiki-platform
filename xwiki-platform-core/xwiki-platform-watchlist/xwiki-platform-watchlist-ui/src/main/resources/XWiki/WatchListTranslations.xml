@@ -57,6 +57,7 @@ watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and childr
 watchlist.notifications.icons.tooltip.space=Watch the parent page and its children
 watchlist.notifications.icons.tooltip.wiki=Watch this wiki
 watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
+watchlist.settings=Settings
 
 ### Watchlist livetable (in the macro)
 watchlist.table.scope.wiki=All pages of the wiki

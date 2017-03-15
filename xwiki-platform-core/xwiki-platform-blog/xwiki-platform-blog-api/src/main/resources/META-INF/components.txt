@@ -1,4 +1,7 @@
+org.xwiki.platform.blog.events.BlogPostPublishedEventDescriptor
+org.xwiki.platform.blog.internal.BlogDocumentSavedListener
 org.xwiki.platform.blog.internal.BlogDocumentSavingListener
+org.xwiki.platform.blog.internal.BlogNotificationDisplayer
 org.xwiki.platform.blog.internal.BlogUpgradeEventListener
 org.xwiki.platform.blog.internal.DefaultBlogVisibilityMigration
 org.xwiki.platform.blog.internal.DefaultBlogVisibilityUpdater

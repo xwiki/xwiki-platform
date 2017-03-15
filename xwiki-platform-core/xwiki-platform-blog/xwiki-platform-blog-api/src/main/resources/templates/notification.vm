@@ -1,0 +1,15 @@
+#set ($document = $xwiki.getDocument($event.document))
+<div class="clearfix">
+  <div class="col-xs-2 notification-icon">
+    $services.icon.renderHTML('rss')
+  </div>
+  <div class="col-xs-10">
+    <p><strong>$escapetool.xml($services.localization.render('blog.applicationName'))</strong></p>
+    <p>A new blog post have been posted: <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a></p>
+    #if ("$!event.user" != '')
+      #set ($userDoc = $xwiki.getDocument($event.user))
+      <p>by <a href="$userDoc.getURL()">$userDoc.display('first_name', 'view') $userDoc.display('last_name', 'view')</a></p>
+    #end
+    <p><small>$escapetool.xml($xwiki.formatDate($event.date))</small></p>
+  </div>
+</div>

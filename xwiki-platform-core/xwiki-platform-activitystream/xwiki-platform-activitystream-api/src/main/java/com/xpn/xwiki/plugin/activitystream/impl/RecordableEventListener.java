@@ -26,11 +26,11 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.AllRecordableEvent;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventConverter;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
@@ -64,13 +64,13 @@ public class RecordableEventListener extends AbstractEventListener
      */
     public RecordableEventListener()
     {
-        super("RecordableEventListener", AllRecordableEvent.ALL_RECORDABLE_EVENT);
+        super("RecordableEventListener", AllEvent.ALLEVENT);
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (remoteObservationManagerContext.isRemoteState()) {
+        if (!(event instanceof RecordableEvent) || remoteObservationManagerContext.isRemoteState()) {
             return;
         }
 

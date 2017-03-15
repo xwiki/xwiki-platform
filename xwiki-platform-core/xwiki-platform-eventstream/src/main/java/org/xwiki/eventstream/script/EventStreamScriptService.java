@@ -30,6 +30,7 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script services for the Event Stream Module.
@@ -40,6 +41,7 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Singleton
 @Named("eventstream")
+@Unstable
 public class EventStreamScriptService implements ScriptService
 {
     @Inject

@@ -17,39 +17,67 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.platform.blog.internal;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.RawBlock;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
- * Default implementation for (@link {@link org.xwiki.notifications.NotificationDisplayer}. The displayer try to execute
- * a template called "notifications/${eventType}.vm" and fallback to "notification/default.vm".
- *
  * @version $Id$
- * @since 9.2RC1
  */
 @Component
 @Singleton
-public class DefaultNotificationDisplayer implements NotificationDisplayer
+@Named(BlogNotificationDisplayer.EVENT_TYPE)
+public class BlogNotificationDisplayer implements NotificationDisplayer, Initializable
 {
+    public static final String EVENT_TYPE = "org.xwiki.platform.blog.events.BlogPostPublishedEvent";
+
+    private static final List<String> EVENTS = Arrays.asList(EVENT_TYPE);
+
+    private static final String TEMPLATE_NAME = String.format("notification/%s.vm", EVENT_TYPE);
+
     @Inject
     private TemplateManager templateManager;
 
     @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
     private VelocityManager velocityManager;
+
+    private String defaultTemplate;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        try {
+            defaultTemplate = IOUtils.toString(getClass().getResourceAsStream("/templates/notification.vm"));
+        } catch (IOException e) {
+            throw new InitializationException("Failed to initialize the Blog Extension.", e);
+        }
+    }
 
     @Override
     public Block renderNotification(Event eventNotification) throws NotificationException
@@ -57,23 +85,25 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
         try {
             velocityManager.getCurrentVelocityContext().put("event", eventNotification);
 
-            String templateName = String.format("notification/%s.vm",
-                    eventNotification.getType().replaceAll("\\/", "."));
-            Template template = templateManager.getTemplate(templateName);
+            Template template = templateManager.getTemplate(TEMPLATE_NAME);
+            if (template != null) {
+                return templateManager.executeNoException(TEMPLATE_NAME);
+            }
 
-            return (template != null) ? templateManager.execute(template)
-                    : templateManager.execute("notification/default.vm");
-
-        } catch (Exception e) {
-            throw new NotificationException("Failed to render the notification.", e);
+            return new RawBlock(executeDefaultTemplate(), Syntax.HTML_5_0);
         } finally {
             velocityManager.getCurrentVelocityContext().remove("event");
         }
     }
 
+    private String executeDefaultTemplate()
+    {
+        return contextProvider.get().getWiki().evaluateVelocity(defaultTemplate, "blog-notification");
+    }
+
     @Override
     public List<String> getSupportedEvents()
     {
-        return Collections.emptyList();
+        return EVENTS;
     }
 }

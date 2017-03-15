@@ -934,7 +934,7 @@ public class ModelFactory
         return restMapEntry;
     }
 
-    public Request tJobRequest(JobRequest restJobRequest)
+    public DefaultRequest toJobRequest(JobRequest restJobRequest)
     {
         DefaultRequest request = new DefaultRequest();
 

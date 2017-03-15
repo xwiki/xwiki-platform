@@ -114,7 +114,7 @@ public class DefaultDistributionJob extends AbstractDistributionJob<Distribution
             ui = this.distributionManager.getWikiUIExtensionId();
         }
 
-        if (StringUtils.isNotBlank(ui.getId())) {
+        if (ui != null && StringUtils.isNotBlank(ui.getId())) {
             // ... but only if the main extension ID is defined
             try {
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,

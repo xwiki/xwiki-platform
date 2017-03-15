@@ -98,7 +98,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiHibernateBaseStore store = getStore();
 
         // Check if the version table exists. If not, then consider we have an empty DB
-        if (isXWikiVersionTableCreated(store.getSession(context))) {
+        if (isXWikiVersionTableCreated(store)) {
             // Try retrieving a version from the database
             ver = store.failSafeExecuteRead(context,
                 new HibernateCallback<XWikiDBVersion>()
@@ -134,26 +134,43 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         return ver;
     }
 
-    private boolean isXWikiVersionTableCreated(Session session) throws DataMigrationException
+    private boolean isXWikiVersionTableCreated(XWikiHibernateBaseStore store) throws DataMigrationException
     {
-        boolean tExists = false;
+        boolean tExists;
+
         // Note: passing null to the first parameter means we're looking in all catalogs and passing null to the second
         // parameters means we're searching in all schemas.
         // An improvement could be to restrict to the catalog/schema, depending on the DB used. However since
         // we're supposed to have only one DB Version table in the DB, it shouldn't matter that much and it's simpler
         // even though it probably takes a bit longer (but this is called only once at startup so it doesn't matter).
-        try (ResultSet rs = session.connection().getMetaData().getTables(null, null, XWIKIDBVERSION_TABLE_NAME, null)) {
-            while (rs.next()) {
-                String tName = rs.getString("TABLE_NAME");
-                if (tName != null && tName.equals(XWIKIDBVERSION_TABLE_NAME)) {
-                    tExists = true;
-                    break;
+        try {
+            tExists = store.executeRead(getXWikiContext(), new HibernateCallback<Boolean>() {
+                @Override
+                public Boolean doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    boolean exists = false;
+                    try (ResultSet rs =
+                        session.connection().getMetaData().getTables(null, null, XWIKIDBVERSION_TABLE_NAME, null))
+                    {
+                        while (rs.next()) {
+                            String tName = rs.getString("TABLE_NAME");
+                            if (tName != null && tName.equals(XWIKIDBVERSION_TABLE_NAME)) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                    } catch (SQLException e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, "Failed to get list of table metadata", e);
+                    }
+                    return exists;
                 }
-            }
-        } catch (SQLException e) {
+            });
+        } catch (Exception e) {
             throw new DataMigrationException(String.format("Error while finding if table [%s] exists",
                 XWIKIDBVERSION_TABLE_NAME), e);
         }
+
         return tExists;
     }
 

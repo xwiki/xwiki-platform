@@ -502,7 +502,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>content</displayInCategory>
     </property>
     <property>
       <displayInSection>Annotations</displayInSection>
@@ -520,7 +520,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>500</sectionOrder>
     </property>
   </object>
 </xwikidoc>

@@ -51,6 +51,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarFile;
 import org.xwiki.xar.internal.model.XarModel;
@@ -113,12 +115,14 @@ public class Packager
     @Inject
     private XWikiDocumentFilterUtils documentImporter;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptors;
+
     public void importXAR(String comment, File xarFile, PackageConfiguration configuration)
-        throws IOException, XWikiException, ComponentLookupException, FilterException
+        throws IOException, XWikiException, ComponentLookupException, FilterException, WikiManagerException
     {
         if (configuration.getWiki() == null) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            Collection<String> wikis = this.wikiDescriptors.getAllIds();
 
             for (String subwiki : wikis) {
                 importXARToWiki(comment, xarFile, new WikiReference(subwiki), configuration);
@@ -229,11 +233,11 @@ public class Packager
         return null;
     }
 
-    public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException
+    public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration)
+        throws WikiManagerException
     {
         if (configuration.getWiki() == null) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            Collection<String> wikis = this.wikiDescriptors.getAllIds();
 
             for (String subwiki : wikis) {
                 unimportPagesFromWiki(pages, subwiki, configuration);
@@ -325,13 +329,12 @@ public class Packager
     }
 
     public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)
-        throws XWikiException
+        throws WikiManagerException
     {
-        List<DocumentReference> documents = new ArrayList<DocumentReference>(pages.size());
+        List<DocumentReference> documents = new ArrayList<>(pages.size());
 
         if (configuration.getWiki() == null) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            Collection<String> wikis = this.wikiDescriptors.getAllIds();
 
             for (String subwiki : wikis) {
                 getDocumentReferencesFromWiki(documents, pages, subwiki, configuration);

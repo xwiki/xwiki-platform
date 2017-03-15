@@ -106,7 +106,7 @@ public class DocumentMergeImporter
                                 nextDocument.setAuthorReference(userReference);
                                 nextDocument.setContentAuthorReference(userReference);
                                 for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                                    attachment.setAuthor(nextDocument.getAuthor());
+                                    attachment.setAuthorReference(nextDocument.getAuthorReference());
                                 }
                             }
 
@@ -146,8 +146,8 @@ public class DocumentMergeImporter
         } catch (Exception e) {
             // Unexpected error, lets behave as if there was a conflict
             documentMergeResult = new MergeResult();
-            documentMergeResult.getLog().error(
-                "Unexpected exception thrown. Usually means there is a bug in the merge.", e);
+            documentMergeResult.getLog()
+                .error("Unexpected exception thrown. Usually means there is a bug in the merge.", e);
             documentMergeResult.setModified(true);
         }
 
@@ -162,13 +162,13 @@ public class DocumentMergeImporter
                 nextDocument.setAuthorReference(userReference);
                 nextDocument.setContentAuthorReference(userReference);
                 for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                    attachment.setAuthor(nextDocument.getAuthor());
+                    attachment.setAuthorReference(nextDocument.getAuthorReference());
                 }
                 mergedDocument.setAuthorReference(userReference);
                 mergedDocument.setContentAuthorReference(userReference);
                 for (XWikiAttachment attachment : mergedDocument.getAttachmentList()) {
                     if (attachment.isContentDirty()) {
-                        attachment.setAuthor(mergedDocument.getAuthor());
+                        attachment.setAuthorReference(mergedDocument.getAuthorReference());
                     }
                 }
             }
@@ -183,8 +183,9 @@ public class DocumentMergeImporter
             saveDocument(mergedDocument, comment, false, configuration);
         }
 
-        return new XarEntryMergeResult(new XarEntry(new LocalDocumentReference(
-            mergedDocument.getDocumentReferenceWithLocale())), documentMergeResult);
+        return new XarEntryMergeResult(
+            new XarEntry(new LocalDocumentReference(mergedDocument.getDocumentReferenceWithLocale())),
+            documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
@@ -305,7 +306,7 @@ public class DocumentMergeImporter
             // Set attachments authors
             for (XWikiAttachment attachment : currentDocument.getAttachmentList()) {
                 if (attachment.isContentDirty()) {
-                    attachment.setAuthor(currentDocument.getAuthor());
+                    attachment.setAuthorReference(currentDocument.getAuthorReference());
                 }
             }
         } else {
@@ -319,7 +320,8 @@ public class DocumentMergeImporter
                 // Set attachments authors
                 for (XWikiAttachment attachment : document.getAttachmentList()) {
                     if (attachment.isContentDirty()) {
-                        currentDocument.getAttachment(attachment.getFilename()).setAuthor(attachment.getAuthor());
+                        currentDocument.getAttachment(attachment.getFilename())
+                            .setAuthorReference(attachment.getAuthorReference());
                     }
                 }
             }

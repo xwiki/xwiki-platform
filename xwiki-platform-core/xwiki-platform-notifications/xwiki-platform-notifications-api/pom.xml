@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-notifications-api</artifactId>
   <name>XWiki Platform - Notifications - API</name>
-  <description>Get and display notifications.</description>
+  <description>Handle notifications</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

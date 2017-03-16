@@ -30,7 +30,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 
 /**
+ * Internal helper to get some configuration about the Activity Stream.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component(roles = ActivityStreamConfiguration.class)
 @Singleton

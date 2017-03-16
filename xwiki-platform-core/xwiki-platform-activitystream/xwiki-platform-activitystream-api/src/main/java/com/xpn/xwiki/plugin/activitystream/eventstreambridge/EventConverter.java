@@ -43,7 +43,11 @@ import com.xpn.xwiki.plugin.activitystream.impl.ActivityEventImpl;
 import com.xpn.xwiki.plugin.activitystream.impl.ActivityEventStatusImpl;
 
 /**
+ * Internal helper that convert some objects from the Event Stream module to objects of the Activity Stream module
+ * (which is used for the storage) and the opposite.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component(roles = EventConverter.class)
 @Singleton
@@ -162,6 +166,12 @@ public class EventConverter
         return result;
     }
 
+    /**
+     * Convert an {@link EventStatus} to an {@link ActivityEventStatus}.
+     *
+     * @param eventStatus the status to transform
+     * @return the equivalent activity event status
+     */
     public ActivityEventStatus convertEventStatusToActivityStatus(EventStatus eventStatus)
     {
         ActivityEventStatusImpl activityStatus = new ActivityEventStatusImpl();
@@ -171,6 +181,12 @@ public class EventConverter
         return activityStatus;
     }
 
+    /**
+     * Convert an {@link ActivityEventStatus} to an {@link EventStatus}.
+     *
+     * @param eventStatus the activity event status to transform
+     * @return the equivalent event status
+     */
     public EventStatus convertActivityStatusToEventStatus(ActivityEventStatus eventStatus)
     {
         return new DefaultEventStatus(

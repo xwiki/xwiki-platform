@@ -28,7 +28,8 @@
     <version>9.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-default</artifactId>
-  <name>XWiki Platform - Notifications - Default implementation</name>
+  <name>XWiki Platform - Notifications - Default bridge</name>
+  <description>Default bridge to oldcore for the Notifications API module.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

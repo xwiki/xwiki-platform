@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Retrieve all RecordableEventDescriptors that are present in the wiki.
+ * Get all RecordableEventDescriptors that are present in the wiki.
  *
  * @version $Id$
  * @since 9.2RC1
@@ -36,6 +36,7 @@ public interface RecordableEventDescriptorManager
 {
     /**
      * @return all the available implementation of RecordableEventDescriptor
+     * @throws EventStreamException if an error occurs
      */
     List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException;
 }

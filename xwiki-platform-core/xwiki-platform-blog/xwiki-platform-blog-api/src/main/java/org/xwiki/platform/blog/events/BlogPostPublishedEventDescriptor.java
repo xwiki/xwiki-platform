@@ -26,6 +26,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
+ * Descriptor for the event {@link BlogPostPublishedEvent}.
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -53,7 +55,7 @@ public class BlogPostPublishedEventDescriptor implements RecordableEventDescript
     }
 
     @Override
-    public String getIcon()
+    public String getApplicationIcon()
     {
         return "rss";
     }

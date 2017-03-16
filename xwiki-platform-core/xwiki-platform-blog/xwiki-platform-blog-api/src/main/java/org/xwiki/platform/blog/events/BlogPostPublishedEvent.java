@@ -22,17 +22,16 @@ package org.xwiki.platform.blog.events;
 import org.xwiki.eventstream.RecordableEvent;
 
 /**
+ * Event sent when a blog post has been published.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 public class BlogPostPublishedEvent implements RecordableEvent
 {
     @Override
     public boolean matches(Object otherEvent)
     {
-        if (otherEvent instanceof BlogPostPublishedEvent) {
-            return true;
-        }
-
-        return false;
+        return otherEvent != null && otherEvent instanceof BlogPostPublishedEvent;
     }
 }

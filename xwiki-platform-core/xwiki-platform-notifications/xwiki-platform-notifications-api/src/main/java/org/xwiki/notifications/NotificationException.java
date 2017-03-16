@@ -20,15 +20,27 @@
 package org.xwiki.notifications;
 
 /**
+ * Exception specific to the notifications module.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 public class NotificationException extends Exception
 {
+    /**
+     * Construct a NotificationException.
+     * @param message the detail message
+     */
     public NotificationException(String message)
     {
         super(message);
     }
 
+    /**
+     * Construct a NotificationException.
+     * @param message the detail message
+     * @param cause the cause
+     */
     public NotificationException(String message, Throwable cause)
     {
         super(message, cause);

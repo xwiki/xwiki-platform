@@ -37,7 +37,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
+ * Send the {@link BlogPostPublishedEvent} when a blog post is published.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component
 @Singleton

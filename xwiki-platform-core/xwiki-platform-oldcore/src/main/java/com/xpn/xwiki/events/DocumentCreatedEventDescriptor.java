@@ -26,7 +26,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
- * @version $id: $
+ * Descriptor for the {@link org.xwiki.bridge.event.DocumentCreatedEvent}.
+ *
+ * @version $Id$
  * @since 9.2RC1
  */
 @Component
@@ -34,7 +36,10 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 @Named(DocumentCreatedEventDescriptor.EVENT_TYPE)
 public class DocumentCreatedEventDescriptor implements RecordableEventDescriptor
 {
-    public final static String EVENT_TYPE = "create";
+    /**
+     * Name of the supported type (as it is stored in Activity Stream).
+     */
+    public static final String EVENT_TYPE = "create";
 
     @Override
     public String getEventType()
@@ -56,7 +61,7 @@ public class DocumentCreatedEventDescriptor implements RecordableEventDescriptor
     }
 
     @Override
-    public String getIcon()
+    public String getApplicationIcon()
     {
         return "page";
     }

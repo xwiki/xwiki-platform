@@ -22,14 +22,33 @@ package org.xwiki.eventstream;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
+ * Handle the statuses for the events.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Role
+@Unstable
 public interface EventStatusManager
 {
+    /**
+     * Get the list of statuses concerning the given events and the given entities.
+     *
+     * @param events a list of events
+     * @param entityIds a list of ids of entities (users and groups)
+     * @return the list of statuses corresponding to each pair or event/entity
+     *
+     * @throws Exception if an error occurs
+     */
     List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception;
 
+    /**
+     * Save in the storage the given status.
+     * @param eventStatus the status to save
+     * @throws Exception if an error occurs
+     */
     void saveEventStatus(EventStatus eventStatus) throws Exception;
 }

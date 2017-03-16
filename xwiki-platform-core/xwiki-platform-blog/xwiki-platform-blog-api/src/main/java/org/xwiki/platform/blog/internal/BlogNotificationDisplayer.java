@@ -20,6 +20,7 @@
 package org.xwiki.platform.blog.internal;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,18 +46,27 @@ import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 
 /**
+ * Implement a {@link NotificationDisplayer} for the event type
+ * {@link org.xwiki.platform.blog.events.BlogPostPublishedEvent}.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component
 @Singleton
 @Named(BlogNotificationDisplayer.EVENT_TYPE)
 public class BlogNotificationDisplayer implements NotificationDisplayer, Initializable
 {
+    /**
+     * Name of the event type that this displayer handle.
+     */
     public static final String EVENT_TYPE = "org.xwiki.platform.blog.events.BlogPostPublishedEvent";
 
     private static final List<String> EVENTS = Arrays.asList(EVENT_TYPE);
 
     private static final String TEMPLATE_NAME = String.format("notification/%s.vm", EVENT_TYPE);
+
+    private static final String EVENT_BINDING_NAME = "event";
 
     @Inject
     private TemplateManager templateManager;
@@ -73,7 +83,8 @@ public class BlogNotificationDisplayer implements NotificationDisplayer, Initial
     public void initialize() throws InitializationException
     {
         try {
-            defaultTemplate = IOUtils.toString(getClass().getResourceAsStream("/templates/notification.vm"));
+            defaultTemplate = IOUtils.toString(getClass().getResourceAsStream("/templates/notification.vm"),
+                    Charset.defaultCharset());
         } catch (IOException e) {
             throw new InitializationException("Failed to initialize the Blog Extension.", e);
         }
@@ -83,16 +94,16 @@ public class BlogNotificationDisplayer implements NotificationDisplayer, Initial
     public Block renderNotification(Event eventNotification) throws NotificationException
     {
         try {
-            velocityManager.getCurrentVelocityContext().put("event", eventNotification);
+            velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, eventNotification);
 
             Template template = templateManager.getTemplate(TEMPLATE_NAME);
             if (template != null) {
-                return templateManager.executeNoException(TEMPLATE_NAME);
+                return templateManager.executeNoException(template);
             }
 
             return new RawBlock(executeDefaultTemplate(), Syntax.HTML_5_0);
         } finally {
-            velocityManager.getCurrentVelocityContext().remove("event");
+            velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
         }
     }
 

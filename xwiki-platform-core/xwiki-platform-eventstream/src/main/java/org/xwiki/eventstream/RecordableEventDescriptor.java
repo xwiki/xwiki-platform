@@ -48,5 +48,8 @@ public interface RecordableEventDescriptor
      */
     String getDescription();
 
-    String getIcon();
+    /**
+     * @return the icon corresponding to the application
+     */
+    String getApplicationIcon();
 }

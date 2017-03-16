@@ -22,6 +22,8 @@ package org.xwiki.notifications;
 import org.xwiki.stability.Unstable;
 
 /**
+ * Represent a preference set by a user concerning a given type of event.
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -34,6 +36,12 @@ public class NotificationPreference
 
     private boolean isNotificationEnabled;
 
+    /**
+     * Construct a NotificationPreference.
+     * @param eventType type of an event
+     * @param applicationId id of an application
+     * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
+     */
     public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled)
     {
         this.eventType = eventType;
@@ -41,16 +49,26 @@ public class NotificationPreference
         this.isNotificationEnabled = isNotificationEnabled;
     }
 
+    /**
+     * @return the type of the event concerned by the preference
+     */
     public String getEventType()
     {
         return eventType;
     }
 
+    /**
+     * @return the if of the application concerned by the preference
+     */
     public String getApplicationId()
     {
+        // Note: this field might be removed a further versions
         return applicationId;
     }
 
+    /**
+     * @return either or not the notification is enabled for the event type or the application
+     */
     public boolean isNotificationEnabled()
     {
         return isNotificationEnabled;

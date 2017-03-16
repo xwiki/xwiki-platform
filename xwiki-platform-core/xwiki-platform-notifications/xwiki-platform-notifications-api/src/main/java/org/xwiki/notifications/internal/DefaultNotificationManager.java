@@ -31,25 +31,23 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.text.StringUtils;
 
 /**
+ * Default implementation of {@link NotificationManager}.
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -73,12 +71,6 @@ public class DefaultNotificationManager implements NotificationManager
     private ModelBridge modelBridge;
 
     @Inject
-    private ComponentManager componentManager;
-
-    @Inject
-    private NotificationDisplayer defaultDisplayer;
-
-    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
@@ -100,7 +92,7 @@ public class DefaultNotificationManager implements NotificationManager
     private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
     {
         try {
-            Query query = getQuery(user, false, true);
+            Query query = generateQuery(user, false, true);
             if (query == null) {
                 return Collections.emptyList();
             }
@@ -127,16 +119,6 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public Block render(Event event) throws NotificationException
-    {
-        try {
-            return getDisplayer(event).renderNotification(event);
-        } catch (Exception e) {
-            throw new NotificationException("Failed to render the notification.", e);
-        }
-    }
-
-    @Override
     public long getEventsCount(boolean onlyUnread) throws NotificationException
     {
         return getEventsCount(onlyUnread, documentAccessBridge.getCurrentUserReference());
@@ -157,7 +139,7 @@ public class DefaultNotificationManager implements NotificationManager
     private long getEventsCount(boolean onlyUnread, DocumentReference userReference) throws NotificationException
     {
         try {
-            Query baseQuery = getQuery(userReference, onlyUnread, false);
+            Query baseQuery = generateQuery(userReference, onlyUnread, false);
             if (baseQuery == null) {
                 return 0;
             }
@@ -178,54 +160,22 @@ public class DefaultNotificationManager implements NotificationManager
         }
     }
 
-    private NotificationDisplayer getDisplayer(Event event) throws ComponentLookupException
-    {
-        for (NotificationDisplayer displayer
-                : componentManager.<NotificationDisplayer>getInstanceList(NotificationDisplayer.class)) {
-            if (displayer == defaultDisplayer) {
-                continue;
-            }
-            for (String ev : displayer.getSupportedEvents()) {
-                if (StringUtils.equals(ev, event.getType())) {
-                    return displayer;
-                }
-            }
-        }
-        return defaultDisplayer;
-    }
-
-    private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException
-    {
-       return modelBridge.getNotificationsPreferences(user);
-    }
-
-    private Query getQuery(DocumentReference user, boolean onlyUnread, boolean withOrder) throws NotificationException,
-            QueryException
+    private Query generateQuery(DocumentReference user, boolean onlyUnread, boolean withOrder)
+            throws NotificationException, QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
-        String hql = "where event.date >= :startDate AND event.user <> :user AND (";
+        // TODO: create unit tests for all use-cases
+        // TODO: idea: handle the items of the watchlist too
 
+        // First: get the preferences of the given user
         List<NotificationPreference> preferences = getPreferences(user);
 
-        List<String> types = new ArrayList<>();
-        for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
-                types.add(preference.getEventType());
-            }
-        }
-        if (!types.isEmpty()) {
-            hql += "event.type IN (:types)";
-        }
+        // Then: generate the HQL query
+        StringBuilder hql = new StringBuilder();
+        hql.append("where event.date >= :startDate AND event.user <> :user AND (");
 
-        List<String> apps = new ArrayList<>();
-        for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
-                apps.add(preference.getApplicationId());
-            }
-        }
-        if (!apps.isEmpty()) {
-            hql += (types.isEmpty() ? "" : " OR ") + "event.application IN (:apps)";
-        }
+        List<String> types = handleEventTypes(hql, preferences);
+        List<String> apps  = handleApplications(hql, preferences, types);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
@@ -233,38 +183,94 @@ public class DefaultNotificationManager implements NotificationManager
             return null;
         }
 
-        hql += ")";
+        hql.append(")");
 
-        // Don't show hidden events unless the user want to display hidden pages
-        if (userPreferencesSource.getProperty("displayHiddenDocuments", 0) == 0) {
-            hql += " AND event.hidden <> true";
-        }
+        handleHiddenEvents(hql);
+        handleEventStatus(onlyUnread, hql);
+        handleOrder(withOrder, hql);
 
-        if (onlyUnread) {
-            hql += " AND (event not in (select status.activityEvent from ActivityEventStatusImpl status " +
-                    "where status.activityEvent = event and status.entityId = :user and status.read = true))";
-        }
+        // The, generate the query
+        Query query = queryManager.createQuery(hql.toString(), Query.HQL);
 
-        // HSQLDB do not support adding "order by" when we do "select count(*)"
-        if (withOrder) {
-            hql += " order by event.date DESC";
-        }
-
-        // TODO: idea: handle the items of the watchlist too
-
-        Query query = queryManager.createQuery(hql, Query.HQL);
-
+        // Bind values
         query.bindValue("startDate", modelBridge.getUserStartDate(user));
         query.bindValue("user", serializer.serialize(user));
+        handleEventTypes(types, query);
+        handleApplications(apps, query);
 
-        if (!types.isEmpty()) {
-            query.bindValue("types", types);
+        // Return the query
+        return query;
+    }
+
+    private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException
+    {
+        return modelBridge.getNotificationsPreferences(user);
+    }
+
+    private void handleOrder(boolean withOrder, StringBuilder hql)
+    {
+        // HSQLDB do not support adding "order by" when we do "select count(*)"
+        if (withOrder) {
+            hql.append(" order by event.date DESC");
         }
+    }
 
+    private void handleEventStatus(boolean onlyUnread, StringBuilder hql)
+    {
+        if (onlyUnread) {
+            hql.append(" AND (event not in (select status.activityEvent from ActivityEventStatusImpl status "
+                    + "where status.activityEvent = event and status.entityId = :user and status.read = true))");
+        }
+    }
+
+    private void handleHiddenEvents(StringBuilder hql)
+    {
+        // Don't show hidden events unless the user want to display hidden pages
+        if (userPreferencesSource.getProperty("displayHiddenDocuments", 0) == 0) {
+            hql.append(" AND event.hidden <> true");
+        }
+    }
+
+    private void handleApplications(List<String> apps, Query query)
+    {
         if (!apps.isEmpty()) {
             query.bindValue("apps", apps);
         }
+    }
 
-        return query;
+    private void handleEventTypes(List<String> types, Query query)
+    {
+        if (!types.isEmpty()) {
+            query.bindValue("types", types);
+        }
+    }
+
+    private List<String> handleApplications(StringBuilder hql, List<NotificationPreference> preferences,
+            List<String> types)
+    {
+        List<String> apps = new ArrayList<>();
+        for (NotificationPreference preference : preferences) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
+                apps.add(preference.getApplicationId());
+            }
+        }
+        if (!apps.isEmpty()) {
+            hql.append((types.isEmpty() ? "" : " OR ") + "event.application IN (:apps)");
+        }
+        return apps;
+    }
+
+    private List<String> handleEventTypes(StringBuilder hql, List<NotificationPreference> preferences)
+    {
+        List<String> types = new ArrayList<>();
+        for (NotificationPreference preference : preferences) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
+                types.add(preference.getEventType());
+            }
+        }
+        if (!types.isEmpty()) {
+            hql.append("event.type IN (:types)");
+        }
+        return types;
     }
 }

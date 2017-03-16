@@ -26,6 +26,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
+ * Descriptor for the {@link org.xwiki.bridge.event.DocumentDeletedEvent}.
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -34,7 +36,10 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 @Named(DocumentDeletedEventDescriptor.EVENT_TYPE)
 public class DocumentDeletedEventDescriptor implements RecordableEventDescriptor
 {
-    public final static String EVENT_TYPE = "delete";
+    /**
+     * Name of the supported type (as it is stored in Activity Stream).
+     */
+    public static final String EVENT_TYPE = "delete";
 
     @Override
     public String getEventType()
@@ -56,7 +61,7 @@ public class DocumentDeletedEventDescriptor implements RecordableEventDescriptor
     }
 
     @Override
-    public String getIcon()
+    public String getApplicationIcon()
     {
         return "page";
     }

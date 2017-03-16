@@ -20,26 +20,42 @@
 package org.xwiki.eventstream;
 
 /**
- * Exceptions specific to the Event Stream module.
+ * Exception specific to the Event Stream module.
  *
  * @version $Id$
  * @since 9.2RC1
  */
 public class EventStreamException extends Exception
 {
+    /**
+     * Construct an EventStreamException.
+     */
     public EventStreamException()
     {
     }
 
+    /**
+     * Construct an EventStreamException.
+     * @param message the detail message
+     */
     public EventStreamException(String message)
     {
         super(message);
     }
 
+    /**
+     * Construct an EventStreamException.
+     * @param message the detail message
+     * @param cause the cause
+     */
     public EventStreamException(String message, Throwable cause)
     {
     }
 
+    /**
+     * Construct an EventStreamException.
+     * @param cause the cause
+     */
     public EventStreamException(Throwable cause)
     {
         super(cause);

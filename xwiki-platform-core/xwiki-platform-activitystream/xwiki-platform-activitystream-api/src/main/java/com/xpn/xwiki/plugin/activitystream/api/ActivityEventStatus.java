@@ -19,14 +19,29 @@
  */
 package com.xpn.xwiki.plugin.activitystream.api;
 
+import org.xwiki.stability.Unstable;
+
 /**
+ * Define a status for any couple of activity/entity.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
+@Unstable
 public interface ActivityEventStatus
 {
+    /**
+     * @return the activity concerned by the status
+     */
     ActivityEvent getActivityEvent();
 
+    /**
+     * @return the id of the entity (a user or a group) concerned by the status
+     */
     String getEntityId();
 
+    /**
+     * @return either or nor the activity has been read by the entity
+     */
     boolean isRead();
 }

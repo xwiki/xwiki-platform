@@ -26,6 +26,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
+ * Descriptor for the {@link org.xwiki.bridge.event.DocumentUpdatedEvent}.
+ *
  * @version $Id$
  * @since 9.2RC1
  */
@@ -34,7 +36,10 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 @Named(DocumentUpdatedEventDescriptor.EVENT_TYPE)
 public class DocumentUpdatedEventDescriptor implements RecordableEventDescriptor
 {
-    public final static String EVENT_TYPE = "update";
+    /**
+     * Name of the supported type (as it is stored in Activity Stream).
+     */
+    public static final String EVENT_TYPE = "update";
 
     @Override
     public String getEventType()
@@ -56,7 +61,7 @@ public class DocumentUpdatedEventDescriptor implements RecordableEventDescriptor
     }
 
     @Override
-    public String getIcon()
+    public String getApplicationIcon()
     {
         return "page";
     }

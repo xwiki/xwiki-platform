@@ -106,7 +106,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * The events to match.
      */
-    protected static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+    public static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
     {
         {
             add(new DocumentCreatedEvent());

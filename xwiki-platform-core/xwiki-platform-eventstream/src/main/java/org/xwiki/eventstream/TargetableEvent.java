@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
 public interface TargetableEvent extends org.xwiki.observation.event.Event
 {
     /**
-     * @return the list of users and groups represented by their id that are targeted by this notification
+     * @return the list of users and groups represented by their id that are targeted by this event
      */
     Set<String> getTarget();
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.activitystream.eventstreambridge;
+package com.xpn.xwiki.plugin.activitystream.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +34,21 @@ import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventStatus;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
+import com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter;
 import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
+ * Default implementation of {@link EventStatusManager} which use the Activity Stream storage.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component
 @Singleton
@@ -74,7 +79,7 @@ public class DefaultEventStatusManager implements EventStatusManager
         // Get the ActivityEventStatus from the database and convert them
         Query query = queryManager.createQuery("select eventStatus from ActivityEventStatusImpl eventStatus "
                 + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);
-        query.bindValue("eventIds", getEventIds(events, entityIds));
+        query.bindValue("eventIds", getEventIds(events));
         query.bindValue("entityIds", entityIds);
         for (ActivityEventStatus activityEventStatus : query.<ActivityEventStatus>execute()) {
             results.add(new DefaultEventStatus(
@@ -96,7 +101,11 @@ public class DefaultEventStatusManager implements EventStatusManager
         return results;
     }
 
-    private List<String> getEventIds(List<Event> events, List<String> entityIds)
+    /**
+     * @param events a list of events
+     * @return the list of the events' id
+     */
+    private List<String> getEventIds(List<Event> events)
     {
         List<String> eventIds = new ArrayList<>();
         for (Event event : events) {
@@ -105,11 +114,14 @@ public class DefaultEventStatusManager implements EventStatusManager
         return eventIds;
     }
 
+    /**
+     * @return if there is a status concerning the given event and the given entity in a list of statuses
+     */
     private boolean isPresent(Event event, String entityId, List<EventStatus> list)
     {
         for (EventStatus status : list) {
-            if (status.getEvent().getId().equals(event.getId())
-                    && status.getEntityId().equals(entityId)) {
+            if (StringUtils.equals(status.getEvent().getId(), event.getId())
+                    && StringUtils.equals(status.getEntityId(), entityId)) {
                 return true;
             }
         }

@@ -45,6 +45,8 @@ import org.xwiki.velocity.VelocityManager;
 @Singleton
 public class DefaultNotificationDisplayer implements NotificationDisplayer
 {
+    private static final String EVENT_BINDING_NAME = "event";
+
     @Inject
     private TemplateManager templateManager;
 
@@ -55,7 +57,7 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
     public Block renderNotification(Event eventNotification) throws NotificationException
     {
         try {
-            velocityManager.getCurrentVelocityContext().put("event", eventNotification);
+            velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, eventNotification);
 
             String templateName = String.format("notification/%s.vm",
                     eventNotification.getType().replaceAll("\\/", "."));
@@ -67,13 +69,15 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         } finally {
-            velocityManager.getCurrentVelocityContext().remove("event");
+            velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
         }
     }
 
     @Override
     public List<String> getSupportedEvents()
     {
+        // The default notification displayer is called manually if no other displayer has been found so we don't need
+        // to create a list of supported events.
         return Collections.emptyList();
     }
 }

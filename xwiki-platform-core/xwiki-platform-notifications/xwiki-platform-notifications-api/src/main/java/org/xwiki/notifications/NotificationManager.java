@@ -24,11 +24,10 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
 /**
- * Retrieve notifications for users.
+ * Get notifications for users.
  *
  * @version $Id$
  * @since 9.2RC1
@@ -38,36 +37,60 @@ import org.xwiki.stability.Unstable;
 public interface NotificationManager
 {
     /**
-     * @return a list of notifications concerning the current user
+     * @param offset the offset
+     * @param limit the number of events to get
+     * @return a list of events concerning the current user and to display as notifications
      * @throws NotificationException if error happens
      */
     List<Event> getEvents(int offset, int limit) throws NotificationException;
 
     /**
      * @param userId id of the user
-     * @return a list of notifications concerning a given user
+     * @param offset the offset
+     * @param limit the number of events to get
+     * @return a list of events concerning a given user and to display as notifications
      * @throws NotificationException if error happens
      */
     List<Event> getEvents(String userId, int offset, int limit) throws NotificationException;
 
     /**
      * @return the list of notifications preferences for the current user
-     * @throws NotificationException
+     * @throws NotificationException if an error happens
      */
     List<NotificationPreference> getPreferences() throws NotificationException;
 
     /**
      * @param userId id of the user
      * @return the list of notifications preferences for a given user
-     * @throws NotificationException
+     * @throws NotificationException if an error happens
      */
     List<NotificationPreference> getPreferences(String userId) throws NotificationException;
 
-    Block render(Event event) throws NotificationException;
-
+    /**
+     * Return the number of events to display as notifications concerning the current user.
+     *
+     * @param onlyUnread either if only unread events should be counted or all events
+     * @return the list of events to display as notifications
+     * @throws NotificationException if an error happens
+     */
     long getEventsCount(boolean onlyUnread) throws NotificationException;
 
+    /**
+     * * Return the number of events to display as notifications concerning a given user.
+     *
+     * @param onlyUnread either if only unread events should be counted or all events
+     * @param userId if a user
+     * @return the list of events to display as notifications
+     * @throws NotificationException if an error happens
+     */
     long getEventsCount(boolean onlyUnread, String userId) throws NotificationException;
 
+    /**
+     * Set the start date for the given user.
+     *
+     * @param userId the id of the user
+     * @param startDate the date before which we ignore notifications
+     * @throws NotificationException if an error happens
+     */
     void setStartDate(String userId, Date startDate) throws NotificationException;
 }

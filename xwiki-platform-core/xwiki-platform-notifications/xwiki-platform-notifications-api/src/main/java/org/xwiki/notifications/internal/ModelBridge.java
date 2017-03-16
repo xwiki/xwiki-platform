@@ -28,7 +28,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 
 /**
- * Internal role that request to the model and avoid a direct dependency to oldcore.
+ * Internal role that make requests to the model and avoid a direct dependency to oldcore.
  *
  * @version $Id$
  * @since 9.2RC1
@@ -36,10 +36,28 @@ import org.xwiki.notifications.NotificationPreference;
 @Role
 public interface ModelBridge
 {
+    /**
+     * Return the notifications preferences of the given user.
+     *
+     * @param userReference the document reference of a user
+     * @return the list of preferences
+     *
+     * @throws NotificationException if an error occurs
+     */
     List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference) throws
             NotificationException;
 
+    /**
+     * @param userReference the document reference of a user
+     * @return the date before which we ignore notifications
+     * @throws NotificationException if an error occurs
+     */
     Date getUserStartDate(DocumentReference userReference) throws NotificationException;
 
+    /**
+     * @param userReference the document reference of a user
+     * @param startDate the date before which we ignore notifications
+     * @throws NotificationException if an error occurs
+     */
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
 }

@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 
@@ -48,6 +49,22 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
+    private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
+        new SpaceReference("Notifications",
+            new SpaceReference("XWiki", new WikiReference("toChange"))
+        )
+    );
+
+    private static final DocumentReference NOTIFICATION_PREFERENCE_CLASS = new DocumentReference(
+            "NotificationPreferenceClass", NOTIFICATION_CODE_SPACE
+    );
+
+    private static final DocumentReference NOTIFICATION_START_DATE_CLASS = new DocumentReference(
+            "NotificationsStartDateClass", NOTIFICATION_CODE_SPACE
+    );
+
+    private static final String START_DATE = "startDate";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -58,9 +75,8 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        final DocumentReference notificationPreferencesClass = new DocumentReference("NotificationPreferenceClass",
-                new SpaceReference("Code", new SpaceReference("Notifications",
-                        new SpaceReference("XWiki", userReference.getWikiReference()))));
+        final DocumentReference notificationPreferencesClass
+                = NOTIFICATION_PREFERENCE_CLASS.setWikiReference(userReference.getWikiReference());
 
         List<NotificationPreference> preferences = new ArrayList<>();
 
@@ -94,13 +110,12 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            final DocumentReference notificationStartDateClass = new DocumentReference("NotificationsStartDateClass",
-                    new SpaceReference("Code", new SpaceReference("Notifications",
-                            new SpaceReference("XWiki", userReference.getWikiReference()))));
+            final DocumentReference notificationStartDateClass
+                    = NOTIFICATION_START_DATE_CLASS.setWikiReference(userReference.getWikiReference());
 
             BaseObject obj = document.getXObject(notificationStartDateClass);
             if (obj != null) {
-                Date date = obj.getDateValue("startDate");
+                Date date = obj.getDateValue(START_DATE);
                 if (date != null) {
                     return date;
                 }
@@ -123,12 +138,11 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            final DocumentReference notificationStartDateClass = new DocumentReference("NotificationsStartDateClass",
-                    new SpaceReference("Code", new SpaceReference("Notifications",
-                            new SpaceReference("XWiki", userReference.getWikiReference()))));
+            final DocumentReference notificationStartDateClass
+                    = NOTIFICATION_START_DATE_CLASS.setWikiReference(userReference.getWikiReference());
 
             BaseObject obj = document.getXObject(notificationStartDateClass, true, context);
-            obj.setDateValue("startDate", startDate);
+            obj.setDateValue(START_DATE, startDate);
 
             xwiki.saveDocument(document, "Update start date for the notifications.", context);
 

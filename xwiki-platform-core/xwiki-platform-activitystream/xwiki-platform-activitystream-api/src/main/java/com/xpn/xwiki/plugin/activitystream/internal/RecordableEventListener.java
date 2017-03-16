@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.activitystream.impl;
+package com.xpn.xwiki.plugin.activitystream.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,10 +34,14 @@ import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
+
 /**
- * Store the notification inside the event stream.
+ * Store the recordable event inside the event stream (except events that are already handled by the Activity Stream
+ * implementation).
  *
  * @version $Id$
+ * @since 9.2RC1
  */
 @Component
 @Singleton

@@ -28,7 +28,10 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventStatus;
 
 /**
+ * Default implementation of {@link ActivityEventStatus}.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 public class ActivityEventStatusImpl implements ActivityEventStatus, Serializable
 {
@@ -56,16 +59,25 @@ public class ActivityEventStatusImpl implements ActivityEventStatus, Serializabl
         return isRead;
     }
 
+    /**
+     * @param activityEvent the activity concerned by the status
+     */
     public void setActivityEvent(ActivityEvent activityEvent)
     {
         this.activityEvent = activityEvent;
     }
 
+    /**
+     * @param entityId the id of the entity (a user or a group) concerned by the status
+     */
     public void setEntityId(String entityId)
     {
         this.entityId = entityId;
     }
 
+    /**
+     * @param read either or nor the activity has been read by the entity
+     */
     public void setRead(boolean read)
     {
         isRead = read;

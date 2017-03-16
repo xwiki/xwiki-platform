@@ -17,34 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.notifications;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.eventstream.Event;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
 /**
- * Special event matcher used by a listener which need to listened to all recordable events.
+ * Render an event as a notification.
  *
  * @version $Id$
  * @since 9.2RC1
  */
+@Role
 @Unstable
-public final class AllRecordableEvent implements RecordableEvent
+public interface NotificationRenderer
 {
     /**
-     * Unique instance of the event matcher.
+     * Generate a rendering Block for a given event to display as notification.
+     * @param event the event to render
+     * @return a rendering block ready to display the event
+     * @throws NotificationException if an error happens
      */
-    public static final AllRecordableEvent ALL_RECORDABLE_EVENT = new AllRecordableEvent();
-
-    /**
-     * Use {@link #ALL_RECORDABLE_EVENT} instead.
-     */
-    private AllRecordableEvent()
-    {
-    }
-
-    @Override
-    public boolean matches(Object otherEvent)
-    {
-        return otherEvent != null ? otherEvent instanceof RecordableEvent : false;
-    }
+    Block render(Event event) throws NotificationException;
 }

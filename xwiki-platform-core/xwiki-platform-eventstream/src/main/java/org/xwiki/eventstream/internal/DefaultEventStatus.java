@@ -23,7 +23,10 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 
 /**
+ * Default implementation for {@link EventStatus}.
+ *
  * @version $Id$
+ * @since 9.2RC1
  */
 public class DefaultEventStatus implements EventStatus
 {
@@ -33,6 +36,12 @@ public class DefaultEventStatus implements EventStatus
 
     private boolean isRead;
 
+    /**
+     * Construct a DefaultEventStatus.
+     * @param event the event concerned by the status
+     * @param entityId the id of the entity concerned by the status
+     * @param isRead either or not the entity as read the given entity
+     */
     public DefaultEventStatus(Event event, String entityId, boolean isRead)
     {
         this.event = event;
@@ -58,16 +67,25 @@ public class DefaultEventStatus implements EventStatus
         return isRead;
     }
 
+    /**
+     * @param event the event concerned by the status
+     */
     public void setEvent(Event event)
     {
         this.event = event;
     }
 
+    /**
+     * @param entityId the id of the entity concerned by the status
+     */
     public void setEntityId(String entityId)
     {
         this.entityId = entityId;
     }
 
+    /**
+     * @param read either or not the entity as read the given entity
+     */
     public void setRead(boolean read)
     {
         isRead = read;

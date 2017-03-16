@@ -57,7 +57,7 @@
     #foreach ($descriptor in $services.eventstream.allRecordableEventDescriptors)
       #set ($discard = $types.add({
         'applicationName' : $services.localization.render($descriptor.applicationName),
-        'applicationIcon' : $services.icon.renderHTML($descriptor.icon),
+        'applicationIcon' : $services.icon.renderHTML($descriptor.applicationIcon),
         'description'     : $services.localization.render($descriptor.description),
         'eventType'       : $descriptor.eventType
       }))

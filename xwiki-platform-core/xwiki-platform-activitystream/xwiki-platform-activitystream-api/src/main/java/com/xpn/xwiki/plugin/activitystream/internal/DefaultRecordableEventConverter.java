@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.activitystream.impl;
+package com.xpn.xwiki.plugin.activitystream.internal;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +28,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.AllRecordableEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventConverter;
@@ -48,8 +47,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultRecordableEventConverter implements RecordableEventConverter
 {
-    private static final List<RecordableEvent> EVENTS = Arrays.asList(AllRecordableEvent.ALL_RECORDABLE_EVENT);
-
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -65,7 +62,7 @@ public class DefaultRecordableEventConverter implements RecordableEventConverter
         convertedEvent.setUser(context.getUserReference());
         convertedEvent.setWiki(context.getWikiReference());
         if (recordableEvent instanceof TargetableEvent) {
-            convertedEvent.setTarget(((TargetableEvent)recordableEvent).getTarget());
+            convertedEvent.setTarget(((TargetableEvent) recordableEvent).getTarget());
         }
 
         if (data instanceof String) {
@@ -82,6 +79,14 @@ public class DefaultRecordableEventConverter implements RecordableEventConverter
     @Override
     public List<RecordableEvent> getSupportedEvents()
     {
-        return EVENTS;
+        // The default recordable event converter is called manually as a fallback when no converter matches the event,
+        // se we don't need to specify a list.
+        //
+        // We could have defined a AllRecordableEvent class just like org.xwiki.observation.event.AllEvent, but it would
+        // not have worked as expected because it would require some special code in
+        // org.xwiki.observation.ObservationManager to handle it and xwiki-commons does not know anything about the
+        // RecordableEvent interface defined in xwiki-platform.
+        //
+        return Collections.emptyList();
     }
 }

@@ -31,7 +31,7 @@
   <name>XWiki Platform - Blog - API</name>
   <properties>
     <!-- Test coverage -->
-    <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

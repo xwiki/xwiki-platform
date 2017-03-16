@@ -57,7 +57,7 @@ public class DocumentUpdatedEventDescriptor implements RecordableEventDescriptor
     @Override
     public String getDescription()
     {
-        return "Someone updates a new page";
+        return "core.events.update.description";
     }
 
     @Override

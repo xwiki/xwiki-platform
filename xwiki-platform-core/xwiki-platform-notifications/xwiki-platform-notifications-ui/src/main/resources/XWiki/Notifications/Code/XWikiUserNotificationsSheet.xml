@@ -43,13 +43,13 @@
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
 (% class="profile-section highlighted-profile-section" %)
 (((
-==Notifications settings==
+==$services.localization.render('notifications.settings.title')==
 {{html}}
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th&gt;&lt;/th&gt;
-      &lt;th&gt;Notification center&lt;/th&gt;
+      &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.menu'))&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
@@ -208,7 +208,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap-switch'], function ($, xm) {
     var objNumber    = tr.attr('data-objnumber');
 
     // Saving
-    var notification = new XWiki.widgets.Notification('Your setting is beeign saved...', 'inprogress');
+    var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
     if (objNumber == '' &amp;&amp; state) {
       // If the object does not exist yet, create it
       var restURL = xm.restURL + '/objects?media=json';
@@ -219,10 +219,10 @@ require(['jquery', 'xwiki-meta', 'bootstrap-switch'], function ($, xm) {
       }).done(function (data) {
         tr.attr('data-objnumber', data.number);
         notification.hide();
-        new XWiki.widgets.Notification('Saved', 'done');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
       }).fail(function () {
         notification.hide();
-        new XWiki.widgets.Notification('Failed to save your setting', 'error');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
     } else if (objNumber != '') {
       // If the object already exist, just update its value
@@ -234,10 +234,10 @@ require(['jquery', 'xwiki-meta', 'bootstrap-switch'], function ($, xm) {
         data: state ? '1' : '0'
       }).done(function (data) {
         notification.hide();
-        new XWiki.widgets.Notification('Saved', 'done');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
       }).fail(function () {
         notification.hide();
-        new XWiki.widgets.Notification('Failed to save your setting', 'error');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
     }
   });

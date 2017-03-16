@@ -57,7 +57,7 @@ public class DocumentCreatedEventDescriptor implements RecordableEventDescriptor
     @Override
     public String getDescription()
     {
-        return "Someone creates a new page";
+        return "core.events.create.description";
     }
 
     @Override

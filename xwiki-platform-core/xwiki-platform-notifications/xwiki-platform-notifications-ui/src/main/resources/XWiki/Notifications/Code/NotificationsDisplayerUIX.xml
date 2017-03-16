@@ -213,12 +213,12 @@
    */
   var createCleanButton = function (startDate) {
     var markAllReadButton = $('&lt;a href="#"&gt;')
-      .html('$services.icon.renderHTML("trash") Clear')
+      .html('$services.icon.renderHTML("trash") $escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
       .click(function (event) {
         // Avoid the menu closing
         event.stopPropagation();
         // Display a saving message
-        var notification = new XWiki.widgets.Notification('Clearing the notifications', 'inprogress');
+        var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
         // Send the request to change the start date
         $.post(url, {
           action: 'setStartDate',
@@ -226,9 +226,9 @@
         }).success(function (){
           // Display the success message
           notification.hide();
-          new XWiki.widgets.Notification('Notifications are cleared', 'done');
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
           // Remove the notifications from the UI and display the "nothing!" message instead.
-          $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text('Nothing!'));
+          $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
           // Update the notifications counter
           updateNotificationCount(0);
         });
@@ -304,7 +304,8 @@
       }
       // If there is other notifications to load
       if (data.notifications.length == notificationsLimit) {
-        var loadMore = $('&lt;div&gt;').html('&lt;p&gt;Load older notifications&lt;/p&gt;').addClass('text-center').addClass('notifications-load-more');
+        var loadMore = $('&lt;div&gt;').addClass('text-center').addClass('notifications-load-more');
+        loadMore.append($('&lt;p&gt;').text("$escapetool.javascript($services.localization.render('notifications.menu.more'))"))
         area.append(loadMore);
         loadMore.click(function(event) {
           loadMore.text('').addClass('loading');
@@ -585,10 +586,10 @@
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     &lt;div class="notifications-header clearfix"&gt;
       &lt;div class="col-xs-6"&gt;
-        &lt;p&gt;&lt;strong&gt;Notifications&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
       &lt;/div&gt;
       &lt;div class="col-xs-6 text-right"&gt;
-        &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;$services.icon.renderHTML('cog') Settings&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;$services.icon.renderHTML('cog') $escapetool.xml($services.localization.render('notifications.menu.header.settings'))&lt;/a&gt;&lt;/p&gt;
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="notifications-area loading clearfix"&gt;

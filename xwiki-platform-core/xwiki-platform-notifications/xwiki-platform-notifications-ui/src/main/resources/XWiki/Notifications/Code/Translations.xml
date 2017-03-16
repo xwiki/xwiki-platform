@@ -40,10 +40,24 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.core.profile.category.notifications=Notifications
+  <content>
+platform.core.profile.category.notifications=Notifications
 notifications.eventTypes.create=Someone creates a new page
 notifications.eventTypes.update=Someone updates a page
-notifications.eventTypes.delete=Someone deletes a page</content>
+notifications.eventTypes.delete=Someone deletes a page
+notifications.menu.header=Notifications
+notifications.menu.header.settings=Settings
+notifications.menu.clear=Clear
+notifications.menu.clearing=Clearing the notifications
+notifications.menu.cleared=Notifications are cleared
+notifications.menu.nothing=Nothing!
+notifications.menu.more=Load older notifications
+notifications.settings.title=Notifications Preferences
+notifications.settings.menu=Notification menu
+notifications.settings.saving=Your setting is being saved...
+notifications.settings.saved=Saved!
+notifications.settings.savingfailed=Failed to save your settings
+</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

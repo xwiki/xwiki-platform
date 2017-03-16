@@ -57,7 +57,7 @@ public class DocumentDeletedEventDescriptor implements RecordableEventDescriptor
     @Override
     public String getDescription()
     {
-        return "Someone deletes a new page";
+        return "core.events.delete.description";
     }
 
     @Override

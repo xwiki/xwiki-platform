@@ -106,7 +106,7 @@
     #set($configClassName = 'XWiki.XWikiPreferences')
     #set($formId = $section.toLowerCase())
   #end
-  &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
+  &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform"&gt;
     #set($obj = $configDoc.getObject($configClassName))
     #foreach ($entry in $params.entrySet())
       #set ($fields = $entry.value)

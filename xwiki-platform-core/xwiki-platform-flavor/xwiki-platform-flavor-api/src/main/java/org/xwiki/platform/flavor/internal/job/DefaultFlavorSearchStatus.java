@@ -53,7 +53,7 @@ public class DefaultFlavorSearchStatus extends DefaultExtensionPlan<FlavorSearch
     public DefaultFlavorSearchStatus(FlavorSearchRequest request, ObservationManager observationManager,
         LoggerManager loggerManager, List<Extension> flavors, JobStatus parentJobStatus)
     {
-        super(request, observationManager, loggerManager, null, parentJobStatus);
+        super(FlavorSearchJob.JOBTYPE, request, observationManager, loggerManager, null, parentJobStatus);
 
         this.flavors = Collections.unmodifiableList(flavors);
     }
@@ -61,6 +61,7 @@ public class DefaultFlavorSearchStatus extends DefaultExtensionPlan<FlavorSearch
     /**
      * @return the flavors found so far
      */
+    @Override
     public List<Extension> getFlavors()
     {
         return this.flavors;

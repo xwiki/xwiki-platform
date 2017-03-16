@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
@@ -50,7 +51,7 @@ public class DiffXarJobStatus extends DefaultJobStatus<InstallRequest>
      */
     public DiffXarJobStatus(InstallRequest request, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(request, null, observationManager, loggerManager);
+        super(DiffXarJob.JOB_TYPE, request, null, observationManager, loggerManager);
     }
 
     /**

@@ -39,7 +39,7 @@ public class WikiInitializerJobStatus extends AbstractJobStatus<WikiInitializerR
     public WikiInitializerJobStatus(WikiInitializerRequest request, ObservationManager observationManager,
         LoggerManager loggerManager)
     {
-        super(request, null, observationManager, loggerManager);
+        super(WikiInitializerJob.JOBTYPE, request, null, observationManager, loggerManager);
 
         setIsolated(false);
     }

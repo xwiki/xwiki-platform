@@ -42,8 +42,11 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AbstractEntityJob}.
@@ -58,12 +61,6 @@ public class EntityJobTest
         public String getType()
         {
             return null;
-        }
-
-        @Override
-        protected EntityJobStatus<EntityRequest> createNewStatus(EntityRequest request)
-        {
-            return new EntityJobStatus<EntityRequest>(request, this.observationManager, this.loggerManager, null);
         }
 
         @Override
@@ -111,8 +108,8 @@ public class EntityJobTest
 
         EntityReferenceProvider defaultEntityReferenceProvider = mock(EntityReferenceProvider.class);
         ReflectionUtils.setFieldValue(job, "defaultEntityReferenceProvider", defaultEntityReferenceProvider);
-        when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
-            new EntityReference("WebHome", EntityType.DOCUMENT, null));
+        when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT, null));
 
         job.initialize(request);
     }
@@ -179,8 +176,8 @@ public class EntityJobTest
         DocumentReference carolBio = new DocumentReference("bar", Arrays.asList("Users", "Carol"), "Bio");
 
         SpaceReference spaceReference = mock(SpaceReference.class);
-        when(this.modelBridge.getDocumentReferences(spaceReference)).thenReturn(
-            Arrays.asList(alice, alicePrefs, aliceBio, bob, bobPrefs, bobBio, carolBio));
+        when(this.modelBridge.getDocumentReferences(spaceReference))
+            .thenReturn(Arrays.asList(alice, alicePrefs, aliceBio, bob, bobPrefs, bobBio, carolBio));
 
         NoopEntityJob job = new NoopEntityJob();
         initialize(job, new EntityRequest());

@@ -50,8 +50,8 @@ import org.xwiki.security.authorization.Right;
  * @version $Id$
  * @since 7.2M1
  */
-public abstract class AbstractEntityJob<R extends EntityRequest, S extends EntityJobStatus<? super R>> extends
-    AbstractJob<R, S> implements GroupedJob
+public abstract class AbstractEntityJob<R extends EntityRequest, S extends EntityJobStatus<? super R>>
+    extends AbstractJob<R, S> implements GroupedJob
 {
     /**
      * Generic interface used to implement the Visitor pattern.
@@ -138,11 +138,17 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         }
     }
 
+    @Override
+    protected S createNewStatus(R request)
+    {
+        return (S) new EntityJobStatus<R>(getType(), request, this.observationManager, this.loggerManager, null);
+    }
+
     /**
      * Return the deepest common parent shared by all concerned entities. For example, if we have:
      * <ul>
-     *     <li>"A.B.C"</li>
-     *     <li>"A.B.D"</li>
+     * <li>"A.B.C"</li>
+     * <li>"A.B.D"</li>
      * </ul>
      * the results will be "A.B".
      *
@@ -157,8 +163,8 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     /**
      * Return the deepest common parents shared by all concerned entities. For example, if we have:
      * <ul>
-     *     <li>A.B.C</li>
-     *     <li>A.B.D</li>
+     * <li>A.B.C</li>
+     * <li>A.B.D</li>
      * </ul>
      * the results will be A.B.
      *
@@ -198,9 +204,8 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     }
 
     /**
-     * Set the context user before executing the job. We don't have to restore the previous context user when
-     * the job is finished because jobs are normally executed in a separate thread, with a separate execution
-     * context.
+     * Set the context user before executing the job. We don't have to restore the previous context user when the job is
+     * finished because jobs are normally executed in a separate thread, with a separate execution context.
      */
     protected void setContextUser()
     {
@@ -241,8 +246,8 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
 
     protected boolean isSpaceHomeReference(DocumentReference documentReference)
     {
-        return documentReference.getName().equals(
-            this.defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName());
+        return documentReference.getName()
+            .equals(this.defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName());
     }
 
     private boolean isSpacePreferencesReference(EntityReference entityReference)

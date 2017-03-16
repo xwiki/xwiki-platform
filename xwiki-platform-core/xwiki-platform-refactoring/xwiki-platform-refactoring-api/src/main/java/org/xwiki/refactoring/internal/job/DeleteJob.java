@@ -48,12 +48,6 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
     }
 
     @Override
-    protected EntityJobStatus<EntityRequest> createNewStatus(EntityRequest request)
-    {
-        return new EntityJobStatus<EntityRequest>(request, this.observationManager, this.loggerManager, null);
-    }
-
-    @Override
     protected void process(EntityReference entityReference)
     {
         // Dispatch the delete operation based on the entity type.

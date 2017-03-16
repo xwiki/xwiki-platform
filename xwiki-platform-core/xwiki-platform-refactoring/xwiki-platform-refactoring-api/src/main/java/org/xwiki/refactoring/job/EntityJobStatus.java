@@ -53,6 +53,21 @@ public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T
     }
 
     /**
+     * Creates a new instance.
+     * 
+     * @param jobType the type of the job
+     * @param request the request provided when the job was started
+     * @param observationManager the observation manager
+     * @param loggerManager the logger manager
+     * @param parentJobStatus the status of the parent job, or {@code null} if this job doesn't have a parent
+     */
+    public EntityJobStatus(String jobType, T request, ObservationManager observationManager,
+        LoggerManager loggerManager, JobStatus parentJobStatus)
+    {
+        super(jobType, request, parentJobStatus, observationManager, loggerManager);
+    }
+
+    /**
      * Cancel the job.
      */
     public void cancel()

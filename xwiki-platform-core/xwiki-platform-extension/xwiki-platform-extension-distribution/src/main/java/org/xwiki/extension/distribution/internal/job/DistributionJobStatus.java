@@ -70,8 +70,8 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(ObjectUtils.cloneIfPossible((DistributionRequest) status.getRequest()), null, observationManager,
-            loggerManager);
+        super(status.getJobType(), ObjectUtils.cloneIfPossible((DistributionRequest) status.getRequest()), null,
+            observationManager, loggerManager);
 
         if (status instanceof DistributionJobStatus) {
             DistributionJobStatus distributionJobStatus = (DistributionJobStatus) status;
@@ -88,7 +88,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     public DistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
         LoggerManager loggerManager, List<DistributionStep> steps)
     {
-        super(request, null, observationManager, loggerManager);
+        super(DefaultDistributionJob.HINT, request, null, observationManager, loggerManager);
 
         this.stepList = steps;
     }

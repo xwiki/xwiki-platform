@@ -74,7 +74,9 @@ public class EntityRequest extends AbstractRequest
     /**
      * @return the type of job that should perform this request; this is useful when different jobs use the same type of
      *         request
+     * @deprecated since 9.2RC1, use {@link EntityJobStatus#getJobType()} instead
      */
+    @Deprecated
     public String getJobType()
     {
         return getProperty(PROPERTY_JOB_TYPE);
@@ -85,7 +87,9 @@ public class EntityRequest extends AbstractRequest
      * request.
      * 
      * @param jobType the type of job that should perform this request
+     * @deprecated
      */
+    @Deprecated
     public void setJobType(String jobType)
     {
         setProperty(PROPERTY_JOB_TYPE, jobType);
@@ -176,8 +180,8 @@ public class EntityRequest extends AbstractRequest
     public Map<String, String> getEntityParameters(EntityReference entityReference)
     {
         Map<String, String> entityParameters =
-            getProperty(PROPERTY_ENTITY_PARAMETERS, Collections.<EntityReference, Map<String, String>>emptyMap()).get(
-                entityReference);
+            getProperty(PROPERTY_ENTITY_PARAMETERS, Collections.<EntityReference, Map<String, String>>emptyMap())
+                .get(entityReference);
         return entityParameters == null ? Collections.emptyMap() : entityParameters;
     }
 

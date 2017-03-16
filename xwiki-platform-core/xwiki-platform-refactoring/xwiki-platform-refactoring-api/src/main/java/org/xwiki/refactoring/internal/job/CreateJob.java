@@ -48,12 +48,6 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
     }
 
     @Override
-    protected EntityJobStatus<CreateRequest> createNewStatus(CreateRequest request)
-    {
-        return new EntityJobStatus<>(request, this.observationManager, this.loggerManager, null);
-    }
-
-    @Override
     protected void process(EntityReference entityReference)
     {
         // Dispatch the create operation based on the entity type.

@@ -67,12 +67,6 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
     }
 
     @Override
-    protected EntityJobStatus<MoveRequest> createNewStatus(MoveRequest request)
-    {
-        return new EntityJobStatus<MoveRequest>(request, this.observationManager, this.loggerManager, null);
-    }
-
-    @Override
     protected void runInternal() throws Exception
     {
         if (this.request.getDestination() != null) {

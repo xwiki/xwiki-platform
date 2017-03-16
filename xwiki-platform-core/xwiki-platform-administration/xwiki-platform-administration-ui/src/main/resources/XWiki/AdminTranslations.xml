@@ -56,7 +56,19 @@ XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki h
 XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
 XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
 XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
-XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates</content>
+XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+
+# Import Section
+administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+
+# Export Section
+administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
+administration.section.export.description.hint=The package description, displayed when importing the package.
+administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
+administration.section.export.author.hint=The package author.
+administration.section.export.version.hint=The package version.
+administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
+administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.</content>
   <object>
     <name>XWiki.AdminTranslations</name>
     <number>0</number>

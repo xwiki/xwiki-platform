@@ -41,6 +41,9 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ## Administrate the wiki import.
+(%class="noitems"%)
+{{translation key="administration.section.import.hint" /}}
+
 {{html}}
 #template('importinline.vm')
 {{/html}}

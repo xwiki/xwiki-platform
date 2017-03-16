@@ -60,24 +60,34 @@
 
   &lt;h2&gt;$escapetool.xml($services.localization.render('annotations.config.activate.title'))&lt;/h2&gt;
 
-  &lt;p&gt;$escapetool.xml($services.localization.render('annotations.config.activate.explanation'))&lt;/p&gt;
+  &lt;p class="noitems"&gt;$escapetool.xml($services.localization.render('annotations.config.activate.explanation'))&lt;/p&gt;
 
   &lt;dl&gt;
 
-    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get('activated').prettyName)&lt;/dt&gt;
-    &lt;dd&gt;
-{{/html}}
-
-{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('activated', 'edit'){{/html}}
-
-{{html clean='false'}}&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="AnnotationCode.AnnotationConfig_0_activated"&gt;
+        {{/html}}{{html wiki="true" clean="false"}}$annotationsConfigDoc.display('activated', 'edit'){{/html}}{{html clean="false"}}
+        $escapetool.xml($annotationsConfigClass.get('activated').prettyName)
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $escapetool.xml($services.localization.render('AnnotationCode.AnnotationConfig_activated.hint'))
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;&lt;/dd&gt;
 
     ## We can`t just join the list values in the hidden DOM element without escaping the separator from each value first.
     #set ($spacesEscapedValues = [])
     #foreach ($spacesValue in $configObject.getValue('exceptionSpaces'))
       #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
     #end
-    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get("exceptionSpaces").prettyName)&lt;/dt&gt;
+    &lt;dt&gt;
+      &lt;label for="AnnotationCode.AnnotationConfig_0_exceptionSpaces"&gt;
+        $escapetool.xml($annotationsConfigClass.get("exceptionSpaces").prettyName)
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $escapetool.xml($services.localization.render('AnnotationCode.AnnotationConfig_exceptionSpaces.hint'))
+      &lt;/span&gt;
+    &lt;/dt&gt;
     &lt;dd&gt;
       &lt;input id="AnnotationCode.AnnotationConfig_0_exceptionSpaces" name="AnnotationCode.AnnotationConfig_0_exceptionSpaces"
             value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
@@ -96,36 +106,43 @@
 
   &lt;dl&gt;
 
-    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get('displayed').prettyName)&lt;/dt&gt;
-    &lt;dd&gt;
-{{/html}}
+    &lt;dt&gt;
+      &lt;label for="AnnotationCode.AnnotationConfig_0_displayed"&gt;
+        {{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayed', 'edit'){{/html}}{{html clean='false'}}
+        $escapetool.xml($annotationsConfigClass.get('displayed').prettyName)
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $escapetool.xml($services.localization.render('AnnotationCode.AnnotationConfig_displayed.hint'))
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;&lt;/dd&gt;
 
-{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayed', 'edit'){{/html}}
-
-{{html clean='false'}}&lt;/dd&gt;
-
-    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get("displayHighlight").prettyName)&lt;/dt&gt;
-    &lt;dd&gt;
-{{/html}}
-
-{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayHighlight', 'edit'){{/html}}
-
-{{html clean='false'}}&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="AnnotationCode.AnnotationConfig_0_displayHighlight"&gt;
+        {{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayHighlight', 'edit'){{/html}}{{html clean='false'}}
+        $escapetool.xml($annotationsConfigClass.get("displayHighlight").prettyName)
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $escapetool.xml($services.localization.render('AnnotationCode.AnnotationConfig_displayHighlight.hint'))
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;&lt;/dd&gt;
 
   &lt;/dl&gt;
 
   &lt;h2&gt;$escapetool.xml($services.localization.render('annotations.config.type.title'))&lt;/h2&gt;
 
-  &lt;p&gt;$escapetool.xml($services.localization.render('annotations.config.type.explanation'))&lt;/p&gt;
+  &lt;p class="noitems"&gt;$escapetool.xml($services.localization.render('annotations.config.type.explanation'))&lt;/p&gt;
 
   &lt;dl&gt;
-    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get('annotationClass').prettyName)&lt;/dt&gt;
+    &lt;dt&gt;
+      &lt;label for="AnnotationCode.AnnotationConfig_0_annotationClass"&gt;
+        $escapetool.xml($annotationsConfigClass.get('annotationClass').prettyName)
+      &lt;/label&gt;
+    &lt;/dt&gt;
     &lt;dd&gt;
-{{/html}}
-
-{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('annotationClass', 'edit'){{/html}}
-
-{{html clean='false'}}&lt;/dd&gt;
+      {{/html}}{{html wiki="true" clean="false"}}$annotationsConfigDoc.display('annotationClass', 'edit'){{/html}}{{html clean="false"}}
+    &lt;/dd&gt;
   &lt;/dl&gt;
 
   ## Add a "Save" button for when displayed in an Administration section or even in view mode.

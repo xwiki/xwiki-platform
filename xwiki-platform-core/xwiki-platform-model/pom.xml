@@ -81,11 +81,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream</artifactId>
-      <version>9.2-SNAPSHOT</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

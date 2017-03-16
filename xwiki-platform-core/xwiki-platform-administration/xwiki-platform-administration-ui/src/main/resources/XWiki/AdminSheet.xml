@@ -86,13 +86,7 @@
   },
   {
     'id' : 'content',
-    'children': [
-       {'id' : 'Templates', 'order' : 100},
-       {'id' : 'Localization', 'order' : 200},
-       {'id' : 'Import', 'action' : 'import', 'order' : 300},
-       {'id' : 'Export', 'order' : 400},
-       {'id' : 'XWiki.OfficeImporterAdmin', 'order' : 600}
-    ]
+    'children': []
   },
   {
     'id' : 'extensionmanager',

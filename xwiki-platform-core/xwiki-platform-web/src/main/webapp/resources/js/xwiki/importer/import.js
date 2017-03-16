@@ -383,7 +383,8 @@ var XWiki = (function(XWiki){
             this.node.addClassName("loading");
             this.node.setStyle("min-height:200px");
 
-            new Ajax.Request(window.location, {
+            // Make sure the request goes through the Import action, where the actual import takes place.
+            new Ajax.Request(XWiki.currentDocument.getURL('import', Object.toQueryString(window.location.href.parseQuery())), {
               method:'post',
               parameters: parameters,
               onSuccess: function(transport) {

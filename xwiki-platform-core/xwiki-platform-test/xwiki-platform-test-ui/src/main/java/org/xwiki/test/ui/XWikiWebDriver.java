@@ -40,7 +40,6 @@ import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.ErrorHandler;
 import org.openqa.selenium.remote.FileDetector;
-import org.openqa.selenium.remote.RemoteStatus;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -665,12 +664,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     public Capabilities getCapabilities()
     {
         return this.wrappedDriver.getCapabilities();
-    }
-
-    @Override
-    public RemoteStatus getRemoteStatus()
-    {
-        return this.wrappedDriver.getRemoteStatus();
     }
 
     @Override

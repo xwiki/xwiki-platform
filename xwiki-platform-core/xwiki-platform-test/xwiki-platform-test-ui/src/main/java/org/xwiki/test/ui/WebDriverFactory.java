@@ -32,6 +32,8 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import io.github.bonigarcia.wdm.FirefoxDriverManager;
+
 /**
  * Create specific {@link WebDriver} instances for various Browsers.
  * 
@@ -44,12 +46,13 @@ public class WebDriverFactory
     {
         WebDriver driver;
         if (browserName.startsWith("*firefox")) {
-            // Native events are disabled by default for Firefox on Linux as it may cause tests which open many windows
-            // in parallel to be unreliable. However, native events work quite well otherwise and are essential for some
-            // of the new actions of the Advanced User Interaction. We need native events to be enable especially for
-            // testing the WYSIWYG editor. See http://code.google.com/p/selenium/issues/detail?id=2331 .
+            // Note: the Gecko driver needs to be set as a system property under the "webdriver.gecko.driver" key for
+            // the Firefox Driver to work with Selenium 3+.
+            // The following line will download and install the latest gecko driver corresponding to the OS and set
+            // this system property.
+            FirefoxDriverManager.getInstance().setup();
+
             FirefoxProfile profile = new FirefoxProfile();
-            profile.setEnableNativeEvents(true);
             // Make sure Firefox doesn't upgrade automatically on CI agents.
             profile.setPreference("app.update.auto", false);
             profile.setPreference("app.update.enabled", false);

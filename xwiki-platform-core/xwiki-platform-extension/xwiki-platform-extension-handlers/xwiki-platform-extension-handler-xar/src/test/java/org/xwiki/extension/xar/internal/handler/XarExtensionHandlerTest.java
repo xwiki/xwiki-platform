@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +72,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -293,10 +293,10 @@ public class XarExtensionHandlerTest
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentSize(getXWikiContext()));
+        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
         Assert.assertEquals("attachment content",
-            IOUtils.toString(attachment.getContentInputStream(getXWikiContext())));
-        Assert.assertEquals(this.contextUser.toString(), attachment.getAuthor());
+            IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
+        Assert.assertEquals(this.contextUser, attachment.getAuthorReference());
 
         // space1.page1
 
@@ -442,10 +442,11 @@ public class XarExtensionHandlerTest
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentSize(getXWikiContext()));
+        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
         Assert.assertEquals("attachment content",
-            IOUtils.toString(attachment.getContentInputStream(getXWikiContext())));
-        Assert.assertEquals("XWiki.attachmentauthor", attachment.getAuthor());
+            IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "attachmentauthor"),
+            attachment.getAuthorReference());
 
         // space1.page1
 
@@ -579,9 +580,9 @@ public class XarExtensionHandlerTest
         XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentSize(getXWikiContext()));
+        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
         Assert.assertEquals("attachment content",
-            IOUtils.toString(attachment.getContentInputStream(getXWikiContext())));
+            IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
 
         // space2.page2
 
@@ -630,8 +631,7 @@ public class XarExtensionHandlerTest
     @Test
     public void testUpgradeOnRoot() throws Throwable
     {
-        when(this.oldcore.getSpyXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class)))
-            .thenReturn(Arrays.asList("wiki1", "wiki2"));
+        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getWikiDescriptorManager()).getAllIds();
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
@@ -696,9 +696,9 @@ public class XarExtensionHandlerTest
         XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
         Assert.assertNotNull(attachment);
         Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentSize(getXWikiContext()));
+        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
         Assert.assertEquals("attachment content",
-            IOUtils.toString(attachment.getContentInputStream(getXWikiContext())));
+            IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
 
         // space2.page2
 
@@ -897,8 +897,7 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
-            .getVirtualWikisDatabaseNames(any(XWikiContext.class));
+        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getWikiDescriptorManager()).getAllIds();
 
         // install
 
@@ -980,8 +979,7 @@ public class XarExtensionHandlerTest
     @Test(expected = UninstallException.class)
     public void testUninstallOnRootWithoutAdminRights() throws Throwable
     {
-        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
-            .getVirtualWikisDatabaseNames(any(XWikiContext.class));
+        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getWikiDescriptorManager()).getAllIds();
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
@@ -1011,8 +1009,7 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnNamespaceThenOnRoot() throws Throwable
     {
-        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
-            .getVirtualWikisDatabaseNames(any(XWikiContext.class));
+        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getWikiDescriptorManager()).getAllIds();
 
         // install on wiki
 
@@ -1053,8 +1050,7 @@ public class XarExtensionHandlerTest
     @Test
     public void testInstallOnNamespaceThenUpgradeOnRoot() throws Throwable
     {
-        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
-            .getVirtualWikisDatabaseNames(any(XWikiContext.class));
+        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getWikiDescriptorManager()).getAllIds();
 
         // install on wiki
 
@@ -1133,8 +1129,7 @@ public class XarExtensionHandlerTest
     @Test
     public void testCreateNewWiki() throws Throwable
     {
-        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getSpyXWiki())
-            .getVirtualWikisDatabaseNames(any(XWikiContext.class));
+        doReturn(Arrays.asList("wiki1", "wiki2")).when(this.oldcore.getWikiDescriptorManager()).getAllIds();
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 

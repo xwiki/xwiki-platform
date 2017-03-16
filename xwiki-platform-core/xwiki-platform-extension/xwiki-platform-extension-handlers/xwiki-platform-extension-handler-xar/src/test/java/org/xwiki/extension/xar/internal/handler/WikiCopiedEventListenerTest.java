@@ -40,6 +40,7 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 @AllComponents
 public class WikiCopiedEventListenerTest
@@ -51,11 +52,20 @@ public class WikiCopiedEventListenerTest
 
     private InstalledExtensionRepository installedExtensionRepository;
 
+    private WikiDescriptorManager wikiDescriptorManager;
+
     private ObservationManager observation;
 
     private LocalExtension localExtension1;
 
     private LocalExtension localExtensionDependency1;
+
+    @AfterComponent
+    public void afterComponent() throws Exception
+    {
+        this.wikiDescriptorManager =
+            this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
+    }
 
     @Before
     public void setUp() throws Exception

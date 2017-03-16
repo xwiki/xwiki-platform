@@ -43,8 +43,7 @@
 ### Administer localization wiki preferences, at global level
 #set ($params = {
   'language': ['multilingual', 'languages' , 'default_language'],
-  'date': ['dateformat', 'timezone'],
-  'translations': ['documentBundles']
+  'date': ['dateformat', 'timezone']
 })
 ## Used to display nicer inputs for the languages
 #set ($discard = $xwiki.jsx.use('XWiki.AdminLocalizationSheet'))
@@ -433,23 +432,10 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
      * Enable the bootstrap-select plugin to have a nicer UI.
      */
     var enableSelectPicker = function (select) {
-      // Return the width of an input which has no custom transformation so that we get the pure results of CSS rules.
-      var getBaseWidth = function () {
-        return $('input[name="XWiki.XWikiPreferences_0_documentBundles"]').outerWidth() + 'px';
-      }
-
-      select.selectpicker({
-        // We need to set the width manually using pixels because if we use "100%", it won't work because the select
-        // picker is using an absolute position, so using "100%" would exceed the window limit.
-        width: getBaseWidth(),
+      // Force 100% width on the select using the form-control CSS class.
+      select.addClass('form-control').selectpicker({
         // Enable the filtering on choices if there is a lot of choices
         liveSearch: select.find('option').length &gt; 10
-      });
-
-      // Update the width of the select picker when the window is resized
-      $(window).resize(function() {
-        select.selectpicker({width: getBaseWidth()});
-        select.selectpicker('refresh');
       });
     }
 

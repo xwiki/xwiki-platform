@@ -32,7 +32,7 @@ $services.template.execute('logging_macros.vm')
           data-target-xpath="parent::*/following-sibling::*">
         <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
         <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
-        #set ($jobType = $status.request.getProperty('job.type'))
+        #set ($jobType = $status.jobType)
         #set ($translationKey = "job.log.label.$jobType")
         #if (!$services.localization.get($translationKey))
           #set ($translationKey = 'job.log.label')

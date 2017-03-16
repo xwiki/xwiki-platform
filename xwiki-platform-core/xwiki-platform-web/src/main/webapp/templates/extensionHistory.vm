@@ -96,7 +96,7 @@
       #set ($message = $services.localization.render('extension.history.currentJobInfo.replay',
         ["<a href='$jobStatusURL'>", '</a>']))
     #else
-      #set ($jobType = $currentJobStatus.request.getProperty('job.type'))
+      #set ($jobType = $currentJobStatus.jobType))
       #set ($message = $services.localization.render('extension.history.currentJobInfo',
         ["<strong>$jobType</strong>", "<strong>$jobId</strong>"]))
     #end

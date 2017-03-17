@@ -41,6 +41,7 @@
   <hidden>true</hidden>
   <content>admin.wikis=Wikis
 admin.wikis.descriptor=Descriptor
+admin.wikis.descriptor.description=Configure the wiki descriptor
 admin.wiki.description=Describe your wiki (pretty name and description) and set its owner and homepage.
 platform.wiki.admin.wiki.ownerProblemConfirmation=The new owner's user does not exist or it may come from a different wiki.\\nAre you sure you want to use it and continue with the save operation?
 platform.wiki.admin.wiki.csrfInvalidError=Invalid security (CSRF) token. Please refresh the page and try again.

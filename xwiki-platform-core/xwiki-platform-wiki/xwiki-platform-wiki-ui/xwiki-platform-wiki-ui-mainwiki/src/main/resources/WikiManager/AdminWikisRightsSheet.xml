@@ -40,7 +40,6 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-== $services.localization.render("admin.wikis.rights") ==
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 {{html}}
   &lt;form method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" class="xform"&gt;
@@ -269,7 +268,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder>200</sectionOrder>
+      <sectionOrder>300</sectionOrder>
     </property>
   </object>
 </xwikidoc>

@@ -40,7 +40,8 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-= {{translation key="admin.wikis.templates" /}}=
+(% class="noitems" %)
+{{translation key="admin.wikis.templates.hint" /}}
 ## Load the User Picker style for the wiki owner column.
 #set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #set($columns = ['wikiprettyname', 'description', 'owner', 'membershipType'])
@@ -55,13 +56,14 @@
    'rowCount' : 10,
    'resultPage' : 'WikiManager.WikisLiveTableResults',
    'translationPrefix' : 'platform.wiki.browse.',
-   'extraParams': 'onlyTemplates=1'
+   'extraParams': 'onlyTemplates=1',
+   'outputOnlyHtml': true
 })
 #if(!$isGuest)
   #set($discard = $columns.add('_actions'))
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['edit', 'delete'] }))
 #end
-#livetable('wikis', $columns, $columnsProperties, $options)
+{{html clean="false"}}#livetable('wikis', $columns, $columnsProperties, $options){{/html}}
 {{/velocity}}</content>
   <object>
     <name>WikiManager.AdminWikisTemplatesSheet</name>
@@ -279,7 +281,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder>300</sectionOrder>
+      <sectionOrder>200</sectionOrder>
     </property>
   </object>
 </xwikidoc>

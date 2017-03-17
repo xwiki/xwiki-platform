@@ -92,10 +92,9 @@
       $xwiki.ssx.use($sheetDocFullName)
     #end
     {{html}}
-    &lt;div class='xform half'&gt;
+    &lt;div class='xform'&gt;
       &lt;form method='post' action="$xwiki.getURL($sheetDocFullName, 'get', 'outputSyntax=plain')"&gt;
         &lt;fieldset&gt;
-          &lt;legend&gt;$services.localization.render('admin.wikis.descriptor')&lt;/legend&gt;
           &lt;dl&gt;
             &lt;dt&gt;
               &lt;label for='prettyName'&gt;$services.localization.render('platform.wiki.sheet.prop.wikiprettyname')&lt;/label&gt;

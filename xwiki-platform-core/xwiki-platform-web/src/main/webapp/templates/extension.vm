@@ -425,7 +425,7 @@
     #set ($install.userReference = $installedExtension.getUserReference($namespace))
   #else
     #set ($installJobStatus = $extensionManager.getExtensionJobStatus($installedExtension.id.id, $namespace))
-    #if ($installJobStatus && $installJobStatus.request.getProperty('job.type') == 'install')
+    #if ($installJobStatus && $installJobStatus.jobType == 'install')
       #set ($install.date = $installJobStatus.startDate)
       #set ($install.userReference = $installJobStatus.request.getProperty('user.reference'))
     #end
@@ -636,7 +636,7 @@ $namespace##
       'installplan': 'extensions.install.error.alreadyInstalled',
       'uninstallplan': 'extensions.uninstall.error.notInstalled'
     })
-    <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
+    <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.jobType))</div>
   #else
     <dl>
     #foreach($entry in $extensionsByAction.entrySet())
@@ -662,6 +662,8 @@ $namespace##
     #displayExtensionDetails_mergeConflictQuestion($question)
   #elseif ($questionType.endsWith('.CleanPagesQuestion'))
     #displayExtensionDetails_cleanPagesQuestion($question)
+  #elseif ($questionType.endsWith('.DefaultConflictActionQuestion'))
+    #displayExtensionDetails_defaultConflictActionQuestion($question)
   #end
 #end
 
@@ -828,6 +830,44 @@ $namespace##
         </li>
       #end
     </ul>
+  #end
+#end
+
+#macro (displayExtensionDetails_defaultConflictActionQuestion $question)
+  <dl>
+    <dt>
+      <label>$services.localization.render('extension.xar.question.defaultConflictAction.label')</label>
+      <span class="xHint">$services.localization.render('extension.xar.question.defaultConflictAction.hint')</span>
+    </dt>
+    <dd>
+      <dl>
+        #foreach ($conflictType in $services.extension.xar.conflictTypes)
+          #set ($defaultConflictAction = $question.getConflictAction($conflictType))
+          <dt>
+            <label>$services.localization.render("extension.xar.conflict.${conflictType}.label")</label>
+            <span class="xHint">$services.localization.render("extension.xar.conflict.${conflictType}.hint")</span>            
+          </dt>
+          <dd>
+            <select name="defaultConflictAction_$conflictType">
+            #foreach ($conflictAction in $conflictType.actions)
+              <option value="$conflictAction"#if ($conflictAction == $defaultConflictAction) selected="selected"#end>
+                $services.localization.render("extension.xar.conflict.action.${conflictAction}.label")
+              </option>
+            #end
+            </select>            
+          </dd>
+        #end
+      </dl>
+    </dd>
+  </dl>
+#end
+
+#macro (answerExtensionJobQuestion_defaultConflictActionQuestion $question)
+  #foreach ($conflictType in $services.extension.xar.conflictTypes)
+    #set ($conflictAction = $request.getParameter("defaultConflictAction_$conflictType"))
+    #if ($conflictAction)
+      #set ($void = $question.setConflictAction($conflictType, $conflictAction))
+    #end
   #end
 #end
 
@@ -1040,17 +1080,17 @@ $namespace##
 #macro (continueExtensionJob $extensionId $extensionVersion)
   #getExtensionJobStatus($extensionId $extensionVersion $jobStatus)
   #set ($jobState = $jobStatus.state)
-  #set ($jobType = $jobStatus.request.getProperty('job.type'))
+  #set ($jobType = $jobStatus.jobType)
   #if ($jobState == 'FINISHED')
     #isExtensionPlan($jobStatus $isExtensionPlan)
     #if ($isExtensionPlan)
       ## Execute the latest extension job plan.
       ## TODO: Would be nice to reuse somehow the job request that was used to create the plan.
       #if ($jobType == 'installplan')
-        #installExtension($extensionId $extensionVersion $jobStatus.request.getNamespaces())
+        #installExtension($extensionId $extensionVersion $jobStatus.request)
         #break
       #elseif ($jobType == 'uninstallplan')
-        #uninstallExtension($extensionId $extensionVersion $jobStatus.request.getNamespaces())
+        #uninstallExtension($extensionId $extensionVersion $jobStatus.request)
         #break
       #end
     #end
@@ -1063,13 +1103,14 @@ $namespace##
 
 #macro (answerExtensionJobQuestion $jobStatus)
   ## Continue an interactive extension job using the data submitted by the user.
-  #set ($questionType = $jobStatus.question.getClass().getName())
+  #set ($question = $jobStatus.question)
+  #set ($questionType = $question.getClass().getName())
   #if ($questionType.endsWith('.ConflictQuestion'))
     ## A merge conflict occurred during installation.
-    #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
-    #set ($discard = $jobStatus.question.setAlways($request.autoResolve.equals('true')))
+    #set ($discard = $question.setGlobalAction($request.versionToKeep))
+    #set ($discard = $question.setAlways($request.autoResolve.equals('true')))
   #elseif ($questionType.endsWith('.CleanPagesQuestion'))
-    #foreach ($entry in $jobStatus.question.pages.entrySet())
+    #foreach ($entry in $question.pages.entrySet())
       ## Currently there's no string representation of a document reference with parameters (such as locale) that can
       ## be resolved so what has been submitted is a set of (document reference without locale, locale) pairs.
       #set ($stringReferenceWithoutLocale = $services.model.serialize($entry.key, 'default'))
@@ -1077,43 +1118,19 @@ $namespace##
       #set ($delete = $localesToDelete && $localesToDelete.contains($entry.key.locale.toString()))
       #set ($discard = $entry.setValue($delete))
     #end
+  #elseif ($questionType.endsWith('.DefaultConflictActionQuestion'))
+    #answerExtensionJobQuestion_defaultConflictActionQuestion($question)
   #end
   #set ($discard = $jobStatus.answered())
 #end
 
-#macro (installExtension $extensionId $extensionVersion $namespaces)
-  #set ($jobIdNamespace = $NULL)
-  #if ($namespaces && $namespaces.size() == 1)
-    ## The namespace that will appear in the job id.
-    #set ($jobIdNamespace = $namespaces.get(0))
-  #end
-  #set ($installRequest = $extensionManager.createInstallRequest($extensionId, $extensionVersion, $jobIdNamespace))
-  ## Add the rest of the namespaces.
-  #foreach ($namespace in $namespaces)
-    #if ($namespace != $jobIdNamespace)
-      #set ($discard = $installRequest.addNamespace($namespace))
-    #end
-  #end
-  #if ($extensionConfig.skipCheckRight)
-    #set ($discard = $installRequest.removeProperty('checkrights'))
-  #end
-  #if ($extensionConfig.skipCurrentUser)
-    #set ($discard = $installRequest.removeProperty('user.reference'))
-  #end
-  #if ($extensionConfig.installJAROnRoot)
-    #set ($discard = $installRequest.rewriter.installExtensionTypeOnRootNamespace('jar'))
-    #set ($discard = $installRequest.rewriter.installExtensionTypeOnRootNamespace('webjar'))
-  #end
+#macro (installExtension $extensionId $extensionVersion $installRequest)
   #set ($discard = $extensionManager.install($installRequest))
   #handleExtensionJobStartFailure('extensions.install.error.installFailure')
 #end
 
-#macro (uninstallExtension $extensionId $extensionVersion $namespaces)
-  #set ($namespace = $NULL)
-  #if ($namespaces && $namespaces.size() == 1)
-    #set ($namespace = $namespaces.get(0))
-  #end
-  #set ($discard = $extensionManager.uninstall($extensionId, $namespace))
+#macro (uninstallExtension $extensionId $extensionVersion $uninstallRequest)
+  #set ($discard = $extensionManager.uninstall($uninstallRequest))
   #handleExtensionJobStartFailure('extensions.uninstall.error.uninstallFailure')
 #end
 

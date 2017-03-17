@@ -25,11 +25,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -48,6 +50,10 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.extension.xar.question.ConflictQuestion.ConflictType;
+import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
+import org.xwiki.extension.xar.question.DefaultConflictActionQuestion;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
@@ -92,6 +98,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private LocalExtensionRepository localRepository;
 
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     /**
      * Used to access the execution context.
      */
@@ -113,21 +122,19 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         ExecutionContext context = this.execution.getContext();
 
-        if (context != null) {
+        if (context != null && context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN) == null) {
             ExtensionPlan plan = (ExtensionPlan) context.getProperty(AbstractExtensionJob.CONTEXTKEY_PLAN);
 
             if (plan != null) {
-                if (context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN) == null) {
-                    if (request.isVerbose()) {
-                        this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
-                    }
+                if (request.isVerbose()) {
+                    this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
+                }
 
-                    context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN,
-                        new XarExtensionPlan(plan, this.xarRepository, this.localRepository));
+                context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN,
+                    new XarExtensionPlan(plan, this.xarRepository, this.localRepository));
 
-                    if (request.isVerbose()) {
-                        this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
-                    }
+                if (request.isVerbose()) {
+                    this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
                 }
             }
         }
@@ -157,7 +164,11 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
-            installInternal(localExtension, wiki, request);
+            try {
+                installInternal(localExtension, wiki, request);
+            } catch (InterruptedException e) {
+                throw new InstallException("Thread has been interrupted", e);
+            }
         }
     }
 
@@ -176,11 +187,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             }
 
             // Install new pages
-            installInternal(newLocalExtension, wiki, request);
+            try {
+                installInternal(newLocalExtension, wiki, request);
+            } catch (InterruptedException e) {
+                throw new InstallException("Thread has been interrupted", e);
+            }
         }
     }
 
-    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request) throws InstallException
+    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request)
+        throws InstallException, InterruptedException
     {
         try {
             initializePagesIndex(request);
@@ -215,7 +231,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             Job currentJob;
             try {
                 currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
-            } catch (ComponentLookupException e1) {
+            } catch (ComponentLookupException e) {
                 currentJob = null;
             }
 
@@ -227,14 +243,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     throw new UninstallException("Failed to extract wiki id from namespace", e);
                 }
 
-                // TODO: delete pages from the wiki which belong only to this extension (several extension could have
-                // some common pages which will cause all sort of other issues but still could happen technically)
+                PackageConfiguration configuration;
+                try {
+                    configuration = createPackageConfiguration(null, request, wiki, getXARExtensionPlan());
+                } catch (InterruptedException e) {
+                    throw new UninstallException("Thread has been interrupted", e);
+                }
 
-                // TODO: maybe remove only unmodified page ? At least ask for sure when question/answer system will be
-                // implemented
-
-                PackageConfiguration configuration =
-                    createPackageConfiguration(null, request, wiki, getXARExtensionPlan());
                 try {
                     XarInstalledExtension xarLocalExtension =
                         (XarInstalledExtension) this.xarRepository.resolve(installedExtension.getId());
@@ -252,31 +267,55 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     }
 
     private PackageConfiguration createPackageConfiguration(LocalExtension extension, Request request, String wiki,
-        XarExtensionPlan xarExtensionPlan)
+        XarExtensionPlan xarExtensionPlan) throws InterruptedException
     {
         PackageConfiguration configuration = new PackageConfiguration();
 
+        DocumentReference userReference = getRequestUserReference(PROPERTY_USERREFERENCE, request);
+
         configuration.setInteractive(request.isInteractive());
-        configuration.setUser(getRequestUserReference(PROPERTY_USERREFERENCE, request));
+        configuration.setUser(userReference);
         configuration.setWiki(wiki);
         configuration.setVerbose(request.isVerbose());
         configuration.setSkipMandatorytDocuments(true);
         configuration.setXarExtensionPlan(xarExtensionPlan);
 
+        // Non blocker conflicts
+        configuration.setConflictAction(ConflictType.CURRENT_DELETED,
+            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_DELETED), GlobalAction.CURRENT);
+        configuration.setConflictAction(ConflictType.MERGE_SUCCESS,
+            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_SUCCESS), GlobalAction.MERGED);
+        // Blocker conflicts
+        configuration.setConflictAction(ConflictType.CURRENT_EXIST,
+            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_EXIST),
+            configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.NEXT);
+        configuration.setConflictAction(ConflictType.MERGE_FAILURE,
+            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_FAILURE),
+            configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
+
+        Job currentJob = null;
         try {
-            Job currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
-            if (currentJob != null) {
-                configuration.setJobStatus(currentJob.getStatus());
-            }
+            currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
         } catch (Exception e) {
             this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
+        }
+
+        if (currentJob != null) {
+            configuration.setJobStatus(currentJob.getStatus());
+
+            // If advanced user ask to confirm default answers
+            if (request.isInteractive() && this.documentAccessBridge.isAdvancedUser(userReference)) {
+                DefaultConflictActionQuestion question = new DefaultConflictActionQuestion(configuration);
+
+                currentJob.getStatus().ask(question, 1, TimeUnit.HOURS);
+            }
         }
 
         // Filter entries to import if there is a plan
         if (extension != null && xarExtensionPlan != null) {
             Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = xarExtensionPlan.nextXAREntries;
 
-            Set<String> entriesToImport = new HashSet<String>();
+            Set<String> entriesToImport = new HashSet<>();
 
             Map<XarEntry, LocalExtension> nextXAREntriesOnRoot = nextXAREntries.get(null);
             if (nextXAREntriesOnRoot != null) {

@@ -40,10 +40,10 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.filter.FilterException;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
 import org.xwiki.xar.XarPackage;
@@ -112,9 +112,8 @@ public class XarExtensionPlan implements Closeable
                 }
 
                 // Get new entries
-                LocalExtension nextExtension =
-                    action.getAction() != Action.UNINSTALL && action.getExtension() != null ? localReposirory
-                        .getLocalExtension(action.getExtension().getId()) : null;
+                LocalExtension nextExtension = action.getAction() != Action.UNINSTALL && action.getExtension() != null
+                    ? localReposirory.getLocalExtension(action.getExtension().getId()) : null;
 
                 if (nextExtension != null) {
                     try {

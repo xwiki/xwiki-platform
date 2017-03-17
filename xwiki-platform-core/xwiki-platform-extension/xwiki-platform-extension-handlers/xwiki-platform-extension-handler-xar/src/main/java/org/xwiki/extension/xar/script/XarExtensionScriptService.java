@@ -34,6 +34,7 @@ import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
+import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.model.reference.DocumentReference;
@@ -153,5 +154,13 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         }
 
         return jobId;
+    }
+
+    /**
+     * @return the possible conflicts
+     */
+    public ConflictQuestion.ConflictType[] getConflictTypes()
+    {
+        return ConflictQuestion.ConflictType.values();
     }
 }

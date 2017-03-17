@@ -26,6 +26,7 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 
@@ -244,8 +245,8 @@ public interface DocumentAccessBridge
      * @param valueToMatch the value to match for this parameter
      * @return the number of the first matching object, or -1 if none found
      */
-    int getObjectNumber(DocumentReference documentReference, DocumentReference classReference,
-        String parameterName, String valueToMatch);
+    int getObjectNumber(DocumentReference documentReference, DocumentReference classReference, String parameterName,
+        String valueToMatch);
 
     /**
      * Retrieves the value for an object property.
@@ -457,8 +458,8 @@ public interface DocumentAccessBridge
     String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor);
 
     /**
-     * Retrieves the relitive (without the hostname) or absolute (with the hostname) URL that can be used to access 
-     * a document, using a specific action.
+     * Retrieves the relitive (without the hostname) or absolute (with the hostname) URL that can be used to access a
+     * document, using a specific action.
      * 
      * @param documentReference the reference of the document to access
      * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
@@ -471,11 +472,8 @@ public interface DocumentAccessBridge
      *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
      * @since 2.5M1
      */
-    String getDocumentURL(DocumentReference documentReference,
-                          String action,
-                          String queryString,
-                          String anchor,
-                          boolean isFullURL);
+    String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor,
+        boolean isFullURL);
 
     /**
      * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
@@ -531,7 +529,7 @@ public interface DocumentAccessBridge
      *
      * @param attachmentReference the attachment name for which to find the URL
      * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
-     *        skip.
+     *            skip.
      * @param isFullURL whether the returned URL will a relative URL or the full URL
      * @return the attachment URL
      * @since 2.5RC1
@@ -613,6 +611,25 @@ public interface DocumentAccessBridge
      * @since 4.0RC1
      */
     DocumentReference getCurrentUserReference();
+
+    /**
+     * @return true if current user is an advanced user
+     * @since 9.2RC1
+     */
+    default boolean isAdvancedUser()
+    {
+        return true;
+    }
+
+    /**
+     * @param userReference the reference of the user
+     * @return true if passed user is an advanced user
+     * @since 9.2RC1
+     */
+    default boolean isAdvancedUser(EntityReference userReference)
+    {
+        return true;
+    }
 
     /**
      * Utility method to set the current user.

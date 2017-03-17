@@ -21,6 +21,9 @@ package com.xpn.xwiki.user.api;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.EntityReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -58,6 +61,17 @@ public interface XWikiRightService
     String ALLGROUP_GROUP_FULLNAME = "XWiki." + ALLGROUP_GROUP;
 
     /**
+     * @param userReference the user reference
+     * @return true if the passed reference belong to superadmin
+     * @since 9.2RC1
+     */
+    static boolean isSuperAdmin(EntityReference userReference)
+    {
+        return userReference != null
+            && StringUtils.equalsIgnoreCase(userReference.getName(), XWikiRightService.SUPERADMIN_USER);
+    }
+
+    /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
      * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
      *
@@ -86,8 +100,7 @@ public interface XWikiRightService
      *             instead
      */
     @Deprecated
-    boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
-        throws XWikiException;
+    boolean hasAccessLevel(String right, String username, String docname, XWikiContext context) throws XWikiException;
 
     /**
      * Checks if the author of the context document (last editor of the content of the document) has programming rights

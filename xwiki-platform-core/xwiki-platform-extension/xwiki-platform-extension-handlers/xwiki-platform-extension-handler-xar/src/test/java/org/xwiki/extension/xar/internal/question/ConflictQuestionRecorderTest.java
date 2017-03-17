@@ -42,12 +42,12 @@ public class ConflictQuestionRecorderTest
     {
         XWikiDocument alice = mock(XWikiDocument.class, "Alice");
         when(alice.getDocumentReference()).thenReturn(new DocumentReference("dev", "Users", "Alice"));
-        ConflictQuestion aliceQuestion = new ConflictQuestion(null, null, alice, null);
+        ConflictQuestion aliceQuestion = new ConflictQuestion(null, null, alice, null, null);
         aliceQuestion.setGlobalAction(GlobalAction.CURRENT);
 
         XWikiDocument bob = mock(XWikiDocument.class, "Bob");
         when(bob.getDocumentReference()).thenReturn(new DocumentReference("dev", "Users", "Bob"));
-        ConflictQuestion bobQuestion = new ConflictQuestion(null, null, bob, null);
+        ConflictQuestion bobQuestion = new ConflictQuestion(null, null, bob, null, null);
         bobQuestion.setGlobalAction(GlobalAction.PREVIOUS);
         bobQuestion.setAlways(true);
 
@@ -57,21 +57,21 @@ public class ConflictQuestionRecorderTest
 
         XWikiDocument carol = mock(XWikiDocument.class, "Carol");
         when(carol.getDocumentReference()).thenReturn(new DocumentReference("drafts", "Users", "Carol"));
-        ConflictQuestion carolQuestion = new ConflictQuestion(null, null, carol, null);
+        ConflictQuestion carolQuestion = new ConflictQuestion(null, null, carol, null, null);
         assertFalse(recorder.replay(carolQuestion));
         assertEquals(GlobalAction.MERGED, carolQuestion.getGlobalAction());
         assertFalse(carolQuestion.isAlways());
 
         XWikiDocument aliceDrafts = mock(XWikiDocument.class, "AliceDrafts");
         when(aliceDrafts.getDocumentReference()).thenReturn(new DocumentReference("drafts", "Users", "Alice"));
-        ConflictQuestion aliceDraftsQuestion = new ConflictQuestion(null, null, aliceDrafts, null);
+        ConflictQuestion aliceDraftsQuestion = new ConflictQuestion(null, null, aliceDrafts, null, null);
         assertTrue(recorder.replay(aliceDraftsQuestion));
         assertEquals(GlobalAction.CURRENT, aliceDraftsQuestion.getGlobalAction());
         assertFalse(aliceDraftsQuestion.isAlways());
 
         XWikiDocument bobDrafts = mock(XWikiDocument.class, "BobDrafts");
         when(bobDrafts.getDocumentReference()).thenReturn(new DocumentReference("drafts", "Users", "Bob"));
-        ConflictQuestion bobDraftsQuestion = new ConflictQuestion(null, null, bobDrafts, null);
+        ConflictQuestion bobDraftsQuestion = new ConflictQuestion(null, null, bobDrafts, null, null);
         assertTrue(recorder.replay(bobDraftsQuestion));
         assertEquals(GlobalAction.PREVIOUS, bobDraftsQuestion.getGlobalAction());
         assertTrue(bobDraftsQuestion.isAlways());

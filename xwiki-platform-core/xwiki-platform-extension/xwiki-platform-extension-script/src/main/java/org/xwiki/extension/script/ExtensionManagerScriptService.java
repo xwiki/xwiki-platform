@@ -60,7 +60,6 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.Right;
@@ -94,7 +93,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PREFIX} instead
      */
     @Deprecated
-    public static final String EXTENSION_JOBID_PREFIX = ROLEHINT;
+    public static final String EXTENSION_JOBID_PREFIX = ExtensionRequest.JOBID_PREFIX;
 
     /**
      * The prefix put behind all job ids which are actual actions.
@@ -102,7 +101,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_ACTION_PREFIX} instead
      */
     @Deprecated
-    public static final String EXTENSIONACTION_JOBID_PREFIX = "action";
+    public static final String EXTENSIONACTION_JOBID_PREFIX = ExtensionRequest.JOBID_ACTION_PREFIX;
 
     /**
      * The prefix put behind all job ids which are information gathering.
@@ -110,13 +109,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PLAN_PREFIX} instead
      */
     @Deprecated
-    public static final String EXTENSIONPLAN_JOBID_PREFIX = "plan";
-
-    /**
-     * This property is set on requests to create an install or uninstall plan in order to specify which type of job
-     * generated the plan.
-     */
-    private static final String PROPERTY_JOB_TYPE = "job.type";
+    public static final String EXTENSIONPLAN_JOBID_PREFIX = ExtensionRequest.JOBID_PLAN_PREFIX;
 
     /**
      * The real extension manager bridged by this script service.
@@ -359,16 +352,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         InstallRequest installRequest = createInstallPlanRequest(id, version, namespace);
 
         installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, id, namespace));
-        installRequest.setInteractive(true);
-        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
-        DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
-        if (currentUserReference != null) {
-            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
-            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
-            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
-            installRequest.setExtensionProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
-                currentUserReference.toString());
-        }
 
         return installRequest;
     }
@@ -399,6 +382,16 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
+        // Fix the request id if needed
+        if (installRequest.getId() == null) {
+            String extensionId = installRequest.getExtensions().iterator().next().getId();
+            String namespace =
+                installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
+
+            installRequest
+                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        }
+
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
@@ -427,6 +420,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, id, namespace));
+        installRequest.setInteractive(true);
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -445,8 +439,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setProperty(PROPERTY_CONTEXT_ACTION, xcontext.getAction());
 
         setRightsProperties(installRequest);
-
-        installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
 
         return installRequest;
     }
@@ -535,6 +527,16 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
+        // Fix the request id if needed
+        if (uninstallRequest.getId() == null) {
+            String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
+            String namespace =
+                uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
+
+            uninstallRequest
+                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        }
+
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(uninstallRequest);
@@ -571,8 +573,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
         uninstallRequest
             .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId.getId(), namespace));
-        uninstallRequest.setInteractive(true);
-        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallJob.JOBTYPE);
 
         return uninstallRequest;
     }
@@ -590,6 +590,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest
             .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), namespace));
+        uninstallRequest.setInteractive(true);
         uninstallRequest.addExtension(extensionId);
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -604,8 +605,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         uninstallRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
 
         setRightsProperties(uninstallRequest);
-
-        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallPlanJob.JOBTYPE);
 
         return uninstallRequest;
     }

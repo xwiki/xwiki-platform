@@ -46,6 +46,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.extension.xar.question.ConflictQuestion.ConflictType;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;

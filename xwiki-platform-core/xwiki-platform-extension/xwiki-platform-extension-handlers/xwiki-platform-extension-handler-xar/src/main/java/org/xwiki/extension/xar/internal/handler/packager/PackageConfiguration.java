@@ -19,9 +19,13 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
+import org.xwiki.extension.xar.question.ConflictQuestion.ConflictType;
+import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -46,6 +50,8 @@ public class PackageConfiguration
     private Set<String> entriesToImport;
 
     private boolean skipMandatorytDocuments = true;
+
+    private Map<ConflictType, GlobalAction> conflictActions = new HashMap<>();
 
     public String getWiki()
     {
@@ -125,5 +131,20 @@ public class PackageConfiguration
     public void setSkipMandatorytDocuments(boolean skipMandatorytDocuments)
     {
         this.skipMandatorytDocuments = skipMandatorytDocuments;
+    }
+
+    public GlobalAction getConflictAction(ConflictType type)
+    {
+        return this.conflictActions.get(type);
+    }
+
+    public void setConflictAction(ConflictType type, GlobalAction action, GlobalAction defaultAnswer)
+    {
+        this.conflictActions.put(type, action != null ? action : defaultAnswer);
+    }
+
+    public Map<ConflictType, GlobalAction> getConflictActions()
+    {
+        return this.conflictActions;
     }
 }

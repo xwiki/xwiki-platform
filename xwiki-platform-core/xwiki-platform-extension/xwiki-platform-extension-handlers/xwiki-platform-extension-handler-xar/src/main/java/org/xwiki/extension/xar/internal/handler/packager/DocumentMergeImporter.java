@@ -52,10 +52,6 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 @Singleton
 public class DocumentMergeImporter
 {
-    static final String PROP_ALWAYS_MERGE = "extension.xar.packager.conflict.always.merge";
-
-    static final String PROP_ALWAYS_NOMERGE = "extension.xar.packager.conflict.always.nomerge";
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -97,24 +93,8 @@ public class DocumentMergeImporter
                 } else {
                     // Already existing document in database but without previous version
                     if (!currentDocument.equalsData(nextDocument)) {
-                        XWikiDocument documentToSave;
-                        if (configuration.isInteractive()) {
-                            // Indicate future author to whoever is going to answer the question
-                            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
-                            DocumentReference userReference = configuration.getUserReference();
-                            if (userReference != null) {
-                                nextDocument.setAuthorReference(userReference);
-                                nextDocument.setContentAuthorReference(userReference);
-                                for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                                    attachment.setAuthorReference(nextDocument.getAuthorReference());
-                                }
-                            }
-
-                            documentToSave =
-                                askDocumentToSave(currentDocument, previousDocument, nextDocument, null, configuration);
-                        } else {
-                            documentToSave = nextDocument;
-                        }
+                        XWikiDocument documentToSave =
+                            askDocumentToSave(currentDocument, null, nextDocument, null, configuration, null);
 
                         if (documentToSave != currentDocument) {
                             saveDocument(documentToSave, comment, false, configuration);
@@ -122,7 +102,16 @@ public class DocumentMergeImporter
                     }
                 }
             }
-        } else if (previousDocument == null) {
+        } else if (previousDocument != null) {
+            // Document have been deleted in the database
+            XWikiDocument documentToSave =
+                askDocumentToSave(null, previousDocument, nextDocument, null, configuration, null);
+
+            if (documentToSave != null) {
+                saveDocument(documentToSave, comment, true, configuration);
+            }
+        } else {
+            // Simple install (the document does not exist in previous version or in the database)
             saveDocument(nextDocument, comment, true, configuration);
         }
 
@@ -153,34 +142,14 @@ public class DocumentMergeImporter
 
         documentMergeResult.getLog().log(this.logger);
 
-        if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
-            // Indicate future author to whoever is going to answer the question
-            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
-            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
-            DocumentReference userReference = configuration.getUserReference();
-            if (userReference != null) {
-                nextDocument.setAuthorReference(userReference);
-                nextDocument.setContentAuthorReference(userReference);
-                for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                    attachment.setAuthorReference(nextDocument.getAuthorReference());
-                }
-                mergedDocument.setAuthorReference(userReference);
-                mergedDocument.setContentAuthorReference(userReference);
-                for (XWikiAttachment attachment : mergedDocument.getAttachmentList()) {
-                    if (attachment.isContentDirty()) {
-                        attachment.setAuthorReference(mergedDocument.getAuthorReference());
-                    }
-                }
-            }
-
-            XWikiDocument documentToSave =
-                askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration);
+        XWikiDocument documentToSave;
+        if (documentMergeResult.isModified() || !documentMergeResult.getLog().getLogsFrom(LogLevel.ERROR).isEmpty()) {
+            documentToSave = askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument,
+                configuration, documentMergeResult);
 
             if (documentToSave != currentDocument) {
                 saveDocument(documentToSave, comment, false, configuration);
             }
-        } else if (documentMergeResult.isModified()) {
-            saveDocument(mergedDocument, comment, false, configuration);
         }
 
         return new XarEntryMergeResult(
@@ -208,48 +177,88 @@ public class DocumentMergeImporter
         return mandatoryDocument;
     }
 
-    private GlobalAction getMergeConflictAnswer(XWikiDocument currentDocument, XWikiDocument previousDocument,
-        XWikiDocument nextDocument)
+    private GlobalAction getMergeConflictAnswer(ConflictQuestion.ConflictType type, PackageConfiguration configuration)
     {
-        return (GlobalAction) this.execution.getContext().getProperty(
-            previousDocument != null ? PROP_ALWAYS_MERGE : PROP_ALWAYS_NOMERGE);
+        GlobalAction action = (GlobalAction) this.execution.getContext().getProperty(ConflictQuestion.toKey(type));
+
+        if (action == null && configuration != null) {
+            action = configuration.getConflictAction(type);
+        }
+
+        return action;
     }
 
-    private void setMergeConflictAnswer(XWikiDocument currentDocument, XWikiDocument previousDocument,
-        XWikiDocument nextDocument, GlobalAction action)
+    private void setMergeConflictAnswer(ConflictQuestion.ConflictType type, GlobalAction action)
     {
-        this.execution.getContext().setProperty(previousDocument != null ? PROP_ALWAYS_MERGE : PROP_ALWAYS_NOMERGE,
-            action);
+        this.execution.getContext().setProperty(ConflictQuestion.toKey(type), action);
     }
 
     private XWikiDocument askDocumentToSave(XWikiDocument currentDocument, XWikiDocument previousDocument,
-        XWikiDocument nextDocument, XWikiDocument mergedDocument, PackageConfiguration configuration)
+        XWikiDocument nextDocument, XWikiDocument mergedDocument, PackageConfiguration configuration,
+        MergeResult documentMergeResult)
     {
-        // Ask what to do
-        ConflictQuestion question =
-            new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument);
-
-        if (mergedDocument == null) {
-            question.setGlobalAction(GlobalAction.NEXT);
+        // Indicate future author to whoever is going to answer the question
+        if (currentDocument != null) {
+            nextDocument.setCreatorReference(currentDocument.getCreatorReference());
         }
-
-        if (configuration != null && configuration.getJobStatus() != null) {
-            GlobalAction contextAction = getMergeConflictAnswer(currentDocument, previousDocument, nextDocument);
-            if (contextAction != null) {
-                question.setGlobalAction(contextAction);
-            } else {
-                try {
-                    configuration.getJobStatus().ask(question);
-                    if (question.isAlways()) {
-                        setMergeConflictAnswer(currentDocument, previousDocument, nextDocument,
-                            question.getGlobalAction());
+        if (mergedDocument != null) {
+            mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
+        }
+        DocumentReference userReference = configuration != null ? configuration.getUserReference() : null;
+        if (userReference != null) {
+            nextDocument.setAuthorReference(userReference);
+            nextDocument.setContentAuthorReference(userReference);
+            for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
+                attachment.setAuthorReference(nextDocument.getAuthorReference());
+            }
+            if (mergedDocument != null) {
+                mergedDocument.setAuthorReference(userReference);
+                mergedDocument.setContentAuthorReference(userReference);
+                for (XWikiAttachment attachment : mergedDocument.getAttachmentList()) {
+                    if (attachment.isContentDirty()) {
+                        attachment.setAuthorReference(mergedDocument.getAuthorReference());
                     }
-                } catch (InterruptedException e) {
-                    // TODO: log something ?
                 }
             }
         }
 
+        // Calculate the conflict type
+        ConflictQuestion.ConflictType type;
+        if (previousDocument == null) {
+            type = ConflictQuestion.ConflictType.CURRENT_EXIST;
+        } else if (currentDocument == null) {
+            type = ConflictQuestion.ConflictType.CURRENT_DELETED;
+        } else if (documentMergeResult != null) {
+            if (!documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+                type = ConflictQuestion.ConflictType.MERGE_FAILURE;
+            } else {
+                type = ConflictQuestion.ConflictType.MERGE_SUCCESS;
+            }
+        } else {
+            type = null;
+        }
+
+        // Create a question
+        ConflictQuestion question =
+            new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument, type);
+
+        // Find the answer
+        GlobalAction contextAction = getMergeConflictAnswer(question.getType(), configuration);
+        if (contextAction != null && contextAction != GlobalAction.ASK) {
+            question.setGlobalAction(contextAction);
+        } else if (configuration != null && configuration.getJobStatus() != null && configuration.isInteractive()) {
+            try {
+                // Ask what to do
+                configuration.getJobStatus().ask(question);
+                if (question.isAlways()) {
+                    setMergeConflictAnswer(question.getType(), question.getGlobalAction());
+                }
+            } catch (InterruptedException e) {
+                // TODO: log something ?
+            }
+        }
+
+        // Find the XWikiDocument to save
         XWikiDocument documentToSave;
 
         switch (question.getGlobalAction()) {

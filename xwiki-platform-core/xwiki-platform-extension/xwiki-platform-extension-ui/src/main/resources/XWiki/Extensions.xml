@@ -352,7 +352,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>lf</displayBeforeCategory>
     </property>
     <property>
       <displayInCategory>extensionmanager</displayInCategory>

@@ -374,7 +374,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory>usersgroups</displayBeforeCategory>
+      <displayBeforeCategory>other</displayBeforeCategory>
     </property>
     <property>
       <displayInCategory>wikis</displayInCategory>

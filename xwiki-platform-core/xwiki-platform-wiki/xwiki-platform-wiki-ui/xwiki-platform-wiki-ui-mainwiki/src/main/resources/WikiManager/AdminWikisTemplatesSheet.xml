@@ -246,7 +246,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon>world</categoryIcon>
+      <categoryIcon/>
     </property>
     <property>
       <codeToExecute>{{include reference="WikiManager.AdminWikisTemplatesSheet" /}}</codeToExecute>
@@ -258,7 +258,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory>usersgroups</displayBeforeCategory>
+      <displayBeforeCategory/>
     </property>
     <property>
       <displayInCategory>wikis</displayInCategory>

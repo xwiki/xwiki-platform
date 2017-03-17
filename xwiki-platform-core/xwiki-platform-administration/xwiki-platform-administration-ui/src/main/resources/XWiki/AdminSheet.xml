@@ -66,6 +66,7 @@
   },
   {
     'id' : 'lf',
+    'displayBeforeCategory': 'content',
     'children': [
        {'id' : 'Presentation', 'perSpace' : true, 'order' : 100},
        {'id' : 'Elements', 'perSpace' : true, 'order' : 200},
@@ -74,6 +75,7 @@
   },
   {
     'id' : 'usersgroups',
+    'displayBeforeCategory': 'extensionmanager',
     'children': [
        {'id' : 'Users', 'order' : 100},
        {'id' : 'Groups', 'order' : 200},
@@ -85,15 +87,7 @@
     ]
   },
   {
-    'id' : 'content',
-    'children': []
-  },
-  {
-    'id' : 'extensionmanager',
-    'children': []
-  },
-  {
-    'id' : 'applications',
+    'id' : 'other',
     'children' : []
   }
 ])
@@ -313,7 +307,7 @@
     #set ($discard = $parameterMap.put('colorTheme', $themeDocFullName))
   #end
   #foreach ($adminMenuCategory in $adminMenu)
-    #set ($customIcon = $adminMenuCategory.categoryIcon)
+    #set ($customIcon = $adminMenuCategory.icon)
     #if ("$!customIcon" != '')
       #set ($discard = $parameterMap.put("${adminMenuCategory.id}Icon", $customIcon))
     #end

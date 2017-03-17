@@ -42,19 +42,19 @@
   <hidden>true</hidden>
   <content>
 platform.core.profile.category.notifications=Notifications
-notifications.eventTypes.create=Someone creates a new page
-notifications.eventTypes.update=Someone updates a page
-notifications.eventTypes.delete=Someone deletes a page
+notifications.eventTypes.create=A page is created
+notifications.eventTypes.update=A page is updtaed
+notifications.eventTypes.delete=A page is deleted
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings
 notifications.menu.clear=Clear
 notifications.menu.clearing=Clearing the notifications
-notifications.menu.cleared=Notifications are cleared
-notifications.menu.nothing=Nothing!
+notifications.menu.cleared=Notifications have been cleared
+notifications.menu.nothing=No notification available!
 notifications.menu.more=Load older notifications
 notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
-notifications.settings.saving=Your setting is being saved...
+notifications.settings.saving=Your settings are being saved...
 notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
 </content>

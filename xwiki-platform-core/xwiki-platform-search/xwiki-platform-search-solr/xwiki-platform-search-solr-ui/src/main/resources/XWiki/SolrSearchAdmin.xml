@@ -42,7 +42,7 @@
   <content>{{velocity output='false'}}
 #macro (displaySolrIndexForm)
   {{html clean="false"}}
-  &lt;form class="xform half" action="$xwiki.relativeRequestURL" method="post"&gt;
+  &lt;form class="xform" action="$xwiki.relativeRequestURL" method="post"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
     &lt;/div&gt;
@@ -108,7 +108,7 @@
   #set ($discard = $xwiki.jsx.use('XWiki.SolrSearchAdmin'))
   == $services.localization.render('solr.admin.status.title') ==
 
-  (% class="xform half" %)
+  (% class="xform" %)
   ; {{html clean="false"}}&lt;label&gt;$services.localization.render('solr.admin.status.queueSize.label')&lt;/label&gt;{{/html}}##
     (% class="xHint" %)$services.localization.render('solr.admin.status.queueSize.hint')
   : (% class="solrQueueSize" %)$services.solr.queueSize

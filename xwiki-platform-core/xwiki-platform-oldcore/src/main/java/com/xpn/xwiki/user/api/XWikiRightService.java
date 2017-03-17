@@ -72,6 +72,17 @@ public interface XWikiRightService
     }
 
     /**
+     * @param userReference the user reference
+     * @return true if the passed reference belong to superadmin
+     * @since 9.2RC1
+     */
+    static boolean isGuest(EntityReference userReference)
+    {
+        return userReference != null
+            && StringUtils.equalsIgnoreCase(userReference.getName(), XWikiRightService.GUEST_USER);
+    }
+
+    /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
      * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
      *

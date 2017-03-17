@@ -788,11 +788,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public boolean isAdvancedUser(EntityReference userReference)
     {
         boolean advanced = false;
-        if (userReference != null) {
-            if (XWikiRightService.isSuperAdmin(userReference)) {
-                advanced = true;
-            } else {
+        if (userReference != null && !XWikiRightService.isGuest(userReference)) {
+            advanced = true;
+
+            if (!XWikiRightService.isSuperAdmin(userReference)) {
                 XWikiContext xcontext = getContext();
+
                 try {
                     XWikiDocument userDocument = xcontext.getWiki().getDocument(userReference, xcontext);
                     advanced =

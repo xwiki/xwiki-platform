@@ -244,7 +244,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory>lf</displayBeforeCategory>
+      <displayBeforeCategory>search</displayBeforeCategory>
     </property>
     <property>
       <displayInCategory>email</displayInCategory>
@@ -265,7 +265,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>300</sectionOrder>
     </property>
   </object>
   <object>
@@ -463,7 +463,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory>lf</displayBeforeCategory>
+      <displayBeforeCategory/>
     </property>
     <property>
       <displayInCategory>email</displayInCategory>
@@ -484,7 +484,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>100</sectionOrder>
     </property>
   </object>
   <object>
@@ -682,7 +682,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory>if</displayBeforeCategory>
+      <displayBeforeCategory/>
     </property>
     <property>
       <displayInCategory>email</displayInCategory>
@@ -703,7 +703,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>200</sectionOrder>
     </property>
   </object>
 </xwikidoc>

@@ -75,6 +75,8 @@
 
   #end
 #end
+(% class="noitems" %)
+{{translation key="admin.emailstatus.hint" /}}
 ##
 ## Livetable #
 ##
@@ -97,8 +99,11 @@
    'translationPrefix' : 'Mail.SendMailStatus_livetable.',
    'tagCloud' : false,
    'selectedColumn' : 'date',
-   'defaultOrder' : 'desc'
+   'defaultOrder' : 'desc',
+   'outputOnlyHtml': true
 })
+{{html clean="false"}}
 #livetable('sendmailstatus' $columns $columnsProperties $options)
+{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

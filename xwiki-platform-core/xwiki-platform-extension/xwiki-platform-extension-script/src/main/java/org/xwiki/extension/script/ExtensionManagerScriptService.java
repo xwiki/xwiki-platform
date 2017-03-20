@@ -382,21 +382,19 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        // Fix the request id if needed
-        if (installRequest.getId() == null) {
-            String extensionId = installRequest.getExtensions().iterator().next().getId();
-            String namespace =
-                installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
+        // Force proper id
+        String extensionId = installRequest.getExtensions().iterator().next().getId();
+        String namespace =
+            installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
+        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
 
-            installRequest
-                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
-        }
-
+        // Check rights
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
         }
 
+        // Start job
         Job job = null;
         try {
             job = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
@@ -527,21 +525,19 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        // Fix the request id if needed
-        if (uninstallRequest.getId() == null) {
-            String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
-            String namespace =
-                uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
+        // Force proper id
+        String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
+        String namespace =
+            uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
+        uninstallRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
 
-            uninstallRequest
-                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
-        }
-
+        // Check rights
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(uninstallRequest);
         }
 
+        // Start job
         Job job = null;
         try {
             job = this.jobExecutor.execute(UninstallJob.JOBTYPE, uninstallRequest);

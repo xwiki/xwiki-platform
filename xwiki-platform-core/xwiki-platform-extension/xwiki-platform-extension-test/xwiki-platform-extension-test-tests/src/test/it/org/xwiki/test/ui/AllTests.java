@@ -77,6 +77,11 @@ public class AllTests
 
     public static void initExtensions(PersistentTestContext context) throws Exception
     {
+        // This will not be null if we are in the middle of allTests
+        if (repositoryUtil == null) {
+            repositoryUtil = new RepositoryUtils();
+        }
+
         // Initialize extensions and repositories
         RepositoryTestUtils repositoryTestUtil =
             new RepositoryTestUtils(context.getUtil(), repositoryUtil, new SolrTestUtils(context.getUtil()));

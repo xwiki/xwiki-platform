@@ -850,7 +850,7 @@ $namespace##
           <dd>
             <select name="defaultConflictAction_$conflictType">
             #foreach ($conflictAction in $conflictType.actions)
-              <option value="$conflictAction"#if ($conflictAction == $defaultConflictAction) selected="selected"#end>
+              <option value="$conflictAction" label="$services.localization.render("extension.xar.conflict.action.${conflictAction}.hint")"#if ($conflictAction == $defaultConflictAction) selected="selected"#end>
                 $services.localization.render("extension.xar.conflict.action.${conflictAction}.label")
               </option>
             #end

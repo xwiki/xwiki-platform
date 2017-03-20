@@ -53,6 +53,13 @@ public class PackageConfiguration
 
     private Map<ConflictType, GlobalAction> conflictActions = new HashMap<>();
 
+    public PackageConfiguration()
+    {
+        // Default behavior
+        setConflictAction(ConflictType.CURRENT_DELETED, GlobalAction.CURRENT);
+        setConflictAction(ConflictType.MERGE_SUCCESS, GlobalAction.MERGED);
+    }
+
     public String getWiki()
     {
         return this.wiki;
@@ -133,16 +140,33 @@ public class PackageConfiguration
         this.skipMandatorytDocuments = skipMandatorytDocuments;
     }
 
+    /**
+     * @since 9.2RC1
+     */
     public GlobalAction getConflictAction(ConflictType type)
     {
         return this.conflictActions.get(type);
     }
 
+    /**
+     * @since 9.2RC1
+     */
+    public void setConflictAction(ConflictType type, GlobalAction action)
+    {
+        setConflictAction(type, action, action);
+    }
+
+    /**
+     * @since 9.2RC1
+     */
     public void setConflictAction(ConflictType type, GlobalAction action, GlobalAction defaultAnswer)
     {
         this.conflictActions.put(type, action != null ? action : defaultAnswer);
     }
 
+    /**
+     * @since 9.2RC1
+     */
     public Map<ConflictType, GlobalAction> getConflictActions()
     {
         return this.conflictActions;

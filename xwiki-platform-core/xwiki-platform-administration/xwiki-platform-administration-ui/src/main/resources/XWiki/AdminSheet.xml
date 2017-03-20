@@ -60,6 +60,7 @@
 #set($adminMenu = [
   {
     'id' : 'lf',
+    'icon': 'columns',
     'displayBeforeCategory': 'content',
     'children': [
        {'id' : 'Themes', 'perSpace' : true, 'order' : 100},
@@ -69,6 +70,7 @@
   },
   {
     'id' : 'usersgroups',
+    'icon': 'group',
     'displayBeforeCategory': 'extensionmanager',
     'children': [
        {'id' : 'Users', 'order' : 100},
@@ -82,6 +84,7 @@
   },
   {
     'id' : 'other',
+    'icon': 'wrench',
     'children' : []
   }
 ])
@@ -279,6 +282,50 @@
 (% class="admin-category" %)
   #foreach ($category in $adminMenu)
     * [[[[image:${category.iconReference}]] **${category.name}**&gt;&gt;path:${category.url}]] (% class="description" %)$!{category.description}
+  #end
+#end
+
+#macro (verticalNavigation $menu $options)
+  {{html clean="false"}}
+  &lt;div id="$!options.id" class="panel-group $!options.cssClass" role="tablist" aria-multiselectable="true"&gt;
+    #foreach ($item in $menu)
+      #verticalNavigationItem($item $options)
+    #end
+  &lt;/div&gt;
+  {{/html}}
+#end
+
+#macro (verticalNavigationItem $item $options)
+  #set ($escapedId = $escapetool.xml($item.id))
+  #set ($name = "$!item.name")
+  #if ($name == '')
+    #set ($name = $services.localization.render("$!options.translationPrefix$item.id"))
+  #end
+  #set ($hasChildren = $item.children &amp;&amp; $item.children.size() &gt; 0)
+  #if ($hasChildren)
+    #set ($children = [])
+    #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
+    &lt;div class="panel panel-default"&gt;
+      &lt;a class="panel-heading#if ($item.id != $options.crtItemId) collapsed#end" role="tab" id="$escapedId" href="$!item.url"
+          data-toggle="collapse" data-parent="#$!options.id" data-target="#${escapedId}-body"
+          aria-expanded="false" aria-controls="${escapedId}-body"&gt;
+        $!services.icon.renderHTML($item.icon) &amp;nbsp;
+        $escapetool.xml($name)
+      &lt;/a&gt;
+      &lt;div id="${escapedId}-body" class="panel-collapse collapse#if ($item.id == $options.crtItemId) in#end"
+          role="tabpanel" aria-labelledby="$escapedId"&gt;
+        &lt;div class="list-group"&gt;
+          #foreach ($child in $children)
+            #verticalNavigationItem($child $options)
+          #end
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #else
+    &lt;a class="list-group-item#if ($item.id == $options.crtItemId) active#end" href="$!item.url"&gt;
+      $!services.icon.renderHTML($item.icon)
+      $escapetool.xml($name)
+    &lt;/a&gt;
   #end
 #end
 {{/velocity}}
@@ -651,21 +698,12 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/* Administration application custom JavaScript */
-
-document.observe('xwiki:dom:loaded', function() {
-  if($('goto-select')) {
-    Event.observe($('goto-select'), 'change', function (event) {
-      var select = event.element();
-      var i = select.selectedIndex;
-      if (window.location != select.options[i].value) {
-        window.location = select.options[i].value;
-      }
-    });
-    $('goto-select').next().hide();
-  }
-});
-</code>
+      <code>require(['jquery', 'bootstrap'], function($) {
+  $(document).on('click', '.admin-menu a.panel-heading', function(event) {
+    event.preventDefault();
+  });
+  $('.admin-menu .list-group-item.active').parents('.collapse').collapse({toggle: true});
+});</code>
     </property>
     <property>
       <name>Administration application javascript</name>
@@ -778,24 +816,8 @@ document.observe('xwiki:dom:loaded', function() {
 #document-title {
   margin-bottom: 1em;
 }
-#change-context {
-  float: right;
-}
-.skin-colibri #change-context {
-  padding-top: 15px;
-}
-.skin-flamingo #change-context {
-  padding-top: 55px;
-}
-#goto-select optgroup {
-  margin: 6px;
-}
 
 /*******************************************************/
-
-.skin-colibri #admin-page-content {
-  margin-left: 15em;
-}
 
 .admin-category {
   list-style: none outside none;
@@ -826,228 +848,6 @@ document.observe('xwiki:dom:loaded', function() {
   display: block;
 }
 
-.admin-menu .group, .admin-menu .group:hover  {
-  background-position: 7px 50%, top center;
-}
-
-## Set the CSS for custom category icons
-#foreach ($parameterKey in $request.getParameterNames())
-  #if ($parameterKey.endsWith('Icon'))
-    #set ($customIcon = $request.getParameterValues($parameterKey)[0])
-    #set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile(""icons/silk/${customIcon}.png"")${escapetool.S})")
-    .admin-menu .group.${parameterKey} {
-      background-image: $configurationIcon;
-    }
-    .skin-colibri .admin-menu .group.${parameterKey} {
-      #css3_backgroundIconAndLinearGradient($configurationIcon, {
-        'to': 'bottom',
-        'colors': [
-          {'color': $theme.menuContentGradientColor, 'position': '0%'},
-          {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-        ]
-      })
-    }
-    .skin-colibri .admin-menu .group.${parameterKey}:hover , .skin-colibri .admin-menu .current.${parameterKey} {
-      #css3_backgroundIconAndLinearGradient($configurationIcon, {
-        'to': 'bottom',
-        'colors': [
-          {'color': $theme.menuGradientColor, 'position': '0%'},
-          {'color': $theme.menuBackgroundColor, 'position': '50%'}
-        ]
-      })
-    }
-  #end
-#end
-
-## Generic icon when no icon has been specified in the ConfigurableClass
-#set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/application.png')${escapetool.S})")
-.admin-menu .group {
-  background-image: $configurationIcon;
-}
-.skin-colibri .admin-menu .group {
-  #css3_backgroundIconAndLinearGradient($configurationIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group:hover , .skin-colibri .admin-menu .current-group {
-  #css3_backgroundIconAndLinearGradient($configurationIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.png')${escapetool.S})")
-.admin-menu .group.configurationIcon {
-  background-image: $configurationIcon;
-}
-.skin-colibri .admin-menu .group.configurationIcon {
-  #css3_backgroundIconAndLinearGradient($configurationIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.configurationIcon:hover , .skin-colibri .admin-menu .current.configurationIcon {
-  #css3_backgroundIconAndLinearGradient($configurationIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.png')${escapetool.S})")
-.admin-menu .group.lfIcon {
-  background-image: $lfIcon;
-}
-.skin-colibri .admin-menu .group.lfIcon {
-  #css3_backgroundIconAndLinearGradient($lfIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.lfIcon:hover , .skin-colibri .admin-menu .current.lfIcon {
-  #css3_backgroundIconAndLinearGradient($lfIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.png')${escapetool.S})")
-.admin-menu .group.usersgroupsIcon {
-  background-image: $usersgroupsIcon;
-}
-
-.skin-colibri .admin-menu .group.usersgroupsIcon {
-  #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.usersgroupsIcon:hover , .skin-colibri .admin-menu .current.usersgroupsIcon {
-  #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.png')${escapetool.S})")
-.admin-menu .group.contentIcon {
-  background-image: $contentIcon;
-}
-.skin-colibri .admin-menu .group.contentIcon {
-  #css3_backgroundIconAndLinearGradient($contentIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.contentIcon:hover , .skin-colibri  .admin-menu .current.contentIcon {
-  #css3_backgroundIconAndLinearGradient($contentIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($extensionmanagerIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/xwiki/plugin_wrench.png')${escapetool.S})")
-.admin-menu .group.extensionmanagerIcon {
-  background-image: $extensionmanagerIcon;
-}
-.skin-colibri .admin-menu .group.extensionmanagerIcon {
-  #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.extensionmanagerIcon:hover , .skin-colibri .admin-menu .current.extensionmanagerIcon {
-  #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.png')${escapetool.S})")
-.admin-menu .group.applicationsIcon {
-  background-image: $applicationsIcon;
-}
-.skin-colibri .admin-menu .group.applicationsIcon {
-  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.applicationsIcon:hover , .skin-colibri .admin-menu .current.applicationsIcon {
-  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-
-#set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.png')${escapetool.S})")
-.admin-menu .group.readOnly {
-  background-image: $readOnlyIcon;
-}
-.skin-colibri .admin-menu .group.readOnly {
-  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuContentGradientColor, 'position': '0%'},
-      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })
-}
-.skin-colibri .admin-menu .group.readOnly:hover , .skin-colibri .admin-menu .current.readOnly {
-  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.menuGradientColor, 'position': '0%'},
-      {'color': $theme.menuBackgroundColor, 'position': '50%'}
-    ]
-  })
-}
-.admin-menu .group.readOnly, .admin-menu .group.readOnly:hover , .admin-menu .current.readOnly  {
-  background-position: 5px 50%, top center;
-}
-
 /* Override general table styles. */
 /* TODO: Move to livetable.css */
 
@@ -1075,6 +875,29 @@ document.observe('xwiki:dom:loaded', function() {
 
 .rights-settings dt input {
   vertical-align: top;
+}
+
+/**
+ * Bootstrap's Accordion Menu
+ */
+
+.admin-menu .panel-heading.collapsed {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.admin-menu a.panel-heading {
+  display: block;
+  font-size: 100%;
+}
+.admin-menu a.panel-heading:not(.collapsed) {
+  background-color: $theme.menuBackgroundColor;
+  color: $theme.menuLinkColor;
+}
+.admin-menu a.panel-heading:active,
+.admin-menu a.panel-heading:focus,
+.admin-menu a.panel-heading:hover {
+  text-decoration: none;
 }</code>
     </property>
     <property>

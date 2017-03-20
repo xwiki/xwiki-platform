@@ -340,7 +340,7 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon>plugin_wrench</categoryIcon>
+      <categoryIcon>plugin</categoryIcon>
     </property>
     <property>
       <codeToExecute/>

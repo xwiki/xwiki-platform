@@ -62,9 +62,9 @@
     'id' : 'lf',
     'displayBeforeCategory': 'content',
     'children': [
-       {'id' : 'Presentation', 'perSpace' : true, 'order' : 100},
-       {'id' : 'Elements', 'perSpace' : true, 'order' : 200},
-       {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 300}
+       {'id' : 'Themes', 'perSpace' : true, 'order' : 100},
+       {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 200},
+       {'id' : 'Presentation', 'perSpace' : true, 'order' : 300}
     ]
   },
   {

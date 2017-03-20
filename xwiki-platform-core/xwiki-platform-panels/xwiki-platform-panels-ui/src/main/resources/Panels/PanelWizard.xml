@@ -80,220 +80,273 @@
 ##
 {{/velocity}}
 
-{{velocity}}
-#if ($accessLevel)
-  $xwiki.jsx.use('Panels.PanelWizard')##
-  $xwiki.ssx.use('Panels.PanelWizard')##
-  (% class="floatcontainer" %)
-  ((({{html}}
-    &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
-      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$escapetool.xml($services.localization.render('panelwizard.panellist'))&lt;/a&gt;&lt;/li&gt;
-      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$escapetool.xml($services.localization.render('panelwizard.pagelayout'))&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  {{/html}})))
-
-  (% id="xwikieditcontent" class="clear" %)
-  (((
-    (% id="PanelListSection" %)
-    (((
-      (% id="draganddroptooltip" class="hastooltip" title="${services.localization.render('panelwizard.tip')}"%)$services.localization.render('panelwizard.draganddrop')(%%)
-      #set ($panelClass = $xwiki.getDocument('Panels.PanelClass').xWikiClass)
-      #set ($categoryList = $panelClass.category.getProperty('values').value.split('[|]'))
-      #set ($panelsList = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName &lt;&gt; ''Panels.PanelTemplate''').execute())
-      #set ($categoryMap = {})
-      #foreach ($category in $categoryList)
-        $!categoryMap.put($category, [])##
-      #end
-      #foreach ($item in $panelsList)
-        ## stats panels can't be seen by non global admins
-        #if ($xwiki.hasAccessLevel('view', $xcontext.user, $item))
-          #set ($obj = $xwiki.getDocument($item).getObject('Panels.PanelClass'))
-          #if ($obj.type == 'view')
-            #set ($arrayList = $categoryMap.get($obj.category))
-            #if ($arrayList)
-              #set ($discard = $categoryMap.get($obj.category).add($item))
-              ## TODO: uncategorized?
-            #end
-          #end
-        #end
-      #end
-      #set ($panelsPerRow = 3)
-      (% id="dhtmltooltip" style="visibility: hidden;" %)((()))
-      #if ($request.place)
-        #set ($ajaxurl = $xwiki.getDocument('Panels.PanelLayoutUpdate').getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
-      #else
-        #set ($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
-      #end
-      $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
-      $xwiki.jsfx.use('js/xwiki/panelwizard/Drag.js')##
-      $xwiki.jsfx.use('js/xwiki/panelwizard/ieemu.js')##
-      $xwiki.jsfx.use('js/xwiki/panelwizard/toolTip.js')##
-      {{html}}
-      &lt;script type="text/javascript"&gt;
-      //&lt;![CDATA[
-      window.ajaxurl = "$ajaxurl";
-      window.allPanelsPlace = new Object();
-      window.panelsavesuccess = "$escapetool.javascript($services.localization.render('panelsavesuccess'))";
-      window.panelsaveerror = "$escapetool.javascript($services.localization.render('panelsaveerror'))";
-      #set ($counter = 0)
-      #set ($panelsStatus = {})
-      #foreach ($category in $categoryList)
-        #set ($categPanels = $categoryMap.get($category))
-        #foreach ($item in $categPanels)
-          #set ($discard = $panelsStatus.put($item, 'false'))
-          #set ($obj = $xwiki.getDocument($item).getObject('Panels.PanelClass'))
-          window.allPanelsPlace[$counter] = new Object();
-          window.allPanelsPlace[$counter]['fullname'] = '$escapetool.javascript($item)';
-          #set ($issetleft = 0)
-          #set ($counterleft = 0)
-          #set ($issetright = 0)
-          #set ($counterright = 0)
-          #foreach ($element in $leftPanels.split(','))
-            #if ($item == $element)
-              window.allPanelsPlace[$counter]['left'] = $counterleft;
-              #set ($issetleft = 1)
-              #set ($discard = $panelsStatus.put($item, 'true'))
-            #end
-            #set ($counterleft = $counterleft + 1)
-          #end
-          #if ($issetleft == 0)
-            window.allPanelsPlace[$counter]['left'] = -1;
-          #end
-          #foreach ($element in $rightPanels.split(','))
-            #if ($item == $element)
-              window.allPanelsPlace[$counter]['right'] = $counterright;
-              #set ($issetright = 1)
-              #set ($discard = $panelsStatus.put($item, 'true'))
-            #end
-            #set ($counterright = $counterright + 1)
-          #end
-          #if ($issetright == 0)
-            window.allPanelsPlace[$counter]['right'] = -1;
-          #end
-          #set ($counter = $counter + 1)
-        #end
-      #end
-      window.showLeftColumn = $showLeftPanels;
-      window.showRightColumn = $showRightPanels;
-      #if ($showApplicationPanel)
-        window.showApplicationPanel = true;
-      #else
-        window.showApplicationPanel = false;
-      #end
-      var obj = {div:'panellistaccordion', no:0, height:512};
-      document.observe('xwiki:dom:loaded', function () {
-        createAccordion(obj);
-      });
-      //]]&gt;
-      &lt;/script&gt;
-      {{/html}}
-      $xwiki.jsfx.use('js/xwiki/panelwizard/panelWizard.js')##
-
-      (% id="allviewpanels" %)
-      (((
-        (% id="panellistaccordion" class="accordion" %)
-        (((
-          #set ($panelCount = 0)
-          #foreach ($category in $categoryList)
-            ## start of accordion tab:
-            (% class="accordionTabTitleBar" id="${category}_header" %)
-            (((=${category}=)))
-            ## start of accordion tab content:
-            (% class="accordionTabContentBox" %)
-            (((
-              #set ($categPanels = $categoryMap.get($category))
-              #if ($categPanels.size() == 0)
-                $services.localization.render('panelwizard.nopanels')
-              #else
-                #foreach ($item in $categPanels)
-                  #set ($panelDoc = $xwiki.getDocument($item))
-                  #set ($obj = $panelDoc.getObject('Panels.PanelClass'))
-                  (% class="panelitemc" %)
-                  (((
-                    (% class="label" %)((($doc.display('name', $obj))))
-                    (% id="panelContainer${panelCount}" class="panelcontainer" title="${doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', '')}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
-                    (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
-                  )))
-                  #set ($panelCount = $panelCount + 1)
-                #end## foreach panel
-              #end## categPanels.size()
-            )))## end of accordion tab content - accordionTabContentBox
-          #end## foreach category
-        )))## panellistaccordion
-      )))## allviewpanels
-    )))## PanelsListSection
-
-
-    (% id="PageLayoutSection" %)
-    (((
-      $services.localization.render('panelwizard.choosepagelayout')
-
-      #set($crtlayout = 0)
-      #if($showLeftPanels and $showLeftPanels == "1")
-        #set($crtlayout = $crtlayout + 1)
-      #end
-      #if($showRightPanels and $showRightPanels == "1")
-        #set($crtlayout = $crtlayout + 2)
-      #end
-      (% class="pagelayoutoptions" %)
-      (((
-      |(% #if ($crtlayout == 0)id="selectedoption" #end class="pagelayoutoption pagelayoutoption0" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.nosidecolumn'))&lt;/label&gt;{{/html}}
-          (% id="nosidecolumn" class="layoutmaquette" %)(((
-            (% class="lmcontentcolumn" %)((()))
-          )))
-        )))|(% #if ($crtlayout == 1)id="selectedoption" #end class="pagelayoutoption pagelayoutoption1" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.leftcolumn'))&lt;/label&gt;{{/html}}
-          (% id="leftcolumn" class="layoutmaquette" %)(((
-            (% class="lmleftcolumn" %)((()))
-            (% class="lmcontentcolumn" %)((()))
-          )))
-        )))|(% #if ($crtlayout == 2)id="selectedoption" #end class="pagelayoutoption pagelayoutoption2" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.rightcolumn'))&lt;/label&gt;{{/html}}
-          (% id="rightcolumn" class="layoutmaquette" %)(((
-            (% class="lmrightcolumn" %)((()))
-            (% class="lmcontentcolumn" %)((()))
-          )))
-        )))|(% #if ($crtlayout == 3)id="selectedoption" #end class="pagelayoutoption pagelayoutoption3" %)(((
-          {{html clean="false"}}&lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.bothcolumns'))&lt;/label&gt;{{/html}}
-          (% id="bothcolumns" class="layoutmaquette" %)(((
-            (% class="lmleftcolumn" %)((()))
-            (% class="lmrightcolumn" %)((()))
-            (% class="lmcontentcolumn" %)((()))
-          )))
-        )))
-      )))## pagelayoutoptions
-      ##
-      ## Panel widths
-      ##
-      (% class="xform third" %)
-      (((
-      ; {{translation key="XWiki.XWikiPreferences_leftPanelsWidth"/}}
-      : $doc.display('leftPanelsWidth', 'edit')
-      ; {{translation key="XWiki.XWikiPreferences_rightPanelsWidth"/}}
-      : $doc.display('rightPanelsWidth', 'edit')
-      )))
-    )))## PageLayoutSection
-  )))## xwikieditcontent
-
-  (% id="panelwizardbuttons" class="floatcontainer" %)
-  (((
-    
-    {{html}}
-      &lt;div class="xwikibuttonlink"&gt;
-        &lt;span class="buttonwrapper"&gt;
-          &lt;button id="saveLayout"&gt;$services.localization.render('xe.panels.wizard.savenew')&lt;/button&gt;
-        &lt;/span&gt;
-        &lt;span class="buttonwrapper"&gt;
-          &lt;button id="revertLayout"&gt;$services.localization.render('xe.panels.wizard.revert')&lt;/button&gt;
-        &lt;/span&gt;
-        &lt;span class="buttonwrapper"&gt;
-          &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'Panels', 'WebHome'))"&gt;$services.localization.render('xe.panels.wizard.homepage')&lt;/a&gt;
-        &lt;/span&gt;
-      &lt;/div&gt;
-    {{/html}}
-  )))
+{{velocity output="false"}}
+#macro (displayConfigPropertyValue $propName $action)
+  #set ($output = $doc.display($propName, $action))
+  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
+  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
+  $output
 #end
+
+#macro (displayPageLayoutSection)
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label&gt;$services.localization.render('panelwizard.panelColumns')&lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('panelwizard.choosepagelayout')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd class="row pagelayoutoptions"&gt;
+      #set ($crtlayout = 0)
+      #if ($showLeftPanels and $showLeftPanels == '1')
+        #set ($crtlayout = $crtlayout + 1)
+      #end
+      #if ($showRightPanels and $showRightPanels == '1')
+        #set ($crtlayout = $crtlayout + 2)
+      #end
+      &lt;div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 pagelayoutoption pagelayoutoption0"
+          #if ($crtlayout == 0) id="selectedoption"#end&gt;
+        &lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.nosidecolumn'))&lt;/label&gt;
+        &lt;div id="nosidecolumn" class="layoutmaquette"&gt;
+          &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 pagelayoutoption pagelayoutoption1"
+          #if ($crtlayout == 1) id="selectedoption"#end&gt;
+        &lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.leftcolumn'))&lt;/label&gt;
+        &lt;div id="leftcolumn" class="layoutmaquette"&gt;
+          &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
+          &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 pagelayoutoption pagelayoutoption2"
+          #if ($crtlayout == 2) id="selectedoption"#end&gt;
+        &lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.rightcolumn'))&lt;/label&gt;
+        &lt;div id="rightcolumn" class="layoutmaquette"&gt;
+          &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
+          &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 pagelayoutoption pagelayoutoption3"
+          #if ($crtlayout == 3) id="selectedoption"#end&gt;
+        &lt;label&gt;$escapetool.xml($services.localization.render('panelwizard.bothcolumns'))&lt;/label&gt;
+        &lt;div id="bothcolumns" class="layoutmaquette"&gt;
+          &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
+          &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
+          &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="XWiki.XWikiPreferences_0_leftPanelsWidth"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_leftPanelsWidth')
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_leftPanelsWidth.hint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayConfigPropertyValue('leftPanelsWidth' 'edit')&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="XWiki.XWikiPreferences_0_leftPanels"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_leftPanels')
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_leftPanels.hint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayConfigPropertyValue('leftPanels' 'edit')&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="XWiki.XWikiPreferences_0_rightPanelsWidth"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_rightPanelsWidth')
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_rightPanelsWidth.hint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayConfigPropertyValue('rightPanelsWidth' 'edit')&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="XWiki.XWikiPreferences_0_rightPanels"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_rightPanels')
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('XWiki.XWikiPreferences_rightPanels.hint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayConfigPropertyValue('rightPanels' 'edit')&lt;/dd&gt;
+  &lt;/dl&gt;
+#end
+
+#macro (displayPanelListSection)
+  (% id="draganddroptooltip" class="hastooltip noitems" title="${services.localization.render('panelwizard.tip')}"%)$services.localization.render('panelwizard.draganddrop')(%%)
+  #set ($panelClass = $xwiki.getDocument('Panels.PanelClass').xWikiClass)
+  #set ($categoryList = $panelClass.category.getProperty('values').value.split('[|]'))
+  #set ($panelsList = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName &lt;&gt; ''Panels.PanelTemplate''').execute())
+  #set ($categoryMap = {})
+  #foreach ($category in $categoryList)
+    $!categoryMap.put($category, [])##
+  #end
+  #foreach ($item in $panelsList)
+    ## stats panels can't be seen by non global admins
+    #if ($xwiki.hasAccessLevel('view', $xcontext.user, $item))
+      #set ($obj = $xwiki.getDocument($item).getObject('Panels.PanelClass'))
+      #if ($obj.type == 'view')
+        #set ($arrayList = $categoryMap.get($obj.category))
+        #if ($arrayList)
+          #set ($discard = $categoryMap.get($obj.category).add($item))
+          ## TODO: uncategorized?
+        #end
+      #end
+    #end
+  #end
+  #set ($panelsPerRow = 3)
+  (% id="dhtmltooltip" style="visibility: hidden;" %)((()))
+  #if ($request.place)
+    #set ($ajaxurl = $xwiki.getDocument('Panels.PanelLayoutUpdate').getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
+  #else
+    #set ($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
+  #end
+  $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
+  $xwiki.jsfx.use('js/xwiki/panelwizard/Drag.js')##
+  $xwiki.jsfx.use('js/xwiki/panelwizard/ieemu.js')##
+  $xwiki.jsfx.use('js/xwiki/panelwizard/toolTip.js')##
+  {{html}}
+  &lt;script type="text/javascript"&gt;
+  //&lt;![CDATA[
+  window.ajaxurl = "$ajaxurl";
+  window.allPanelsPlace = new Object();
+  window.panelsavesuccess = "$escapetool.javascript($services.localization.render('panelsavesuccess'))";
+  window.panelsaveerror = "$escapetool.javascript($services.localization.render('panelsaveerror'))";
+  #set ($counter = 0)
+  #set ($panelsStatus = {})
+  #foreach ($category in $categoryList)
+    #set ($categPanels = $categoryMap.get($category))
+    #foreach ($item in $categPanels)
+      #set ($discard = $panelsStatus.put($item, 'false'))
+      #set ($obj = $xwiki.getDocument($item).getObject('Panels.PanelClass'))
+      window.allPanelsPlace[$counter] = new Object();
+      window.allPanelsPlace[$counter]['fullname'] = '$escapetool.javascript($item)';
+      #set ($issetleft = 0)
+      #set ($counterleft = 0)
+      #set ($issetright = 0)
+      #set ($counterright = 0)
+      #foreach ($element in $leftPanels.split(','))
+        #if ($item == $element)
+          window.allPanelsPlace[$counter]['left'] = $counterleft;
+          #set ($issetleft = 1)
+          #set ($discard = $panelsStatus.put($item, 'true'))
+        #end
+        #set ($counterleft = $counterleft + 1)
+      #end
+      #if ($issetleft == 0)
+        window.allPanelsPlace[$counter]['left'] = -1;
+      #end
+      #foreach ($element in $rightPanels.split(','))
+        #if ($item == $element)
+          window.allPanelsPlace[$counter]['right'] = $counterright;
+          #set ($issetright = 1)
+          #set ($discard = $panelsStatus.put($item, 'true'))
+        #end
+        #set ($counterright = $counterright + 1)
+      #end
+      #if ($issetright == 0)
+        window.allPanelsPlace[$counter]['right'] = -1;
+      #end
+      #set ($counter = $counter + 1)
+    #end
+  #end
+  window.showLeftColumn = $showLeftPanels;
+  window.showRightColumn = $showRightPanels;
+  #if ($showApplicationPanel)
+    window.showApplicationPanel = true;
+  #else
+    window.showApplicationPanel = false;
+  #end
+  var obj = {div:'panellistaccordion', no:0, height:512};
+  document.observe('xwiki:dom:loaded', function () {
+    createAccordion(obj);
+  });
+  //]]&gt;
+  &lt;/script&gt;
+  {{/html}}
+  $xwiki.jsfx.use('js/xwiki/panelwizard/panelWizard.js')##
+
+  (% id="allviewpanels" %)
+  (((
+    (% id="panellistaccordion" class="accordion" %)
+    (((
+      #set ($panelCount = 0)
+      #foreach ($category in $categoryList)
+        ## start of accordion tab:
+        (% class="accordionTabTitleBar" id="${category}_header" %)
+        (((=${category}=)))
+        ## start of accordion tab content:
+        (% class="accordionTabContentBox" %)
+        (((
+          #set ($categPanels = $categoryMap.get($category))
+          #if ($categPanels.size() == 0)
+            $services.localization.render('panelwizard.nopanels')
+          #else
+            #foreach ($item in $categPanels)
+              #set ($panelDoc = $xwiki.getDocument($item))
+              #set ($obj = $panelDoc.getObject('Panels.PanelClass'))
+              (% class="panelitemc" %)
+              (((
+                (% class="label" %)((($doc.display('name', $obj))))
+                (% id="panelContainer${panelCount}" class="panelcontainer" title="${doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', '')}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
+                (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
+              )))
+              #set ($panelCount = $panelCount + 1)
+            #end## foreach panel
+          #end## categPanels.size()
+        )))## end of accordion tab content - accordionTabContentBox
+      #end## foreach category
+    )))## panellistaccordion
+  )))## allviewpanels
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html clean="false"}}
+#if ($accessLevel)
+  #set ($discard = $xwiki.jsx.use('Panels.PanelWizard'))
+  #set ($discard = $xwiki.ssx.use('Panels.PanelWizard'))
+  &lt;ul class="nav nav-tabs" role="tablist" id="panelEditorSteps"&gt;
+    &lt;li role="presentation" class="active"&gt;
+      &lt;a href="#PageLayoutSection" aria-controls="PageLayoutSection" role="tab" data-toggle="tab"&gt;
+        $escapetool.xml($services.localization.render('panelwizard.pagelayout'))
+      &lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li role="presentation"&gt;
+      &lt;a href="#PanelListSection" aria-controls="PanelListSection" role="tab" data-toggle="tab"&gt;
+        $escapetool.xml($services.localization.render('panelwizard.panellist'))
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div class="tab-content"&gt;
+    &lt;div role="tabpanel" class="tab-pane active xform" id="PageLayoutSection"&gt;
+      #displayPageLayoutSection
+    &lt;/div&gt;
+    &lt;div role="tabpanel" class="tab-pane" id="PanelListSection"&gt;
+      {{/html}}
+
+#displayPanelListSection
+
+{{html clean="false"}}
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="panelwizardbuttons"&gt;
+    &lt;button class="btn btn-primary" id="saveLayout"&gt;
+      $services.localization.render('xe.panels.wizard.savenew')
+    &lt;/button&gt;
+    &lt;button class="btn btn-default" id="revertLayout"&gt;
+      $services.localization.render('xe.panels.wizard.revert')
+    &lt;/button&gt;
+    &lt;a href="$xwiki.getURL('Panels.WebHome')"&gt;
+      $services.localization.render('xe.panels.wizard.homepage')
+    &lt;/a&gt;
+  &lt;/div&gt;
+#end
+{{/html}}
 {{/velocity}}</content>
   <attachment>
     <filename>icon.png</filename>
@@ -407,16 +460,6 @@
       return;
     }
     showtip($('draganddroptooltip'), $('draganddroptooltip')._x_tooltip, 300);
-  });
-
-  Event.observe($('firstwtab'), "click", function(event) {
-    event.stop();
-    switchToWizardPage($('firstwtab'), 'PanelListSection');
-  });
-
-  Event.observe($('secondwtab'), "click", function(event) {
-    event.stop();
-    switchToWizardPage($('secondwtab'), 'PageLayoutSection');
   });
 
   Event.observe($$('.pagelayoutoption0')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption0')[0], 0); });
@@ -600,19 +643,7 @@
 
 /* ----------------Page Layout Selection-----------------*/
 .pagelayoutoption {
-  text-align: center;
-  width: 106px;
-}
-
-.pagelayoutoptions  table {
-  margin: 1em 0 0;
-  width: 100%;
-}
-
-.pagelayoutoptions  table td {
-  border: 0;
-  display: table;
-  float: left;
+  cursor: pointer;
 }
 
 .pagelayoutoption label {
@@ -656,10 +687,6 @@ div.lmrightcolumn {
   margin-right: 24px;
 }
 
-div.pagelayoutoption:hover .layoutmaquette {
-  background-color: $theme.highlightColor;
-}
-
 div.pagelayoutoption:hover .lmcontentcolumn {
   background-color: #ddd;
 }
@@ -680,8 +707,7 @@ div.pagelayoutoption:hover .lmleftcolumn,
 
 #selectedoption label, .pagelayoutoption:hover label {
   color: $theme.titleColor;
-}
-</code>
+}</code>
     </property>
     <property>
       <name>Panel Wizard styling</name>

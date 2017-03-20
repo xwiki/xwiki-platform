@@ -107,9 +107,8 @@
 ##########################
 ## Display the information message
 ##########################
-{{info}}
+(% class="noitems" %)
 {{translation key="platform.panels.applications.helper" /}}
-{{/info}}
 ##########################
 ## Display the 2 panels
 ##########################
@@ -122,7 +121,7 @@
 ## Display the buttons
 ##########################
 {{html}}
-&lt;button class="btn btn-success" id="bt-save"&gt;$services.localization.render('platform.panels.applications.save')&lt;/button&gt; &lt;button class="btn btn-default" id="bt-revert"&gt;$services.localization.render('platform.panels.applications.revert')&lt;/button&gt;
+&lt;button class="btn btn-primary" id="bt-save"&gt;$services.localization.render('platform.panels.applications.save')&lt;/button&gt; &lt;button class="btn btn-default" id="bt-revert"&gt;$services.localization.render('platform.panels.applications.revert')&lt;/button&gt;
 {{/html}}
 {{/velocity}}
 </content>

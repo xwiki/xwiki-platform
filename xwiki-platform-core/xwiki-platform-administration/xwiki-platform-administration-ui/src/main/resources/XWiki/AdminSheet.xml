@@ -59,12 +59,6 @@
 ##
 #set($adminMenu = [
   {
-    'id' : 'configuration',
-    'children': [
-       {'id' : 'Editing', 'order' : 100}
-    ]
-  },
-  {
     'id' : 'lf',
     'displayBeforeCategory': 'content',
     'children': [

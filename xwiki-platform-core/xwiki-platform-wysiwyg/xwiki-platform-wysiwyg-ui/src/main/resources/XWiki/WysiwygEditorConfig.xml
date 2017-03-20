@@ -232,8 +232,12 @@
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
       <codeToExecute>{{html clean="false"}}
-&lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
+&lt;form id="gwtEditorConfig" method="post" action="$formAction" class="xform" data-editorId="gwt"
+  data-label="$services.localization.render('edit.editor.gwt.name')"&gt;
 {{/html}}
 
 {{include reference="XWiki.WysiwygEditorConfig" context="new" /}}
@@ -266,6 +270,12 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory>edit</displayInCategory>
+    </property>
+    <property>
       <displayInSection>WYSIWYG</displayInSection>
     </property>
     <property>
@@ -279,6 +289,9 @@
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder>200</sectionOrder>
     </property>
   </object>
   <object>

@@ -39,10 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.colorthemes.local=Local
-admin.colorthemes.global=Global
-
-administration.title=Administration
+  <content>administration.title=Administration
 administration.title.page=Page Administration
 administration.title.wiki=Wiki Administration
 administration.title.global=Global Administration
@@ -50,6 +47,21 @@ administration.sectionTitle=Administration: {0}
 administration.sectionTitle.page=Page Administration: {0}
 administration.sectionTitle.wiki=Wiki Administration: {0}
 administration.sectionTitle.global=Global Administration: {0}
+
+admin.colorthemes.local=Local
+admin.colorthemes.global=Global
+
+# Editing Sections
+admin.edit=Editing
+admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
+admin.title=Title
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
+XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
+XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
+XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
+admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
 
 # Localization Section
 XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.

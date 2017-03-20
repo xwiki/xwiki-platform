@@ -482,6 +482,7 @@
 }
 
 .notifications-count {
+  background-color: red;
   opacity: 0.9;
   position: absolute;
   right: 0;

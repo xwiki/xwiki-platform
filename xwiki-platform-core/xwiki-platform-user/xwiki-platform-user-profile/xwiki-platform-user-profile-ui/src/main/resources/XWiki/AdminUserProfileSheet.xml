@@ -55,7 +55,7 @@
 {{html clean='false' wiki='true'}}
   &lt;form action="$sheetDocument.getURL('save')" method='post'&gt;
   ## When in edit mode, the form above gets overriden so we need a div with class xform to cover all cases.
-  &lt;div class='xform half'&gt;
+  &lt;div class='xform'&gt;
     #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
     &lt;h2&gt;$services.localization.render('platform.user.profileConfigureSectionsTitle')&lt;/h2&gt;
     &lt;dl&gt;

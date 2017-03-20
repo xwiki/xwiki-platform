@@ -77,7 +77,6 @@
   #end
   {{html}}
   &lt;div id="xwikieditcontent"&gt;
-    &lt;h2&gt;$services.localization.render('admin.users')&lt;/h2&gt;
     &lt;table id="userstable" class="xwiki-livetable"&gt;
       &lt;tr&gt;
         &lt;td class="xwiki-livetable-pagination"&gt;

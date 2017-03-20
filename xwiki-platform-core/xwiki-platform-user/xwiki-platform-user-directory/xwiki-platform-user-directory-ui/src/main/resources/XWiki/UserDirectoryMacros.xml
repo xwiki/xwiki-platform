@@ -224,7 +224,7 @@
     ##
     == {{translation key="xe.userdirectory.customizeColumnsTitle"/}} ==
     {{html clean='false' wiki='true'}}
-    &lt;form class='xform half' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
+    &lt;form class='xform' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
       &lt;dl&gt;
         &lt;dt&gt;
           &lt;label&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsLabel"/}}&lt;/label&gt;
@@ -256,7 +256,7 @@
         &lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/form&gt;
-    &lt;form class='xform half' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
+    &lt;form class='xform' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
       &lt;dl&gt;
         &lt;dt&gt;
           &lt;label&gt;{{translation key="xe.userdirectory.customizeSelectedColumnsLabel"/}}&lt;/label&gt;

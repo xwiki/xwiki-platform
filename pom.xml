@@ -57,6 +57,9 @@
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.8</batik.version>
 
+    <tika.version>1.14</tika.version>
+    <pdfbox.version>2.0.5</pdfbox.version>
+
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
 
@@ -104,12 +107,12 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.14</version>
+        <version>${tika.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.14</version>
+        <version>${tika.version}</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -363,7 +366,12 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.4</version>
+        <version>${pdfbox.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox-tools</artifactId>
+        <version>${pdfbox.version}</version>
       </dependency>
       <dependency>
       <groupId>org.apache.xmlgraphics</groupId>

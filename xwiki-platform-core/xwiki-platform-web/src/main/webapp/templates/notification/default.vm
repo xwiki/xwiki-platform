@@ -5,7 +5,7 @@
 #set ($app  = "$!event.application")
 #set ($icon = 'bell')
 #if ($app == 'xwiki')
-  #set ($app = 'XWiki')
+  #set ($app = $services.localization.render('core.events.appName'))
   #set ($icon = 'file')
 #end
 #set ($document = $xwiki.getDocument($event.document))
@@ -14,7 +14,7 @@
     $services.icon.renderHTML($icon)
   </div>
   <div class="col-xs-10">
-    <p><strong>$app</strong></p>
+    <p><strong>$escapetool.xml($app)</strong></p>
     <p><strong>[$!escapetool.xml($event.type)]</strong> <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a></p>
     <p><small>$escapetool.xml($xwiki.formatDate($event.date))</small></p>
   </div>

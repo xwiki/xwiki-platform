@@ -187,14 +187,13 @@
             {
               "revapi": {
                 "ignore" : [
-                  // Add more ignores below...
                   {
                     "code": "java.annotation.removed",
                     "old": "field org.xwiki.rest.model.jaxb.JobStatus.id",
                     "new": "field org.xwiki.rest.model.jaxb.JobStatus.id",
                     "annotationType": "javax.xml.bind.annotation.XmlElement",
                     "elementKind": "annotation",
-                    "justification": "Not a breakcage from REST API point of view"
+                    "justification": "Not a breakage from REST API point of view"
                   },
                   {
                     "code": "java.annotation.removed",
@@ -202,7 +201,7 @@
                     "new": "field org.xwiki.rest.model.jaxb.JobStatus.progress",
                     "annotationType": "javax.xml.bind.annotation.XmlElement",
                     "elementKind": "annotation",
-                    "justification": "Not a breakcage from REST API point of view"
+                    "justification": "Not a breakage from REST API point of view"
                   },
                   {
                     "code": "java.annotation.attributeValueChanged",

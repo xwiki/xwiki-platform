@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 4.0M2
  */
-public class PackageConfiguration
+public class PackageConfiguration implements Cloneable
 {
     private String wiki;
 
@@ -51,13 +51,24 @@ public class PackageConfiguration
 
     private boolean skipMandatorytDocuments = true;
 
-    private Map<ConflictType, GlobalAction> conflictActions = new HashMap<>();
+    private final Map<ConflictType, GlobalAction> conflictActions = new HashMap<>();
 
     public PackageConfiguration()
     {
         // Default behavior
         setConflictAction(ConflictType.CURRENT_DELETED, GlobalAction.CURRENT);
         setConflictAction(ConflictType.MERGE_SUCCESS, GlobalAction.MERGED);
+    }
+
+    @Override
+    public PackageConfiguration clone()
+    {
+        try {
+            return (PackageConfiguration) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            return null;
+        }
     }
 
     public String getWiki()

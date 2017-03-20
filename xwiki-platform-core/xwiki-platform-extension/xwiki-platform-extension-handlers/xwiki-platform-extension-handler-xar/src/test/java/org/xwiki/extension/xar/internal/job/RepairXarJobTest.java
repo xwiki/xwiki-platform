@@ -29,6 +29,8 @@ import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.test.annotation.AfterComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +38,12 @@ import static org.junit.Assert.assertTrue;
 public class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
     private InstalledExtensionRepository xarExtensionRepository;
+
+    @AfterComponent
+    public void afterComponent() throws Exception
+    {
+        this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
+    }
 
     @Override
     @Before
@@ -75,7 +83,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
-        repair(extensionId, new String[] {"wiki:wiki1"}, LogLevel.WARN);
+        repair(extensionId, new String[] { "wiki:wiki1" }, LogLevel.WARN);
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 

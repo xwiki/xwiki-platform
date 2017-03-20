@@ -31,8 +31,10 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,6 +49,12 @@ public class XarInstalledExtensionRepositoryTest
     public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.mocker);
 
     private XarInstalledExtensionRepository installedExtensionRepository;
+
+    @AfterComponent
+    public void afterComponent() throws Exception
+    {
+        this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
+    }
 
     @Before
     public void setUp() throws Exception

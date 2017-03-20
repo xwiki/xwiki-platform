@@ -85,6 +85,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private static final TranslationMarker LOG_EXTENSIONPLAN_END =
         new TranslationMarker("extension.xar.log.extensionplan.end");
 
+    private static final String CONTEXTKEY_PACKAGECONFIGURATION = "extension.xar.packageconfiguration";
+
     @Inject
     private Packager packager;
 
@@ -164,11 +166,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
 
-            try {
-                installInternal(localExtension, wiki, request);
-            } catch (InterruptedException e) {
-                throw new InstallException("Thread has been interrupted", e);
-            }
+            installInternal(localExtension, wiki, request);
         }
     }
 
@@ -187,26 +185,21 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             }
 
             // Install new pages
-            try {
-                installInternal(newLocalExtension, wiki, request);
-            } catch (InterruptedException e) {
-                throw new InstallException("Thread has been interrupted", e);
-            }
+            installInternal(newLocalExtension, wiki, request);
         }
     }
 
-    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request)
-        throws InstallException, InterruptedException
+    private void installInternal(LocalExtension newLocalExtension, String wiki, Request request) throws InstallException
     {
         try {
             initializePagesIndex(request);
+            initJobPackageConfiguration(request);
         } catch (Exception e) {
             throw new InstallException("Failed to initialize extension plan index", e);
         }
 
         // import xar into wiki (add new version when the page already exists)
-        PackageConfiguration configuration =
-            createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
+        PackageConfiguration configuration = createPackageConfiguration(newLocalExtension, request, wiki);
         try {
             this.packager.importXAR("Install extension [" + newLocalExtension + "]",
                 new File(newLocalExtension.getFile().getAbsolutePath()), configuration);
@@ -221,6 +214,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex(request);
+            initJobPackageConfiguration(request);
         } catch (Exception e) {
             throw new UninstallException("Failed to initialize extension plan index", e);
         }
@@ -243,12 +237,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     throw new UninstallException("Failed to extract wiki id from namespace", e);
                 }
 
-                PackageConfiguration configuration;
-                try {
-                    configuration = createPackageConfiguration(null, request, wiki, getXARExtensionPlan());
-                } catch (InterruptedException e) {
-                    throw new UninstallException("Thread has been interrupted", e);
-                }
+                PackageConfiguration configuration = createPackageConfiguration(null, request, wiki);
 
                 try {
                     XarInstalledExtension xarLocalExtension =
@@ -266,54 +255,90 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private PackageConfiguration createPackageConfiguration(LocalExtension extension, Request request, String wiki,
-        XarExtensionPlan xarExtensionPlan) throws InterruptedException
+    private void initJobPackageConfiguration(Request request) throws InterruptedException
     {
-        PackageConfiguration configuration = new PackageConfiguration();
+        ExecutionContext context = this.execution.getContext();
 
-        DocumentReference userReference = getRequestUserReference(PROPERTY_USERREFERENCE, request);
+        if (context != null && context.getProperty(CONTEXTKEY_PACKAGECONFIGURATION) == null) {
+            Job currentJob = null;
+            try {
+                currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
+            } catch (Exception e) {
+                this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
+            }
 
-        configuration.setInteractive(request.isInteractive());
-        configuration.setUser(userReference);
-        configuration.setWiki(wiki);
-        configuration.setVerbose(request.isVerbose());
-        configuration.setSkipMandatorytDocuments(true);
-        configuration.setXarExtensionPlan(xarExtensionPlan);
+            if (currentJob != null) {
+                PackageConfiguration configuration = new PackageConfiguration();
+                context.setProperty(CONTEXTKEY_PACKAGECONFIGURATION, configuration);
 
-        // Non blocker conflicts
-        configuration.setConflictAction(ConflictType.CURRENT_DELETED,
-            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_DELETED), GlobalAction.CURRENT);
-        configuration.setConflictAction(ConflictType.MERGE_SUCCESS,
-            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_SUCCESS), GlobalAction.MERGED);
-        // Blocker conflicts
-        configuration.setConflictAction(ConflictType.CURRENT_EXIST,
-            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_EXIST),
-            configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.NEXT);
-        configuration.setConflictAction(ConflictType.MERGE_FAILURE,
-            request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_FAILURE),
-            configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
+                DocumentReference userReference = getRequestUserReference(PROPERTY_USERREFERENCE, request);
 
-        Job currentJob = null;
-        try {
-            currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
-        } catch (Exception e) {
-            this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
-        }
+                configuration.setInteractive(request.isInteractive());
+                configuration.setUser(userReference);
+                configuration.setVerbose(request.isVerbose());
+                configuration.setSkipMandatorytDocuments(true);
+                configuration.setXarExtensionPlan(getXARExtensionPlan());
 
-        if (currentJob != null) {
-            configuration.setJobStatus(currentJob.getStatus());
+                configuration.setJobStatus(currentJob.getStatus());
 
-            // If advanced user ask to confirm default answers
-            if (request.isInteractive() && this.documentAccessBridge.isAdvancedUser(userReference)) {
-                DefaultConflictActionQuestion question = new DefaultConflictActionQuestion(configuration);
+                // Non blocker conflicts
+                configuration.setConflictAction(ConflictType.CURRENT_DELETED,
+                    request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_DELETED),
+                    GlobalAction.CURRENT);
+                configuration.setConflictAction(ConflictType.MERGE_SUCCESS,
+                    request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_SUCCESS),
+                    GlobalAction.MERGED);
+                // Blocker conflicts
+                configuration.setConflictAction(ConflictType.CURRENT_EXIST,
+                    request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_EXIST),
+                    configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.NEXT);
+                configuration.setConflictAction(ConflictType.MERGE_FAILURE,
+                    request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_FAILURE),
+                    configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
 
-                currentJob.getStatus().ask(question, 1, TimeUnit.HOURS);
+                // If advanced user ask to confirm default answers
+                if (currentJob.getStatus().getRequest().isInteractive()
+                    && this.documentAccessBridge.isAdvancedUser(userReference)) {
+                    DefaultConflictActionQuestion question = new DefaultConflictActionQuestion(configuration);
+
+                    currentJob.getStatus().ask(question, 1, TimeUnit.HOURS);
+                }
             }
         }
+    }
+
+    private PackageConfiguration createPackageConfiguration(LocalExtension extension, Request request, String wiki)
+    {
+        PackageConfiguration configuration;
+
+        // Search job configuration in the context
+        ExecutionContext context = this.execution.getContext();
+        if (context != null) {
+            configuration = (PackageConfiguration) context.getProperty(CONTEXTKEY_PACKAGECONFIGURATION);
+        } else {
+            configuration = null;
+        }
+
+        // Create a configuration for this extension
+        if (configuration != null) {
+            configuration = configuration.clone();
+        } else {
+            configuration = new PackageConfiguration();
+
+            DocumentReference userReference = getRequestUserReference(PROPERTY_USERREFERENCE, request);
+
+            configuration.setInteractive(request.isInteractive());
+            configuration.setUser(userReference);
+            configuration.setVerbose(request.isVerbose());
+            configuration.setSkipMandatorytDocuments(true);
+        }
+
+        configuration.setWiki(wiki);
 
         // Filter entries to import if there is a plan
-        if (extension != null && xarExtensionPlan != null) {
-            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = xarExtensionPlan.nextXAREntries;
+        if (extension != null && configuration.getXarExtensionPlan() != null) {
+            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries =
+                configuration.getXarExtensionPlan().nextXAREntries;
 
             Set<String> entriesToImport = new HashSet<>();
 

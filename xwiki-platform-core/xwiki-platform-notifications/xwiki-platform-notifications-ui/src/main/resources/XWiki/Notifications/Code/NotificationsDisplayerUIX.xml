@@ -290,7 +290,7 @@
       $('.notifications-load-more').remove();
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; offset == 0) {
-        area.html($('&lt;p&gt;').addClass('text-center').text('Nothing!'));
+        area.html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
       } else if (offset == 0 ) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.

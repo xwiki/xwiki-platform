@@ -76,8 +76,8 @@
        {'id' : 'Rights', 'perSpace' : false, 'order' : 300},
        {'id' : 'PageAndChildrenRights', 'perSpace' : true, 'order' : 300, 'global': false},
        {'id' : 'PageRights', 'perSpace' : true, 'order' : 350, 'global': false},
-       {'id' : 'Registration', 'order' : 400},
-       {'id' : 'UserProfile', 'order' : 500}
+       {'id' : 'UserProfile', 'order' : 400},
+       {'id' : 'Registration', 'order' : 500}
     ]
   },
   {

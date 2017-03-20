@@ -945,6 +945,9 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
       <codeToExecute/>
     </property>
     <property>
@@ -952,6 +955,12 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory>usersgroups</displayInCategory>
     </property>
     <property>
       <displayInSection>Invitation</displayInSection>
@@ -967,6 +976,9 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder>600</sectionOrder>
     </property>
   </object>
   <object>

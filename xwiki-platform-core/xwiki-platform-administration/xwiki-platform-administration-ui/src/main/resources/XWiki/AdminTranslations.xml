@@ -82,9 +82,11 @@ administration.section.export.version.hint=The package version.
 administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
 administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
 
-# Other Section
+# Other Category
 admin.other=Other
-admin.other.description=Various configurations for extensions.</content>
+admin.other.description=Various configurations for extensions.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
   <object>
     <name>XWiki.AdminTranslations</name>
     <number>0</number>

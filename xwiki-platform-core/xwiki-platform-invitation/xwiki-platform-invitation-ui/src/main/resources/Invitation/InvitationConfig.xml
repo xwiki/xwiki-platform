@@ -580,13 +580,34 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute/>
+    </property>
+    <property>
       <configurationClass>Invitation.WebHome</configurationClass>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
+    </property>
+    <property>
       <displayInSection>Invitation</displayInSection>
+    </property>
+    <property>
+      <heading/>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
     </property>
     <property>
       <propertiesToShow>
@@ -600,6 +621,9 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <value>emailClass</value>
         <value>emailContainer</value>
       </propertiesToShow>
+    </property>
+    <property>
+      <sectionOrder/>
     </property>
   </object>
   <object>
@@ -785,16 +809,34 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute/>
+    </property>
+    <property>
       <configurationClass>Invitation.WebHome</configurationClass>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
+    </property>
+    <property>
       <displayInSection>Invitation</displayInSection>
     </property>
     <property>
       <heading>$services.localization.render('xe.invitation.configuration.smtpHeading')</heading>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
     </property>
     <property>
       <propertiesToShow>
@@ -804,6 +846,9 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
         <value>smtp_server</value>
         <value>javamail_extra_props</value>
       </propertiesToShow>
+    </property>
+    <property>
+      <sectionOrder/>
     </property>
   </object>
 </xwikidoc>

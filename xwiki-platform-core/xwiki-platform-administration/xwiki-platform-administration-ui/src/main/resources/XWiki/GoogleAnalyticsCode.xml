@@ -90,11 +90,19 @@
 #else## !hasAdmin
   {{error}}{{translation key="needadminrights"/}}.{{/error}}
 #end##
-#displayAnalyticsStatus()
 
-{{html}}
-&lt;form action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
+{{html clean="false"}}
+&lt;form action="$xwiki.relativeRequestURL" method="post" class="xform"&gt;
   &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label&gt;$services.localization.render('administration.section.analytics.status')&lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('administration.section.analytics.status.hint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      {{/html}}#displayAnalyticsStatus(){{html clean="false"}}
+    &lt;/dd&gt;
     &lt;dt&gt;
       &lt;label for="analytics_method"&gt;$!methodPropertyClass.translatedPrettyName&lt;/label&gt;
       &lt;span class="xHint"&gt;$services.localization.render('admin.analytics.method.description', 'xhtml/1.0')&lt;/span&gt;

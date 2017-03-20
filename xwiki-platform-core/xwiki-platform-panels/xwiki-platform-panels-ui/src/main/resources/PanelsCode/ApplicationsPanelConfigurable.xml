@@ -238,7 +238,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>lf</displayInCategory>
     </property>
     <property>
       <displayInSection>panels.applications</displayInSection>
@@ -256,7 +256,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>400</sectionOrder>
     </property>
   </object>
 </xwikidoc>

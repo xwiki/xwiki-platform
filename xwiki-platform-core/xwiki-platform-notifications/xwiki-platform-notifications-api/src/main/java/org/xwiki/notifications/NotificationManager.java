@@ -37,20 +37,36 @@ import org.xwiki.stability.Unstable;
 public interface NotificationManager
 {
     /**
+     * Return events to display as notifications concerning the specified user.
+     *
+     * @param userId id of the user
      * @param onlyUnread if only unread events should be returned
-     * @param limit the maximum events to return
-     * @return a list of events concerning the current user and to display as notifications
-     * @throws NotificationException
+     * @param expectedCount the maximum events to return
+     * @return the matching events for the user, could be less than expectedCount but not more
+     * @throws NotificationException if error happens
      */
-    List<Event> getEvents(String userId, boolean onlyUnread, int limit) throws NotificationException;
+    List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException;
 
-    List<Event> getEvents(String userId, boolean onyUnread, int count, Date untilDate, List<String> blackList)
+    /**
+     * Return events to display as notifications concerning the specified user.
+     *
+     * @param userId id of the user
+     * @param onlyUnread if only unread events should be returned
+     * @param expectedCount the maximum events to return
+     * @param untilDate do not return events happened after this date
+     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
+     * @return the matching events for the user, could be less than expectedCount but not more
+     * @throws NotificationException if error happens
+     */
+    List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate, List<String> blackList)
             throws NotificationException;
 
     /**
-     * Return the number of events to display as notifications concerning the current user.
+     * Return the number of events to display as notifications concerning the specified user.
      *
+     * @param userId id of the user
      * @param onlyUnread either if only unread events should be counted or all events
+     * @param maxCount maximum number of events to count
      * @return the list of events to display as notifications
      * @throws NotificationException if an error happens
      */

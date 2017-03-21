@@ -223,6 +223,9 @@
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon/>
+    </property>
+    <property>
       <codeToExecute>{{include reference="XWiki.UserDirectoryConfigurationSheet"}}</codeToExecute>
     </property>
     <property>
@@ -230,6 +233,12 @@
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory>usersgroups</displayInCategory>
     </property>
     <property>
       <displayInSection>userdirectory</displayInSection>
@@ -245,6 +254,9 @@
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder>450</sectionOrder>
     </property>
   </object>
   <object>

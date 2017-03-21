@@ -254,7 +254,7 @@ $doc.dropPermissions()##
                   ## We are opening a form and fieldset without closing it, thus we cannot clean this html.
 
                   {{html clean=false}}
-                    &lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
+                    &lt;form id="$formId" method="post" action="$formAction" class="xform"&gt;
                       &lt;fieldset&gt;
                   {{/html}}
                   #set($insideForm = true)

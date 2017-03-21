@@ -41,7 +41,64 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SearchCode" /}}
 
+{{velocity output="false"}}
+#macro (displayObjectPropertyValue $propertyName $mode)
+  #set ($output = $doc.display($propertyName, $mode))
+  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
+  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
+  $output
+#end
+
+#macro (displaySearchSuggestSource $source)
+  #set ($icon = $source.getProperty('icon').value)
+  #if ($icon.startsWith('icon:'))
+    #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
+  #else
+    ## Evaluate the Velocity code for backward compatibility.
+    #set ($icon = "#evaluate($icon)")
+  #end
+  #set ($name = $source.getProperty('name').value)
+  #if ($services.localization.get($name))
+    #set ($name = $services.localization.render($name))
+  #else
+    ## Evaluate the Velocity code for backward compatibility.
+    #set ($name = "#evaluate($name)")
+  #end
+  #set ($style = 'source-header')
+  #if ("$source.getProperty('activated').value" == '1')
+    #set ($style = "$style activated")
+  #end
+  #if ("$source.getProperty('highlight').value" == '1')
+    #set ($style = "$style highlighted")
+  #end
+  &lt;li class="source"&gt;
+    &lt;div class="$style"&gt;
+      &lt;img class="icon" src="$!icon" /&gt;
+      &lt;span class="limit"&gt;$!source.getProperty('resultsNumber').value&lt;/span&gt;
+      &lt;span class="name"&gt;$!name&lt;/span&gt;
+      #if ($editing)
+        &lt;div class="actions"&gt;
+          &lt;a class="delete" href="$doc.getURL('objectremove', $escapetool.url({
+            'form_token': $services.csrf.token,
+            'classname': $searchSuggestSourceClassName,
+            'classid': $source.number,
+            'xredirect': $doc.getURL('edit')
+          }))"&gt;
+            $services.icon.renderHTML('cross')
+          &lt;/a&gt;
+        &lt;/div&gt;
+      #end
+    &lt;/div&gt;
+    &lt;div class="source-body hidden"&gt;
+      #set ($object = $source)
+      $sourceSheet.getRenderedContent().replace('{{', '&amp;#123;&amp;#123;')
+    &lt;/div&gt;
+  &lt;/li&gt;
+#end
+{{/velocity}}
+
 {{velocity}}
+{{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('XWiki.SearchSuggestConfigSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.SearchSuggestConfigSheet'))
 #set ($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
@@ -49,19 +106,23 @@
 #if ($editing)
   #set ($mode = 'edit')
 #end
-= {{translation key="admin.searchsuggest" /}} =
-
 #set($discard = $doc.use($doc.fullName))
-(% class="xform" %)(((
-; {{html clean="false"}}
-  &lt;label#if ($editing) for="${doc.fullName}_0_activated"#end&gt;
-    $doc.displayPrettyName('activated', false, false)
-  &lt;/label&gt;
-  {{/html}}
-: $doc.display('activated', $mode)
-)))
-
-== {{translation key="platform.search.suggestSources" /}} ==
+&lt;div class="xform"&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label#if ($editing) for="${doc.fullName}_0_activated"#end&gt;
+        $doc.displayPrettyName('activated', false, false)
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('XWiki.SearchSuggestConfig_activated.hint')
+      &lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayObjectPropertyValue('activated' $mode)&lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label&gt;$services.localization.render('platform.search.suggestSources')&lt;/label&gt;
+      &lt;span class="xHint"&gt;$services.localization.render('platform.search.suggestSources.hint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
 #set ($searchSuggestSourceClassName = 'XWiki.SearchSuggestSourceClass')
 ## Group sources by search engine.
 #set ($sources = {})
@@ -78,73 +139,44 @@
   #set ($discard = $sourcesForEngine.add($source))
 #end
 ## Display the list of search engines.
-## We use HTML here just because we can't set the class name of a list item using wiki syntax.
 #if ($sources.size() &gt; 0)
-  {{html clean="false"}}
-  &lt;ul class="xwikitabbar searchEngines"&gt;
+  &lt;ul class="nav nav-tabs searchEngines" role="tablist"&gt;
   #foreach ($engine in $sorttool.sort($sources.keySet()))
-    &lt;li#if ($engine == $searchEngine) class="active"#end&gt;
-      &lt;a href="#${engine}SearchSuggestSources"&gt;$engine&lt;/a&gt;
+    &lt;li#if ($engine == $searchEngine) class="active"#end role="presentation"&gt;
+      &lt;a href="#${engine}SearchSuggestSources" aria-controls="${engine}SearchSuggestSources"
+        role="tab" data-toggle="tab"&gt;$engine&lt;/a&gt;
     &lt;/li&gt;
   #end
   &lt;/ul&gt;
-  {{/html}}
-
 #end
 ## Display sources by search engine.
 #set ($sourceSheet = $xwiki.getDocument('XWiki.SearchSuggestSourceSheet'))
-#foreach ($engine in $sources.keySet())
-  (% class="searchSuggestSources#if ($engine != $searchEngine) hidden#end" id="${engine}SearchSuggestSources" %)
-  #foreach ($source in $sources.get($engine))
-    #set ($icon = $source.getProperty('icon').value)
-    #if (!$icon.startsWith('icon:'))
-      ## Evaluate the Velocity code for backward compatibility.
-      #set ($icon = "path:#evaluate($icon)")
+&lt;div class="tab-content"&gt;
+  #foreach ($engine in $sources.keySet())
+    &lt;ul class="tab-pane searchSuggestSources#if ($engine == $searchEngine) active#end"
+      role="tabpanel" id="${engine}SearchSuggestSources"&gt;
+    #foreach ($source in $sources.get($engine))
+      #displaySearchSuggestSource($source)
     #end
-    #set ($name = $source.getProperty('name').value)
-    #if ($services.localization.get($name))
-      #set ($name = $services.localization.render($name))
-    #else
-      ## Evaluate the Velocity code for backward compatibility.
-      #set ($name = "#evaluate($name)")
-    #end
-    #set ($style = 'source-header')
-    #if ("$source.getProperty('activated').value" == '1')
-      #set ($style = "$style activated")
-    #end
-    #if ("$source.getProperty('highlight').value" == '1')
-      #set ($style = "$style highlighted")
-    #end
-    * (% class="source" %)(((
-        (% class="$style" %)(((
-          [[image:$icon||class="icon"]] (% class="limit" %)$!{source.getProperty('resultsNumber').value}(%%) (% class="name" %)$name(%%)##
-          #if ($editing)
-            (% class="actions" %)(((
-              [[[[image:icon:cross||class="icon"]]&gt;&gt;path:$doc.getURL('objectremove', $escapetool.url({
-                'form_token': $services.csrf.token,
-                'classname': $searchSuggestSourceClassName,
-                'classid': $source.number,
-                'xredirect': $doc.getURL('edit')
-              }))||class="delete"]]
-            )))
-          #end
-        )))
-        (% class="source-body hidden" %)(((
-          #set ($object = $source)
-          {{html clean="false"}}$sourceSheet.getRenderedContent().replace('{{', '&amp;#123;&amp;#123;'){{/html}}
-        )))
-      )))
+    &lt;/ul&gt;
   #end
-
-#end
-
+&lt;/div&gt;
 #if ($editing)
-  [[{{translation key="platform.search.suggestAddNewSource" /}}&gt;&gt;path:$doc.getURL('objectadd', $escapetool.url({
+  &lt;ul class="searchSuggestSourceTemplate hidden"&gt;
+    #displaySearchSuggestSource({})
+  &lt;/ul&gt;
+  &lt;a class="addSearchSuggestSource" href="$doc.getURL('objectadd', $escapetool.url({
     'form_token': $services.csrf.token,
     'classname': $searchSuggestSourceClassName,
     'xredirect': $xwiki.relativeRequestURL
-  }))||class="addSearchSuggestSource"]]
+  }))"&gt;
+    $services.localization.render('platform.search.suggestAddNewSource')
+  &lt;/a&gt;
 #end
+    &lt;/dd&gt;## Sources
+  &lt;/dl&gt;
+&lt;/div&gt;## xform
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.SearchSuggestConfigSheet</name>
@@ -227,23 +259,11 @@
     </property>
     <property>
       <code>require(['jquery'], function($) {
-  //-----------------------
-  // Search engine tab bar.
-  //-----------------------
-  $('.searchEngines a').click(function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    $(this).closest('.searchEngines').children().removeClass('active');
-    $(this).closest('li').addClass('active');
-    $('.searchSuggestSources').addClass('hidden');
-    $($(this).attr('href')).removeClass('hidden');
-  });
-
   // Toggle source details.
   var sourceHeaderClickHandler = function() {
     $(this).next('.source-body').toggleClass('hidden');
   };
-  $('.searchSuggestSources .source-header').click(sourceHeaderClickHandler);
+  $('.searchSuggestSources').on('click', '.source-header', sourceHeaderClickHandler);
 
   //--------------------
   // Ajax source delete.
@@ -262,7 +282,7 @@
           deleteLink.disabled = true;
         },
         onSuccess : function() {
-          $(deleteLink).closest('.source').parent().remove();
+          $(deleteLink).closest('.source').remove();
         },
         onComplete : function() {
           deleteLink.disabled = false;
@@ -277,47 +297,34 @@
       }
     );
   };
-  $('.searchSuggestSources .source-header .delete').click(sourceDeleteHandler);
+  $('.searchSuggestSources').on('click', '.source-header .delete', sourceDeleteHandler);
 
   //-----------------
   // Ajax source add.
   //-----------------
   var targetDocument = new XWiki.Document('SearchSuggestConfig', 'XWiki');
-  var createSourceDeleteLink = function(objectNumber) {
-    var icon = document.createElement('img');
-    $(icon).addClass('icon').attr('alt', 'cross')
-      .attr('src', "$xwiki.getSkinFile('icons/silk/cross.png')");
-    var link = document.createElement('a');
-    var deleteSourceURL = targetDocument.getURL('objectremove', $.param({
+  var createSourceUI = function(container, sourceFormHTML) {
+    container.find('.name').text("$escapetool.javascript($services.localization.render('platform.search.suggestNewSourceName'))");
+    container.find('.source-body').html(sourceFormHTML);
+    var objectNumber = parseInt(container.find('input[type="text"]')
+      .attr('name').substr('XWiki.SearchSuggestSourceClass_'.length));
+    container.find('.source-header .delete').attr('href', targetDocument.getURL('objectremove', $.param({
       form_token: $('meta[name="form_token"]').attr('content'),
       classname: 'XWiki.SearchSuggestSourceClass',
       classid: objectNumber
-    }));
-    $(link).addClass('delete').attr('href', deleteSourceURL)
-      .append(icon).click(sourceDeleteHandler);
-    return link;
-  };
-  var createSourceUI = function(sourceFormHTML) {
-    var container = document.createElement('li');
-    $(container).html('&lt;div class="source"&gt;&lt;div class="source-header"&gt;&lt;span class="name"&gt;'
-      + "$escapetool.javascript($escapetool.xml($services.localization.render('platform.search.suggestNewSourceName')))"
-      + '&lt;/span&gt;&lt;div class="actions"/&gt;&lt;/div&gt;&lt;div class="source-body"/&gt;&lt;/div&gt;');
-    $(container).find('.source-body').html(sourceFormHTML);
-    var objectNumber = parseInt($(container).find('input[type="text"]')
-      .attr('name').substr('XWiki.SearchSuggestSourceClass_'.length));
-    $(container).find('.source-header').click(sourceHeaderClickHandler)
-      .find('.actions').append(createSourceDeleteLink(objectNumber));
+    })));
     return container;
   };
   var insertSource = function(sourceFormHTML) {
-    var searchEngines = $(this).closest('p').prevAll('.searchEngines');
+    var searchEngines = $(this).closest('form').find('.searchEngines');
     if (searchEngines.length == 0) {
       // There is no search suggest source present. This will be the first one.
       // TODO: Prepare the search engine tab bar.
       // TODO: Prepare the search suggest sources container.
     }
-    var source = createSourceUI(sourceFormHTML);
-    searchEngines.nextAll(searchEngines.find('li.active a').attr('href')).append(source);
+    var sourceTemplate = $(this).closest('form').find('.searchSuggestSourceTemplate').children().first();
+    var source = createSourceUI(sourceTemplate.clone(), sourceFormHTML);
+    searchEngines.next('.tab-content').find(searchEngines.find('li.active a').attr('href')).append(source);
   }
   $('.addSearchSuggestSource').click(function(event) {
     event.stopPropagation();
@@ -455,7 +462,6 @@
     <property>
       <code>#template('colorThemeInit.vm')
 ul.searchEngines {
-  margin-top: 1.2em;
   text-transform: capitalize;
 }
 ul.searchSuggestSources {
@@ -483,10 +489,6 @@ ul.searchSuggestSources {
 .searchSuggestSources .source-header.highlighted .limit {
   background-color: yellow;
 }
-.searchSuggestSources .source-header &gt; p,
-.searchSuggestSources .source-header .actions &gt; p {
-  margin: 0;
-}
 .searchSuggestSources .source-header .actions {
   display: none;
   position: absolute;
@@ -495,6 +497,9 @@ ul.searchSuggestSources {
 }
 .searchSuggestSources .source:hover .actions {
   display: block;
+}
+.searchSuggestSources .actions .delete {
+  color: $theme.notificationErrorColor;
 }
 .searchSuggestSources .source-body {
   border-left: 1px dotted $theme.borderColor;

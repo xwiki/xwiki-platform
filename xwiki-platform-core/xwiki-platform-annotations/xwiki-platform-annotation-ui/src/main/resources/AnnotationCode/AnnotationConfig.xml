@@ -62,7 +62,7 @@
       <customDisplay/>
       <defaultValue>1</defaultValue>
       <disabled>0</disabled>
-      <displayFormType>radio</displayFormType>
+      <displayFormType>checkbox</displayFormType>
       <displayType/>
       <name>activated</name>
       <number>1</number>
@@ -101,7 +101,7 @@
       <customDisplay/>
       <defaultValue>1</defaultValue>
       <disabled>0</disabled>
-      <displayFormType>radio</displayFormType>
+      <displayFormType>checkbox</displayFormType>
       <displayType/>
       <name>displayHighlight</name>
       <number>4</number>
@@ -115,7 +115,7 @@
       <customDisplay/>
       <defaultValue>0</defaultValue>
       <disabled>0</disabled>
-      <displayFormType>radio</displayFormType>
+      <displayFormType>checkbox</displayFormType>
       <displayType/>
       <name>displayed</name>
       <number>3</number>
@@ -168,7 +168,7 @@
         <customDisplay/>
         <defaultValue>1</defaultValue>
         <disabled>0</disabled>
-        <displayFormType>radio</displayFormType>
+        <displayFormType>checkbox</displayFormType>
         <displayType/>
         <name>activated</name>
         <number>1</number>
@@ -207,7 +207,7 @@
         <customDisplay/>
         <defaultValue>1</defaultValue>
         <disabled>0</disabled>
-        <displayFormType>radio</displayFormType>
+        <displayFormType>checkbox</displayFormType>
         <displayType/>
         <name>displayHighlight</name>
         <number>4</number>
@@ -221,7 +221,7 @@
         <customDisplay/>
         <defaultValue>0</defaultValue>
         <disabled>0</disabled>
-        <displayFormType>radio</displayFormType>
+        <displayFormType>checkbox</displayFormType>
         <displayType/>
         <name>displayed</name>
         <number>3</number>
@@ -502,7 +502,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>content</displayInCategory>
     </property>
     <property>
       <displayInSection>Annotations</displayInSection>
@@ -520,7 +520,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>500</sectionOrder>
     </property>
   </object>
 </xwikidoc>

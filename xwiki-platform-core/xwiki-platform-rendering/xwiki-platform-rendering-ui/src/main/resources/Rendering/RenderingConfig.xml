@@ -238,7 +238,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory>configuration</displayInCategory>
+      <displayInCategory>edit</displayInCategory>
     </property>
     <property>
       <displayInSection>Syntaxes</displayInSection>
@@ -256,7 +256,7 @@
       <propertiesToShow/>
     </property>
     <property>
-      <sectionOrder/>
+      <sectionOrder>300</sectionOrder>
     </property>
   </object>
 </xwikidoc>

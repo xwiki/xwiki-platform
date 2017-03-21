@@ -39,14 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.email=Email
-admin.email.description=Configure email (general, mail sending) and view mail statuses.
-admin.emailgeneral=General
-admin.emailgeneral.description=Configure general email parameters.
+  <content>admin.email=Mail
+admin.email.description=Configure mail sending parameters and view mail statuses.
+admin.emailgeneral=Advanced
+admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
 admin.emailsend=Mail Sending
 admin.emailsend.description=Configure mail sending parameters.
 admin.emailstatus=Mail Sending Status
-admin.emailstatus.description=View the statuses of sent mails.
+admin.emailstatus.description=View the statuses of sent mails and resend mails that have failed to be sent.
+admin.emailstatus.hint=If you can't find the status of a mail then it may be the case that the feature that sent the mail did not specify that the mail status should be persisted.
 Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
 Mail.GeneralMailConfigClass_obfuscate.hint=This affects only the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 Mail.SendMailConfigClass_from=Email address to send from

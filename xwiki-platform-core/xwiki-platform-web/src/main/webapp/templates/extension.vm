@@ -36,19 +36,28 @@
         <input type="text" #if ("$!request.search" == '')class="withTip" #{end}id="extensionSearchInput" name="search"
           value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$services.localization.render('extensions.search.tip')#{end}" />
         <label class="hidden" for="extensionSearchRepositoryList">$services.localization.render('extensions.search.repository.label')</label>
+        #set ($selectedRepositoryId = 'recommended')
+        #if ($request.repo)
+          #set ($selectedRepositoryId = $request.repo)
+        #end
         <select id="extensionSearchRepositoryList" name="repo">
-          ## Recommended extensions repository (default)
-          <option value="recommended">$services.localization.render("extensions.search.repository.recommended.label")</option>
-          #if ($request.repo)
-            #set ($selectedRepositoryId = $request.repo)
-          #end
-          ## Remote extensions repository
-          <option value=""#if ($selectedRepositoryId == '') selected="selected"#end>$services.localization.render('extensions.search.repository.remote.label')</option>
-          ## Local repositories
-          #foreach ($repositoryId in ['core', 'installed', 'local'])
-            <option value="$repositoryId"#if ($selectedRepositoryId == $repositoryId) selected="selected"#end>
-              $services.localization.render("extensions.search.repository.${repositoryId}.label")</option>
-          #end
+          <optgroup label="$services.localization.render('extension.search.repositoryGroup.remote.label')">
+            ## Remote extensions repository
+            <option value=""#if ($selectedRepositoryId == '') selected="selected"#end>
+              $services.localization.render('extensions.search.repository.remote.label')
+            </option>
+            ## Recommended extensions repository (default)
+            <option value="recommended"#if ($selectedRepositoryId == 'recommended') selected="selected"#end">
+              $services.localization.render("extensions.search.repository.recommended.label")
+            </option>
+          </optgroup>
+          <optgroup label="$services.localization.render('extension.search.repositoryGroup.local.label')">
+            ## Local repositories
+            #foreach ($repositoryId in ['installed', 'local', 'core'])
+              <option value="$repositoryId"#if ($selectedRepositoryId == $repositoryId) selected="selected"#end>
+                $services.localization.render("extensions.search.repository.${repositoryId}.label")</option>
+            #end
+          </optgroup>
         </select>
         ## We don't use #em_submitButton because we want to use <button> instead of <input type="submit">, in order to 
         ## be able to use HTML content inside the text of the button (the search icon and the hidden span for screen readers).

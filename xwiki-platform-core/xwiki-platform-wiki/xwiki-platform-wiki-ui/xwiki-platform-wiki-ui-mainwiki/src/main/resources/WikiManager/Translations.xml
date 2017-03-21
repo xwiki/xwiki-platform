@@ -241,7 +241,9 @@ platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
 admin.wikis.description=Wikis management.
-admin.wikis.templates=Templates
+admin.wikis.templates=Wiki Templates
+admin.wikis.templates.description=Manage the wiki templates
+admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
 admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet

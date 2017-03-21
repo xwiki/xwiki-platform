@@ -324,21 +324,7 @@ function start1() {
   if (!rightPanels.isVisible) {
     rightPanels.panels = getBlocList(rightPanels);
   }
-  //
-  var layoutMaquettesTD = document.getElementById("PageLayoutSection").getElementsByTagName("td");
-  layoutMaquettes = new Object();
-  for (i = 0; i < layoutMaquettesTD.length; i++) {
-    for (j = 0; j < layoutMaquettesTD[i].childNodes.length; ++j) {
-      if (layoutMaquettesTD[i].childNodes[j].tagName == "DIV") {
-        layoutMaquettes[i] = layoutMaquettesTD[i].childNodes[j];
-        break;
-      }
-    }
-  }
-  
-  window.activeWizardPage = document.getElementById("PanelListSection");
-  window.activeWizardTab  = document.getElementById("firstwtab");
-  document.getElementById("PageLayoutSection").style.display = "none";
+  layoutMaquettes = $('PageLayoutSection').select('.pagelayoutoption');
 }
 
 function attachDragHandler(el) {
@@ -541,18 +527,6 @@ function revert() {
   }
   setPanelWidth();
   changePreviewLayout(layoutMaquettes[layoutCode], layoutCode);
-}
-
-//----------------------------------------------------------------
-
-function switchToWizardPage(el, toShowID) {
-  window.activeWizardPage.style.display = "none";
-  window.activeWizardTab.className = "";
-  window.activeWizardTab = el;
-  window.activeWizardTab.className = "active";
-  window.activeWizardPage = document.getElementById(toShowID)
-  window.activeWizardPage.style.display = "block";
-  el.blur();
 }
 
 //----------------------------------------------------------------

@@ -41,14 +41,11 @@
   <hidden>true</hidden>
   <content>{{include reference='XWiki.SearchCode' /}}
 
-(% id='Hsearch.admin.configuration.title' %)
-= {{velocity}}$services.localization.render('search.admin.configuration.title'){{/velocity}} =
-
 {{velocity}}
 #set ($searchEnginePropertyClass = $searchConfigClass.engine)
 #set ($availableSearchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortById' : ''}))
 {{html wiki='true'}}
-&lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform half'&gt;
+&lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform'&gt;
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
@@ -78,10 +75,24 @@
   #set ($searchAdminDoc = $xwiki.getDocument($searchAdminPage))
   ## If the document doesn't exist don't display it either.
   #if (!$searchAdminDoc.isNew())
-    = $searchAdminDoc.displayTitle =
+    ----
 
-    ## Use context='new' in the include so that we can use PR.
-    {{include reference="$searchAdminPage" context='new'}}
+    {{html clean="false"}}
+    &lt;ul class="nav nav-tabs" role="tablist"&gt;
+      &lt;li role="presentation" class="active"&gt;
+        &lt;a href="#${searchEngine}Config" aria-controls="${searchEngine}Config" role="tab" data-toggle="tab"&gt;
+          $searchExtension.parameters.label
+        &lt;/a&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+    {{/html}}
+
+    (% class="tab-content" %)(((
+      (% role="tabpanel" class="tab-pane active" id="${searchEngine}Config" %)(((
+        ## Use context='new' in the include so that we can use PR.
+        {{include reference="$searchAdminPage" context='new'}}
+      )))
+    )))
   #end
 #end
 {{/velocity}}</content>
@@ -277,6 +288,9 @@
       </sectionOrder>
     </class>
     <property>
+      <categoryIcon>magnifier</categoryIcon>
+    </property>
+    <property>
       <codeToExecute>{{include reference="XWiki.SearchAdmin"/}}</codeToExecute>
     </property>
     <property>
@@ -284,6 +298,12 @@
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory>wikis</displayBeforeCategory>
+    </property>
+    <property>
+      <displayInCategory>search</displayInCategory>
     </property>
     <property>
       <displayInSection>Search</displayInSection>
@@ -299,6 +319,9 @@
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder>100</sectionOrder>
     </property>
   </object>
 </xwikidoc>

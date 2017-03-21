@@ -39,7 +39,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output="false"}}
+## We can't use a single HTML form at the moment because the default syntax is saved in a different location.
+#set ($params = {
+  'general': ['core.defaultDocumentSyntax']
+})
+{{/velocity}}
+
+{{include reference="XWiki.AdminFieldsDisplaySheet" /}}
+
+{{velocity}}
 #set ($configDocName = 'Rendering.RenderingConfig')
 #set ($configDoc = $xwiki.getDocument($configDocName))
 #set ($configClassName = 'Rendering.RenderingConfigClass')

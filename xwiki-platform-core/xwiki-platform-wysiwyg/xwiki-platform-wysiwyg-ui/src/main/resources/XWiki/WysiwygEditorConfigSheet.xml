@@ -1288,18 +1288,18 @@ return XWiki;
     <property>
       <code>#template('colorThemeInit.vm')
 
-.xform dd input, .xform dd select {
+#gwtEditorConfig dd input, #gwtEditorConfig dd select {
   margin-bottom: .3em;
   min-width: 15em;
   vertical-align: middle;
   width: auto !important;
 }
 
-.xform dd input[type="radio"] {
+#gwtEditorConfig dd input[type="radio"] {
   min-width: 0;
 }
 
-.xform dd input.icon {
+#gwtEditorConfig dd input.icon {
   margin-left: .3em;
   min-width: 0;
   width: 16px !important;
@@ -1307,7 +1307,7 @@ return XWiki;
   padding: 0 !important;
 }
 
-.xform dd .listBoxWrapper input.icon {
+#gwtEditorConfig dd .listBoxWrapper input.icon {
   vertical-align: top;
 }
 
@@ -1339,7 +1339,7 @@ return XWiki;
   display: block;
 }
 
-.xform dd input#styleInline {
+#gwtEditorConfig dd input#styleInline {
   min-width: 0;
 }
 

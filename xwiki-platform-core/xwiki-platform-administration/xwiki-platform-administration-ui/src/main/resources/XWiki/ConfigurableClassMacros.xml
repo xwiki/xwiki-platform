@@ -148,42 +148,43 @@
     ##
     #foreach ($configurableObject in $app.getObjects($nameOfThisDocument))
       #set ($displayInCategory = $app.getValue('displayInCategory', $configurableObject))
-      ## It's ok to not specify a category, in which case the app will be added to a default one (i.e. "applications")
+      ## It's OK to not specify a category, in which case the app will be added to a default one (i.e. "other").
       #if ("$!displayInCategory" != '')
         #if ($categoriesByName.containsKey($displayInCategory))
-          ## Add a new section in this category
+          ## Add a new section in this category.
           #set ($appCategory = $categoriesByName.get($displayInCategory))
         #else
-          ## Add a new section
-          #set($key = "admin.${displayInCategory.toLowerCase()}")
-          #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInCategory) #end
-          #set ($appCategory= {'id' : $displayInCategory, 'name' : $name, 'children': []})
-          #set ($discard = $categoriesByName.put($displayInCategory, $appCategory))
-          ## Insert at the specified position
-          #set ($displayBeforeCategory = $app.getValue('displayBeforeCategory', $configurableObject))
-          #if ("$!displayBeforeCategory" != '')
-            #set ($listPosition = $adminMenu.indexOf($categoriesByName.get($displayBeforeCategory)))
-            #if ($listPosition &gt; -1)
-              #set ($discard = $adminMenu.add($listPosition, $appCategory))
-            #else
-              #set ($discard = $adminMenu.add($appCategory))
-            #end
-          #else
-            #set ($discard = $adminMenu.add($appCategory))
+          ## Add a new category.
+          #set ($key = "admin.$displayInCategory.toLowerCase()")
+          #set ($name = $displayInCategory)
+          #if ($services.localization.get($key))
+            #set ($name = $services.localization.render($key))
           #end
+          #set ($appCategory= {
+            'id': $displayInCategory,
+            'name': $name,
+            'children': []
+          })
+          #set ($discard = $categoriesByName.put($displayInCategory, $appCategory))
+          ## Insert the category at the end for now. We'll sort the categories after we add all of them.
+          #set ($discard = $adminMenu.add($appCategory))
         #end
         #set ($categoryIcon = $app.getValue('categoryIcon', $configurableObject))
         #if ("$!categoryIcon" != '')
-          #set ($appCategory.categoryIcon = $categoryIcon)
+          #set ($appCategory.icon = $categoryIcon)
+        #end
+        #set ($displayBeforeCategory = $app.getValue('displayBeforeCategory', $configurableObject))
+        #if ("$!displayBeforeCategory" != '')
+          #set ($appCategory.displayBeforeCategory = $displayBeforeCategory)
         #end
       #else
-        #set ($appCategory = $categoriesByName.get('applications'))
+        #set ($appCategory = $categoriesByName.get('other'))
       #end
       ##
       #set ($displayInSection = $app.getValue('displayInSection', $configurableObject))
       ##
       ## If there is no section specified in the object, just skip it
-      #if ("$!{displayInSection}" == '')
+      #if ("$!displayInSection" == '')
         ## Skip, bad object
       ## If there is no section for this configurable or if the section cannot be edited, then check if the
       ## application can be edited by the current user, if so then we display the icon from the current app and
@@ -195,9 +196,18 @@
       #else
         ##
         ## If there is no section for this configurable, then we will have to add one.
-        #set($key = "admin.${displayInSection.toLowerCase()}")
-        #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInSection) #end
-        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true, 'order': $configurableObject.getValue('sectionOrder')})
+        #set ($key = "admin.$displayInSection.toLowerCase()")
+        #set ($name = $displayInSection)
+        #if ($services.localization.get($key))
+          #set ($name = $services.localization.render($key))
+        #end
+        #set ($appSection = {
+          'id': $displayInSection,
+          'name': $name,
+          'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;section=$escapetool.url($displayInSection)"),
+          'configurable': true,
+          'order': $configurableObject.getValue('sectionOrder')
+        })
         #if ($app.getValue('configureGlobally', $configurableObject) != 1)
           #set ($appSection.perSpace = true)
         #end
@@ -214,8 +224,8 @@
       #set ($attachment = $app.getAttachment("$!app.getValue('iconAttachment', $configurableObject)"))
       #if ($attachment &amp;&amp; $attachment.isImage())
         ## Set the icon for this section as the attachment URL.
-        #set ($appSection.iconReference = "${appName}@${attachment.getFilename()}")
-      #elseif(!$appSection.iconReference)
+        #set ($appSection.iconReference = "${appName}@$attachment.getFilename()")
+      #elseif (!$appSection.iconReference)
         #set ($appSection.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.png')
       #end
       ##
@@ -227,6 +237,28 @@
       #end
     #end## Foreach configurable object in this app.
   #end## Foreach application which is configurable.
+  ##
+  ## Sort the categories
+  ##
+  #foreach ($category in $adminMenu)
+    #set ($category.score = 0)
+  #end
+  #foreach ($round in [1..$adminMenu.size()])
+    #set ($scoreChanged = false)
+    #foreach ($category in $adminMenu)
+      #if ($category.displayBeforeCategory)
+        #set ($newScore = $categoriesByName.get($category.displayBeforeCategory).score + 1)
+        #if ($newScore &amp;&amp; $newScore &gt; $category.score)
+          #set ($category.score = $newScore)
+          #set ($scoreChanged = true)
+        #end
+      #end
+    #end
+    #if (!$scoreChanged)
+      #break
+    #end
+  #end
+  #set ($adminMenu = $sorttool.sort($adminMenu, 'score:desc'))
 #end
 
 

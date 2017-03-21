@@ -39,8 +39,69 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.colorthemes.local=Local
-admin.colorthemes.global=Global</content>
+  <content>administration.title=Administration
+administration.title.page=Page Administration
+administration.title.wiki=Wiki Administration
+administration.title.global=Global Administration
+administration.sectionTitle=Administration: {0}
+administration.sectionTitle.page=Page Administration: {0}
+administration.sectionTitle.wiki=Wiki Administration: {0}
+administration.sectionTitle.global=Global Administration: {0}
+
+# Look &amp; Feel Sections
+admin.themes=Themes
+admin.themes.description=Customize the color and icon themes.
+admin.colorthemes.local=Local
+admin.colorthemes.global=Global
+XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
+XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
+XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
+XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
+XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
+XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
+XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
+XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
+XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
+XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
+XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+
+# Editing Sections
+admin.edit=Editing
+admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
+admin.title=Title
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
+XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
+XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
+XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
+admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
+XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
+XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
+XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
+XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+
+# Import Section
+administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+
+# Export Section
+administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
+administration.section.export.description.hint=The package description, displayed when importing the package.
+administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
+administration.section.export.author.hint=The package author.
+administration.section.export.version.hint=The package version.
+administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
+administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
+
+# Other Category
+admin.other=Other
+admin.other.description=Various configurations for extensions.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
   <object>
     <name>XWiki.AdminTranslations</name>
     <number>0</number>

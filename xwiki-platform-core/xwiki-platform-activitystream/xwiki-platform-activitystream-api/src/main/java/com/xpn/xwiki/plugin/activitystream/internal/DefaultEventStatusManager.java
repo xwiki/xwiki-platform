@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.activitystream.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -97,6 +98,10 @@ public class DefaultEventStatusManager implements EventStatusManager
                 }
             }
         }
+
+        // Sort statuses by date, in the descending order, like notifications, otherwise the order is lost
+        Collections.sort(results,
+            (status1, status2) -> status2.getEvent().getDate().compareTo(status1.getEvent().getDate()));
 
         return results;
     }

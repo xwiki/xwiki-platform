@@ -193,7 +193,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex(request);
-            initJobPackageConfiguration(request);
+            initJobPackageConfiguration(request, true);
         } catch (Exception e) {
             throw new InstallException("Failed to initialize extension plan index", e);
         }
@@ -214,7 +214,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex(request);
-            initJobPackageConfiguration(request);
+            initJobPackageConfiguration(request, false);
         } catch (Exception e) {
             throw new UninstallException("Failed to initialize extension plan index", e);
         }
@@ -255,7 +255,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void initJobPackageConfiguration(Request request) throws InterruptedException
+    private void initJobPackageConfiguration(Request request, boolean defaultConflict) throws InterruptedException
     {
         ExecutionContext context = this.execution.getContext();
 
@@ -297,7 +297,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
 
                 // If advanced user ask to confirm default answers
-                if (currentJob.getStatus().getRequest().isInteractive()
+                if (defaultConflict && currentJob.getStatus().getRequest().isInteractive()
                     && this.documentAccessBridge.isAdvancedUser(userReference)) {
                     DefaultConflictActionQuestion question = new DefaultConflictActionQuestion(configuration);
 

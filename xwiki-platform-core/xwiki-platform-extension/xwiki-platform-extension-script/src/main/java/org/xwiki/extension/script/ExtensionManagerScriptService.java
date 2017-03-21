@@ -60,6 +60,7 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.Right;
@@ -392,6 +393,16 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
+        }
+
+        // Remember current user
+        DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
+        if (currentUserReference != null) {
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+                currentUserReference.toString());
         }
 
         // Start job

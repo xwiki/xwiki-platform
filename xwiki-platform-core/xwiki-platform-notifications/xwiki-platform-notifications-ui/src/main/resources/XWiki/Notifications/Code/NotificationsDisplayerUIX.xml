@@ -220,7 +220,7 @@
     }
     // Update the counter
     counter.text(count);
-    if (count > maxCountNumber) {
+    if (count &gt; maxCountNumber) {
       counter.text(maxCountNumber + '+');
     };
   };
@@ -234,20 +234,31 @@
       .click(function (event) {
         // Avoid the menu closing
         event.stopPropagation();
-        // Display a saving message
-        var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
-        // Send the request to change the start date
-        $.post(url, {
-          action: 'setStartDate',
-          date: startDate
-        }).success(function (){
-          // Display the success message
-          notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
-          // Remove the notifications from the UI and display the "nothing!" message instead.
-          $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-          // Update the notifications counter
-          updateNotificationCount(0);
+        // Ask confirmation
+        new XWiki.widgets.ConfirmationBox({
+          onYes: function(event) {
+            // Avoid the menu closing
+            event.stopPropagation();
+            // Display a saving message
+            var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
+            // Send the request to change the start date
+            $.post(url, {
+              action: 'setStartDate',
+              date: startDate
+            }).success(function (){
+              // Display the success message
+              notification.hide();
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
+              // Remove the notifications from the UI and display the "nothing!" message instead.
+              $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+              // Update the notifications counter
+              updateNotificationCount(0);
+            });
+          },
+          onNo: function(event) {
+            // Avoid the menu closing
+            event.stopPropagation();
+          }
         });
       });
     // Append the button just before the "settings" link in the menu

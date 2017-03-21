@@ -133,8 +133,7 @@ public class DefaultNotificationManager implements NotificationManager
             for (Event event : batch) {
                 DocumentReference document = event.getDocument();
                 // Don't record events concerning a doc the user cannot see
-                if (document != null && !authorizationManager.hasAccess(Right.VIEW, userReference,
-                        event.getDocument())) {
+                if (document != null && !authorizationManager.hasAccess(Right.VIEW, userReference, document)) {
                     continue;
                 }
                 // Record this event

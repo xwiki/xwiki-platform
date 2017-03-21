@@ -301,6 +301,10 @@
 
   /**
    * Load the notifications.
+   *
+   * The parameter `untilDate` is used as an "offset" to get events in a paginate mode.
+   * We cannot rely on an integer offset because new events could have been stored recently and we want to display older
+   * ones only.
    */
   var loadNotifications = function (untilDate) {
     var params = {};
@@ -316,9 +320,9 @@
       area.removeClass('loading');
       $('.notifications-load-more').remove();
       // Display the "nothing!" message if there is no notification
-      if (data.notifications.length == 0 &amp;&amp; untilDate === undefined) {
+      if (data.notifications.length == 0 &amp;&amp; !untilDate) {
         area.html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-      } else if (untilDate === undefined) {
+      } else if (!untilDate) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.
         // Note: we use the date of the more recent notification that we have displayed to avoid cleaning
@@ -336,6 +340,7 @@
         area.append(loadMore);
         loadMore.click(function(event) {
           loadMore.text('').addClass('loading');
+          // We use the date of the last displayed event as an offset to display those that come next
           loadNotifications(data.notifications[data.notifications.length - 1].date);
         });
       }

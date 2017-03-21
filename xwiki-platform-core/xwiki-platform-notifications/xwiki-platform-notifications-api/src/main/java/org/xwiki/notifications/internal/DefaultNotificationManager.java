@@ -94,10 +94,10 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public List<Event> getEvents(String userId, boolean onyUnread, int count, Date untilDate, List<String> blackList)
+    public List<Event> getEvents(String userId, boolean onlyUnread, int count, Date untilDate, List<String> blackList)
             throws NotificationException
     {
-        return getEvents(documentReferenceResolver.resolve(userId), onyUnread, count, untilDate,
+        return getEvents(documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
                 new ArrayList<>(blackList));
     }
 
@@ -111,7 +111,7 @@ public class DefaultNotificationManager implements NotificationManager
         return events.size();
     }
 
-    public List<Event> getEvents(DocumentReference userReference, boolean onlyUnread, int expectedCount,
+    private List<Event> getEvents(DocumentReference userReference, boolean onlyUnread, int expectedCount,
             Date endDate, List<String> blackList) throws NotificationException
     {
         final int batchSize = expectedCount * 2;

@@ -65,7 +65,7 @@
     {{/velocity}}")
   #set ($menuBar = "{{velocity}}
     ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, '$doc.prefixedFullName'))
-      {{menu type=""horizontal fixedWidth""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
+      {{menu type=""horizontal fixedWidth"" id=""menu-horizontal-$doc.prefixedFullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
     ${escapetool.h}end
     {{/velocity}}")
   #set ($extensionPoints = {

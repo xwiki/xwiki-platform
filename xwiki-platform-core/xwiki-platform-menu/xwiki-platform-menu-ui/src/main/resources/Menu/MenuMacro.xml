@@ -172,6 +172,11 @@ $xwiki.getDocument('MenuTemplate').content
       });
     });
   });
+
+  // In case of horizontal responsive menus, make sub-submenus in the navbar work on mobile devices
+  $(document).on('touchstart.dropdown.data-api', '.dropdown-submenu > a', function (event) {
+    event.preventDefault();
+  });
 })</code>
     </property>
     <property>
@@ -859,6 +864,19 @@ $xwiki.getDocument('MenuTemplate').content
 .menu .wikiexternallink {
   background: rgba(0, 0, 0, 0) none repeat scroll 0 center;
   padding: 0;
+}
+
+.menu-horizontal-toggle {
+  .clearfix;
+  background-color: @navbar-default-bg;
+  border-color: @navbar-default-border;
+  .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
+  min-height: @navbar-height;
+  &amp; .navbar-toggle {
+    &amp; .icon-bar {
+      background-color: @navbar-default-link-color;
+    }
+  }
 }</code>
     </property>
     <property>
@@ -999,9 +1017,27 @@ $xwiki.getDocument('MenuTemplate').content
 #end
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
-(% #if ("$!id" != '') id="$id"#end class="menu menu-$!type" %)(((
-  $xcontext.macro.content
-)))
+#if($type.contains('horizontal'))
+  (% role="navigation" class="menu-horizontal-toggle" %)(((
+    (% class="navbar-header" %)(((
+      {{html}}
+        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{id}" aria-expanded="false"&gt;
+          &lt;span class="sr-only"&gt;&lt;/span&gt;
+          &lt;span class="icon-bar"&gt;&lt;/span&gt;
+          &lt;span class="icon-bar"&gt;&lt;/span&gt;
+          &lt;span class="icon-bar"&gt;&lt;/span&gt;
+        &lt;/button&gt;
+      {{/html}}
+    )))
+    (% id="${id}" class="menu menu-$!type collapse navbar-collapse" %)(((
+      $xcontext.macro.content
+    )))
+  )))
+#else
+  (% #if ("$!id" != '') id="$id"#end class="menu menu-$!type" %)(((
+    $xcontext.macro.content
+  )))
+#end
 {{/velocity}}</code>
     </property>
     <property>

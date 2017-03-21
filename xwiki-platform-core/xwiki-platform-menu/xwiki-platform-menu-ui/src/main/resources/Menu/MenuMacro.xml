@@ -873,6 +873,8 @@ $xwiki.getDocument('MenuTemplate').content
   .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
   min-height: @navbar-height;
   &amp; .navbar-toggle {
+    float: left;
+    padding-left: 15px;
     &amp; .icon-bar {
       background-color: @navbar-default-link-color;
     }

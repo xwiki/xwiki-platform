@@ -44,12 +44,16 @@
     List the notifications of the current user as JSON
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method)
+  #set ($batchSize = 5)
   #set ($notifications = [])
-  #set ($offset = 0)
-  #if ("$!request.offset" != '')
-    #set ($offset = $numbertool.toNumber($request.offset).intValue())
+  #if ("$!request.untilDate" != '' &amp;&amp; "$!request.blackList" != '')
+    #set ($untilDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.untilDate).longValue()).toDate())
+    #set ($blackList = $request.blackList.split(','))
+    #set ($events = $services.notification.getEvents(false, $batchSize, $untilDate, $blackList))
+  #else
+    #set ($events = $services.notification.getEvents(false, $batchSize))
   #end
-  #foreach ($eventStatus in $services.notification.getEventStatuses($services.notification.getEvents($offset, 5)))
+  #foreach ($eventStatus in $services.notification.getEventStatuses($events))
     #set ($event = $eventStatus.event)
     #set ($discard = $notifications.add({
       'id'          : $event.id,
@@ -61,7 +65,7 @@
     }))
   #end
   #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true)})
+  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true, 21)})
 #********************************************************
              Mark a notification as read
 ********************************************************#
@@ -176,9 +180,19 @@
   var notificationsLimit = 5;
 
   /**
+   * Maximum number of events to count
+   */
+  var maxCountNumber = 20;
+
+  /**
    * The current number of unread notifications
    */
   var notificationCount = 0;
+
+  /**
+   * The list of the ids of events that have already been displayed and that we don't want to get again in next batches.
+   */
+  var blackList = [];
 
   /**
    * URL to the service that return the notifications to display
@@ -206,6 +220,9 @@
     }
     // Update the counter
     counter.text(count);
+    if (count > maxCountNumber) {
+      counter.text(maxCountNumber + '+');
+    };
   };
 
   /**
@@ -243,6 +260,9 @@
    * Display a notification entry
    */
   var displayEntry = function (entry) {
+    // Add the id of the entry to the blacklist
+    blackList.push(entry.id);
+    // Create the container
     var notif = $('&lt;div&gt;').addClass('notification-event');
     var readButton = $('&lt;button&gt;');
     if (!entry.read) {
@@ -272,7 +292,9 @@
           read: true
         });
         $(this).remove();
-        updateNotificationCount(notificationCount - 1);
+        if (notificationCount &lt;= maxCountNumber) {
+          updateNotificationCount(notificationCount - 1);
+        }
       });
     }
   };
@@ -280,8 +302,13 @@
   /**
    * Load the notifications.
    */
-  var loadNotifications = function (offset) {
-    $.getJSON(url, {offset: offset}).done(function (data) {
+  var loadNotifications = function (untilDate) {
+    var params = {};
+    if (untilDate) {
+      params.untilDate = untilDate;
+      params.blackList = blackList.join(',');
+    }
+    $.getJSON(url, params).done(function (data) {
       updateNotificationCount(data.unread);
       // Display notifications
       var area = $('.notifications-area');
@@ -289,9 +316,9 @@
       area.removeClass('loading');
       $('.notifications-load-more').remove();
       // Display the "nothing!" message if there is no notification
-      if (data.notifications.length == 0 &amp;&amp; offset == 0) {
+      if (data.notifications.length == 0 &amp;&amp; untilDate === undefined) {
         area.html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-      } else if (offset == 0 ) {
+      } else if (untilDate === undefined) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.
         // Note: we use the date of the more recent notification that we have displayed to avoid cleaning
@@ -309,7 +336,7 @@
         area.append(loadMore);
         loadMore.click(function(event) {
           loadMore.text('').addClass('loading');
-          loadNotifications(offset + notificationsLimit);
+          loadNotifications(data.notifications[data.notifications.length - 1].date);
         });
       }
     });

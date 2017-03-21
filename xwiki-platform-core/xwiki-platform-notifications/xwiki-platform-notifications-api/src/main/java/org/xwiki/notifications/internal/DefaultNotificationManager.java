@@ -114,6 +114,8 @@ public class DefaultNotificationManager implements NotificationManager
     private List<Event> getEvents(DocumentReference userReference, boolean onlyUnread, int expectedCount,
             Date endDate, List<String> blackList) throws NotificationException
     {
+        // Because the user might not be able to see all notifications because of the rights, we take from the database
+        // more events than expected and we will filter afterwards.
         final int batchSize = expectedCount * 2;
         try {
             // Create the query
@@ -130,11 +132,14 @@ public class DefaultNotificationManager implements NotificationManager
             List<Event> results = new ArrayList<>();
             for (Event event : batch) {
                 DocumentReference document = event.getDocument();
+                // Don't record events concerning a doc the user cannot see
                 if (document != null && !authorizationManager.hasAccess(Right.VIEW, userReference,
                         event.getDocument())) {
                     continue;
                 }
+                // Record this event
                 results.add(event);
+                // If the expected count is reached, stop now
                 if (results.size() == expectedCount) {
                     return results;
                 }

@@ -89,24 +89,6 @@
   }
 ])
 
-#**
- * Returns whether or not the requested section exists
- *
- * Example of use:
- * #if("#admin_hasSection('sectionId')" != '')
- *   OK
- * #end
- *#
-#macro (admin_hasSection $sectionId)
-  #foreach($category in $adminMenu)
-    #foreach($section in $category.children)
-      #if($section.id == $sectionId)
-        OK
-      #end
-    #end
-  #end
-#end
-
 ##
 ## Fill in the list of custom applications to configure
 ##
@@ -135,23 +117,12 @@
   #set ($crtCategoryId = '')
 #end
 
-#if ("$!crtSectionId" != '')
-  #if("#admin_hasSection($crtSectionId)" != '')
-    #set ($crtItemId = $crtSectionId)
-  #else
-    #set($crtSectionId = $NULL)
-  #end
-#elseif ("$!crtCategoryId" != '')
-  #set ($crtItemId = $adminMenu.get($crtCategoryId).id)
-#end
-#set ($crtSection = $NULL)
-#set ($crtCategory = $NULL)
-
-
 ##
 ## Prepare the Admin menu map for processing
 ##
 #set ($filteredAdminMenu = [])
+#set ($crtSection = $NULL)
+#set ($crtCategory = $NULL)
 #foreach ($category in $adminMenu)
   ## "Standard" URLs and icons for categories
   #set ($category.url = $xwiki.getURL($currentDoc, $adminAction, "category=${mathtool.sub($velocityCount, 1)}"))
@@ -225,6 +196,18 @@
   #end
 #end
 #set ($adminMenu = $filteredAdminMenu)
+
+## Mark the active category/section. We use this flag when displaying the menu.
+#if ($crtCategory)
+  #set ($crtCategory.active = true)
+  #if ($crtSection)
+    #set ($crtSection.active = true)
+  #else
+    #set ($crtSectionId = $NULL)
+  #end
+#else
+  #set ($crtCategoryId = $NULL)
+#end
 
 #**
  * Displays the sections from an administration category
@@ -301,16 +284,17 @@
   #if ($name == '')
     #set ($name = $services.localization.render("$!options.translationPrefix$item.id"))
   #end
+  #set ($isActive = $item.active == true)
   #set ($hasChildren = $item.children &amp;&amp; $item.children.size() &gt; 0)
   #if ($hasChildren)
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     &lt;div class="panel panel-default"&gt;
-      &lt;a class="panel-heading#if ($item.id != $options.crtItemId) collapsed#end" role="tab" id="$escapedId"
-        href="$!item.url" data-toggle="collapse" data-parent="#$!options.id" data-target="#${escapedId}-body"
-        aria-expanded="false" aria-controls="${escapedId}-body"
+      &lt;a class="panel-heading#if (!$isActive) collapsed#end" role="tab" id="$escapedId"
+        href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id"#end
+        data-target="#${escapedId}-body" aria-expanded="$isActive" aria-controls="${escapedId}-body"
         &gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
-      &lt;div id="${escapedId}-body" class="panel-collapse collapse#if ($item.id == $options.crtItemId) in#end"
+      &lt;div id="${escapedId}-body" class="panel-collapse collapse#if ($isActive) in#end"
           role="tabpanel" aria-labelledby="$escapedId"&gt;
         &lt;div class="list-group"&gt;
           #foreach ($child in $children)
@@ -320,7 +304,7 @@
       &lt;/div&gt;
     &lt;/div&gt;
   #else
-    &lt;a class="list-group-item#if ($item.id == $options.crtItemId) active#end" data-id="$escapedId"
+    &lt;a class="list-group-item#if ($isActive) active#end" data-id="$escapedId"
       href="$!item.url"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
   #end
 #end
@@ -335,19 +319,10 @@
   $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))##
 #else
   $xwiki.jsx.use('XWiki.AdminSheet')##
-  ## Construct the SSX parameter map:
-  ## - One parameter for the color theme
-  ## - Each custom ConfigurableClass can provide a custom icon to display in categories headings and
-  ##   thus we need to pass them to the SSX of the AdminSheet.
+  ## Construct the SSX parameter map.
   #set ($parameterMap = {})
   #if ($themeDoc)
     #set ($discard = $parameterMap.put('colorTheme', $themeDocFullName))
-  #end
-  #foreach ($adminMenuCategory in $adminMenu)
-    #set ($customIcon = $adminMenuCategory.icon)
-    #if ("$!customIcon" != '')
-      #set ($discard = $parameterMap.put("${adminMenuCategory.id}Icon", $customIcon))
-    #end
   #end
   $xwiki.ssx.use('XWiki.AdminSheet', $parameterMap)##
   #if ("$!crtSectionId" != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0 &amp;&amp; $xwiki.exists($crtSectionId))
@@ -356,8 +331,8 @@
     #set ($sectionName = $services.localization.render("admin.${crtSectionId.toLowerCase()}"))
   #elseif ("$!crtSectionId" != '')
     #set ($sectionName = $crtSectionId)
-  #elseif ($crtCategoryId != '')
-    #set ($sectionName = $services.localization.render("admin.${crtItemId}"))
+  #elseif ("$!crtCategoryId" != '')
+    #set ($sectionName = $services.localization.render("admin.$crtCategory.id"))
   #elseif ($editor == 'globaladmin')
     #set ($sectionName = $services.wiki.getById($xcontext.database).prettyName)
     #if ("$!sectionName" == '')
@@ -399,7 +374,11 @@
   ----
 )))
 
-  #verticalNavigation($adminMenu {'translationPrefix' : 'admin.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'admin-menu'})
+  #verticalNavigation($adminMenu {
+    'id': 'administration-menu',
+    'translationPrefix': 'admin.',
+    'cssClass': 'admin-menu'
+  })
   ##-----------------------------------------
   ## admin-page display
   ##-----------------------------------------
@@ -698,7 +677,6 @@
   $(document).on('click', '.admin-menu a.panel-heading', function(event) {
     event.preventDefault();
   });
-  $('.admin-menu .list-group-item.active').parents('.collapse').collapse({toggle: true});
 });</code>
     </property>
     <property>

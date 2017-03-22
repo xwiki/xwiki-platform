@@ -11,16 +11,9 @@ function debugwrite(sometext) {
   document.getElementById("headerglobal").appendChild(document.createTextNode(sometext));
 }
 
-function isPanel(el) {
-    if (el.className) {
-        var classes = el.className.split(" ");
-        for (var i=0; i<classes.length; ++i) {
-            if (classes[i] == "panel") {
-                return true;
-            }
-        }
-    }
-    return false;
+function isPanel(node) {
+  return node && node.nodeType === 1 && $(node).hasClassName('panel') &&
+    $(node).up('#leftPanels, #rightPanels, #allviewpanels');
 }
 
 function getX(el) {

@@ -38,7 +38,7 @@ You need Maven 3.1+ in order to build this extension.
     ## * commit only the significant changes
 
     ## Prepare the tag for the new version.
-    mvn org.apache.maven.plugins:maven-release-plugin:2.5:prepare -DautoVersionSubmodules
+    mvn org.apache.maven.plugins:maven-release-plugin:2.5:prepare -DautoVersionSubmodules -DskipTests -Darguments="-DskipTests" -Pintegration-tests
 
     ## Select Java 7 in order to silence the enforcer (even if we don't have Java code ATM,
     ## a WebJar is a Jar and we support older versions of XWiki that run on Java 7).
@@ -46,6 +46,7 @@ You need Maven 3.1+ in order to build this extension.
     sudo update-alternatives --config javac
 
     ## Perform the release
+    ## We don't release the tests module ATM because it requires Java 8 and we need to build with Java 7.
     mvn org.apache.maven.plugins:maven-release-plugin:2.5:perform
 
     ## Restore the Java version.

@@ -262,9 +262,7 @@
         });
       });
     // Append the button just before the "settings" link in the menu
-    $('.notifications-settings').before(markAllReadButton);
-    // Add a visual separator
-    markAllReadButton.after(' | ');
+    $('.notifications-header-uix').append(markAllReadButton);
   };
 
   /**
@@ -487,8 +485,8 @@
       <code>#template('colorThemeInit.vm')
 
 .notifications-area {
+  margin-top: 10px;
   min-height: 20px;
-  min-width: 400px;
   overflow: hidden;
 }
 
@@ -529,12 +527,18 @@
   background-color: red;
   opacity: 0.9;
   position: absolute;
-  right: 0;
-  top: 3px;
+  margin-left: 1.6em;
+  top: 0;
 }
 
-.notifications-clean {
-  padding: 1em;
+@media (min-width: 768px) {
+  .notifications-count {
+    top: 3px;
+  }
+}
+
+.notifications-header-uix {
+  text-align: right;
 }
 </code>
     </property>
@@ -636,6 +640,7 @@
       &lt;div class="col-xs-6 text-right"&gt;
         &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;$services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))&lt;/a&gt;&lt;/p&gt;
       &lt;/div&gt;
+      &lt;div class="notifications-header-uix col-xs-12"&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="notifications-area loading clearfix"&gt;
     &lt;/div&gt;

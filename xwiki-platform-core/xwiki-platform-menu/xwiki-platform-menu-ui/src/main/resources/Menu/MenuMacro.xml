@@ -174,7 +174,7 @@ $xwiki.getDocument('MenuTemplate').content
   });
 
   // In case of horizontal responsive menus, make sub-submenus in the navbar work on mobile devices
-  $(document).on('touchstart.dropdown.data-api', '.dropdown-submenu > a', function (event) {
+  $(document).on('touchstart.dropdown.data-api', '.dropdown-submenu &gt; a', function (event) {
     event.preventDefault();
   });
 })</code>

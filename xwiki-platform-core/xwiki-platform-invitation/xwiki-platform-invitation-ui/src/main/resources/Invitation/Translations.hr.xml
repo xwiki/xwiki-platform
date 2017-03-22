@@ -20,33 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="XWiki.UserProfileTranslations" locale="fr">
-  <web>XWiki</web>
-  <name>UserProfileTranslations</name>
-  <language>fr</language>
+<xwikidoc reference="Invitation.Translations" locale="hr">
+  <web>Invitation</web>
+  <name>Translations</name>
+  <language>hr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>XWiki.WebHome</parent>
+  <parent>Invitation.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1469191733000</creationDate>
-  <date>1469192565000</date>
-  <contentUpdateDate>1469192565000</contentUpdateDate>
+  <creationDate>1444133636000</creationDate>
+  <date>1444133706000</date>
+  <contentUpdateDate>1444133706000</contentUpdateDate>
   <version>1.1</version>
-  <title>User Profile Translations</title>
+  <title>Translations</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-XWiki.XWikiUsers_displayHiddenDocuments.hint=Le wiki contient certains documents qui ne sont pas affichés par défaut. Ces documents masqués sont des contenus techniques comme des classes d'application, des pages de configuration, des macros, des styles, des scripts, etc.
-XWiki.XWikiUsers_editor.hint=Choisissez l'éditeur par défaut, celui-ci remplacera l'éditeur par défaut général. S'il n'est pas renseigné, un éditeur par défaut sera utilisé, en fonction de ce qui est édité.
-XWiki.XWikiUsers_timezone.hint=Indiquez un fuseau horaire afin que les dates et heures soient adaptées à votre position géographique.
-XWiki.XWikiUsers_usertype.hint=Choisissez quel type d'utilisateur sera celui par défaut. Les utilisateurs avancés auront accès à plusieurs fonctionnalités d'édition, de création de page terminal, etc.
-userprofile.default=Par défaut
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+invitation.applicationsPanelEntryLabel=Pozivnica
 </content>
 </xwikidoc>

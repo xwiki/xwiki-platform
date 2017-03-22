@@ -19,9 +19,6 @@
  */
 package org.xwiki.administration.test.po;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.ViewPage;
@@ -34,38 +31,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AdministrationPage extends ViewPage
 {
-    @FindBy(xpath = "//a[contains(@href, 'section=Localization')]")
-    WebElement localizationLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Import')]")
-    WebElement importLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Registration')]")
-    WebElement registrationLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Users')]")
-    WebElement usersLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Rights')]")
-    WebElement rightsLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Annotations')]")
-    WebElement annotationsLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Extension Manager')]")
-    WebElement extensionsLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=WYSIWYG')]")
-    WebElement wysiwygLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Elements')]")
-    private WebElement pageElementsLink;
-
-    @FindBy(xpath = "//a[contains(@href, 'section=Presentation')]")
-    private WebElement presentationLink;
-
-    @FindBy(id = "goto-select")
-    WebElement spaceAdminSelect;
+    private AdministrationMenu menu = new AdministrationMenu();
 
     public static AdministrationPage gotoPage()
     {
@@ -118,64 +84,53 @@ public class AdministrationPage extends ViewPage
 
     public LocalizationAdministrationSectionPage clickLocalizationSection()
     {
-        this.localizationLink.click();
+        this.menu.expandCategoryWithId("content").getSectionById("Localization").click();
         return new LocalizationAdministrationSectionPage();
     }
 
     public ImportAdministrationSectionPage clickImportSection()
     {
-        this.importLink.click();
+        this.menu.expandCategoryWithId("content").getSectionById("Import").click();
         return new ImportAdministrationSectionPage();
     }
 
     public AdministrationSectionPage clickRegistrationSection()
     {
-        this.registrationLink.click();
+        this.menu.expandCategoryWithId("usersgroups").getSectionById("Registration").click();
         return new AdministrationSectionPage("register");
     }
 
     public UsersAdministrationSectionPage clickUsersSection()
     {
-        this.usersLink.click();
+        this.menu.expandCategoryWithId("usersgroups").getSectionById("Users").click();
         return new UsersAdministrationSectionPage();
     }
 
     public GlobalRightsAdministrationSectionPage clickGlobalRightsSection()
     {
-        this.rightsLink.click();
+        this.menu.expandCategoryWithId("usersgroups").getSectionById("Rights").click();
         return new GlobalRightsAdministrationSectionPage();
     }
 
     public AnnotationsPage clickAnnotationsSection()
     {
-        this.annotationsLink.click();
+        this.menu.expandCategoryWithId("content").getSectionById("Annotations").click();
         return new AnnotationsPage();
     }
 
     public WYSIWYGEditorAdministrationSectionPage clickWYSIWYGEditorSection()
     {
-        this.wysiwygLink.click();
+        this.menu.expandCategoryWithId("edit").getSectionById("WYSIWYG").click();
         return new WYSIWYGEditorAdministrationSectionPage();
     }
 
     /**
-     * @since 6.3M1
+     * @since 9.2RC1
      */
-    public PresentationAdministrationSectionPage clickPresentationSection()
+    public ThemesAdministrationSectionPage clickThemesSection()
     {
-        this.presentationLink.click();
-        return new PresentationAdministrationSectionPage();
-    }
-
-    /**
-     * Opens the "Page Elements" administration section.
-     *
-     * @return the "Page Elements" administration section
-     */
-    public PageElementsAdministrationSectionPage clickPageElementsSection()
-    {
-        pageElementsLink.click();
-        return new PageElementsAdministrationSectionPage();
+        this.menu.expandCategoryWithId("lf").getSectionById("Themes").click();
+        return new ThemesAdministrationSectionPage();
     }
 
     /**
@@ -183,10 +138,7 @@ public class AdministrationPage extends ViewPage
      */
     public ViewPage clickSection(String categoryName, String sectionName)
     {
-        getDriver().findElement(By.xpath(
-            "//div[contains(@class, 'admin-menu')]"
-            + "/ul/li/span/a[text() = '" + categoryName + "']"
-            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).click();
+        this.menu.expandCategoryWithName(categoryName).getSectionByName(categoryName, sectionName).click();
         return new ViewPage();
     }
 
@@ -195,16 +147,7 @@ public class AdministrationPage extends ViewPage
      */
     public boolean hasSection(String categoryName, String sectionName)
     {
-        return getDriver().hasElement(By.xpath(
-            "//div[contains(@class, 'admin-menu')]"
-            + "/ul/li/span/a[text() = '" + categoryName + "']"
-            + "/../../ul/li/span/a[text() = '" + sectionName + "']"));
-    }
-
-    public boolean hasSection(String sectionName)
-    {
-        return getDriver().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
-            + sectionName + "')]"));
+        return this.menu.hasSectionWithName(categoryName, sectionName);
     }
 
     /**
@@ -212,29 +155,16 @@ public class AdministrationPage extends ViewPage
      */
     public boolean hasNotSection(String categoryName, String sectionName)
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath(
-            "//div[contains(@class, 'admin-menu')]"
-            + "/ul/li/span/a[text() = '" + categoryName + "']"
-            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).size() == 0;
+        return this.menu.hasNotSectionWithName(categoryName, sectionName);
     }
 
-    public boolean hasNotSection(String sectionName)
+    public boolean hasSection(String sectionId)
     {
-        return getDriver().findElementsWithoutWaiting(
-            By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
-                + sectionName + "')]")).size() == 0;
+        return this.menu.hasSectionWithId(sectionId);
     }
 
-    /**
-     * Select the space to administer.
-     *
-     * Note that caller of the API need to wait for the page to be loaded since the selection of the page is done
-     * asynchronously with JS.
-     */
-    public AdministrationPage selectSpaceToAdminister(String spaceName)
+    public boolean hasNotSection(String sectionId)
     {
-        // FIXME: actually implement this (and maybe change its signature accordingly) once the new page administration
-        // UI is implemented in http://jira.xwiki.org/browse/XWIKI-12219
-        return gotoSpaceAdministrationPage(spaceName);
+        return this.menu.hasNotSectionWithId(sectionId);
     }
 }

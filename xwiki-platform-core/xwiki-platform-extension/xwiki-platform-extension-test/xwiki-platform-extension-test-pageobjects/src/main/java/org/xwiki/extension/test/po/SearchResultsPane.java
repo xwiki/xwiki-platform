@@ -75,7 +75,7 @@ public class SearchResultsPane extends BaseElement
         By xpath =
             By.xpath("//form[contains(@class, 'extension-item') and descendant::*[contains(@class, "
                 + "'extension-title') and normalize-space(.) = '" + nameAndVersion + "']]");
-        List<WebElement> found = getDriver().findElements(xpath);
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(xpath);
         return found.size() == 1 ? new ExtensionPane(found.get(0)) : null;
     }
 
@@ -100,6 +100,6 @@ public class SearchResultsPane extends BaseElement
     {
         int position = index + 1;
         By xpath = By.xpath("//form[contains(@class, 'extension-item')][" + position + "]");
-        return new ExtensionPane(getDriver().findElement(xpath));
+        return new ExtensionPane(getDriver().findElementWithoutWaiting(xpath));
     }
 }

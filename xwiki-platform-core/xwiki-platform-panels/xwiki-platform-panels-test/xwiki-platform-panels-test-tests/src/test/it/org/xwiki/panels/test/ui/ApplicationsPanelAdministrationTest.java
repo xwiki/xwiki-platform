@@ -127,6 +127,7 @@ public class ApplicationsPanelAdministrationTest extends AbstractTest
 
     private void createApplicationUIX(String applicationName)
     {
+        getUtil().deletePage(new LocalDocumentReference(Arrays.asList("Apps", applicationName), "WebHome"));
         ViewPage page = getUtil().gotoPage("Apps", applicationName);
         ObjectEditPage editPage = page.editObjects();
         ObjectEditPane object = editPage.addObject("XWiki.UIExtensionClass");

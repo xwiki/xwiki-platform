@@ -60,7 +60,7 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
     {
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         assertTrue(administrationPage.hasSection("panels.applications"));
-        administrationPage.clickSection("Applications", "Applications Panel");
+        administrationPage.clickSection("Look & Feel", "Applications Panel");
         return new ApplicationsPanelAdministrationPage();
     }
     

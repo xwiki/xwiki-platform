@@ -19,12 +19,17 @@
  */
 package org.xwiki.administration.test.ui;
 
-import org.junit.*;
-import org.openqa.selenium.By;
+import java.util.Arrays;
+import java.util.function.Consumer;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+
+import static org.junit.Assert.*;
 
 /**
  * Verify the overall Administration application features.
@@ -41,7 +46,6 @@ public class AdministrationTest extends AbstractTest
      * This method makes the following tests :
      *
      * <ul>
-     * <li>Login as global admin.</li>
      * <li>Validate presence of default sections for global and space sections.</li>
      * <li>Validate presence of application administration sections at global level only.</li>
      * </ul>
@@ -56,44 +60,48 @@ public class AdministrationTest extends AbstractTest
         AdministrablePage page = new AdministrablePage();
         AdministrationPage administrationPage = page.clickAdministerWiki();
 
-        // TODO: Move these tests in their own modules, i.e. the modules that brought the Admin UI extension
-        Assert.assertTrue(administrationPage.hasSection("Editing"));
-        Assert.assertTrue(administrationPage.hasSection("Localization"));
-        Assert.assertTrue(administrationPage.hasSection("Presentation"));
-        Assert.assertTrue(administrationPage.hasSection("Elements"));
-        Assert.assertTrue(administrationPage.hasSection("Registration"));
-        Assert.assertTrue(administrationPage.hasSection("Users"));
-        Assert.assertTrue(administrationPage.hasSection("Groups"));
-        Assert.assertTrue(administrationPage.hasSection("Rights"));
-        Assert.assertTrue(administrationPage.hasSection("Registration"));
-        Assert.assertTrue(administrationPage.hasSection("Import"));
-        Assert.assertTrue(administrationPage.hasSection("Export"));
-        Assert.assertTrue(administrationPage.hasSection("Templates"));
+        assertEquals("Global Administration: Home", administrationPage.getDocumentTitle());
+        assertTrue(administrationPage.getBreadcrumbContent().endsWith("/Global Administration"));
+
+        // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
+        Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
+            "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
+            .stream().forEach(new Consumer<String>()
+            {
+                @Override
+                public void accept(String sectionId)
+                {
+                    assertTrue(String.format("Seection %s is missing.", sectionId),
+                        administrationPage.hasSection(sectionId));
+                }
+            });
+
+        // These are page-only sections.
+        assertTrue(administrationPage.hasNotSection("PageAndChildrenRights"));
+        assertTrue(administrationPage.hasNotSection("PageRights"));
 
         // Select XWiki space administration.
-        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
+        AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
 
-        // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
-        // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
-        getDriver().waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
-        // Also wait till the page is fully loaded to be extra sure...
-        spaceAdministrationPage.waitUntilPageIsLoaded();
+        assertEquals("Page Administration: XWiki", spaceAdministrationPage.getDocumentTitle());
+        assertTrue(spaceAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 
-        Assert.assertTrue(spaceAdministrationPage.hasSection("Presentation"));
-        Assert.assertTrue(spaceAdministrationPage.hasSection("Elements"));
-        Assert.assertTrue(spaceAdministrationPage.hasSection("PageAndChildrenRights"));
-        Assert.assertTrue(spaceAdministrationPage.hasSection("PageRights"));
+        assertTrue(spaceAdministrationPage.hasSection("Themes"));
+        assertTrue(spaceAdministrationPage.hasSection("Presentation"));
+        assertTrue(spaceAdministrationPage.hasSection("PageAndChildrenRights"));
+        assertTrue(spaceAdministrationPage.hasSection("PageRights"));
 
-        // All those sections should not be present
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Editing"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Localization"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Registration"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Users"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Groups"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Rights"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Registration"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Import"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Export"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Templates"));
+        // All these sections should not be present (they provide global configuration).
+        Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
+                "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
+            .stream().forEach(new Consumer<String>()
+            {
+                @Override
+                public void accept(String sectionId)
+                {
+                    assertTrue(String.format("Seection %s is present.", sectionId),
+                        administrationPage.hasNotSection(sectionId));
+                }
+            });
     }
 }

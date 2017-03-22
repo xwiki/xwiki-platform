@@ -27,12 +27,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents the actions possible on the Presentation administration section.
+ * Represents the actions possible on the Themes administration section.
  *
  * @version $Id$
  * @since 6.3M1
  */
-public class PresentationAdministrationSectionPage extends AdministrationSectionPage
+public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 {
     /**
      * The select input to set the color theme.
@@ -49,9 +49,9 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     /**
      * Default constructor.
      */
-    public PresentationAdministrationSectionPage()
+    public ThemesAdministrationSectionPage()
     {
-        super("Presentation");
+        super("Themes");
     }
 
     private List<WebElement> getColorThemeOptions()

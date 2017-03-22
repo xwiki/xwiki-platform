@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.test.po;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -32,31 +30,35 @@ import org.xwiki.test.ui.po.ViewPage;
 public class ExtensionAdministrationPage extends ViewPage
 {
     /**
-     * The link to the administration section from where we can add extensions.
-     */
-    @FindBy(linkText = "Add Extensions")
-    private WebElement addExtensionsLink;
-
-    /**
-     * The link to the administration section that lists the installed extensions.
-     */
-    @FindBy(linkText = "Installed Extensions")
-    private WebElement installedExtensionsLink;
-
-    /**
-     * The link to the administration section that lists the core extensions.
-     */
-    @FindBy(linkText = "Core Extensions")
-    private WebElement coreExtensionsLink;
-
-    /**
      * Opens the extension manager administration page.
      * 
      * @return the extension manager administration page
      */
     public static ExtensionAdministrationPage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin");
+        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin", "section=XWiki.Extensions");
+        return new ExtensionAdministrationPage();
+    }
+
+    /**
+     * Opens the extension manager administration page that lists the installed extensions.
+     * 
+     * @return the extension manager administration page
+     */
+    public static ExtensionAdministrationPage gotoInstalledExtensions()
+    {
+        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin", "section=XWiki.Extensions&repo=installed");
+        return new ExtensionAdministrationPage();
+    }
+
+    /**
+     * Opens the extension manager administration page that lists the core extensions.
+     * 
+     * @return the extension manager administration page
+     */
+    public static ExtensionAdministrationPage gotoCoreExtensions()
+    {
+        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin", "section=XWiki.Extensions&repo=core");
         return new ExtensionAdministrationPage();
     }
 
@@ -74,38 +76,5 @@ public class ExtensionAdministrationPage extends ViewPage
     public SearchResultsPane getSearchResults()
     {
         return new SearchResultsPane();
-    }
-
-    /**
-     * Clicks on the link to the 'Add Extensions' section.
-     * 
-     * @return the newly loaded administration page
-     */
-    public ExtensionAdministrationPage clickAddExtensionsSection()
-    {
-        addExtensionsLink.click();
-        return new ExtensionAdministrationPage();
-    }
-
-    /**
-     * Clicks on the link to the 'Installed Extensions' section.
-     * 
-     * @return the newly loaded administration page
-     */
-    public ExtensionAdministrationPage clickInstalledExtensionsSection()
-    {
-        installedExtensionsLink.click();
-        return new ExtensionAdministrationPage();
-    }
-
-    /**
-     * Clicks on the link to the 'Core Extensions' section.
-     * 
-     * @return the newly loaded administration page
-     */
-    public ExtensionAdministrationPage clickCoreExtensionsSection()
-    {
-        coreExtensionsLink.click();
-        return new ExtensionAdministrationPage();
     }
 }

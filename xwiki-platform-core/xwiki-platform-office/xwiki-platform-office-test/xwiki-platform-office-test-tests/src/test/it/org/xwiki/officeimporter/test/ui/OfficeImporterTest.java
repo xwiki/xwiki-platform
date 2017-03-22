@@ -39,13 +39,11 @@ import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Functional tests for the office importer
- *  
+ * 
  * @version $Id$
  * @since 7.3M1
  */
@@ -53,15 +51,15 @@ public class OfficeImporterTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-    
+
     @Before
     public void setUp()
     {
         // Connect the wiki to the office server if it is not already done
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        administrationPage.clickSection("Configuration", "Office Server");
-        OfficeServerAdministrationSectionPage officeServerAdministrationSectionPage
-                = new OfficeServerAdministrationSectionPage();
+        administrationPage.clickSection("Content", "Office Server");
+        OfficeServerAdministrationSectionPage officeServerAdministrationSectionPage =
+            new OfficeServerAdministrationSectionPage();
         if (!"Connected".equals(officeServerAdministrationSectionPage.getServerState())) {
             officeServerAdministrationSectionPage.startServer();
             assertEquals("Connected", officeServerAdministrationSectionPage.getServerState());
@@ -69,7 +67,8 @@ public class OfficeImporterTest extends AbstractTest
     }
 
     /**
-     * Import an office file in the wiki. 
+     * Import an office file in the wiki.
+     * 
      * @param fileName name of the file to import (the file should be located in test /resources/ folder)
      * @return the result page
      */
@@ -79,15 +78,16 @@ public class OfficeImporterTest extends AbstractTest
     }
 
     /**
-     * Import an office file in the wiki. 
+     * Import an office file in the wiki.
+     * 
      * @param fileName name of the file to import (the file should be located in test /resources/ folder)
      * @param splitByHeadings either the option splitByHeadings should be use or not
      * @return the result page
      */
     private ViewPage importFile(String fileName, boolean splitByHeadings)
     {
-        ViewPage page = getUtil().gotoPage(new DocumentReference("xwiki", 
-                Arrays.asList(getTestClassName(), getTestMethodName()), "WebHome"));
+        ViewPage page = getUtil().gotoPage(
+            new DocumentReference("xwiki", Arrays.asList(getTestClassName(), getTestMethodName()), "WebHome"));
         CreatePagePage createPage = page.createPage();
         createPage.setType("office");
         createPage.clickCreate();
@@ -96,16 +96,16 @@ public class OfficeImporterTest extends AbstractTest
         officeImporterPage.setFile(new File(getClass().getResource(fileName).getPath()));
         officeImporterPage.setFilterStyle(true);
         officeImporterPage.setSplitDocument(splitByHeadings);
-        
+
         OfficeImporterResultPage officeImporterResultPage = officeImporterPage.clickImport();
-        assertEquals(
-                "Conversion succeeded. You can view the result, or you can Go back to convert another document.",
-                officeImporterResultPage.getMessage());
+        assertEquals("Conversion succeeded. You can view the result, or you can Go back to convert another document.",
+            officeImporterResultPage.getMessage());
         return officeImporterResultPage.viewResult();
     }
 
     /**
      * Delete a page with all its children.
+     * 
      * @param pageToDelete the page to delete
      */
     private void deletePageWithChildren(ViewPage pageToDelete)
@@ -124,14 +124,14 @@ public class OfficeImporterTest extends AbstractTest
      */
     private void deletePage()
     {
-        DocumentReference pageToDelete = new DocumentReference("xwiki",
-                Arrays.asList(getTestClassName(), getTestMethodName()), "WebHome");
+        DocumentReference pageToDelete =
+            new DocumentReference("xwiki", Arrays.asList(getTestClassName(), getTestMethodName()), "WebHome");
         getUtil().deletePage(pageToDelete);
     }
 
     /**
-     * A basic test that imports some documents and verify they are correctly imported
-     * TODO: do a more advanced check about styling and content
+     * A basic test that imports some documents and verify they are correctly imported TODO: do a more advanced check
+     * about styling and content
      */
     @Test
     public void testImports()
@@ -149,7 +149,7 @@ public class OfficeImporterTest extends AbstractTest
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide3.jpg"));
         deletePage();
-        
+
         // Test excel file
         resultPage = importFile("/msoffice.97-2003/Test.xls");
         assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
@@ -182,24 +182,24 @@ public class OfficeImporterTest extends AbstractTest
      */
     private void testChild(String expectedName, String expectedContent)
     {
-        ViewPage child = getUtil().gotoPage(new DocumentReference("xwiki", 
-                Arrays.asList(getTestClassName(), getTestMethodName()), expectedName));
+        ViewPage child = getUtil().gotoPage(
+            new DocumentReference("xwiki", Arrays.asList(getTestClassName(), getTestMethodName()), expectedName));
         assertTrue(child.exists());
         assertEquals(expectedName, child.getDocumentTitle());
         assertTrue(StringUtils.contains(child.getContent(), expectedContent));
     }
-    
+
     @Test
     public void testSplitByHeadings()
     {
         ViewPage resultPage = importFile("/ToSplit.odt", true);
         assertTrue(StringUtils.contains(resultPage.getContent(), "Introduction"));
-        
-        // See children      
+
+        // See children
         testChild("First Part", "Hello, this is the first part of my story!");
         testChild("Second Part", "This is the second part of my story!");
         testChild("Last Part", "It's finished. Thanks you!");
-        
+
         // Go back to the parent
         resultPage = getUtil().gotoPage(new DocumentReference("xwiki", getTestClassName(), getTestMethodName()));
         deletePageWithChildren(resultPage);
@@ -211,12 +211,12 @@ public class OfficeImporterTest extends AbstractTest
     @Test
     public void testChildNamingMethodInputVisibility()
     {
-        DocumentReference testDocument = new DocumentReference("xwiki", Arrays.asList(getTestClassName()),
-                getTestMethodName());
-        
+        DocumentReference testDocument =
+            new DocumentReference("xwiki", Arrays.asList(getTestClassName()), getTestMethodName());
+
         // Cleaning
         getUtil().deletePage(testDocument);
-        
+
         // 1: create a terminal page
         CreatePagePage createPagePage = getUtil().gotoPage(testDocument).createPage();
         createPagePage.setType("office");
@@ -225,7 +225,7 @@ public class OfficeImporterTest extends AbstractTest
         OfficeImporterPage officeImporterPage = new OfficeImporterPage();
         // Test
         assertTrue(officeImporterPage.isChildPagesNamingMethodDisplayed());
-        
+
         // 2: create a non terminal page
         createPagePage = getUtil().gotoPage(testDocument).createPage();
         createPagePage.setType("office");

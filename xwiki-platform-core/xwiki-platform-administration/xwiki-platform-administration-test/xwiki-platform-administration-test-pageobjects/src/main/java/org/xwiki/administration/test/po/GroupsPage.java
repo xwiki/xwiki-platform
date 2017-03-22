@@ -75,7 +75,7 @@ public class GroupsPage extends BasePage
      */
     public static GroupsPage gotoPage()
     {
-        AdministrationPage.gotoPage().clickSection("Users & Groups", "Groups");
+        AdministrationPage.gotoPage().clickSection("Users & Rights", "Groups");
         GroupsPage groupsPage = new GroupsPage();
         groupsPage.waitUntilPageIsLoaded();
         return groupsPage;

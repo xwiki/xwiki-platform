@@ -206,7 +206,19 @@ function onDragEnd(el, x, y) {
     parentNode.replaceChild(el, dragel);
   }
   dragel.style.display = "none";
+  updatePanelLayout();
 }
+
+var updatePanelLayout = function() {
+  var leftPanelsInput = $('XWiki.XWikiPreferences_0_leftPanels');
+  if (leftPanelsInput) {
+    leftPanelsInput.value = getBlocNameList(leftPanels);
+  }
+  var rightPanelsInput = $('XWiki.XWikiPreferences_0_rightPanels');
+  if (rightPanelsInput) {
+    rightPanelsInput.value = getBlocNameList(rightPanels);
+  }
+};
 
 //------------------
 // threadsafe asynchronous XMLHTTPRequest code
@@ -362,16 +374,14 @@ function save() {
   url = window.ajaxurl;  
   url += "&showLeftPanels=" + window.showLeftColumn;
   url += "&showRightPanels=" + window.showRightColumn;
-  if (window.showLeftColumn) {
-    var leftPanelsList = getBlocNameList(leftPanels);
-    url += "&leftPanels=" + leftPanelsList;
-    url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
-  }
-  if (window.showRightColumn) {
-    var rightPanelsList = getBlocNameList(rightPanels);
-    url += "&rightPanels=" + rightPanelsList;
-    url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
-  }
+  var leftPanelsInput = $('XWiki.XWikiPreferences_0_leftPanels');
+  var leftPanelsList = leftPanelsInput ? leftPanelsInput.value : getBlocNameList(leftPanels);
+  url += "&leftPanels=" + leftPanelsList;
+  url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
+  var rightPanelsInput = $('XWiki.XWikiPreferences_0_rightPanels');
+  var rightPanelsList = rightPanelsInput ? rightPanelsInput.value : getBlocNameList(rightPanels);
+  url += "&rightPanels=" + rightPanelsList;
+  url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
   executeCommand(url, saveResult);
 }
 
@@ -527,6 +537,7 @@ function revert() {
   }
   setPanelWidth();
   changePreviewLayout(layoutMaquettes[layoutCode], layoutCode);
+  updatePanelLayout();
 }
 
 //----------------------------------------------------------------

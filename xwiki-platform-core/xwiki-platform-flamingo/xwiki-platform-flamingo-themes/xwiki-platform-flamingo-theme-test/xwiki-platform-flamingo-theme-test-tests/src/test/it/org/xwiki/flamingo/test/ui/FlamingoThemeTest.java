@@ -24,7 +24,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.administration.test.po.PresentationAdministrationSectionPage;
+import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.flamingo.test.po.EditThemePage;
 import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
@@ -52,8 +52,8 @@ public class FlamingoThemeTest extends AbstractTest
     {
         // Go to the presentation section of the administration
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        PresentationAdministrationSectionPage presentationAdministrationSectionPage =
-                administrationPage.clickPresentationSection();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage =
+                administrationPage.clickThemesSection();
 
         // Select the 'Charcoal' color theme
         presentationAdministrationSectionPage.setColorTheme("Charcoal");
@@ -145,8 +145,8 @@ public class FlamingoThemeTest extends AbstractTest
     {
         // Go to the presentation section of the administration
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        PresentationAdministrationSectionPage presentationAdministrationSectionPage =
-                administrationPage.clickPresentationSection();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage =
+                administrationPage.clickThemesSection();
 
         // Click on "manage color theme"
         presentationAdministrationSectionPage.manageColorThemes();

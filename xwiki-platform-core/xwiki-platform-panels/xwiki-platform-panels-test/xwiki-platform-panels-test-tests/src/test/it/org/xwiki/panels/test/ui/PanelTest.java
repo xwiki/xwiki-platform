@@ -19,11 +19,14 @@
  */
 package org.xwiki.panels.test.ui;
 
-import org.junit.*;
-import org.xwiki.administration.test.po.PageElementsAdministrationSectionPage;
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.panels.test.po.ApplicationsPanel;
+import org.xwiki.panels.test.po.PageLayoutTabContent;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelEditPage;
+import org.xwiki.panels.test.po.PanelsAdministrationPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -83,6 +86,7 @@ public class PanelTest extends AbstractTest
 
         // Add the panel to the right column from the administration.
         setRightPanelInAdministration(panelName);
+        getUtil().gotoPage(getTestClassName(), getTestMethodName());
         assertTrue(new PageWithPanels().hasPanel(panelName));
     }
 
@@ -108,12 +112,12 @@ public class PanelTest extends AbstractTest
         // Add the panel to the right column from the administration. This also proves that the Panel Admin UI is
         // displayed fine and can be modified.
         setRightPanelInAdministration(panelName);
+        getUtil().gotoPage(getTestClassName(), getTestMethodName());
 
         // The panel should be visible for the administrator.
         assertTrue(new PageWithPanels().hasPanel(panelName));
 
         // Force the guest user to verify the Panel is also visible for Guests.
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
         getUtil().forceGuestUser();
         assertTrue(new PageWithPanels().hasPanel(panelName));
 
@@ -133,12 +137,15 @@ public class PanelTest extends AbstractTest
 
     private void setRightPanelInAdministration(String panelName)
     {
-        PageElementsAdministrationSectionPage peasp = PageElementsAdministrationSectionPage.gotoPage();
-        String rightPanels = peasp.getRightPanels();
+        AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");
+        PanelsAdministrationPage panelsAdminPage = new PanelsAdministrationPage();
+        PageLayoutTabContent pageLayout = panelsAdminPage.selectPageLayout();
+        pageLayout.selectRightColumnLayout();
+        String rightPanels = pageLayout.getRightPanels();
         String newPanelString = "Panels." + panelName;
         if (!rightPanels.contains(newPanelString)) {
-            peasp.setRightPanels(StringUtils.join(new Object[]{ rightPanels, newPanelString }, ','));
+            pageLayout.setRightPanels(StringUtils.join(new Object[] {rightPanels, newPanelString}, ','));
         }
-        peasp.clickSave();
+        panelsAdminPage.clickSave();
     }
 }

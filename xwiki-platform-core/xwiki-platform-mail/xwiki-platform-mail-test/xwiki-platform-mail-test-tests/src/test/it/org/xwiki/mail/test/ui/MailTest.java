@@ -78,21 +78,22 @@ public class MailTest extends AbstractTest
     @Test
     public void testMail() throws Exception
     {
-        // Step 1: Verify that there are 2 email sections in the Email category
+        // Step 1: Verify that there are 2 email sections in the Mail category
 
         AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
 
-        Assert.assertTrue(wikiAdministrationPage.hasSection("Email", "General"));
-        Assert.assertTrue(wikiAdministrationPage.hasSection("Email", "Mail Sending"));
+        Assert.assertTrue(wikiAdministrationPage.hasSection("Mail", "Mail Sending"));
+        Assert.assertTrue(wikiAdministrationPage.hasSection("Mail", "Mail Sending Status"));
+        Assert.assertTrue(wikiAdministrationPage.hasSection("Mail", "Advanced"));
 
-        // Verify we can click on Email > General
-        wikiAdministrationPage.clickSection("Email", "General");
+        // Verify we can click on Mail > Advanced
+        wikiAdministrationPage.clickSection("Mail", "Advanced");
 
         // Step 2: Before validating that we can send email, let's verify that we can report errors when the mail
         // setup is not correct
 
         // Make sure there's an invalid mail server set.
-        wikiAdministrationPage.clickSection("Email", "Mail Sending");
+        wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("invalidmailserver");
         sendMailPage.clickSave();
@@ -102,7 +103,7 @@ public class MailTest extends AbstractTest
 
         // Step 3: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
         wikiAdministrationPage = AdministrationPage.gotoPage();
-        wikiAdministrationPage.clickSection("Email", "Mail Sending");
+        wikiAdministrationPage.clickSection("Mail", "Mail Sending");
         sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("localhost");
         sendMailPage.setPort("3025");
@@ -119,8 +120,9 @@ public class MailTest extends AbstractTest
         AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
 
         // All those sections should not be present
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email", "General"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email", "Mail Sending"));
+        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending"));
+        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending Status"));
+        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Advanced"));
 
         // Step 4: Prepare a Template Mail
         getUtil().deletePage(getTestClassName(), "MailTemplate");
@@ -161,7 +163,7 @@ public class MailTest extends AbstractTest
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
         wikiAdministrationPage = AdministrationPage.gotoPage();
-        wikiAdministrationPage.clickSection("Email", "Mail Sending Status");
+        wikiAdministrationPage.clickSection("Mail", "Mail Sending Status");
         MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
         LiveTableElement liveTableElement = statusPage.getLiveTable();
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");

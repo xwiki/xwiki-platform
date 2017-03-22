@@ -306,12 +306,10 @@
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     &lt;div class="panel panel-default"&gt;
-      &lt;a class="panel-heading#if ($item.id != $options.crtItemId) collapsed#end" role="tab" id="$escapedId" href="$!item.url"
-          data-toggle="collapse" data-parent="#$!options.id" data-target="#${escapedId}-body"
-          aria-expanded="false" aria-controls="${escapedId}-body"&gt;
-        $!services.icon.renderHTML($item.icon) &amp;nbsp;
-        $escapetool.xml($name)
-      &lt;/a&gt;
+      &lt;a class="panel-heading#if ($item.id != $options.crtItemId) collapsed#end" role="tab" id="$escapedId"
+        href="$!item.url" data-toggle="collapse" data-parent="#$!options.id" data-target="#${escapedId}-body"
+        aria-expanded="false" aria-controls="${escapedId}-body"
+        &gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
       &lt;div id="${escapedId}-body" class="panel-collapse collapse#if ($item.id == $options.crtItemId) in#end"
           role="tabpanel" aria-labelledby="$escapedId"&gt;
         &lt;div class="list-group"&gt;
@@ -322,10 +320,8 @@
       &lt;/div&gt;
     &lt;/div&gt;
   #else
-    &lt;a class="list-group-item#if ($item.id == $options.crtItemId) active#end" href="$!item.url"&gt;
-      $!services.icon.renderHTML($item.icon)
-      $escapetool.xml($name)
-    &lt;/a&gt;
+    &lt;a class="list-group-item#if ($item.id == $options.crtItemId) active#end" data-id="$escapedId"
+      href="$!item.url"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
   #end
 #end
 {{/velocity}}
@@ -898,6 +894,10 @@
 .admin-menu a.panel-heading:focus,
 .admin-menu a.panel-heading:hover {
   text-decoration: none;
+}
+
+.admin-menu .panel-heading &gt; *:first-child {
+  margin-right: .8em;
 }</code>
     </property>
     <property>

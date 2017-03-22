@@ -610,15 +610,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertEquals("installed-dependency", uninstallPlan.get(1).getStatus());
         assertEquals("Installed as dependency", uninstallPlan.get(1).getStatusMessage());
 
-        // Apply uninstall
-        extensionPane = extensionPane.confirm();
-
-        // Validate conflict resolution configuration
-        if (extensionPane.getContinueButton() != null) {
-            extensionPane = extensionPane.confirm();
-        }
-
         // Check the confirmation to delete the unused wiki pages.
+        extensionPane = extensionPane.confirm();
         UnusedPagesPane unusedPages = extensionPane.openProgressSection().getUnusedPages();
         assertTrue(unusedPages.contains("ExtensionTest", "Alice"));
         assertTrue(unusedPages.contains("ExtensionTest", "Bob"));
@@ -700,7 +693,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
             adminPage.getSearchBar().clickAdvancedSearch().search(extensionId).getExtension(0);
 
         // Install and uninstall.
-        extensionPane = extensionPane.install().confirm().confirm().uninstall().confirm().confirm().confirm().install();
+        extensionPane = extensionPane.install().confirm().confirm().uninstall().confirm().confirm().install();
         assertEquals("remote", extensionPane.getStatus());
     }
 

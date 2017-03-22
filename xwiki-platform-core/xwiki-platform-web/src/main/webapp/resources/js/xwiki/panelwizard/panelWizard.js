@@ -210,12 +210,10 @@ function onDragEnd(el, x, y) {
 }
 
 var updatePanelLayout = function() {
-  var leftPanelsInput = $('XWiki.XWikiPreferences_0_leftPanels');
-  if (leftPanelsInput) {
+  if (leftPanelsInput && !leftPanelsInput.disabled) {
     leftPanelsInput.value = getBlocNameList(leftPanels);
   }
-  var rightPanelsInput = $('XWiki.XWikiPreferences_0_rightPanels');
-  if (rightPanelsInput) {
+  if (rightPanelsInput && !rightPanelsInput.disabled) {
     rightPanelsInput.value = getBlocNameList(rightPanels);
   }
 };
@@ -374,14 +372,16 @@ function save() {
   url = window.ajaxurl;  
   url += "&showLeftPanels=" + window.showLeftColumn;
   url += "&showRightPanels=" + window.showRightColumn;
-  var leftPanelsInput = $('XWiki.XWikiPreferences_0_leftPanels');
-  var leftPanelsList = leftPanelsInput ? leftPanelsInput.value : getBlocNameList(leftPanels);
-  url += "&leftPanels=" + leftPanelsList;
-  url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
-  var rightPanelsInput = $('XWiki.XWikiPreferences_0_rightPanels');
-  var rightPanelsList = rightPanelsInput ? rightPanelsInput.value : getBlocNameList(rightPanels);
-  url += "&rightPanels=" + rightPanelsList;
-  url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
+  if (window.showLeftColumn) {
+    var leftPanelsList = leftPanelsInput ? leftPanelsInput.value : getBlocNameList(leftPanels);
+    url += "&leftPanels=" + leftPanelsList;
+    url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
+  }
+  if (window.showRightColumn) {
+    var rightPanelsList = rightPanelsInput ? rightPanelsInput.value : getBlocNameList(rightPanels);
+    url += "&rightPanels=" + rightPanelsList;
+    url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
+  }
   executeCommand(url, saveResult);
 }
 
@@ -463,7 +463,9 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthidelefthideright";
       mainContainer.addClassName("hidelefthideright");
+      leftPanelsInput && leftPanelsInput.disable();
       leftPanelsWidthInput.disable();
+      rightPanelsInput && rightPanelsInput.disable();
       rightPanelsWidthInput.disable();
       break;
     case 1:
@@ -480,7 +482,9 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthideright";
       mainContainer.addClassName("hideright");
+      leftPanelsInput && leftPanelsInput.enable();
       leftPanelsWidthInput.enable();
+      rightPanelsInput && rightPanelsInput.disable();
       rightPanelsWidthInput.disable();
       break;
     case 2:
@@ -497,7 +501,9 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthideleft";
       mainContainer.addClassName("hideleft");
+      leftPanelsInput && leftPanelsInput.disable();
       leftPanelsWidthInput.disable();
+      rightPanelsInput && rightPanelsInput.enable();
       rightPanelsWidthInput.enable();
       break;
     case 3:
@@ -513,7 +519,9 @@ function changePreviewLayout(element, code) {
         restorePanels(rightPanels);
       }
       mainContainer.addClassName("content");
+      leftPanelsInput && leftPanelsInput.enable();
       leftPanelsWidthInput.enable();
+      rightPanelsInput && rightPanelsInput.enable();
       rightPanelsWidthInput.enable();
       break;
     default:
@@ -583,15 +591,21 @@ function panelEditorInit() {
   rightPanelsRight = rightPanelsLeft + rightPanels.offsetWidth;
   allpanelsLeft    = getX(allPanels);
   allpanelsTop     = getY(allPanels);
+  leftPanelsInput  = $("XWiki.XWikiPreferences_0_leftPanels");
   leftPanelsWidthInput  = $("XWiki.XWikiPreferences_0_leftPanelsWidth");
+  rightPanelsInput = $("XWiki.XWikiPreferences_0_rightPanels");
   rightPanelsWidthInput = $("XWiki.XWikiPreferences_0_rightPanelsWidth");
-  
+
   leftPanelsWidthInput.observe('change', setPanelWidth);
   rightPanelsWidthInput.observe('change', setPanelWidth);
-  
+
   prevcolumn = allPanels;
 
   start1();
+
+  // Update the enabled/disable state of the left/right panel inputs.
+  var selectedLayout = $('selectedoption');
+  changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().size());
 }
 
 (XWiki && XWiki.isInitialized && panelEditorInit())

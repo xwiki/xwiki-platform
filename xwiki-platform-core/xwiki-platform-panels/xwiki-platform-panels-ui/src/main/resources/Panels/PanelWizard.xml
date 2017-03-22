@@ -312,14 +312,12 @@
   #set ($discard = $xwiki.ssx.use('Panels.PanelWizard'))
   &lt;ul class="nav nav-tabs" role="tablist" id="panelEditorSteps"&gt;
     &lt;li role="presentation" class="active"&gt;
-      &lt;a href="#PageLayoutSection" aria-controls="PageLayoutSection" role="tab" data-toggle="tab"&gt;
-        $escapetool.xml($services.localization.render('panelwizard.pagelayout'))
-      &lt;/a&gt;
+      &lt;a href="#PageLayoutSection" aria-controls="PageLayoutSection" role="tab" data-toggle="tab"
+        &gt;$escapetool.xml($services.localization.render('panelwizard.pagelayout'))&lt;/a&gt;
     &lt;/li&gt;
     &lt;li role="presentation"&gt;
-      &lt;a href="#PanelListSection" aria-controls="PanelListSection" role="tab" data-toggle="tab"&gt;
-        $escapetool.xml($services.localization.render('panelwizard.panellist'))
-      &lt;/a&gt;
+      &lt;a href="#PanelListSection" aria-controls="PanelListSection" role="tab" data-toggle="tab"
+        &gt;$escapetool.xml($services.localization.render('panelwizard.panellist'))&lt;/a&gt;
     &lt;/li&gt;
   &lt;/ul&gt;
   &lt;div class="tab-content"&gt;
@@ -335,15 +333,12 @@
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div id="panelwizardbuttons"&gt;
-    &lt;button class="btn btn-primary" id="saveLayout"&gt;
-      $services.localization.render('xe.panels.wizard.savenew')
-    &lt;/button&gt;
-    &lt;button class="btn btn-default" id="revertLayout"&gt;
-      $services.localization.render('xe.panels.wizard.revert')
-    &lt;/button&gt;
-    &lt;a href="$xwiki.getURL('Panels.WebHome')"&gt;
-      $services.localization.render('xe.panels.wizard.homepage')
-    &lt;/a&gt;
+    &lt;button class="btn btn-primary" id="saveLayout"
+      &gt;$services.localization.render('xe.panels.wizard.savenew')&lt;/button&gt;
+    &lt;button class="btn btn-default" id="revertLayout"
+      &gt;$services.localization.render('xe.panels.wizard.revert')&lt;/button&gt;
+    &lt;a href="$xwiki.getURL('Panels.WebHome')"
+      &gt;$services.localization.render('xe.panels.wizard.homepage')&lt;/a&gt;
   &lt;/div&gt;
 #end
 {{/html}}

@@ -56,7 +56,8 @@
 #set ($discard = $xwiki.ssx.use('CKEditor.AdminSection'))
 #set ($discard = $xwiki.jsx.use('CKEditor.AdminSection'))
 #set ($configDoc = $xwiki.getDocument('CKEditor.Config'))
-&lt;form #if ("$!formId" != '')id="$formId"#end method="post" action="$configDoc.getURL('save')" class="xform"&gt;
+&lt;form id="ckeditorConfig" method="post" action="$configDoc.getURL('save')" class="xform"
+    data-editorId="ckeditor" data-label="CKEditor"&gt;
   &lt;fieldset&gt;
     #if ($configDoc.isNew())
       ## Copy the configuration object from the template.
@@ -82,7 +83,7 @@
         'form_token': $services.csrf.token,
         'xredirect': "$request.requestURI?$!request.queryString"
       })))
-      &lt;a class="btn btn-danger" href="$resetURL"
+      &lt;a class="btn btn-default" href="$resetURL"
           title="$escapetool.xml($services.localization.render('ckeditor.admin.reset.hint'))"
           data-confirmation="$escapetool.xml($services.localization.render('ckeditor.admin.reset.confirmation'))"&gt;
         $escapetool.xml($services.localization.render('ckeditor.admin.reset'))
@@ -406,9 +407,10 @@
       <code>require(['jquery', 'bootstrap'], function($) {
   var adminPageContent = $('#admin-page-content');
   var forms = adminPageContent.find('form');
-  // Check if there are multiple editors to configure.
-  if (forms.size() &lt; 2) {
-    // Only one editor is available. Leave the administration page as it is.
+  // Check if we need to enhance the WYSIWYG administration section with tabs (one tab for each editor).
+  if (forms.size() &lt; 2 || forms.is('#wysiwyg')) {
+    // Either there is only one editor available or the WYSIWYG administration section handles the tabs itself
+    // (XWiki 9.2RC1+). Leave the administration page as it is.
     // This JavaScript code is executed after the page has been loaded so in order to avoid flickering UI we hide the
     // page content from CSS and restore it back here.
     adminPageContent.addClass('visible');
@@ -560,13 +562,13 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/* Hide the page content until the JavaScript code is loaded and executed. Also hide unnecessary headings. */
+      <code>/* Hide the page content until the JavaScript code is loaded and executed. Also hide unnecessary headings.
+  This is not needed anymore starting with XWiki 9.2RC1. */
 #admin-page-content &gt; form,
 #admin-page-content &gt; .codeToExecute,
 #admin-page-content &gt; h1.wikigeneratedheader {
   display: none;
 }
-
 #admin-page-content.visible &gt; form,
 #admin-page-content.visible &gt; .codeToExecute {
   display: initial;
@@ -576,7 +578,7 @@
   margin-top: 1em;
 }
 
-/* Fix the styles that come from the GWT editor section. */
+/* Fix the styles that come from the GWT editor section (XWiki &lt;9.2RC1). */
 form.xform .ckeditor-config dd input[type="text"] {
   width: 100% !important;
 }</code>

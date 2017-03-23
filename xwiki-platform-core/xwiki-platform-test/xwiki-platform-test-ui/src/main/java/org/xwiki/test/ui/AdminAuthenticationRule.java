@@ -31,4 +31,12 @@ public class AdminAuthenticationRule extends AuthenticationRule
     {
         super("Admin", "admin", util);
     }
+
+    /**
+     * @since 9.3-rc-1
+     */
+    public AdminAuthenticationRule(boolean isAdvanced, TestUtils util)
+    {
+        super("Admin", "admin", true, util);
+    }
 }

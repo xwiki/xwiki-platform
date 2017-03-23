@@ -23,6 +23,8 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
+import static org.xwiki.test.ui.AbstractTest.getUtil;
+
 /**
  * Authenticates a user in the wiki before the test starts.
  *
@@ -37,11 +39,22 @@ public class AuthenticationRule implements MethodRule
 
     private TestUtils util;
 
+    private boolean isAdvanced;
+
     public AuthenticationRule(String userName, String userPassword, TestUtils util)
     {
         this.userName = userName;
         this.userPassword = userPassword;
         this.util = util;
+    }
+
+    /**
+     * @since 9.3-rc-1
+     */
+    public AuthenticationRule(String userName, String userPassword, boolean isAdvanced, TestUtils util)
+    {
+        this(userName, userPassword, util);
+        this.isAdvanced = isAdvanced;
     }
 
     @Override
@@ -53,6 +66,10 @@ public class AuthenticationRule implements MethodRule
             public void evaluate() throws Throwable
             {
                 authenticate();
+                if (isAdvanced) {
+                    getUtil().updateObject("XWiki", "Admin", "XWiki.XWikiUsers", 0, "usertype", "Advanced");
+                }
+
                 base.evaluate();
             }
         };

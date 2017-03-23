@@ -96,6 +96,8 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("avatar", "Avatar", 30);
         xclass.addTextField("phone", "Phone", 30);
         xclass.addTextAreaField("address", "Address", 40, 3);
+
+        xclass.addBooleanField("extensionConflictSetup", "Enable extension conflict setup", "yesno");
     }
 
     @Override

@@ -37,21 +37,49 @@ import org.xwiki.stability.Unstable;
 public interface NotificationManager
 {
     /**
-     * @param offset the offset
-     * @param limit the number of events to get
-     * @return a list of events concerning the current user and to display as notifications
+     * Return events to display as notifications concerning the specified user.
+     *
+     * @param userId id of the user
+     * @param onlyUnread if only unread events should be returned
+     * @param expectedCount the maximum events to return
+     * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    List<Event> getEvents(int offset, int limit) throws NotificationException;
+    List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException;
 
     /**
+     * Return events to display as notifications concerning the specified user.
+     *
      * @param userId id of the user
-     * @param offset the offset
-     * @param limit the number of events to get
-     * @return a list of events concerning a given user and to display as notifications
+     * @param onlyUnread if only unread events should be returned
+     * @param expectedCount the maximum events to return
+     * @param untilDate do not return events happened after this date
+     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
+     * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    List<Event> getEvents(String userId, int offset, int limit) throws NotificationException;
+    List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate, List<String> blackList)
+            throws NotificationException;
+
+    /**
+     * Return the number of events to display as notifications concerning the specified user.
+     *
+     * @param userId id of the user
+     * @param onlyUnread either if only unread events should be counted or all events
+     * @param maxCount maximum number of events to count
+     * @return the list of events to display as notifications
+     * @throws NotificationException if an error happens
+     */
+    long getEventsCount(String userId, boolean onlyUnread, int maxCount) throws NotificationException;
+
+    /**
+     * Set the start date for the given user.
+     *
+     * @param userId the id of the user
+     * @param startDate the date before which we ignore notifications
+     * @throws NotificationException if an error happens
+     */
+    void setStartDate(String userId, Date startDate) throws NotificationException;
 
     /**
      * @return the list of notifications preferences for the current user
@@ -65,32 +93,4 @@ public interface NotificationManager
      * @throws NotificationException if an error happens
      */
     List<NotificationPreference> getPreferences(String userId) throws NotificationException;
-
-    /**
-     * Return the number of events to display as notifications concerning the current user.
-     *
-     * @param onlyUnread either if only unread events should be counted or all events
-     * @return the list of events to display as notifications
-     * @throws NotificationException if an error happens
-     */
-    long getEventsCount(boolean onlyUnread) throws NotificationException;
-
-    /**
-     * * Return the number of events to display as notifications concerning a given user.
-     *
-     * @param onlyUnread either if only unread events should be counted or all events
-     * @param userId if a user
-     * @return the list of events to display as notifications
-     * @throws NotificationException if an error happens
-     */
-    long getEventsCount(boolean onlyUnread, String userId) throws NotificationException;
-
-    /**
-     * Set the start date for the given user.
-     *
-     * @param userId the id of the user
-     * @param startDate the date before which we ignore notifications
-     * @throws NotificationException if an error happens
-     */
-    void setStartDate(String userId, Date startDate) throws NotificationException;
 }

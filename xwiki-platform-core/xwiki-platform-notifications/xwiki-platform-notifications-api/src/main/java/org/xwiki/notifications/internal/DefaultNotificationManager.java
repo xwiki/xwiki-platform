@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +42,8 @@ import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -77,30 +78,81 @@ public class DefaultNotificationManager implements NotificationManager
     @Named("user")
     private ConfigurationSource userPreferencesSource;
 
+    @Inject
+    private AuthorizationManager authorizationManager;
+
     @Override
-    public List<Event> getEvents(int offset, int limit) throws NotificationException
+    public List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException
     {
-        return getEvents(documentAccessBridge.getCurrentUserReference(), offset, limit);
+        return getEvents(
+                documentReferenceResolver.resolve(userId),
+                onlyUnread,
+                expectedCount,
+                null,
+                new ArrayList<>()
+        );
     }
 
     @Override
-    public List<Event> getEvents(String userId, int offset, int limit) throws NotificationException
+    public List<Event> getEvents(String userId, boolean onlyUnread, int count, Date untilDate, List<String> blackList)
+            throws NotificationException
     {
-        return getEvents(documentReferenceResolver.resolve(userId), offset, limit);
+        return getEvents(documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
+                new ArrayList<>(blackList));
     }
 
-    private List<Event> getEvents(DocumentReference user, int offset, int limit) throws NotificationException
+    @Override
+    public long getEventsCount(String userId, boolean onlyUnread, int maxCount) throws NotificationException
     {
+        DocumentReference user = documentReferenceResolver.resolve(userId);
+
+        List<Event> events = getEvents(user, onlyUnread, maxCount, null, new ArrayList<>());
+
+        return events.size();
+    }
+
+    private List<Event> getEvents(DocumentReference userReference, boolean onlyUnread, int expectedCount,
+            Date endDate, List<String> blackList) throws NotificationException
+    {
+        // Because the user might not be able to see all notifications because of the rights, we take from the database
+        // more events than expected and we will filter afterwards.
+        final int batchSize = expectedCount * 2;
         try {
-            Query query = generateQuery(user, false, true);
+            // Create the query
+            Query query = generateQuery(userReference, onlyUnread, endDate, blackList);
             if (query == null) {
                 return Collections.emptyList();
             }
+            query.setLimit(batchSize);
 
-            query.setOffset(offset);
-            query.setLimit(limit);
+            // Get a batch of events
+            List<Event> batch = eventStream.searchEvents(query);
 
-            return eventStream.searchEvents(query);
+            // Add to the results the events the user has the right to see
+            List<Event> results = new ArrayList<>();
+            for (Event event : batch) {
+                DocumentReference document = event.getDocument();
+                // Don't record events concerning a doc the user cannot see
+                if (document != null && !authorizationManager.hasAccess(Right.VIEW, userReference, document)) {
+                    continue;
+                }
+                // Record this event
+                results.add(event);
+                // If the expected count is reached, stop now
+                if (results.size() == expectedCount) {
+                    return results;
+                }
+            }
+
+            // If we haven't get the expected number of events, perform a new batch
+            if (results.size() < expectedCount && batch.size() == batchSize) {
+                blackList.addAll(getEventsIds(batch));
+                results.addAll(
+                        getEvents(userReference, onlyUnread, expectedCount - results.size(), endDate, blackList)
+                );
+            }
+
+            return results;
         } catch (Exception e) {
             throw new NotificationException("Fail to get the list of notifications.", e);
         }
@@ -119,48 +171,12 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public long getEventsCount(boolean onlyUnread) throws NotificationException
-    {
-        return getEventsCount(onlyUnread, documentAccessBridge.getCurrentUserReference());
-    }
-
-    @Override
-    public long getEventsCount(boolean onlyUnread, String userId) throws NotificationException
-    {
-        return getEventsCount(onlyUnread, documentReferenceResolver.resolve(userId));
-    }
-
-    @Override
     public void setStartDate(String userId, Date startDate) throws NotificationException
     {
         modelBridge.setStartDateForUser(documentReferenceResolver.resolve(userId), startDate);
     }
 
-    private long getEventsCount(boolean onlyUnread, DocumentReference userReference) throws NotificationException
-    {
-        try {
-            Query baseQuery = generateQuery(userReference, onlyUnread, false);
-            if (baseQuery == null) {
-                return 0;
-            }
-
-            // Currently, event stream module does not provide an API to get the number of events, so implement
-            // it here for now.
-            // TODO: move this code to the event stream module
-
-            Query query = queryManager.createQuery("select count(*) from ActivityEventImpl event "
-                    + baseQuery.getStatement(), baseQuery.getLanguage());
-            for (Map.Entry<String, Object> entry : baseQuery.getNamedParameters().entrySet()) {
-                query.bindValue(entry.getKey(), entry.getValue());
-            }
-
-            return (query.<Long>execute()).get(0);
-        } catch (QueryException e) {
-            throw new NotificationException("Failed to retrieve the number of unread events.", e);
-        }
-    }
-
-    private Query generateQuery(DocumentReference user, boolean onlyUnread, boolean withOrder)
+    private Query generateQuery(DocumentReference user, boolean onlyUnread, Date endDate, List<String> blackList)
             throws NotificationException, QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
@@ -185,9 +201,11 @@ public class DefaultNotificationManager implements NotificationManager
 
         hql.append(")");
 
+        handleBlackList(blackList, hql);
+        handleEndDate(endDate, hql);
         handleHiddenEvents(hql);
         handleEventStatus(onlyUnread, hql);
-        handleOrder(withOrder, hql);
+        handleOrder(hql);
 
         // The, generate the query
         Query query = queryManager.createQuery(hql.toString(), Query.HQL);
@@ -197,9 +215,48 @@ public class DefaultNotificationManager implements NotificationManager
         query.bindValue("user", serializer.serialize(user));
         handleEventTypes(types, query);
         handleApplications(apps, query);
+        handleBlackList(blackList, query);
+        handleEndDate(endDate, query);
 
         // Return the query
         return query;
+    }
+
+    private void handleEndDate(Date endDate, Query query)
+    {
+        if (endDate != null) {
+            query.bindValue("endDate", endDate);
+        }
+    }
+
+    private void handleBlackList(List<String> blackList, Query query)
+    {
+        if (blackList != null && !blackList.isEmpty()) {
+            query.bindValue("blackList", blackList);
+        }
+    }
+
+    private void handleEndDate(Date endDate, StringBuilder hql)
+    {
+        if (endDate != null) {
+            hql.append(" AND event.date <= :endDate");
+        }
+    }
+
+    private void handleBlackList(List<String> blackList, StringBuilder hql)
+    {
+        if (blackList != null && !blackList.isEmpty()) {
+            hql.append(" AND event.id NOT IN (:blackList)");
+        }
+    }
+
+    private List<String> getEventsIds(List<Event> events)
+    {
+        List<String> list = new ArrayList<>();
+        for (Event event : events) {
+            list.add(event.getId());
+        }
+        return list;
     }
 
     private List<NotificationPreference> getPreferences(DocumentReference user) throws NotificationException
@@ -207,12 +264,9 @@ public class DefaultNotificationManager implements NotificationManager
         return modelBridge.getNotificationsPreferences(user);
     }
 
-    private void handleOrder(boolean withOrder, StringBuilder hql)
+    private void handleOrder(StringBuilder hql)
     {
-        // HSQLDB do not support adding "order by" when we do "select count(*)"
-        if (withOrder) {
-            hql.append(" order by event.date DESC");
-        }
+        hql.append(" order by event.date DESC");
     }
 
     private void handleEventStatus(boolean onlyUnread, StringBuilder hql)

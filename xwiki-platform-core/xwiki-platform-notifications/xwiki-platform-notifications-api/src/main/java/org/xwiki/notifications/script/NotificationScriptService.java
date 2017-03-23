@@ -74,38 +74,75 @@ public class NotificationScriptService implements ScriptService
     private ModelBridge modelBridge;
 
     /**
-     * @param offset the offset
-     * @param limit the number of events to get
-     * @return a list of events concerning the current user and to display as notifications
+     * @param onyUnread either or not to return only unread events
+     * @param expectedCount number of expected events
+     * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(int offset, int limit) throws NotificationException
+    public List<Event> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
     {
-        return notificationManager.getEvents(offset, limit);
+        return notificationManager.getEvents(
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onyUnread,
+                expectedCount
+        );
+    }
+
+    /**
+     * @param onyUnread either or not to return only unread events
+     * @param expectedCount number of expected events
+     * @param untilDate do not return events happened after this date
+     * @param blackList array of events id to exclude from the search
+     * @return the matching events for the current user, could be less than expectedCount but not more
+     * @throws NotificationException if error happens
+     */
+    public List<Event> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
+            throws NotificationException
+    {
+        return notificationManager.getEvents(
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onyUnread,
+                expectedCount,
+                untilDate,
+                Arrays.asList(blackList)
+        );
+    }
+
+    /**
+     * @param onyUnread either or not to return only unread events
+     * @param expectedCount number of expected events
+     * @param untilDate do not return events happened after this date
+     * @param blackList list of events id to exclude from the search
+     * @return the matching events for the current user, could be less than expectedCount but not more
+     * @throws NotificationException if error happens
+     */
+    public List<Event> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
+            throws NotificationException
+    {
+        return notificationManager.getEvents(
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onyUnread,
+                expectedCount,
+                untilDate,
+                blackList
+        );
     }
 
     /**
      * Return the number of events to display as notifications concerning the current user.
      *
      * @param onlyUnread either if only unread events should be counted or all events
+     * @param maxCount maximum number of events to count
      * @return the list of events to display as notifications
      * @throws NotificationException if an error happens
      */
-    public long getEventsCount(boolean onlyUnread) throws NotificationException
+    public long getEventsCount(boolean onlyUnread, int maxCount) throws NotificationException
     {
-        return notificationManager.getEventsCount(onlyUnread);
-    }
-
-    /**
-     * @param userId id of the user
-     * @param offset the offset
-     * @param limit the number of events to get
-     * @return a list of events concerning a given user and to display as notifications
-     * @throws NotificationException if error happens
-     */
-    public List<Event> getEvents(String userId, int offset, int limit) throws NotificationException
-    {
-        return notificationManager.getEvents(userId, offset, limit);
+        return notificationManager.getEventsCount(
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onlyUnread,
+                maxCount
+        );
     }
 
     /**

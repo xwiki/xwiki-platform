@@ -44,12 +44,16 @@
     List the notifications of the current user as JSON
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method)
+  #set ($batchSize = 5)
   #set ($notifications = [])
-  #set ($offset = 0)
-  #if ("$!request.offset" != '')
-    #set ($offset = $numbertool.toNumber($request.offset).intValue())
+  #if ("$!request.untilDate" != '' &amp;&amp; "$!request.blackList" != '')
+    #set ($untilDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.untilDate).longValue()).toDate())
+    #set ($blackList = $request.blackList.split(','))
+    #set ($events = $services.notification.getEvents(false, $batchSize, $untilDate, $blackList))
+  #else
+    #set ($events = $services.notification.getEvents(false, $batchSize))
   #end
-  #foreach ($eventStatus in $services.notification.getEventStatuses($services.notification.getEvents($offset, 5)))
+  #foreach ($eventStatus in $services.notification.getEventStatuses($events))
     #set ($event = $eventStatus.event)
     #set ($discard = $notifications.add({
       'id'          : $event.id,
@@ -61,7 +65,7 @@
     }))
   #end
   #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true)})
+  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true, 21)})
 #********************************************************
              Mark a notification as read
 ********************************************************#
@@ -176,9 +180,19 @@
   var notificationsLimit = 5;
 
   /**
+   * Maximum number of events to count
+   */
+  var maxCountNumber = 20;
+
+  /**
    * The current number of unread notifications
    */
   var notificationCount = 0;
+
+  /**
+   * The list of the ids of events that have already been displayed and that we don't want to get again in next batches.
+   */
+  var blackList = [];
 
   /**
    * URL to the service that return the notifications to display
@@ -206,6 +220,9 @@
     }
     // Update the counter
     counter.text(count);
+    if (count &gt; maxCountNumber) {
+      counter.text(maxCountNumber + '+');
+    };
   };
 
   /**
@@ -217,32 +234,44 @@
       .click(function (event) {
         // Avoid the menu closing
         event.stopPropagation();
-        // Display a saving message
-        var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
-        // Send the request to change the start date
-        $.post(url, {
-          action: 'setStartDate',
-          date: startDate
-        }).success(function (){
-          // Display the success message
-          notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
-          // Remove the notifications from the UI and display the "nothing!" message instead.
-          $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-          // Update the notifications counter
-          updateNotificationCount(0);
+        // Ask confirmation
+        new XWiki.widgets.ConfirmationBox({
+          onYes: function(event) {
+            // Avoid the menu closing
+            event.stopPropagation();
+            // Display a saving message
+            var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
+            // Send the request to change the start date
+            $.post(url, {
+              action: 'setStartDate',
+              date: startDate
+            }).success(function (){
+              // Display the success message
+              notification.hide();
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
+              // Remove the notifications from the UI and display the "nothing!" message instead.
+              $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+              // Update the notifications counter
+              updateNotificationCount(0);
+            });
+          },
+          onNo: function(event) {
+            // Avoid the menu closing
+            event.stopPropagation();
+          }
         });
       });
     // Append the button just before the "settings" link in the menu
-    $('.notifications-settings').before(markAllReadButton);
-    // Add a visual separator
-    markAllReadButton.after(' | ');
+    $('.notifications-header-uix').append(markAllReadButton);
   };
 
   /**
    * Display a notification entry
    */
   var displayEntry = function (entry) {
+    // Add the id of the entry to the blacklist
+    blackList.push(entry.id);
+    // Create the container
     var notif = $('&lt;div&gt;').addClass('notification-event');
     var readButton = $('&lt;button&gt;');
     if (!entry.read) {
@@ -272,16 +301,27 @@
           read: true
         });
         $(this).remove();
-        updateNotificationCount(notificationCount - 1);
+        if (notificationCount &lt;= maxCountNumber) {
+          updateNotificationCount(notificationCount - 1);
+        }
       });
     }
   };
 
   /**
    * Load the notifications.
+   *
+   * The parameter `untilDate` is used as an "offset" to get events in a paginate mode.
+   * We cannot rely on an integer offset because new events could have been stored recently and we want to display older
+   * ones only.
    */
-  var loadNotifications = function (offset) {
-    $.getJSON(url, {offset: offset}).done(function (data) {
+  var loadNotifications = function (untilDate) {
+    var params = {};
+    if (untilDate) {
+      params.untilDate = untilDate;
+      params.blackList = blackList.join(',');
+    }
+    $.getJSON(url, params).done(function (data) {
       updateNotificationCount(data.unread);
       // Display notifications
       var area = $('.notifications-area');
@@ -289,9 +329,9 @@
       area.removeClass('loading');
       $('.notifications-load-more').remove();
       // Display the "nothing!" message if there is no notification
-      if (data.notifications.length == 0 &amp;&amp; offset == 0) {
+      if (data.notifications.length == 0 &amp;&amp; !untilDate) {
         area.html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-      } else if (offset == 0 ) {
+      } else if (!untilDate) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.
         // Note: we use the date of the more recent notification that we have displayed to avoid cleaning
@@ -309,7 +349,8 @@
         area.append(loadMore);
         loadMore.click(function(event) {
           loadMore.text('').addClass('loading');
-          loadNotifications(offset + notificationsLimit);
+          // We use the date of the last displayed event as an offset to display those that come next
+          loadNotifications(data.notifications[data.notifications.length - 1].date);
         });
       }
     });
@@ -444,8 +485,8 @@
       <code>#template('colorThemeInit.vm')
 
 .notifications-area {
+  margin-top: 10px;
   min-height: 20px;
-  min-width: 400px;
   overflow: hidden;
 }
 
@@ -486,12 +527,18 @@
   background-color: red;
   opacity: 0.9;
   position: absolute;
-  right: 0;
-  top: 3px;
+  margin-left: 1.6em;
+  top: 0;
 }
 
-.notifications-clean {
-  padding: 1em;
+@media (min-width: 768px) {
+  .notifications-count {
+    top: 3px;
+  }
+}
+
+.notifications-header-uix {
+  text-align: right;
 }
 </code>
     </property>
@@ -593,6 +640,7 @@
       &lt;div class="col-xs-6 text-right"&gt;
         &lt;p&gt;&lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;$services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))&lt;/a&gt;&lt;/p&gt;
       &lt;/div&gt;
+      &lt;div class="notifications-header-uix col-xs-12"&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="notifications-area loading clearfix"&gt;
     &lt;/div&gt;

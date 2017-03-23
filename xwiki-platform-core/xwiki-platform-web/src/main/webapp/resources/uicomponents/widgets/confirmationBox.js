@@ -77,22 +77,22 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
       content.insert(question).insert(buttons);
       return content;
     },
-    onYes : function() {
+    onYes : function(event) {
       this.closeDialog();
       if (typeof (this.behavior.onYes) == 'function') {
-        this.behavior.onYes();
+        this.behavior.onYes(event);
       }
     },
-    onNo : function() {
+    onNo : function(event) {
       this.closeDialog();
       if (typeof (this.behavior.onNo) == 'function') {
-        this.behavior.onNo();
+        this.behavior.onNo(event);
       }
     },
-    onCancel : function() {
+    onCancel : function(event) {
       this.closeDialog();
       if (typeof (this.behavior.onCancel) == 'function') {
-        this.behavior.onCancel();
+        this.behavior.onCancel(event);
       }
     }
   });

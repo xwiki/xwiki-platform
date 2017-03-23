@@ -493,16 +493,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertEquals(dependencyId, installPlan.get(0).getId());
         assertEquals(extensionId, installPlan.get(1).getId());
 
-        // Confirm install
-        extensionPane = extensionPane.confirm();
-
-        // Validate conflict resolution configuration
-        if (extensionPane.getContinueButton() != null) {
-            extensionPane = extensionPane.confirm();
-        }
-
         // Finish the install and assert the install log.
-        List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
+        List<LogItemPane> log = extensionPane.confirm().openProgressSection().getJobLog();
         int logSize = log.size();
         assertTrue(logSize > 1);
         assertEquals("info", log.get(0).getLevel());
@@ -693,7 +685,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
             adminPage.getSearchBar().clickAdvancedSearch().search(extensionId).getExtension(0);
 
         // Install and uninstall.
-        extensionPane = extensionPane.install().confirm().confirm().uninstall().confirm().confirm().install();
+        extensionPane = extensionPane.install().confirm().uninstall().confirm().confirm().install();
         assertEquals("remote", extensionPane.getStatus());
     }
 
@@ -735,15 +727,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertEquals("remote-installed", upgradePlan.get(0).getStatus());
         assertEquals("Version 1.3 is installed", upgradePlan.get(0).getStatusMessage());
 
-        // Apply upgrade
-        extensionPane = extensionPane.confirm();
-
-        // Validate conflict resolution configuration
-        if (extensionPane.getContinueButton() != null) {
-            extensionPane = extensionPane.confirm();
-        }
-
         // Finish the upgrade and check the upgrade log.
+        extensionPane = extensionPane.confirm();
         assertEquals("installed", extensionPane.getStatus());
         assertEquals("Installed", extensionPane.getStatusMessage());
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
@@ -796,7 +781,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         SearchResultsPane searchResults =
             adminPage.getSearchBar().clickAdvancedSearch().search(extensionId, newVersion);
         ExtensionPane extensionPane = searchResults.getExtension(0);
-        extensionPane = extensionPane.upgrade().confirm().confirm();
+        extensionPane = extensionPane.upgrade().confirm();
 
         // Check the merge conflict UI.
         assertEquals("loading", extensionPane.getStatus());
@@ -914,15 +899,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertEquals("remote-installed", downgradePlan.get(0).getStatus());
         assertEquals("Version 2.1.4 is installed", downgradePlan.get(0).getStatusMessage());
 
-        // Apply downgrade
-        extensionPane = extensionPane.confirm();
-
-        // Validate conflict resolution configuration
-        if (extensionPane.getContinueButton() != null) {
-            extensionPane = extensionPane.confirm();
-        }
-
         // Finish the downgrade and check the downgrade log.
+        extensionPane = extensionPane.confirm();
         assertEquals("installed", extensionPane.getStatus());
         assertEquals("Installed", extensionPane.getStatusMessage());
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();

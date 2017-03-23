@@ -29,9 +29,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -61,6 +62,8 @@ import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * @version $Id$
@@ -101,7 +104,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private LocalExtensionRepository localRepository;
 
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Used to access the execution context.
@@ -296,12 +299,19 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_FAILURE),
                     configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
 
-                // If advanced user ask to confirm default answers
-                if (defaultConflict && currentJob.getStatus().getRequest().isInteractive()
-                    && this.documentAccessBridge.isAdvancedUser(userReference)) {
-                    DefaultConflictActionQuestion question = new DefaultConflictActionQuestion(configuration);
+                // If user asked to be asked about conflict behavior
+                if (defaultConflict && currentJob.getStatus().getRequest().isInteractive()) {
+                    XWikiContext xcontext = xcontextProvider.get();
+                    // Make sure the context has the right user
+                    xcontext.setUserReference(userReference);
+                    int extensionConflictSetup =
+                        NumberUtils.toInt(xcontext.getWiki().getUserPreference("extensionConflictSetup", xcontext), 0);
 
-                    currentJob.getStatus().ask(question, 1, TimeUnit.HOURS);
+                    if (extensionConflictSetup == 1) {
+                        DefaultConflictActionQuestion question = new DefaultConflictActionQuestion(configuration);
+
+                        currentJob.getStatus().ask(question, 1, TimeUnit.HOURS);
+                    }
                 }
             }
         }

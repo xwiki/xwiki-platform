@@ -420,7 +420,7 @@ public class PackageMojo extends AbstractExtensionMojo
             // to disk and will be lost. In practice this means the last Document imported has a
             // very high chance of not making it...
             // TODO: Find a way to implement this generically for all databases and inside
-            // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
+            // XWikiHibernateStore (cf https://jira.xwiki.org/browse/XWIKI-471).
             try {
                 importer.shutdownHSQLDB(xcontext);
             } catch (Exception e) {
@@ -734,7 +734,7 @@ public class PackageMojo extends AbstractExtensionMojo
                 // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
                 // log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
                 // - Exclude batik-js to prevent conflict with the patched version of Rhino used by yuicompressor used
-                // for JSX. See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details.
+                // for JSX. See https://jira.xwiki.org/browse/XWIKI-6151 for more details.
                 new ExcludesArtifactFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
                     "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
 

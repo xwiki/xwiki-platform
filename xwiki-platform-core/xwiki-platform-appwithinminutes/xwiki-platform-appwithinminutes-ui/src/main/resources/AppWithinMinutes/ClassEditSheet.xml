@@ -87,7 +87,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Constants
  *#
-## Magic date used to mark in AWM that the date field is not set for the current entry. See http://jira.xwiki.org/browse/XWIKI-10296
+## Magic date used to mark in AWM that the date field is not set for the current entry. See https://jira.xwiki.org/browse/XWIKI-10296
 #set($MAGIC_DATE = $datetool.toDate('yyyy-MM-dd', '9999-12-31'))
 
 #**
@@ -129,7 +129,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
               ## FIXME2: In the future don't force the text editor type and instead use the default editor. This means
               ## that if the WYSIWYG editor is used, we'll need to convert the HTML into the target syntax so that the
               ## Template in #updateAndSaveTemplate is saved with target syntax and not HTML.
-              ## See http://jira.xwiki.org/browse/XWIKI-13789
+              ## See https://jira.xwiki.org/browse/XWIKI-13789
               &lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;sheet=AppWithinMinutes.ClassEditSheet&amp;field=$escapetool.url($formFieldDoc.fullName)&amp;xeditmode=text")" class="data"/&gt;
             {{/html}}
         #end
@@ -577,7 +577,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 
 #**
  * Handle Date fields that have the "Empty is today" option checked in the class edit form.
- * See http://jira.xwiki.org/browse/XWIKI-10296
+ * See https://jira.xwiki.org/browse/XWIKI-10296
  **#
 #macro(handleEmptyIsTodayDateFields $templateDoc)
   #foreach($property in $doc.xWikiClass.properties)

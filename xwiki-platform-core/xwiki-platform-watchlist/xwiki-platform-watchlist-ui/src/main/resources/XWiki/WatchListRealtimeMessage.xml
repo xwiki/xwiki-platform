@@ -156,7 +156,7 @@
             ## The string returned by XWiki#getUserName() is XML encoded.
             #if ("$!event.authorReference" != '')&lt;a href="$userURL"&gt;#end
               ## Note: We are currently attaching the user's avatar to the current mail. This is now done in the java side, but we should be able to do it
-              ## from the template in the future when http://jira.xwiki.org/browse/XWIKI-10638 gets implemented.
+              ## from the template in the future when https://jira.xwiki.org/browse/XWIKI-10638 gets implemented.
               ###getUserAvatarURL($event.authorReference $avatarURL 30)
               ##&lt;img src="${escapetool.xml($avatarURL.url)}" alt="${xwiki.getUserName($event.author, false)}" /&gt;
               &lt;img src="cid:${event.author}.png" alt="${xwiki.getUserName($event.author, false)}" /&gt;

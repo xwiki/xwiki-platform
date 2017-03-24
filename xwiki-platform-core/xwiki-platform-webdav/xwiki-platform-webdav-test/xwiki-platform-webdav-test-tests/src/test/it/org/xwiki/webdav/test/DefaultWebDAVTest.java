@@ -183,7 +183,7 @@ public class DefaultWebDAVTest extends AbstractWebDAVTest
         assertEquals(newContent, getMethod.getResponseBodyAsString());
         putMethod.setPath(wikiXMLFileUrl);
         putMethod.setRequestEntity(new InputStreamRequestEntity(new ByteArrayInputStream(newContent.getBytes())));
-        // XML saving was disabled recently. See http://jira.xwiki.org/jira/browse/XWIKI-2910
+        // XML saving was disabled recently. See https://jira.xwiki.org/browse/XWIKI-2910
         assertEquals(DavServletResponse.SC_METHOD_NOT_ALLOWED, getHttpClient().executeMethod(putMethod));
         deleteMethod.setPath(pageUrl);
         assertEquals(DavServletResponse.SC_NO_CONTENT, getHttpClient().executeMethod(deleteMethod));

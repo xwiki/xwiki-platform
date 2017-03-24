@@ -46,7 +46,7 @@ function fireContentLoad(contentLoadTriggerId) {
 }
 ##
 ## Remove the @media queries from when Internet Explorer 9 is used.
-## Otherwise, it creates some bugs reported there: http://jira.xwiki.org/browse/XWIKI-11206
+## Otherwise, it creates some bugs reported there: https://jira.xwiki.org/browse/XWIKI-11206
 ## @TODO: Remove this when IE9 will no longer be supported.
 ##
 #if($request.getHeader('User-Agent').contains('MSIE 9.0'))

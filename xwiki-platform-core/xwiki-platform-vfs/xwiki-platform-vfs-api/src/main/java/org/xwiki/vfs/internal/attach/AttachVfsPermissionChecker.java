@@ -35,7 +35,7 @@ import org.xwiki.vfs.VfsResourceReference;
 /**
  * Permission checker for the Attach VFS URI scheme. We check that the current user has view permissions on the page
  * holding the attachment. We need to do this here for the moment because of
- * <a href="http://jira.xwiki.org/browse/XWIKI-12912">this issue</a>.
+ * <a href="https://jira.xwiki.org/browse/XWIKI-12912">this issue</a>.
  *
  * @version $Id$
  * @since 7.4M2

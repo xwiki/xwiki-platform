@@ -346,7 +346,7 @@ public class DefaultModelBridge implements ModelBridge
             // But if the user has voluntary enabled the legacy "parent/child" mechanism for the breadcrumbs, we keep
             // the old behaviour when location and parent/child mechanism were not linked.
             //
-            // More information: http://jira.xwiki.org/browse/XWIKI-13493
+            // More information: https://jira.xwiki.org/browse/XWIKI-13493
             if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
                 DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
                 if (!hierarchicalParent.equals(document.getParentReference())) {

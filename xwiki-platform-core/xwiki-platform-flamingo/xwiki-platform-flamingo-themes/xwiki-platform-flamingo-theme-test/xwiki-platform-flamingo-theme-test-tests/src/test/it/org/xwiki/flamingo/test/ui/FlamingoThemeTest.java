@@ -99,7 +99,7 @@ public class FlamingoThemeTest extends AbstractTest
     private void verifyVariablesCategoriesDoesNotDisappear(EditThemePage editThemePage) throws Exception
     {
         // Because of an incompatibility between PrototypeJS and Bootstrap, the variables categories can disappear
-        // (see: http://jira.xwiki.org/browse/XWIKI-11670).
+        // (see: https://jira.xwiki.org/browse/XWIKI-11670).
         // This test verifies that the bug is still fixed.
         assertEquals(11, editThemePage.getVariableCategories().size());
         // We click on different categories

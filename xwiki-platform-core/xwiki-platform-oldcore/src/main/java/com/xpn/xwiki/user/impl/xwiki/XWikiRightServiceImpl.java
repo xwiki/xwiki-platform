@@ -577,7 +577,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     .equals("XWiki") && docReference.getName().equals("XWikiPreferences")))) {
                 // Since edit rights on these documents would be sufficient for a user to elevate himself to
                 // admin or even programmer, we will instead check for admin access on these documents.
-                // See http://jira.xwiki.org/browse/XWIKI-6987 and http://jira.xwiki.org/browse/XWIKI-2184.
+                // See https://jira.xwiki.org/browse/XWIKI-6987 and https://jira.xwiki.org/browse/XWIKI-2184.
                 accessLevel = "admin";
             }
 

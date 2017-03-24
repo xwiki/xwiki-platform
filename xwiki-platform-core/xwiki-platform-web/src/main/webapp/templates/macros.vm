@@ -2649,7 +2649,7 @@ Recursive title display detected!##
 ### @param exception The exception to format for displaying
 #macro(displayUnhandledException $exception)
   #set ($sentence1 = 'Unexpected error.')
-  #set ($sentence2 = 'Contact your administrator or <a href="http://jira.xwiki.org">report the issue</a>.')
+  #set ($sentence2 = 'Contact your administrator or <a href="https://jira.xwiki.org">report the issue</a>.')
   #set ($sentence3 = 'Click this box to get technical details.')
   #displayException("${sentence1} ${sentence2} ${sentence3}", $exception)
 #end

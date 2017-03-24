@@ -296,9 +296,9 @@ public class XWikiRCSArchive extends Archive
                     // 1) Revision 1.1 doesn't exist. Some time in the past there was a bug in XWiki where version
                     //    were starting at 1.2. When this happens the returned xml has a value of "\n".
                     // 2) A Class property with an invalid XML name was created.
-                    //    See http://jira.xwiki.org/jira/browse/XWIKI-1855
+                    //    See https://jira.xwiki.org/browse/XWIKI-1855
                     // 3) Cannot get the revision as a string from a node version. Not sure why this
-                    //    is happening though... See http://jira.xwiki.org/jira/browse/XWIKI-2076
+                    //    is happening though... See https://jira.xwiki.org/browse/XWIKI-2076
                     LOGGER.warn("Error in revision [" + node.getVersion().toString() + "]: [" + e.getMessage()
                         + "]. Ignoring non-fatal error, the Author, Comment and Date are not set.");
                 }

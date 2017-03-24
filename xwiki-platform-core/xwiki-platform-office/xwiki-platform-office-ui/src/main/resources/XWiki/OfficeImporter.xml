@@ -147,7 +147,7 @@
         ## - "mainPageNameAndNumbering" will create pages called "WebHome-1" instead of "targetDoc/1".
         ## In both cases, the "WebHome" part of the names are meaningless.
         ##
-        ## NOTE: The created children are terminal until http://jira.xwiki.org/browse/XWIKI-12569 is fixed.
+        ## NOTE: The created children are terminal until https://jira.xwiki.org/browse/XWIKI-12569 is fixed.
         &lt;input type="hidden" name="childPagesNamingMethod" value="headingNames" /&gt;
       #else
         &lt;dt&gt;

@@ -21,10 +21,10 @@
   ## This supports the following 2 use cases for non-admin users:
   ## - I'm on a space where I don't have permissions to create pages but I have the right to create pages in the wiki.
   ##   Example: I'm on my user profile which is located in the XWiki space (in which users don't have Edit rights by
-  ##   default). I can see the Create button. See http://jira.xwiki.org/browse/XWIKI-10999
+  ##   default). I can see the Create button. See https://jira.xwiki.org/browse/XWIKI-10999
   ## - I don't have the right to create pages in the wiki but I have the right to create pages under a given hierarchy.
   ##   Example: I'm allowed to create pages only in the Sandbox space and I'm there. I can see the Create button.
-  ##   See http://jira.xwiki.org/browse/XWIKI-13847
+  ##   See https://jira.xwiki.org/browse/XWIKI-13847
   #if ($displayCreateMenu && ($hasCreateSpace || $hasCreatePage))
     #displayCreateButton()
   #end

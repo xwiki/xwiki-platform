@@ -76,7 +76,7 @@ public class WikiDescriptorMigrator extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "http://jira.xwiki.org/browse/XWIKI-10091";
+        return "https://jira.xwiki.org/browse/XWIKI-10091";
     }
 
     @Override

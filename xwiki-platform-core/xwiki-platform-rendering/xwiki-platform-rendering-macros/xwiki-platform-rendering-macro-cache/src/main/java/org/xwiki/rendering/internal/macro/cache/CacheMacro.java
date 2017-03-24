@@ -140,7 +140,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      * <p>
      * Note that whenever a new cache is created it currently means a new thread is used too (since the JBoss cache used
      * underneath uses a thread for evicting entries from the cache). We need to modify our xwiki-cache module to allow
-     * setting time to live on cache items, see http://jira.xwiki.org/jira/browse/XWIKI-5907
+     * setting time to live on cache items, see https://jira.xwiki.org/browse/XWIKI-5907
      * </p>
      *
      * @param lifespan the number of seconds to cache the content

@@ -61,7 +61,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     private static final String DOWNLOADREV_ACTION = "downloadrev";
 
     /**
-     * @TODO: Remove when http://jira.xwiki.org/browse/XWIKI-12449 is implemented
+     * @TODO: Remove when https://jira.xwiki.org/browse/XWIKI-12449 is implemented
      */
     private static final String SKIN_ACTION = "skin";
 

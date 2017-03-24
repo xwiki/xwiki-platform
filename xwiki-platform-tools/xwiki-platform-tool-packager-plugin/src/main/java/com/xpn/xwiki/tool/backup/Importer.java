@@ -110,7 +110,7 @@ public class Importer extends AbstractPackager
         pack.setWithVersions(false);
 
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
-        // See http://jira.xwiki.org/jira/browse/XWIKI-458
+        // See https://jira.xwiki.org/browse/XWIKI-458
         try {
             pack.readFromDir(sourceDirectory, xcontext);
         } catch (IOException e) {
@@ -123,7 +123,7 @@ public class Importer extends AbstractPackager
         // to disk and will be lost. In practice this means the last Document imported has a
         // very high chance of not making it...
         // TODO: Find a way to implement this generically for all databases and inside
-        // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
+        // XWikiHibernateStore (cf https://jira.xwiki.org/browse/XWIKI-471).
         shutdownHSQLDB(xcontext);
 
         disposeXWikiContext(xcontext);

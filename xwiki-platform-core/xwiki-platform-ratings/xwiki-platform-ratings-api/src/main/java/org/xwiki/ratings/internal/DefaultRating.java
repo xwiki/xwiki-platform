@@ -224,7 +224,7 @@ public class DefaultRating implements Rating
             // Force content dirty to false, so that the content update date is not changed when saving the document.
             // This should not be handled there, since it is not the responsibility of this plugin to decide if
             // the content has actually been changed or not since current revision, but the implementation of
-            // this in XWiki core is wrong. See http://jira.xwiki.org/jira/XWIKI-2800 for more details.
+            // this in XWiki core is wrong. See https://jira.xwiki.org/XWIKI-2800 for more details.
             // There is a draw-back to doing this, being that if the document content is being changed before
             // the document is rated, the contentUpdateDate will not be modified. Although possible, this is very
             // unlikely to happen, or to be a use case. The default rating application will use an asynchronous service

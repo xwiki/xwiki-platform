@@ -499,7 +499,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         // Run LESS (which use promises)
         // Note: because of yuicompressor which does not support Promise.prototype.catch() properly, we cannot
         // call p.catch() directly (it generates an error in the logs).
-        // See http://jira.xwiki.org/browse/XWIKI-13772
+        // See https://jira.xwiki.org/browse/XWIKI-13772
         // Instead, we use the following trick: p['catch']()
         // TODO: remove this trick when we replace yuicompressor by something else.
         iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain)['catch'](removeCurtain);

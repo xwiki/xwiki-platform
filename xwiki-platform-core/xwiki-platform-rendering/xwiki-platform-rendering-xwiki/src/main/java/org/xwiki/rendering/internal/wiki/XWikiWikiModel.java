@@ -130,7 +130,7 @@ public class XWikiWikiModel implements WikiModel
      * {@link com.steadystate.css.parser.SACParserCSS2}, affecting other components that require a CSS SAC parser (e.g.
      * PDF export).
      *
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-5625">XWIKI-5625: PDF styling doesn't work anymore</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-5625">XWIKI-5625: PDF styling doesn't work anymore</a>
      */
     private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS21());
 

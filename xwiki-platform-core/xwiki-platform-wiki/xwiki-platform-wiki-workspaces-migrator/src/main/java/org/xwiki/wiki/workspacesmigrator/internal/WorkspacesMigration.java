@@ -126,7 +126,7 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "http://jira.xwiki.org/browse/XWIKI-9738";
+        return "https://jira.xwiki.org/browse/XWIKI-9738";
     }
 
     @Override
@@ -139,7 +139,7 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
     /**
      * The WorkspaceManager.Install script has added a new XWiki.SearchSuggestSourceClass object that we need to remove.
      * If we don't remove it, it will cause a conflict in DW since we have added a new object in the standard
-     * distribution (see http://jira.xwiki.org/browse/XWIKI-9697).
+     * distribution (see https://jira.xwiki.org/browse/XWIKI-9697).
      *
      * @param wikiId id of the wiki where the config should be removed
      */

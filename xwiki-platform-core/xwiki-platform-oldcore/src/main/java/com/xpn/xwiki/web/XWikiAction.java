@@ -624,7 +624,7 @@ public abstract class XWikiAction extends Action
         // This code is already called by struts.
         // However struts will also set all the parameters of the form data
         // directly from the request objects.
-        // However because of bug http://jira.xwiki.org/jira/browse/XWIKI-2422
+        // However because of bug https://jira.xwiki.org/browse/XWIKI-2422
         // We need to perform encoding of windows-1252 chars in ISO mode
         // So we need to make sure this code is called
         // TODO: completely get rid of struts so that we control this part of the code and can reduce drastically the

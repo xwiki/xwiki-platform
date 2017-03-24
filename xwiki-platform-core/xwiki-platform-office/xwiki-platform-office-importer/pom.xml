@@ -79,7 +79,7 @@
         release that includes fixes required by XWiki.
 
         GitHub: https://github.com/xwiki/jodconverter
-        JIRA: http://jira.xwiki.org/browse/XJODC
+        JIRA: https://jira.xwiki.org/browse/XJODC
       -->
       <version>3.1-xwiki</version>
     </dependency>

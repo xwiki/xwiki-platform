@@ -244,7 +244,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
      * {@link AbstractNotifyOnUpdateList}.
      * </p>
      *
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-9013">XWIKI-9013: Multiple Select List values are not correctly
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-9013">XWIKI-9013: Multiple Select List values are not correctly
      *      indexed by Lucene</a>
      */
     @Override

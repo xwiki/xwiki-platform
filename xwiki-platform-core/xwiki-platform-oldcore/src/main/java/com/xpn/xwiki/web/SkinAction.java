@@ -96,7 +96,7 @@ public class SkinAction extends XWikiAction
         // Example 3 (wiki skin attachment or xproperty): .../bin/skin/XWiki/DefaultSkin/somefile.css
         //
         // TODO: The mapping to an Entity URL is hackish and needs to be fixed,
-        // see http://jira.xwiki.org/browse/XWIKI-12449
+        // see https://jira.xwiki.org/browse/XWIKI-12449
 
         // Since we support Nested Spaces, these two examples will be mapped as the following Attachment References:
         // Example 1: skins.flamingo@style\.css

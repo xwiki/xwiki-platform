@@ -103,7 +103,7 @@ public class DefaultHTMLConverter implements HTMLConverter
      * editor. We should use the transformation manager once generic transformation markers are implemented in the
      * rendering module and the WYSIWYG editor supports them.
      * 
-     * @see <a href="http://jira.xwiki.org/browse/XRENDERING-78">XWIKI-3260: Add markers to modified XDOM by
+     * @see <a href="https://jira.xwiki.org/browse/XRENDERING-78">XWIKI-3260: Add markers to modified XDOM by
      * Transformations/Macros</a>
      */
     @Inject

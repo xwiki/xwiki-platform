@@ -68,7 +68,7 @@ public class LinkOfficeCleaningTest extends AbstractHTMLCleaningTest
     }
 
     /**
-     * Test duplicate anchor filtering with TOC structures. see: http://jira.xwiki.org/jira/browse/XWIKI-3415
+     * Test duplicate anchor filtering with TOC structures. see: https://jira.xwiki.org/browse/XWIKI-3415
      */
     @Test
     public void testAnchorFilteringWithTOC()

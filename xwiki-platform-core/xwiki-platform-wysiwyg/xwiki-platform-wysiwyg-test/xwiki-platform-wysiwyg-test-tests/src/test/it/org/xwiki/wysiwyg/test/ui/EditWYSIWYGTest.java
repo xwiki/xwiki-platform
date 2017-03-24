@@ -44,13 +44,13 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
     /**
      * Tests that images are uploaded fine after a preview.
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-5895">XWIKI-5895</a>: Adding an image in the WYSIWYG editor
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-5895">XWIKI-5895</a>: Adding an image in the WYSIWYG editor
      *      and previewing it without saving the page first makes the XWiki page corrupt.
      **/
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testUploadImageAfterPreview() throws Exception
     {
@@ -74,8 +74,8 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
      */
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testBackForwardCache()
     {
@@ -115,8 +115,8 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
      */
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testPreserveUnsavedRichContentAgainstRefresh()
     {
@@ -139,8 +139,8 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
      */
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testPreserveUnsavedSourceAgainstRefresh()
     {
@@ -165,8 +165,8 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
      */
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testPreserveSelectedEditorAgainstRefresh()
     {
@@ -202,8 +202,8 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
      */
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void testUndoRepeatedPaste()
     {
@@ -247,10 +247,10 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
     /**
      * Test that hitting the . (dot) key at the end of a list item does not act as delete.
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-3304">XWIKI-3304</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-3304">XWIKI-3304</a>
      */
     @Test
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146")
     public void testDotAtEndDoesNotDelete()
     {
         EditorElement editor = this.editPage.getContentEditor();

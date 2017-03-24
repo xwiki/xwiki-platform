@@ -34,7 +34,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
  * <p>
- * This filter includes a temporary fix for the JIRA: http://jira.xwiki.org/jira/browse/XWIKI-3262
+ * This filter includes a temporary fix for the JIRA: https://jira.xwiki.org/browse/XWIKI-3262
  * </p>
  * <p>
  * Removes isolated paragraph items from list items.

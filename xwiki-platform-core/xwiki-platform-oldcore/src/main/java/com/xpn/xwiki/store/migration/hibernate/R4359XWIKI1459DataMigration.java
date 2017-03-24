@@ -64,7 +64,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "See http://jira.xwiki.org/jira/browse/XWIKI-1459";
+        return "See https://jira.xwiki.org/browse/XWIKI-1459";
     }
 
     @Override
@@ -108,7 +108,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         // Note that we cannot use NULL since in old databases (prior to 1.1) the
                         // XWD_ARCHIVE column had a not null constraint and since this column has disappeared in 1.2
                         // and after, the hibernate update script will not have modified the nullability of it...
-                        // (see http://jira.xwiki.org/jira/browse/XWIKI-2074).
+                        // (see https://jira.xwiki.org/browse/XWIKI-2074).
                         rs =
                             stmt
                                 .executeQuery(

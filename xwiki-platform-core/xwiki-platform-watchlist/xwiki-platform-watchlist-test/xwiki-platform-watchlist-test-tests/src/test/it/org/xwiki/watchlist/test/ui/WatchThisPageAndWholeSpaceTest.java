@@ -112,8 +112,8 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 
     @Test
     @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See http://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See http://jira.xwiki.org/browse/XE-1177")})
+        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146"),
+        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")})
     public void testWatchThisPageAndWholeSpace() throws Exception
     {
         // Clear the list of watched documents and spaces

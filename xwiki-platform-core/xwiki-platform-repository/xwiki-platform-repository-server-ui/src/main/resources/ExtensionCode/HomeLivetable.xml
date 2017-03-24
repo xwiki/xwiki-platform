@@ -64,7 +64,7 @@
    "rowCount": 30
 })
 ## Only display tags for non Recommended because there's currently a limitation,
-## see http://jira.xwiki.org/browse/XWIKI-13680
+## see https://jira.xwiki.org/browse/XWIKI-13680
 #if (!$useRecommendations || !$isRecommendedView)
   #set ($discard = $options.put('tagCloud', true))
 #else

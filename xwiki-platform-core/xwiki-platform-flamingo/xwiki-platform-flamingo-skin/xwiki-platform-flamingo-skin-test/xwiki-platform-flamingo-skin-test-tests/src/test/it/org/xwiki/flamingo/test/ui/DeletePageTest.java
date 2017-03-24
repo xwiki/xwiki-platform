@@ -136,7 +136,7 @@ public class DeletePageTest extends AbstractTest
     }
 
     @Test
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     public void deletePageIsImpossibleWhenNoDeleteRights()
     {
         // Logs out to be guest and not have the right to delete

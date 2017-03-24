@@ -255,7 +255,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
     /**
      * Verify issue "When loading a revision of a document the creation date is incorrectly set as the last
      * modification date".
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-2029">XWIKI-2029</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-2029">XWIKI-2029</a>
      */
     public void testVerifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
     {

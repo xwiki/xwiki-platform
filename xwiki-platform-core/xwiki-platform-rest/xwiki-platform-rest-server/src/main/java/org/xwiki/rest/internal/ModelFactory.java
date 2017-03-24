@@ -199,7 +199,7 @@ public class ModelFactory
             }
         }
 
-        // TODO: add support for class, see http://jira.xwiki.org/browse/XWIKI-12597
+        // TODO: add support for class, see https://jira.xwiki.org/browse/XWIKI-12597
 
         // TODO: add attachment content to the REST model ?
 

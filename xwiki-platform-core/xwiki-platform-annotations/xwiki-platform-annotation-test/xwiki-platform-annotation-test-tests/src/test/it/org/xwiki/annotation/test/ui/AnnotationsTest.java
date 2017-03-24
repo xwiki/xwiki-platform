@@ -64,8 +64,8 @@ public class AnnotationsTest extends AbstractTest
 
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
     public void addAndDeleteAnnotations()
     {
@@ -96,7 +96,7 @@ public class AnnotationsTest extends AbstractTest
      * are shown This test is against XAANNOTATIONS-17
      */
     @Test
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     public void annotationsShouldNotBeShownInXWiki10Syntax()
     {
         getUtil().deletePage(getTestClassName(), getTestMethodName());

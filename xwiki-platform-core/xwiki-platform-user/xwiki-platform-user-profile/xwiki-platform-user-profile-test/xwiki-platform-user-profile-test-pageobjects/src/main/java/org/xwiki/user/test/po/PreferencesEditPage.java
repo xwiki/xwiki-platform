@@ -73,7 +73,7 @@ public class PreferencesEditPage extends EditPage
 
     public void setTimezone(String value)
     {
-        // See http://jira.xwiki.org/browse/XWIKI-8905
+        // See https://jira.xwiki.org/browse/XWIKI-8905
         // When it's fixed use instead:
         //   Select select = new Select(this.timezone);
         //   select.selectByValue(value);

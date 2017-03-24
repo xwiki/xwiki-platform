@@ -78,7 +78,7 @@ public class DatePropertyTest
     }
 
     /**
-     * Verify that we can set a date that is null (<a href="http://jira.xwiki.org/browse/XWIKI-8837">XWIKI-8837</a>).
+     * Verify that we can set a date that is null (<a href="https://jira.xwiki.org/browse/XWIKI-8837">XWIKI-8837</a>).
      */
     @Test
     public void setValueWithNullDate()

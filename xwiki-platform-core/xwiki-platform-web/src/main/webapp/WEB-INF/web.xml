@@ -123,7 +123,7 @@
   </filter>
   
   <!-- We need this filter because cross domain request for fonts are not allowed if some headers are not set.
-       See http://jira.xwiki.org/browse/XWIKI-11300 for more informations. -->
+       See https://jira.xwiki.org/browse/XWIKI-11300 for more informations. -->
   <filter>
     <filter-name>Set CORS policy for fonts</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>

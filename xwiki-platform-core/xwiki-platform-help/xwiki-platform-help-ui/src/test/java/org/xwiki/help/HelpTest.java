@@ -48,7 +48,7 @@ public class HelpTest extends PageTest
      * The bug we're trying to prevent happening again was that there was that "$subHeading" was rendered when going to
      * the Links section (for example).
      * Note: It was working fine when displaying all sections though.
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-13650">XWIKI-13650</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-13650">XWIKI-13650</a>
      */
     @Test
     public void verifySubHeadingVelocityVariableCorrectlyEvaluatedWhenUsedInSection() throws Exception

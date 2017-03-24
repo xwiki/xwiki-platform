@@ -185,7 +185,7 @@ public class DataMojo extends AbstractImportMojo
         // to disk and will be lost. In practice this means the last Document imported has a
         // very high chance of not making it...
         // TODO: Find a way to implement this generically for all databases and inside
-        // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
+        // XWikiHibernateStore (cf https://jira.xwiki.org/browse/XWIKI-471).
         importer.shutdownHSQLDB(xcontext);
 
         importer.disposeXWikiContext(xcontext);

@@ -49,7 +49,7 @@ public class NumberPropertyTest
 
     /**
      * Verify that we can compare a null valued number property with a non-null valued number property without having a
-     * NPE (<a href="http://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
+     * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
     public void nullValueEqualsWithOtherNumberProperty()
@@ -68,7 +68,7 @@ public class NumberPropertyTest
 
     /**
      * Verify that we can compare a not-null valued number property with a null valued number property without having a
-     * NPE (<a href="http://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
+     * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
     public void notNullValueEqualsWithOtherNullNumberProperty()
@@ -87,7 +87,7 @@ public class NumberPropertyTest
 
     /**
      * Verify that we can compare two null valued number properties without having a NPE (<a
-     * href="http://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
+     * href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
     public void equalNullValueEquals()

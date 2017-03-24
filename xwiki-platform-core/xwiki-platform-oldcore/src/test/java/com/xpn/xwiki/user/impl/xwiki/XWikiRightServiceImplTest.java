@@ -808,7 +808,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
     // This is currently a proof-of-behavior test to show that if a document prevents you from editing
     // it, calling hasAccessLevel('create') on that document will also fail.
     // Changing this behavior is proposed here: http://lists.xwiki.org/pipermail/devs/2013-March/053802.html
-    // See also: http://jira.xwiki.org/browse/XWIKI-8892
+    // See also: https://jira.xwiki.org/browse/XWIKI-8892
     public void testDeniesAccessLevelForCreateIfDocumentDeniesEdit() throws Exception
     {
         getContext().setWikiId(this.user.getWikiName());

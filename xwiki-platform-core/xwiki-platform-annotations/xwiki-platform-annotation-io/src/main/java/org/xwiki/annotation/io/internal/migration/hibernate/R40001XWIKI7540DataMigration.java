@@ -103,7 +103,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "See http://jira.xwiki.org/browse/XWIKI-7540";
+        return "See https://jira.xwiki.org/browse/XWIKI-7540";
     }
 
     @Override
@@ -398,7 +398,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             // StringListProperty and Hibernate gets confused when loading them. The result is that
             // StringListProperty instances are loaded instead of LargeStringProperty and, since we know our
             // classes well in this specific migration, we can just create the LargeStringProperty instances
-            // ourselves from the loaded ones. It might be related to http://jira.xwiki.org/browse/XWIKI-4384
+            // ourselves from the loaded ones. It might be related to https://jira.xwiki.org/browse/XWIKI-4384
             if (deletedProperty instanceof StringListProperty) {
                 // The "author" property was of type User List in AnnotationClass and now it is going to be
                 // String in XWikiComments.

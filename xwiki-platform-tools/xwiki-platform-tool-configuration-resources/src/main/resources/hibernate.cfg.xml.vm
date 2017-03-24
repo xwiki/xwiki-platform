@@ -62,7 +62,7 @@
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
          schema if the same PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache
          prepared statement there's no performance loss by not caching Prepared Statements at the DBCP level.
-         See http://jira.xwiki.org/browse/XWIKI-1740.
+         See https://jira.xwiki.org/browse/XWIKI-1740.
          Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :)
 
          Note 2: The same applies to PostGreSQL.
@@ -187,7 +187,7 @@
            - "jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - "xwiki.virtual_mode" can be set to either "schema" or "database". Note that currently the database mode
-             doesn't support database creation (see http://jira.xwiki.org/browse/XWIKI-8753)
+             doesn't support database creation (see https://jira.xwiki.org/browse/XWIKI-8753)
            - if you want the main wiki database to be different than "xwiki" (or "public" in schema mode)
              you will also have to set the property xwiki.db in xwiki.cfg file
 

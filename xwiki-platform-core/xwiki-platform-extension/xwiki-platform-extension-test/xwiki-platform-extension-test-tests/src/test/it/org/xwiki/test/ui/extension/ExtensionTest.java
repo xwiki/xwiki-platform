@@ -339,7 +339,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         extension.setScm(new DefaultExtensionScm("https://github.com/xwiki-contrib/alice-xar-extension",
             new DefaultExtensionScmConnection("git", "git://github.com/xwiki-contrib/alice-xar-extension.git"),
             new DefaultExtensionScmConnection("git", "git:git@github.com:xwiki-contrib/alice-xar-extension.git")));
-        extension.setIssueManagement(new DefaultExtensionIssueManagement("jira", "http://jira.xwiki.org/browse/ALICE"));
+        extension.setIssueManagement(new DefaultExtensionIssueManagement("jira", "https://jira.xwiki.org/browse/ALICE"));
         getRepositoryTestUtils().addExtension(extension);
 
         // Search the extension and assert the displayed information.

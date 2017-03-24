@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-uiextension-test</artifactId>
   <name>XWiki Platform - UI Extension Extension - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>XWiki Platform - User Interface Extension - Functional Tests</description>
   <properties>
@@ -38,7 +38,7 @@
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <!-- TODO: Remove once http://jira.xwiki.org/jira/browse/XWIKI-7581 is fixed -->
+    <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Override in order to activate the macro transformation required by UI Extensions -->
     <xwikiRenderingTransformations>macro</xwikiRenderingTransformations>

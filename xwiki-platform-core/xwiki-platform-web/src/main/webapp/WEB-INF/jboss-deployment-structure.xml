@@ -38,7 +38,7 @@
       <module name="org.apache.commons.logging" />
 
       <!-- Without this the SLF4J implementation used at runtime is the JBoss one and not the Logback implementation
-           that XWiki expects by default. This leads to http://jira.xwiki.org/browse/XWIKI-7987 -->
+           that XWiki expects by default. This leads to https://jira.xwiki.org/browse/XWIKI-7987 -->
       <module name="org.slf4j" />
       <module name="org.slf4j.impl" />
     </exclusions>

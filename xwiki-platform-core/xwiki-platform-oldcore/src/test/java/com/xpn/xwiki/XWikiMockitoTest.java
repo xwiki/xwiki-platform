@@ -149,7 +149,7 @@ public class XWikiMockitoTest
     /**
      * Verify that attachment versions are not incremented when a document is copied.
      * 
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-8157">XWIKI-8157: The "Copy Page" action adds an extra version
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-8157">XWIKI-8157: The "Copy Page" action adds an extra version
      *      to the attached file</a>
      */
     @Test

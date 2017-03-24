@@ -55,7 +55,7 @@
     <debian.description>
  ${xwiki.debian.description}
     </debian.description>
-    <debian.bugs>http://jira.xwiki.org</debian.bugs>
+    <debian.bugs>https://jira.xwiki.org</debian.bugs>
     <debian.homepage>http://www.xwiki.org</debian.homepage>
   </properties>
   <build>

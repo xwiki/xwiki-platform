@@ -336,7 +336,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         // in the XWiki Context since this is what XWikiAction does and if we don't do this it generates
         // issues since the current doc is put in the context instead of the skin. Specifically we'll
         // get for example "Main.WebHome" as the current doc instead of "Main.flamingo".
-        // See http://jira.xwiki.org/browse/XWIKI-10922 for details.
+        // See https://jira.xwiki.org/browse/XWIKI-10922 for details.
 
         DocumentReference dummyDocumentReference =
             new DocumentReference(wikiId, this.legacySpaceResolver.resolve(spaces), name);

@@ -71,7 +71,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        // TODO: See http://jira.xwiki.org/jira/browse/XWIKI-471. Note that this code currently duplicates
+        // TODO: See https://jira.xwiki.org/browse/XWIKI-471. Note that this code currently duplicates
         // XWikiHibernateBaseStore.shutdownHibernate() which is not public and getting a Store implementation from
         // this component is very difficult since there's no XWikiContext and the store used is defined in xwiki.cfg
         SessionFactory sessionFactory = getSessionFactory();

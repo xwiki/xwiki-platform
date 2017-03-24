@@ -51,7 +51,7 @@ public class R4340XWIKI883DataMigration extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "See http://jira.xwiki.org/jira/browse/XWIKI-883";
+        return "See https://jira.xwiki.org/browse/XWIKI-883";
     }
 
     @Override

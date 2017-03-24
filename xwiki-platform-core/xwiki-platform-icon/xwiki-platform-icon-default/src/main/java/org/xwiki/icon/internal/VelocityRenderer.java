@@ -68,9 +68,9 @@ public class VelocityRenderer
             engine.startedUsingMacroNamespace(namespace);
 
             // Create a new VelocityContext to prevent the code creating variables in the current context.
-            // See http://jira.xwiki.org/browse/XWIKI-11400.
+            // See https://jira.xwiki.org/browse/XWIKI-11400.
             // We set the current context as inner context of the new one to be able to read existing variables.
-            // See http://jira.xwiki.org/browse/XWIKI-11426.
+            // See https://jira.xwiki.org/browse/XWIKI-11426.
             VelocityContext context = new VelocityContext(velocityManager.getVelocityContext());
 
             // Render the code

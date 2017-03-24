@@ -326,7 +326,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     stmt.execute("CREATE SCHEMA " + escapedSchema);
                 } else {
                     this.logger.error("Creation of a new database is currently only supported in the schema mode, "
-                        + "see http://jira.xwiki.org/browse/XWIKI-8753");
+                        + "see https://jira.xwiki.org/browse/XWIKI-8753");
                 }
             } else {
                 stmt.execute("create database " + escapedSchema);

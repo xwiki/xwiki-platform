@@ -1126,7 +1126,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Note: We are currently duplicating code from getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
         // document's context. For example this is true for the Admin page, see
-        // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
+        // https://jira.xwiki.org/browse/XWIKI-4274 for more details.
 
         getProgress().startStep(this, "document.progress.render", "Render document [{}] in syntax [{}]",
             getDocumentReference(), targetSyntax);

@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Component that remove SearchSuggestConfig objects that was previously added by WorkspaceManager.Install.
  * If we don't remove them, it will cause a conflict in DW since we have added a new object in the standard
- * distribution (see http://jira.xwiki.org/browse/XWIKI-9697).
+ * distribution (see https://jira.xwiki.org/browse/XWIKI-9697).
  *
  * @since 5.3RC1
  * @version $Id$

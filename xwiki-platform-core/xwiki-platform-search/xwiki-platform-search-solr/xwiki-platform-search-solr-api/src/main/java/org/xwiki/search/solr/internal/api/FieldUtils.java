@@ -82,7 +82,7 @@ public final class FieldUtils
      * @deprecated since 7.2, use {@link #SPACES} instead; the problem with this field is that the standard tokenizer
      *             doesn't split around dots, and even if it did, it would also split around escaped dots (e.g.
      *             {@code A.B\.1.C}) which is not what we want.
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-12594">XWIKI-12594: The path of a nested document is not
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-12594">XWIKI-12594: The path of a nested document is not
      *      properly matched</a>
      */
     @Deprecated

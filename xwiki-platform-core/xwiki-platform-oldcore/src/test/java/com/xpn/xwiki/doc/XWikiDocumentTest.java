@@ -325,7 +325,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     /**
      * Verify that if we have sections nested in groups, they are not taken into account when computing document
-     * sections by number. See <a href="http://jira.xwiki.org/browse/XWIKI-6195">XWIKI-6195</a>.
+     * sections by number. See <a href="https://jira.xwiki.org/browse/XWIKI-6195">XWIKI-6195</a>.
      *
      * @since 5.0M1
      */

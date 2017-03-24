@@ -72,7 +72,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "http://jira.xwiki.org/browse/XWIKI-9516";
+        return "https://jira.xwiki.org/browse/XWIKI-9516";
     }
 
     @Override

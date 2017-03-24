@@ -698,7 +698,7 @@ public class XWikiDocumentMockitoTest
      * Verify that setting a new creator will create a new revision (we verify that that metadata dirty flag is set to
      * true).
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
     public void testSetCreatorReferenceSetsMetadataDirtyFlag()
@@ -716,7 +716,7 @@ public class XWikiDocumentMockitoTest
      * Verify that setting a new creator that is the same as the currenet creator doesn't create a new revision (we
      * verify that the metadata dirty flag is not set).
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
     public void testSetCreatorReferenceWithSameCreatorDoesntSetMetadataDirtyFlag()
@@ -736,7 +736,7 @@ public class XWikiDocumentMockitoTest
      * Verify that setting a new author will create a new revision (we verify that that metadata dirty flag is set to
      * true).
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
     public void testSetAuthorReferenceSetsMetadataDirtyFlag()
@@ -754,7 +754,7 @@ public class XWikiDocumentMockitoTest
      * Verify that setting a new author that is the same as the currenet creator doesn't create a new revision (we
      * verify that the metadata dirty flag is not set).
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
     public void testSetAuthorReferenceWithSameAuthorDoesntSetMetadataDirtyFlag()
@@ -774,7 +774,7 @@ public class XWikiDocumentMockitoTest
      * Verify that setting a new content author will create a new revision (we verify that that metadata dirty flag is
      * set to true).
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
     public void testSetContentAuthorReferenceSetsMetadataDirtyFlag()
@@ -792,7 +792,7 @@ public class XWikiDocumentMockitoTest
      * Verify that setting a new content author that is the same as the currenet creator doesn't create a new revision
      * (we verify that the metadata dirty flag is not set).
      * 
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-7445">XWIKI-7445</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-7445">XWIKI-7445</a>
      */
     @Test
     public void testSetContentAuthorReferenceWithSameContentAuthorDoesntSetMetadataDirtyFlag()
@@ -1301,8 +1301,8 @@ public class XWikiDocumentMockitoTest
     }
 
     /**
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-6743">XWIKI-6743</a>
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-12349">XWIKI-12349</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-6743">XWIKI-6743</a>
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-12349">XWIKI-12349</a>
      */
     @Test
     public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
@@ -1367,7 +1367,7 @@ public class XWikiDocumentMockitoTest
     @Test
     public void tofromXMLDocument() throws XWikiException
     {
-        // equals won't work on password fields because of http://jira.xwiki.org/browse/XWIKI-12561
+        // equals won't work on password fields because of https://jira.xwiki.org/browse/XWIKI-12561
         this.baseObject.removeField("passwd");
         this.baseObject2.removeField("passwd");
 

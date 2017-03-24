@@ -68,7 +68,7 @@ public class WikiTemplateMigration extends AbstractHibernateDataMigration
     @Override
     public String getDescription()
     {
-        return "http://jira.xwiki.org/browse/XWIKI-9934";
+        return "https://jira.xwiki.org/browse/XWIKI-9934";
     }
 
     @Override

@@ -53,7 +53,7 @@ public class TableFilter extends AbstractHTMLFilter
                 replaceWithChildren(paragraphs.get(0));
             }
         }
-        // Strip off empty table rows. See http://jira.xwiki.org/jira/browse/XWIKI-3136.
+        // Strip off empty table rows. See https://jira.xwiki.org/browse/XWIKI-3136.
         List<Element> emptyRows =
             filterDescendants(document.getDocumentElement(), new String[] {TAG_TR}, new ElementSelector()
             {

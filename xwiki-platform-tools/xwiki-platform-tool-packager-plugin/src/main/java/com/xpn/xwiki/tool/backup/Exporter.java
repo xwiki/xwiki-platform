@@ -53,7 +53,7 @@ public class Exporter extends AbstractPackager
         pack.addAllWikiDocuments(xcontext);
 
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
-        // See http://jira.xwiki.org/jira/browse/XWIKI-458
+        // See https://jira.xwiki.org/browse/XWIKI-458
         try {
             pack.exportToDir(exportDirectory, xcontext);
         } catch (IOException e) {

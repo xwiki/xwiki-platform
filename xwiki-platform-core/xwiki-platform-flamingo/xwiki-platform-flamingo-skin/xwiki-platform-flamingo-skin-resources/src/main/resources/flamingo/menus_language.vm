@@ -14,7 +14,7 @@
       #set ($discard = $additionallangs.add($lang))
     #end
   #end
-  ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
+  ## Get the query string as a map to preserve the values except the language (see: https://jira.xwiki.org/browse/XWIKI-11314)
   #set($queryStringMap = {})
   #set($discard = $queryStringMap.putAll($request.parameterMap))
   #set($discard = $queryStringMap.put('language', $currentLanguage))

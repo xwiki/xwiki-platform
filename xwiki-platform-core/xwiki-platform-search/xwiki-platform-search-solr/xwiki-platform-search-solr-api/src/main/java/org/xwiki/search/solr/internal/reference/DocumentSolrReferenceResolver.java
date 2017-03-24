@@ -93,7 +93,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
 
             // FIXME: Assumption - Only original documents contain objects and attachments, because objects are
             // not translatable.
-            // http://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
+            // https://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
             if (documentReference.getLocale() == null || documentReference.getLocale().equals(Locale.ROOT)) {
                 XWikiDocument document;
                 try {

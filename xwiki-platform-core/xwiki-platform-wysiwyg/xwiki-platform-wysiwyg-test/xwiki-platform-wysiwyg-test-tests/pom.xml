@@ -30,11 +30,11 @@
   <artifactId>xwiki-platform-wysiwyg-test-tests</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Tests - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>XWiki Platform - WYSIWYG Editor - Tests - Functional Tests</description>
   <properties>
-    <!-- TODO: Remove once http://jira.xwiki.org/jira/browse/XWIKI-7581 is fixed -->
+    <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

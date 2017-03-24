@@ -112,7 +112,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         // * the requested URL doesn't point to a zip file
         // * or the request URL doesn't point to a file inside a zip file
         // * or if the passed attachment points to a Nested Space. This is because currently the Zip Explorer plugin
-        //   doesn't support Nested Spaces (See http://jira.xwiki.org/browse/XWIKI-12448).
+        //   doesn't support Nested Spaces (See https://jira.xwiki.org/browse/XWIKI-12448).
         if (attachment.getReference().getDocumentReference().getSpaceReferences().size() > 1
             || !isValidZipURL(url, context.getAction().trim()))
         {
@@ -271,7 +271,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      *         doesn't point inside a zip file.
      */
     // TODO: There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL manipulation. Once
-    // this exists remove this code. See http://jira.xwiki.org/jira/browse/XWIKI-437
+    // this exists remove this code. See https://jira.xwiki.org/browse/XWIKI-437
     protected String getFileLocationFromZipURL(String url, String action)
     {
         String path = url.substring(url.indexOf(URL_SEPARATOR + action));
@@ -333,7 +333,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         boolean isValidZipURL = false;
         try {
             // TODO: There shouldn't be the need to do a trim() on an Action. Actually actions
-            // should be enumerated types. See http://jira.xwiki.org/jira/browse/XWIKI-436
+            // should be enumerated types. See https://jira.xwiki.org/browse/XWIKI-436
             String filenameInZip = getFileLocationFromZipURL(url, action);
 
             // TODO: Ideally we should also check to see if the URL points to a file and not to

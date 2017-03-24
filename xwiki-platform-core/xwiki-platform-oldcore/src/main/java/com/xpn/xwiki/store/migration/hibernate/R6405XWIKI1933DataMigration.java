@@ -45,7 +45,7 @@ public class R6405XWIKI1933DataMigration extends R4340XWIKI883DataMigration
     @Override
     public String getDescription()
     {
-        return "See http://jira.xwiki.org/jira/browse/XWIKI-1933";
+        return "See https://jira.xwiki.org/browse/XWIKI-1933";
     }
 
     @Override

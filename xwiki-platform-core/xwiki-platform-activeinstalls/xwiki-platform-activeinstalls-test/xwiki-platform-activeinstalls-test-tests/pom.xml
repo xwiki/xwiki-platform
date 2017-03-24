@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-activeinstalls-test-tests</artifactId>
   <name>XWiki Platform - Active Installs - Tests - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Tests for the Active Installs feature</description>
   <properties>

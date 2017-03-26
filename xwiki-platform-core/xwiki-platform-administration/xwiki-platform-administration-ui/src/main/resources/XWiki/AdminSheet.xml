@@ -291,7 +291,7 @@
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     &lt;div class="panel panel-default"&gt;
       &lt;a class="panel-heading#if (!$isActive) collapsed#end" role="tab" id="$escapedId"
-        href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id"#end
+        href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
         data-target="#${escapedId}-body" aria-expanded="$isActive" aria-controls="${escapedId}-body"
         &gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
       &lt;div id="${escapedId}-body" class="panel-collapse collapse#if ($isActive) in#end"

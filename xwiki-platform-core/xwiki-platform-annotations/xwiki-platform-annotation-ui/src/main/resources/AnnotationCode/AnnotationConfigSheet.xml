@@ -45,9 +45,7 @@
 #set ($configObject = $annotationsConfigDoc.getObject($annotationsConfigClassName))
 ## FIXME: The class is currently stored in the same document as the configuration.
 #set ($annotationsConfigClass = $annotationsConfigDoc.xWikiClass)
-
 #set ($discard = $xwiki.jsx.use('AnnotationCode.AnnotationConfigSheet'))
-
 {{html clean='false'}}
 ## Keep the xform div separate from the form since in inline edit mode (when editing the config doc manually), the form is removed.
 &lt;div class="xform"&gt;
@@ -66,7 +64,11 @@
 
     &lt;dt&gt;
       &lt;label for="AnnotationCode.AnnotationConfig_0_activated"&gt;
-        {{/html}}{{html wiki="true" clean="false"}}$annotationsConfigDoc.display('activated', 'edit'){{/html}}{{html clean="false"}}
+{{/html}}
+
+$annotationsConfigDoc.display('activated', 'edit')
+
+{{html clean="false"}}
         $escapetool.xml($annotationsConfigClass.get('activated').prettyName)
       &lt;/label&gt;
       &lt;span class="xHint"&gt;
@@ -93,9 +95,7 @@
             value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
 {{/html}}
 
-{{html wiki='true' clean='false'}}
-        {{documentTree showTerminalDocuments='false' checkboxes='true' links='false' showTranslations='false' showAttachments='false' /}}
-{{/html}}
+{{documentTree showTerminalDocuments='false' checkboxes='true' links='false' showTranslations='false' showAttachments='false' /}}
 
 {{html clean='false'}}
     &lt;/dd&gt;
@@ -108,7 +108,11 @@
 
     &lt;dt&gt;
       &lt;label for="AnnotationCode.AnnotationConfig_0_displayed"&gt;
-        {{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayed', 'edit'){{/html}}{{html clean='false'}}
+{{/html}}
+
+$annotationsConfigDoc.display('displayed', 'edit')
+
+{{html clean='false'}}
         $escapetool.xml($annotationsConfigClass.get('displayed').prettyName)
       &lt;/label&gt;
       &lt;span class="xHint"&gt;
@@ -119,7 +123,11 @@
 
     &lt;dt&gt;
       &lt;label for="AnnotationCode.AnnotationConfig_0_displayHighlight"&gt;
-        {{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayHighlight', 'edit'){{/html}}{{html clean='false'}}
+{{/html}}
+
+$annotationsConfigDoc.display('displayHighlight', 'edit')
+
+{{html clean='false'}}
         $escapetool.xml($annotationsConfigClass.get("displayHighlight").prettyName)
       &lt;/label&gt;
       &lt;span class="xHint"&gt;
@@ -141,7 +149,11 @@
       &lt;/label&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      {{/html}}{{html wiki="true" clean="false"}}$annotationsConfigDoc.display('annotationClass', 'edit'){{/html}}{{html clean="false"}}
+{{/html}}
+
+$annotationsConfigDoc.display('annotationClass', 'edit')
+
+{{html clean="false"}}
     &lt;/dd&gt;
   &lt;/dl&gt;
 

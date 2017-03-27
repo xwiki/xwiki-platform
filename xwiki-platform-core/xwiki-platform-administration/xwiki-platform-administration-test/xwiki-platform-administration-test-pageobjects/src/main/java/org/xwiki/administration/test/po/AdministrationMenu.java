@@ -42,7 +42,7 @@ public class AdministrationMenu extends BaseElement
 
     private By categoryById(String categoryId)
     {
-        return By.cssSelector("a.panel-heading[id='" + categoryId + "']");
+        return By.cssSelector("a[id='panel-heading-" + categoryId + "']");
     }
 
     public WebElement getCategoryByName(String categoryName)

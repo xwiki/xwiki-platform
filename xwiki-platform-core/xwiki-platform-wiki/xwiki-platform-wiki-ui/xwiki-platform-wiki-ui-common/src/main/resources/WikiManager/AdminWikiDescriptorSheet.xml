@@ -86,10 +86,10 @@
     ##
     ## Display the UI.
     ##
-    $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+    #set ($discard = $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true))
     #if ($doc.documentReference.name != $sheetDocName)
-      $xwiki.jsx.use($sheetDocFullName)
-      $xwiki.ssx.use($sheetDocFullName)
+      #set ($discard = $xwiki.jsx.use($sheetDocFullName))
+      #set ($discard = $xwiki.ssx.use($sheetDocFullName))
     #end
     {{html}}
     &lt;div class='xform'&gt;

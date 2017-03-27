@@ -47,14 +47,14 @@
   #set ($jsObj = $analyticsCodeDoc.getObject('XWiki.JavaScriptExtension'))
   #set ($discard = $analyticsObj.set('account', $!account))
   #set ($discard = $analyticsObj.set('method', $!method))
-  $analyticsConfigDoc.save()
+  #set ($discard = $analyticsConfigDoc.save())
   #if ("$!jsObj" != "")
     #if ("$!account" != "")
       #set ($discard = $jsObj.set('use', 'always'))
     #else
       #set ($discard = $jsObj.set('use', 'onDemand'))
     #end
-    $analyticsCodeDoc.save()
+    #set ($discard = $analyticsCodeDoc.save())
   #end
 #end
 
@@ -78,19 +78,19 @@
   $response.sendRedirect($xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=analytics'))
 #end
 #set ($analyticsConfigDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsConfig'))
-#set ($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))##
-#set ($analyticsObj = $analyticsConfigDoc.getObject('XWiki.GoogleAnalyticsCode', true))##
-#set ($analyticsCodeClass = $analyticsCodeDoc.xWikiClass)##
-#set ($accountPropertyClass = $analyticsCodeClass.account)##
-#set ($methodPropertyClass = $analyticsCodeClass.method)##
-#if ($hasAdmin)##
-  #if ($request.action == 'save')##
-    #saveGoogleAccount($request.analytics_account $request.analytics_method)##
-  #end## save action
-#else## !hasAdmin
+#set ($analyticsCodeDoc = $xwiki.getDocument('XWiki.GoogleAnalyticsCode'))
+#set ($analyticsObj = $analyticsConfigDoc.getObject('XWiki.GoogleAnalyticsCode', true))
+#set ($analyticsCodeClass = $analyticsCodeDoc.xWikiClass)
+#set ($accountPropertyClass = $analyticsCodeClass.account)
+#set ($methodPropertyClass = $analyticsCodeClass.method)
+#if ($hasAdmin)
+  #if ($request.action == 'save')
+    #saveGoogleAccount($request.analytics_account $request.analytics_method)
+  #end
+#else
   {{error}}{{translation key="needadminrights"/}}.{{/error}}
-#end##
 
+#end
 {{html clean="false"}}
 &lt;form action="$xwiki.relativeRequestURL" method="post" class="xform"&gt;
   &lt;dl&gt;
@@ -101,7 +101,11 @@
       &lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      {{/html}}#displayAnalyticsStatus(){{html clean="false"}}
+{{/html}}
+
+#displayAnalyticsStatus()
+
+{{html clean="false"}}
     &lt;/dd&gt;
     &lt;dt&gt;
       &lt;label for="analytics_method"&gt;$!methodPropertyClass.translatedPrettyName&lt;/label&gt;

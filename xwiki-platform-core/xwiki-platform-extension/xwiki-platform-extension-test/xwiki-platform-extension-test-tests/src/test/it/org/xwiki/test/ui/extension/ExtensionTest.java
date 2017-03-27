@@ -369,7 +369,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Install the extension to check the details that are specific to installed extensions.
         Date beforeInstall = new Date();
-        descriptionPane = extensionPane.install().confirm().confirm().openDescriptionSection();
+        descriptionPane = extensionPane.install().confirm().openDescriptionSection();
         Date afterInstall = new Date();
 
         List<String> namespaces = descriptionPane.getNamespaces();

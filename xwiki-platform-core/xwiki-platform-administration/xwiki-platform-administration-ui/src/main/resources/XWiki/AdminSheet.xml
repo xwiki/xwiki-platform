@@ -379,33 +379,30 @@
     'translationPrefix': 'admin.',
     'cssClass': 'admin-menu'
   })
+
   ##-----------------------------------------
   ## admin-page display
   ##-----------------------------------------
     #if(!$crtSection &amp;&amp; !$crtCategory)
-      #admin_displayCategories($adminMenu 'admin.')
+      #admin_displayCategories($adminMenu)
     #elseif (!$crtSection)
-      #admin_displayCategory($crtCategory.children 'admin.')
+      #admin_displayCategory($crtCategory.children)
     #else
       (% id="admin-page-content" %)(((
         ##------------------------------------------------------------------------------------------------------------
         ## The Administration allows editing other pages from different applications inside the admin context (UI)
         ##------------------------------------------------------------------------------------------------------------
-        #if("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
-          $xcontext.setDisplayMode('edit')##
-
+        #if ("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
+          #set ($discard = $xcontext.setDisplayMode('edit'))
           {{html clean="false"}}{{include reference="XWiki.AdminInlineSheet" /}}{{/html}}
-        #else
-          #if($xwiki.exists("XWiki.Admin${section}Sheet"))
-            ## Custom XE administration section
-
-            {{include reference="XWiki.Admin${section}Sheet" /}}
-
-          #elseif($xwiki.exists($section))
-            {{html clean="false"}}#includeForm($section){{/html}}
-          #end
+        #elseif ($xwiki.exists("XWiki.Admin${section}Sheet"))
+          ## Custom XE administration section
+          {{include reference="XWiki.Admin${section}Sheet" /}}
+        #elseif ($xwiki.exists($section))
+          {{html clean="false"}}#includeForm($section){{/html}}
         #end
         #if ($crtSection.configurable)
+
           {{include reference="XWiki.ConfigurableClass" /}}
         #end
       ))) ## admin-page-content
@@ -787,11 +784,27 @@
     <property>
       <code>#template('colorThemeInit.vm')
 
-#document-title {
+#admin-page-content h2.wikigeneratedheader,
+#admin-page-content .xform h2 {
+  border-bottom: 1px solid $theme.borderColor;
+  font-size: 150%;
+  line-height: inherit;
   margin-bottom: 1em;
 }
 
-/*******************************************************/
+#admin-page-content h2.wikigeneratedheader:first-of-type,
+#admin-page-content .xform h2:first-of-type {
+  margin-top: 0;
+}
+
+#admin-page-content label &gt; input[type="checkbox"],
+#admin-page-content label &gt; input[type="radio"] {
+  vertical-align: bottom;
+}
+
+/**
+ * Category Overview
+ */
 
 .admin-category {
   list-style: none outside none;
@@ -822,14 +835,14 @@
   display: block;
 }
 
+/**
+ * Users &amp; Rights
+ */
+
 /* Override general table styles. */
 /* TODO: Move to livetable.css */
 
 #userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
-  border-color: transparent;
-}
-
-#userstable, #groupstable, #usersandgroupstable, #alldocstable {
   border-color: transparent;
 }
 
@@ -854,6 +867,11 @@
 /**
  * Bootstrap's Accordion Menu
  */
+
+.admin-menu {
+  /* Align the menu with the page title. */
+  padding-left: 0;
+}
 
 .admin-menu .panel-heading.collapsed {
   border-bottom-left-radius: 3px;

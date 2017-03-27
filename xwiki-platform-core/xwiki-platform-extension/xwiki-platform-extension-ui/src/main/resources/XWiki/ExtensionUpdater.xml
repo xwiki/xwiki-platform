@@ -42,9 +42,6 @@
   <content>{{template name="extension.vm" output="false"/}}
 
 {{velocity}}
-(% class="noitems" %)
-{{translation key="extension.updater.hint" /}}
-
 {{html}}
 #if ($isAjaxRequest)
   #if ($request.extensionId)

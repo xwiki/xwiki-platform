@@ -42,9 +42,6 @@
   <content>{{template name="extensionHistory.vm" output="false"/}}
 
 {{velocity}}
-(% class="noitems" %)
-{{translation key="extension.history.hint" /}}
-
 {{html clean="false"}}
 #if ($request.extensionId &amp;&amp; ($request.extensionVersion || $request.extensionVersionConstraint))
   #handleExtensionRequest

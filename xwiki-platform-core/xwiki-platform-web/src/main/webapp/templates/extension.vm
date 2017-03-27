@@ -47,7 +47,7 @@
               $services.localization.render('extensions.search.repository.remote.label')
             </option>
             ## Recommended extensions repository (default)
-            <option value="recommended"#if ($selectedRepositoryId == 'recommended') selected="selected"#end">
+            <option value="recommended"#if ($selectedRepositoryId == 'recommended') selected="selected"#end>
               $services.localization.render("extensions.search.repository.recommended.label")
             </option>
           </optgroup>

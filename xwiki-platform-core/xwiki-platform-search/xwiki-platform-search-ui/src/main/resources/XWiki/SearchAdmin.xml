@@ -46,12 +46,11 @@
 #set ($availableSearchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortById' : ''}))
 {{html wiki='true'}}
 &lt;form id='search_XWiki.SearchConfig' method='post' action="${searchConfigDoc.getURL('save')}" class='xform'&gt;
+  &lt;div class="hidden"&gt;
+    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type='hidden' name='xredirect' value="$doc.getURL($xcontext.action, $!{request.queryString})" /&gt;
+  &lt;/div&gt;
   &lt;dl&gt;
-    &lt;dt&gt;
-      &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input type='hidden' name='xredirect' value="$doc.getURL($xcontext.action, $!{request.queryString})" /&gt;
-    &lt;/dt&gt;
-
     &lt;dt&gt;
       &lt;label&gt;$searchEnginePropertyClass.translatedPrettyName&lt;/label&gt;
       &lt;span class='xHint'&gt;$services.localization.render('search.admin.configuration.seexwikicfg')&lt;/span&gt;

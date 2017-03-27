@@ -48,6 +48,23 @@ administration.sectionTitle.page=Page Administration: {0}
 administration.sectionTitle.wiki=Wiki Administration: {0}
 administration.sectionTitle.global=Global Administration: {0}
 
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.
+XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
+XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
+XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
+XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
+
+XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
+XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
+XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
+XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
+XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
+XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
+XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+
 # Look &amp; Feel Sections
 admin.themes=Themes
 admin.themes.description=Customize the color and icon themes.

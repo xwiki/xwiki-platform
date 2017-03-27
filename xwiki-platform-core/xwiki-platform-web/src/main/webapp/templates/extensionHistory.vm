@@ -32,6 +32,7 @@
     #set ($discard = $xwiki.ssfx.use('uicomponents/extension/history.css', true))
     #set ($discard = $xwiki.jsfx.use('uicomponents/extension/history.js'))
     <div class="extension-history">
+      <p class="noitems">$escapetool.xml($services.localization.render('extension.history.hint'))</p>
       #displayCurrentJobInfo
       #displayExtensionHistorySourcesForm
       #maybeDisplayExtensionHistoryRecordsForm
@@ -212,10 +213,10 @@
     <div class="extension-history-records-form">
       <ul class="extension-history-records">
         <li class="extension-history-record">
-          <div class="box infomessage">
+          <span class="box infomessage">
             $services.icon.renderHTML('info')
             $services.localization.render('extension.history.noRecords')
-          </div>
+          </span>
         </li>
       </ul>
     </div>
@@ -400,7 +401,7 @@
   #end
   #set ($records = $services.extension.history.createReplayPlan($records, $preserveUsers, $namespaces))
   #getExtensionHistoryURL($replayPlanSubmitURL 'get' {})
-  <form method="post" action="$replayPlanSubmitURL" class="extension-history-replay-plan">
+  <form method="post" action="$replayPlanSubmitURL" class="extension-history-replay-plan xform">
     <h2>$services.localization.render('extension.history.replayPlan.title')</h2>
     #if ($records && $records.size() > 0)
       <div class="hidden">
@@ -464,7 +465,9 @@
   #getExtensionHistoryURL($extensionHistoryURL 'get' {})
   <div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"
       data-extensionHistoryURL="$extensionHistoryURL">
-    <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
+    <h2 class="wikigeneratedheader">
+      $services.localization.render('extension.history.replayStatus.title')
+    </h2>
     <div class="xHint">
       $services.localization.render('extension.history.replayStatus.hint',
         [$xwiki.getUserName($userReference), $xwiki.formatDate($replayJobStatus.startDate)])

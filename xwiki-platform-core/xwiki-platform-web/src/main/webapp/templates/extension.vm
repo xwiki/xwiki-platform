@@ -1708,6 +1708,9 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   #if (!$isAjaxRequest)
     ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
     #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
+    <p class="noitems">
+      $escapetool.xml($services.localization.render('extension.updater.hint'))
+    </p>
     #displayExtensionUpdaterTrigger($plan)
   #end
   <div class="extensionUpdater">

@@ -83,9 +83,7 @@ $annotationsConfigDoc.display('activated', 'edit')
       #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
     #end
     &lt;dt&gt;
-      &lt;label for="AnnotationCode.AnnotationConfig_0_exceptionSpaces"&gt;
-        $escapetool.xml($annotationsConfigClass.get("exceptionSpaces").prettyName)
-      &lt;/label&gt;
+      &lt;label&gt;$escapetool.xml($annotationsConfigClass.get("exceptionSpaces").prettyName)&lt;/label&gt;
       &lt;span class="xHint"&gt;
         $escapetool.xml($services.localization.render('AnnotationCode.AnnotationConfig_exceptionSpaces.hint'))
       &lt;/span&gt;

@@ -73,7 +73,7 @@
   #end
   &lt;li class="source"&gt;
     &lt;div class="$style"&gt;
-      &lt;img class="icon" src="$!icon" /&gt;
+      &lt;img class="icon" src="$!icon" alt="" /&gt;
       &lt;span class="limit"&gt;$!source.getProperty('resultsNumber').value&lt;/span&gt;
       &lt;span class="name"&gt;$!name&lt;/span&gt;
       #if ($editing)

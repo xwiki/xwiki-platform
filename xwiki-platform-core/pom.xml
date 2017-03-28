@@ -194,43 +194,6 @@
                   }
                 },
                 "ignore" : [
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "field org.xwiki.rest.model.jaxb.JobStatus.id",
-                    "new": "field org.xwiki.rest.model.jaxb.JobStatus.id",
-                    "annotationType": "javax.xml.bind.annotation.XmlElement",
-                    "elementKind": "annotation",
-                    "justification": "Not a breakage from REST API point of view"
-                  },
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "field org.xwiki.rest.model.jaxb.JobStatus.progress",
-                    "new": "field org.xwiki.rest.model.jaxb.JobStatus.progress",
-                    "annotationType": "javax.xml.bind.annotation.XmlElement",
-                    "elementKind": "annotation",
-                    "justification": "Not a breakage from REST API point of view"
-                  },
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "class org.xwiki.rest.model.jaxb.JobStatus",
-                    "new": "class org.xwiki.rest.model.jaxb.JobStatus",
-                    "attribute": "propOrder",
-                    "oldValue": "{\"id\", \"state\", \"progress\", \"startDate\", \"endDate\"}",
-                    "newValue": "{\"id\", \"request\", \"state\", \"progress\", \"log\", \"startDate\", \"endDate\"}",
-                    "annotationType": "javax.xml.bind.annotation.XmlType",
-                    "elementKind": "annotation",
-                    "justification": "Not a breakage from REST API point of view"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method org.xwiki.rest.model.jaxb.JobStatus org.xwiki.rest.resources.job.JobStatusResource::getJobStatus(java.lang.String) throws org.xwiki.rest.XWikiRestException",
-                    "new": "method org.xwiki.rest.model.jaxb.JobStatus org.xwiki.rest.resources.job.JobStatusResource::getJobStatus(java.lang.String, boolean, boolean, boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException",
-                    "package": "org.xwiki.rest.resources.job",
-                    "classSimpleName": "JobStatusResource",
-                    "methodName": "getJobStatus",
-                    "elementKind": "method",
-                    "justification": "Not a breakage from REST API point of view"
-                  },
                 ]
               }
             }

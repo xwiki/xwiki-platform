@@ -571,7 +571,7 @@
 }
 #admin-page-content.visible &gt; form,
 #admin-page-content.visible &gt; .codeToExecute {
-  display: initial;
+  display: block;
 }
 
 .tab-content .ckeditor-config {

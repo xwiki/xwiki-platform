@@ -173,7 +173,7 @@ require.config({
 });
 
 require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPromise) {
-  $('.btn-danger[data-confirmation]').click(function(event) {
+  $('.btn-default[data-confirmation]').click(function(event) {
     if (!window.confirm($(this).attr('data-confirmation'))) {
       event.preventDefault();
     }

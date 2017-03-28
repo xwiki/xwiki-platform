@@ -569,7 +569,7 @@
   display: none;
 }
 #admin-page-content .codeToExecute &gt; form#wysiwyg {
-  display: initial;
+  display: block;
 }</code>
     </property>
     <property>

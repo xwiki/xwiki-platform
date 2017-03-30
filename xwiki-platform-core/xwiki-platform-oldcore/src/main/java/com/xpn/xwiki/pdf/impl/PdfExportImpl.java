@@ -162,19 +162,18 @@ public class PdfExportImpl implements PdfExport
 
         if (configuration != null) {
             // Get a writable configuration instance
-            DefaultConfiguration writableConfiguration = null;
-            if (configuration instanceof DefaultConfiguration) {
-                writableConfiguration = (DefaultConfiguration) configuration;
-            } else {
+            if (!(configuration instanceof DefaultConfiguration)) {
                 try {
-                    writableConfiguration = new DefaultConfiguration(configuration, true);
+                    configuration = new DefaultConfiguration(configuration, true);
                 } catch (ConfigurationException e) {
                     // Should never happen
                     LOGGER.error("Failed to copy configuration", e);
                 }
             }
 
-            if (writableConfiguration != null) {
+            if (configuration instanceof DefaultConfiguration) {
+                DefaultConfiguration writableConfiguration = (DefaultConfiguration) configuration;
+
                 // Add XWiki fonts folder to the configuration
                 try {
                     Environment environment = Utils.getComponent(Environment.class);
@@ -188,25 +187,48 @@ public class PdfExportImpl implements PdfExport
                         }
                     }
 
-                    DefaultConfiguration rendererConfiguration =
-                        (DefaultConfiguration) writableConfiguration.getChild("renderer");
-                    if (rendererConfiguration != null) {
-                        DefaultConfiguration fontsConfiguration =
-                            (DefaultConfiguration) rendererConfiguration.getChild("fonts");
-                        DefaultConfiguration directoryConfiguration = new DefaultConfiguration("directory");
-                        directoryConfiguration.setValue(fontsPath);
-                        fontsConfiguration.addChild(directoryConfiguration);
-
+                    // <renderers>
+                    DefaultConfiguration renderersConfiguration =
+                        (DefaultConfiguration) writableConfiguration.getChild("renderers", false);
+                    if (renderersConfiguration == null) {
+                        renderersConfiguration = new DefaultConfiguration("renderers");
+                        writableConfiguration.addChild(renderersConfiguration);
                     }
+
+                    // <renderer mime="application/pdf">
+                    DefaultConfiguration pdfRenderer = null;
+                    for (Configuration renderer : renderersConfiguration.getChildren()) {
+                        if ("application/pdf".equals(renderer.getAttribute("mime"))) {
+                            pdfRenderer = (DefaultConfiguration) renderer;
+                        }
+                    }
+                    if (pdfRenderer == null) {
+                        pdfRenderer = new DefaultConfiguration("renderer");
+                        pdfRenderer.setAttribute("mime", "application/pdf");
+                        renderersConfiguration.addChild(pdfRenderer);
+                    }
+
+                    // <fonts>
+                    DefaultConfiguration fontsConfiguration =
+                        (DefaultConfiguration) pdfRenderer.getChild("fonts", false);
+                    if (fontsConfiguration == null) {
+                        fontsConfiguration = new DefaultConfiguration("fonts");
+                        pdfRenderer.addChild(fontsConfiguration);
+                    }
+
+                    // <directory>fontdirectory</directory>
+                    DefaultConfiguration directoryConfiguration = new DefaultConfiguration("directory");
+                    directoryConfiguration.setValue(fontsPath);
+                    fontsConfiguration.addChild(directoryConfiguration);
                 } catch (Throwable ex) {
                     LOGGER.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                         + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
                         + "FOP cannot access this directory. If this is an upgrade from a previous version, "
                         + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
                 }
-
-                builder.setConfiguration(writableConfiguration);
             }
+
+            builder.setConfiguration(configuration);
         }
 
         fopFactory = builder.build();

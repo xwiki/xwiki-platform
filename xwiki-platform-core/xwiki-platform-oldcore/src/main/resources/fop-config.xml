@@ -35,12 +35,8 @@
   <default-page-settings height="29.7cm" width="21cm"/>
   <renderers>
     <renderer mime="application/pdf">
-      <filterList>
-        <!-- provides compression using zlib flate (default is on) -->
-        <value>flate</value>
-      </filterList>
       <fonts>
-        <!-- Fonts located in WEB-INF/fonts/ are automatically loaded -->
+        <!-- Fonts located in WEB-INF/fonts/ are automatically added to the configuration -->
 
         <!-- Load system fonts -->
         <!-- <auto-detect/> -->

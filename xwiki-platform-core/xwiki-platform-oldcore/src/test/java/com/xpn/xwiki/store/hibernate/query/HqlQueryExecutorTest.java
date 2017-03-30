@@ -33,6 +33,7 @@ import org.hibernate.engine.NamedSQLQueryDefinition;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
@@ -40,6 +41,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.query.WrappingQuery;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -268,15 +270,18 @@ public class HqlQueryExecutorTest
     public void createNamedNativeHibernateQuery() throws Exception
     {
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
-        QueryFilter filter = mock(QueryFilter.class);
-        query.addFilter(filter);
 
         Session session = mock(Session.class);
         SQLQuery sqlQuery = mock(SQLQuery.class);
         when(session.getNamedQuery(query.getStatement())).thenReturn(sqlQuery);
-
         when(sqlQuery.getQueryString()).thenReturn("foo");
+
+        // Add a Query Filter to verify it's called and can change the statement
+        QueryFilter filter = mock(QueryFilter.class);
+        query.addFilter(filter);
         when(filter.filterStatement("foo", "sql")).thenReturn("bar");
+        ArgumentCaptor<Query> capturedQuery = ArgumentCaptor.forClass(Query.class);
+        when(filter.filterQuery(capturedQuery.capture())).thenReturn(capturedQuery.getValue());
 
         SQLQuery finalQuery = mock(SQLQuery.class);
         when(session.createSQLQuery("bar")).thenReturn(finalQuery);
@@ -292,7 +297,31 @@ public class HqlQueryExecutorTest
         verify(finalQuery).setResultSetMapping(definition.getResultSetRef());
     }
 
-    // Allowed
+    @Test
+    public void createHibernateQueryWhenFilter() throws Exception
+    {
+        Session session = mock(Session.class);
+
+        DefaultQuery query = new DefaultQuery("where doc.space='Main'", Query.HQL, this.executor);
+
+        // Add a Query Filter to verify it's called and can change the statement.
+        // We also verify that QueryFilter#filterStatement() is called before QueryFilter#filterQuery()
+        QueryFilter filter = mock(QueryFilter.class);
+        query.addFilter(filter);
+        when(filter.filterStatement("select doc.fullName from XWikiDocument doc where doc.space='Main'",
+            Query.HQL)).thenReturn("select doc.fullName from XWikiDocument doc where doc.space='Main2'");
+        when(filter.filterQuery(any(Query.class))).thenReturn(new WrappingQuery(query) {
+            @Override public String getStatement()
+            {
+                return "select doc.fullName from XWikiDocument doc where doc.space='Main3'";
+            }
+        });
+
+        this.executor.createHibernateQuery(session, query);
+
+        // The test is here!
+        verify(session).createQuery("select doc.fullName from XWikiDocument doc where doc.space='Main3'");
+    }
 
     @Test
     public void executeShortWhereHQLQueryWithProgrammingRights() throws QueryException

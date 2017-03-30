@@ -57,9 +57,11 @@ public class Object extends Collection
     }
 
     /**
+     * Display the passed field.
+     * <p>
      * This method's name is misleading since it doesn't return the Object's property value; it"s equivalent to
-     * {@link #display(String, String)} (with {@code type} equals to {@code view}). In order to get the Object's
-     * property value use {@code getProperty(String).getValue()} instead.
+     * {@link #display(String, String)} (with {@code type} equals to the context action ("view" or "edit" usually). The
+     * right method to get the field value is {@link #getValue(String)}.
      */
     public java.lang.Object get(String name)
     {

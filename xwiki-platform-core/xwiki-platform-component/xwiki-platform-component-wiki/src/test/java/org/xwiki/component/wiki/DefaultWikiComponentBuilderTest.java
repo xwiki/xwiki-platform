@@ -32,8 +32,6 @@ import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 
@@ -48,14 +46,11 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
 
     private WikiComponentBridge bridge;
 
-    private ContextualAuthorizationManager authorization;
-
     @Before
     public void configure() throws Exception
     {
         this.builder = getComponentManager().getInstance(WikiComponentBuilder.class);
         this.bridge = getComponentManager().getInstance(WikiComponentBridge.class);
-        this.authorization = getComponentManager().getInstance(ContextualAuthorizationManager.class);
     }
 
     @Test
@@ -64,7 +59,7 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(authorization).hasAccess(Right.PROGRAM, DOC_REFERENCE);
+                oneOf(bridge).hasProgrammingRights(DOC_REFERENCE);
                 will(returnValue(false));
             }
         });
@@ -99,8 +94,7 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
                 will(returnValue(ListUtils.EMPTY_LIST));
                 oneOf(bridge).getSyntax(DOC_REFERENCE);
                 will(returnValue(Syntax.XWIKI_2_1));
-
-                oneOf(authorization).hasAccess(Right.PROGRAM, DOC_REFERENCE);
+                oneOf(bridge).hasProgrammingRights(DOC_REFERENCE);
                 will(returnValue(true));
             }
         });

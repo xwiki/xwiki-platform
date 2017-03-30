@@ -47,6 +47,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.SecureQuery;
+import org.xwiki.query.WrappingQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -157,7 +158,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
         String oldDatabase = getContext().getWikiId();
         try {
-            this.progress.startStep(query, "query.hql.progress.execute", "Execute HQL query [{}]", query);
+            this.progress.startStep(query, "query.hql.progress.execute", "Execute HQL query [{}]",
+                query);
 
             if (query.getWiki() != null) {
                 getContext().setWikiId(query.getWiki());
@@ -169,7 +171,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 public List<T> doInHibernate(Session session)
                 {
                     org.hibernate.Query hquery = createHibernateQuery(session, query);
-                    populateParameters(hquery, query);
 
                     List<T> results = hquery.list();
                     if (query.getFilters() != null && !query.getFilters().isEmpty()) {
@@ -187,6 +188,58 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
             this.progress.endStep(query);
         }
+    }
+
+    protected org.hibernate.Query createHibernateQuery(Session session, Query query)
+    {
+        org.hibernate.Query hquery;
+
+        Query filteredQuery = query;
+        if (!filteredQuery.isNamed()) {
+            // For non-named queries, convert the short form into long form before we apply the filters.
+            filteredQuery = new WrappingQuery(filteredQuery)
+            {
+                @Override
+                public String getStatement()
+                {
+                    // handle short queries
+                    return completeShortFormStatement(getWrappedQuery().getStatement());
+                }
+            };
+            filteredQuery = filterQuery(filteredQuery, Query.HQL);
+            hquery = session.createQuery(filteredQuery.getStatement());
+            populateParameters(hquery, filteredQuery);
+        } else {
+            hquery = createNamedHibernateQuery(session, filteredQuery);
+        }
+
+        return hquery;
+    }
+
+    private Query filterQuery(Query query, String language)
+    {
+        Query filteredQuery = query;
+
+        if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+            for (QueryFilter filter : query.getFilters()) {
+                // Step 1: For backward-compatibility reasons call #filterStatement() first
+                String filteredStatement = filter.filterStatement(filteredQuery.getStatement(), language);
+                // Prevent unnecessary creation of WrappingQuery objects when the QueryFilter doesn't modify the
+                // statement.
+                if (!filteredStatement.equals(filteredQuery.getStatement())) {
+                    filteredQuery = new WrappingQuery(filteredQuery) {
+                        @Override
+                        public String getStatement()
+                        {
+                            return filteredStatement;
+                        }
+                    };
+                }
+                // Step 2: Run #filterQuery()
+                filteredQuery = filter.filterQuery(filteredQuery);
+            }
+        }
+        return filteredQuery;
     }
 
     /**
@@ -211,49 +264,30 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         return statement;
     }
 
-    /**
-     * @param session hibernate session
-     * @param query Query object
-     * @return hibernate query
-     */
-    protected org.hibernate.Query createHibernateQuery(Session session, Query query)
-    {
-        org.hibernate.Query hquery;
-
-        if (!query.isNamed()) {
-            // handle short queries
-            String statement = completeShortFormStatement(query.getStatement());
-
-            // Handle query filters
-            if (query.getFilters() != null) {
-                for (QueryFilter filter : query.getFilters()) {
-                    statement = filter.filterStatement(statement, Query.HQL);
-                }
-            }
-            hquery = session.createQuery(statement);
-        } else {
-            hquery = createNamedHibernateQuery(session, query);
-        }
-
-        return hquery;
-    }
-
     private org.hibernate.Query createNamedHibernateQuery(Session session, Query query)
     {
         org.hibernate.Query hQuery = session.getNamedQuery(query.getStatement());
-        if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+        Query filteredQuery = query;
+        if (filteredQuery.getFilters() != null && !filteredQuery.getFilters().isEmpty()) {
             // Since we can't modify the Hibernate query statement at this point we need to create a new one to apply
             // the query filter. This comes with a performance cost, we could fix it by handling named queries ourselves
             // and not delegate them to Hibernate. This way we would always get a statement that we can transform before
             // the execution.
             boolean isNative = hQuery instanceof SQLQuery;
             String language = isNative ? "sql" : Query.HQL;
-            String statement = hQuery.getQueryString();
-            for (QueryFilter filter : query.getFilters()) {
-                statement = filter.filterStatement(statement, language);
-            }
+            final String statement = hQuery.getQueryString();
+
+            // Run filters
+            filteredQuery = filterQuery(new WrappingQuery(filteredQuery) {
+                @Override
+                public String getStatement()
+                {
+                    return statement;
+                }
+            }, language);
+
             if (isNative) {
-                hQuery = session.createSQLQuery(statement);
+                hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 // Copy the information about the return column types, if possible.
                 NamedSQLQueryDefinition definition = (NamedSQLQueryDefinition) this.sessionFactory.getConfiguration()
                     .getNamedSQLQueries().get(query.getStatement());
@@ -261,9 +295,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                     ((SQLQuery) hQuery).setResultSetMapping(definition.getResultSetRef());
                 }
             } else {
-                hQuery = session.createQuery(statement);
+                hQuery = session.createQuery(filteredQuery.getStatement());
             }
         }
+        populateParameters(hQuery, filteredQuery);
         return hQuery;
     }
 

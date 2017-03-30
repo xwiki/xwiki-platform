@@ -57,4 +57,20 @@ public interface QueryFilter
      * @return a filtered result list.
      */
     List filterResults(List results);
+
+    /**
+     * Transforms a query. The query can be returned without modification. This allows for example to also transform
+     * parameters.
+     * <p>
+     * Note: executes before {@link #filterStatement(String, String)}.
+     *
+     * @param query the query to transform
+     * @return the transformed query
+     *
+     * @since 8.4.5
+     * @since 9.3RC1
+     */
+    default Query filterQuery(Query query) {
+        return query;
+    }
 }

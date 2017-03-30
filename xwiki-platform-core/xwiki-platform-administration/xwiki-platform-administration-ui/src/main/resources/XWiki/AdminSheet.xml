@@ -271,9 +271,18 @@
 #macro (verticalNavigation $menu $options)
   {{html clean="false"}}
   &lt;div id="$!options.id" class="panel-group $!options.cssClass" role="tablist" aria-multiselectable="true"&gt;
+    &lt;div class="panel xform"&gt;
+      &lt;input type="text" class="form-control panel-group-filter" autocomplete="off"
+        placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))" /&gt;
+    &lt;/div&gt;
     #foreach ($item in $menu)
       #verticalNavigationItem($item $options)
     #end
+    &lt;div class="panel panel-default noitems hidden"&gt;
+      &lt;div class="panel-heading collapsed"&gt;
+        $escapetool.xml($services.localization.render('administration.menu.search.noResults'))
+      &lt;/div&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
   {{/html}}
 #end
@@ -293,7 +302,7 @@
       &lt;a class="panel-heading#if (!$isActive) collapsed#end" role="tab" id="panel-heading-$escapedId"
         href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
         data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
-        &gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
+        title="$!escapetool.xml($item.description)"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
       &lt;div class="panel-collapse collapse#if ($isActive) in#end" role="tabpanel" id="panel-body-$escapedId"
           aria-labelledby="panel-heading-$escapedId"&gt;
         &lt;div class="list-group"&gt;
@@ -305,7 +314,8 @@
     &lt;/div&gt;
   #else
     &lt;a class="list-group-item#if ($isActive) active#end" data-id="$escapedId"
-      href="$!item.url"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
+      href="$!item.url" title="$!escapetool.xml($item.description)"
+      &gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
   #end
 #end
 {{/velocity}}
@@ -671,8 +681,67 @@
     </property>
     <property>
       <code>require(['jquery', 'bootstrap'], function($) {
+  // Don't follow the category link on click. Just expand/collapse the category.
   $(document).on('click', '.admin-menu a.panel-heading', function(event) {
     event.preventDefault();
+  });
+});
+
+/**
+ * Live search in the category/section name and description.
+ */
+require(['jquery'], function($) {
+  var filterItem = function(text) {
+    var name = $(this).text().toLowerCase();
+    var description = ($(this).attr('title') || '').toLowerCase();
+    return typeof text === 'string' &amp;&amp; name.indexOf(text) &lt; 0 &amp;&amp; description.indexOf(text) &lt; 0;
+  };
+
+  var filterPanelGroup = function(text) {
+    var panelGroup = $(this);
+    // Filter the sections.
+    panelGroup.find('.list-group-item').each(function() {
+      $(this).toggleClass('hidden', filterItem.call(this, text));
+    });
+    // Filter the categories.
+    panelGroup.find('a.panel-heading').each(function() {
+      var panel = $(this).closest('.panel');
+      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').size() &gt; 0;
+      var matchesFilterQuery = !filterItem.call($(this), text);
+      panel.toggle(hasVisibleSections || matchesFilterQuery);
+      if (!hasVisibleSections &amp;&amp; matchesFilterQuery) {
+        // If the filter query matches only the category name/description and none of its sections name/description then
+        // show all the sections.
+        panel.find('.list-group-item').removeClass('hidden');
+      }
+      // Fix the style (round corners) of the last visible section in each category.
+      panel.find('.list-group-item.last').removeClass('last');
+      panel.find('.list-group-item').not('.hidden').last().addClass('last');
+    });
+    // Expand the first visible category, if there is a filter query.
+    if (typeof text === 'string' &amp;&amp; text !== '') {
+      // We expand the category manually, instead of using the JavaScript API of Bootstrap Collapse, because we can't
+      // disable the animation.
+      panelGroup.find('.panel-collapse.in').removeClass('in')
+        .prev('.panel-heading').addClass('collapsed').attr('aria-expanded', false);
+      panelGroup.find('a.panel-heading').filter(':visible').first()
+        .removeClass('collapsed').attr('aria-expanded', true)
+        // Remove the height:0px in-line style added by the collapse animation because it breaks the border styles.
+        .next('.panel-collapse').addClass('in').css('height', '');
+    }
+    // Show/Hide the "No results." message.
+    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').size() &gt; 0;
+    panelGroup.find('.noitems').toggleClass('hidden', hasVisibleCategories);
+  };
+
+  var timeoutId;
+  $('.panel-group-filter').on('input', function() {
+    // Cancel the previously scheduled filter operation.
+    clearTimeout(timeoutId);
+    var panelGroup = $(this).closest('.panel-group');
+    var text = $(this).val().toLowerCase();
+    // Schedule a new filter operation.
+    timeoutId = setTimeout($.proxy(filterPanelGroup, panelGroup, text), 500);
   });
 });</code>
     </property>
@@ -894,6 +963,15 @@
 
 .admin-menu .panel-heading &gt; *:first-child {
   margin-right: .8em;
+}
+
+.admin-menu .panel-collapse &gt; .list-group:last-child .list-group-item.last {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.admin-menu .panel.noitems &gt; .panel-heading {
+  color: $theme.textSecondaryColor;
 }</code>
     </property>
     <property>

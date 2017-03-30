@@ -47,6 +47,8 @@ administration.sectionTitle=Administration: {0}
 administration.sectionTitle.page=Page Administration: {0}
 administration.sectionTitle.wiki=Wiki Administration: {0}
 administration.sectionTitle.global=Global Administration: {0}
+administration.menu.search.hint=Search for...
+administration.menu.search.noResults=No results.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.

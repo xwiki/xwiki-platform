@@ -4,6 +4,10 @@
 
 .breadcrumb {
   > li {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
     + li:before {
       content: "@{breadcrumb-separator}"; /* No additional space needed */
     }

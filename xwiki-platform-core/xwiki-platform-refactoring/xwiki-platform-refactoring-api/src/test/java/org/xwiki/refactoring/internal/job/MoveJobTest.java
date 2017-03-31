@@ -153,7 +153,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
 
         DocumentReference backLinkReference = new DocumentReference("wiki", "Three", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(oldReference)).thenReturn(Arrays.asList(backLinkReference));
+        when(this.modelBridge.getBackLinkedReferences(oldReference, false))
+            .thenReturn(Arrays.asList(backLinkReference));
 
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
         when(this.modelBridge.exists(newReference)).thenReturn(true);
@@ -235,7 +236,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
 
         DocumentReference backLinkReference = new DocumentReference("wiki", "A", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(sourceReference)).thenReturn(Arrays.asList(backLinkReference));
+        when(this.modelBridge.getBackLinkedReferences(sourceReference, false))
+            .thenReturn(Arrays.asList(backLinkReference));
 
         DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
         when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);

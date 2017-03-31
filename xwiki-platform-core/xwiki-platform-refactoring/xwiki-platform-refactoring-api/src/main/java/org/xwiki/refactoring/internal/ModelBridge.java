@@ -86,9 +86,11 @@ public interface ModelBridge
 
     /**
      * @param reference a document reference
+     * @param onFarm {@code true} to look for links on the entire farm, {@code false} to look for links only in the wiki
+     *            where the specified document is located
      * @return the list of documents that have links to the specified document
      */
-    List<DocumentReference> getBackLinkedReferences(DocumentReference reference);
+    List<DocumentReference> getBackLinkedReferences(DocumentReference reference, boolean onFarm);
 
     /**
      * @param spaceReference a space reference

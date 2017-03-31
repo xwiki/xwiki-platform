@@ -275,7 +275,8 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference)
     {
-        List<DocumentReference> backlinkDocumentReferences = this.modelBridge.getBackLinkedReferences(oldReference);
+        List<DocumentReference> backlinkDocumentReferences =
+            this.modelBridge.getBackLinkedReferences(oldReference, this.request.isUpdateLinksOnFarm());
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 
         try {
@@ -293,8 +294,12 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
     @Override
     protected String getTargetWiki()
     {
-        List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
-        entityReferences.add(this.request.getDestination());
-        return getTargetWiki(entityReferences);
+        if (this.request.isUpdateLinksOnFarm()) {
+            return null;
+        } else {
+            List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
+            entityReferences.add(this.request.getDestination());
+            return getTargetWiki(entityReferences);
+        }
     }
 }

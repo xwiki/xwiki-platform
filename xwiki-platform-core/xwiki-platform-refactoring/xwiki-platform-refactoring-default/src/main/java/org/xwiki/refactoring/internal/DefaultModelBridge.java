@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -117,6 +120,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -228,14 +234,49 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public List<DocumentReference> getBackLinkedReferences(DocumentReference documentReference)
+    public List<DocumentReference> getBackLinkedReferences(DocumentReference documentReference, boolean onFarm)
+    {
+        Collection<String> wikiIds = Collections.singleton(documentReference.getWikiReference().getName());
+        if (onFarm) {
+            try {
+                wikiIds = this.wikiDescriptorManager.getAllIds();
+            } catch (WikiManagerException e) {
+                this.logger.error("Failed to retrieve the list of wiki identifiers.", e);
+            }
+        }
+        List<DocumentReference> backLinks = new ArrayList<>();
+        boolean popLevelProgress = false;
+        try {
+            if (wikiIds.size() > 0) {
+                this.progressManager.pushLevelProgress(wikiIds.size(), this);
+                popLevelProgress = true;
+            }
+            for (String wikiId : wikiIds) {
+                this.progressManager.startStep(this);
+                backLinks.addAll(getBackLinkedReferences(documentReference, wikiId));
+                this.progressManager.endStep(this);
+            }
+        } finally {
+            if (popLevelProgress) {
+                this.progressManager.popLevelProgress(this);
+            }
+        }
+        return backLinks;
+    }
+
+    private List<DocumentReference> getBackLinkedReferences(DocumentReference documentReference, String wikiId)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        String previousWikiId = xcontext.getWikiId();
         try {
+            xcontext.setWikiId(wikiId);
             return xcontext.getWiki().getDocument(documentReference, xcontext).getBackLinkedReferences(xcontext);
         } catch (XWikiException e) {
-            this.logger.error("Failed to retrieve the back-links for document [{}].", documentReference, e);
+            this.logger.error("Failed to retrieve the back-links for document [{}] on wiki [{}].", documentReference,
+                wikiId, e);
             return Collections.emptyList();
+        } finally {
+            xcontext.setWikiId(previousWikiId);
         }
     }
 

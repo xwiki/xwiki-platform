@@ -200,9 +200,11 @@ Lightbox = Class.create({
   },
 
   lbSaveData: function() {
+    document.fire('xwiki:actions:beforeSave', {form: this.form});
     this.formData += "&" + Form.serialize(this.form);
     this.formData = this.formData.replace("_segmentChief=&", "=&");
     this.formData = this.formData.replace("_periodicity=&", "=&");
+    document.fire('xwiki:actions:save', {form: this.form});
   },
 
   lbSave: function(url) {
@@ -219,10 +221,12 @@ Lightbox = Class.create({
   },
 
   lbClearData: function() {
+    document.fire('xwiki:actions:cancel', {form: this.form});
     this.formData = "";
   },
 
   lbClose: function() {
+    document.fire('xwiki:actions:cancel', {form: this.form});
     this.lbHide();
     if (this.redirectUrl !== undefined) {
       window.location = this.redirectUrl;

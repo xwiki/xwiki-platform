@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.internal.job;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,6 +38,8 @@ import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * A job that can move entities to a new parent within the hierarchy.
@@ -59,6 +63,9 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
      */
     @Inject
     private LinkRefactoring linkRefactoring;
+    
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public String getType()
@@ -276,8 +283,37 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference)
     {
+        Collection<String> wikiIds = Collections.singleton(oldReference.getWikiReference().getName());
+        if (this.request.isUpdateLinksOnFarm()) {
+            try {
+                wikiIds = this.wikiDescriptorManager.getAllIds();
+            } catch (WikiManagerException e) {
+                this.logger.error("Failed to retrieve the list of wikis.", e);
+            }
+        }
+        boolean popLevelProgress = false;
+        try {
+            if (wikiIds.size() > 0) {
+                this.progressManager.pushLevelProgress(wikiIds.size(), this);
+                popLevelProgress = true;
+            }
+            for (String wikiId : wikiIds) {
+                this.progressManager.startStep(this);
+                updateBackLinks(oldReference, newReference, wikiId);
+                this.progressManager.endStep(this);
+            }
+        } finally {
+            if (popLevelProgress) {
+                this.progressManager.popLevelProgress(this);
+            }
+        }
+    }
+
+    private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference, String wikiId)
+    {
+        this.logger.info("Updating the back-links for document [{}] in wiki [{}].", oldReference, wikiId);
         List<DocumentReference> backlinkDocumentReferences =
-            this.modelBridge.getBackLinkedReferences(oldReference, this.request.isUpdateLinksOnFarm());
+            this.modelBridge.getBackLinkedReferences(oldReference, wikiId);
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 
         try {

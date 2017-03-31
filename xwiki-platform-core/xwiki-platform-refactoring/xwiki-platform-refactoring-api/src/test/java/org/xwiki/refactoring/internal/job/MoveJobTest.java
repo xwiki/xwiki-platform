@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.job.GroupedJob;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -32,9 +33,12 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -153,7 +157,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
 
         DocumentReference backLinkReference = new DocumentReference("wiki", "Three", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(oldReference, false))
+        when(this.modelBridge.getBackLinkedReferences(oldReference, "wiki"))
             .thenReturn(Arrays.asList(backLinkReference));
 
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
@@ -177,6 +181,39 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(oldReference);
         verify(this.modelBridge).createRedirect(oldReference, newReference);
+    }
+
+    @Test
+    public void updateLinksOnFarm() throws Exception
+    {
+        DocumentReference oldReference = new DocumentReference("foo", "One", "Page");
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
+
+        DocumentReference newReference = new DocumentReference("foo", "Two", "Page");
+        when(this.modelBridge.exists(newReference)).thenReturn(false);
+
+        when(this.modelBridge.copy(oldReference, newReference)).thenReturn(true);
+
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
+
+        DocumentReference aliceReference = new DocumentReference("foo", "Alice", "BackLink");
+        when(this.modelBridge.getBackLinkedReferences(oldReference, "foo")).thenReturn(Arrays.asList(aliceReference));
+
+        DocumentReference bobReference = new DocumentReference("bar", "Bob", "BackLink");
+        when(this.modelBridge.getBackLinkedReferences(oldReference, "bar")).thenReturn(Arrays.asList(bobReference));
+
+        MoveRequest request = createRequest(oldReference, newReference.getParent());
+        request.setCheckRights(false);
+        request.setInteractive(false);
+        request.setUpdateLinksOnFarm(true);
+
+        GroupedJob job = (GroupedJob) run(request);
+        assertEquals(RefactoringJobs.GROUP, job.getGroupPath().toString());
+
+        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
+        verify(linkRefactoring).renameLinks(aliceReference, oldReference, newReference);
+        verify(linkRefactoring).renameLinks(bobReference, oldReference, newReference);
     }
 
     @Test
@@ -234,10 +271,6 @@ public class MoveJobTest extends AbstractMoveJobTest
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
-
-        DocumentReference backLinkReference = new DocumentReference("wiki", "A", "BackLink");
-        when(this.modelBridge.getBackLinkedReferences(sourceReference, false))
-            .thenReturn(Arrays.asList(backLinkReference));
 
         DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
         when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);

@@ -39,7 +39,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -318,51 +317,20 @@ public class DefaultModelBridgeTest
     }
 
     @Test
-    public void getBackLinkedReferencesOnWiki() throws Exception
+    public void getBackLinkedReferences() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("foo", Arrays.asList("Path", "To"), "Page");
+        DocumentReference documentReference = new DocumentReference("alice", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
 
-        List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("foo", "Two", "Three"));
+        List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("bob", "One", "Two"));
         when(document.getBackLinkedReferences(this.xcontext)).thenReturn(backLinks);
 
-        ModelBridge modelBridge = this.mocker.getComponentUnderTest();
-        assertEquals(backLinks, modelBridge.getBackLinkedReferences(documentReference, false));
+        this.xcontext.setWikiId("carol");
 
-        JobProgressManager progressManager = this.mocker.getInstance(JobProgressManager.class);
-        verify(progressManager).pushLevelProgress(1, modelBridge);
-        verify(progressManager).startStep(modelBridge);
-        verify(this.xcontext).setWikiId("foo");
-        verify(progressManager).endStep(modelBridge);
-        verify(progressManager).popLevelProgress(modelBridge);
-    }
+        assertEquals(backLinks, this.mocker.getComponentUnderTest().getBackLinkedReferences(documentReference, "bob"));
 
-    @Test
-    @SuppressWarnings("unchecked")
-    public void getBackLinkedReferencesOnFarm() throws Exception
-    {
-        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
-
-        DocumentReference documentReference = new DocumentReference("foo", Arrays.asList("Path", "To"), "Page");
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
-
-        DocumentReference alice = new DocumentReference("foo", "Alice", "WebHome");
-        DocumentReference bob = new DocumentReference("bar", "Bob", "WebHome");
-        when(document.getBackLinkedReferences(this.xcontext)).thenReturn(Collections.singletonList(alice),
-            Collections.singletonList(bob));
-
-        ModelBridge modelBridge = this.mocker.getComponentUnderTest();
-        assertEquals(Arrays.asList(alice, bob), modelBridge.getBackLinkedReferences(documentReference, true));
-
-        JobProgressManager progressManager = this.mocker.getInstance(JobProgressManager.class);
-        verify(progressManager).pushLevelProgress(2, modelBridge);
-        verify(progressManager, times(2)).startStep(modelBridge);
-        verify(this.xcontext).setWikiId("foo");
-        verify(this.xcontext).setWikiId("bar");
-        verify(progressManager, times(2)).endStep(modelBridge);
-        verify(progressManager).popLevelProgress(modelBridge);
+        verify(this.xcontext).setWikiId("bob");
+        verify(this.xcontext).setWikiId("carol");
     }
 }

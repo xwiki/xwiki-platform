@@ -33,7 +33,7 @@ public class MoveRequest extends EntityRequest
     /**
      * Serialization identifier.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * @see #getDestination()
@@ -49,6 +49,11 @@ public class MoveRequest extends EntityRequest
      * @see #isUpdateLinks()
      */
     private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
+
+    /**
+     * @see #isUpdateLinksOnFarm()
+     */
+    private static final String PROPERTY_UPDATE_LINKS_ON_FARM = "updateLinksOnFarm";
 
     /**
      * @see #isAutoRedirect()
@@ -117,6 +122,30 @@ public class MoveRequest extends EntityRequest
     public void setUpdateLinks(boolean updateLinks)
     {
         setProperty(PROPERTY_UPDATE_LINKS, updateLinks);
+    }
+
+    /**
+     * @return {@code true} if the job should update the links that target the old entity reference (before the move)
+     *         from anywhere on the farm, {@code false} if the job should update only the links from the wiki where the
+     *         entity was located before the move
+     */
+    public boolean isUpdateLinksOnFarm()
+    {
+        return getProperty(PROPERTY_UPDATE_LINKS_ON_FARM, false);
+    }
+
+    /**
+     * Sets whether the job should update the links that target the old entity reference (before the move) from anywhere
+     * on the farm, or only from the wiki where the entity was located before the mode.
+     * <p>
+     * Note that this parameter has no effect if {@link #isUpdateLinks()} is {@code false}.
+     * 
+     * @param updateLinksOnFarm {@code true} to update the links from anywhere on the farm, {@code false} to update only
+     *            the links from the wiki where the entity is located
+     */
+    public void setUpdateLinksOnFarm(boolean updateLinksOnFarm)
+    {
+        setProperty(PROPERTY_UPDATE_LINKS_ON_FARM, updateLinksOnFarm);
     }
 
     /**

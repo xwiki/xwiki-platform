@@ -21,6 +21,7 @@ package org.xwiki.refactoring.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Provider;
@@ -38,6 +39,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,17 +47,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultModelBridge}.
@@ -321,5 +315,54 @@ public class DefaultModelBridgeTest
         verify(document, never()).setParentReference(any(DocumentReference.class));
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
                 any(XWikiContext.class));
+    }
+
+    @Test
+    public void getBackLinkedReferencesOnWiki() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("foo", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+
+        List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("foo", "Two", "Three"));
+        when(document.getBackLinkedReferences(this.xcontext)).thenReturn(backLinks);
+
+        ModelBridge modelBridge = this.mocker.getComponentUnderTest();
+        assertEquals(backLinks, modelBridge.getBackLinkedReferences(documentReference, false));
+
+        JobProgressManager progressManager = this.mocker.getInstance(JobProgressManager.class);
+        verify(progressManager).pushLevelProgress(1, modelBridge);
+        verify(progressManager).startStep(modelBridge);
+        verify(this.xcontext).setWikiId("foo");
+        verify(progressManager).endStep(modelBridge);
+        verify(progressManager).popLevelProgress(modelBridge);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getBackLinkedReferencesOnFarm() throws Exception
+    {
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
+
+        DocumentReference documentReference = new DocumentReference("foo", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+
+        DocumentReference alice = new DocumentReference("foo", "Alice", "WebHome");
+        DocumentReference bob = new DocumentReference("bar", "Bob", "WebHome");
+        when(document.getBackLinkedReferences(this.xcontext)).thenReturn(Collections.singletonList(alice),
+            Collections.singletonList(bob));
+
+        ModelBridge modelBridge = this.mocker.getComponentUnderTest();
+        assertEquals(Arrays.asList(alice, bob), modelBridge.getBackLinkedReferences(documentReference, true));
+
+        JobProgressManager progressManager = this.mocker.getInstance(JobProgressManager.class);
+        verify(progressManager).pushLevelProgress(2, modelBridge);
+        verify(progressManager, times(2)).startStep(modelBridge);
+        verify(this.xcontext).setWikiId("foo");
+        verify(this.xcontext).setWikiId("bar");
+        verify(progressManager, times(2)).endStep(modelBridge);
+        verify(progressManager).popLevelProgress(modelBridge);
     }
 }

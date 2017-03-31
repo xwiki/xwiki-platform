@@ -1,4 +1,5 @@
 #template("xwikivars.vm")
+#skinExtensionHooks
 <div>
 <form name="edituser" method="post">
 #set($force = $!request.get("force"))

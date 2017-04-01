@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
+import org.xwiki.text.StringUtils;
 
 /**
  * Query filter transforming queries in order to make them return the total number of results instead of a list of
@@ -65,15 +66,16 @@ public class CountDocumentFilter extends AbstractQueryFilter
     public String filterStatement(String statement, String language)
     {
         String result = statement.trim();
+        String lcOriginal = result.toLowerCase();
         String original = result;
 
-        if (Query.HQL.equals(language) && isFilterable(original)) {
-            String distinct = getSelectColumns(original).contains(DISTINCT_FULLNAME_COLUMN) ? "distinct " : "";
+        if (Query.HQL.equals(language) && isFilterable(lcOriginal)) {
+            String distinct = getSelectColumns(lcOriginal).contains(DISTINCT_FULLNAME_COLUMN) ? "distinct " : "";
             result = "select count(" + distinct + "doc.fullName) "
-                + result.substring(original.indexOf("from XWikiDocument"));
+                + result.substring(lcOriginal.indexOf("from xwikidocument"));
 
-            int oidx = result.indexOf("order by ");
-            int gidx = result.indexOf("group by ");
+            int oidx = StringUtils.indexOfIgnoreCase(result, "order by ");
+            int gidx = StringUtils.indexOfIgnoreCase(result, "group by ");
             if (oidx > -1) {
                 if (gidx > -1 && gidx > oidx) {
                     // There's an order by and a group by after, remove the order by only.

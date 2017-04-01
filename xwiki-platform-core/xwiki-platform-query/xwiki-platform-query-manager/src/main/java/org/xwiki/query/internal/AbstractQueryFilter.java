@@ -35,13 +35,15 @@ public abstract class AbstractQueryFilter implements QueryFilter
 {
     /**
      * Usual identifier of the document full name column in our queries.
+     * Note: it's expressed in lowercase since we make comparisons in lowercases.
      */
-    protected static final String FULLNAME_COLUMN = "doc.fullName";
+    protected static final String FULLNAME_COLUMN = "doc.fullname";
 
     /**
      * Distinct document full name column in our queries.
+     * Note: it's expressed in lowercase since we make comparisons in lowercases.
      */
-    protected static final String DISTINCT_FULLNAME_COLUMN = "distinct doc.fullName";
+    protected static final String DISTINCT_FULLNAME_COLUMN = "distinct doc.fullname";
 
     /**
      * Character used to separate columns in select, order by and group by clauses.
@@ -76,7 +78,7 @@ public abstract class AbstractQueryFilter implements QueryFilter
      */
     protected List<String> getSelectColumns(String statement)
     {
-        List<String> columns = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
         String select = statement.substring(SELECT.length(), statement.indexOf(FROM));
         for (String column : select.split(COLUMN_SEPARATOR)) {
             columns.add(column.trim());
@@ -96,7 +98,7 @@ public abstract class AbstractQueryFilter implements QueryFilter
      */
     protected List<String> getOrderByColumns(String statement)
     {
-        List<String> columns = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
         int oidx = statement.indexOf(ORDER_BY);
 
         if (oidx > -1) {

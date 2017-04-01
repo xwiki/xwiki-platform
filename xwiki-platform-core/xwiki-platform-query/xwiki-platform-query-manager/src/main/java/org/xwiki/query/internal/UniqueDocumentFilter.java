@@ -60,7 +60,7 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
      * the select clause. We use this list when we filter out results in order to remove extra data added by these
      * extra columns since they shouldn't be returned to the user.
      */
-    private List<Integer> columnsToRemove = new ArrayList<Integer>();
+    private List<Integer> columnsToRemove = new ArrayList<>();
 
     /**
      * @param statement statement to filter.
@@ -78,14 +78,15 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
         StringBuilder builder = new StringBuilder();
         String result = statement;
         String original = statement;
+        String lcStatement = statement.toLowerCase();
 
-        if (Query.HQL.equals(language) && isFilterable(statement)) {
+        if (Query.HQL.equals(language) && isFilterable(lcStatement)) {
             String prettySeparator = ", ";
             builder.append("select distinct doc.fullName");
 
             // Put back original select columns.
             int columnPosition = 1;
-            List<String> selectColumns = getSelectColumns(statement);
+            List<String> selectColumns = getSelectColumns(lcStatement);
             for (String column : selectColumns) {
                 if (!FULLNAME_COLUMN.equals(column)) {
                     builder.append(prettySeparator);
@@ -94,7 +95,7 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
                 }
             }
             // Put the order by columns in the select clause to circumvent HQL limitations (distinct+order by).
-            for (String column : getOrderByColumns(statement)) {
+            for (String column : getOrderByColumns(lcStatement)) {
                 if (!FULLNAME_COLUMN.equals(column) && !selectColumns.contains(column)) {
                     builder.append(prettySeparator);
                     builder.append(column);
@@ -104,7 +105,7 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
                 }
             }
             builder.append(" ");
-            builder.append(statement.substring(statement.indexOf(" from ")).trim());
+            builder.append(statement.substring(lcStatement.indexOf(" from ")).trim());
             result = builder.toString();
         }
 

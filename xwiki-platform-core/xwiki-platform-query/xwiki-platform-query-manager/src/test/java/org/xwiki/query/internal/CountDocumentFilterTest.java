@@ -54,6 +54,10 @@ public class CountDocumentFilterTest
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc",
             filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
+
+        // Verify it works with keywords in uppercase
+        assertEquals("select count(doc.fullName) FROM XWikiDocument doc",
+            filter.filterStatement("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL));
     }
 
     @Test

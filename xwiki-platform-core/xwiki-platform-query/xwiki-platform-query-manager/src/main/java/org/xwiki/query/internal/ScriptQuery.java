@@ -28,6 +28,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
 
 import java.util.List;
@@ -178,6 +179,13 @@ public class ScriptQuery implements SecureQuery
     {
         this.query.bindValues(values);
         return this;
+    }
+
+    @Override
+    public QueryParameter bindValue(String var)
+    {
+        QueryParameter parameter = this.query.bindValue(var);
+        return new ScriptQueryParameter(this, parameter);
     }
 
     @Override

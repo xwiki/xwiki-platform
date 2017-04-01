@@ -28,7 +28,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
+import org.xwiki.query.internal.DefaultQueryParameter;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.script.service.ScriptService;
 
@@ -91,6 +93,25 @@ public class QueryManagerScriptService implements ScriptService
     public Query createQuery(String statement, String language) throws QueryException
     {
         return createQuery(statement, language, true);
+    }
+
+    /**
+     * Allow creating query parameters. For example:
+     * <code><pre>
+     * #set ($queryParams = [])
+     * #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?")
+     * #set ($discard = $queryParams.add($services.query.parameter().literal($request.space)))
+     * </pre></code>
+     *
+     * @return the Query parameter object, see {@link QueryParameter} for more details on how to create the parameter
+     *         content
+     *
+     * @since 8.4.5
+     * @since 9.3RC1
+     */
+    public QueryParameter parameter()
+    {
+        return new DefaultQueryParameter(null);
     }
 
     private Query createQuery(String statement, String language, boolean checkCurrentUser) throws QueryException

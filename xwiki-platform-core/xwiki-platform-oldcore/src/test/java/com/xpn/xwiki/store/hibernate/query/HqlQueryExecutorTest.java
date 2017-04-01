@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
@@ -35,6 +37,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
@@ -57,6 +61,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -321,6 +326,29 @@ public class HqlQueryExecutorTest
 
         // The test is here!
         verify(session).createQuery("select doc.fullName from XWikiDocument doc where doc.space='Main3'");
+    }
+
+    @Test
+    public void createHibernateQueryAutomaticallyAddEscapeLikeParametersFilterWhenQueryParameter() throws Exception
+    {
+        Session session = mock(Session.class);
+        DefaultQuery query = new DefaultQuery("where space like :space", Query.HQL, this.executor);
+        query.bindValue("space").literal("test");
+
+        QueryFilter filter = mock(QueryFilter.class);
+        when(filter.filterStatement(anyString(), anyString())).then(returnsFirstArg());
+        when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
+
+        ComponentManager cm = this.mocker.getInstance(ComponentManager.class, "context");
+        when(cm.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
+
+        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.Query.class));
+
+        this.executor.createHibernateQuery(session, query);
+
+        // The test is here! We verify that the filter has been called even though we didn't explicitly add it to the
+        // query, i.e. that it's been added automatically
+        verify(filter).filterQuery(any(Query.class));
     }
 
     @Test

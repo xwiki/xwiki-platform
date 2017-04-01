@@ -89,7 +89,6 @@ $response.setContentType("application/json")
 #foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
   #set ($query = $query.addFilter($queryFilter))
 #end
-#set ($query = $query.addFilter('escapeParameters'))
 #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($queryParams))
 #if ("$!request.wiki" != '')
   #set ($query = $query.setWiki($request.wiki))

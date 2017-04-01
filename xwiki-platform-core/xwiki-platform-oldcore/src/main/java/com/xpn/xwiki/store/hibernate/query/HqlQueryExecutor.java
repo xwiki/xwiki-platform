@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +39,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.NamedQueryDefinition;
 import org.hibernate.engine.NamedSQLQueryDefinition;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -46,6 +49,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.query.WrappingQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -75,6 +79,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     private static final String MAPPING_PATH = "queries.hbm.xml";
 
+    private static final String ESCAPE_LIKE_PARAMETERS_FILTER = "escapeLikeParameters";
+
     /**
      * Session factory needed for register named queries mapping.
      */
@@ -92,6 +98,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
     @Inject
     private JobProgressManager progress;
+
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     private volatile Set<String> allowedNamedQueries;
 
@@ -220,6 +230,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     {
         Query filteredQuery = query;
 
+        // If there are Query parameters of type QueryParameter then, for convenience, automatically add the
+        // "escapeLikeParameters" filter (if not already there)
+        addEscapeLikeParametersFilter(query);
+
         if (query.getFilters() != null && !query.getFilters().isEmpty()) {
             for (QueryFilter filter : query.getFilters()) {
                 // Step 1: For backward-compatibility reasons call #filterStatement() first
@@ -240,6 +254,58 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             }
         }
         return filteredQuery;
+    }
+
+    private void addEscapeLikeParametersFilter(Query query)
+    {
+        if (!hasQueryParametersType(query)) {
+            return;
+        }
+
+        // Find the component class for the "escapeLikeParameters" filter
+        QueryFilter escapeFilter;
+        try {
+            escapeFilter =
+                this.componentManagerProvider.get().getInstance(QueryFilter.class, ESCAPE_LIKE_PARAMETERS_FILTER);
+        } catch (ComponentLookupException e) {
+            // Shouldn't happen!
+            throw new RuntimeException(
+                String.format("Failed to locate [%s] Query Filter", ESCAPE_LIKE_PARAMETERS_FILTER), e);
+        }
+
+        boolean found = false;
+        for (QueryFilter filter : query.getFilters()) {
+            if (escapeFilter.getClass().getName().equals(filter.getClass().getName())) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            query.addFilter(escapeFilter);
+        }
+    }
+
+    private boolean hasQueryParametersType(Query query)
+    {
+        boolean found = false;
+
+        for (Object value : query.getNamedParameters().values()) {
+            if (value instanceof QueryParameter) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            for (Object value : query.getPositionalParameters().values()) {
+                if (value instanceof QueryParameter) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        return found;
     }
 
     /**

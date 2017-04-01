@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
@@ -36,6 +38,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
@@ -321,6 +325,32 @@ public class HqlQueryExecutorTest
 
         // The test is here!
         verify(session).createQuery("select doc.fullName from XWikiDocument doc where doc.space='Main3'");
+    }
+
+    @Test
+    public void createHibernateQueryAutomaticallyAddEscapeLikeParametersFilterWhenQueryParameter() throws Exception
+    {
+        Session session = mock(Session.class);
+        DefaultQuery query = new DefaultQuery("where space like :space", Query.HQL, this.executor);
+        query.bindValue("space").literal("test");
+
+        QueryFilter filter = mock(QueryFilter.class);
+        ArgumentCaptor<String> capturedStatement = ArgumentCaptor.forClass(String.class);
+        when(filter.filterStatement(capturedStatement.capture(), any(String.class))).thenReturn(
+            capturedStatement.getValue());
+        ArgumentCaptor<Query> capturedQuery = ArgumentCaptor.forClass(Query.class);
+        when(filter.filterQuery(capturedQuery.capture())).thenReturn(capturedQuery.getValue());
+
+        ComponentManager cm = this.mocker.getInstance(ComponentManager.class, "context");
+        when(cm.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
+
+        when(session.createQuery(any(String.class))).thenReturn(mock(org.hibernate.Query.class));
+
+        this.executor.createHibernateQuery(session, query);
+
+        // The test is here! We verify that the filter has been called even though we didn't explicitly add it to the
+        // query, i.e. that it's been added automatically
+        verify(filter).filterQuery(any(Query.class));
     }
 
     @Test

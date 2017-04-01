@@ -19,44 +19,20 @@
  */
 package org.xwiki.query.internal;
 
-import java.util.List;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-
 /**
- * Changes the default escape character for LIKE clauses. The reason this can be useful is when we need to handle
- * parameters that contain the backslash character ('\') which is considered as the default escape character on MySQL.
+ * Represents characters for which the {@code %} and {@code _} characters need to be escaped.
  *
  * @version $Id$
  * @since 8.4.5
  * @since 9.3RC1
  */
-@Component
-@Named("changeLikeEscape")
-@Singleton
-// TODO: Remove this hackish class once Hibernate handles this transparently...
-public class ChangeLikeEscapeFilter implements QueryFilter
+public class LiteralParameterPart extends ParameterPart
 {
-    @Override
-    public Query filterQuery(Query query)
+    /**
+     * @param part the literals that will be escaped
+     */
+    public LiteralParameterPart(String part)
     {
-        return new ChangeLikeEscapeQuery(query);
-    }
-
-    @Override
-    public String filterStatement(String statement, String language)
-    {
-        return statement;
-    }
-
-    @Override
-    public List filterResults(List results)
-    {
-        return results;
+        super(part);
     }
 }

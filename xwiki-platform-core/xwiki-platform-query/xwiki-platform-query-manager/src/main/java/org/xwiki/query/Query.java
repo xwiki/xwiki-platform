@@ -107,6 +107,24 @@ public interface Query
     Query bindValues(List<Object> values);
 
     /**
+     * Bind named parameter var with a value that will be constructed using calls to
+     * {@link QueryParameter#literal(String)}, {@link QueryParameter#anychar()} and {@link QueryParameter#anyChars()}.
+     * In order to perserve the fluent API, it's also possible to call {@link QueryParameter#query()} to get back the
+     * {@link Query}.
+     *
+     * @param var the variable in the query statement ({@code :var}).
+     * @return an empty {@link QueryParameter} that needs to be populated by calling
+     *         {@link QueryParameter#literal(String)}, {@link QueryParameter#anychar()} and
+     *         {@link QueryParameter#anyChars()}
+     * @since 8.4.5
+     * @since 9.3RC1
+     */
+    default QueryParameter bindValue(String var)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
      * @return map from parameter name to value.
      * @see #bindValue(String, Object)
      */

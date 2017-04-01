@@ -30,6 +30,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
 
 /**
@@ -195,6 +196,14 @@ public class DefaultQuery implements SecureQuery
             }
         }
         return this;
+    }
+
+    @Override
+    public QueryParameter bindValue(String var)
+    {
+        QueryParameter parameter = new DefaultQueryParameter(this);
+        bindValue(var, parameter);
+        return parameter;
     }
 
     @Override

@@ -31,7 +31,7 @@
   <name>XWiki Platform - Query - Manager</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Query API</xwiki.extension.name>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
@@ -51,6 +51,11 @@
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.jsqlparser</groupId>
+      <artifactId>jsqlparser</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <!-- Test Dependencies -->

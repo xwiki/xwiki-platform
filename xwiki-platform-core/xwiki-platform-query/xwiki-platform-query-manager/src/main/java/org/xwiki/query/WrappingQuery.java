@@ -105,6 +105,12 @@ public class WrappingQuery implements Query
     }
 
     @Override
+    public QueryParameter bindValue(String var)
+    {
+        return getWrappedQuery().bindValue(var);
+    }
+
+    @Override
     public Map<Integer, Object> getPositionalParameters()
     {
         return getWrappedQuery().getPositionalParameters();

@@ -89,8 +89,10 @@
 #macro(getChildren)
   #if ($doc.name == 'WebHome') ## terminal documents have no child
     #set($childCountXWQL = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
-    ## Note: The 'changeLikeEscape' filter is to make sure that we handle '\' in references when we're on MySQL.
-    #set($childCount = $services.query.xwql($childCountXWQL).bindValue('space', "${doc.space}.%").bindValue('fullName', $doc.fullName).addFilter('unique').addFilter('changeLikeEscape').count())
+    #set ($query = $services.query.xwql($childCountXWQL))
+    #set ($query = $query.bindValue('space').literal($doc.space).literal('.').anyChars().query())
+    #set ($query = $query.bindValue('fullName', $doc.fullName))
+    #set($childCount = $query.addFilter('unique').addFilter('escapeLikeParameters').count())
     #if ($childCount > 0)
       ## Check if we should propose by default to affect children when the only remaining children (after the delete) would be the WebPreferences document.
       #set ($webPreferencesDocumentReference = $services.model.createDocumentReference('WebPreferences', $doc.documentReference.lastSpaceReference))

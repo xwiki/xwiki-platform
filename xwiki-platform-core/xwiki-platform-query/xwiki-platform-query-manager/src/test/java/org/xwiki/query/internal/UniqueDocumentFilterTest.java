@@ -59,6 +59,10 @@ public class UniqueDocumentFilterTest
 
         List<String> items = Arrays.asList("doc1", "doc2");
         assertThat((List<String>) filter.filterResults(items), is(items));
+
+        // Verify it works with keywords in uppercase
+        assertEquals("select distinct doc.fullName FROM XWikiDocument doc",
+            filter.filterStatement("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL));
     }
 
     @Test

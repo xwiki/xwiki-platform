@@ -86,7 +86,10 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                     StringBuffer buffer = new StringBuffer();
                     for (ParameterPart part : queryParameter.getParts()) {
                         if (part instanceof LiteralParameterPart) {
-                            buffer.append(part.getValue().replaceAll("([%_!])", "!$1"));
+                            // SQL92 only specifies "%", "_" and the escape character itself.
+                            // However some DBs also support "[specifier]" and "[^specifier]" so by escaping "[" we're
+                            // playing it safe. See http://bit.ly/2ongxm6
+                            buffer.append(part.getValue().replaceAll("([\\[%_!])", "!$1"));
                         } else {
                             buffer.append(part.getValue());
                         }

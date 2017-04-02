@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
@@ -35,11 +33,9 @@ import org.hibernate.engine.NamedSQLQueryDefinition;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
@@ -284,8 +280,13 @@ public class HqlQueryExecutorTest
         QueryFilter filter = mock(QueryFilter.class);
         query.addFilter(filter);
         when(filter.filterStatement("foo", "sql")).thenReturn("bar");
-        ArgumentCaptor<Query> capturedQuery = ArgumentCaptor.forClass(Query.class);
-        when(filter.filterQuery(capturedQuery.capture())).thenReturn(capturedQuery.getValue());
+        when(filter.filterQuery(any(Query.class))).thenAnswer(new Answer<Query>() {
+            @Override
+            public Query answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return (Query) args[0];
+            }
+        });
 
         SQLQuery finalQuery = mock(SQLQuery.class);
         when(session.createSQLQuery("bar")).thenReturn(finalQuery);
@@ -335,11 +336,20 @@ public class HqlQueryExecutorTest
         query.bindValue("space").literal("test");
 
         QueryFilter filter = mock(QueryFilter.class);
-        ArgumentCaptor<String> capturedStatement = ArgumentCaptor.forClass(String.class);
-        when(filter.filterStatement(capturedStatement.capture(), any(String.class))).thenReturn(
-            capturedStatement.getValue());
-        ArgumentCaptor<Query> capturedQuery = ArgumentCaptor.forClass(Query.class);
-        when(filter.filterQuery(capturedQuery.capture())).thenReturn(capturedQuery.getValue());
+        when(filter.filterStatement(any(String.class), any(String.class))).thenAnswer(new Answer<String>() {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return (String) args[0];
+            }
+        });
+        when(filter.filterQuery(any(Query.class))).thenAnswer(new Answer<Query>() {
+            @Override
+            public Query answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return (Query) args[0];
+            }
+        });
 
         ComponentManager cm = this.mocker.getInstance(ComponentManager.class, "context");
         when(cm.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);

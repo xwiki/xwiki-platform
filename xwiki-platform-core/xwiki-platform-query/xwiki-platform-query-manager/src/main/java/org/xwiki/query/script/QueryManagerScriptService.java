@@ -97,11 +97,11 @@ public class QueryManagerScriptService implements ScriptService
 
     /**
      * Allow creating query parameters. For example:
-     * <code><pre>
+     * <pre>{@code
      * #set ($queryParams = [])
      * #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?")
      * #set ($discard = $queryParams.add($services.query.parameter().literal($request.space)))
-     * </pre></code>
+     * }</pre>
      *
      * @return the Query parameter object, see {@link QueryParameter} for more details on how to create the parameter
      *         content

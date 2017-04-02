@@ -28,11 +28,11 @@ package org.xwiki.query;
  *       respectively to the {@code %} and {@code _} SQL characters.</li>
  * </ul>
  * Example:
- * <code><pre>
+ * <pre>{@code
  * #set(xwql = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
  * #set ($query = $services.query.xwql(xwql))
  * #set ($query = $query.bindValue('space').literal($doc.space).literal('.').anyChars().query())
- * </pre></code>
+ * }</pre>
  *
  * @version $Id$
  * @since 8.4.5

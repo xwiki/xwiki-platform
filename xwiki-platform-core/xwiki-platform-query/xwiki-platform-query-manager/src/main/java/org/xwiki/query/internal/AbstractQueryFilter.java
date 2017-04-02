@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.text.StringUtils;
 
 /**
  * Abstract {@link QueryFilter} providing methods to parse Query statements.
@@ -35,15 +36,13 @@ public abstract class AbstractQueryFilter implements QueryFilter
 {
     /**
      * Usual identifier of the document full name column in our queries.
-     * Note: it's expressed in lowercase since we make comparisons in lowercases.
      */
-    protected static final String FULLNAME_COLUMN = "doc.fullname";
+    protected static final String FULLNAME_COLUMN = "doc.fullName";
 
     /**
      * Distinct document full name column in our queries.
-     * Note: it's expressed in lowercase since we make comparisons in lowercases.
      */
-    protected static final String DISTINCT_FULLNAME_COLUMN = "distinct doc.fullname";
+    protected static final String DISTINCT_FULLNAME_COLUMN = "distinct doc.fullName";
 
     /**
      * Character used to separate columns in select, order by and group by clauses.
@@ -79,7 +78,7 @@ public abstract class AbstractQueryFilter implements QueryFilter
     protected List<String> getSelectColumns(String statement)
     {
         List<String> columns = new ArrayList<>();
-        String select = statement.substring(SELECT.length(), statement.indexOf(FROM));
+        String select = statement.substring(SELECT.length(), StringUtils.indexOfIgnoreCase(statement, FROM));
         for (String column : select.split(COLUMN_SEPARATOR)) {
             columns.add(column.trim());
         }
@@ -99,11 +98,11 @@ public abstract class AbstractQueryFilter implements QueryFilter
     protected List<String> getOrderByColumns(String statement)
     {
         List<String> columns = new ArrayList<>();
-        int oidx = statement.indexOf(ORDER_BY);
+        int oidx = StringUtils.indexOfIgnoreCase(statement, ORDER_BY);
 
         if (oidx > -1) {
             String fragment = statement.substring(oidx + ORDER_BY.length());
-            int gidx = fragment.indexOf(GROUP_BY);
+            int gidx = StringUtils.indexOfIgnoreCase(fragment, GROUP_BY);
             if (gidx > -1) {
                 fragment = fragment.substring(0, gidx);
             }

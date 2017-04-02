@@ -68,8 +68,8 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
      */
     private boolean isFilterable(String statement)
     {
-        return getSelectColumns(statement).contains(FULLNAME_COLUMN)
-            && !getSelectColumns(statement).contains("distinct doc.fullName");
+        return getSelectColumns(statement).contains(FULLNAME_COLUMN.toLowerCase())
+            && !getSelectColumns(statement).contains(DISTINCT_FULLNAME_COLUMN.toLowerCase());
     }
 
     @Override
@@ -86,7 +86,7 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
 
             // Put back original select columns.
             int columnPosition = 1;
-            List<String> selectColumns = getSelectColumns(lcStatement);
+            List<String> selectColumns = getSelectColumns(original);
             for (String column : selectColumns) {
                 if (!FULLNAME_COLUMN.equals(column)) {
                     builder.append(prettySeparator);
@@ -95,7 +95,7 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
                 }
             }
             // Put the order by columns in the select clause to circumvent HQL limitations (distinct+order by).
-            for (String column : getOrderByColumns(lcStatement)) {
+            for (String column : getOrderByColumns(original)) {
                 if (!FULLNAME_COLUMN.equals(column) && !selectColumns.contains(column)) {
                     builder.append(prettySeparator);
                     builder.append(column);

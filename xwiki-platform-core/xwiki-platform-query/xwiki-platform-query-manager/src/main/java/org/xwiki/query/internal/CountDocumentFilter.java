@@ -59,7 +59,8 @@ public class CountDocumentFilter extends AbstractQueryFilter
     private boolean isFilterable(String statement)
     {
         List<String> selectColumns = getSelectColumns(statement);
-        return selectColumns.contains(FULLNAME_COLUMN) || selectColumns.contains(DISTINCT_FULLNAME_COLUMN);
+        return selectColumns.contains(FULLNAME_COLUMN.toLowerCase())
+            || selectColumns.contains(DISTINCT_FULLNAME_COLUMN.toLowerCase());
     }
 
     @Override
@@ -70,7 +71,7 @@ public class CountDocumentFilter extends AbstractQueryFilter
         String original = result;
 
         if (Query.HQL.equals(language) && isFilterable(lcOriginal)) {
-            String distinct = getSelectColumns(lcOriginal).contains(DISTINCT_FULLNAME_COLUMN) ? "distinct " : "";
+            String distinct = getSelectColumns(statement).contains(DISTINCT_FULLNAME_COLUMN) ? "distinct " : "";
             result = "select count(" + distinct + "doc.fullName) "
                 + result.substring(lcOriginal.indexOf("from xwikidocument"));
 

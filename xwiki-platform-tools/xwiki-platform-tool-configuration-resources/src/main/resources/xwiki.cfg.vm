@@ -42,7 +42,7 @@
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
 #-# document names.
-# xwiki.users.initialGroups=XWiki.XWikiAllGroup
+# xwiki.users.initialGroup = (xwiki.authentication.group.allgroupimplicit != 1)  ? "XWiki.XWikiAllGroup" : ""
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
 #-# group's document?

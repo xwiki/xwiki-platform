@@ -55,7 +55,6 @@
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
       <artifactId>jsqlparser</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <!-- Test Dependencies -->

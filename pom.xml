@@ -374,36 +374,42 @@
         <version>${pdfbox.version}</version>
       </dependency>
       <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>fop</artifactId>
-      <version>2.1</version>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>xmlgraphics-commons</artifactId>
-      <version>2.2</version>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- Needed to have a nice toggle button instead of plain checkboxes in the UI -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap-switch</artifactId>
-      <version>3.3.2</version>
-      <scope>runtime</scope>
-    </dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>fop</artifactId>
+        <version>2.1</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>xmlgraphics-commons</artifactId>
+        <version>2.2</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- Needed to have a nice toggle button instead of plain checkboxes in the UI -->
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap-switch</artifactId>
+        <version>3.3.2</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!--Used by oldcore + querymanager -->
+      <dependency>
+        <groupId>com.github.jsqlparser</groupId>
+        <artifactId>jsqlparser</artifactId>
+        <version>1.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

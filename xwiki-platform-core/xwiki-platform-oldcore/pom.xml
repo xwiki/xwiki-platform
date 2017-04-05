@@ -164,7 +164,6 @@
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
       <artifactId>jsqlparser</artifactId>
-      <version>0.9.6</version>
     </dependency>
 
     <!-- UnexpectedException -->

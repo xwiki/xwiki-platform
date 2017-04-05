@@ -11,39 +11,74 @@
 ## Display the 4 menus
 ##
 #if ($displayContentMenu)
-#template("menus_macros.vm")
-<div id="contentmenu" class="pull-right actionmenu">
-  #if ($displayEditMenu && $hasEdit && !$isReadOnly)
-    #displayEditMenu()
-  #end
-  ## Display a create menu if the user has the right to create spaces in the current wiki (since the Create UI supports)
-  ## creating pages in other places in the hierarchy) or if the user has right to create pages in the current location.
-  ## This supports the following 2 use cases for non-admin users:
-  ## - I'm on a space where I don't have permissions to create pages but I have the right to create pages in the wiki.
-  ##   Example: I'm on my user profile which is located in the XWiki space (in which users don't have Edit rights by
-  ##   default). I can see the Create button. See https://jira.xwiki.org/browse/XWIKI-10999
-  ## - I don't have the right to create pages in the wiki but I have the right to create pages under a given hierarchy.
-  ##   Example: I'm allowed to create pages only in the Sandbox space and I'm there. I can see the Create button.
-  ##   See https://jira.xwiki.org/browse/XWIKI-13847
-  #if ($displayCreateMenu && ($hasCreateSpace || $hasCreatePage))
-    #displayCreateButton()
-  #end
-  
-  #if ($displayAdminMenu)
-    #displayAdminMenu()
-  #end
-  
-  #if ($displayMoreActionsMenu)
-    #diplayOptionsMenu()
-    #if ($canView)
-      #template("export_modal.vm")
-      #exportModal()
+  #template("menus_macros.vm")
+  ##
+  #set ($topStaticExtensions = [])
+  ##
+  ## EDIT menu
+  ##
+  #define ($editMenu)
+    #if ($displayEditMenu && $hasEdit && !$isReadOnly)
+      #displayEditMenu()
     #end
   #end
-  #if($keyboardShortcutsEnabled)
-    #keyboardShortcuts()
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!editMenu", 'order': 10000}))
+  ##
+  ## CREATE menu
+  ##
+  #define ($createMenu)
+    ## Display a create menu if the user has the right to create spaces in the current wiki (since the Create UI supports)
+    ## creating pages in other places in the hierarchy) or if the user has right to create pages in the current location.
+    ## This supports the following 2 use cases for non-admin users:
+    ## - I'm on a space where I don't have permissions to create pages but I have the right to create pages in the wiki.
+    ##   Example: I'm on my user profile which is located in the XWiki space (in which users don't have Edit rights by
+    ##   default). I can see the Create button. See https://jira.xwiki.org/browse/XWIKI-10999
+    ## - I don't have the right to create pages in the wiki but I have the right to create pages under a given hierarchy.
+    ##   Example: I'm allowed to create pages only in the Sandbox space and I'm there. I can see the Create button.
+    ##   See https://jira.xwiki.org/browse/XWIKI-13847
+    #if ($displayCreateMenu && ($hasCreateSpace || $hasCreatePage))
+      #displayCreateButton()
+    #end
   #end
-</div>
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!createMenu", 'order': 20000}))
+  ##
+  ## ADMIN menu
+  ##
+  #define ($adminMenu)
+    #if ($displayAdminMenu)
+      #displayAdminMenu()
+    #end
+  #end
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!adminMenu", 'order': 30000}))
+  ##
+  ## MORE ACTIONS menu
+  ##
+  #define ($moreActionsMenu)
+    #if ($displayMoreActionsMenu)
+      #diplayOptionsMenu()
+      #if ($canView)
+        #template("export_modal.vm")
+        #exportModal()
+      #end
+    #end
+  #end
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!moreActionsMenu", 'order': 40000}))
+  ##
+  ## Display all the extensions points, including the static ones
+  ##
+  #define ($menuContent)
+    #displaySecureUIX('org.xwiki.plaftorm.menu.content', $topStaticExtensions)
+  #end
+  ##
+  ## Display the menu
+  ##
+  <div id="contentmenu" class="pull-right actionmenu">
+    $menuContent
+
+    #if($keyboardShortcutsEnabled)
+      #keyboardShortcuts()
+    #end
+  </div>
 #end
 
 #**

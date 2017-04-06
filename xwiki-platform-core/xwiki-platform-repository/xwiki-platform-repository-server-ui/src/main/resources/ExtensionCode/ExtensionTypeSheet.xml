@@ -20,30 +20,46 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.2" reference="ExtensionCode.ExtensionTypeSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionTypeSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ExtensionCode.ExtensionTypeClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1319443834000</creationDate>
-  <date>1329754225000</date>
-  <contentUpdateDate>1329754225000</contentUpdateDate>
+  <parent>ExtensionCode.ExtensionTypeClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1491465094000</date>
+  <contentUpdateDate>1491465094000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set($extensionType = $doc.getObject("ExtensionCode.ExtensionTypeClass"))
+{{/velocity}}
+
+{{velocity}}
+#if ($extensionType)
+  ; Type
+  : $doc.display('id', $extensionType)
+  ; Name
+  : $doc.display('name', $extensionType)
+  ; Description
+  : $doc.display('description', $extensionType)
+  ; Installation instructions
+  : $doc.display('installation', $extensionType)
+#end
+{{/velocity}}</content>
   <object>
+    <name>ExtensionCode.ExtensionTypeSheet</name>
+    <number>0</number>
+    <className>XWiki.SheetClass</className>
+    <guid>6c785e0e-bba5-4c36-9423-2d1104db6645</guid>
     <class>
       <name>XWiki.SheetClass</name>
       <customClass/>
@@ -63,28 +79,8 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultEditMode>
     </class>
-    <name>ExtensionCode.ExtensionTypeSheet</name>
-    <number>0</number>
-    <className>XWiki.SheetClass</className>
-    <guid>6c785e0e-bba5-4c36-9423-2d1104db6645</guid>
     <property>
       <defaultEditMode/>
     </property>
   </object>
-  <content>{{velocity output="false"}}
-#set($extensionType = $doc.getObject("ExtensionCode.ExtensionTypeClass"))
-{{/velocity}}
-
-{{velocity}}
-#if ($extensionType)
-  ; Type
-  : $extensionType.display('id')
-  ; Name
-  : $extensionType.display('name')
-  ; Description
-  : $extensionType.display('description')
-  ; Installation instructions
-  : $extensionType.display('installation')
-#end
-{{/velocity}}</content>
 </xwikidoc>

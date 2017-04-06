@@ -19,6 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
+import java.io.File;
 import java.net.URL;
 
 import javax.inject.Inject;
@@ -26,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -44,10 +46,9 @@ import org.xwiki.environment.Environment;
 @Singleton
 public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSource implements Initializable
 {
-    /**
-     * The file where standard filesystem properties are located.
-     */
-    private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
+    private static final String XWIKI_PROPERTIES_FILE = "xwiki.properties";
+
+    private static final String XWIKI_PROPERTIES_WARPATH = "/WEB-INF/" + XWIKI_PROPERTIES_FILE;
 
     /**
      * the Environment from where to get the XWiki properties file.
@@ -64,30 +65,46 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     @Override
     public void initialize() throws InitializationException
     {
+        setConfiguration(loadConfiguration());
+    }
+
+    private Configuration loadConfiguration()
+    {
+        // Looking for /etc/xwiki/xwiki.properties first
+        File file = new File("/etc/xwiki/" + XWIKI_PROPERTIES_FILE);
+        if (file.exists()) {
+            try {
+                return new PropertiesConfiguration(file);
+            } catch (Exception e) {
+                // Note: if we cannot read the configuration file for any reason we log a warning but continue since
+                // XWiki will use default values for all configurable elements.
+                this.logger.warn("Failed to load configuration file [{}]", file, e.getMessage());
+            }
+        }
+
         // Register the Commons Properties Configuration, looking for a xwiki.properties file
         // in the XWiki path somewhere.
         URL xwikiPropertiesUrl = null;
         try {
-            xwikiPropertiesUrl = this.environment.getResource(XWIKI_PROPERTIES_FILE);
+            xwikiPropertiesUrl = this.environment.getResource(XWIKI_PROPERTIES_WARPATH);
             if (xwikiPropertiesUrl != null) {
-                setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
+                return new PropertiesConfiguration(xwikiPropertiesUrl);
             } else {
                 // We use a debug logging level here since we consider it's ok that there's no XWIKI_PROPERTIES_FILE
                 // available, in which case default values are used.
                 this.logger.debug("No configuration file [{}] found. Using default configuration values.",
-                    XWIKI_PROPERTIES_FILE);
+                    XWIKI_PROPERTIES_WARPATH);
             }
         } catch (Exception e) {
             // Note: if we cannot read the configuration file for any reason we log a warning but continue since XWiki
             // will use default values for all configurable elements.
-            this.logger.warn("Failed to load configuration file [{}]. Using default configuration values. "
-                + "Internal error [{}]", XWIKI_PROPERTIES_FILE, e.getMessage());
+            this.logger.warn(
+                "Failed to load configuration file [{}]. Using default configuration values. " + "Internal error [{}]",
+                XWIKI_PROPERTIES_WARPATH, e.getMessage());
         }
 
         // If no Commons Properties Configuration has been set, use a default empty Commons Configuration
         // implementation.
-        if (xwikiPropertiesUrl == null) {
-            setConfiguration(new BaseConfiguration());
-        }
+        return new BaseConfiguration();
     }
 }

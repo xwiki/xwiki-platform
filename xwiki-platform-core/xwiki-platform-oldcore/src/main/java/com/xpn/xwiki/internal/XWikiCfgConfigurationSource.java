@@ -87,7 +87,10 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
             Context envContext = (Context) new InitialContext().lookup("java:comp/env");
             configurationLocation = (String) envContext.lookup(CFG_ENV_NAME);
         } catch (Exception e) {
-            configurationLocation = "/WEB-INF/xwiki.cfg";
+            configurationLocation = "/etc/xwiki/xwiki.cfg";
+            if (!new File(configurationLocation).exists()) {
+                configurationLocation = "/WEB-INF/xwiki.cfg";
+            }
         }
 
         return configurationLocation;
@@ -98,41 +101,45 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     {
         this.configurationLocation = getConfigPath();
 
-        InputStream xwikicfgis = null;
+        InputStream xwikicfgis = loadConfiguration();
 
-        try {
-            // First try loading from a file.
-            File f = new File(this.configurationLocation);
+        if (xwikicfgis != null) {
             try {
-                if (f.exists()) {
-                    xwikicfgis = new FileInputStream(f);
-                }
-            } catch (Exception e) {
-                // Error loading the file. Most likely, the Security Manager prevented it.
-                // We'll try loading it as a resource below.
-                this.logger.debug("Failed to load the file [{}] using direct file access."
-                    + " Trying to load it as a resource using the Servlet Context...", this.configurationLocation, e);
-            }
-
-            // Second, try loading it as a resource from the environment
-            if (xwikicfgis == null) {
-                xwikicfgis = this.environment.getResourceAsStream(this.configurationLocation);
-                this.logger.debug("Failed to load the file [{}] as a resource "
-                    + "using the Servlet Context. Trying to load it as classpath resource...",
-                    this.configurationLocation);
-            }
-
-            // Third, try loading it from the classloader used to load this current class
-            if (xwikicfgis == null) {
-                xwikicfgis = Thread.currentThread().getContextClassLoader().getResourceAsStream("xwiki.cfg");
-            }
-
-            if (xwikicfgis != null) {
                 this.properties.load(xwikicfgis);
+            } catch (Exception e) {
+                this.logger.error("Failed to load configuration", e);
+            }
+        }
+    }
+
+    private InputStream loadConfiguration()
+    {
+        this.configurationLocation = getConfigPath();
+
+        // First try loading from a file.
+        File f = new File(this.configurationLocation);
+        try {
+            if (f.exists()) {
+                return new FileInputStream(f);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to load configuration", e);
+            // Error loading the file. Most likely, the Security Manager prevented it.
+            // We'll try loading it as a resource below.
+            this.logger.debug("Failed to load the file [{}] using direct file access."
+                + " Trying to load it as a resource using the Servlet Context...", this.configurationLocation, e);
         }
+
+        // Second, try loading it as a resource from the environment
+        InputStream xwikicfgis = this.environment.getResourceAsStream(this.configurationLocation);
+        this.logger.debug("Failed to load the file [{}] as a resource using the Servlet Context."
+            + " Trying to load it as classpath resource...", this.configurationLocation);
+
+        // Third, try loading it from the classloader used to load this current class
+        if (xwikicfgis == null) {
+            xwikicfgis = Thread.currentThread().getContextClassLoader().getResourceAsStream("xwiki.cfg");
+        }
+
+        return xwikicfgis;
     }
 
     /**

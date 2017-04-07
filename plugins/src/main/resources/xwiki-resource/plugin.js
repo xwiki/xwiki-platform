@@ -180,19 +180,6 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
         },
         onSelectResource: function(event, resource) {
           this.selectedResource = resource;
-        },
-        getResourceLabel: function() {
-          var resourceReference = this.getValue();
-          if (this.selectedResource && this.selectedResource.title &&
-              this.selectedResource.reference.type === resourceReference.type &&
-              this.selectedResource.reference.reference === resourceReference.reference) {
-            return this.selectedResource.title;
-          } else if (resourceReference.reference) {
-            return resourceReference.reference;
-          } else {
-            // Some resource types support empty (relative) references.
-            return 'type the link label';
-          }
         }
       };
       pickerDefinition = pickerDefinition || {};

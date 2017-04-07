@@ -19,6 +19,7 @@
  */
 (function (){
   'use strict';
+  var $ = jQuery;
   var wikiLinkClassPattern =  /\bwiki(\w*)link\b/i;
   var resourceTypeToLinkType = {
     attach: 'attachment',
@@ -134,6 +135,10 @@
             var type = reference.indexOf('://') < 0 ? 'path' : 'url';
             data.resourceReference = {type: type, reference: reference};
           }
+          var wikiGeneratedLinkContent = element.getAttribute('data-wikigeneratedlinkcontent');
+          if (wikiGeneratedLinkContent) {
+            data.wikiGeneratedLinkContent = wikiGeneratedLinkContent;
+          }
         }
         return data;
       };
@@ -149,6 +154,9 @@
           attributes.set['data-reference'] = CKEDITOR.plugins.xwikiResource
             .serializeResourceReference(resourceReference);
           attributes.set['data-linktype'] = resourceTypeToLinkType[resourceReference.type] || '';
+        }
+        if (data.wikiGeneratedLinkContent) {
+          attributes.set['data-wikigeneratedlinkcontent'] = data.wikiGeneratedLinkContent;
         }
         return attributes;
       };
@@ -305,17 +313,6 @@
         });
         dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
-      },
-      onSelectResource: function(event, resource) {
-        this.base.onSelectResource.apply(this, arguments);
-        this.maybeUpdateLinkLabel();
-      },
-      maybeUpdateLinkLabel: function() {
-        var linkLabelField = this.getDialog().getContentElement('info', 'linkDisplayText');
-        if (linkLabelField.getValue() === '') {
-          // Use the resource label (e.g. the wiki page title or the attachment file name) as link label.
-          linkLabelField.setValue(this.getResourceLabel());
-        }
       }
     });
   };
@@ -425,16 +422,99 @@
    */
   var overwriteDefaultLinkLabel = function(dialogDefinition) {
     var linkLabelField = dialogDefinition.getContents('info').get('linkDisplayText');
+    var oldSetup = linkLabelField.setup;
     var oldCommit = linkLabelField.commit;
-    linkLabelField.commit = function(data) {
-      if (this.getValue() === '') {
-        // Use the resource label (e.g. the wiki page title or the attachment file name) as link label.
-        this.setValue(this.getDialog().getContentElement('info', 'resourceReference').getResourceLabel());
+    CKEDITOR.tools.extend(linkLabelField, {
+      setup: function(data) {
+        if (typeof oldSetup === 'function') {
+          oldSetup.apply(this, arguments);
+        }
+        if (!this.resourceReferenceField) {
+          // We don't add the event listener onLoad because the resource reference field is initialized later.
+          this.resourceReferenceField = this.getDialog().getContentElement('info', 'resourceReference');
+          // Update the wiki generated link content whenever a new resource is selected.
+          $(this.resourceReferenceField.getElement().$).on('selectResource', $.proxy(this,
+            'maybeUpdateWikiGeneratedLinkContent'));
+        }
+        this.wikiGeneratedLinkContent = data.wikiGeneratedLinkContent;
+        delete this.validationRequest;
+      },
+      validate: function() {
+        if (!this.validationRequest) {
+          // Trigger a new validation.
+          this.validationRequest = this.validateAsync().always($.proxy(function() {
+            // Re-submit the dialog after the current event is handled.
+            setTimeout($.proxy(function() {
+              this.getDialog().click('ok');
+            }, this), 0);
+          }, this));
+          return false;
+        } else if (this.validationRequest.state() === 'pending') {
+          // Block the submit while the validation takes place.
+          return false;
+        } else {
+          // Trigger a new validation next time validate() is called.
+          delete this.validationRequest;
+          return true;
+        }
+      },
+      validateAsync: function() {
+        // Update the wiki generated link content based on the selected resource before submitting the dialog.
+        var resourceReferenceField = this.getDialog().getContentElement('info', 'resourceReference');
+        // Call the base function because we don't need the resource reference parameters.
+        var resourceReference = resourceReferenceField.base.getValue.call(resourceReferenceField);
+        return this.maybeUpdateWikiGeneratedLinkContent(null, {'reference': resourceReference});
+      },
+      commit: function(data) {
+        if (typeof oldCommit === 'function') {
+          oldCommit.apply(this, arguments);
+        }
+        data.wikiGeneratedLinkContent = this.wikiGeneratedLinkContent;
+      },
+      // Update the link label when a different resource is selected, if there's no label set or the current label is
+      // generated automatically.
+      maybeUpdateWikiGeneratedLinkContent: function(event, resource) {
+        var value = this.getValue();
+        if (value === '' || value === this.wikiGeneratedLinkContent) {
+          return this.getWikiGeneratedLinkContent(resource).done($.proxy(function(wikiGeneratedLinkContent) {
+            this.setValue(wikiGeneratedLinkContent);
+            this.wikiGeneratedLinkContent = wikiGeneratedLinkContent;
+          }, this)).fail($.proxy(function() {
+            if (value === '') {
+              // Fall-back on the resource label.
+              this.setValue(this.getResourceLabel(resource));
+            }
+            delete this.wikiGeneratedLinkContent;
+          }, this));
+        } else {
+          return $.Deferred().resolve();
+        }
+      },
+      // We use this as a fall-back when the request for the wiki generated link content fails.
+      getResourceLabel: function(resource) {
+        return (resource && resource.title) ||
+          (resource && resource.entityReference && resource.entityReference.name) ||
+          (resource && resource.reference && resource.reference.reference) ||
+          'type the link label';
+      },
+      getWikiGeneratedLinkContent: function(resource) {
+        var sendRequest = $.proxy(function() {
+          this.getDialog().setState(CKEDITOR.DIALOG_STATE_BUSY);
+          var resourceReference = (resource && resource.reference) || {};
+          var config = this.getDialog().getParentEditor().config['xwiki-link'] || {};
+          return $.get(config.labelGenerator, resourceReference).then(function(html) {
+            // Extract the wiki generated link content from the HTML.
+            return $(html).find('.wikigeneratedlinkcontent').text();
+          }).always($.proxy(function() {
+            this.getDialog().setState(CKEDITOR.DIALOG_STATE_IDLE);
+          }, this));
+        }, this);
+        // Wait until the previous request is handled, by chaining the requests.
+        this.wikiGeneratedLinkContentRequest = (this.wikiGeneratedLinkContentRequest || $.Deferred().resolve())
+          .then(sendRequest, sendRequest);
+        return this.wikiGeneratedLinkContentRequest;
       }
-      if (typeof oldCommit === 'function') {
-        oldCommit.apply(this, arguments);
-      }
-    };
+    }, true);
   };
 
   // Adds a context menu entry to open the selected link in a new tab.
@@ -445,7 +525,7 @@
       return;
     }
 
-    editor.addCommand( 'openLink', {
+    editor.addCommand('openLink', {
       exec: function(editor) {
         var anchor = getActiveLink(editor);
         if (anchor) {

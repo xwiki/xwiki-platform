@@ -298,11 +298,14 @@ define('xwiki-ckeditor', [
       })),
       // This is used in CKEditor.FileUploader so we must keep them in sync.
       fileTools_defaultFileName: '__fileCreatedFromDataURI__',
+      height: $(element).height(),
+      language: $('html').attr('xml:lang'),
+      'xwiki-link': {
+        labelGenerator: sourceDocument.getURL('get', 'sheet=CKEditor.LinkLabelGenerator&amp;outputSyntax=plain')
+      },
       'xwiki-resource': {
         dispatcher: sourceDocument.getURL('get', 'sheet=CKEditor.ResourceDispatcher&amp;outputSyntax=plain')
       },
-      height: $(element).height(),
-      language: $('html').attr('xml:lang'),
       'xwiki-source': {
         htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
       }

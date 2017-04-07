@@ -73,19 +73,27 @@ public class XarExtensionPlan implements Closeable
     public XarExtensionPlan(ExtensionPlan plan, InstalledExtensionRepository xarRepository,
         LocalExtensionRepository localReposirory) throws ExtensionException, XarException, IOException
     {
-        this.previousXAREntries = new HashMap<String, Map<XarEntry, XarExtensionPlanEntry>>();
-        this.nextXAREntries = new HashMap<String, Map<XarEntry, LocalExtension>>();
+        this.previousXAREntries = new HashMap<>();
+        this.nextXAREntries = new HashMap<>();
 
-        Map<ExtensionId, XarExtensionPlanEntry> planEntry = new HashMap<ExtensionId, XarExtensionPlanEntry>();
+        Map<ExtensionId, XarExtensionPlanEntry> planEntry = new HashMap<>();
 
         for (ExtensionPlanAction action : plan.getActions()) {
             if (action.getExtension().getType().equals(XarExtensionHandler.TYPE)) {
                 // Get previous entries
                 Collection<InstalledExtension> previousExtensions = action.getPreviousExtensions();
                 for (InstalledExtension previousExtension : previousExtensions) {
-                    if (previousExtension != null) {
+                    if (previousExtension != null && previousExtension.getType().equals(XarExtensionHandler.TYPE)) {
                         XarInstalledExtension previousXARExtension =
                             (XarInstalledExtension) xarRepository.getInstalledExtension(previousExtension.getId());
+
+                        if (previousXARExtension == null) {
+                            // Very weird situation but let's be safe
+                            LOGGER.error("Installed extension [{}] is not properly registered in"
+                                + " the virtual XAR installed extensions repository", previousExtension);
+
+                            continue;
+                        }
 
                         XarExtensionPlanEntry xarPlanEntry = planEntry.get(previousXARExtension.getId());
                         if (xarPlanEntry == null) {
@@ -103,7 +111,7 @@ public class XarExtensionPlan implements Closeable
                             }
                             Map<XarEntry, XarExtensionPlanEntry> pages = previousXAREntries.get(wiki);
                             if (pages == null) {
-                                pages = new HashMap<XarEntry, XarExtensionPlanEntry>();
+                                pages = new HashMap<>();
                                 this.previousXAREntries.put(wiki, pages);
                             }
                             pages.put(entry, xarPlanEntry);
@@ -129,7 +137,7 @@ public class XarExtensionPlan implements Closeable
                             }
                             Map<XarEntry, LocalExtension> pages = this.nextXAREntries.get(wiki);
                             if (pages == null) {
-                                pages = new HashMap<XarEntry, LocalExtension>();
+                                pages = new HashMap<>();
                                 this.nextXAREntries.put(wiki, pages);
                             }
                             pages.put(entry, nextExtension);

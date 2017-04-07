@@ -861,7 +861,7 @@ a.cke_button_disabled &gt; span.cke_button_icon.loading {
 .ckeditor-textarea.loading {
   border: 0 none;
   box-shadow: none;
-  color: white;
+  color: transparent;
   cursor: wait;
   overflow: hidden;
   resize: none;

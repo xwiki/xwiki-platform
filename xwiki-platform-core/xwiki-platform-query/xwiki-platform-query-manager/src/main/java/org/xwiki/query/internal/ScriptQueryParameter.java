@@ -53,6 +53,13 @@ public class ScriptQueryParameter implements QueryParameter
     }
 
     @Override
+    public QueryParameter like(String like)
+    {
+        this.parameter.like(like);
+        return this;
+    }
+
+    @Override
     public QueryParameter anychar()
     {
         this.parameter.anychar();

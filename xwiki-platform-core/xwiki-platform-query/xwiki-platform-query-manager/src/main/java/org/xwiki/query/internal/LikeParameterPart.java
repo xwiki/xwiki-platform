@@ -20,19 +20,21 @@
 package org.xwiki.query.internal;
 
 /**
- * Represents characters for which the {@code %}, {@code _} and {@code [} (see http://bit.ly/2ongxm6 to understand more)
- * characters need to be escaped.
+ * Represents characters for which no escaping will be performed, i.e. they'll behave as they would behave in a SQL
+ * like clause as is (for example {@code %} will mean any char, etc). This is interesting when you don't control the
+ * input and you wish special LIKE characters to keep their meanings but you still wish that the SQL escape character
+ * used be defined (and not default to {@code \} for MySQL for example).
  *
  * @version $Id$
  * @since 8.4.5
  * @since 9.3RC1
  */
-public class LiteralParameterPart extends ParameterPart
+public class LikeParameterPart extends ParameterPart
 {
     /**
      * @param part the literals that will be escaped
      */
-    public LiteralParameterPart(String part)
+    public LikeParameterPart(String part)
     {
         super(part);
     }

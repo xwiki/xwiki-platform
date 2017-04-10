@@ -47,6 +47,13 @@ public interface QueryParameter
     QueryParameter literal(String literal);
 
     /**
+     * @param like the characters that will get executed as is (i.e no escape will be performed on them) at query
+     *        execution time
+     * @return this object, in order to make the API fluent
+     */
+    QueryParameter like(String like);
+
+    /**
      * Append a {@code _} character that will not be escaped.
      *
      * @return this object, in order to make the API fluent

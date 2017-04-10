@@ -71,6 +71,13 @@ public class DefaultQueryParameter implements QueryParameter
     }
 
     @Override
+    public QueryParameter like(String like)
+    {
+        this.parts.add(new LikeParameterPart(like));
+        return this;
+    }
+
+    @Override
     public QueryParameter anychar()
     {
         this.parts.add(new AnyCharParameterPart());

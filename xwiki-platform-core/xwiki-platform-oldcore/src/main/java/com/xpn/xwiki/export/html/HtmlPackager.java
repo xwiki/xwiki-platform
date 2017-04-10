@@ -412,7 +412,10 @@ public class HtmlPackager
         for (DocumentReference reference : this.pageReferences) {
             builder.append("        <li><a href=\"");
             builder.append("pages/");
-            builder.append(this.pathEntityReferenceSerializer.serialize(reference));
+            // Compute the relative URL corresponding to the path.
+            String relativeURL = new File("").toURI().relativize(
+                new File(this.pathEntityReferenceSerializer.serialize(reference)).toURI()).toString();
+            builder.append(relativeURL);
             builder.append(".html");
             builder.append("\">");
             builder.append(reference.toString());

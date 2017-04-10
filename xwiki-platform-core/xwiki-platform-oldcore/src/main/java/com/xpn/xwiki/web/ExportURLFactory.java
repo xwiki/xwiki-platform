@@ -463,7 +463,12 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 newpath.append(StringUtils.repeat("../", getFilesystemExportContext().getDocParentLevel()));
 
                 newpath.append("pages/");
-                newpath.append(serializedReference);
+
+                // Compute a valid relative URL from a FS path.
+                String relativeURLPath =
+                    new File("").toURI().relativize(new File(serializedReference).toURI()).toString();
+
+                newpath.append(relativeURLPath);
                 newpath.append(".html");
 
                 if (!StringUtils.isEmpty(anchor)) {
@@ -519,11 +524,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
         // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
         adjustCSSPath(newPath);
 
-        newPath.append(path);
+        // Compute a valid relative URL from a FS path.
+        String relativeURLPath = new File("").toURI().relativize(new File(path).toURI()).toString();
+        newPath.append(relativeURLPath);
 
-        // Since the returned URL is used in HTML links, we need to escape "%" characters so that browsers don't decode
-        // for example %2E as "." by default which would lead to the browser not finding the file on the filesystem.
-        return new URL(newPath.toString().replaceAll("%", "%25"));
+        return new URL(newPath.toString());
     }
 
     @Override

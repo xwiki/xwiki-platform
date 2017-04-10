@@ -19,7 +19,7 @@
  */
 package org.xwiki.mail.script;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,16 +32,19 @@ import javax.inject.Singleton;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.mail.MailContentStore;
-import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailResender;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -61,8 +64,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
      */
     private static final String ERROR_KEY = "scriptservice.mailstorage.error";
 
-    private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
-
     @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
@@ -80,47 +81,79 @@ public class MailStorageScriptService extends AbstractMailScriptService
     @Inject
     private MailStorageConfiguration storageConfiguration;
 
+    @Inject
+    @Named("database")
+    private MailResender mailResender;
+
     /**
      * Resend the serialized MimeMessage synchronously.
      *
      * @param batchId the name of the directory that contains serialized MimeMessage
      * @param uniqueMessageId the unique id of the serialized MimeMessage
-     * @return the result and status of the send batch
+     * @return the result and status of the send batch; null if an error occurred when getting the message from the
+     *         store
      */
     public ScriptMailResult resend(String batchId, String uniqueMessageId)
     {
-        // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
-        // to be able to call this method and for it to have any effect.
-
-        MailListener listener;
-        try {
-            listener = this.componentManagerProvider.get().getInstance(MailListener.class, "database");
-        } catch (ComponentLookupException e) {
-            // Save the exception for reporting through the script services's getLastError() API
-            setError(e);
-            // Don't send the mail!
-            return null;
+        ScriptMailResult result = resendAsynchronously(batchId, uniqueMessageId);
+        if (result != null) {
+            // Wait for the message to have been resent before returning
+            result.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
         }
+        return result;
+    }
 
-        MimeMessage message;
+    /**
+     * Resend the serialized MimeMessage asynchronously.
+     *
+     * @param batchId the name of the directory that contains serialized MimeMessage
+     * @param uniqueMessageId the unique id of the serialized MimeMessage
+     * @return the result and status of the send batch; null if an error occurred when getting the message from the
+     *         store
+     * @since 9.3RC1
+     */
+    @Unstable
+    public ScriptMailResult resendAsynchronously(String batchId, String uniqueMessageId)
+    {
         try {
-            // Set the batch id so that no new batch id is generated when re-sending the mail
-            Session session = this.sessionFactory.create(Collections.singletonMap(SESSION_BATCHID_KEY, batchId));
-
-            message = loadMessage(session, batchId, uniqueMessageId);
-
-            ScriptMailResult scriptMailResult = new ScriptMailResult(this.mailSender.sendAsynchronously(
-                Arrays.asList(message), session, listener), listener.getMailStatusResult());
-
-            // Wait for all messages from this batch to have been sent before returning
-            scriptMailResult.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
-
+            MailStatusResult statusResult = this.mailResender.resendAsynchronously(batchId, uniqueMessageId);
+            ScriptMailResult scriptMailResult = new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
             return scriptMailResult;
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
             return null;
         }
+    }
+
+    /**
+     * Resends all mails matching the passed filter map.
+     *
+     * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
+     * @param offset the number of rows to skip (0 means don't skip any row)
+     * @param count the number of rows to return. If 0 then all rows are returned
+     * @return the mail results for the resent mails and null if an error occurred while loading the mail statuses
+     *         from the store
+     * @since 9.3RC1
+     */
+    @Unstable
+    public List<ScriptMailResult> resendAsynchronously(Map<String, Object> filterMap, int offset, int count)
+    {
+        List<Pair<MailStatus, MailStatusResult>> results;
+        try {
+            results = this.mailResender.resendAsynchronously(filterMap, offset, count);
+        } catch (MailStoreException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
+            return null;
+        }
+
+        List<ScriptMailResult> scriptResults = new ArrayList<>();
+        for (Pair<MailStatus, MailStatusResult> result : results) {
+            scriptResults.add(new ScriptMailResult(
+                new DefaultMailResult(result.getLeft().getBatchId()), result.getRight()));
+        }
+        return scriptResults;
     }
 
     /**

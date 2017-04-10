@@ -56,10 +56,10 @@ public interface MailStatusStore
     /**
      * Loads all message statuses matching the passed filters.
      *
-     * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
      * @param offset the number of rows to skip (0 means don't skip any row)
      * @param count the number of rows to return. If 0 then all rows are returned
-     * @param sortField the name of the field used to order returned status
+     * @param sortField the name of the field used to order returned status or null if not sort should be performed
      * @param sortAscending when true, sort is done in ascending order of sortField, else in descending order
      * @return the loaded {@link org.xwiki.mail.MailStatus} instances
      * @throws MailStoreException when an error occurs while loading the data
@@ -71,7 +71,7 @@ public interface MailStatusStore
     /**
      * Count the number of message statuses matching the passed filters.
      *
-     * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @param filterMap the map of Mail Status parameters to match (e.g. "state", "wiki", "batchId", etc)
      * @return the number of emails matching the passed filters
      * @throws MailStoreException when an error occurs when loading the data
      */

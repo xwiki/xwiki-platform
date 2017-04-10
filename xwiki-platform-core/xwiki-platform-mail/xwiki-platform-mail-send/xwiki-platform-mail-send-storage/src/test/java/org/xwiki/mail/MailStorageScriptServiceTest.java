@@ -19,15 +19,15 @@
  */
 package org.xwiki.mail;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.Map;
 
 import javax.inject.Provider;
-import javax.mail.Session;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,9 +35,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.mail.internal.MemoryMailListener;
-import org.xwiki.mail.internal.UpdateableMailStatusResult;
 import org.xwiki.mail.script.MailStorageScriptService;
 import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -48,9 +46,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -81,24 +77,10 @@ public class MailStorageScriptServiceTest
     }
 
     @Test
-    public void resendWhenDatabaseListenerNotFound() throws Exception
+    public void resendWhenMailResendingFailed() throws Exception
     {
-        ScriptMailResult result = this.mocker.getComponentUnderTest().resend("batchId", "messageId");
-
-        assertNull(result);
-        assertEquals("Can't find descriptor for the component [role = [interface org.xwiki.mail.MailListener] "
-            + "hint = [database]]", this.mocker.getComponentUnderTest().getLastError().getMessage());
-    }
-
-    @Test
-    public void resendWhenMailContentStoreLoadingFails() throws Exception
-    {
-        this.mocker.registerComponent(MailListener.class, "database",
-            this.mocker.getInstance(MailListener.class, "memory"));
-
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(any(), eq("batchId"), eq("messageId"))).thenThrow(
-            new MailStoreException("error"));
+        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
+        when(resender.resendAsynchronously("batchId", "messageId")).thenThrow(new MailStoreException("error"));
 
         ScriptMailResult result = this.mocker.getComponentUnderTest().resend("batchId", "messageId");
 
@@ -109,29 +91,65 @@ public class MailStorageScriptServiceTest
     @Test
     public void resend() throws Exception
     {
-        MemoryMailListener memoryMailListener = this.mocker.getInstance(MailListener.class, "memory");
-        this.mocker.registerComponent(MailListener.class, "database", memoryMailListener);
+        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
+        MailStatusResult statusResult = mock(MailStatusResult.class);
+        when(resender.resendAsynchronously("batchId", "messageId")).thenReturn(statusResult);
 
-        Session session = Session.getInstance(new Properties());
-        ExtendedMimeMessage message = new ExtendedMimeMessage();
-        String batchId = UUID.randomUUID().toString();
+        ScriptMailResult result = this.mocker.getComponentUnderTest().resend("batchId", "messageId");
 
-        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(any(), eq(batchId), eq("messageId"))).thenReturn(message);
+        assertEquals("batchId", result.getBatchId());
+        assertNotNull(result.getStatusResult());
+    }
 
-        MailSender sender = this.mocker.getInstance(MailSender.class);
-        when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(), same(memoryMailListener)))
-            .thenReturn(new DefaultMailResult(batchId));
+    @Test
+    public void resendAsynchronouslySeveralMessages() throws Exception
+    {
+        Map filterMap = Collections.singletonMap("state", "prepare_%");
 
-        // Since resend() will wait indefinitely for the message count to be correct, we need to configure it here
-        // as we're mocking the MailSender.
-        ((UpdateableMailStatusResult) memoryMailListener.getMailStatusResult()).setTotalSize(1);
-        ((UpdateableMailStatusResult) memoryMailListener.getMailStatusResult()).incrementCurrentSize();
+        MailStatus status1 = new MailStatus();
+        status1.setBatchId("batch1");
+        status1.setMessageId("message1");
 
-        ScriptMailResult result = this.mocker.getComponentUnderTest().resend(batchId, "messageId");
+        MailStatus status2 = new MailStatus();
+        status2.setBatchId("batch2");
+        status2.setMessageId("message2");
 
-        assertNotNull(result);
-        assertEquals(batchId, result.getBatchId());
+        MailStatusResult statusResult1 = mock(MailStatusResult.class, "status1");
+        when(statusResult1.getTotalMailCount()).thenReturn(1L);
+
+        MailStatusResult statusResult2 = mock(MailStatusResult.class, "status2");
+        when(statusResult2.getTotalMailCount()).thenReturn(2L);
+
+        List<Pair<MailStatus, MailStatusResult>> results = new ArrayList<>();
+        results.add(new ImmutablePair<>(status1, statusResult1));
+        results.add(new ImmutablePair<>(status2, statusResult2));
+
+        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
+        when(resender.resendAsynchronously(filterMap, 5, 10)).thenReturn(results);
+
+        List<ScriptMailResult> scriptResults =
+            this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 5, 10);
+
+        assertEquals(2, scriptResults.size());
+        assertEquals("batch1", scriptResults.get(0).getBatchId());
+        assertEquals(1L, scriptResults.get(0).getStatusResult().getTotalMailCount());
+        assertEquals("batch2", scriptResults.get(1).getBatchId());
+        assertEquals(2L, scriptResults.get(1).getStatusResult().getTotalMailCount());
+    }
+
+    @Test
+    public void resendAsynchronouslySeveralMessagesWhenMailResendingFailed() throws Exception
+    {
+        Map filterMap = Collections.singletonMap("state", "prepare_%");
+
+        MailResender resender = this.mocker.getInstance(MailResender.class, "database");
+        when(resender.resendAsynchronously(filterMap, 5, 10)).thenThrow(new MailStoreException("error"));
+
+        List<ScriptMailResult> scriptResults =
+            this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 5, 10);
+
+        assertNull(scriptResults);
+        assertEquals("error", this.mocker.getComponentUnderTest().getLastError().getMessage());
     }
 
     @Test

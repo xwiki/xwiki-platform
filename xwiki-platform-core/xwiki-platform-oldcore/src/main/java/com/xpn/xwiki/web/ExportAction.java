@@ -44,6 +44,11 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
+import org.xwiki.query.QueryParameter;
+import org.xwiki.query.internal.DefaultQueryParameter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -138,7 +143,7 @@ public class ExportAction extends XWikiAction
         if (pages == null || pages.length == 0) {
             pageList.add(context.getDoc().getDocumentReference());
         } else {
-            Map<String, Object[]> wikiQueries = new HashMap<String, Object[]>();
+            Map<String, Object[]> wikiQueries = new HashMap<>();
             for (int i = 0; i < pages.length; ++i) {
                 String pattern = pages[i];
 
@@ -152,17 +157,17 @@ public class ExportAction extends XWikiAction
                 }
 
                 StringBuffer where;
-                List<String> params;
+                List<QueryParameter> params;
 
                 if (!wikiQueries.containsKey(wikiName)) {
                     Object[] query = new Object[2];
                     query[0] = where = new StringBuffer("where ");
-                    query[1] = params = new ArrayList<String>();
+                    query[1] = params = new ArrayList<>();
                     wikiQueries.put(wikiName, query);
                 } else {
                     Object[] query = wikiQueries.get(wikiName);
                     where = (StringBuffer) query[0];
-                    params = (List<String>) query[1];
+                    params = (List<QueryParameter>) query[1];
                 }
 
                 if (i > 0) {
@@ -170,23 +175,25 @@ public class ExportAction extends XWikiAction
                 }
 
                 where.append("doc.fullName like ?");
-                params.add(pattern);
+                params.add(new DefaultQueryParameter(null).like(pattern));
             }
 
             DocumentReferenceResolver<String> resolver =
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+
+            QueryManager queryManager = Utils.getComponent(QueryManager.class);
 
             String database = context.getWikiId();
             try {
                 for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
                     String wikiName = entry.getKey();
                     Object[] query = entry.getValue();
-                    String where = ((StringBuffer) query[0]).toString();
-                    @SuppressWarnings("unchecked")
-                    List<String> params = (List<String>) query[1];
+                    String where = query[0].toString();
+                    List<Object> params = (List<Object>) query[1];
 
-                    context.setWikiId(wikiName);
-                    List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
+                    Query dbQuery = queryManager.createQuery(where, Query.HQL);
+                    List<String> docsNames = dbQuery.setWiki(wikiName).bindValues(params).execute();
+
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
                         if (context.getWiki().getRightService().hasAccessLevel(
@@ -196,6 +203,9 @@ public class ExportAction extends XWikiAction
                         }
                     }
                 }
+            } catch (QueryException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                    "Failed to resolve pages to export", e);
             } finally {
                 context.setWikiId(database);
             }

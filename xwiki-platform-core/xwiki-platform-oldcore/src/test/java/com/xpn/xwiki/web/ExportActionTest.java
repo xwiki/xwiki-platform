@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 
@@ -36,6 +37,8 @@ import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -74,9 +77,15 @@ public class ExportActionTest
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
 
+        // Query Manager-related mocking
+        QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
+        Query query = mock(Query.class);
+        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
+        when(query.setWiki("xwiki")).thenReturn(query);
+        when(query.bindValues(any(List.class))).thenReturn(query);
+        when(query.execute()).thenReturn(Arrays.asList("Space.Page1", "Space.Page2"));
+
         // Register some mock resolver to resolve passed page references
-        when(oldcore.getMockStore().searchDocumentsNames("where doc.fullName like ?", Arrays.asList("Space.%"),
-            context)).thenReturn(Arrays.asList("Space.Page1", "Space.Page2"));
         when(oldcore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "xwiki:Space.Page1", context))
             .thenReturn(true);
         when(oldcore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "xwiki:Space.Page2", context))

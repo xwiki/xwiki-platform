@@ -328,8 +328,20 @@ public class DocumentReference extends EntityReference
     /**
      * @return the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}
      * @since 8.3
+     * @deprecated since 9.3RC1/8.4.5, use {@link #getLocalDocumentReference()} instead
      */
+    @Deprecated
     public LocalDocumentReference getLocaleDocumentReference()
+    {
+        return getLocalDocumentReference();
+    }
+
+    /**
+     * @return the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}
+     * @since 9.3RC1
+     * @since 8.4.5
+     */
+    public LocalDocumentReference getLocalDocumentReference()
     {
         if (this.localDocumentReference == null) {
             this.localDocumentReference = new LocalDocumentReference(this);

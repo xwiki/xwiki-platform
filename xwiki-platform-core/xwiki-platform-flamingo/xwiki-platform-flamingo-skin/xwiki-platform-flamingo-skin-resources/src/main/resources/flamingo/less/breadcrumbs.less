@@ -7,7 +7,12 @@
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
-    
+    vertical-align: top;
+
+    &.open {
+      overflow: inherit;
+    }
+
     + li:before {
       content: "@{breadcrumb-separator}"; /* No additional space needed */
     }

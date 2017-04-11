@@ -5,7 +5,7 @@
 .admin-menu {
   .make-xs-column(12);
   .make-sm-column(3);
-  
+
   @media (min-width: @screen-lg-min) {
     max-width: 300px;
   }
@@ -14,7 +14,6 @@
 .admin-category, #admin-page-content {
   .make-xs-column(12);
   .make-sm-column(9);
-  overflow: auto;
 }
 
 @media (max-width: @screen-xs-min) {
@@ -22,4 +21,10 @@
     padding-left: 0;
     padding-right: 0;
   }
+}
+
+/* Allow scrolling for containers that take a lot of space: like Rights or Livetables  */
+#admin-page-content #xwikieditcontent,
+#admin-page-content .xwiki-livetable-container {
+  overflow: auto;
 }

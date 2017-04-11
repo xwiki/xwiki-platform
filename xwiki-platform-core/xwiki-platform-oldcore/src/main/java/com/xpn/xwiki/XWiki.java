@@ -3711,7 +3711,10 @@ public class XWiki implements EventListener
 
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
     {
-        String groupsPreference = getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
+        String groupsPreference = groupService.isAllGroupImplicit(context) ?
+                getConfiguration().getProperty("xwiki.users.initialGroups")
+                :
+                getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
 
         if (groupsPreference != null) {
             String[] groups = groupsPreference.split(",");

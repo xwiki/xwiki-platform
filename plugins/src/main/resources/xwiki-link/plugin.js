@@ -154,9 +154,13 @@
           attributes.set['data-reference'] = CKEDITOR.plugins.xwikiResource
             .serializeResourceReference(resourceReference);
           attributes.set['data-linktype'] = resourceTypeToLinkType[resourceReference.type] || '';
+        } else {
+          attributes.removed.push('data-reference', 'data-linktype');
         }
         if (data.wikiGeneratedLinkContent) {
           attributes.set['data-wikigeneratedlinkcontent'] = data.wikiGeneratedLinkContent;
+        } else {
+          attributes.removed.push('data-wikigeneratedlinkcontent');
         }
         return attributes;
       };
@@ -460,10 +464,18 @@
       },
       validateAsync: function() {
         // Update the wiki generated link content based on the selected resource before submitting the dialog.
-        var resourceReferenceField = this.getDialog().getContentElement('info', 'resourceReference');
         // Call the base function because we don't need the resource reference parameters.
-        var resourceReference = resourceReferenceField.base.getValue.call(resourceReferenceField);
-        return this.maybeUpdateWikiGeneratedLinkContent(null, {'reference': resourceReference});
+        var resourceReference = this.resourceReferenceField.base.getValue.call(this.resourceReferenceField);
+        var selectedResourceReference = (this.resourceReferenceField.selectedResource || {}).reference || {};
+        var selectedResource = {'reference': resourceReference};
+        if (selectedResourceReference.type === resourceReference.type &&
+            selectedResourceReference.reference === resourceReference.reference) {
+          // The previous getValue() call returns a resource reference so it doesn't include the meta data associated
+          // with the resource (e.g. its title). We need the meta data to determine the link label so we use the cached
+          // resource object, in case it wasn't modified by the user.
+          selectedResource = this.resourceReferenceField.selectedResource;
+        }
+        return this.maybeUpdateWikiGeneratedLinkContent(null, selectedResource);
       },
       commit: function(data) {
         if (typeof oldCommit === 'function') {
@@ -476,7 +488,7 @@
       maybeUpdateWikiGeneratedLinkContent: function(event, resource) {
         var value = this.getValue();
         if (value === '' || value === this.wikiGeneratedLinkContent) {
-          return this.getWikiGeneratedLinkContent(resource).done($.proxy(function(wikiGeneratedLinkContent) {
+          return this.maybeGetWikiGeneratedLinkContent(resource).done($.proxy(function(wikiGeneratedLinkContent) {
             this.setValue(wikiGeneratedLinkContent);
             this.wikiGeneratedLinkContent = wikiGeneratedLinkContent;
           }, this)).fail($.proxy(function() {
@@ -496,6 +508,15 @@
           (resource && resource.entityReference && resource.entityReference.name) ||
           (resource && resource.reference && resource.reference.reference) ||
           'type the link label';
+      },
+      maybeGetWikiGeneratedLinkContent: function(resource) {
+        var config = this.getDialog().getParentEditor().config['xwiki-link'] || {};
+        if (config.autoGenerateLabels) {
+          return this.getWikiGeneratedLinkContent(resource);
+        } else {
+          // Use the resource label instead.
+          return $.Deferred().reject();
+        }
       },
       getWikiGeneratedLinkContent: function(resource) {
         var sendRequest = $.proxy(function() {

@@ -32,11 +32,13 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
+import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import org.apache.commons.collections4.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.junit.Assert;
+import org.mockito.Mockito;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -67,6 +69,10 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
@@ -188,6 +194,39 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setAuthor("Albatross");
 
         this.xwiki.saveDocument(this.document, getContext());
+    }
+
+    public void testUserNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicite() throws Exception {
+        //given
+        getConfigurationSource().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
+
+        XWikiGroupServiceImpl xWikiGroupService = new XWikiGroupServiceImpl();
+        xwiki.setGroupService(xWikiGroupService);
+
+        XWiki spyXWiki = Mockito.spy(xwiki);
+
+        //when
+        spyXWiki.setUserDefaultGroup("XWiki.user1", getContext());
+
+        //then
+        Mockito.verify(spyXWiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
+    }
+
+    public void testUserAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlesXWikiAllGroupIsImplicite() throws Exception {
+        //given
+        getConfigurationSource().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
+        getConfigurationSource().setProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
+
+        XWikiGroupServiceImpl xWikiGroupService = new XWikiGroupServiceImpl();
+        xwiki.setGroupService(xWikiGroupService);
+
+        XWiki spyXWiki = Mockito.spy(xwiki);
+
+        //when
+        spyXWiki.setUserDefaultGroup("XWiki.user1", getContext());
+
+        //then
+        Mockito.verify(spyXWiki, times(1)).addUserToGroup("XWiki.user1", "XWiki.XWikiAllGroup", getContext());
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException

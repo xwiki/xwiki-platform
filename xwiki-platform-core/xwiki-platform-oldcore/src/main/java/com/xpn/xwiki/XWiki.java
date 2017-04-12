@@ -3711,7 +3711,7 @@ public class XWiki implements EventListener
 
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
     {
-        String groupsPreference = groupService.isAllGroupImplicit(context) ?
+        String groupsPreference = isAllGroupImplicit() ?
                 getConfiguration().getProperty("xwiki.users.initialGroups")
                 :
                 getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
@@ -4730,6 +4730,10 @@ public class XWiki implements EventListener
     public boolean isLDAP()
     {
         return "1".equals(getConfiguration().getProperty("xwiki.authentication.ldap"));
+    }
+
+    public boolean isAllGroupImplicit(){
+        return "1".equals(getConfiguration().getProperty("xwiki.authentication.group.allgroupimplicit"));
     }
 
     public int checkActive(XWikiContext context) throws XWikiException

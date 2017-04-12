@@ -196,7 +196,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.saveDocument(this.document, getContext());
     }
 
-    public void testUserNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicite() throws Exception {
+    public void testUserNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicit() throws Exception
+    {
         //given
         getConfigurationSource().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
 
@@ -212,7 +213,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         Mockito.verify(spyXWiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
     }
 
-    public void testUserAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlesXWikiAllGroupIsImplicite() throws Exception {
+    public void testUserAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlessXWikiAllGroupIsImplicit() throws Exception
+    {
         //given
         getConfigurationSource().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
         getConfigurationSource().setProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");

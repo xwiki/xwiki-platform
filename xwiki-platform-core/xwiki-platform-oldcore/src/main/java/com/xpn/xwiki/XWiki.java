@@ -4732,7 +4732,8 @@ public class XWiki implements EventListener
         return "1".equals(getConfiguration().getProperty("xwiki.authentication.ldap"));
     }
 
-    public boolean isAllGroupImplicit(){
+    public boolean isAllGroupImplicit()
+    {
         return "1".equals(getConfiguration().getProperty("xwiki.authentication.group.allgroupimplicit"));
     }
 

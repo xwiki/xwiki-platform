@@ -195,8 +195,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         }
     }
 
-    @Override
-    public boolean isAllGroupImplicit(XWikiContext context)
+    private boolean isAllGroupImplicit(XWikiContext context)
     {
         return context.getWiki().isAllGroupImplicit();
     }

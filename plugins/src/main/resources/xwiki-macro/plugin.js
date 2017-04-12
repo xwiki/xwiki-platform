@@ -28,6 +28,17 @@
     '</div>';
   var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
 
+  var withLowerCaseKeys = function(object) {
+    var key, keys = Object.keys(object);
+    var n = keys.length;
+    var result = {};
+    while (n--) {
+      key = keys[n];
+      result[key.toLowerCase()] = object[key];
+    }
+    return result;
+  };
+
   CKEDITOR.plugins.add('xwiki-macro', {
     requires: 'widget,notification,xwiki-marker,xwiki-source',
     init : function(editor) {
@@ -247,6 +258,8 @@
           return;
         }
         definition.commandId = definition.commandId || 'xwiki-macro-' + definition.macroCall.name;
+        // Macro parameter names are case-insensitive. Make all parameter names lowercase to ease the lookup.
+        definition.macroCall.parameters = withLowerCaseKeys(definition.macroCall.parameters || {});
         this.registerDedicatedInsertMacroButton(editor, definition);
       }
     },

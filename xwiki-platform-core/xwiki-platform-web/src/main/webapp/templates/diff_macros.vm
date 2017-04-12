@@ -451,7 +451,9 @@
         #else
           #set ($detailsAnchor = "#diffAnchor($summary.documentReference)")
         #end
-        <li>
+        <li data-documentreference="$escapetool.xml($services.model.serialize($documentReference, 'default'))"
+            data-documentlocale="$documentReference.locale"
+            #diffVersionAttribute($documentDiff.previousReference.version)>
           <div class="diff-summary-item">
             $services.icon.renderHTML($entry.icon)
             <a href="#$detailsAnchor">$services.localization.render($entry.name)</a>
@@ -544,6 +546,15 @@ $!version##
 #end
 #end
 
+#macro (diffVersionAttribute $version)
+#if ($version.id && $version.version)
+## Seems to be an extension id.
+data-documentextensionid="${version.id}" data-documentextensionversion="${version.version}"##
+#else
+data-documentversion="$!version"##
+#end
+#end
+
 #macro (displayDocumentUnifiedDiffsWithSummary $documentDiffs $headingLevel)
   <h$headingLevel>$services.localization.render('web.history.changes.summary')</h$headingLevel>
   #displayDocumentUnifiedDiffsSummary($documentDiffs)
@@ -576,7 +587,7 @@ $!version##
     </div>
     <ul class="diff-summary">
       #foreach ($documentDiff in $documentDiffs)
-        <li>#displayDocumentUnifiedDiffSummary($documentDiff)</li>
+        <li id="summary-#diffAnchor($documentDiff.reference)">#displayDocumentUnifiedDiffSummary($documentDiff)</li>
       #end
     </ul>
   #end
@@ -669,7 +680,11 @@ $!version##
 #macro (displayDocumentUnifiedDiffs $documentDiffs)
   #foreach ($documentDiff in $documentDiffs)
     #set ($documentReference = $documentDiff.reference)
-    <h$mathtool.add($headingLevel, 1) id="#diffAnchor($documentReference)">
+    <div id="#diffAnchor($documentReference)">
+    <h$mathtool.add($headingLevel, 1) class="diff-item-header"
+      data-documentreference="$escapetool.xml($services.model.serialize($documentReference, 'default'))"
+      data-documentlocale="$documentReference.locale"
+      #diffVersionAttribute($documentDiff.previousReference.version)>
       #diffIcon('file-white' $documentDiff.type)
       <a href="$xwiki.getURL($documentReference)"
         >$escapetool.xml($services.model.serialize($documentReference, 'local'))</a>
@@ -683,6 +698,7 @@ $!version##
       </span>
     </h$mathtool.add($headingLevel, 1)>
     #displayDocumentUnifiedDiff($documentDiff)
+    </div>
   #end
 #end
 

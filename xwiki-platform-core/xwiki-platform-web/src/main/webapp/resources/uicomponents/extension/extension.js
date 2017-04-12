@@ -42,6 +42,9 @@ XWiki.ExtensionBehaviour = Class.create({
     // Enhances the behaviour of the Dependencies section.
     this._enhanceDependenciesBehaviour();
 
+    // Enhances the behaviour of the Changes section.
+    this._enhanceChanges();
+
     // Refresh the extension display if the extension has a job running.
     this._maybeScheduleRefresh();
   },
@@ -526,6 +529,66 @@ XWiki.ExtensionBehaviour = Class.create({
       event.element().hide().up().addClassName('loading').setStyle({'height': '16px', 'width': '16px'});
       this._refresh({'listVersions': true});
     }.bindAsEventListener(this));
+  },
+
+  _enhanceChanges : function() {
+    var resetDocument = this._resetDocument.bindAsEventListener(this);
+
+    this.container.select('.extension-body-changes').each(function(extensionDiff) {
+      extensionDiff.select('.diff-item-header').each(function(diffItem) {
+        var revertButtonDiv = new Element('div', {'class': 'btn btn-default btn-xs pull-right', 'style' : 'margin-top: -.3em;'});
+        revertButtonDiv.insert(new Element('span', {'class': 'fa fa-undo'}));
+        revertButtonDiv.appendChild(document.createTextNode(' Reset'));        
+        diffItem.insertBefore(revertButtonDiv, diffItem.firstChild);
+
+        // Call resetDocument() when revert button is clicked
+        revertButtonDiv.documentReference = diffItem.getAttribute('data-documentreference');
+        revertButtonDiv.documentLocale = diffItem.getAttribute('data-documentlocale');
+        revertButtonDiv.documentExtensionId = diffItem.getAttribute('data-documentextensionid');
+        revertButtonDiv.documentExtensionVersion = diffItem.getAttribute('data-documentextensionversion');
+        revertButtonDiv.observe('click', resetDocument);
+      });
+    });
+  },
+
+  _resetDocument : function(event) {
+    var formData = new Hash(this.container.serialize({submit: false}));
+
+    // Indicate the action identifier
+    formData.set('extensionAction', 'revertDocument');
+
+    // Give information about the document to revert
+    formData.set('documentReference', event.target.documentReference);
+    formData.set('documentLocale', event.target.documentLocale);
+    formData.set('documentExtensionId', event.target.documentExtensionId);
+    formData.set('documentExtensionVersion', event.target.documentExtensionVersion);
+
+    new Ajax.Request(this._getServiceURL(formData.get('section')), {
+      parameters : formData,
+      onCreate : function() {
+        // Start loading
+        event.target.setAttribute('disabled', 'disabled');
+        event.target.firstChild.setAttribute('class', 'fa fa-spinner fa-pulse');
+      },
+      onSuccess : function(response) {
+        var diffItemBlock = event.target.parentNode.parentNode;
+
+        // Update the summary
+        this.container.select('#summary-' + diffItemBlock.id).each(function(diffSummaryLi) {
+          diffSummaryLi.parentNode.removeChild(diffSummaryLi);
+        });
+
+        // Remove the document from the details
+        diffItemBlock.parentNode.removeChild(diffItemBlock);
+      }.bind(this),
+      onFailure : function(response) {
+        // Stop loading
+        event.target.removeAttribute('disabled');
+        event.target.firstChild.setAttribute('class', 'fa fa-undo');
+
+        this._onAjaxRequestFailure(response);
+      }.bind(this)
+    });
   }
 });
 

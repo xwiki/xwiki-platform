@@ -576,6 +576,8 @@ $namespace##
   #end
   #set ($documentDiffs = $jobStatus.documentDiffs)
   #if ($jobState == 'FINISHED' && $documentDiffs)
+    ## Need csrf token for reverts
+    <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
     <div id="extension-body-changes-$extensionIdHashCode"></div>
     <div class="extension-body-changes extension-body-section">
       #template('diff_macros.vm')
@@ -1003,6 +1005,8 @@ $namespace##
     #computeUninstallPlan($request.extensionId $request.extensionVersion $NULL)
   #elseif ($request.extensionAction == 'diffXAR')
     #diffXarExtension($request.extensionId $request.extensionVersion)
+  #elseif ($request.extensionAction == 'revertDocument' && $withValidToken)
+    #revertDocument($request.documentReference $request.documentLocale $request.documentExtensionId $request.documentExtensionVersion, $request.extensionId)
   #elseif ($request.extensionVersionConstraint)
     #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
     #displayDependency($dependency $extensionNamespace true)
@@ -1108,6 +1112,17 @@ $namespace##
   #end
   ## Redirect to extension display.
   $response.sendRedirect("#getExtensionURL()")
+#end
+
+#macro(revertDocument $documentReference $documentLocale $documentExtensionId $documentExtensionVersion $jobExtensionId)
+  ## Create instance of ExtensionId
+  #set ($extensionId = $services.extension.createExtensionId($documentExtensionId, $documentExtensionVersion))
+  ## Create instance of DocumentRefernce with the Locale
+  #set ($documentReferenceWithLocale = $services.model.createDocumentReference($services.model.resolveDocument($documentReference), $services.localization.toLocale($documentLocale)))
+  ## Revert the document to the extension state
+  #if (!$services.extension.xar.reset($documentReferenceWithLocale, $extensionId, $services.extension.xar.getDiffJobId($jobExtensionId, $extensionNamespace)))
+    $response.sendError(500, $services.localization.render('extensions.xar.resetDocument.error'))
+  #end
 #end
 
 #macro (answerExtensionJobQuestion $jobStatus)

@@ -21,6 +21,7 @@ package org.xwiki.extension.xar.internal.repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.xwiki.extension.repository.internal.installed.AbstractInstalledExtens
 import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
+import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -223,12 +225,24 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
      */
     public Collection<XarInstalledExtension> getXarInstalledExtensions(DocumentReference reference)
     {
+        if (reference instanceof DocumentVersionReference) {
+            DocumentVersionReference versionReference = (DocumentVersionReference) reference;
+
+            if (versionReference.getVersion() instanceof ExtensionId) {
+                ExtensionId extensionId = (ExtensionId) versionReference.getVersion();
+
+                if (extensionId != null) {
+                    return Arrays.asList((XarInstalledExtension) getInstalledExtension(extensionId));
+                }
+            }
+        }
+
         Collection<XarInstalledExtension> wikiExtensions = this.documents
             .get(reference.getLocale() == null ? new DocumentReference(reference, Locale.ROOT) : reference);
         Collection<XarInstalledExtension> rootExtensions =
-            this.rootDocuments.get(reference.getLocaleDocumentReference().getLocale() == null
-                ? new LocalDocumentReference(reference.getLocaleDocumentReference(), Locale.ROOT)
-                : reference.getLocaleDocumentReference());
+            this.rootDocuments.get(reference.getLocalDocumentReference().getLocale() == null
+                ? new LocalDocumentReference(reference.getLocalDocumentReference(), Locale.ROOT)
+                : reference.getLocalDocumentReference());
 
         List<XarInstalledExtension> allExtensions = new ArrayList<>();
 

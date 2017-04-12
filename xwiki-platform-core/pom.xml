@@ -194,6 +194,36 @@
                   }
                 },
                 "ignore" : [
+                  {
+                    "code": "java.generics.formalTypeParameterAdded",
+                    "old": "method <T> T org.xwiki.extension.script.AbstractExtensionScriptService::safe(T)",
+                    "new": "method <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(T)",
+                    "package": "org.xwiki.extension.script",
+                    "classSimpleName": "AbstractExtensionScriptService",
+                    "methodName": "safe",
+                    "elementKind": "method",
+                    "justification": "Not a binary breakage and should not change anything at build either time most of the time"
+                  },
+                  {
+                    "code": "java.generics.formalTypeParameterAdded",
+                    "old": "method <T> T org.xwiki.extension.script.AbstractExtensionScriptService::safe(T) @ org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "new": "method <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(T) @ org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "package": "org.xwiki.extension.xar.script",
+                    "classSimpleName": "XarExtensionScriptService",
+                    "methodName": "safe",
+                    "elementKind": "method",
+                    "justification": "Not a binary breakage and should not change anything at build either time most of the time"
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDUnchanged",
+                    "old": "field org.xwiki.extension.xar.job.diff.DocumentVersionReference.serialVersionUID",
+                    "new": "field org.xwiki.extension.xar.job.diff.DocumentVersionReference.serialVersionUID",
+                    "package": "org.xwiki.extension.xar.job.diff",
+                    "classSimpleName": "DocumentVersionReference",
+                    "fieldName": "serialVersionUID",
+                    "elementKind": "field",
+                    "justification": "Not a breakage"
+                  }
                 ]
               }
             }

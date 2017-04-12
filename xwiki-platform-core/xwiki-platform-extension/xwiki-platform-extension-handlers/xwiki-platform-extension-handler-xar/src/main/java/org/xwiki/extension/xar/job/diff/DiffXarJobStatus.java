@@ -20,12 +20,14 @@
 package org.xwiki.extension.xar.job.diff;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 
 /**
@@ -59,6 +61,29 @@ public class DiffXarJobStatus extends DefaultJobStatus<InstallRequest>
      */
     public List<DocumentUnifiedDiff> getDocumentDiffs()
     {
-        return documentDiffs;
+        return this.documentDiffs;
+    }
+
+    /**
+     * @param reference the reference of the document to remove from the diff
+     * @since 9.3RC1
+     */
+    public void reset(DocumentReference reference)
+    {
+        for (Iterator<DocumentUnifiedDiff> it = this.documentDiffs.iterator(); it.hasNext();) {
+            DocumentUnifiedDiff documentDiff = it.next();
+
+            DocumentVersionReference versionReference = documentDiff.getReference();
+
+            if (reference instanceof DocumentVersionReference) {
+                if (reference.equals(versionReference)) {
+                    it.remove();
+                }
+            } else {
+                if (reference.equals(versionReference.removeVersion())) {
+                    it.remove();
+                }
+            }
+        }
     }
 }

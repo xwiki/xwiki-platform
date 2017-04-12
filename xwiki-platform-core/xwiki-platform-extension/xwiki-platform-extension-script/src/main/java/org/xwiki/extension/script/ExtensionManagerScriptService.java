@@ -337,6 +337,19 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         return versions;
     }
 
+    /**
+     * Create an instance of {@link ExtensionId}.
+     * 
+     * @param id the id of the extension
+     * @param version the version of the extension
+     * @return the {@link ExtensionId} instance
+     * @since 9.3RC1
+     */
+    public ExtensionId createExtensionId(String id, String version)
+    {
+        return new ExtensionId(id, version);
+    }
+
     // Actions
 
     /**

@@ -108,9 +108,9 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * @return the safe version of the passed object
      */
     @SuppressWarnings("unchecked")
-    protected <T> T safe(T unsafe)
+    protected <S, T> S safe(T unsafe)
     {
-        return (T) this.scriptProvider.get(unsafe);
+        return (S) this.scriptProvider.get(unsafe);
     }
 
     protected <T extends AbstractRequest> void setRightsProperties(T extensionRequest)

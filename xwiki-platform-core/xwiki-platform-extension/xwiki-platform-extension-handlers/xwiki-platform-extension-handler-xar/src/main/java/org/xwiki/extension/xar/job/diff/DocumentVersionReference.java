@@ -50,6 +50,7 @@ public class DocumentVersionReference extends DocumentReference
     public DocumentVersionReference(DocumentReference documentReference, Serializable version)
     {
         super(documentReference);
+
         setParameter(VERSION, version);
     }
 
@@ -69,5 +70,14 @@ public class DocumentVersionReference extends DocumentReference
     public Serializable getVersion()
     {
         return getParameter(VERSION);
+    }
+
+    /**
+     * @return the {@link DocumentReference} without the version
+     * @since 9.3RC1
+     */
+    public DocumentReference removeVersion()
+    {
+        return new DocumentReference(new DocumentVersionReference(this, null));
     }
 }

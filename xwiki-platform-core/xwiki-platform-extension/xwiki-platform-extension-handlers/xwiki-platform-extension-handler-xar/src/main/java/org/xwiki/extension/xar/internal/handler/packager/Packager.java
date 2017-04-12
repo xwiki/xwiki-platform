@@ -37,7 +37,13 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.xar.XarExtensionExtension;
+import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
@@ -54,6 +60,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarException;
 import org.xwiki.xar.XarFile;
 import org.xwiki.xar.internal.model.XarModel;
 
@@ -117,6 +124,15 @@ public class Packager
 
     @Inject
     private WikiDescriptorManager wikiDescriptors;
+
+    @Inject
+    @Named(XarExtensionHandler.TYPE)
+    private InstalledExtensionRepository installedXARs;
+
+    private XarInstalledExtensionRepository getXarInstalledExtensionRepository()
+    {
+        return (XarInstalledExtensionRepository) this.installedXARs;
+    }
 
     public void importXAR(String comment, File xarFile, PackageConfiguration configuration)
         throws IOException, XWikiException, ComponentLookupException, FilterException, WikiManagerException
@@ -312,6 +328,36 @@ public class Packager
         return null;
     }
 
+    private DocumentReference cleanDocumentReference(DocumentReference reference)
+    {
+        // Remove the version if any since it does not make sense in a XAR
+        DocumentReference documentReference = reference;
+        if (reference instanceof DocumentVersionReference) {
+            documentReference = ((DocumentVersionReference) reference).removeVersion();
+        }
+
+        return documentReference;
+    }
+
+    public XWikiDocument getXWikiDocument(DocumentReference reference, XarInstalledExtension extension)
+        throws FilterException, IOException, ComponentLookupException, XarException
+    {
+        // Remove the version if any since it does not make sense in a XAR
+        DocumentReference documentReference = cleanDocumentReference(reference);
+
+        return getXWikiDocument(documentReference.getWikiReference(), documentReference.getLocalDocumentReference(),
+            extension);
+    }
+
+    public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
+        XarInstalledExtension extension) throws FilterException, IOException, ComponentLookupException, XarException
+    {
+        try (
+            XarFile xarFile = new XarFile(new File(extension.getFile().getAbsolutePath()), extension.getXarPackage())) {
+            return getXWikiDocument(wikiReference, documentReference, xarFile);
+        }
+    }
+
     public XWikiDocument getXWikiDocument(InputStream source, WikiReference wikiReference)
         throws FilterException, IOException, ComponentLookupException
     {
@@ -326,6 +372,50 @@ public class Packager
 
         return this.documentImporter.importDocument(new DefaultInputStreamInputSource(source), xarProperties,
             documentProperties);
+    }
+
+    /**
+     * @since 9.3RC1
+     */
+    public void reset(DocumentReference reference, DocumentReference authorReference) throws FilterException,
+        IOException, ComponentLookupException, XarException, XWikiException, XarExtensionExtension
+    {
+        Collection<XarInstalledExtension> installedExtensions =
+            getXarInstalledExtensionRepository().getXarInstalledExtensions(reference);
+        if (!installedExtensions.isEmpty()) {
+            XarInstalledExtension extension = installedExtensions.iterator().next();
+
+            // Remove the version if any since it does not make sense in a XAR
+            DocumentReference documentReference = cleanDocumentReference(reference);
+
+            XWikiDocument document = getXWikiDocument(documentReference, extension);
+
+            if (document != null) {
+                XWikiContext xcontext = this.xcontextProvider.get();
+
+                // Get database document
+                XWikiDocument databaseDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+                // Override data of database document with extension document
+                databaseDocument.apply(document, true);
+                // Make sure new version will have the right author
+                databaseDocument.setAuthorReference(authorReference);
+                databaseDocument.setContentAuthorReference(authorReference);
+                // Force generating new version
+                databaseDocument.setMetaDataDirty(true);
+                databaseDocument.setContentDirty(true);
+
+                // Save
+                xcontext.getWiki().saveDocument(databaseDocument, "Reset document from extension [" + extension + "]",
+                    xcontext);
+            } else {
+                throw new XarExtensionExtension("Can't find any document with reference [" + documentReference
+                    + "] in extension [" + extension.getId() + "]");
+            }
+        } else {
+            throw new XarExtensionExtension(
+                "Can't find any installed extension associated with the document reference [" + reference + "]");
+        }
     }
 
     public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)

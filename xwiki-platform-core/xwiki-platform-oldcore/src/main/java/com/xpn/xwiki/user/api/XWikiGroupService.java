@@ -42,6 +42,7 @@ public interface XWikiGroupService
     void initCache(int iCapacity, XWikiContext context) throws XWikiException;
 
     void flushCache();
+
     /**
      * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
      */

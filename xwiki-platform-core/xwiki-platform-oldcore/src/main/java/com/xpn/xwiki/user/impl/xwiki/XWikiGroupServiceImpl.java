@@ -195,7 +195,16 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         }
     }
 
-    private boolean isAllGroupImplicit(XWikiContext context)
+    /**
+     * Check whether the configuration specifies that every user is implicitly in XWikiAllGroup. Configured by the
+     * {@code xwiki.authentication.group.allgroupimplicit} parameter in {@code xwiki.cfg}.
+     *
+     * @param context the current XWiki context
+     * @return {@code true} if the group is implicit and all users should be by default in it, {@code false} if the
+     *         group behaves as all other groups, containing only the users/subgroups that are explicitly listed inside
+     *         the document.
+     */
+    protected boolean isAllGroupImplicit(XWikiContext context)
     {
         return context.getWiki().isAllGroupImplicit();
     }

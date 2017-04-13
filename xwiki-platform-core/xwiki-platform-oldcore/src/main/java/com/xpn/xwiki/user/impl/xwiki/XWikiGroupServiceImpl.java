@@ -206,8 +206,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      */
     protected boolean isAllGroupImplicit(XWikiContext context)
     {
-        long implicit = context.getWiki().ParamAsLong("xwiki.authentication.group.allgroupimplicit", 0);
-        return (implicit == 1);
+        return context.getWiki().isAllGroupImplicit();
     }
 
     @Override

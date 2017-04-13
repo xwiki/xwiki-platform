@@ -523,6 +523,12 @@ public class BasePage extends BaseElement
         WebElement languagesElement = getDriver().findElementWithoutWaiting(By.xpath("//a[@id='tmLanguages']"));
         languagesElement.click();
 
+        // Wait for the languages submenu to be open
+        getDriver().waitUntilCondition(webDriver ->
+                getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu")).getAttribute("class")
+                        .contains("collapse in")
+        );
+
         // Click passed locale
         WebElement localeElement = getDriver().findElementWithoutWaiting(
             By.xpath("//ul[@id='tmLanguages_menu']/li/a[contains(@href,'language=" + locale + "')]"));

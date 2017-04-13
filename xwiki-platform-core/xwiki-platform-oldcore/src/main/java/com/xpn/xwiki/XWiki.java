@@ -3444,7 +3444,7 @@ public class XWiki implements EventListener
                     LOGGER.warn("User created. Failed to send the mail to the created user.", e);
                     return -11;
                 }
-                
+
             }
 
             return result;
@@ -3711,10 +3711,8 @@ public class XWiki implements EventListener
 
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
     {
-        String groupsPreference = isAllGroupImplicit() ?
-                getConfiguration().getProperty("xwiki.users.initialGroups")
-                :
-                getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
+        String groupsPreference = isAllGroupImplicit() ? getConfiguration().getProperty("xwiki.users.initialGroups")
+            : getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
 
         if (groupsPreference != null) {
             String[] groups = groupsPreference.split(",");
@@ -4732,6 +4730,11 @@ public class XWiki implements EventListener
         return "1".equals(getConfiguration().getProperty("xwiki.authentication.ldap"));
     }
 
+    /**
+     * @return true if XWikiAllGroup group should be seen as virtual group containing all users, false to use it as any
+     *         other group
+     * @since 9.3RC1
+     */
     public boolean isAllGroupImplicit()
     {
         return "1".equals(getConfiguration().getProperty("xwiki.authentication.group.allgroupimplicit"));

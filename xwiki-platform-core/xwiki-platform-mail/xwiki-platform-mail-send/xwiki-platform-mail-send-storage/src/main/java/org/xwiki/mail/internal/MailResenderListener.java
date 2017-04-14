@@ -88,12 +88,8 @@ public class MailResenderListener implements EventListener
 
         MailResender resender = this.mailResenderProvider.get();
 
-        // Step 1: Resend all mails that in some prepare state since they've not been sent
+        // Resend all mails that in some prepare state since they've not been sent
         resendAllMatching(resender, Collections.singletonMap(STATE_FIELD, "prepare_%"));
-
-        // Step 2: Resend mails that were tried to be sent but failed previously. Who knows, maybe it'll work this
-        // time...
-        resendAllMatching(resender, Collections.singletonMap(STATE_FIELD, "send_%error"));
     }
 
     private void resendAllMatching(MailResender resender, Map<String, Object> filterMap)

@@ -177,6 +177,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Defines mappings between suite of characters and the icon to display when those characters are found.
 #-# The format is: rendering.transformation.icon.mappings = <suite of characters> = <icon name>
 #-# The following mappings are already predefined and you don't need to redefine them unless you wish to override them
+#-# [Since 9.3RC1/8.4.5] To disable a default mapping, define it with an empty value. For example:
+#-#   rendering.transformation.icon.mappings = (n) =
+#-#
 #-# rendering.transformation.icon.mappings = :) = emoticon_smile
 #-# rendering.transformation.icon.mappings = :( = emoticon_unhappy
 #-# rendering.transformation.icon.mappings = :P = emoticon_tongue

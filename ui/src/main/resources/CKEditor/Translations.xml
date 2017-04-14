@@ -53,7 +53,22 @@ CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify 
 ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
 ckeditor.admin.reset=Reset
 ckeditor.admin.reset.hint=Restore the default configuration
-ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.</content>
+ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
+
+macroSelector.title=Select Macro
+macroSelector.filter.text.placeholder=Type to filter
+macroSelector.filter.category.all=All Macros
+macroSelector.filter.category.other=Other
+macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
+macroSelector.select=Select
+
+macroEditor.title=Edit Macro
+macroEditor.more=More
+macroEditor.changeMacro=Change Macro
+macroEditor.submit=Submit
+macroEditor.content=Content
+macroEditor.noParameters=This macro has no parameters.
+macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.</content>
   <object>
     <name>CKEditor.Translations</name>
     <number>0</number>

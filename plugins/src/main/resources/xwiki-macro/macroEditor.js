@@ -17,7 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('macroEditor', ['jquery', 'modal'], function($, $modal) {
+define('macroEditorTranslationKeys', [], [
+  'title',
+  'changeMacro',
+  'submit',
+  'descriptorRequestFailed',
+  'noParameters',
+  'content',
+  'more'
+]);
+
+define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $modal, translations) {
   'use strict';
   var macroDescriptors = {},
 
@@ -85,7 +95,7 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
     if (macroDescriptor.contentDescriptor) {
       parameter = $.extend({
         id: '$content',
-        name: 'Content'
+        name: translations.get('content')
       }, macroDescriptor.contentDescriptor);
       if (typeof macroCall.content === 'string') {
         parameter.value = macroCall.content;
@@ -137,9 +147,10 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
     if (parameter.name) {
       return displayMacroParameter(parameter);
     } else if (parameter.id === 'more') {
-      return $('<li class="more"><span class="arrow arrow-down"/> <a href="#more">More</a></li>');
+      return $('<li class="more"><span class="arrow arrow-down"/> <a href="#more"/></li>')
+        .find('a').text(translations.get('more')).end();
     } else if (parameter.id === 'empty') {
-      return $('<li class="empty"/>').text('This macro has no parameters.');
+      return $('<li class="empty"/>').text(translations.get('noParameters'));
     }
   },
 
@@ -221,7 +232,7 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
     if (this.prop('requestNumber') === requestNumber) {
       this.removeClass('loading').append(
         '<div class="box errormessage">' +
-          'Failed to retrieve the <strong></strong> macro descriptor.' +
+          translations.get('descriptorRequestFailed', '<strong/>') +
         '</div>'
       ).find('strong').text(this.attr('data-macroId'));
     }
@@ -308,13 +319,13 @@ define('macroEditor', ['jquery', 'modal'], function($, $modal) {
 
   editMacro = $modal.createModalStep({
     'class': 'macro-editor-modal',
-    title: 'Edit Macro',
+    title: translations.get('title'),
     content: '<div class="macro-editor xform"/>',
-    acceptLabel: 'Submit',
+    acceptLabel: translations.get('submit'),
     onLoad: function() {
       var modal = this;
       var submitButton = modal.find('.modal-footer .btn-primary');
-      var changeMacroButton = $('<button type="button" class="btn btn-default">Change Macro</button>')
+      var changeMacroButton = $('<button type="button" class="btn btn-default"/>').text(translations.get('changeMacro'))
         .insertBefore(submitButton);
       modal.on('show.bs.modal', function(event) {
         submitButton.prop('disabled', true);

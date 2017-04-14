@@ -17,7 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('macroSelector', ['jquery', 'modal'], function($, $modal) {
+define('macroSelectorTranslationKeys', [], [
+  'title',
+  'filter.text.placeholder',
+  'filter.category.all',
+  'filter.category.other',
+  'failedToRetrieveMacros',
+  'select'
+]);
+
+define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $modal, translations) {
   'use strict';
   var macrosBySyntax = {},
 
@@ -67,7 +76,7 @@ define('macroSelector', ['jquery', 'modal'], function($, $modal) {
     var textFilter = $(document.createElement('input')).attr({
       'type': 'text',
       'class': 'macro-textFilter',
-      'placeholder': 'Type to filter'
+      'placeholder': translations.get('filter.text.placeholder')
     });
     var filters = $(document.createElement('div')).addClass('macro-filters input-group');
     filters.append(textFilter).append(categoryFilter);
@@ -78,12 +87,15 @@ define('macroSelector', ['jquery', 'modal'], function($, $modal) {
     var categoryFilter = $(
       '<div class="macro-categories input-group-btn">' +
         '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
-          'aria-haspopup="true" aria-expanded="false">All Macros <span class="caret"></span></button>' +
+          'aria-haspopup="true" aria-expanded="false"><span class="caret"/></button>' +
         '<ul class="dropdown-menu dropdown-menu-right">' +
-          '<li><a href="#">All Macros</a></li>' +
+          '<li><a href="#"/></li>' +
         '</ul>' +
       '</div>'
     );
+    var allMacrosCategoryName = translations.get('filter.category.all');
+    categoryFilter.find('.caret').before(document.createTextNode(allMacrosCategoryName + ' '));
+    categoryFilter.find('a').text(allMacrosCategoryName);
     var separator = '<li role="separator" class="divider"></li>';
     var categoryList = categoryFilter.find('ul.dropdown-menu');
     if (categories.length > 0) {
@@ -92,7 +104,7 @@ define('macroSelector', ['jquery', 'modal'], function($, $modal) {
     var otherCategory;
     categories.forEach(function(category) {
       var item = $('<li><a href="#"></a></li>').attr('data-category', category);
-      item.children('a').text(category || 'Other');
+      item.children('a').text(category || translations.get('filter.category.other'));
       if (category) {
         categoryList.append(item);
       } else {
@@ -221,11 +233,8 @@ define('macroSelector', ['jquery', 'modal'], function($, $modal) {
   maybeShowError = function(requestNumber) {
     // Check if the error corresponds to the last request.
     if (this.prop('requestNumber') === requestNumber) {
-      this.removeClass('loading').append(
-        '<div class="box errormessage">' +
-          'Failed to retrieve the list of available macros.' +
-        '</div>'
-      );
+      var errorMessage = $('<div class="box errormessage"/>').text(translations.get('failedToRetrieveMacros'));
+      this.removeClass('loading').append(errorMessage);
     }
   },
 
@@ -262,9 +271,9 @@ define('macroSelector', ['jquery', 'modal'], function($, $modal) {
 
   selectMacro = $modal.createModalStep({
     'class': 'macro-selector-modal',
-    title: 'Select Macro',
+    title: translations.get('title'),
     content: '<div class="macro-selector loading"/>',
-    acceptLabel: 'Select',
+    acceptLabel: translations.get('select'),
     onLoad: function() {
       var modal = this;
       var selectButton = modal.find('.modal-footer .btn-primary');

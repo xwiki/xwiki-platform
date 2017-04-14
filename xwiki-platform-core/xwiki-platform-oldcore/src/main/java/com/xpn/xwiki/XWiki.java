@@ -172,6 +172,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -423,6 +424,8 @@ public class XWiki implements EventListener
     private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
 
     private WikiSkinUtils wikiSkinUtils;
+
+    private DocumentRevisionProvider documentRevisionProvider;
 
     /**
      * List of top level space names that can be used in the fake context document created when accessing a resource
@@ -688,6 +691,15 @@ public class XWiki implements EventListener
         }
 
         return this.wikiSkinUtils;
+    }
+
+    private DocumentRevisionProvider getDocumentRevisionProvider()
+    {
+        if (this.documentRevisionProvider == null) {
+            this.documentRevisionProvider = Utils.getComponent(DocumentRevisionProvider.class);
+        }
+
+        return this.documentRevisionProvider;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1821,38 +1833,24 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param reference the reference of the document
+     * @param revision the version of the document
+     * @since 9.3RC1
+     */
+    public XWikiDocument getDocument(DocumentReference reference, String revision, XWikiContext context)
+        throws XWikiException
+    {
+        return getDocumentRevisionProvider().getRevision(reference, revision);
+    }
+
+    /**
      * @param doc the document
      * @param revision the version of the document
      * @param context see {@link XWikiContext}
      */
     public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException
     {
-        XWikiDocument newdoc;
-
-        String database = context.getWikiId();
-        try {
-            if (doc.getDocumentReference().getWikiReference().getName() != null) {
-                context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
-            }
-
-            if ((revision == null) || revision.equals("")) {
-                newdoc = new XWikiDocument(doc.getDocumentReference());
-            } else if (revision.equals(doc.getVersion())) {
-                newdoc = doc;
-            } else {
-                newdoc = getVersioningStore().loadXWikiDoc(doc, revision, context);
-            }
-        } catch (XWikiException e) {
-            if (revision.equals("1.1") || revision.equals("1.0")) {
-                newdoc = new XWikiDocument(doc.getDocumentReference());
-            } else {
-                throw e;
-            }
-        } finally {
-            context.setWikiId(database);
-        }
-
-        return newdoc;
+        return getDocumentRevisionProvider().getRevision(doc, revision);
     }
 
     /**
@@ -6498,8 +6496,8 @@ public class XWiki implements EventListener
 
             List<XWikiAttachment> oldAttachments = rolledbackDoc.getAttachmentList();
             List<XWikiAttachment> currentAttachments = tdoc.getAttachmentList();
-            List<XWikiAttachment> toRestore = new ArrayList<XWikiAttachment>();
-            List<XWikiAttachment> toRevert = new ArrayList<XWikiAttachment>();
+            List<XWikiAttachment> toRestore = new ArrayList<>();
+            List<XWikiAttachment> toRevert = new ArrayList<>();
 
             // First step, determine what to do with each attachment
             LOGGER.debug("Checking attachments");

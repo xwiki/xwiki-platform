@@ -37,6 +37,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.xar.XarExtensionExtension;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
@@ -339,14 +340,47 @@ public class Packager
         return documentReference;
     }
 
+    public XWikiDocument getXWikiDocument(DocumentReference reference)
+        throws FilterException, IOException, ComponentLookupException, XarException
+    {
+        if (reference != null) {
+            Collection<XarInstalledExtension> extensions =
+                getXarInstalledExtensionRepository().getXarInstalledExtensions(reference);
+            if (!extensions.isEmpty()) {
+                return getXWikiDocument(reference, extensions.iterator().next());
+            }
+        }
+
+        return null;
+    }
+
+    public XWikiDocument getXWikiDocument(DocumentReference reference, ExtensionId extensionId)
+        throws FilterException, IOException, ComponentLookupException, XarException
+    {
+        if (reference != null) {
+            if (extensionId != null) {
+                return getXWikiDocument(reference,
+                    (XarInstalledExtension) this.installedXARs.getInstalledExtension(extensionId));
+            }
+
+            return getXWikiDocument(reference);
+        }
+
+        return null;
+    }
+
     public XWikiDocument getXWikiDocument(DocumentReference reference, XarInstalledExtension extension)
         throws FilterException, IOException, ComponentLookupException, XarException
     {
-        // Remove the version if any since it does not make sense in a XAR
-        DocumentReference documentReference = cleanDocumentReference(reference);
+        if (reference != null) {
+            // Remove the version if any since it does not make sense in a XAR
+            DocumentReference documentReference = cleanDocumentReference(reference);
 
-        return getXWikiDocument(documentReference.getWikiReference(), documentReference.getLocalDocumentReference(),
-            extension);
+            return getXWikiDocument(documentReference.getWikiReference(), documentReference.getLocalDocumentReference(),
+                extension);
+        }
+
+        return null;
     }
 
     public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,

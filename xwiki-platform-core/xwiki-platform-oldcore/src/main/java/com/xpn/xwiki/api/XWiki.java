@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,8 +278,7 @@ public class XWiki extends Api
                 return null;
             }
 
-            Document newdoc = doc.newDocument(getXWikiContext());
-            return newdoc;
+            return doc.newDocument(getXWikiContext());
         } catch (Exception ex) {
             LOGGER.warn("Failed to access document " + reference + ": " + ex.getMessage());
             return new Document(new XWikiDocument(reference), getXWikiContext());
@@ -559,6 +559,32 @@ public class XWiki extends Api
         } catch (Exception e) {
             // Can't read versioned document
             LOGGER.error("Failed to read versioned document", e);
+
+            return null;
+        }
+    }
+
+    /**
+     * Load a specific revision of a document
+     *
+     * @param doc Document for which to load a specific revision
+     * @param rev Revision number
+     * @return Specific revision of a document
+     * @throws XWikiException
+     * @since 9.3RC1
+     */
+    public Document getDocument(DocumentReference reference, String revision) throws XWikiException
+    {
+        try {
+            XWikiDocument doc = this.xwiki.getDocument(reference, revision, getXWikiContext());
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
+                doc.getPrefixedFullName(), getXWikiContext()) == false) {
+                return null;
+            }
+
+            return doc.newDocument(getXWikiContext());
+        } catch (Exception e) {
+            LOGGER.warn("Failed to access document {}: {}", reference, ExceptionUtils.getRootCauseMessage(e));
 
             return null;
         }

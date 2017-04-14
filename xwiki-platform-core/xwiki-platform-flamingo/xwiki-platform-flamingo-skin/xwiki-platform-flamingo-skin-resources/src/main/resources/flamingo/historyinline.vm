@@ -81,6 +81,25 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 ## Display, loop over the extracted revisions and print them in the table.
 ##
   <tbody>
+  #set ($documentExtensions = $services.extension.xar.getInstalledExtensions($doc.getDocumentReferenceWithLocale()))
+  #if ($documentExtensions.size() > 0)
+    #foreach ($documentExtension in $documentExtensions)
+      #set ($version = "xar:$documentExtension.id.id/$documentExtension.id.version")
+      <tr class="extension">
+        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))"><input type="radio" name="rev1" value="$version"/></td>
+        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))"><input type="radio" name="rev2" value="$version"/></td>
+        #set ($versionURL = $tdoc.getURL('viewrev', $escapetool.url({'rev' : $version}))
+        ## #set ($extensionURL = )
+        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="4">$services.localization.render('core.viewers.history.extension.label', ["<a href='$versionURL'>", '</a>', "<a href='$extensionURL'>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</a>'])</a></td>
+        #if ($hasEdit || $hasAdmin)
+          <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;extensionId=${escapetool.xml($documentExtension.id.id)}&amp;extensionVersion=${documentExtension.id.version}")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>
+        #end
+        #if ($hasAdmin)
+          <td class="xwikibuttonlink"></td>
+        #end
+      </tr>
+    #end
+  #end
   #foreach ($version in $versions)
     #set ($revinfo = $tdoc.getRevisionInfo($version))
     #if ($tdoc.getRCSVersion() == $version)
@@ -88,7 +107,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #else
        <tr class="#if($velocityCount % 2 == 0) even #else odd #end">
     #end
-    #if ($totalVersions > 1)
+    #if ($totalVersions > 1 || $documentExtensions.size() > 0)
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))"><input type="radio" name="rev1" value="$version" #if ($velocityCount==2) checked="checked" #end/></td>
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))"><input type="radio" name="rev2" value="$version" #if ($velocityCount==1) checked="checked" #end/></td>
     #end

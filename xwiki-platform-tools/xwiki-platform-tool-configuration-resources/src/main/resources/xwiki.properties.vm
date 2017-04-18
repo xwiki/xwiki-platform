@@ -22,6 +22,10 @@
 # xwiki.cfg file. However right now it's only used by some XWiki components.
 # As time progresses more and more component will get their configurations from
 # this file.
+# 
+# This file come from one of those locations (in this order):
+# * [since 9.3] /etc/xwiki/xwiki.properties
+# * /WEB-INF/xwiki.properties in the web application resources
 
 #-------------------------------------------------------------------------------------
 # Core

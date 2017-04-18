@@ -23,7 +23,10 @@
 #
 # This is the main old XWiki configuration file. Commented parameters show the default value, although some features
 # might be disabled. To customize, uncomment and put your own value instead.
-
+# 
+# This file come from one of those locations (in this order):
+# * [since 9.3] /etc/xwiki/xwiki.cfg
+# * /WEB-INF/xwiki.cfg in the web application resources
 
 #---------------------------------------
 # General wiki settings

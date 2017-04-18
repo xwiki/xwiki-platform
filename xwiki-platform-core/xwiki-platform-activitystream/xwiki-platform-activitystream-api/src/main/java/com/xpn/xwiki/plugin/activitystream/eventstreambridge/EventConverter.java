@@ -36,6 +36,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventStatus;
@@ -88,7 +89,7 @@ public class EventConverter
         result.setBody(e.getBody());
         result.setDate(e.getDate());
         result.setEventId(e.getId());
-        result.setPage(this.serializer.serialize(e.getDocument()));
+        result.setPage(this.localSerializer.serialize(e.getDocument()));
         if (e.getDocumentTitle() != null) {
             result.setParam1(e.getDocumentTitle());
         }
@@ -127,7 +128,8 @@ public class EventConverter
         result.setApplication(e.getApplication());
         result.setBody(e.getBody());
         result.setDate(e.getDate());
-        result.setDocument(new DocumentReference(this.resolver.resolve(e.getPage(), EntityType.DOCUMENT)));
+        result.setDocument(new DocumentReference(this.resolver.resolve(e.getPage(), EntityType.DOCUMENT,
+                new WikiReference(e.getWiki()))));
         result.setId(e.getEventId());
         result.setDocumentTitle(e.getParam1());
         if (StringUtils.isNotEmpty(e.getParam2())) {

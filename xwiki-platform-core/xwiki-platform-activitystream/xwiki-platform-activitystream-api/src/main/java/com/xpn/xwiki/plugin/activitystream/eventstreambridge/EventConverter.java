@@ -64,8 +64,8 @@ public class EventConverter
 
     /** Needed for serializing the wiki and space references. */
     @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> localSerializer;
+    @Named("compact")
+    private EntityReferenceSerializer<String> compactSerializer;
 
     /** Needed for deserializing document names. */
     @Inject
@@ -89,7 +89,7 @@ public class EventConverter
         result.setBody(e.getBody());
         result.setDate(e.getDate());
         result.setEventId(e.getId());
-        result.setPage(this.localSerializer.serialize(e.getDocument()));
+        result.setPage(this.compactSerializer.serialize(e.getDocument()));
         if (e.getDocumentTitle() != null) {
             result.setParam1(e.getDocumentTitle());
         }
@@ -99,7 +99,7 @@ public class EventConverter
         result.setPriority((e.getImportance().ordinal() + 1) * 10);
 
         result.setRequestId(e.getGroupId());
-        result.setSpace(this.localSerializer.serialize(e.getSpace()));
+        result.setSpace(this.compactSerializer.serialize(e.getSpace()));
         result.setStream(e.getStream());
         result.setTitle(e.getTitle());
         result.setType(e.getType());

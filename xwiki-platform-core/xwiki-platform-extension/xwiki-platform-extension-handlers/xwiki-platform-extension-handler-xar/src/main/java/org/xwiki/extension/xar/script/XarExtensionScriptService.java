@@ -164,12 +164,14 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     {
         setError(null);
 
+        String namespace = getWikiNamespace(wiki);
+
         InstallRequest installRequest = new InstallRequest();
         installRequest.addExtension(new ExtensionId(feature, (Version) null));
-        if (StringUtils.isNotBlank(wiki)) {
-            installRequest.addNamespace(getWikiNamespace(wiki));
+        if (namespace != null) {
+            installRequest.addNamespace(namespace);
         }
-        installRequest.setId(getDiffJobId(feature, wiki));
+        installRequest.setId(getDiffJobId(feature, namespace));
 
         try {
             return this.jobExecutor.execute(DiffXarJob.JOB_TYPE, installRequest);
@@ -181,7 +183,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
 
     private String getWikiNamespace(String wiki)
     {
-        return "wiki:" + wiki;
+        return StringUtils.isNotBlank(wiki) ? "wiki:" + wiki : null;
     }
 
     /**

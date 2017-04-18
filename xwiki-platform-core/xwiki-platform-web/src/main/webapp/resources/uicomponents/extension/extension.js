@@ -538,7 +538,7 @@ XWiki.ExtensionBehaviour = Class.create({
       extensionDiff.select('.diff-item-header').each(function(diffItem) {
         var revertButtonDiv = new Element('div', {'class': 'btn btn-default btn-xs pull-right', 'style' : 'margin-top: -.3em;'});
         revertButtonDiv.insert(new Element('span', {'class': 'fa fa-undo'}));
-        var label = $services.localization.render('extensions.xar.changes.reset.button');
+        var label = "${services.localization.render('extensions.xar.changes.reset.button')}";
         revertButtonDiv.appendChild(document.createTextNode(' ' + label));        
         diffItem.insertBefore(revertButtonDiv, diffItem.firstChild);
 

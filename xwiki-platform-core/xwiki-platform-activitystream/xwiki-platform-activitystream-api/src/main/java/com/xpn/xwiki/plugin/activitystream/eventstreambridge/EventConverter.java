@@ -64,7 +64,7 @@ public class EventConverter
 
     /** Needed for serializing the wiki and space references. */
     @Inject
-    @Named("compact")
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> compactSerializer;
 
     /** Needed for deserializing document names. */
@@ -89,7 +89,7 @@ public class EventConverter
         result.setBody(e.getBody());
         result.setDate(e.getDate());
         result.setEventId(e.getId());
-        result.setPage(this.compactSerializer.serialize(e.getDocument()));
+        result.setPage(this.compactSerializer.serialize(e.getDocument(), new WikiReference(e.getWiki())));
         if (e.getDocumentTitle() != null) {
             result.setParam1(e.getDocumentTitle());
         }

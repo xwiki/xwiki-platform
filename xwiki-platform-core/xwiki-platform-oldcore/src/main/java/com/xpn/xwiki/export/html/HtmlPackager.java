@@ -221,7 +221,7 @@ public class HtmlPackager
      * @param pageReference the reference of the page to render.
      * @param zos the ZIP output stream.
      * @param exportContext the context object for the export
-     * @param context the XWiki context.
+     * @param context the clean XWiki context for rendering
      * @throws XWikiException error when rendering document.
      * @throws IOException error when rendering document.
      */
@@ -247,7 +247,6 @@ public class HtmlPackager
         ZipEntry zipentry = new ZipEntry(zipname);
         zos.putNextEntry(zipentry);
 
-        String originalDatabase = context.getWikiId();
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
             context.setDoc(doc);
@@ -264,8 +263,8 @@ public class HtmlPackager
 
             zos.write(content.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
-        } finally {
-            context.setWikiId(originalDatabase);
+        } catch (Exception e) {
+            throw new IOException(String.format("Failed to render document [%s] for HTML export", pageReference), e);
         }
     }
 
@@ -299,53 +298,59 @@ public class HtmlPackager
      * Init provided {@link ExportURLFactory} and add rendered documents to ZIP stream.
      *
      * @param zos the ZIP output stream.
-     * @param tempdir the directory where to copy attached files.
      * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory} used to render the documents.
      * @param context the XWiki context.
      * @throws XWikiException error when render documents.
      * @throws IOException error when render documents.
      */
-    private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf, XWikiContext context)
+    private void renderDocuments(ZipOutputStream zos, ExportURLFactory urlf, XWikiContext context)
         throws XWikiException, IOException
     {
-        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+        ExecutionContextManager ecm = Utils.getComponent(ExecutionContextManager.class);
         Execution execution = Utils.getComponent(Execution.class);
 
-        try {
-            XWikiContext renderContext = context.clone();
-            renderContext.put("action", "view");
-
-            ExecutionContext executionContext = ecim.clone(execution.getContext());
-
-            // Bridge with old XWiki Context, required for legacy code.
-            executionContext.setProperty("xwikicontext", renderContext);
-
-            // Push a clean new Execution Context since we don't want the main Execution Context to be used for
-            // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
-            // Execution Context automatically gets initialized with a new Velocity Context by
-            // the VelocityRequestInitializer class.
-            execution.pushContext(executionContext);
-
+        for (DocumentReference pageReference : this.pageReferences) {
             try {
-                // Set the URL Factories/Serializer to use
-                Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
-                    new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
-                FilesystemExportContext exportContext = exportContextProvider.get();
-                urlf.init(this.pageReferences, tempdir, exportContext, renderContext);
-                renderContext.setURLFactory(urlf);
-                // Use the filesystem URL format for all code using the url module to generate URLs (webjars, etc).
-                Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
+                // Isolate and initialize Contexts
+                XWikiContext renderContext = initializeContexts(ecm, execution, urlf, context);
 
-                for (DocumentReference pageReference : this.pageReferences) {
-                    renderDocument(pageReference, zos, exportContext, renderContext);
-                }
+                renderDocument(pageReference, zos, urlf.getFilesystemExportContext(), renderContext);
+            } catch (ExecutionContextException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_INIT_FAILED,
+                    "Failed to initialize Execution Context", e);
             } finally {
+                // Clean up context
                 execution.popContext();
             }
-        } catch (ExecutionContextException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_INIT_FAILED,
-                "Failed to initialize Execution Context", e);
         }
+    }
+
+    private XWikiContext initializeContexts(ExecutionContextManager ecm, Execution execution, ExportURLFactory urlf,
+        XWikiContext originalContext) throws ExecutionContextException
+    {
+        XWikiContext renderContext = originalContext.clone();
+
+        // Override the current action to ensure we always render a view action.
+        renderContext.put("action", "view");
+
+        // Set the URL Factories/Serializer to use
+        renderContext.setURLFactory(urlf);
+
+        ExecutionContext executionContext = ecm.clone(execution.getContext());
+
+        // Bridge with old XWiki Context, required for legacy code.
+        executionContext.setProperty("xwikicontext", renderContext);
+
+        // Push a clean new Execution Context since we don't want the main Execution Context to be used for
+        // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
+        // Execution Context automatically gets initialized with a new Velocity Context by
+        // the VelocityRequestInitializer class.
+        execution.pushContext(executionContext);
+
+        // Use the filesystem URL format for all code using the url module to generate URLs (webjars, etc).
+        Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
+
+        return renderContext;
     }
 
     /**
@@ -370,11 +375,19 @@ public class HtmlPackager
         File attachmentDir = new File(tempdir, "attachment");
         attachmentDir.mkdirs();
 
-        // Create custom URL factory
+        // Create and initialize a custom URL factory
         ExportURLFactory urlf = new ExportURLFactory();
+        Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
+            new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
+        // Note that the following line will set a FilesystemExportContext instance in the Execution Context
+        // and this Execution Context will be cloned for each document rendered below.
+        // TODO: to be cleaner we should set the FilesystemExportContext in the EC used to render each document.
+        // However we also need to initialize the ExportURLFactory.
+        FilesystemExportContext exportContext = exportContextProvider.get();
+        urlf.init(this.pageReferences, tempdir, exportContext, context);
 
         // Render pages to export
-        renderDocuments(zos, tempdir, urlf, context);
+        renderDocuments(zos, urlf, context);
 
         // Add required skins to ZIP file
         for (String skinName : urlf.getFilesystemExportContext().getNeededSkins()) {

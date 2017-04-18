@@ -88,7 +88,7 @@ public class FilesystemResourceReferenceSerializer
         List<String> pathSegments = new ArrayList<>();
 
         // If the webjar URL is computed inside a CSS file then we need to be relative to that CSS's path, i.e only
-        // take into accoutn the CSS Parent levels. However if the webjar URL is not inside a CSS we need to take into
+        // take into account the CSS Parent levels. However if the webjar URL is not inside a CSS we need to take into
         // account the doc parent level.
 
         // Adjust path depending on where the current doc is stored

@@ -153,12 +153,16 @@
 #set ($sourceSheet = $xwiki.getDocument('XWiki.SearchSuggestSourceSheet'))
 &lt;div class="tab-content"&gt;
   #foreach ($engine in $sources.keySet())
-    &lt;ul class="tab-pane searchSuggestSources#if ($engine == $searchEngine) active#end"
-      role="tabpanel" id="${engine}SearchSuggestSources"&gt;
-    #foreach ($source in $sources.get($engine))
-      #displaySearchSuggestSource($source)
-    #end
-    &lt;/ul&gt;
+    ## We can't use the UL element as tab panel because we break the HTML validation tests: "Bad value 'tabpanel' for
+    ## attribute 'role' on element 'ul'". I don't understand the reason as there's no constraint on
+    ## https://www.w3.org/TR/2010/WD-wai-aria-20100916/roles#tabpanel .
+    &lt;div class="tab-pane#if ($engine == $searchEngine) active#end" role="tabpanel" id="${engine}SearchSuggestSources"&gt;
+      &lt;ul class="searchSuggestSources"&gt;
+      #foreach ($source in $sources.get($engine))
+        #displaySearchSuggestSource($source)
+      #end
+      &lt;/ul&gt;
+    &lt;/div&gt;
   #end
 &lt;/div&gt;
 #if ($editing)
@@ -324,7 +328,8 @@
     }
     var sourceTemplate = $(this).closest('form').find('.searchSuggestSourceTemplate').children().first();
     var source = createSourceUI(sourceTemplate.clone(), sourceFormHTML);
-    searchEngines.next('.tab-content').find(searchEngines.find('li.active a').attr('href')).append(source);
+    searchEngines.next('.tab-content').find(searchEngines.find('li.active a').attr('href'))
+      .find('ul.searchSuggestSources').append(source);
   }
   $('.addSearchSuggestSource').click(function(event) {
     event.stopPropagation();

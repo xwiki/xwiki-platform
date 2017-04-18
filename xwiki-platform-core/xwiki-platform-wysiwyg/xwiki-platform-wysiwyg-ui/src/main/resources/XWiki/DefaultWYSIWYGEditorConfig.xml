@@ -116,11 +116,11 @@
 &lt;ul class="nav nav-tabs" role="tablist"
     data-defaultEditorId="$!services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id"&gt;
   &lt;li role="presentation" class="hidden"&gt;
-    &lt;a href="#tab-pane" aria-controls="tab-pane" role="tab" data-toggle="tab"&gt;&lt;/a&gt;
+    &lt;a href="#tab-pane-template" aria-controls="tab-pane-template" role="tab" data-toggle="tab"&gt;&lt;/a&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
 &lt;div class="tab-content"&gt;
-  &lt;div role="tabpanel" class="tab-pane hidden"&gt;&lt;/div&gt;
+  &lt;div role="tabpanel" class="tab-pane hidden" id="tab-pane-template"&gt;&lt;/div&gt;
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>

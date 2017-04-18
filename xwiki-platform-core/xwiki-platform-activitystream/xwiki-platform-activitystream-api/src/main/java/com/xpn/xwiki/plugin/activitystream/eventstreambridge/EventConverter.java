@@ -89,7 +89,7 @@ public class EventConverter
         result.setBody(e.getBody());
         result.setDate(e.getDate());
         result.setEventId(e.getId());
-        result.setPage(this.compactSerializer.serialize(e.getDocument(), new WikiReference(e.getWiki())));
+        result.setPage(this.compactSerializer.serialize(e.getDocument(), e.getWiki()));
         if (e.getDocumentTitle() != null) {
             result.setParam1(e.getDocumentTitle());
         }
@@ -99,7 +99,7 @@ public class EventConverter
         result.setPriority((e.getImportance().ordinal() + 1) * 10);
 
         result.setRequestId(e.getGroupId());
-        result.setSpace(this.compactSerializer.serialize(e.getSpace()));
+        result.setSpace(this.compactSerializer.serialize(e.getSpace(), e.getWiki()));
         result.setStream(e.getStream());
         result.setTitle(e.getTitle());
         result.setType(e.getType());

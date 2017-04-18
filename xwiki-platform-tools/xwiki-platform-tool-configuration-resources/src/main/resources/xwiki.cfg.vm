@@ -42,6 +42,9 @@
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group
 #-# document names.
+#-# The default list depends on the value of xwiki.authentication.group.allgroupimplicit:
+#-# 0: created users are added to XWiki.XWikiAllGroup group page
+#-# 1: created users are not added to any group page (but they will virtually be part of XWiki.XWikiAllGroup group)
 # xwiki.users.initialGroups=XWiki.XWikiAllGroup
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the

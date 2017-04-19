@@ -29,7 +29,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-link', {
-    requires: 'xwiki-marker,xwiki-resource',
+    requires: 'xwiki-marker,xwiki-resource,xwiki-localization',
 
     init: function(editor) {
       // Remove the link markers (XML comments used by the XWiki Rendering to detect wiki links) when the content is
@@ -195,7 +195,7 @@
     infoTab.get('urlOptions').className = 'hidden';
 
     // Add the link options toggle.
-    infoTab.add(createOptionsToggle(), 'urlOptions');
+    infoTab.add(createOptionsToggle(editor), 'urlOptions');
     dialogDefinition.minHeight = 100;
 
     // Add page link options.
@@ -203,8 +203,8 @@
       type: 'vbox',
       id: 'docOptions',
       children: [
-        createQueryStringField({id: 'docQueryString'}, 'doc'),
-        createAnchorField({id: 'docAnchor'}, 'doc')
+        createQueryStringField({id: 'docQueryString'}, 'doc', editor),
+        createAnchorField({id: 'docAnchor'}, 'doc', editor)
       ]
     });
 
@@ -213,7 +213,7 @@
       type: 'vbox',
       id: 'attachOptions',
       children: [
-        createQueryStringField({id: 'attachQueryString'}, 'attach')
+        createQueryStringField({id: 'attachQueryString'}, 'attach', editor)
       ]
     });
 
@@ -321,13 +321,14 @@
     });
   };
 
-  var createOptionsToggle = function() {
+  var createOptionsToggle = function(editor) {
     return {
       id: 'optionsToggle',
       type: 'html',
       html: '<div class="linkOptionsToggle">' +
               '<label class="cke_dialog_ui_labeled_label">' +
-                '<span class="arrow arrow-right"></span> Options' +
+                '<span class="arrow arrow-right"></span> ' +
+                CKEDITOR.tools.htmlEncode(editor.localization.get('xwiki-link.options')) +
               '</label>' +
             '</div>',
       onLoad: function() {
@@ -367,15 +368,15 @@
     };
   };
 
-  var createAnchorField = function(definition, resourceType) {
+  var createAnchorField = function(definition, resourceType, editor) {
     return createReferenceParameterField('anchor', CKEDITOR.tools.extend(definition || {}, {
-      label: 'Anchor'
+      label: editor.localization.get('xwiki-link.anchor')
     }), resourceType);
   };
 
-  var createQueryStringField = function(definition, resourceType) {
+  var createQueryStringField = function(definition, resourceType, editor) {
     return createReferenceParameterField('queryString', CKEDITOR.tools.extend(definition || {}, {
-      label: 'Query String'
+      label: editor.localization.get('xwiki-link.queryString')
     }), resourceType);
   };
 
@@ -507,7 +508,7 @@
         return (resource && resource.title) ||
           (resource && resource.entityReference && resource.entityReference.name) ||
           (resource && resource.reference && resource.reference.reference) ||
-          'type the link label';
+          this.getDialog().getParentEditor().localization.get('xwiki-link.defaultLabel');
       },
       maybeGetWikiGeneratedLinkContent: function(resource) {
         var config = this.getDialog().getParentEditor().config['xwiki-link'] || {};
@@ -560,7 +561,7 @@
 
     if (typeof editor.addMenuItem === 'function') {
       editor.addMenuItem('openLink', {
-        label: 'Open Link in New Tab',
+        label: editor.localization.get('xwiki-link.openInNewTab'),
         command: 'openLink',
         group: 'link',
         order: -1

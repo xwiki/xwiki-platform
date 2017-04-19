@@ -55,6 +55,50 @@ ckeditor.admin.reset=Reset
 ckeditor.admin.reset.hint=Restore the default configuration
 ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
 
+ckeditor.plugin.link.options=Options
+ckeditor.plugin.link.anchor=Anchor
+ckeditor.plugin.link.queryString=Query String
+ckeditor.plugin.link.defaultLabel=type the link label
+ckeditor.plugin.link.openInNewTab=Open Link in New Tab
+
+ckeditor.plugin.macro.placeholder=macro:{0}
+ckeditor.plugin.macro.buttonHint=XWiki Macro
+ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+
+ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
+ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+
+modal.ok=OK
+modal.cancel=Cancel
+modal.close=Close
+
+resource.attach.label=Attachment
+resource.attach.placeholder=Path.To.Page@attachment.png
+resource.data.label=Data URI
+resource.doc.label=Page
+resource.doc.placeholder=Path.To.Page
+resource.icon.label=Icon
+resource.mailto.label=Mail Address
+resource.mailto.placeholder=user@example.org
+resource.path.label=Path
+resource.path.placeholder=/path/to/file
+resource.unc.label=UNC Path
+resource.unc.placeholder=//server/share/path/to/file
+resource.unknown.label=Unknown
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=User
+resource.user.placeholder=alias
+
+entityResourceSuggester.doc.placeholder=Find a page...
+entityResourceSuggester.attach.placeholder=Find an attachment...
+
+entityResourcePicker.select=Select
+entityResourcePicker.doc.title=Select Page
+entityResourcePicker.attach.title=Select Attachment
+
 macroSelector.title=Select Macro
 macroSelector.filter.text.placeholder=Type to filter
 macroSelector.filter.category.all=All Macros
@@ -69,6 +113,130 @@ macroEditor.submit=Submit
 macroEditor.content=Content
 macroEditor.noParameters=This macro has no parameters.
 macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.</content>
+  <object>
+    <name>CKEditor.Translations</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>db49c038-03d9-4c33-9cfe-5f758ae54354</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/*
+#set ($lines = $stringtool.split($doc.content, $util.newline))
+#set ($translations = {})
+#foreach ($line in $lines)
+  #set ($key = $stringtool.substringBefore($line.trim(), '='))
+  #if ($key.startsWith('ckeditor.plugin.'))
+    #set ($relativeKeyStart = $key.indexOf('.', 16))
+    #set ($pluginName = "xwiki-$key.substring(16, $relativeKeyStart)")
+    #set ($relativeKey = $key.substring($mathtool.add($relativeKeyStart, 1)))
+    #set ($pluginTranslations = $translations.get($pluginName))
+    #if (!$pluginTranslations)
+      #set ($pluginTranslations = {})
+      #set ($discard = $translations.put($pluginName, $pluginTranslations))
+    #end
+    #set ($translation = $services.localization.get($key))
+    #if ($translation)
+      #set ($discard = $pluginTranslations.put($relativeKey, $translation.rawSource))
+    #else
+      #set ($discard = $pluginTranslations.put($relativeKey, $relativeKey))
+    #end
+  #end
+#end
+*/
+require(['ckeditor'], function(ckeditor) {
+  var translations = $jsontool.serialize($translations);
+  for (var pluginName in translations) {
+    if (translations.hasOwnProperty(pluginName)) {
+      ckeditor.plugins.setLang(pluginName, '$xcontext.locale', translations[pluginName]);
+    }
+  }
+});</code>
+    </property>
+    <property>
+      <name>Make the translations available to the JavaScript code</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
   <object>
     <name>CKEditor.Translations</name>
     <number>0</number>

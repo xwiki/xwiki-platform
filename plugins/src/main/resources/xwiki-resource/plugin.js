@@ -21,7 +21,7 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
   'use strict';
 
   CKEDITOR.plugins.add('xwiki-resource', {
-    requires: 'xwiki-marker,xwiki-dialog'
+    requires: 'xwiki-marker,xwiki-dialog,xwiki-localization'
   });
 
   CKEDITOR.plugins.xwikiResource = {
@@ -132,7 +132,8 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
             // Check if the selected resource type supports empty references.
             var resourceTypeConfig = $resource.types[resourceReference.type] || {};
             if (resourceTypeConfig.allowEmptyReference !== true) {
-              return 'The ' + this.getLabelElement().getText() + ' is not specified.';
+              return this.getDialog().getParentEditor().localization.get('xwiki-resource.notSpecified',
+                this.getLabelElement().getText());
             }
           }
           return true;

@@ -20,6 +20,10 @@
 describe('XWiki Macro Plugin for CKEditor', function() {
   var editor;
 
+  CKEDITOR.plugins.setLang('xwiki-macro', 'en', {
+    'placeholder': 'macro:{0}'
+  });
+
   beforeEach(function(done) {
     editor = testUtils.createEditor(done, {'extraPlugins': 'xwiki-macro'});
   });

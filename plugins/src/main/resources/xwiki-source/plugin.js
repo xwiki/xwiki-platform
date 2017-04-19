@@ -20,7 +20,7 @@
 (function() {
   'use strict';
   CKEDITOR.plugins.add('xwiki-source', {
-    requires: 'sourcearea,notification',
+    requires: 'sourcearea,notification,xwiki-localization',
 
     init: function(editor) {
       editor.on('beforeSetMode', jQuery.proxy(this.onBeforeSetMode, this));
@@ -122,7 +122,7 @@
         editor._.modes[editor.mode].failed = true;
         editor.setMode(editor._.previousMode, function() {
           thisPlugin.setLoading(editor, false);
-          editor.showNotification('Failed to perform the conversion.', 'warning');
+          editor.showNotification(editor.localization.get('xwiki-source.conversionFailed'), 'warning');
         });
       });
     },

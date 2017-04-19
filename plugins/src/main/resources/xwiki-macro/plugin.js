@@ -40,7 +40,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget,notification,xwiki-marker,xwiki-source',
+    requires: 'widget,notification,xwiki-marker,xwiki-source,xwiki-localization',
     init : function(editor) {
       var macroPlugin = this;
 
@@ -110,7 +110,8 @@
           // Use a placeholder for the macro output. The user cannot edit the macro otherwise.
           var placeholder = new CKEDITOR.htmlParser.element(wrapperName, {'class': 'macro-placeholder'});
           var macroCall = macroPlugin.parseMacroCall(startMacroComment.value);
-          placeholder.add(new CKEDITOR.htmlParser.text('macro:' + macroCall.name));
+          var text = editor.localization.get('xwiki-macro.placeholder', macroCall.name);
+          placeholder.add(new CKEDITOR.htmlParser.text(text));
           wrapper.add(placeholder);
         }
 
@@ -137,7 +138,7 @@
       };
 
       editor.ui.addButton('xwiki-macro', {
-        label: 'XWiki Macro',
+        label: editor.localization.get('xwiki-macro.buttonHint'),
         command: 'xwiki-macro',
         toolbar: 'insert,40'
       });
@@ -159,7 +160,7 @@
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
-          this.pathName = 'macro:' + this.data.name;
+          this.pathName = editor.localization.get('xwiki-macro.placeholder', this.data.name);
           // The elementspath plugin takes the path name from the 'data-cke-display-name' attribute which is set by the
           // widget plugin only once, based on the initial pathName property from the widget definition. We have to
           // update the attribute ourselves in order to have a dynamic path name (since the user can change the macro).
@@ -202,7 +203,7 @@
         done: function(success) {
           editor.plugins['xwiki-source'].setLoading(editor, false);
           if (!success) {
-            editor.showNotification('Failed to refresh the edited content.', 'warning');
+            editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
           }
           editor.fire('afterCommandExec', {name: this.name, command: this});
         }
@@ -281,7 +282,7 @@
         }
       });
       editor.ui.addButton(definition.commandId, {
-        label: 'Insert ' +  definition.macroCall.name + ' macro',
+        label: editor.localization.get('xwiki-macro.dedicatedInsertButtonHint', definition.macroCall.name),
         command: definition.commandId,
         toolbar: 'insert,50'
       });

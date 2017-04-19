@@ -19,8 +19,45 @@
  */
 (function() {
   'use strict';
+
   CKEDITOR.plugins.add('xwiki-localization', {
-    init : function(editor) {
+    beforeInit: function(editor) {
+      // We don't use editor.lang.* directly because:
+      // * it doesn't fail nicely when a translation is missing (e.g. fall-back on the translation key)
+      // * it doesn't support parameter substitution
+      editor.localization = {
+        get: function(key) {
+          return getTranslation.apply(editor, arguments);
+        }
+      };
     }
   });
+
+  var getTranslation = function(key) {
+    var translation = getNestedProperty(this.lang, key);
+    if (typeof translation === 'string') {
+      // Naive implementation for message parameter substitution that suits our current needs.
+      for (var i = 1; i < arguments.length; i++) {
+        translation = translation.replace(new RegExp('\\{' + (i - 1) + '\\}', 'g'), arguments[i]);
+      }
+    } else {
+      translation = key;
+    }
+    return translation;
+  };
+
+  var getNestedProperty = function(object, path) {
+    if (path && path.length > 0) {
+      var parts = path.split('.', 2);
+      if (object && object.hasOwnProperty(parts[0])) {
+        return getNestedProperty(object[parts[0]], parts[1]);
+      } else if (object && object.hasOwnProperty(path)) {
+        return object[path];
+      } else {
+        return undefined;
+      }
+    } else {
+      return object;
+    }
+  };
 })();

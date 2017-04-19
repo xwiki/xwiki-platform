@@ -17,42 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('entityResourcePicker', ['jquery', 'resource', 'tree'], function($, $resource) {
+define('entityResourcePickerTranslationKeys', [], [
+  'select',
+  'doc.title',
+  'attach.title'
+]);
+
+define('entityResourcePicker', [
+  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'tree'
+], function($, $resource, $modal, translations) {
   'use strict';
-
-  var modalTemplate = 
-    '<div class="ckeditor-modal modal" tabindex="-1" role="dialog" data-backdrop="static">' +
-      '<div class="modal-dialog" role="document">' +
-        '<div class="modal-content">' +
-          '<div class="modal-header">' +
-            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-              '<span aria-hidden="true">&times;</span>' +
-            '</button>' +
-            '<h4 class="modal-title"></h4>' +
-          '</div>' +
-          '<div class="modal-body"></div>' +
-          '<div class="modal-footer">' +
-            '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
-            '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-
-  var createModal = function(definition) {
-    definition = $.extend({
-      title: '',
-      content: '',
-      acceptLabel: 'OK',
-      dismissLabel: 'Cancel'
-    }, definition);
-    var modal = $(modalTemplate).appendTo(document.body);
-    modal.find('.modal-title').text(definition.title);
-    modal.find('.modal-body').html('').append(definition.content);
-    modal.find('.modal-footer .btn-primary').text(definition.acceptLabel);
-    modal.find('.modal-footer .btn-default').text(definition.dismissLabel);
-    return modal;
-  };
 
   var createTreeElement = function(attributes) {
     return $(document.createElement('div')).attr($.extend({
@@ -193,12 +167,13 @@ define('entityResourcePicker', ['jquery', 'resource', 'tree'], function($, $reso
   };
 
   var registerResourcePicker = function(resourceType, title) {
-    var modal = createModal({
+    var modal = $modal.createModal({
+      'class': 'entity-resource-picker-modal',
       title: title,
       content: createTreeElement({
         'data-url': treeURL[resourceType]
       }),
-      acceptLabel: 'Select'
+      acceptLabel: translations.get('select')
     });
 
     var picker = createResourcePicker(modal, {resourceType: resourceType});
@@ -214,7 +189,7 @@ define('entityResourcePicker', ['jquery', 'resource', 'tree'], function($, $reso
   };
 
   if (typeof $.fn.xtree === 'function') {
-    registerResourcePicker('doc', 'Select Page');
-    registerResourcePicker('attach', 'Select Attachment');
+    registerResourcePicker('doc', translations.get('doc.title'));
+    registerResourcePicker('attach', translations.get('attach.title'));
   }
 });

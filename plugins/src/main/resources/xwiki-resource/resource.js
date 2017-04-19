@@ -17,62 +17,82 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('resource', [], function() {
+define('resourceTranslationKeys', [], [
+  'attach.label',
+  'attach.placeholder',
+  'data.label',
+  'doc.label',
+  'doc.placeholder',
+  'icon.label',
+  'mailto.label',
+  'mailto.placeholder',
+  'path.label',
+  'path.placeholder',
+  'unc.label',
+  'unc.placeholder',
+  'unknown.label',
+  'url.label',
+  'url.placeholder',
+  'user.label',
+  'user.placeholder'
+]);
+
+define('resource', ['l10n!resource'], function(translations) {
   'use strict';
 
   var types = {
     attach: {
-      label: 'Attachment',
+      label: translations.get('attach.label'),
       icon: 'glyphicon glyphicon-paperclip',
-      placeholder: 'Path.To.Page@attachment.png',
+      placeholder: translations.get('attach.placeholder'),
       entityType: 'attachment'
     },
     data: {
-      label: 'Data URI',
+      label: translations.get('data.label'),
       icon: 'glyphicon glyphicon-briefcase',
       placeholder: 'image/png;base64,AAAAAElFTkSuQmCC'
     },
     doc: {
-      label: 'Page',
+      label: translations.get('doc.label'),
       icon: 'glyphicon glyphicon-file',
-      placeholder: 'Path.To.Page',
+      placeholder: translations.get('doc.placeholder'),
       allowEmptyReference: true,
       entityType: 'document'
     },
     icon: {
-      label: 'Icon',
+      label: translations.get('icon.label'),
       icon: 'glyphicon glyphicon-flag',
       placeholder: 'help'
     },
     mailto: {
-      label: 'Mail Address',
+      label: translations.get('mailto.label'),
       icon: 'glyphicon glyphicon-envelope',
-      placeholder: 'user@example.org'
+      placeholder: translations.get('mailto.placeholder')
     },
     path: {
-      label: 'Path',
+      label: translations.get('path.label'),
       icon: 'glyphicon glyphicon-road',
-      placeholder: '/path/to/file'
+      placeholder: translations.get('path.placeholder')
     },
     unc: {
-      label: 'UNC Path',
+      label: translations.get('unc.label'),
       icon: 'glyphicon glyphicon-hdd',
-      placeholder: '//server/share/path/to/file'
+      placeholder: translations.get('unc.placeholder')
     },
     unknown: {
-      label: 'Unknown',
+      label: translations.get('unknown.label'),
       icon: 'glyphicon glyphicon-question-sign',
       placeholder: ''
     },
     url: {
-      label: 'URL',
+      label: translations.get('url.label'),
       icon: 'glyphicon glyphicon-globe',
-      placeholder: 'http://www.example.org/image.png'
+      placeholder: translations.get('url.placeholder')
     },
     user: {
-      label: 'User',
+      label: translations.get('user.label'),
       icon: 'glyphicon glyphicon-user',
-      placeholder: 'alias'
+      placeholder: translations.get('user.placeholder')
     }
   };
 

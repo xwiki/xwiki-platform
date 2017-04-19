@@ -204,7 +204,7 @@ require.config({
   },
   config: {
     l10n: {
-      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=$xcontext.language')
+      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=$xcontext.locale')
     }
   }
 });
@@ -326,8 +326,14 @@ define('xwiki-ckeditor', [
     return oldReplace.call(this, element, ckeditor.tools.extend(config || {}, getConfig(element)));
   };
 
-  // We cannot add these modules to the list of dependencies because they need the tree module to be configured first.
-  require(['entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer'], function() {
+  require([
+    // We cannot add these modules to the list of dependencies because they need the tree module to be configured first.
+    'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer',
+    // Load the translations for our custom CKEditor plugins. We didn't add this as a dependency to the xwiki-ckeditor
+    // module because some of our plugins load their dependencies with RequireJS and thus they are loaded with a small
+    // delay. The plugin needs to be defined before calling CKEDITOR.plugins.setLang().
+    '$!xwiki.getURL("CKEditor.Translations", "jsx", "language=$xcontext.locale")'
+  ], function() {
     deferred.resolve(ckeditor);
   });
 

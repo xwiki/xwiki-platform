@@ -21,7 +21,7 @@
   'use strict';
   var $ = jQuery;
   CKEDITOR.plugins.add('xwiki-save', {
-    requires: 'xwiki-cache',
+    requires: 'xwiki-cache,xwiki-localization',
     editors: [],
 
     beforeInit: function(editor) {
@@ -92,8 +92,9 @@
           submitInProgress = false;
         }
         // Display the leave confirmation if there are unsaved changes.
-        if (this.checkDirty()) {
-          event.returnValue = 'There are unsaved changes. Do you want to discard them?';
+        var dirtyEditor = this.checkDirty();
+        if (dirtyEditor) {
+          event.returnValue = dirtyEditor.localization.get('xwiki-save.leaveConfirmationMessage');
           return event.returnValue;
         }
       }, this));
@@ -135,7 +136,7 @@
         var editor = this.editors[i];
         var config = editor.config['xwiki-save'] || {};
         if (config.leaveConfirmation && editor.checkDirty()) {
-          return true;
+          return editor;
         }
       }
       return false;

@@ -17,7 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource) {
+define('entityResourceSuggesterTranslationKeys', [], [
+  'doc.placeholder',
+  'attach.placeholder'
+]);
+
+define('entityResourceSuggester', [
+  'jquery', 'resource', 'l10n!entityResourceSuggester'
+], function($, $resource, translations) {
   'use strict';
 
   var search = function(query, input, deferred, entityType) {  
@@ -97,7 +104,7 @@ define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource)
 
   var advancedSearchPattern = /[+\-!(){}\[\]\^"~*?:\\]+/;
 
-  $resource.types.doc.placeholder = 'Find a page...';
+  $resource.types.doc.placeholder = translations.get('doc.placeholder');
   $resource.suggesters.doc = {
     retrieve: function(resourceReference) {
       var deferred = $.Deferred();
@@ -122,7 +129,7 @@ define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource)
     display: display
   };
 
-  $resource.types.attach.placeholder = 'Find an attachment...';
+  $resource.types.attach.placeholder = translations.get('attach.placeholder');
   $resource.suggesters.attach = {
     retrieve: function(resourceReference) {
       var deferred = $.Deferred();

@@ -17,7 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('modal', ['jquery', 'bootstrap'], function($) {
+define('modalTranslationKeys', [], [
+  'ok',
+  'cancel',
+  'close'
+]);
+
+define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations) {
   'use strict';
   var modalTemplate = 
     '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
@@ -42,10 +48,14 @@ define('modal', ['jquery', 'bootstrap'], function($) {
     definition = $.extend({
       title: '',
       content: '',
-      acceptLabel: 'OK',
-      dismissLabel: 'Cancel'
+      acceptLabel: translations.get('ok'),
+      dismissLabel: translations.get('cancel')
     }, definition);
     var modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
+    modal.find('.close').attr({
+      title: translations.get('close'),
+      'aria-label': translations.get('close')
+    });
     modal.find('.modal-title').text(definition.title);
     modal.find('.modal-body').html('').append(definition.content);
     modal.find('.modal-footer .btn-primary').text(definition.acceptLabel);

@@ -72,6 +72,11 @@ public class BaseObjectReference extends ObjectReference
     protected Integer objectNumber;
 
     /**
+     * True if the name and the metadata (class reference and number) are in sync.
+     */
+    private boolean nameParsed;
+
+    /**
      * Constructor which would raise exceptions if the source entity reference does not have the appropriate type or
      * parent, etc.
      *
@@ -93,8 +98,37 @@ public class BaseObjectReference extends ObjectReference
      */
     public BaseObjectReference(DocumentReference classReference, Integer objectNumber, DocumentReference parent)
     {
-        // FIXME: Not very nice having to serialize classReference/objectNumber and then parse it in #setName
-        super(toName(classReference, objectNumber), parent);
+        this((EntityReference) classReference, objectNumber, parent);
+    }
+
+    /**
+     * Builds an indexed object reference for the object of class {@code className} with index {@code objectNumber} in
+     * the document referenced by {@code parent}.
+     *
+     * @param classReference the name of the class of the object
+     * @param objectNumber the number of the object in the document, or {@code null} if the default object should be
+     *            referenced
+     * @param parent reference to the parent document where the object is
+     */
+    public BaseObjectReference(EntityReference classReference, Integer objectNumber, DocumentReference parent)
+    {
+        super(toName(classReference, objectNumber, parent), parent);
+
+        this.xclassReference = resolveClassReference(classReference);
+        this.objectNumber = objectNumber;
+
+        // Indicate that the name does not need to be parsed
+        this.nameParsed = true;
+    }
+
+    private DocumentReference resolveClassReference(EntityReference classReference)
+    {
+        if (classReference instanceof DocumentReference) {
+            return (DocumentReference) classReference;
+        }
+
+        return Utils.<DocumentReferenceResolver<EntityReference>>getComponent(DocumentReferenceResolver.TYPE_REFERENCE)
+            .resolve(classReference, getParent());
     }
 
     /**
@@ -104,11 +138,13 @@ public class BaseObjectReference extends ObjectReference
      * @param objectNumber the object number
      * @return the object reference name
      */
-    private static String toName(DocumentReference classReference, Integer objectNumber)
+    private static String toName(EntityReference classReference, Integer objectNumber, DocumentReference parent)
     {
+        // Optimize the reference of the class to avoid useless wiki part in most cases (which also make impossible to
+        // get a local version of the object reference)
         String name =
-            Utils.<EntityReferenceSerializer<String>>getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
-                classReference);
+            Utils.<EntityReferenceSerializer<String>>getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki")
+                .serialize(classReference, parent);
 
         if (objectNumber != null) {
             StringBuilder builder = new StringBuilder(name);
@@ -130,11 +166,48 @@ public class BaseObjectReference extends ObjectReference
         return name;
     }
 
+    private void maybeParseName()
+    {
+        if (!this.nameParsed) {
+            String name = getName();
+
+            String classReferenceStr;
+            String objectNumberStr;
+
+            Matcher matcher = NUMBERPATTERN.matcher(name);
+            if (matcher.find()) {
+                if (matcher.group(1).length() % 2 == 0) {
+                    classReferenceStr = name.substring(0, matcher.end(1));
+                    objectNumberStr = matcher.group(2);
+                } else {
+                    classReferenceStr = name;
+                    objectNumberStr = null;
+                }
+            } else {
+                classReferenceStr = name;
+                objectNumberStr = null;
+            }
+
+            this.xclassReference =
+                Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING)
+                    .resolve(classReferenceStr, getParent());
+            if (objectNumberStr != null) {
+                this.objectNumber = Integer.valueOf(objectNumberStr);
+            }
+
+            // Indicate that the name does not need to be parsed
+            this.nameParsed = true;
+        }
+    }
+
     /**
      * @return the reference of the class of this object.
      */
     public DocumentReference getXClassReference()
     {
+        // Make sure metadata are in sync with the name
+        maybeParseName();
+
         return this.xclassReference;
     }
 
@@ -146,44 +219,9 @@ public class BaseObjectReference extends ObjectReference
      */
     public Integer getObjectNumber()
     {
+        // Make sure metadata are in sync with the name
+        maybeParseName();
+
         return this.objectNumber;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Overridden to always compute the class name and the object number.
-     * </p>
-     *
-     * @see org.xwiki.model.reference.EntityReference#setName(java.lang.String)
-     */
-    @Override
-    protected void setName(String name)
-    {
-        super.setName(name);
-
-        String classReferenceStr;
-        String objectNumberStr;
-
-        Matcher matcher = NUMBERPATTERN.matcher(name);
-        if (matcher.find()) {
-            if (matcher.group(1).length() % 2 == 0) {
-                classReferenceStr = name.substring(0, matcher.end(1));
-                objectNumberStr = matcher.group(2);
-            } else {
-                classReferenceStr = name;
-                objectNumberStr = null;
-            }
-        } else {
-            classReferenceStr = name;
-            objectNumberStr = null;
-        }
-
-        this.xclassReference =
-            Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
-                classReferenceStr);
-        if (objectNumberStr != null) {
-            this.objectNumber = Integer.valueOf(objectNumberStr);
-        }
     }
 }

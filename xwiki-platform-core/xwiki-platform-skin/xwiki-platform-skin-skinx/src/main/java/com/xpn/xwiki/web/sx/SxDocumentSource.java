@@ -38,7 +38,6 @@ import org.xwiki.velocity.XWikiVelocityException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -135,8 +134,7 @@ public class SxDocumentSource implements SxSource
                     LESSResourceReferenceFactory lessResourceReferenceFactory =
                         Utils.getComponent(LESSResourceReferenceFactory.class);
                     ObjectPropertyReference objectPropertyReference =
-                        new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
-                            sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()));
+                        new ObjectPropertyReference(CONTENT_PROPERTY_NAME, sxObj.getReference());
                     LESSResourceReference lessResourceReference =
                         lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
                     try {

@@ -52,6 +52,7 @@ import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -65,22 +66,10 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     XClassMigratorListener.class,
     DefaultObservationManager.class,
-    LocalStringEntityReferenceSerializer.class,
-    DefaultStringDocumentReferenceResolver.class,
     PropertyConverter.class,
-    CurrentReferenceDocumentReferenceResolver.class,
-    CurrentReferenceEntityReferenceResolver.class,
-    CurrentEntityReferenceProvider.class,
-    DefaultModelConfiguration.class,
-    DefaultStringEntityReferenceResolver.class,
-    DefaultEntityReferenceProvider.class,
     XClassPropertyEventGeneratorListener.class,
-    CurrentStringDocumentReferenceResolver.class,
-    CurrentStringEntityReferenceResolver.class,
-    LocalUidStringEntityReferenceSerializer.class,
-    DefaultStringEntityReferenceSerializer.class,
-    DefaultSymbolScheme.class
 })
+@ReferenceComponentList
 public class XClassMigratorListenerTest
 {
     @Rule

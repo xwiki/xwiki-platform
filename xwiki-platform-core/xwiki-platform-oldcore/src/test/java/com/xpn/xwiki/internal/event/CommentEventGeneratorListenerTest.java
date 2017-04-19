@@ -23,25 +23,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
@@ -52,17 +43,7 @@ import static org.mockito.Mockito.verify;
  * 
  * @version $Id$
  */
-@ComponentList({
-    CurrentReferenceDocumentReferenceResolver.class,
-    CurrentReferenceEntityReferenceResolver.class,
-    CurrentEntityReferenceProvider.class,
-    DefaultModelConfiguration.class,
-    DefaultStringEntityReferenceSerializer.class,
-    DefaultStringDocumentReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class,
-    DefaultEntityReferenceProvider.class,
-    DefaultSymbolScheme.class
-})
+@ReferenceComponentList
 public class CommentEventGeneratorListenerTest
 {
     public MockitoComponentMockingRule<CommentEventGeneratorListener> mocker =

@@ -53,6 +53,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 /**
  * Validate {@link XWikiDocument#merge(XWikiDocument, XWikiDocument, MergeConfiguration, com.xpn.xwiki.XWikiContext)}.
@@ -60,21 +61,9 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * @version $Id$
  */
 @ComponentList(value = {
-    DefaultDiffManager.class,
-    LocalStringEntityReferenceSerializer.class,
-    CurrentReferenceDocumentReferenceResolver.class,
-    CurrentReferenceEntityReferenceResolver.class,
-    CurrentEntityReferenceProvider.class,
-    DefaultModelConfiguration.class,
-    CurrentStringDocumentReferenceResolver.class,
-    CurrentStringEntityReferenceResolver.class,
-    LocalUidStringEntityReferenceSerializer.class,
-    DefaultStringEntityReferenceSerializer.class,
-    DefaultStringDocumentReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class,
-    DefaultEntityReferenceProvider.class,
-    DefaultSymbolScheme.class
+    DefaultDiffManager.class
 })
+@ReferenceComponentList
 public class XWikiDocumentMergeTest
 {
     @Rule

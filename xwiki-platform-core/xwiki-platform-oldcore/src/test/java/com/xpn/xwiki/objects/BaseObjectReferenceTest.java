@@ -55,11 +55,11 @@ public class BaseObjectReferenceTest
         BaseObjectReference reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class"), 42, this.document);
 
-        Assert.assertEquals("wiki:space.class[42]", reference.getName());
+        Assert.assertEquals("space.class[42]", reference.getName());
 
         reference = new BaseObjectReference(new DocumentReference("wiki", "space", "class"), null, this.document);
 
-        Assert.assertEquals("wiki:space.class", reference.getName());
+        Assert.assertEquals("space.class", reference.getName());
     }
 
     @Test
@@ -68,24 +68,24 @@ public class BaseObjectReferenceTest
         BaseObjectReference reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class[42]"), null, this.document);
 
-        Assert.assertEquals("wiki:space.class\\[42]", reference.getName());
+        Assert.assertEquals("space.class\\[42]", reference.getName());
 
         reference =
             new BaseObjectReference(new DocumentReference("wiki", "space", "class\\\\[42]"), null, this.document);
 
-        Assert.assertEquals("wiki:space.class\\\\\\\\\\[42]", reference.getName());
+        Assert.assertEquals("space.class\\\\\\\\\\[42]", reference.getName());
     }
 
     @Test
     public void testUnserialize() throws Exception
     {
         BaseObjectReference reference =
-            new BaseObjectReference(new EntityReference("wiki:space.class[42]", EntityType.OBJECT, this.document));
+            new BaseObjectReference(new EntityReference("space.class[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
         Assert.assertEquals(42, (int) reference.getObjectNumber());
 
-        reference = new BaseObjectReference(new EntityReference("wiki:space.class", EntityType.OBJECT, this.document));
+        reference = new BaseObjectReference(new EntityReference("space.class", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());
@@ -95,25 +95,24 @@ public class BaseObjectReferenceTest
     public void testUnserializeEscape() throws Exception
     {
         BaseObjectReference reference =
-            new BaseObjectReference(new EntityReference("wiki:space.class\\[42]", EntityType.OBJECT, this.document));
+            new BaseObjectReference(new EntityReference("space.class\\[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class[42]"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());
 
         reference =
-            new BaseObjectReference(new EntityReference("wiki:space.class\\\\[42]", EntityType.OBJECT, this.document));
+            new BaseObjectReference(new EntityReference("space.class\\\\[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class\\"), reference.getXClassReference());
         Assert.assertEquals(42, (int) reference.getObjectNumber());
 
         reference =
-            new BaseObjectReference(new EntityReference("wiki:space.class\\\\\\[42]", EntityType.OBJECT, this.document));
+            new BaseObjectReference(new EntityReference("space.class\\\\\\[42]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class\\[42]"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());
 
-        reference =
-            new BaseObjectReference(new EntityReference("wiki:space.class[word]", EntityType.OBJECT, this.document));
+        reference = new BaseObjectReference(new EntityReference("space.class[word]", EntityType.OBJECT, this.document));
 
         Assert.assertEquals(new DocumentReference("wiki", "space", "class[word]"), reference.getXClassReference());
         Assert.assertNull(reference.getObjectNumber());

@@ -296,7 +296,7 @@
                 <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
               </wikiClassProperty>
             </wikiClass>
-            <wikiObject name="wiki:otherspace.otherclass[0]">
+            <wikiObject name="otherspace.otherclass[0]">
               <p>
                 <parameters>
                   <entry>
@@ -370,7 +370,7 @@
                 </p>
               </wikiObjectProperty>
             </wikiObject>
-            <wikiObject name="wiki:space.page[0]">
+            <wikiObject name="space.page[0]">
               <p>
                 <parameters>
                   <entry>
@@ -614,7 +614,7 @@
                   <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
                 </wikiClassProperty>
               </wikiClass>
-              <wikiObject name="wiki:otherspace.otherclass[0]">
+              <wikiObject name="otherspace.otherclass[0]">
                 <p>
                   <parameters>
                     <entry>
@@ -688,7 +688,7 @@
                   </p>
                 </wikiObjectProperty>
               </wikiObject>
-              <wikiObject name="wiki:space.nestedspace.page[0]">
+              <wikiObject name="space.nestedspace.page[0]">
                 <p>
                   <parameters>
                     <entry>

@@ -106,7 +106,7 @@ public class RecordableEventMigrator extends AbstractHibernateDataMigration
                 }
             } while (!events.isEmpty());
         } catch (QueryException e) {
-            throw new DataMigrationException("Failed to fix RecordableEvent problems.");
+            throw new DataMigrationException("Failed to fix RecordableEvent problems.", e);
         }
     }
 

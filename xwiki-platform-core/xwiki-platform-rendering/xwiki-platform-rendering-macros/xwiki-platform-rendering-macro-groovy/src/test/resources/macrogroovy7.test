@@ -1,0 +1,21 @@
+.runTransformations
+.#--------------------------------------------------------
+.input|xwiki/2.1
+.# Make sure script containing only class definition does not output anything
+.#--------------------------------------------------------
+{{groovy}}
+class MyClass1 {
+  public field = "content";
+}
+{{/groovy}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [groovy] [] [class MyClass1 {
+  public field = "content";
+}]
+endMacroMarkerStandalone [groovy] [] [class MyClass1 {
+  public field = "content";
+}]
+endDocument

@@ -277,6 +277,9 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
             && ((List< ? >) scriptResult).get(0) instanceof Block) {
             result = (List<Block>) scriptResult;
+        } else if (scriptResult instanceof Class) {
+            // Class result means class definition and we don't want to print anything in this case
+            result = Collections.emptyList();
         } else {
             // If the Script Context writer is empty and the Script Result isn't, then convert the String Result
             // to String and display it!
@@ -286,7 +289,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
                 contentToParse = this.converterManager.convert(String.class, scriptResult);
             }
             // Run the wiki syntax parser on the Script returned content
-            result = parseScriptResult(contentToParse, parameters, context);
+            result = parseScriptResult(contentToParse, parameters, context);            
         }
 
         return result;

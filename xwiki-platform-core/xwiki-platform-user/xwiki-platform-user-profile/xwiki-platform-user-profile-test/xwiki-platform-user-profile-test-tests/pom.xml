@@ -37,6 +37,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Mapping needed by the ActivityStream migrator since AS is a dependency of the User Directory -->
+    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>
@@ -79,6 +81,15 @@
             </goals>
           </execution>
         </executions>
+        <dependencies>
+          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the classpath. -->
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-activitystream-api</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

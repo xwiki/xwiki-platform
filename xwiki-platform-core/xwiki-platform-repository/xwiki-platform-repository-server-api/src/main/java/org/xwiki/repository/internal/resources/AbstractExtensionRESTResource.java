@@ -42,6 +42,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionScmConnection;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
@@ -274,8 +275,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return getExtensionObject(getExistingExtensionDocumentById(extensionId));
     }
 
-    protected BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version)
-    {
+    protected BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version) {
         if (version == null) {
             List<BaseObject> objects =
                 extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
@@ -287,6 +287,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             }
         }
 
+        if( repositoryManager.shouldVersionsBeProxied(extensionDocument) ){
+            // no ExtensionVersionClass object so we need to create such object temporarily
+            try {
+                repositoryManager.addExtensionVersionObjectToDocument(extensionDocument, version);
+            } catch (XWikiException | ResolveException e) {
+                throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+            }
+        }
         return extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
     }
 

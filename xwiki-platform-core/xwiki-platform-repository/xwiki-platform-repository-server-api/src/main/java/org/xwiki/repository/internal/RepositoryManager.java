@@ -61,6 +61,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.Version.Type;
@@ -143,6 +144,9 @@ public class RepositoryManager implements Initializable, Disposable
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private ExtensionRepositoryManager extensionRepositoryManager;
 
     /**
      * Used to validate download reference.
@@ -615,7 +619,7 @@ public class RepositoryManager implements Initializable, Disposable
                 if (versionObject != null) {
                     String version = getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
 
-                    if (StringUtils.isBlank(version)) {
+                    if (StringUtils.isBlank(version) || ( shouldVersionsBeProxied(document) && !new DefaultVersion(version).equals(extension.getId().getVersion()) ) ) {
                         // Empty version, it's invalid
                         document.removeXObject(versionObject);
                         needSave = true;
@@ -664,8 +668,9 @@ public class RepositoryManager implements Initializable, Disposable
                 Extension versionExtension;
                 if (version.equals(extension.getId().getVersion())) {
                     versionExtension = extension;
-                } else {
-                    versionExtension = repository.resolve(new ExtensionId(id, version));
+                } else if( shouldVersionsBeProxied(document) ) {
+                    continue;
+                } else {            versionExtension = repository.resolve(new ExtensionId(id, version));
                 }
 
                 // Update version related informations
@@ -705,6 +710,11 @@ public class RepositoryManager implements Initializable, Disposable
         }
 
         return document.getDocumentReference();
+    }
+
+    public boolean shouldVersionsBeProxied(XWikiDocument extensionDocument){
+        BaseObject extensionProxyObject = extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
+        return "version".equals(getValue(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_PROXYLEVEL, (String) null));
     }
 
     private boolean updateExtension(Extension extension, BaseObject extensionObject, XWikiContext xcontext)
@@ -996,9 +1006,32 @@ public class RepositoryManager implements Initializable, Disposable
         return needSave;
     }
 
+    public void addExtensionVersionObjectToDocument(XWikiDocument extensionDocument, String extensionVersion) throws XWikiException, ResolveException {
+        BaseObject extensionObject = extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+        if(extensionObject == null){
+            return;
+        }
+        String id = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null);
+
+        BaseObject extensionProxyObject = extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
+        if(extensionProxyObject == null){
+            return;
+        }
+        String repositoryId = getValue(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, (String) null);
+
+        if(id == null || repositoryId == null){
+            return;
+        }
+
+        ExtensionRepository repository = this.extensionRepositoryManager.getRepository(repositoryId);
+        Extension versionExtension = repository.resolve(new ExtensionId(id, extensionVersion));
+
+        updateExtensionVersion(extensionDocument, versionExtension);
+    }
+
     private boolean updateExtensionVersion(XWikiDocument document, Extension extension) throws XWikiException
     {
-        boolean needSave;
+        boolean needSave = false;
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -1011,8 +1044,6 @@ public class RepositoryManager implements Initializable, Disposable
                 xcontext);
 
             needSave = true;
-        } else {
-            needSave = false;
         }
 
         // Id

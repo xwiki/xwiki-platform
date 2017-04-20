@@ -175,6 +175,8 @@ public class XWikiRepositoryModel
 
     public static final String PROP_PROXY_AUTOUPDATE = "autoUpdate";
 
+    public static final String PROP_PROXY_PROXYLEVEL = "proxyLevel";
+
     public static final String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
 
     public static final String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";

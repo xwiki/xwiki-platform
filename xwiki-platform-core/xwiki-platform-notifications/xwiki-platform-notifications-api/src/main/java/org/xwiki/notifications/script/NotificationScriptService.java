@@ -35,6 +35,7 @@ import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationRenderer;
@@ -79,7 +80,7 @@ public class NotificationScriptService implements ScriptService
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
+    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
     {
         return notificationManager.getEvents(
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
@@ -96,7 +97,7 @@ public class NotificationScriptService implements ScriptService
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
+    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
             throws NotificationException
     {
         return notificationManager.getEvents(
@@ -116,7 +117,7 @@ public class NotificationScriptService implements ScriptService
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
+    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
             throws NotificationException
     {
         return notificationManager.getEvents(
@@ -151,7 +152,7 @@ public class NotificationScriptService implements ScriptService
      * @return a rendering block ready to display the event
      * @throws NotificationException if an error happens
      */
-    public Block render(Event event) throws NotificationException
+    public Block render(CompositeEvent event) throws NotificationException
     {
         return notificationRenderer.render(event);
     }

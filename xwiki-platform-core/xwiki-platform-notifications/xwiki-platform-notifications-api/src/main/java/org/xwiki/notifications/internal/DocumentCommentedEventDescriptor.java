@@ -17,35 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.internal;
 
-import java.util.List;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
- * Display a notification.
+ *
  *
  * @version $Id$
  * @since 9.2RC1
  */
-@Role
-@Unstable
-public interface NotificationDisplayer
+// TODO: move to oldcore
+@Component
+@Singleton
+@Named(DocumentCommentedEventDescriptor.EVENT_TYPE)
+public class DocumentCommentedEventDescriptor implements RecordableEventDescriptor
 {
     /**
-     * Render a notification.
-     *
-     * @param eventNotification the notification stored in the event stream
-     * @return the rendering of the notification in the page
-     * @throws NotificationException if error occurs
+     * Name of the supported type (as it is stored in Activity Stream).
      */
-    Block renderNotification(CompositeEvent eventNotification) throws NotificationException;
+    public static final String EVENT_TYPE = "addComment";
 
-    /**
-     * @return the list of the event types that this displayer support
-     */
-    List<String> getSupportedEvents();
+    @Override
+    public String getEventType()
+    {
+        // Match the name used by Activity Stream.
+        return EVENT_TYPE;
+    }
+
+    @Override
+    public String getApplicationName()
+    {
+        return "XWiki";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "core.events.comment.description";
+    }
+
+    @Override
+    public String getApplicationIcon()
+    {
+        return "page";
+    }
 }

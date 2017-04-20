@@ -34,6 +34,7 @@ import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
@@ -124,7 +125,7 @@ public class DefaultNotificationManagerTest
                 Arrays.asList(event5, event6));
 
         // Test
-        List<Event> results
+        List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
 
         // Verify
@@ -140,7 +141,7 @@ public class DefaultNotificationManagerTest
         when(modelBridge.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
         // Test
-        List<Event> results
+        List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
 
         // Verify

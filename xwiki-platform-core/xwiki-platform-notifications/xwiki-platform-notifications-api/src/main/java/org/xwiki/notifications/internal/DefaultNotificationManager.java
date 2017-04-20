@@ -36,6 +36,7 @@ import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
@@ -81,10 +82,15 @@ public class DefaultNotificationManager implements NotificationManager
     @Inject
     private AuthorizationManager authorizationManager;
 
+    @Inject
+    private SimilarityCalculator similarityCalculator;
+
     @Override
-    public List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException
+    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount)
+            throws NotificationException
     {
         return getEvents(
+                new ArrayList<>(),
                 documentReferenceResolver.resolve(userId),
                 onlyUnread,
                 expectedCount,
@@ -94,10 +100,10 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public List<Event> getEvents(String userId, boolean onlyUnread, int count, Date untilDate, List<String> blackList)
-            throws NotificationException
+    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int count, Date untilDate,
+            List<String> blackList) throws NotificationException
     {
-        return getEvents(documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
+        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
                 new ArrayList<>(blackList));
     }
 
@@ -106,13 +112,14 @@ public class DefaultNotificationManager implements NotificationManager
     {
         DocumentReference user = documentReferenceResolver.resolve(userId);
 
-        List<Event> events = getEvents(user, onlyUnread, maxCount, null, new ArrayList<>());
+        List<CompositeEvent> events = getEvents(new ArrayList<>(), user, onlyUnread, maxCount,
+                null, new ArrayList<>());
 
         return events.size();
     }
 
-    private List<Event> getEvents(DocumentReference userReference, boolean onlyUnread, int expectedCount,
-            Date endDate, List<String> blackList) throws NotificationException
+    private List<CompositeEvent> getEvents(List<CompositeEvent> results, DocumentReference userReference,
+            boolean onlyUnread, int expectedCount, Date endDate, List<String> blackList) throws NotificationException
     {
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
@@ -129,7 +136,6 @@ public class DefaultNotificationManager implements NotificationManager
             List<Event> batch = eventStream.searchEvents(query);
 
             // Add to the results the events the user has the right to see
-            List<Event> results = new ArrayList<>();
             for (Event event : batch) {
                 DocumentReference document = event.getDocument();
                 // Don't record events concerning a doc the user cannot see
@@ -137,7 +143,7 @@ public class DefaultNotificationManager implements NotificationManager
                     continue;
                 }
                 // Record this event
-                results.add(event);
+                recordEvent(results, event);
                 // If the expected count is reached, stop now
                 if (results.size() == expectedCount) {
                     return results;
@@ -147,14 +153,55 @@ public class DefaultNotificationManager implements NotificationManager
             // If we haven't get the expected number of events, perform a new batch
             if (results.size() < expectedCount && batch.size() == batchSize) {
                 blackList.addAll(getEventsIds(batch));
-                results.addAll(
-                        getEvents(userReference, onlyUnread, expectedCount - results.size(), endDate, blackList)
-                );
+                getEvents(results, userReference, onlyUnread, expectedCount - results.size(), endDate,
+                        blackList);
             }
 
             return results;
         } catch (Exception e) {
             throw new NotificationException("Fail to get the list of notifications.", e);
+        }
+    }
+
+    private void recordEvent(List<CompositeEvent> results, Event event) throws NotificationException
+    {
+        int bestSimilarity = 0;
+        CompositeEvent bestCompositeEvent = null;
+        Event bestSimilarEvent = null;
+
+        // Looking for the most similar event inside the existing composite events
+        for (CompositeEvent existingCompositeEvent : results) {
+            for (Event existingEvent : existingCompositeEvent.getEvents()) {
+                int similarity = similarityCalculator.computeSimilarity(event, existingEvent);
+                if (similarity > bestSimilarity && similarity >= existingCompositeEvent.getSimilarityBetweenEvents()) {
+                    bestSimilarity = similarity;
+                    bestSimilarEvent = existingEvent;
+                    bestCompositeEvent = existingCompositeEvent;
+                }
+            }
+        }
+
+        if (bestCompositeEvent != null) {
+            if (bestSimilarity > bestCompositeEvent.getSimilarityBetweenEvents() &&
+                    bestCompositeEvent.getEvents().size() > 1) {
+                // We have found an event A inside a composite event C1 that have a greater similarity with the event E
+                // than the similarity between events (A, B, C) of that composite event (C1).
+                //
+                // It means we must remove the existing event A from that composite event C1 and create a new composite
+                // event C2 made of A and E.
+                bestCompositeEvent.remove(bestSimilarEvent);
+                CompositeEvent newCompositeEvent = new CompositeEvent(event);
+                newCompositeEvent.add(bestSimilarEvent, bestSimilarity);
+                results.add(newCompositeEvent);
+            } else {
+                // We have found a composite event C1 made of events (A, B, C) which have the same similarity between
+                // themselves than between A end E.
+                // All we need to do it to add E to C1.
+                bestCompositeEvent.add(event, bestSimilarity);
+            }
+        } else {
+            // We haven't found an event that is similar to the current one, so we create a new composite event
+            results.add(new CompositeEvent(event));
         }
     }
 

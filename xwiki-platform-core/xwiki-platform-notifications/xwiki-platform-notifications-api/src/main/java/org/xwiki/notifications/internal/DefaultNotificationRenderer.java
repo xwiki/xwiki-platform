@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.Event;
+import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationRenderer;
@@ -49,7 +49,7 @@ public class DefaultNotificationRenderer implements NotificationRenderer
     private NotificationDisplayer defaultDisplayer;
 
     @Override
-    public Block render(Event event) throws NotificationException
+    public Block render(CompositeEvent event) throws NotificationException
     {
         try {
             return getDisplayer(event).renderNotification(event);
@@ -58,7 +58,7 @@ public class DefaultNotificationRenderer implements NotificationRenderer
         }
     }
 
-    private NotificationDisplayer getDisplayer(Event event) throws ComponentLookupException
+    private NotificationDisplayer getDisplayer(CompositeEvent event) throws ComponentLookupException
     {
         // Lookup all displayers
         for (NotificationDisplayer displayer

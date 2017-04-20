@@ -89,7 +89,12 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                             // SQL92 only specifies "%", "_" and the escape character itself.
                             // However some DBs also support "[specifier]" and "[^specifier]" so by escaping "[" we're
                             // playing it safe. See http://bit.ly/2ongxm6
-                            buffer.append(part.getValue().replaceAll("([\\[%_!])", "!$1"));
+                            // Now the problem is that most databases don't accept escaping any character and they only
+                            // support escaping the special characters such as "%", "_" and the escape character itself.
+                            // See https://jira.xwiki.org/browse/XWIKI-14217 and
+                            // https://groups.google.com/d/msg/h2-database/jT0O3rNgpSw/hU_JKXRkZNoJ
+                            // Thus we don't escape '[' FTM meaning that the query could fail on Sybase and SQL Server
+                            buffer.append(part.getValue().replaceAll("([%_!])", "!$1"));
                         } else {
                             buffer.append(part.getValue());
                         }

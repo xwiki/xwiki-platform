@@ -54,7 +54,7 @@
   </issueManagement>
   <properties>
     <!-- Use a more recent version of Selenium. -->
-    <selenium.version>3.3.1</selenium.version>
+    <selenium.version>3.4.0</selenium.version>
     <!-- Selenium 3+ communicates with Firefox through the Gecko Driver. -->
     <geckodriver.version>0.15.0</geckodriver.version>
     <!-- Skip the ValidateDependencyVersion enforcer rule because we can't use ${project.version} for platform
@@ -73,6 +73,21 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>21.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-io</artifactId>
+        <version>9.4.3.v20170317</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>9.4.3.v20170317</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

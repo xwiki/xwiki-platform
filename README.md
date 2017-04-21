@@ -13,7 +13,7 @@ Starting with XWiki 8.2 this is the default WYSIWYG content editor. On older ver
 * License: LGPL 2.1+
 * [Translations](http://l10n.xwiki.org/xwiki/bin/view/Contrib/CKEditorIntegration)
 * Sonar Dashboard: N/A
-* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=xwiki-contrib-application-ckeditor)](http://ci.xwiki.org/job/xwiki-contrib-application-ckeditor/)
+* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=XWiki Contrib/application-ckeditor/master)](http://ci.xwiki.org/view/Contrib/job/XWiki%20Contrib/job/application-ckeditor/job/master/)
 
 ## Building
 

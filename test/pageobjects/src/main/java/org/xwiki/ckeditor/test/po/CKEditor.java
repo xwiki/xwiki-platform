@@ -61,6 +61,8 @@ public class CKEditor extends BaseElement
 
     /**
      * Waits for CKEditor to load.
+     *
+     * @return this editor instance
      */
     public CKEditor waitToLoad()
     {
@@ -75,7 +77,7 @@ public class CKEditor extends BaseElement
         script.append("      if (!name || name === event.editor.name) {\n");
         script.append("        ckeditor.removeListener('instanceReady', listener);\n");
         script.append("        callback(event.editor.name);\n");
-        script.append("      }\n");
+        script.append("      };\n");
         script.append("    };\n");
         script.append("    ckeditor.on('instanceReady', listener);\n");
         script.append("    if (name) {\n");

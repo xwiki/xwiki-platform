@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.contrib</groupId>
-    <artifactId>application-ckeditor-test</artifactId>
-    <version>1.15-SNAPSHOT</version>
-  </parent>
-  <artifactId>application-ckeditor-test-pageobjects</artifactId>
-  <name>CKEditor Integration Test Page Objects</name>
-  <packaging>jar</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-ui</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
-  </dependencies>
-</project>
+// It's assumed that Jenkins has been configured to implicitly load the vars/xwikiModule.groovy library which exposes
+// the "xwikiModule" global function/DSL.
+// Note that the version used is the one defined in Jenkins but it can be overridden as follows:
+// @Library("XWiki@<branch, tag, sha1>") _
+// See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
+
+xwikiModule {
+}

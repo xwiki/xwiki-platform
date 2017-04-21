@@ -172,6 +172,7 @@
           <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
             currently more widely used in the JavaScript world. -->
           <suffix>.min</suffix>
+          <nosuffix>false</nosuffix>
           <preProcessAggregates>true</preProcessAggregates>
         </configuration>
       </plugin>

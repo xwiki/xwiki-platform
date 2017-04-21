@@ -25,11 +25,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons-pom</artifactId>
+    <groupId>org.xwiki.contrib</groupId>
+    <artifactId>parent-platform</artifactId>
     <version>6.2.5</version>
   </parent>
-  <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-ckeditor-pom</artifactId>
   <packaging>pom</packaging>
   <name>CKEditor Integration Parent POM</name>
@@ -41,29 +40,14 @@
       <name>Marius Dumitru Florea</name>
     </developer>
   </developers>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/browse/CKEDITOR</url>
-  </issueManagement>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/application-ckeditor.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-ckeditor.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-ckeditor/tree/master</url>
     <tag>HEAD</tag>
   </scm>
-  <distributionManagement>
-    <repository>
-      <id>xwiki-staging</id>
-      <name>XWiki Staging Repository</name>
-      <url>http://nexus.xwiki.org/nexus/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
   <properties>
     <ckeditor.version>4.6.2</ckeditor.version>
-    <!-- Use a more recent version of Selenium. -->
-    <selenium.version>3.3.1</selenium.version>
-    <!-- Selenium 3+ communicates with Firefox through the Gecko Driver. -->
-    <geckodriver.version>0.15.0</geckodriver.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor-dev-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
@@ -71,6 +55,7 @@
     <!-- Follow the specifications regarding the WebJar content path.
       (this property is defined in platform-core pom; remove this when the CKEditor is integrated in platform)-->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+    <xwiki.issueManagement.jira.id>CKEDITOR</xwiki.issueManagement.jira.id>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -110,19 +95,6 @@
               </goals>
               <configuration>
                 <url>https://github.com/ckeditor/ckeditor-dev/archive/${ckeditor.version}.zip</url>
-                <unpack>true</unpack>
-              </configuration>
-            </execution>
-            <!-- Download the Gecko Driver used to communicate with Firefox. -->
-            <execution>
-              <id>download-gecko-driver</id>
-              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
-              <phase>none</phase>
-              <goals>
-                <goal>wget</goal>
-              </goals>
-              <configuration>
-                <url>https://github.com/mozilla/geckodriver/releases/download/v${geckodriver.version}/geckodriver-v${geckodriver.version}-linux64.tar.gz</url>
                 <unpack>true</unpack>
               </configuration>
             </execution>

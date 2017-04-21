@@ -57,7 +57,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-sheet-ui</artifactId>
-      <version>${commons.version}</version>
+      <version>${platform.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
@@ -65,13 +65,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${commons.version}</version>
+      <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${commons.version}</version>
+      <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Used by the configuration section. -->
@@ -84,27 +84,9 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
-      <version>${commons.version}</version>
+      <version>${platform.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
   </dependencies>
-  <build>
-    <!-- Needed to add support for the XAR packaging -->
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
-    <plugins>
-      <!-- The XAR packaging uses the XAR plugin and thus we need to define what version to use -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <version>${commons.version}</version>
-      </plugin>
-    </plugins>
-  </build>
 </project>

@@ -125,7 +125,7 @@ public class RichTextAreaElement extends org.xwiki.test.ui.po.editor.wysiwyg.Ric
     }
 
     /**
-     * Sets the HTML content of the rich text area
+     * Sets the HTML content of the rich text area.
      * 
      * @param content the new HTML content
      */

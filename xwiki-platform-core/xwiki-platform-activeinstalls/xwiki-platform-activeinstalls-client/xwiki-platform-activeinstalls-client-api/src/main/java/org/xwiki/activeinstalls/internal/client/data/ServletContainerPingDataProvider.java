@@ -96,9 +96,8 @@ public class ServletContainerPingDataProvider implements PingDataProvider
                 // Ignore, we just don't save that information...
                 // However we log a warning since it's a problem that needs to be seen and looked at.
                 this.logger.warn("Failed to compute Servlet container information. "
-                        + "This information has not been added to the Active Installs ping data. Reason [{}]",
-                    ExceptionUtils.getRootCauseMessage(e)
-                );
+                    + "This information has not been added to the Active Installs ping data. Reason [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
         return jsonMap;

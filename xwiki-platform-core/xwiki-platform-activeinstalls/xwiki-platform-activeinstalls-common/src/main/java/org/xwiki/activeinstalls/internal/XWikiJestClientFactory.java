@@ -35,8 +35,8 @@ public class XWikiJestClientFactory extends JestClientFactory
     private ActiveInstallsConfiguration configuration;
 
     /**
-     * @param configuration the object from which to extract the user agent to use when sending HTTP request (pings)
-     *        to the remote server
+     * @param configuration the object from which to extract the user agent to use when sending HTTP request (pings) to
+     *            the remote server
      */
     public XWikiJestClientFactory(ActiveInstallsConfiguration configuration)
     {

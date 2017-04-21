@@ -40,9 +40,9 @@ import io.searchbox.params.SearchType;
 import net.sf.json.JSONObject;
 
 /**
- *  Provide the date of the first ping and the elapsed days since the first ping. We do that to make it simpler to
- *  perform complex queries on the ping data later on (for example to be able to query the average duration an instance
- *  is used: < 1 day, 2-7 days, 7-30 days, 30-365 days, > 365 days).
+ * Provide the date of the first ping and the elapsed days since the first ping. We do that to make it simpler to
+ * perform complex queries on the ping data later on (for example to be able to query the average duration an instance
+ * is used: < 1 day, 2-7 days, 7-30 days, 30-365 days, > 365 days).
  *
  * @version $Id$
  * @since 6.1M1

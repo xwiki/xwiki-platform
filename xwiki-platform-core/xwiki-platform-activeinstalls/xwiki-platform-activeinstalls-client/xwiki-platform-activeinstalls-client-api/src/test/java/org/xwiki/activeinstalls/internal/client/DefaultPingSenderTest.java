@@ -19,20 +19,21 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import io.searchbox.client.JestClient;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.google.gson.Gson;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.core.DocumentResult;
+import io.searchbox.core.Index;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultPingSender}.

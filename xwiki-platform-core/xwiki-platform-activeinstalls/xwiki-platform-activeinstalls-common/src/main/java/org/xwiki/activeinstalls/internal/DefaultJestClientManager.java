@@ -34,8 +34,8 @@ import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
 
 /**
- * Factory to get a singleton {@link JestClient} instance since it's threadsafe. The URL to connect to is defined in
- * the Active Install configuration.
+ * Factory to get a singleton {@link JestClient} instance since it's threadsafe. The URL to connect to is defined in the
+ * Active Install configuration.
  *
  * @version $Id$
  * @since 5.2M2

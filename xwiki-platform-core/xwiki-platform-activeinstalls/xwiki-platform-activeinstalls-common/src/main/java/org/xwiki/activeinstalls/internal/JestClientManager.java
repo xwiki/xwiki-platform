@@ -20,6 +20,7 @@
 package org.xwiki.activeinstalls.internal;
 
 import org.xwiki.component.annotation.Role;
+
 import io.searchbox.client.JestClient;
 
 /**

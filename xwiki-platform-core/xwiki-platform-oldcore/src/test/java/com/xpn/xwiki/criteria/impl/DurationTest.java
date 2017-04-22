@@ -20,17 +20,19 @@
 
 package com.xpn.xwiki.criteria.impl;
 
-import junit.framework.TestCase;
-import com.xpn.xwiki.criteria.impl.Duration;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.criteria.impl.Duration} class.
  */
-public class DurationTest extends TestCase
+public class DurationTest
 {
     /**
      * Test for {@link com.xpn.xwiki.criteria.impl.Duration#Duration(int, int, int, int)}
      */
+    @Test
     public void testConstructor()
     {
         doConstructorTest(0, 0, 0, 0);

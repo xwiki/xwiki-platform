@@ -20,18 +20,19 @@
 
 package com.xpn.xwiki.criteria.impl;
 
-import junit.framework.TestCase;
-import com.xpn.xwiki.criteria.impl.Range;
-import com.xpn.xwiki.criteria.impl.RangeFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.criteria.impl.RangeFactory} class.
  */
-public class RangeFactoryTest extends TestCase
+public class RangeFactoryTest
 {
     /**
      * Test for {@link RangeFactory#ALL}
      */
+    @Test
     public void testAll()
     {
         doRangeTest(RangeFactory.ALL, 0, 0);
@@ -40,6 +41,7 @@ public class RangeFactoryTest extends TestCase
     /**
      * Test for {@link RangeFactory#FIRST}
      */
+    @Test
     public void testFirst()
     {
         doRangeTest(RangeFactory.FIRST, 0, 1);
@@ -48,6 +50,7 @@ public class RangeFactoryTest extends TestCase
     /**
      * Test for {@link RangeFactory#LAST}
      */
+    @Test
     public void testLast()
     {
         doRangeTest(RangeFactory.LAST, 0, -1);
@@ -56,6 +59,7 @@ public class RangeFactoryTest extends TestCase
     /**
      * Test for {@link RangeFactory#createRange(int, int)}
      */
+    @Test
     public void testCreateRange()
     {
         doCreateRangeTest(0, 0);
@@ -74,6 +78,7 @@ public class RangeFactoryTest extends TestCase
     /**
      * Test for {@link RangeFactory#createHeadRange(int)}
      */
+    @Test
     public void testCreateHeadRange()
     {
         doCreateHeadRangeTest(0);
@@ -89,6 +94,7 @@ public class RangeFactoryTest extends TestCase
     /**
      * Test for {@link RangeFactory#createTailRange(int)}
      */
+    @Test
     public void testCreateTailRange()
     {
         doCreateTailRangeTest(0);

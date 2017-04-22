@@ -20,18 +20,19 @@
 
 package com.xpn.xwiki.criteria.impl;
 
-import junit.framework.TestCase;
-import com.xpn.xwiki.criteria.impl.Duration;
-import com.xpn.xwiki.criteria.impl.DurationFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for the {@link DurationFactory} class.
  */
-public class DurationFactoryTest extends TestCase
+public class DurationFactoryTest
 {
     /**
      * Test for {@link DurationFactory#DAY}
      */
+    @Test
     public void testDay()
     {
         doDurationTest(DurationFactory.DAY, 0, 0, 0, 1);
@@ -40,6 +41,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#WEEK}
      */
+    @Test
     public void testWeek()
     {
         doDurationTest(DurationFactory.WEEK, 0, 0, 1, 0);
@@ -48,6 +50,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#MONTH}
      */
+    @Test
     public void testMonth()
     {
         doDurationTest(DurationFactory.MONTH, 0, 1, 0, 0);
@@ -56,6 +59,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#YEAR}
      */
+    @Test
     public void testYear()
     {
         doDurationTest(DurationFactory.YEAR, 1, 0, 0, 0);
@@ -64,6 +68,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#createDuration(int, int, int, int)}
      */
+    @Test
     public void testCreateDuration()
     {
         doCreateDurationTest(0, 0, 0, 0);
@@ -81,6 +86,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#createDays(int)}
      */
+    @Test
     public void testCreateDays()
     {
         doCreateDaysTest(0);
@@ -96,6 +102,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#createWeeks(int)}
      */
+    @Test
     public void testCreateWeeks()
     {
         doCreateWeeksTest(0);
@@ -111,6 +118,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#createMonths(int)}
      */
+    @Test
     public void testCreateMonths()
     {
         doCreateMonthsTest(0);
@@ -126,6 +134,7 @@ public class DurationFactoryTest extends TestCase
     /**
      * Test for {@link DurationFactory#createYears(int)}
      */
+    @Test
     public void testCreateYears()
     {
         doCreateYearsTest(0);

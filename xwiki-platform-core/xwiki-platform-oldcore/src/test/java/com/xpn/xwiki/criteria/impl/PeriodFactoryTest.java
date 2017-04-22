@@ -22,20 +22,21 @@ package com.xpn.xwiki.criteria.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link PeriodFactory}.
  */
-public class PeriodFactoryTest extends TestCase
+public class PeriodFactoryTest
 {
     /**
      * Tests if the start code of a day period is strictly less than its end code. This is needed because the
-     * {@link XWikiStatsReader} retrieves the statistics that have been recorded between the start code, including it,
-     * and the end code, excluding it.
-     * 
-     * @throws ParseException
+     * {@link com.xpn.xwiki.stats.impl.xwiki.XWikiStatsReader} retrieves the statistics that have been recorded between
+     * the start code, including it, and the end code, excluding it.
      */
+    @Test
     public void testDayPeriodStartEndCode() throws ParseException
     {
         Period day = PeriodFactory.createDayPeriod(System.currentTimeMillis());
@@ -47,11 +48,10 @@ public class PeriodFactoryTest extends TestCase
 
     /**
      * Tests if the start code of a month period is strictly less than its end code. This is needed because the
-     * {@link XWikiStatsReader} retrieves the statistics that have been recorded between the start code, including it,
-     * and the end code, excluding it.
-     * 
-     * @throws ParseException
+     * {@link com.xpn.xwiki.stats.impl.xwiki.XWikiStatsReader} retrieves the statistics that have been recorded between
+     * the start code, including it, and the end code, excluding it.
      */
+    @Test
     public void testMonthPeriodStartEndCode() throws ParseException
     {
         Period month = PeriodFactory.createMonthPeriod(System.currentTimeMillis());

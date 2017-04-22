@@ -19,21 +19,24 @@
  */
 package com.xpn.xwiki.criteria.impl;
 
-import junit.framework.TestCase;
-
 import java.util.List;
 import java.util.Arrays;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.criteria.impl.Range}.
  *
  * @version $Id$
  */
-public class RangeTest extends TestCase
+public class RangeTest
 {
     /**
      * Test for {@link com.xpn.xwiki.criteria.impl.Range#Range(int, int)}
      */
+    @Test
     public void testConstructor()
     {
         doConstructorTest(0, 0);
@@ -56,18 +59,21 @@ public class RangeTest extends TestCase
     public static final List<String> zeroToHeight =
         Arrays.asList(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"});
 
+    @Test
     public void testSubListWithStartZeroAndSizeZero()
     {
         Range range = new Range(0, 0);
         assertEquals(range.subList(zeroToHeight), zeroToHeight);
     }
 
+    @Test
     public void testSubListWithStartZeroAndSizeOneThousand()
     {
         Range range = new Range(0, 1000);
         assertEquals(range.subList(zeroToHeight), zeroToHeight);
     }
 
+    @Test
     public void testSubListWithHeadIntervalOne()
     {
         Range range = RangeFactory.createHeadRange(1);
@@ -75,6 +81,7 @@ public class RangeTest extends TestCase
         assertEquals(range.subList(zeroToHeight), zero);
     }
 
+    @Test
     public void testSubListWithTailIntervalOne()
     {
         Range range = RangeFactory.createTailRange(1);
@@ -82,6 +89,7 @@ public class RangeTest extends TestCase
         assertEquals(range.subList(zeroToHeight), height);
     }
 
+    @Test
     public void testSubListWithStartZeroAndPositiveSize()
     {
         Range range = new Range(0, 4);
@@ -89,6 +97,7 @@ public class RangeTest extends TestCase
         assertEquals(range.subList(zeroToHeight), zeroToThree);
     }
 
+    @Test
     public void testSubListWithStartZeroAndNegativeSize()
     {
         Range range = new Range(0, -4);
@@ -96,6 +105,7 @@ public class RangeTest extends TestCase
         assertEquals(range.subList(zeroToHeight), fiveToHeight);
     }
 
+    @Test
     public void testSubListWithStartMinusTwoAndSizeFour()
     {
         Range range = new Range(-2, 4);
@@ -103,6 +113,7 @@ public class RangeTest extends TestCase
         assertEquals(range.subList(zeroToHeight), sevenToHeight);
     }
 
+    @Test
     public void testSubListWithStartMinusTwoAndSizeMinusFour()
     {
         Range range = new Range(-2, -4);
@@ -110,6 +121,7 @@ public class RangeTest extends TestCase
         assertEquals(range.subList(zeroToHeight), threeToSix);
     }
 
+    @Test
     public void testSubListWithStartTwoAndSizeMinusFour()
     {
         Range range = new Range(2, -4);

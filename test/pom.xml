@@ -56,7 +56,7 @@
     <!-- Use a more recent version of Selenium. -->
     <selenium.version>3.4.0</selenium.version>
     <!-- Selenium 3+ communicates with Firefox through the Gecko Driver. -->
-    <geckodriver.version>0.15.0</geckodriver.version>
+    <geckodriver.version>0.16.0</geckodriver.version>
     <!-- Skip the ValidateDependencyVersion enforcer rule because we can't use ${project.version} for platform
       dependencies) -->
     <xwiki.enforcer.skip>true</xwiki.enforcer.skip>

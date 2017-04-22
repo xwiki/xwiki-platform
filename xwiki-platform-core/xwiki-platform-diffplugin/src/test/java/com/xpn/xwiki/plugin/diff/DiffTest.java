@@ -23,23 +23,29 @@ import com.xpn.xwiki.XWikiException;
 
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.suigeneris.jrcs.diff.delta.Delta;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * Created by IntelliJ IDEA. User: ldubost Date: 1 mai 2007 Time: 15:06:14 To change this template
- * use File | Settings | File Templates.
+ * Unit tests for {@link DiffPlugin}.
+ *
+ * @version $Id$
  */
-public class DiffTest extends org.jmock.cglib.MockObjectTestCase
+public class DiffTest
 {
     private DiffPlugin plugin;
 
-    @Override
-    protected void setUp()
+    @Before
+    public void setUp()
     {
         this.plugin = new DiffPlugin("diff", DiffPlugin.class.getName(), null);
     }
 
+    @Test
     public void testSimpleLineDiff() throws XWikiException
     {
         String text1 = "A";
@@ -53,6 +59,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised should be", "A B", revised.toString());
     }
 
+    @Test
     public void testSimpleLineDiff2() throws XWikiException
     {
         String text1 = "A\nB\nC";
@@ -66,6 +73,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised should be", "B B", revised.toString());
     }
 
+    @Test
     public void testSimpleWordDiff() throws XWikiException
     {
         String text1 = "I love Paris";
@@ -82,6 +90,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised 1 should be", "livein", revised1.toString());
     }
 
+    @Test
     public void testSimpleWordDiff2() throws XWikiException
     {
         String text1 = "I love Paris and London";
@@ -96,6 +105,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised 1 should be", "livein", revised1.toString());
     }
 
+    @Test
     public void testSimpleWordDiff3() throws XWikiException
     {
         String text1 = "I love Paris and London";
@@ -115,6 +125,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised 2 should be", "andParis", revised2.toString());
     }
 
+    @Test
     public void testSimpleWordDiff4() throws XWikiException
     {
         String text1 = "I love Paris and I like London";
@@ -134,6 +145,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised 2 should be", "Paris", revised2.toString());
     }
 
+    @Test
     public void testSimpleWordDiffAsHTML() throws XWikiException
     {
         String text1 = "A";
@@ -145,6 +157,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
             html);
     }
 
+    @Test
     public void testSimpleWordDiffAsHTML2() throws XWikiException
     {
         String text1 = "A C";
@@ -156,6 +169,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
             html);
     }
 
+    @Test
     public void testSimpleWordDiffAsHTML3() throws XWikiException
     {
         String text1 = "A B C D E F";
@@ -167,6 +181,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
             html);
     }
 
+    @Test
     public void testSimpleLineDiffAsHTML2() throws XWikiException
     {
         String text1 = "A C";
@@ -178,6 +193,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
             html);
     }
 
+    @Test
     public void testSimpleLineDiffAsHTML3() throws XWikiException
     {
         String text1 = "A B C D E F";
@@ -189,6 +205,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
             html);
     }
 
+    @Test
     public void testSimpleLineDiffAsHTML4() throws XWikiException
     {
         String text1 = "A B C\nD E F\nG H I\nJ K L\n";
@@ -200,6 +217,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
             html);
     }
 
+    @Test
     public void testMultiLineDiffAsHTML() throws XWikiException
     {
         String text1 = "A\n";

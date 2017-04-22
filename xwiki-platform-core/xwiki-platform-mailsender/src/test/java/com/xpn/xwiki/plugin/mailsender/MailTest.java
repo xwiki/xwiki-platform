@@ -19,13 +19,16 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}.
  */
-public class MailTest extends TestCase
+public class MailTest
 {
+    @Test
     public void testToString()
     {
         Mail mail = new Mail();

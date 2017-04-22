@@ -22,19 +22,20 @@ package org.xwiki.validator;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.validator.ValidationError.Type;
 
-public class DutchWebGuidelinesValidatorTest extends TestCase
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class DutchWebGuidelinesValidatorTest
 {
     private DutchWebGuidelinesValidator validator;
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-
         this.validator = new DutchWebGuidelinesValidator();
     }
 
@@ -77,6 +78,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // All
 
+    @Test
     public void testValidate() throws Exception
     {
         setValidatorDocument(getClass().getResourceAsStream("/dwg-valid.html"));
@@ -91,6 +93,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 1s3
 
+    @Test
     public void testRpd1s3LinkValid() throws Exception
     {
         setValidatorDocument("<a href='test'>test</a>");
@@ -98,6 +101,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3LinkJavascript() throws Exception
     {
         setValidatorDocument("<a href='javascript:'>test</a>");
@@ -105,6 +109,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3LinkEventHandlers() throws Exception
     {
         setValidatorDocument("<a href='' onclick=''></a>");
@@ -120,6 +125,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3FormValidInput() throws Exception
     {
         setValidatorDocument("<form><fieldset><input type='submit' /></fieldset></form>");
@@ -127,6 +133,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3FormValidSubmitButton() throws Exception
     {
         setValidatorDocument("<form><fieldset><button type='submit'>Go</button></fieldset></form>");
@@ -138,6 +145,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3FormInvalidImageInput() throws Exception
     {
         setValidatorDocument("<form><fieldset><input type='image' alt='' /></fieldset></form>");
@@ -145,6 +153,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3FormValidImageInput() throws Exception
     {
         setValidatorDocument("<form><fieldset><input type='image' alt='submit' /></fieldset></form>");
@@ -152,6 +161,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd1s3FormNoSubmit() throws Exception
     {
         setValidatorDocument("<form></form>");
@@ -169,6 +179,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 2s3
 
+    @Test
     public void testRpd2s3NoDoctype() throws Exception
     {
         setValidatorDocument("<html></html>");
@@ -178,6 +189,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 2s4
 
+    @Test
     public void testRpd2s4NoDoctype() throws Exception
     {
         setValidatorDocument("<html></html>");
@@ -187,6 +199,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 2s5
 
+    @Test
     public void testRpd2s5ValidDoctype() throws Exception
     {
         setValidatorDocument("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' "
@@ -195,6 +208,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd2s5FramesetDoctype() throws Exception
     {
         setValidatorDocument("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Frameset//EN' "
@@ -203,6 +217,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd2s5FramesetTag() throws Exception
     {
         setValidatorDocument("<frameset></frameset>");
@@ -210,6 +225,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd2s5FrameTag() throws Exception
     {
         setValidatorDocument("<frame></frame>");
@@ -219,6 +235,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s1
 
+    @Test
     public void testRpd3s1BoldMarkup() throws Exception
     {
         setValidatorDocument("<p><b></b></p>");
@@ -226,6 +243,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd3s1ItalicMarkup() throws Exception
     {
         setValidatorDocument("<p><i></i></p>");
@@ -235,6 +253,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s2
 
+    @Test
     public void testRpd3s2NoHeading() throws Exception
     {
         setValidatorDocument("<body></body>");
@@ -244,6 +263,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s3
 
+    @Test
     public void testRpd3s3HeadingsValid() throws Exception
     {
         setValidatorDocument("<body><h1></h1><h2></h2><h2></h2><h3></h3></body>");
@@ -251,6 +271,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd3s3HeadingsMissingLevel() throws Exception
     {
         setValidatorDocument("<body><h1></h1><h3></h3></body>");
@@ -260,6 +281,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s4
 
+    @Test
     public void testRpd3s4ValidParagraphs() throws Exception
     {
         setValidatorDocument("<body><p>content<br/>content<br/>content<br/></p>"
@@ -268,6 +290,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd3s4MissingParagraph() throws Exception
     {
         // Consecutive line breaks.
@@ -283,6 +306,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s5
 
+    @Test
     public void testRpd3s5InvalidMarkup() throws Exception
     {
         setValidatorDocument("<body><p><b>bold</b></p></body>");
@@ -296,6 +320,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s9
 
+    @Test
     public void testRpd3s9Sub() throws Exception
     {
         setValidatorDocument("<body><p><sub>sub</sub></p></body>");
@@ -303,6 +328,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd3s9Sup() throws Exception
     {
         setValidatorDocument("<body><p><sup>sup</sup></p></body>");
@@ -312,6 +338,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s11
 
+    @Test
     public void testRpd3s11Quotation() throws Exception
     {
         setValidatorDocument("<body><p><q>quotation</q></p></body>");
@@ -321,6 +348,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     // RPD 3s13
 
+    @Test
     public void testRpd3s13BulletList() throws Exception
     {
         setValidatorDocument("<body> * item1<br/> * item2 <br/> * item3</body>");
@@ -333,6 +361,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     }
 
+    @Test
     public void testRpd3s13DashList() throws Exception
     {
         setValidatorDocument("<body> - item1<br/> - item2 <br/> - item3</body>");
@@ -344,6 +373,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd3s13NumberedList() throws Exception
     {
         setValidatorDocument("<body> 1. item1<br/> 2. item2 <br/> 3. item3</body>");
@@ -355,6 +385,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd6s1Doctypes() throws Exception
     {
         setValidatorDocument("<!DOCTYPE html PUBLIC '-//ORG//DTD FOO 1.0 Bar//EN' "
@@ -368,6 +399,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd7s1ValidAlts() throws Exception
     {
         setValidatorDocument("<body><img alt='' /></body>");
@@ -383,6 +415,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd7s1MissingAlts() throws Exception
     {
         setValidatorDocument("<body><img /></body>");
@@ -398,6 +431,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd7s4ImagesInLinks() throws Exception
     {
         setValidatorDocument("<body><a><img alt=''/></a></body>");
@@ -413,6 +447,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd7s5ImageMaps() throws Exception
     {
         setValidatorDocument("<body><img alt='' usemap='#map' /></body>");
@@ -428,6 +463,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd8s1Links() throws Exception
     {
         setValidatorDocument("<body><a>to get the resource, click here</a></body>");
@@ -439,6 +475,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd8s11Accesskeys() throws Exception
     {
         setValidatorDocument("<body><a accesskey='a'></a></body>");
@@ -450,6 +487,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd8s14Links() throws Exception
     {
         setValidatorDocument("<body><a target='any'></a></body>");
@@ -461,6 +499,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd8s16Links() throws Exception
     {
         setValidatorDocument("<body><a href='mailto:text@text.com?subject=foobar'>text@text.com</a></body>");
@@ -472,6 +511,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd8s17Links() throws Exception
     {
         setValidatorDocument("<body><a href='mailto:text@text.com?subject=foobar'>text@text.com</a></body>");
@@ -483,6 +523,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd9s1StyleAttr() throws Exception
     {
         setValidatorDocument("<body><div style='test'></div></body>");
@@ -490,6 +531,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd9s1StyleTag() throws Exception
     {
         setValidatorDocument("<body><style></style></body>");
@@ -497,6 +539,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd11s2Table() throws Exception
     {
         setValidatorDocument("<body><table></table></body>");
@@ -508,6 +551,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd11s4Table() throws Exception
     {
         setValidatorDocument("<body><table><th/><th/></table></body>");
@@ -523,6 +567,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd11s5Table() throws Exception
     {
         setValidatorDocument("<body><table><th/><th/></table></body>");
@@ -538,6 +583,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd12s1Iframe() throws Exception
     {
         setValidatorDocument("<body><iframe/></body>");
@@ -545,6 +591,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd13s1Label() throws Exception
     {
         setValidatorDocument("<body><form><input name='test' /></form></body>");
@@ -569,6 +616,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd13s4Submits() throws Exception
     {
         setValidatorDocument("<body><form><input name='test' /></form></body>");
@@ -584,6 +632,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd13s18Reset() throws Exception
     {
         setValidatorDocument("<body><form><input type='reset' /></form></body>");
@@ -591,6 +640,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd15s6Language() throws Exception
     {
         setValidatorDocument("<html></html>");
@@ -602,6 +652,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd16s1Charset() throws Exception
     {
         setValidatorDocument("<html><head></head></html>");
@@ -613,6 +664,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd16s2Charset() throws Exception
     {
         setValidatorDocument("<html><head></head></html>");
@@ -635,6 +687,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(this.validator), isValid(this.validator));
     }
 
+    @Test
     public void testRpd16s4CharsetPosition() throws Exception
     {
         setValidatorDocument("<html><head><meta/>"

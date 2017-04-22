@@ -22,7 +22,10 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Verify the {@link XWikiNotificationManager}
@@ -30,17 +33,17 @@ import junit.framework.TestCase;
  * @version $Id$
  */
 @Deprecated
-public class XWikiNotificationManagerTest extends TestCase
+public class XWikiNotificationManagerTest
 {
     private XWikiNotificationManager notificationManager;
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         notificationManager = new XWikiNotificationManager();
-        super.setUp();
     }
 
+    @Test
     public void testRemoveRuleFromNamedRule()
     {
         XWikiNotificationRule rule1 = getDummyNotificationRule();
@@ -55,6 +58,7 @@ public class XWikiNotificationManagerTest extends TestCase
         assertNull(notificationManager.getNamedRules("testrule"));
     }
 
+    @Test
     public void testRemoveNamedRule()
     {
         assertNull(notificationManager.getNamedRules("testrule"));

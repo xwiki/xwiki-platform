@@ -19,12 +19,13 @@
  */
 package org.xwiki.query.jpql.internal;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class JPQLParserTest extends TestCase
+public class JPQLParserTest
 {
-    JPQLParser parser = new JPQLParser();
+    private JPQLParser parser = new JPQLParser();
 
+    @Test
     public void testStartSpeed() throws Exception
     {
         // heat up parser engine for more accuracy test timing
@@ -32,6 +33,7 @@ public class JPQLParserTest extends TestCase
         parser.parse("select a from A as a");
     }
 
+    @Test
     public void testJPQL() throws Exception
     {
         // quotes
@@ -50,6 +52,7 @@ public class JPQLParserTest extends TestCase
         parser.parse("select a from A as a where a.p = ?1 or :name = a.p or ?2 member of a.p or a.p like :qwe");
     }
 
+    @Test
     public void testXWQLExtensions() throws Exception
     {
         // object() in from clause

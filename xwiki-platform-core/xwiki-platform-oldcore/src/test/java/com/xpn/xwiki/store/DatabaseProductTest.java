@@ -19,15 +19,21 @@
  */
 package com.xpn.xwiki.store;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link DatabaseProduct}.
  *
  * @version $Id$
  */
-public class DatabaseProductTest extends TestCase
+public class DatabaseProductTest
 {
+    @Test
     public void testEquality()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
@@ -55,6 +61,7 @@ public class DatabaseProductTest extends TestCase
         assertSame(DatabaseProduct.H2, product);
     }
 
+    @Test
     public void testDifference()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
@@ -62,6 +69,7 @@ public class DatabaseProductTest extends TestCase
         assertNotSame(DatabaseProduct.DERBY, product);
     }
 
+    @Test
     public void testUnknown()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("whatever");

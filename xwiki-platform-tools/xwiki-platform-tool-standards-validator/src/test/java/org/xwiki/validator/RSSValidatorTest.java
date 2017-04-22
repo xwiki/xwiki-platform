@@ -19,20 +19,22 @@
  */
 package org.xwiki.validator;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-public class RSSValidatorTest extends TestCase
+import static org.junit.Assert.assertTrue;
+
+public class RSSValidatorTest
 {
     private RSSValidator validator;
     
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-        
         validator = new RSSValidator();
     }
-    
+
+    @Test
     public void testValidRSS() throws Exception 
     {        
         this.validator.setDocument(getClass().getResourceAsStream("/rss-valid.xml"));

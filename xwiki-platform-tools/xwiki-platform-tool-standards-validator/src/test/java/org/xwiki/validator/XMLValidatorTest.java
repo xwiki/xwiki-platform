@@ -22,11 +22,14 @@ package org.xwiki.validator;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.validator.framework.AbstractXMLValidator;
 
-public class XMLValidatorTest extends TestCase
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class XMLValidatorTest
 {
     public class XMLValidator extends AbstractXMLValidator
     {
@@ -39,14 +42,13 @@ public class XMLValidatorTest extends TestCase
 
     private XMLValidator validator;
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-
         this.validator = new XMLValidator();
     }
 
+    @Test
     public void testValidate() throws UnsupportedEncodingException
     {
         this.validator.setValidateXML(false);

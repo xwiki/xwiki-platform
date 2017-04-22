@@ -19,29 +19,31 @@
  */
 package org.xwiki.validator;
 
-import org.xwiki.validator.XHTMLValidator;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class XHTMLValidatorTest extends TestCase
+public class XHTMLValidatorTest
 {   
     private XHTMLValidator validator;
     
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-        
         validator = new XHTMLValidator();
     }
-    
+
+    @Test
     public void testValidXHTML() throws Exception 
     {        
         validator.setDocument(getClass().getResourceAsStream("/xhtml-valid.html"));
         validator.validate();
         assertTrue(validator.getErrors().toString(), validator.getErrors().isEmpty());
     }
-    
+
+    @Test
     public void testInvalidXHTML() throws Exception 
     {        
         validator.setDocument(getClass().getResourceAsStream("/xhtml-invalid.html"));

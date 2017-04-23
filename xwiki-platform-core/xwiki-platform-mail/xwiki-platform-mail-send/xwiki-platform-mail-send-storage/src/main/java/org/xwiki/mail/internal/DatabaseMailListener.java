@@ -194,11 +194,13 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
             if (status == null) {
                 // It's not normal to have no status in the mail status store since onPrepare should have been called
                 // before.
-                this.logger.error("Failed to find a previous mail status for message [{}] of batch [{}].",
+                this.logger.error(
+                    "Failed to find a previous mail status for message [{}] of batch [{}] and state [{}].",
                     uniqueMessageId, getBatchId(), state);
             }
         } catch (MailStoreException e) {
-            this.logger.error("Error when looking for a previous mail status for message [{}] of batch [{}].",
+            this.logger.error(
+                "Error when looking for a previous mail status for message [{}] of batch [{}] and state [{}].",
                 uniqueMessageId, getBatchId(), state, e);
             status = null;
         }

@@ -145,7 +145,7 @@ public class DefaultNotificationManager implements NotificationManager
                 // Record this event
                 recordEvent(results, event);
                 // If the expected count is reached, stop now
-                if (results.size() == expectedCount) {
+                if (results.size() >= expectedCount) {
                     return results;
                 }
             }
@@ -163,46 +163,112 @@ public class DefaultNotificationManager implements NotificationManager
         }
     }
 
+    private class BestSimilarity
+    {
+        public int value;
+        public CompositeEvent compositeEvent;
+        public Event event;
+
+        public boolean isBestCompositeEventCompatibleWith(Event event)
+        {
+            // Here we have a composite event made of A and B.
+            // - if A is a "create" or an "update" event
+            // - if A and B have the same groupId (which means A or B is a "create" or an "update" event basically)
+            // - if B has the same type than E
+            // (or vice versa)
+            // It means the "update" event A has been triggered for technical reason, but the interesting event is
+            // B, which we can group with the event E even if it lowers the similarity between the events.
+            return compositeEvent.getSimilarityBetweenEvents() >= SimilarityCalculator.SAME_GROUP_ID
+                    && compositeEvent.getType().equals(event.getType());
+        }
+    }
+
     private void recordEvent(List<CompositeEvent> results, Event event) throws NotificationException
     {
-        int bestSimilarity = 0;
-        CompositeEvent bestCompositeEvent = null;
-        Event bestSimilarEvent = null;
+        BestSimilarity bestSimilarity = getBestSimilarity(results, event);
 
-        // Looking for the most similar event inside the existing composite events
-        for (CompositeEvent existingCompositeEvent : results) {
-            for (Event existingEvent : existingCompositeEvent.getEvents()) {
-                int similarity = similarityCalculator.computeSimilarity(event, existingEvent);
-                if (similarity > bestSimilarity && similarity >= existingCompositeEvent.getSimilarityBetweenEvents()) {
-                    bestSimilarity = similarity;
-                    bestSimilarEvent = existingEvent;
-                    bestCompositeEvent = existingCompositeEvent;
-                }
-            }
-        }
-
-        if (bestCompositeEvent != null) {
-            if (bestSimilarity > bestCompositeEvent.getSimilarityBetweenEvents() &&
-                    bestCompositeEvent.getEvents().size() > 1) {
+        if (bestSimilarity.compositeEvent != null) {
+            if (bestSimilarity.value > bestSimilarity.compositeEvent.getSimilarityBetweenEvents()
+                    && bestSimilarity.compositeEvent.getEvents().size() > 1) {
                 // We have found an event A inside a composite event C1 that have a greater similarity with the event E
                 // than the similarity between events (A, B, C) of that composite event (C1).
                 //
                 // It means we must remove the existing event A from that composite event C1 and create a new composite
                 // event C2 made of A and E.
-                bestCompositeEvent.remove(bestSimilarEvent);
-                CompositeEvent newCompositeEvent = new CompositeEvent(event);
-                newCompositeEvent.add(bestSimilarEvent, bestSimilarity);
-                results.add(newCompositeEvent);
-            } else {
+                bestSimilarity.compositeEvent.remove(bestSimilarity.event);
+
+                // Instead of creating a new composite event with A and E, we first look if an other composite event can
+                // match with A and E.
+                BestSimilarity bestSecondChoice = getBestSimilarity(results, event);
+                if (bestSecondChoice.compositeEvent != null
+                        && bestSecondChoice.isBestCompositeEventCompatibleWith(event)) {
+                    // We have found a composite event C2 made of events (X, Y) which have a greater similarity between
+                    // themselves than between X and the event E.
+                    // It means we cannot add E in C2.
+                    // But there is actually an exception:
+                    // - if X is a "create" or an "update" event
+                    // - if X and Y have the same groupId
+                    // - if Y has the same type than E
+                    // (or vice versa)
+                    // It means the "update" event X has been triggered for technical reason, but the interesting event is
+                    // Y, which we can group with the event E.
+                    bestSecondChoice.compositeEvent.add(bestSimilarity.event,
+                            bestSecondChoice.compositeEvent.getSimilarityBetweenEvents());
+                    bestSecondChoice.compositeEvent.add(event,
+                            bestSecondChoice.compositeEvent.getSimilarityBetweenEvents());
+                } else {
+                    CompositeEvent newCompositeEvent = new CompositeEvent(event);
+                    newCompositeEvent.add(bestSimilarity.event, bestSimilarity.value);
+                    results.add(newCompositeEvent);
+                }
+
+            } else if (bestSimilarity.value >= bestSimilarity.compositeEvent.getSimilarityBetweenEvents()){
                 // We have found a composite event C1 made of events (A, B, C) which have the same similarity between
                 // themselves than between A end E.
                 // All we need to do it to add E to C1.
-                bestCompositeEvent.add(event, bestSimilarity);
+                bestSimilarity.compositeEvent.add(event, bestSimilarity.value);
+            } else {
+                // We have found a composite event C1 made of events (A, B) which have a greater similarity between
+                // themselves than between A and the event E.
+                // It means we cannot add E in C1.
+                // But there is actually an exception:
+                // - if A is a "create" or an "update" event
+                // - if A and B have the same groupId
+                // - if B has the same type than E
+                // (or vice versa)
+                // It means the "update" event A has been triggered for technical reason, but the interesting event is
+                // B, which we can group with the event E.
+                if (bestSimilarity.isBestCompositeEventCompatibleWith(event)) {
+                    bestSimilarity.compositeEvent.add(event,
+                            bestSimilarity.compositeEvent.getSimilarityBetweenEvents());
+                } else {
+                    // We really need to create a new composite event for E.
+                    results.add(new CompositeEvent(event));
+                }
             }
         } else {
             // We haven't found an event that is similar to the current one, so we create a new composite event
             results.add(new CompositeEvent(event));
         }
+    }
+
+    private BestSimilarity getBestSimilarity(List<CompositeEvent> results, Event event)
+    {
+        BestSimilarity bestSimilarity = new BestSimilarity();
+
+        // Looking for the most similar event inside the existing composite events
+        for (CompositeEvent existingCompositeEvent : results) {
+            for (Event existingEvent : existingCompositeEvent.getEvents()) {
+                int similarity = similarityCalculator.computeSimilarity(event, existingEvent);
+                if (similarity > bestSimilarity.value) {
+                    bestSimilarity.value = similarity;
+                    bestSimilarity.event = existingEvent;
+                    bestSimilarity.compositeEvent = existingCompositeEvent;
+                }
+            }
+        }
+
+        return bestSimilarity;
     }
 
     @Override

@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
-import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -32,28 +31,33 @@ import org.xwiki.text.StringUtils;
 @Singleton
 public class SimilarityCalculator
 {
-    private static final int SAME_GROUP_ID = 10000;
+    protected static final int SAME_GROUP_ID = 10000;
 
-    private static final int SAME_DOCUMENT_AND_TYPE = 1000;
+    protected static final int SAME_DOCUMENT_AND_TYPE = 1000;
 
-    private static final int SAME_DOCUMENT = 100;
+    protected static final int SAME_DOCUMENT = 100;
 
-    private static final int SAME_TYPE_BUT_NO_DOCUMENT = 10;
+    protected static final int SAME_TYPE_BUT_NO_DOCUMENT = 10;
 
-    private static final int NO_SIMILARITY = 0;
+    protected static final int NO_SIMILARITY = 0;
 
+    /**
+     *
+     * @param event1
+     * @param event2
+     * @return
+     */
     public int computeSimilarity(Event event1, Event event2)
     {
         if (event1.getDocument() != null && event1.getDocument().equals(event2.getDocument())) {
-            if (StringUtils.equals(event1.getGroupId(), event2.getGroupId())) {
+            if (event1.getGroupId() != null && event1.getGroupId().equals(event2.getGroupId())) {
                 return SAME_GROUP_ID;
             }
-            if (StringUtils.equals(event1.getType(), event2.getType())) {
+            if (event1.getType() != null && event1.getType().equals(event2.getType())) {
                 return SAME_DOCUMENT_AND_TYPE;
             }
-            // TODO: TO REMOVE BECAUSE IT HAS BAD CONSEQUENCE
-            return SAME_DOCUMENT;
-        } else if (event1.getDocument() == null && StringUtils.equals(event1.getType(), event2.getType())) {
+        } else if (event1.getDocument() == null && event1.getType() != null
+                && event1.getType().equals(event2.getType())) {
             return SAME_TYPE_BUT_NO_DOCUMENT;
         }
 

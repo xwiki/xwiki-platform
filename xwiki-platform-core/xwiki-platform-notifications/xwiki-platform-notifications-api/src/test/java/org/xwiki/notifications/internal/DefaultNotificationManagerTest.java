@@ -41,6 +41,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -55,6 +56,7 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
+@ComponentList(SimilarityCalculator.class)
 public class DefaultNotificationManagerTest
 {
     @Rule
@@ -101,7 +103,7 @@ public class DefaultNotificationManagerTest
     }
 
     @Test
-    public void getEvents() throws Exception
+    public void getEventsWith2Queries() throws Exception
     {
         // Mocks
         Event event1 = mock(Event.class);
@@ -121,6 +123,13 @@ public class DefaultNotificationManagerTest
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(false);
 
+        when(event1.getType()).thenReturn("type1");
+        when(event2.getType()).thenReturn("type2");
+        when(event3.getType()).thenReturn("type3");
+        when(event4.getType()).thenReturn("type4");
+        when(event5.getType()).thenReturn("type5");
+        when(event6.getType()).thenReturn("type6");
+
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4),
                 Arrays.asList(event5, event6));
 
@@ -130,8 +139,8 @@ public class DefaultNotificationManagerTest
 
         // Verify
         assertEquals(2, results.size());
-        assertEquals(event1, results.get(0));
-        assertEquals(event5, results.get(1));
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event5, results.get(1).getEvents().get(0));
     }
 
     @Test
@@ -177,11 +186,6 @@ public class DefaultNotificationManagerTest
         Event event2 = mock(Event.class);
         Event event3 = mock(Event.class);
 
-        DocumentReference doc2 = new DocumentReference("xwiki", "PrivateSpace", "WebHome");
-        when(event2.getDocument()).thenReturn(doc2);
-
-        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(false);
-
         when(eventStream.searchEvents(query)).thenReturn(
                 Arrays.asList(event1, event2, event1, event2, event2, event2, event1, event2, event2, event2),
                 Arrays.asList(event1, event2, event2, event1, event3));
@@ -192,6 +196,253 @@ public class DefaultNotificationManagerTest
         // Verify
         assertEquals(5, result);
         verifyZeroInteractions(event3);
+    }
+
+    @Test
+    public void getEventsUC1() throws Exception
+    {
+        // Facts:
+        // * Alice updates the page "Bike"
+        // * Bob updates the page "Bike"
+
+        // Expected:
+        // * Alice and Bob have updated the page "Bike"
+
+        // Comment:
+        // Note: the 2 events have been combined
+
+        // Mocks
+        Event eventAlice = mock(Event.class);
+        Event eventBob = mock(Event.class);
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(eventAlice.getDocument()).thenReturn(doc);
+        when(eventBob.getDocument()).thenReturn(doc);
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+
+
+        when(eventAlice.getType()).thenReturn("update");
+        when(eventBob.getType()).thenReturn("update");
+
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAlice, eventBob));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+
+        // Verify
+        assertEquals(1, results.size());
+        assertEquals(eventAlice, results.get(0).getEvents().get(0));
+        assertEquals(eventBob, results.get(0).getEvents().get(1));
+    }
+
+    @Test
+    public void getEventsUC2() throws Exception
+    {
+        // Facts:
+        // * Bob comments the page "Bike" (which actually update the page too)
+
+        // Expected:
+        // * Bob has commented the page "Bike"
+
+        // Comment: we do not mention that Bob has updated the page "Bike", because it's actually a technical
+        // implementation of the "comment" feature.
+
+        // Mocks
+        Event eventComment = mock(Event.class);
+        Event eventUpdate = mock(Event.class);
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(eventComment.getDocument()).thenReturn(doc);
+        when(eventUpdate.getDocument()).thenReturn(doc);
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+
+        when(eventComment.getType()).thenReturn("addComment");
+        when(eventUpdate.getType()).thenReturn("update");
+
+        when(eventComment.getGroupId()).thenReturn("g1");
+        when(eventUpdate.getGroupId()).thenReturn("g1");
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventComment, eventUpdate));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+
+        // Verify
+        assertEquals(1, results.size());
+        assertEquals(eventComment, results.get(0).getEvents().get(0));
+        assertEquals(eventUpdate, results.get(0).getEvents().get(1));
+    }
+
+    @Test
+    public void getEventsUC3() throws Exception
+    {
+        // Facts:
+        // * Alice updates the page "Bike"
+        // * Bob comments the page "Bike"
+
+        // Expected:
+        // * Alice has updated the page "Bike"
+        // * Bob has commented the page "Bike"
+
+        // Comment: same as UC2 but we make sure we don't lose the event concerning Alice
+
+        // Note: the UC4 described in https://jira.xwiki.org/browse/XWIKI-14114 is actually similar to that one
+        // because we don't care of the event' user in our tests.
+
+        // Mocks
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+        Event event3 = mock(Event.class);
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(event1.getDocument()).thenReturn(doc);
+        when(event2.getDocument()).thenReturn(doc);
+        when(event3.getDocument()).thenReturn(doc);
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+
+        when(event1.getType()).thenReturn("update");
+        when(event2.getType()).thenReturn("addComment");
+        when(event3.getType()).thenReturn("update");
+
+        when(event1.getGroupId()).thenReturn("g1");
+        when(event2.getGroupId()).thenReturn("g2");
+        when(event3.getGroupId()).thenReturn("g2");
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+
+        // Verify
+        assertEquals(2, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event2, results.get(1).getEvents().get(0));
+        assertEquals(event3, results.get(1).getEvents().get(1));
+    }
+
+    @Test
+    public void getEventsUC5() throws Exception
+    {
+        // Facts:
+        // * Bob updates the page "Bike"
+        // * Then Bob updates the page "Bike" again
+
+        // Expected:
+        // * Bob has updated the page "Bike"
+
+        // Comment: we don't show 2 events, only one is interesting
+
+        // Mocks
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(event1.getDocument()).thenReturn(doc);
+        when(event2.getDocument()).thenReturn(doc);
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+
+        when(event1.getType()).thenReturn("update");
+        when(event2.getType()).thenReturn("update");
+
+        when(event1.getGroupId()).thenReturn("g1");
+        when(event2.getGroupId()).thenReturn("g2");
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+
+        // Verify
+        assertEquals(1, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event2, results.get(0).getEvents().get(1));
+    }
+
+    @Test
+    public void getEventsUC6() throws Exception
+    {
+        // Facts:
+        // * Bob updates the page "Bike" (E1)
+        // * Alice updates the page "Bike" (E2)
+        // * Bob comments the page "Bike" (E3 & E4)
+        // * Carol comments the page "Bike" (E5 & E6)
+        // * Dave comments the page "Guitar" (E7 & E8)
+
+        // Expected:
+        // * Bob and Alice have updated the page "Bike"
+        // * Bob and Carol have commented the page "Bike"
+        // * Dave has commented the page "Guitar"
+
+        // Comment: it's only a mix of other use cases to make sure we have the expected results.
+
+        // Mocks
+        Event event1 = mock(Event.class); when(event1.toString()).thenReturn("event1");
+        Event event2 = mock(Event.class); when(event2.toString()).thenReturn("event2");
+        Event event3 = mock(Event.class); when(event3.toString()).thenReturn("event3");
+        Event event4 = mock(Event.class); when(event4.toString()).thenReturn("event4");
+        Event event5 = mock(Event.class); when(event5.toString()).thenReturn("event5");
+        Event event6 = mock(Event.class); when(event6.toString()).thenReturn("event6");
+        Event event7 = mock(Event.class); when(event7.toString()).thenReturn("event7");
+        Event event8 = mock(Event.class); when(event8.toString()).thenReturn("event8");
+
+        DocumentReference doc1 = new DocumentReference("xwiki", "Main", "Bike");
+        when(event1.getDocument()).thenReturn(doc1);
+        when(event2.getDocument()).thenReturn(doc1);
+        when(event3.getDocument()).thenReturn(doc1);
+        when(event4.getDocument()).thenReturn(doc1);
+        when(event5.getDocument()).thenReturn(doc1);
+        when(event6.getDocument()).thenReturn(doc1);
+        DocumentReference doc2 = new DocumentReference("xwiki", "Main", "Guitar");
+        when(event7.getDocument()).thenReturn(doc2);
+        when(event8.getDocument()).thenReturn(doc2);
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(true);
+
+        when(event1.getType()).thenReturn("update");
+        when(event2.getType()).thenReturn("update");
+        when(event3.getType()).thenReturn("addComment");
+        when(event4.getType()).thenReturn("update");
+        when(event5.getType()).thenReturn("update");
+        when(event6.getType()).thenReturn("addComment");
+        when(event7.getType()).thenReturn("update");
+        when(event8.getType()).thenReturn("addComment");
+
+        when(event1.getGroupId()).thenReturn("g1");
+        when(event2.getGroupId()).thenReturn("g2");
+        when(event3.getGroupId()).thenReturn("g3");
+        when(event4.getGroupId()).thenReturn("g3");
+        when(event5.getGroupId()).thenReturn("g5");
+        when(event6.getGroupId()).thenReturn("g5");
+        when(event7.getGroupId()).thenReturn("g7");
+        when(event8.getGroupId()).thenReturn("g7");
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4, event5, event6,
+                event7, event8));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 50);
+
+        // Verify
+        assertEquals(3, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event2, results.get(0).getEvents().get(1));
+        assertEquals(event3, results.get(1).getEvents().get(0));
+        assertEquals(event4, results.get(1).getEvents().get(1));
+        assertEquals(event5, results.get(1).getEvents().get(2));
+        assertEquals(event6, results.get(1).getEvents().get(3));
+        assertEquals(event7, results.get(2).getEvents().get(0));
+        assertEquals(event8, results.get(2).getEvents().get(1));
     }
 
     @Test

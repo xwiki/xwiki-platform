@@ -236,6 +236,15 @@ public class Document extends Api
     }
 
     /**
+     * @return the {@link DocumentReference} of the document also containing the document {@link Locale}
+     * @since 9.3RC1
+     */
+    public DocumentReference getDocumentReferenceWithLocale()
+    {
+        return this.doc.getDocumentReferenceWithLocale();
+    }
+
+    /**
      * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
      *
      * @return the name of the document

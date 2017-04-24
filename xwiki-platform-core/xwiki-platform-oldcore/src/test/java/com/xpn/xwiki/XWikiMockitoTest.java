@@ -58,6 +58,7 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
@@ -108,6 +109,8 @@ public class XWikiMockitoTest
 
     private XWikiStoreInterface storeMock;
 
+    private DocumentRevisionProvider documentRevisionProvider;
+
     @Before
     public void setUp() throws Exception
     {
@@ -142,6 +145,7 @@ public class XWikiMockitoTest
 
         XWikiVersioningStoreInterface versioningStore = mock(XWikiVersioningStoreInterface.class);
         xwiki.setVersioningStore(versioningStore);
+        this.documentRevisionProvider = this.mocker.registerMockComponent(DocumentRevisionProvider.class);
 
         this.xwikiCfgConfigurationSource = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikicfg");
     }
@@ -196,7 +200,7 @@ public class XWikiMockitoTest
         when(result.getOriginalDocument()).thenReturn(originalDocument);
 
         String revision = "3.5";
-        when(xwiki.getVersioningStore().loadXWikiDoc(document, revision, context)).thenReturn(result);
+        when(this.documentRevisionProvider.getRevision(document, revision)).thenReturn(result);
 
         this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
@@ -242,7 +246,7 @@ public class XWikiMockitoTest
         when(result.getAttachment(fileName)).thenReturn(oldAttachment);
 
         String revision = "3.5";
-        when(xwiki.getVersioningStore().loadXWikiDoc(document, revision, context)).thenReturn(result);
+        when(this.documentRevisionProvider.getRevision(document, revision)).thenReturn(result);
 
         AttachmentRecycleBinStore attachmentRecycleBinStore = mock(AttachmentRecycleBinStore.class);
         xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);

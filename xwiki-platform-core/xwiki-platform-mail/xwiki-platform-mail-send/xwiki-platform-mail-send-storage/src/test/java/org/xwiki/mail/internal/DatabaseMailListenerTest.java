@@ -164,7 +164,7 @@ public class DatabaseMailListenerTest
         listener.onSendMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
         assertEquals("Error when looking for a previous mail status for message [" + this.messageId + "] of batch ["
-            + batchId + "].", this.logRule.getMessage(0));
+            + batchId + "] and state [send_success].", this.logRule.getMessage(0));
         assertEquals("Forcing a new mail status for message [" + this.messageId + "] of batch [" + batchId
             + "] to send_success state.", this.logRule.getMessage(1));
 

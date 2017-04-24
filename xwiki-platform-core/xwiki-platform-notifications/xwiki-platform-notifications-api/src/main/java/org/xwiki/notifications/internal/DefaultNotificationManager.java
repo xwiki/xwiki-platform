@@ -169,7 +169,7 @@ public class DefaultNotificationManager implements NotificationManager
         public CompositeEvent compositeEvent;
         public Event event;
 
-        public boolean isBestCompositeEventCompatibleWith(Event event)
+        public boolean isCompositeEventCompatibleWith(Event event)
         {
             // Here we have a composite event made of A and B.
             // - if A is a "create" or an "update" event
@@ -201,7 +201,7 @@ public class DefaultNotificationManager implements NotificationManager
                 // match with A and E.
                 BestSimilarity bestSecondChoice = getBestSimilarity(results, event);
                 if (bestSecondChoice.compositeEvent != null
-                        && bestSecondChoice.isBestCompositeEventCompatibleWith(event)) {
+                        && bestSecondChoice.isCompositeEventCompatibleWith(event)) {
                     // We have found a composite event C2 made of events (X, Y) which have a greater similarity between
                     // themselves than between X and the event E.
                     // It means we cannot add E in C2.
@@ -210,8 +210,8 @@ public class DefaultNotificationManager implements NotificationManager
                     // - if X and Y have the same groupId
                     // - if Y has the same type than E
                     // (or vice versa)
-                    // It means the "update" event X has been triggered for technical reason, but the interesting event is
-                    // Y, which we can group with the event E.
+                    // It means the "update" event X has been triggered for technical reason, but the interesting event
+                    // is Y, which we can group with the event E.
                     bestSecondChoice.compositeEvent.add(bestSimilarity.event,
                             bestSecondChoice.compositeEvent.getSimilarityBetweenEvents());
                     bestSecondChoice.compositeEvent.add(event,
@@ -222,12 +222,14 @@ public class DefaultNotificationManager implements NotificationManager
                     results.add(newCompositeEvent);
                 }
 
-            } else if (bestSimilarity.value >= bestSimilarity.compositeEvent.getSimilarityBetweenEvents()){
+                return;
+            } else if (bestSimilarity.value >= bestSimilarity.compositeEvent.getSimilarityBetweenEvents()) {
                 // We have found a composite event C1 made of events (A, B, C) which have the same similarity between
                 // themselves than between A end E.
                 // All we need to do it to add E to C1.
                 bestSimilarity.compositeEvent.add(event, bestSimilarity.value);
-            } else {
+                return;
+            } else if (bestSimilarity.isCompositeEventCompatibleWith(event)) {
                 // We have found a composite event C1 made of events (A, B) which have a greater similarity between
                 // themselves than between A and the event E.
                 // It means we cannot add E in C1.
@@ -238,18 +240,13 @@ public class DefaultNotificationManager implements NotificationManager
                 // (or vice versa)
                 // It means the "update" event A has been triggered for technical reason, but the interesting event is
                 // B, which we can group with the event E.
-                if (bestSimilarity.isBestCompositeEventCompatibleWith(event)) {
-                    bestSimilarity.compositeEvent.add(event,
-                            bestSimilarity.compositeEvent.getSimilarityBetweenEvents());
-                } else {
-                    // We really need to create a new composite event for E.
-                    results.add(new CompositeEvent(event));
-                }
+                bestSimilarity.compositeEvent.add(event,
+                        bestSimilarity.compositeEvent.getSimilarityBetweenEvents());
+                return;
             }
-        } else {
-            // We haven't found an event that is similar to the current one, so we create a new composite event
-            results.add(new CompositeEvent(event));
         }
+        // We haven't found an event that is similar to the current one, so we create a new composite event
+        results.add(new CompositeEvent(event));
     }
 
     private BestSimilarity getBestSimilarity(List<CompositeEvent> results, Event event)

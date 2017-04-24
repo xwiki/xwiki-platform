@@ -25,27 +25,42 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 
 /**
+ * Compute similarity between two events.
+ *
  * @version $Id$
+ * @since 9.4RC1
  */
 @Component(roles = SimilarityCalculator.class)
 @Singleton
 public class SimilarityCalculator
 {
-    protected static final int SAME_GROUP_ID = 10000;
-
-    protected static final int SAME_DOCUMENT_AND_TYPE = 1000;
-
-    protected static final int SAME_DOCUMENT = 100;
-
-    protected static final int SAME_TYPE_BUT_NO_DOCUMENT = 10;
-
-    protected static final int NO_SIMILARITY = 0;
+    /**
+     * The 2 events have the same groupId.
+     */
+    public static final int SAME_GROUP_ID = 10000;
 
     /**
+     * The 2 events have the same type and concern the same document.
+     */
+    public static final int SAME_DOCUMENT_AND_TYPE = 1000;
+
+    /**
+     * The 2 events have the same type but no document is concerned.
+     */
+    public static final int SAME_TYPE_BUT_NO_DOCUMENT = 10;
+
+    /**
+     * The 2 events are totally different.
+     */
+    public static final int NO_SIMILARITY = 0;
+
+    /**
+     * Compute the similarity between two events.
      *
-     * @param event1
-     * @param event2
-     * @return
+     * @param event1 first event to compare
+     * @param event2 second event to compare
+     *
+     * @return an integer representing the similarity between the two events
      */
     public int computeSimilarity(Event event1, Event event2)
     {

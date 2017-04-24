@@ -57,8 +57,8 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate, List<String> blackList)
-            throws NotificationException;
+    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
+            List<String> blackList) throws NotificationException;
 
     /**
      * Return the number of events to display as notifications concerning the specified user.

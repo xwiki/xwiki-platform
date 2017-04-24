@@ -101,7 +101,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>4.0.1.Final</version>
+        <version>4.0.2.Final</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>

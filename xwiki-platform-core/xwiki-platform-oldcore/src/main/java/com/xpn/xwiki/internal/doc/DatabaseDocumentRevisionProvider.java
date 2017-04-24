@@ -20,8 +20,11 @@
 package com.xpn.xwiki.internal.doc;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -35,6 +38,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 9.3RC1
  */
+@Component
+@Named("database")
+@Singleton
 public class DatabaseDocumentRevisionProvider implements DocumentRevisionProvider
 {
     @Inject

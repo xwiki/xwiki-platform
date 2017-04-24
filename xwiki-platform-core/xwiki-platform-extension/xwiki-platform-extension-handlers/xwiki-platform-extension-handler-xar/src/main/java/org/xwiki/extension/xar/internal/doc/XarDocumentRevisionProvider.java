@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -45,6 +46,7 @@ import com.xpn.xwiki.internal.doc.AbstractDocumentRevisionProvider;
  */
 @Component
 @Named("xar")
+@Singleton
 public class XarDocumentRevisionProvider extends AbstractDocumentRevisionProvider
 {
     @Inject

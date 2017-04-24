@@ -22,7 +22,9 @@ package com.xpn.xwiki.internal.doc;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -40,6 +42,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 9.3rc1
  */
+@Component
+@Singleton
 public class DefaultDocumentRevisionProvider extends AbstractDocumentRevisionProvider
 {
     @Inject
@@ -54,28 +58,31 @@ public class DefaultDocumentRevisionProvider extends AbstractDocumentRevisionPro
     public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
     {
         // Parse the version
-        String revisionPrefix;
-        String shortRevision;
+        String revisionPrefix = null;
         if (revision != null) {
             int revisionPrefixIndex = revision.indexOf(':');
-            revisionPrefix = revision.substring(0, revisionPrefixIndex);
-            shortRevision = revisionPrefix.substring(revisionPrefixIndex + 1);
+            if (revisionPrefixIndex > 0) {
+                revisionPrefix = revision.substring(0, revisionPrefixIndex);
+            }
+        }
+        String shortRevision;
+        if (revisionPrefix != null) {
+            shortRevision = revision.substring(revisionPrefix.length() + 1);
         } else {
-            revisionPrefix = null;
             shortRevision = revision;
         }
 
         // Find the provider
-        DocumentRevisionProvider provider;
-        ComponentManager componentManager = this.componentManagerProvider.get();
-        if (revision != null && componentManager.hasComponent(DocumentRevisionProvider.class, revisionPrefix)) {
-            try {
-                provider = componentManager.getInstance(DocumentRevisionProvider.class, revisionPrefix);
-            } catch (ComponentLookupException e) {
-                throw new XWikiException("Failed to get revision provider for revision [" + revision + "]", e);
+        DocumentRevisionProvider provider = this.databaseDocumentRevisionProvider;
+        if (revisionPrefix != null) {
+            ComponentManager componentManager = this.componentManagerProvider.get();
+            if (componentManager.hasComponent(DocumentRevisionProvider.class, revisionPrefix)) {
+                try {
+                    provider = componentManager.getInstance(DocumentRevisionProvider.class, revisionPrefix);
+                } catch (ComponentLookupException e) {
+                    throw new XWikiException("Failed to get revision provider for revision [" + revision + "]", e);
+                }
             }
-        } else {
-            provider = this.databaseDocumentRevisionProvider;
         }
 
         // Load the document revision

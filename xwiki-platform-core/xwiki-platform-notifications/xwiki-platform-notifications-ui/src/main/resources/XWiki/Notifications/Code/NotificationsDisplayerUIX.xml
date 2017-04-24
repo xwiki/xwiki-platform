@@ -53,16 +53,20 @@
   #else
     #set ($events = $services.notification.getEvents(false, $batchSize))
   #end
-  #foreach ($eventStatus in $services.notification.getEventStatuses($events))
-    #set ($event = $eventStatus.event)
-    #set ($discard = $notifications.add({
-      'id'          : $event.id,
+  #foreach ($status in $services.notification.getCompositeEventStatuses($events))
+    #set ($event = $status.compositeEvent)
+    #set ($notification = {
+      'ids'         : $event.eventIds,
       'type'        : $event.type,
-      'date'        : $event.date,
-      'document'    : $services.model.serialize($event.document, 'default'),
-      'html'        : $services.rendering.render($services.notification.render($event), 'html/5.0'),
-      'read'        : $eventStatus.isRead()
-    }))
+      'read'        : $status.status
+    })
+    #if ($event.document)
+      #set ($discard = $notification.put('document', $services.model.serialize($event.document, 'default')))
+    #end
+    #try("notificationException")
+      #set ($discard = $notification.put('html', $services.rendering.render($services.notification.render($event), 'html/5.0')))
+    #end
+    #set ($discard = $notifications.add($notification))
   #end
   #set ($discard = $response.setContentType('application/json'))
   $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true, 21)})

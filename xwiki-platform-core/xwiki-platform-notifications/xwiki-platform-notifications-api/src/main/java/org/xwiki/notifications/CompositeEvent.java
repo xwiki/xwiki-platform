@@ -28,6 +28,8 @@ import java.util.Set;
 
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.text.StringUtils;
 
 /**
  * A group of similar events that compose a "composite" event.
@@ -35,6 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 9.4RC1
  */
+@Unstable
 public class CompositeEvent
 {
     private List<Event> events = new ArrayList<>();
@@ -48,6 +51,18 @@ public class CompositeEvent
     public CompositeEvent(Event event)
     {
         events.add(event);
+    }
+
+    /**
+     * @return the list of the ids of the events
+     */
+    public List<String> getEventIds()
+    {
+        ArrayList results = new ArrayList(events.size());
+        for (Event event : events) {
+            results.add(event.getId());
+        }
+        return results;
     }
 
     /**
@@ -91,7 +106,8 @@ public class CompositeEvent
         for (Event event : events) {
             // We are most interested in "advanced" event that we are in "core" events such as "create" or "update",
             // which often are the technical consequences of the real event (ex: a comment has been added).
-            if (!"create".equals(event.getType()) && !"update".equals(event.getType())) {
+            if (StringUtils.isNotBlank(event.getType()) && !"create".equals(event.getType())
+                    && !"update".equals(event.getType())) {
                 type = event.getType();
             }
         }

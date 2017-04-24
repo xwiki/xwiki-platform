@@ -19,9 +19,12 @@
  */
 package org.xwiki.notifications.script;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +39,7 @@ import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationRenderer;
@@ -169,6 +173,40 @@ public class NotificationScriptService implements ScriptService
     {
         return eventStatusManager.getEventStatus(events,
                 Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+    }
+
+    /**
+     * Get the list of statuses concerning the given events and the current user.
+     *
+     * @param events a list of events
+     * @return the list of statuses corresponding to each pair or event/entity
+     *
+     * @throws Exception if an error occurs
+     * @since 9.4RC1
+     */
+    public List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents) throws Exception
+    {
+        // Creating a list of all events to avoid multiple calls to getEventStatuses() and so multiple calls to the
+        // database.
+        List<Event> allEvents = new ArrayList<>();
+        // But maintain a mapping between eventId and their composite event status
+        Map<String, CompositeEventStatus> map = new HashMap<>();
+        for (CompositeEvent compositeEvent : compositeEvents) {
+            CompositeEventStatus compositeEventStatus = new CompositeEventStatus(compositeEvent);
+            for (Event event : compositeEvent.getEvents()) {
+                map.put(event.getId(), compositeEventStatus);
+            }
+            allEvents.addAll(compositeEvent.getEvents());
+        }
+        for (EventStatus eventStatus : getEventStatuses(allEvents)) {
+            map.get(eventStatus.getEvent().getId()).add(eventStatus);
+        }
+        List<CompositeEventStatus> results = new ArrayList<>();
+        // Keep the same order than inputs
+        for (CompositeEvent event : compositeEvents) {
+            results.add(map.get(event.getEvents().get(0).getId()));
+        }
+        return results;
     }
 
     /**

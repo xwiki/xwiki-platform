@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package com.xpn.xwiki.events;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,13 +25,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 
+import com.xpn.xwiki.internal.event.CommentAddedEvent;
+
 /**
- *
+ * Descriptor for {@link CommentAddedEvent}.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 9.4RC1
  */
-// TODO: move to oldcore
 @Component
 @Singleton
 @Named(DocumentCommentedEventDescriptor.EVENT_TYPE)

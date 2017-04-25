@@ -25,7 +25,10 @@ import java.util.List;
 import org.xwiki.eventstream.EventStatus;
 
 /**
+ * Combine all event statuses of a composite event.
+ *
  * @version $Id$
+ * @since 9.4RC1
  */
 public class CompositeEventStatus
 {
@@ -33,25 +36,40 @@ public class CompositeEventStatus
 
     private List<EventStatus> eventStatuses = new ArrayList<>();
 
+    /**
+     * Construct a composite event status.
+     * @param compositeEvent composite event
+     */
     public CompositeEventStatus(CompositeEvent compositeEvent)
     {
         this.compositeEvent = compositeEvent;
     }
 
+    /**
+     * Add an event status to the object.
+     * The event status must concern an event that compose the composite event.
+     * @param eventStatus the event status to add
+     */
     public void add(EventStatus eventStatus)
     {
         eventStatuses.add(eventStatus);
     }
 
+    /**
+     * @return the composite event
+     */
     public CompositeEvent getCompositeEvent()
     {
         return compositeEvent;
     }
 
+    /**
+     * @return a global status for all event statuses
+     */
     public boolean getStatus()
     {
         boolean result = true;
-        // If any of the event is not read, the composite event is not read neither
+        // If any of the event is not read, then we consider the composite event as not read.
         for (EventStatus status : eventStatuses) {
             result &= status.isRead();
         }

@@ -22,6 +22,7 @@ package org.xwiki.notifications;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Compute composite event statuses.
@@ -30,6 +31,7 @@ import org.xwiki.component.annotation.Role;
  * @since 9.4RC1
  */
 @Role
+@Unstable
 public interface CompositeEventStatusManager
 {
     /**

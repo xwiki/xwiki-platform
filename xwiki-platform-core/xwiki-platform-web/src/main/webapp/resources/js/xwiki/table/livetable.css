@@ -227,6 +227,12 @@ tbody.xwiki-livetable-display-body td a.actionrename {
 tbody.xwiki-livetable-display-body td a.actiondelete {
   background-image: url($xwiki.getSkinFile("icons/silk/cross.png"));
 }
+tbody.xwiki-livetable-display-body td a.actionrestore {
+  background-image: url($xwiki.getSkinFile("icons/silk/arrow_refresh.png"));
+}
+tbody.xwiki-livetable-display-body td a.actionundelete {
+  background-image: url($xwiki.getSkinFile("icons/silk/arrow_refresh.png"));
+}
 tbody.xwiki-livetable-display-body td a.actionrights {
   background-image: url($xwiki.getSkinFile("icons/silk/lock_edit.png"));
 }

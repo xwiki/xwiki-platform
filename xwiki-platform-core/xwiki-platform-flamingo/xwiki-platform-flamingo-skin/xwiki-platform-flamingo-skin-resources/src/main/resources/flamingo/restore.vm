@@ -1,0 +1,128 @@
+#######################################################
+###              RESTORE (UNDELETE) PAGE ACTION
+###              ------------------
+###
+#######################################################
+##
+#######################################################
+##                     GLOBALS
+#######################################################
+#set($fullmsg = '')
+#set($quote = '"')
+#set($hasInlinks = false)
+#######################################################
+##                     DISPLAY
+#######################################################
+#template("startpage.vm")
+<div class="main">
+  <div id="mainContentArea">
+    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+    #set($titleToDisplay = $services.localization.render('core.restore.title', [$title]))
+    <div class="xcontent">
+      #template('contentheader.vm')
+      #controller()
+      <div class="clearfloats"></div>
+    </div> ## xcontent
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")
+#######################################################
+##                    CONTROLLER
+#######################################################
+#macro(controller)
+  #if("$!{request.showBatch}" == 'true')
+    ## showBatch=true means that we are displaying the other documents that were deleted in the same batch as the
+    ## current one, which we might want to restore as well.
+    #displayConfirmationPage()
+  #end
+#end
+#######################################################
+##            DISPLAY CONFIRMATION PAGE
+#######################################################
+#macro(displayConfirmationPage)
+  <form action="$xwiki.relativeRequestURL" method="post">
+    #getBatch()
+    #displayConfirmMessage()
+  </form>
+#end
+#######################################################
+##                  DISPLAY PANEL
+#######################################################
+#macro(displayPanel $panelId $panelClass $heading $body)
+  <div class="panel $!panelClass">
+    <div class="panel-heading">
+      $heading
+      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId"><span class="caret"></span></a></div>
+    </div>
+    <div class="panel-body collapse" id="$panelId">
+      $body
+    </div>
+  </div>
+#end
+#######################################################
+##                    BATCH
+#######################################################
+#macro(getBatch)
+  #set ($deletedDocument = $xwiki.getDeletedDocument($tdoc.getFullName(), "$tdoc.locale", $request.get('id')))
+  #set ($batchDeletedDocuments = $xwiki.getDeletedDocuments($deletedDocument.batchId))
+  ## Only propose to restore the batch if it also contains other documents than the current one.
+  #if ($batchDeletedDocuments.size() > 1)
+    #define($heading)
+      <input name="includeBatch" id="includeBatch" type="checkbox" value="true"/><label for="includeBatch">$services.localization.render('core.restore.includeBatch')</label> ($batchDeletedDocuments.size())
+    #end
+    #define($body)
+      ##
+      ## Batch details.
+      ##
+      <div class="row">
+        <div class="col-xs-12 col-lg-4">
+          <div><b>$services.localization.render('core.restore.deleter')</b></div> $xwiki.getUserName($deletedDocument.deleter)
+        </div>
+        <div class="col-xs-12 col-lg-4">
+          <div><b>$services.localization.render('core.restore.deleteDate')</b></div> $xwiki.formatDate($deletedDocument.date)
+        </div>
+        <div class="col-xs-12 col-lg-4">
+          <div><b>$services.localization.render('core.restore.batchId')</b></div> $deletedDocument.batchId
+        </div>
+      </div>
+      ##
+      ## List the deleted documents in the batch using a livetable.
+      ##
+      #set ($collist = ['doc.title', 'doc.location', '_actions'])
+      #set ($colprops = {
+        'doc.title'    : { 'link' : 'view', 'filterable': false, 'sortable' : 'false' },
+        'doc.location' : { 'type' : 'text', 'link' : false, 'filterable': true, 'html': true},
+        '_actions' : { 'actions' : ['restore', 'delete'] }
+      })
+      #set ($urlParameters = "xpage=getdeleteddocuments&doc.batchId=$!{escapetool.url($deletedDocument.batchId)}")
+      #set ($options = { 
+        'url' : "$doc.getURL('get', $urlParameters)",
+        'translationPrefix' : 'core.restore.batch.',
+        'outputOnlyHtml' : true,
+        'selectedColumn' : 'doc.location'
+      })
+      #livetable('deletedBatch' $collist $colprops $options)
+    #end
+    #displayPanel('panel-batch', 'panel-default', $heading, $body)
+  #end
+#end
+#######################################################
+##              DISPLAY CONFIRM MESSAGE
+#######################################################
+#macro(displayConfirmMessage)
+  <div class="hidden">
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+    <input type="hidden" name="confirm" value="true"/>
+    <input type="hidden" name="async" value="true"/>
+    #if("$!{request.xredirect}" != '')
+      <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+    #end
+  </div>
+  <button class="btn btn-primary">$services.localization.render('core.restore.confirm.yes')</button>
+  #if("$!{request.xredirect}" != '')
+    #set($cancelUrl = "$request.xredirect")
+  #else
+    #set($cancelUrl = $doc.getURL())
+  #end
+  <a class="btn btn-default" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('core.restore.confirm.no')</a>
+#end

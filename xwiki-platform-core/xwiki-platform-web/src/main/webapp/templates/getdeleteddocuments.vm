@@ -1,0 +1,134 @@
+###
+### Template used by a livetable macro to list deleted documents from the recycle bin.
+###
+$response.setContentType("application/json")
+##
+## FROM
+##
+#set ($fromQueryPart = 'FROM XWikiDeletedDocument as ddoc')
+##
+## WHERE
+##
+#set ($whereQueryPart = 'WHERE 1=1')
+#set ($queryParams = [])
+## Exclude some documents
+#set ($excludes = $request.getParameterValues('exclude'))
+#if ("$!excludes" != '')
+  #foreach ($exclude in $excludes)
+    #set ($whereQueryPart = "${whereQueryPart} AND ddoc.fullName <> ?")
+    #set ($discard = $queryParams.add($exclude))
+  #end
+#end
+#if ("$!request.get('doc.location')" != '')
+  ## Location is a special case, that we need to handle separatly.
+  ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
+  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.fullName) LIKE LOWER(?) ESCAPE '!'")
+  #set ($locationFilterValue = $request.get('location'))
+  ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as wildcards).
+  ## However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
+  ## As a consequence, we must escape these characters.
+  ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
+  ## Since we use '!' for the escaping, we also double existing ones.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
+  ## Because the user might filter with "/" as separator we replace that by "%", because it could be "." 
+  ## (the space separator) or "/" (as it is in the document name).
+  ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
+  ## to filter on different levels:
+  ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
+  ##        On the other hand, it will also returns: "BlogForIntrospection", which might be unexpected.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%'))
+  #set ($discard = $queryParams.add("%${locationFilterValue}%"))
+#end
+#set ($batchId = $request.get('doc.batchId'))
+#if ("$!batchId" != '')
+  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.batchId) LIKE LOWER(?)")
+  #set ($discard = $queryParams.add("%${batchId.trim()}%"))
+#end
+##
+## ORDER
+##
+#set ($order = "$!request.sort")
+#set ($orderQueryPart = '')
+#if ($order != '')
+  #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")
+  #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
+    #set($orderDirection = 'desc')
+  #end
+  ## Sorting by ddoc.location is not supported by the DB, since the location field does not exist.
+  #if ($order == 'doc.location')
+    ## So we filter on the document full name instead, which is the expected behavior.
+    #set ($order = 'ddoc.fullName')
+  #end
+  ## Weird things happen if we use "ORDER BY" (upper case), at least on HSQLDB. Other DBs may behave differently
+  #set ($orderQueryPart = "order by ${order} ${orderDirection}")
+#end
+##
+## OFFSET and LIMIT
+##
+#set ($offset = $mathtool.toInteger($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set ($offset = $offset - 1)
+#if (!$offset || $offset < 0)
+  #set($offset = 0)
+#end
+#set ($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
+##
+## Build the query
+##
+#set ($queryString = "SELECT ddoc.id ${fromQueryPart} $!{whereQueryPart} $!{orderQueryPart}")
+#set ($query = $services.query.hql($queryString))
+#set ($query = $query.setLimit($limit).setOffset($offset).bindValues($queryParams))
+#if ("$!request.wiki" != '')
+  #set ($query = $query.setWiki($request.wiki))
+#end
+#set ($countQueryString = "SELECT COUNT(ddoc.id) ${fromQueryPart} $!{whereQueryPart}")
+#set ($countQuery = $services.query.hql($countQueryString).bindValues($queryParams).setWiki($query.wiki))
+##
+## Execute the query and build the results
+##
+#set ($items = $query.execute())
+#set ($map = {})
+#set ($discard = $map.put('totalrows', $countQuery.execute()[0]))
+#set ($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+#set ($discard = $map.put('offset', $mathtool.add($offset, 1)))
+#if("$!request.sql" != '')
+  ## Add debug infos
+  #set($discard = $map.put('sql', $queryString))
+  #set($discard = $map.put('params', $queryParams))
+#end
+#template('hierarchy_macros.vm')
+#set ($rows = [])
+#foreach ($item in $items)
+  #set ($deletedDocument = $xwiki.getDeletedDocument("", "", $item))
+  #set ($originalDocument = $deletedDocument.getDocument())
+  #set ($viewable = $services.security.authorization.hasAccess('view', $originalDocument.documentReference))
+  #set ($row = {'doc_viewable' : $viewable})
+  #set ($discard = $row.put('fullName', "$originalDocument.prefixedFullName"))
+  #if ($viewable)
+    #set ($discard = $row.put('doc_url', $originalDocument.getURL('view', "viewer=recyclebin&id=${item}")))
+    #set ($title = $originalDocument.plainTitle)
+    #if ("$!{deletedDocument.locale}" != '')
+      #set ($title = "${title} (${deletedDocument.locale})")
+    #end
+    #set ($discard = $row.put('doc_title', $title))
+    #set ($location = "#hierarchy($originalDocument.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
+    #set ($discard = $row.put('doc_location', $location))
+    #set ($discard = $row.put('doc_date', $xwiki.formatDate($deletedDocument.date)))
+    #set ($discard = $row.put('doc_deleter', $xwiki.getUserName($deletedDocument.deleter, false)))
+    #set ($discard = $row.put('doc_deleter_url', $xwiki.getURL($deletedDocument.deleter)))
+    #set ($discard = $row.put('doc_locale', $deletedDocument.locale))
+    #set ($discard = $row.put('doc_hasdelete', $deletedDocument.canDelete()))
+    #set ($discard = $row.put('doc_delete_url', $originalDocument.getURL('delete', "id=${item}&form_token=$!{services.csrf.getToken()}")))
+    #set ($discard = $row.put('doc_hasrestore', $deletedDocument.canUndelete()))
+    #set ($discard = $row.put('doc_restore_url', $originalDocument.getURL('undelete', "id=${item}&form_token=$!{services.csrf.getToken()}")))
+  #end
+  #set ($discard = $rows.add($row))
+#end
+#set ($discard = $map.put('rows', $rows))
+##
+## Serialize the JSON
+##
+$jsontool.serialize($map)

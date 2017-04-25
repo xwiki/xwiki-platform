@@ -68,6 +68,10 @@ $response.setContentType('application/json')
 #if("$!{deleterFilter}" != '')
   #set($sql = $sql + "and lower(ddoc.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
 #end
+#set($batchIdFilter = $request.get('ddoc.batchId'))
+#if ("$!batchIdFilter" != '')
+  #set($sql = "${sql} and lower(ddoc.batchId) like '%${batchIdFilter.trim().toLowerCase()}%' ")
+#end
 #if("$!{request.sort}" != '')
   #set($order = $request.sort)
 #else
@@ -120,7 +124,9 @@ $response.setContentType('application/json')
      "deleter" : "$escapetool.javascript($ddoc.deleter)",
      "deletername" : "$escapetool.javascript($xwiki.getUserName($ddoc.deleter, false))",
      "deleterurl" : "$escapetool.javascript($xwiki.getURL($ddoc.deleter, 'view'))",
-     "language" : "$ddoc.locale"
+     "language" : "$ddoc.locale",
+     "batchId" : "$ddoc.batchId",
+     "batchId_url" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;showBatch=true"))"
    }
 #end
 ]}

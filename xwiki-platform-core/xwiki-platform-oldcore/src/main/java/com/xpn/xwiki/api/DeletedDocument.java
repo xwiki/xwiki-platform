@@ -114,6 +114,15 @@ public class DeletedDocument extends Api
     }
 
     /**
+     * @return the id of the operation that deleted multiple documents at the same time, including this one
+     * @since 9.4RC1
+     */
+    public String getBatchId()
+    {
+        return this.deletedDoc.getBatchId();
+    }
+
+    /**
      * Check if the current user has the right to restore the document.
      *
      * @return {@code true} if the current user can restore this document, {@code false} otherwise

@@ -51,6 +51,21 @@ public interface XWikiRecycleBinStoreInterface
         throws XWikiException;
 
     /**
+     * Save document to recycle bin.
+     *
+     * @param doc - document to save
+     * @param deleter - the user which delete document
+     * @param date - date of delete action
+     * @param batchId - id of the operation that deleted multiple documents at the same time, useful when trying to
+     *            revert the operation. {@code null} or empty values are ignored
+     * @param bTransaction - should use old transaction(false) or create new (true)
+     * @param context - used while saving
+     * @throws XWikiException if error in saving
+     */
+    void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId, XWikiContext context,
+        boolean bTransaction) throws XWikiException;
+
+    /**
      * @return restored document from recycle bin
      * @param doc - document to restore
      * @param index - what deleted document to restore. see {@link XWikiDeletedDocument#getId()}
@@ -73,7 +88,7 @@ public interface XWikiRecycleBinStoreInterface
         throws XWikiException;
 
     /**
-     * @return infos about all delete actions of specific document. sorted by date.
+     * @return info about all delete actions of specific document. sorted by date.
      * @param doc - the deleted document
      * @param context - used to load
      * @param bTransaction - should use old transaction(false) or create new (true)
@@ -83,13 +98,24 @@ public interface XWikiRecycleBinStoreInterface
         throws XWikiException;
 
     /**
+     * @return info about all documents that were deleted in the same batch, as part of the same operation
+     * @param batchId - id of the operation that deleted multiple documents at the same time; useful when trying to
+     *            revert the operation
+     * @param context - used to load
+     * @param bTransaction - should use old transaction(false) or create new (true)
+     * @throws XWikiException - if error in loading
+     */
+    XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
+
+    /**
      * Permanently delete document from recycle bin.
      *
      * @param doc - document to delete
      * @param index - which instance document in recycle bin to delete
      * @param context - used for environment
      * @param bTransaction - should use old transaction(false) or create new (true)
-     * @throws XWikiException if eny error
+     * @throws XWikiException if any error
      */
     void deleteFromRecycleBin(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
         throws XWikiException;

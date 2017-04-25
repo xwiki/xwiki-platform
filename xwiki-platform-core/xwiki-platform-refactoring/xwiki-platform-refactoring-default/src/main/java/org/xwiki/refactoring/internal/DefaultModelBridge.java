@@ -395,4 +395,30 @@ public class DefaultModelBridge implements ModelBridge
         //         The parent should be A.WebHome
         return new DocumentReference(spaceHomePage, documentReference.getLastSpaceReference());
     }
+
+    @Override
+    public void setContextProperty(String name, Object value)
+    {
+        try {
+            XWikiContext context = xcontextProvider.get();
+            context.put(name, value);
+        } catch (Exception e) {
+            this.logger.error("Failed to set context property [{}] with value [{}].", name, value, e);
+        }
+    }
+
+    @Override
+    public Object getContextProperty(String name)
+    {
+        Object value = null;
+
+        try {
+            XWikiContext context = xcontextProvider.get();
+            value = context.get(name);
+        } catch (Exception e) {
+            this.logger.error("Failed to get context property [{}]", name, e);
+        }
+
+        return value;
+    }
 }

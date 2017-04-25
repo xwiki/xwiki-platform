@@ -116,9 +116,23 @@ public interface ModelBridge
 
     /**
      * Modify the specified document based on the given parameters (usually the fields to update).
-     * 
+     *
      * @param documentReference specifies the document to update
      * @param parameters specifies the updates to perform (e.g. which fields to update)
      */
     void update(DocumentReference documentReference, Map<String, String> parameters);
+
+    /**
+     * @param name the name of the execution context property to set
+     * @param value the value of the execution context property to set
+     * @since 9.4RC1
+     */
+    void setContextProperty(String name, Object value);
+
+    /**
+     * @param name the name of the property
+     * @return the execution context property value
+     * @since 9.4RC1
+     */
+    Object getContextProperty(String name);
 }

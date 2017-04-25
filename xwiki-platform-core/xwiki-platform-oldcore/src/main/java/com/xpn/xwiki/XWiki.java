@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -1913,6 +1914,19 @@ public class XWiki implements EventListener
             XWikiDocument doc = new XWikiDocument(getCurrentMixedDocumentReferenceResolver().resolve(fullname));
             doc.setLanguage(locale);
             return getRecycleBinStore().getAllDeletedDocuments(doc, context, true);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String)
+     * @since 9.4RC1
+     */
+    public XWikiDeletedDocument[] getDeletedDocuments(String batchId, XWikiContext context) throws XWikiException
+    {
+        if (hasRecycleBin(context)) {
+            return getRecycleBinStore().getAllDeletedDocuments(batchId, context, true);
         } else {
             return null;
         }
@@ -3995,7 +4009,12 @@ public class XWiki implements EventListener
             }
 
             if (hasRecycleBin(context) && totrash) {
-                getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
+                // Extract (safely) any existing batchId from the context.
+                Object batchIdValue = context.get("BATCH_ID");
+                String batchId = Objects.toString(batchIdValue, null);
+
+                // Save to recycle bin together with any determined batch ID.
+                getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), batchId, context, true);
             }
 
             getStore().deleteXWikiDoc(doc, context);

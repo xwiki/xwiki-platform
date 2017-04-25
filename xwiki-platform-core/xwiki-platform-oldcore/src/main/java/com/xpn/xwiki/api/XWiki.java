@@ -360,14 +360,36 @@ public class XWiki extends Api
      */
     public List<DeletedDocument> getDeletedDocuments(String fullname, String locale) throws XWikiException
     {
-        XWikiDeletedDocument[] dds = this.xwiki.getDeletedDocuments(fullname, locale, this.context);
-        if (dds == null || dds.length == 0) {
+        XWikiDeletedDocument[] deletedDocuments = this.xwiki.getDeletedDocuments(fullname, locale, this.context);
+        List<DeletedDocument> result = wrapDeletedDocuments(deletedDocuments);
+        return result;
+    }
+
+    /**
+     * @param batchId id of the operation that deleted multiple documents at the same time; useful when trying to revert
+     *            the operation
+     * @return a list of all document versions that were deleted in the same batch, as part of the same operation
+     * @throws XWikiException if any error
+     * @since 9.4RC1
+     */
+    public List<DeletedDocument> getDeletedDocuments(String batchId) throws XWikiException
+    {
+        XWikiDeletedDocument[] deletedDocuments = this.xwiki.getDeletedDocuments(batchId, this.context);
+        List<DeletedDocument> result = wrapDeletedDocuments(deletedDocuments);
+        return result;
+    }
+
+    private List<DeletedDocument> wrapDeletedDocuments(XWikiDeletedDocument[] deletedDocuments)
+    {
+        if (deletedDocuments == null || deletedDocuments.length == 0) {
             return Collections.emptyList();
         }
-        List<DeletedDocument> result = new ArrayList<DeletedDocument>(dds.length);
-        for (XWikiDeletedDocument dd : dds) {
-            result.add(new DeletedDocument(dd, this.context));
+
+        List<DeletedDocument> result = new ArrayList<>(deletedDocuments.length);
+        for (XWikiDeletedDocument deletedDocument : deletedDocuments) {
+            result.add(new DeletedDocument(deletedDocument, this.context));
         }
+
         return result;
     }
 

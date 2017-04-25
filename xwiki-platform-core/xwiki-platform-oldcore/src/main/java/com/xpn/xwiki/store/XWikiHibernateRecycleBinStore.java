@@ -39,6 +39,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -80,7 +81,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
         {
             Criteria c = session.createCriteria(XWikiDeletedDocument.class);
-            c.add(Restrictions.eq("fullName", this.document.getFullName()));
+            c.add(Restrictions.eq(FULL_NAME_FIELD, this.document.getFullName()));
 
             // Note: We need to support databases who treats empty strings as NULL like Oracle. For those checking
             // for equality when the string is empty is not going to work and thus we need to handle the special
@@ -102,6 +103,40 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     /**
+     * {@link HibernateCallback} used to retrieve from the recycle bin store the deleted document versions from a given
+     * batch.
+     */
+    private static class DeletedDocumentsBatchHibernateCallback implements HibernateCallback<XWikiDeletedDocument[]>
+    {
+        private String batchId;
+
+        /**
+         * Creates a new call-back for the given batch.
+         *
+         * @param batchId the ID of the batch of deleted documents you want to retrieve from the recycle bin store
+         */
+        DeletedDocumentsBatchHibernateCallback(String batchId)
+        {
+            this.batchId = batchId;
+        }
+
+        @Override
+        public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
+        {
+            Criteria c = session.createCriteria(XWikiDeletedDocument.class);
+            c.add(Restrictions.eq("batchId", batchId));
+
+            c.addOrder(Order.asc(FULL_NAME_FIELD));
+            @SuppressWarnings("unchecked")
+            List<XWikiDeletedDocument> deletedVersions = c.list();
+            XWikiDeletedDocument[] result = new XWikiDeletedDocument[deletedVersions.size()];
+            return deletedVersions.toArray(result);
+        }
+    }
+
+    private static final String FULL_NAME_FIELD = "fullName";
+
+    /**
      * Name of the language property in the Hibernate mapping.
      */
     private static final String LANGUAGE_PROPERTY_NAME = "language";
@@ -115,6 +150,9 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private DocumentReferenceResolver<String> defaultResolver;
 
     /**
      * @param context used for environment
@@ -174,17 +212,21 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     private XWikiDeletedDocument createXWikiDeletedDocument(XWikiDocument doc, String deleter, Date date,
-        XWikiRecycleBinContentStoreInterface contentStore) throws XWikiException
+        XWikiRecycleBinContentStoreInterface contentStore, String batchId) throws XWikiException
     {
         XWikiDeletedDocument trashdoc;
 
+        String storeType = null;
+        XWikiDeletedDocumentContent deletedDocumentContent = null;
+
         if (contentStore != null) {
-            trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), contentStore.getHint(), deleter,
-                date, null);
+            storeType = contentStore.getHint();
         } else {
-            trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), null, deleter, date,
-                new XWikiHibernateDeletedDocumentContent(doc));
+            deletedDocumentContent = new XWikiHibernateDeletedDocumentContent(doc);
         }
+
+        trashdoc = new XWikiDeletedDocument(doc.getFullName(), doc.getLocale(), storeType, deleter, date,
+            deletedDocumentContent, batchId);
 
         return trashdoc;
     }
@@ -204,6 +246,13 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
+        saveToRecycleBin(doc, deleter, date, null, inputxcontext, bTransaction);
+    }
+
+    @Override
+    public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId,
+        XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
+    {
         XWikiContext context = getXWikiContext(inputxcontext);
 
         executeWrite(context, new HibernateCallback<Void>()
@@ -213,9 +262,9 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             {
                 XWikiRecycleBinContentStoreInterface contentStore = getDefaultXWikiRecycleBinContentStore();
 
-                XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore);
+                XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
 
-                // Hibernate store
+                // Hibernate store.
                 long index = ((Number) session.save(trashdoc)).longValue();
 
                 // External store
@@ -273,6 +322,27 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         for (int i = 0; i < deletedDocuments.length; ++i) {
             deletedDocuments[i] =
                 resolveDeletedDocumentContent(deletedDocuments[i], doc.getDocumentReferenceWithLocale(), bTransaction);
+        }
+
+        return deletedDocuments;
+    }
+
+    @Override
+    public XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        XWikiDeletedDocument[] deletedDocuments =
+            executeRead(context, new DeletedDocumentsBatchHibernateCallback(batchId));
+
+        // Resolve deleted document content if needed
+        for (int i = 0; i < deletedDocuments.length; ++i) {
+            XWikiDeletedDocument deletedDocument = deletedDocuments[i];
+            DocumentReference simpleDocumentReference = this.defaultResolver.resolve(deletedDocument.getFullName());
+            DocumentReference documentReferenceWithLocale =
+                new DocumentReference(simpleDocumentReference, deletedDocument.getLocale());
+
+            deletedDocuments[i] =
+                resolveDeletedDocumentContent(deletedDocument, documentReferenceWithLocale, bTransaction);
         }
 
         return deletedDocuments;

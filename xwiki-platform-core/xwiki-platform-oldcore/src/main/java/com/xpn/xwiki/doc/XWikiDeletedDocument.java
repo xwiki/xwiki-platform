@@ -70,6 +70,8 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     private XWikiDeletedDocumentContent xml;
 
+    private String batchId;
+
     /**
      * Default constructor. Used only in hibernate.
      */
@@ -125,6 +127,25 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
         this(fullName, locale, storeType, deleter, deleteDate);
 
         this.xml = content;
+    }
+
+    /**
+     * @param fullName the local reference of the document
+     * @param locale the locale of the document
+     * @param storeType the way to store the document
+     * @param deleter the user who delete document
+     * @param deleteDate date of delete action
+     * @param content the stored deleted document
+     * @param batchId the id of the batch deletion
+     * @throws XWikiException if any error
+     * @since 9.4RC1
+     */
+    public XWikiDeletedDocument(String fullName, Locale locale, String storeType, String deleter, Date deleteDate,
+        XWikiDeletedDocumentContent content, String batchId) throws XWikiException
+    {
+        this(fullName, locale, storeType, deleter, deleteDate, content);
+
+        this.batchId = batchId;
     }
 
     /**
@@ -312,5 +333,23 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     public XWikiDocument restoreDocument(XWikiContext context) throws XWikiException
     {
         return restoreDocument(null, context);
+    }
+
+    /**
+     * @param batchId batch operation ID to set
+     * @since 9.4RC1
+     */
+    protected void setBatchId(String batchId)
+    {
+        this.batchId = batchId;
+    }
+
+    /**
+     * @return the id of the operation that deleted multiple documents at the same time, including this one
+     * @since 9.4RC1
+     */
+    public String getBatchId()
+    {
+        return batchId;
     }
 }

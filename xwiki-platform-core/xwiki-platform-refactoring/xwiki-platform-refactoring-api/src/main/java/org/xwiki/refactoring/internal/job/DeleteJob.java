@@ -19,6 +19,9 @@
  */
 package org.xwiki.refactoring.internal.job;
 
+import java.util.Collection;
+import java.util.UUID;
+
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
@@ -41,10 +44,26 @@ import org.xwiki.security.authorization.Right;
 @Named(RefactoringJobs.DELETE)
 public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
 {
+    /** Context property used to save the batchId in the recycle bin. */
+    private static final String BATCH_ID_PROPERTY = "BATCH_ID";
+
     @Override
     public String getType()
     {
         return RefactoringJobs.DELETE;
+    }
+
+    @Override
+    protected void process(Collection<EntityReference> entityReferences)
+    {
+        // Generate the batch ID and set it in the context.
+        String deleteBatchId = UUID.randomUUID().toString();
+        modelBridge.setContextProperty(BATCH_ID_PROPERTY, deleteBatchId);
+
+        super.process(entityReferences);
+
+        // Clean the context when done.
+        modelBridge.setContextProperty(BATCH_ID_PROPERTY, null);
     }
 
     @Override

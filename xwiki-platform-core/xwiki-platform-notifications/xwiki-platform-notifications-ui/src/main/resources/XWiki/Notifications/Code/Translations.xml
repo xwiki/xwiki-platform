@@ -43,7 +43,7 @@
   <content>
 platform.core.profile.category.notifications=Notifications
 notifications.eventTypes.create=A page is created
-notifications.eventTypes.update=A page is updtaed
+notifications.eventTypes.update=A page is updated
 notifications.eventTypes.delete=A page is deleted
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings
@@ -52,6 +52,7 @@ notifications.menu.clearing=Clearing the notifications
 notifications.menu.cleared=Notifications have been cleared
 notifications.menu.nothing=No notification available!
 notifications.menu.more=Load older notifications
+notifications.menu.details=Details
 notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
 notifications.settings.saving=Your settings are being saved...

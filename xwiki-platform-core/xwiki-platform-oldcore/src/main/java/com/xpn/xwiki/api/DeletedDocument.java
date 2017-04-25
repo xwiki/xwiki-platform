@@ -39,6 +39,8 @@ import com.xpn.xwiki.util.Programming;
  */
 public class DeletedDocument extends Api
 {
+    private static final String ADMIN_RIGHT = "admin";
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DeletedDocument.class);
 
@@ -119,11 +121,10 @@ public class DeletedDocument extends Api
     public boolean canUndelete()
     {
         try {
-            return hasAdminRights() || hasAccessLevel("undelete", getFullName());
+            return hasAccessLevel(ADMIN_RIGHT, getFullName()) || hasAccessLevel("undelete", getFullName());
         } catch (XWikiException ex) {
             // Public APIs should not throw exceptions
-            LOGGER.warn(String.format("Exception while checking if entry [%s] can be restored from the recycle bin",
-                getId()), ex);
+            LOGGER.warn("Exception while checking if entry [{}] can be restored from the recycle bin", getId(), ex);
             return false;
         }
     }
@@ -140,12 +141,12 @@ public class DeletedDocument extends Api
         try {
             XWikiDocument doc = new XWikiDocument();
             doc.setFullName(getFullName(), this.context);
-            if (!hasAdminRights()
+            if (!hasAccessLevel(ADMIN_RIGHT, getFullName())
                 && !getXWikiContext().getWiki().getRightService().checkAccess("delete", doc, this.context)) {
                 return false;
             }
             String waitdays;
-            if (hasAdminRights()) {
+            if (hasAccessLevel(ADMIN_RIGHT, getFullName())) {
                 waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.adminWaitDays", "0");
             } else {
                 waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.waitDays", "7");
@@ -157,8 +158,7 @@ public class DeletedDocument extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOGGER.warn(String.format("Exception while checking if entry [%s] can be removed from the recycle bin",
-                getId()), ex);
+            LOGGER.warn("Exception while checking if entry [{}] can be removed from the recycle bin", getId(), ex);
             return false;
         }
     }
@@ -177,15 +177,15 @@ public class DeletedDocument extends Api
     }
 
     /**
-     * @return the document as it is in the recycle bin if the user has admin rights, {@code null} otherwise
+     * @return the document as it is in the recycle bin if the user is allowed to restore it, {@code null} otherwise
      */
     public Document getDocument()
     {
-        if (hasAdminRights()) {
+        if (canUndelete()) {
             try {
                 return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to parse deleted document: " + e.getMessage());
+                LOGGER.warn("Failed to parse deleted document [{}]", getFullName(), e);
             }
         }
 

@@ -27,17 +27,15 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.hibernate.Session;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import org.slf4j.Logger;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.activitystream.impl.ActivityEventImpl;
-import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamConfiguration;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -57,13 +55,7 @@ public class RecordableEventMigrator extends AbstractHibernateDataMigration
 {
     @Inject
     private QueryManager queryManager;
-
-    @Inject
-    private ActivityStreamConfiguration configuration;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
+    
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -80,15 +72,6 @@ public class RecordableEventMigrator extends AbstractHibernateDataMigration
     public XWikiDBVersion getVersion()
     {
         return new XWikiDBVersion(93000);
-    }
-
-    @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
-    {
-        // Should execute only on the main wiki
-        return (configuration.useMainStore()
-                && wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId()))
-                || configuration.useLocalStore();
     }
 
     @Override

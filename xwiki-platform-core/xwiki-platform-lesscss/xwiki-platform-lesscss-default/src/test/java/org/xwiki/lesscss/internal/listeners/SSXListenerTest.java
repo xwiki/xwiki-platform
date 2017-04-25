@@ -35,7 +35,6 @@ import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
 import org.xwiki.lesscss.internal.resources.LESSObjectPropertyResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -46,7 +45,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
-import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 
 import static org.junit.Assert.assertEquals;

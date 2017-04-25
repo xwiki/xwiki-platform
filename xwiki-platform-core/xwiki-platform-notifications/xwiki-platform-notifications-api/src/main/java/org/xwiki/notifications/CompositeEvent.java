@@ -151,7 +151,7 @@ public class CompositeEvent
         for (Event event : events) {
             dates.add(event.getDate());
         }
-        Collections.sort(dates);
+        Collections.sort(dates, Collections.reverseOrder());
         return dates;
     }
 

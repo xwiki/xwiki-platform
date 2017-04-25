@@ -46,6 +46,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 
 import static org.junit.Assert.assertEquals;
@@ -128,16 +129,16 @@ public class SSXListenerTest
 
         // Mock to serialize the object
         EntityReferenceSerializer entityReferenceSerializer = mock(EntityReferenceSerializer.class);
-        when(contextComponentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "default"))
+        when(contextComponentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki"))
             .thenReturn(entityReferenceSerializer);
-        when(entityReferenceSerializer.serialize(any(EntityReference.class))).thenReturn("objName");
+        when(entityReferenceSerializer.serialize(any(EntityReference.class), any(EntityReference.class)))
+            .thenReturn("objName");
 
         // Mock to resolve the object
         DocumentReferenceResolver documentReferenceResolver = mock(DocumentReferenceResolver.class);
         when(contextComponentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "default"))
             .thenReturn(documentReferenceResolver);
-        when(documentReferenceResolver.resolve(any())).thenReturn(new DocumentReference("a", "b", "c"));
-
+        when(documentReferenceResolver.resolve(any(), any())).thenReturn(new DocumentReference("a", "b", "c"));
         
         ObjectPropertyReference objPropertyReference = 
                 new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference));

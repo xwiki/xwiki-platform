@@ -60,6 +60,8 @@ notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
 notifications.events.by=By {0}.
 notifications.events.lastChange=Last change: {0}.
+notifications.events.lastComment=Last comment: {0}.
+notifications.events.addComment.description=The document {0} has been commented by {1}.
 </content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>

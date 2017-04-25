@@ -1,0 +1,44 @@
+#template('notification/macros.vm')
+###
+### Only display "addComment" events
+###
+#set ($commentEvents = [])
+#foreach ($ev in $event.events)
+  #if ($ev.type == 'addComment')
+    #set ($discard = $commentEvents.add($ev))
+  #end
+#end
+###
+### Custom display
+###
+#define ($content)
+  #set ($document = $xwiki.getDocument($event.document))
+  <p><strong>$escapetool.xml($services.localization.render('core.events.appName'))</strong></p>
+  <p>$services.localization.render('notifications.events.addComment.description', ["<a href='$!escapetool.xml($document.getURL())'>$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a>", "#displayNotificationEventUsers($event.users)"])
+  </p>
+  #set ($dates = $event.dates)
+  #if ($dates.size() > 1)
+    <p><small>$services.localization.render('notifications.events.lastComment', [$xwiki.formatDate($dates.get(0))])</small></p>
+  #else
+    <p><small>$escapetool.xml($xwiki.formatDate($event.dates.get(0)))</small></p>
+  #end
+#end
+###
+### The event type in the first row is custom
+###
+#define($rows)
+  #foreach($commentEvent in $commentEvents)
+    <tr>
+      <td>$services.icon.renderHTML('comments') $escapetool.xml($services.localization.render('core.comment.addComment'))</td>
+      <td>#displayNotificationEventUser($commentEvent.user)</td>
+      <td class="text-right">$escapetool.xml($xwiki.formatDate($commentEvent.date))</td>
+    </tr>
+  #end
+#end
+#define($details)
+  #displayNotificationEventDetailsSkeletons($commentEvents.size(), $rows)
+#end
+###
+### Finaly display the notification
+###
+#displayNotificationEventSkeleton('comments', $content, $details)

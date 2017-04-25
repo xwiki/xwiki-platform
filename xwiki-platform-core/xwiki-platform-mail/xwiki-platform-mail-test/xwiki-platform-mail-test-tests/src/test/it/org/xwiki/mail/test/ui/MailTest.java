@@ -78,6 +78,13 @@ public class MailTest extends AbstractTest
     @Test
     public void testMail() throws Exception
     {
+        // Step 0: Delete all pre-existing mails to start clean. This also verifies the deleteAll() script service
+        //         API.
+        String content = "{{velocity}}$services.mailstorage.deleteAll(){{/velocity}}";
+        ViewPage deleteAllPage = getUtil().createPage(getTestClassName(), "DeleteAll", content, "");
+        // Verify that the page doesn't display any content (unless there's an error!)
+        assertEquals("", deleteAllPage.getContent());
+
         // Step 1: Verify that there are 2 email sections in the Mail category
 
         AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
@@ -174,9 +181,7 @@ public class MailTest extends AbstractTest
         // but the last mail's status in the database may not have been updated yet. Note that The first 2 are
         // guaranteed to have been updated since we send mail in one thread one after another and we update the
         // database after sending each mail.
-        // Note: Since this tests was flickering at this point, we've increased the default timeout to a very high
-        // value to verify that the timeout is not the issue.
-        liveTableElement.waitUntilRowCountGreaterThan(3, getDriver().getTimeout() * 20);
+        liveTableElement.waitUntilRowCountGreaterThan(3);
 
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         assertTrue(liveTableElement.getRowCount() > 0);

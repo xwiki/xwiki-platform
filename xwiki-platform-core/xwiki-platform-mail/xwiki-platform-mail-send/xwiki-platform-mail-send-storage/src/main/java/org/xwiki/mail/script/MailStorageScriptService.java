@@ -240,14 +240,31 @@ public class MailStorageScriptService extends AbstractMailScriptService
      */
     public void delete(String batchId)
     {
-        // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
-        // to be able to call this method and for it to have any effect.
+        // Note: We don't need to check permissions since the call to load() will do that anyway.
 
         Map<String, Object> filterMap = Collections.<String, Object>singletonMap("batchId", batchId);
         List<MailStatus> statuses = load(filterMap, 0, 0, null, false);
         if (statuses != null) {
             for (MailStatus status : statuses) {
                 delete(batchId, status.getMessageId());
+            }
+        }
+    }
+
+    /**
+     * Delete all messages having a status in the database and their serialized messages on the file system.
+     *
+     * @since 9.4RC1
+     */
+    @Unstable
+    public void deleteAll()
+    {
+        // Note: We don't need to check permissions since the call to load() will do that anyway.
+
+        List<MailStatus> statuses = load(Collections.emptyMap(), 0, 0, null, false);
+        if (statuses != null) {
+            for (MailStatus status : statuses) {
+                delete(status.getBatchId(), status.getMessageId());
             }
         }
     }

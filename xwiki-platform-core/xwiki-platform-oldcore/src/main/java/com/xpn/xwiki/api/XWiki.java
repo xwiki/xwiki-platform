@@ -567,8 +567,8 @@ public class XWiki extends Api
     /**
      * Load a specific revision of a document
      *
-     * @param doc Document for which to load a specific revision
-     * @param rev Revision number
+     * @param reference Document for which to load a specific revision
+     * @param revision Revision number
      * @return Specific revision of a document
      * @throws XWikiException
      * @since 9.3RC1

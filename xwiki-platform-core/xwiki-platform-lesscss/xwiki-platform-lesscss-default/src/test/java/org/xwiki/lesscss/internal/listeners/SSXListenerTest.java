@@ -134,12 +134,6 @@ public class SSXListenerTest
         when(entityReferenceSerializer.serialize(any(EntityReference.class), any(EntityReference.class)))
             .thenReturn("objName");
 
-        // Mock to resolve the object
-        DocumentReferenceResolver documentReferenceResolver = mock(DocumentReferenceResolver.class);
-        when(contextComponentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "default"))
-            .thenReturn(documentReferenceResolver);
-        when(documentReferenceResolver.resolve(any(), any())).thenReturn(new DocumentReference("a", "b", "c"));
-        
         ObjectPropertyReference objPropertyReference = 
                 new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference));
         LESSObjectPropertyResourceReference lessObjectPropertyResourceReference = 

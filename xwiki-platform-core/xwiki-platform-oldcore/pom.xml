@@ -229,7 +229,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>batik-rasterizer</artifactId>
+      <artifactId>batik-svgrasterizer</artifactId>
     </dependency>
     <!-- fop gets us batik but not batik-codec and we need this one for SVGPlugin -->
     <dependency>

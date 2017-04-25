@@ -28,7 +28,7 @@ import com.xpn.xwiki.XWikiException;
  * Provide generic way of requesting a specific revision of a document from several sources (database, installed XAR
  * extension, etc.).
  * <p>
- * The revision syntax is <provider hint>:<revision> and the default is database.
+ * The revision syntax is {@code <provider hint>:<revision>} and the default is database.
  * 
  * @version $Id$
  * @since 9.3RC1
@@ -42,7 +42,6 @@ public interface DocumentRevisionProvider
      * @param reference the reference of the document
      * @param revision the revision of the document
      * @return the {@link XWikiDocument} instance or null if none existing
-     * @throws DocumentRevisionExcepion when failing to get a provider for the passed revision
      * @throws XWikiException when failing to load the document revision
      */
     XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException;
@@ -53,7 +52,6 @@ public interface DocumentRevisionProvider
      * @param document the current document
      * @param revision the revision of the document
      * @return the {@link XWikiDocument} instance or null if none existing
-     * @throws DocumentRevisionExcepion when failing to get a provider for the passed revision
      * @throws XWikiException when failing to load the document revision
      */
     XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException;

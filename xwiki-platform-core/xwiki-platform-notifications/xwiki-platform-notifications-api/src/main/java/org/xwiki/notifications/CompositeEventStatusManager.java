@@ -22,30 +22,25 @@ package org.xwiki.notifications;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
- * Display a notification.
+ * Compute composite event statuses.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 9.4RC1
  */
 @Role
-@Unstable
-public interface NotificationDisplayer
+public interface CompositeEventStatusManager
 {
     /**
-     * Render a notification.
+     * Get the list of statuses concerning the given composite events and the current user.
      *
-     * @param eventNotification the notification stored in the event stream
-     * @return the rendering of the notification in the page
-     * @throws NotificationException if error occurs
+     * @param compositeEvents a list of composite events
+     * @param entityId id of the user or the group
+     * @return the list of statuses corresponding to each pair or event/entity
+     *
+     * @throws Exception if an error occurs
      */
-    Block renderNotification(CompositeEvent eventNotification) throws NotificationException;
-
-    /**
-     * @return the list of the event types that this displayer support
-     */
-    List<String> getSupportedEvents();
+    List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents, String entityId)
+            throws Exception;
 }

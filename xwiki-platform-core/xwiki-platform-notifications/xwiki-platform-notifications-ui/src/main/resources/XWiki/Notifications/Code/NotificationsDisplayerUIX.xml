@@ -53,16 +53,24 @@
   #else
     #set ($events = $services.notification.getEvents(false, $batchSize))
   #end
-  #foreach ($eventStatus in $services.notification.getEventStatuses($events))
-    #set ($event = $eventStatus.event)
-    #set ($discard = $notifications.add({
-      'id'          : $event.id,
+  #foreach ($status in $services.notification.getCompositeEventStatuses($events))
+    #set ($event = $status.compositeEvent)
+    #set ($notification = {
+      'ids'         : $event.eventIds,
       'type'        : $event.type,
-      'date'        : $event.date,
-      'document'    : $services.model.serialize($event.document, 'default'),
-      'html'        : $services.rendering.render($services.notification.render($event), 'html/5.0'),
-      'read'        : $eventStatus.isRead()
-    }))
+      'read'        : $status.status,
+      'dates'       : $event.dates
+    })
+    #if ($event.document)
+      #set ($discard = $notification.put('document', $services.model.serialize($event.document, 'default')))
+    #end
+    #try("notificationException")
+      #set ($discard = $notification.put('html', $services.rendering.render($services.notification.render($event), 'html/5.0')))
+    #end
+    #if ("$!notificationException" != '')
+      #set ($discard = $notification.put('exception', $notificationException.toString()))
+    #end
+    #set ($discard = $notifications.add($notification))
   #end
   #set ($discard = $response.setContentType('application/json'))
   $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true, 21)})
@@ -70,12 +78,14 @@
              Mark a notification as read
 ********************************************************#
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'read' == $request.action)
-  #set ($eventId = "$!request.eventId")
+  #set ($eventIds = $request.eventIds.split(','))
   #set ($read = "$!request.read")
-  #if ($eventId.isEmpty() || $read.isEmpty())
+  #if ($eventIds.lenght == 0 || $read.isEmpty())
     #set ($discard = $response.setStatus(400))
   #else
-    #set ($discard = $services.notification.saveEventStatus($eventId, $read.equals('true')))
+    #foreach ($eventId in $eventIds)
+      #set ($discard = $services.notification.saveEventStatus($eventId, $read.equals('true')))
+    #end
   #end
 #********************************************************
            Change the start date of the user
@@ -230,6 +240,7 @@
    */
   var createCleanButton = function (startDate) {
     var markAllReadButton = $('&lt;a href="#"&gt;')
+      .addClass('notification-event-clean')
       .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
       .click(function (event) {
         // Avoid the menu closing
@@ -270,7 +281,9 @@
    */
   var displayEntry = function (entry) {
     // Add the id of the entry to the blacklist
-    blackList.push(entry.id);
+    for (var i = 0; i &lt; entry.ids.length; ++i) {
+      blackList.push(entry.ids[i].id);
+    }
     // Create the container
     var notif = $('&lt;div&gt;').addClass('notification-event');
     var readButton = $('&lt;button&gt;');
@@ -281,6 +294,11 @@
     }
     // Put the content
     notif.append(entry.html);
+    if (entry.exception) {
+      var exceptionBox = $('&lt;div&gt;').addClass('box errormessage');
+      exceptionBox.text(entry.exception);
+      notif.append(exceptionBox);
+    }
     // Store the data in the DOM element so that any javascript code can retrieve it
     notif.data('notif', entry);
     // Add the notification entry
@@ -297,7 +315,7 @@
         notif.removeClass('notification-event-unread');
         $.post(url, {
           action: 'read',
-          eventId: notif.data('notif').id,
+          eventIds: notif.data('notif').ids.join(','),
           read: true
         });
         $(this).remove();
@@ -306,6 +324,14 @@
         }
       });
     }
+    // Details
+    var details = notif.find('.notification-event-details');
+    details.hide();
+    var arrow = notif.find('.notification-event-arrow');
+    notif.find('.toggle-notification-event-details').click(function() {
+      details.toggle();
+      arrow.text(arrow.text() == '▸' ? '▾' : '▸');
+    });
   };
 
   /**
@@ -331,7 +357,7 @@
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; !untilDate) {
         area.html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-      } else if (!untilDate) {
+      } else if (untilDate == 0) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.
         // Note: we use the date of the more recent notification that we have displayed to avoid cleaning
@@ -350,7 +376,9 @@
         loadMore.click(function(event) {
           loadMore.text('').addClass('loading');
           // We use the date of the last displayed event as an offset to display those that come next
-          loadNotifications(data.notifications[data.notifications.length - 1].date);
+          var lastCompositeEvent = data.notifications[data.notifications.length - 1];
+          var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
+          loadNotifications(lastEventDate);
         });
       }
     });
@@ -539,6 +567,17 @@
 
 .notifications-header-uix {
   text-align: right;
+}
+
+.notification-event-details {
+  font-size: 0.9em;
+}
+
+.notification-event-details td {
+  text-overflow: ellipsis;
+  width: 33%;
+  max-width: 47px;
+  overflow: hidden;
 }
 </code>
     </property>

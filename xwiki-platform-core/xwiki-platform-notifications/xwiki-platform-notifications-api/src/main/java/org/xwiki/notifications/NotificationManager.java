@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.eventstream.Event;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -45,7 +44,7 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException;
+    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException;
 
     /**
      * Return events to display as notifications concerning the specified user.
@@ -58,8 +57,8 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    List<Event> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate, List<String> blackList)
-            throws NotificationException;
+    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
+            List<String> blackList) throws NotificationException;
 
     /**
      * Return the number of events to display as notifications concerning the specified user.

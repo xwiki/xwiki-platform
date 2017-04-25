@@ -35,6 +35,9 @@ import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.CompositeEventStatus;
+import org.xwiki.notifications.CompositeEventStatusManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationRenderer;
@@ -71,6 +74,9 @@ public class NotificationScriptService implements ScriptService
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
+    private CompositeEventStatusManager compositeEventStatusManager;
+
+    @Inject
     private ModelBridge modelBridge;
 
     /**
@@ -79,7 +85,7 @@ public class NotificationScriptService implements ScriptService
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
+    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
     {
         return notificationManager.getEvents(
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
@@ -96,7 +102,7 @@ public class NotificationScriptService implements ScriptService
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
+    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
             throws NotificationException
     {
         return notificationManager.getEvents(
@@ -116,7 +122,7 @@ public class NotificationScriptService implements ScriptService
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<Event> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
+    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
             throws NotificationException
     {
         return notificationManager.getEvents(
@@ -151,7 +157,7 @@ public class NotificationScriptService implements ScriptService
      * @return a rendering block ready to display the event
      * @throws NotificationException if an error happens
      */
-    public Block render(Event event) throws NotificationException
+    public Block render(CompositeEvent event) throws NotificationException
     {
         return notificationRenderer.render(event);
     }
@@ -168,6 +174,21 @@ public class NotificationScriptService implements ScriptService
     {
         return eventStatusManager.getEventStatus(events,
                 Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+    }
+
+    /**
+     * Get the list of statuses concerning the given composite events and the current user.
+     *
+     * @param compositeEvents a list of composite events
+     * @return the list of statuses corresponding to each pair or event/entity
+     *
+     * @throws Exception if an error occurs
+     * @since 9.4RC1
+     */
+    public List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents) throws Exception
+    {
+        return compositeEventStatusManager.getCompositeEventStatuses(compositeEvents,
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()));
     }
 
     /**

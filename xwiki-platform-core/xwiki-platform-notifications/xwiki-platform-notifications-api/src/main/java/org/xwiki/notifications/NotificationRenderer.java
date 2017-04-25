@@ -20,7 +20,6 @@
 package org.xwiki.notifications;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.eventstream.Event;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
@@ -40,5 +39,5 @@ public interface NotificationRenderer
      * @return a rendering block ready to display the event
      * @throws NotificationException if an error happens
      */
-    Block render(Event event) throws NotificationException;
+    Block render(CompositeEvent event) throws NotificationException;
 }

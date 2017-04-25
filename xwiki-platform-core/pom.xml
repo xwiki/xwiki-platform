@@ -194,6 +194,105 @@
                   }
                 },
                 "ignore" : [
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationDisplayer::renderNotification(===org.xwiki.eventstream.Event===) throws org.xwiki.notifications.NotificationException",
+                    "new": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationDisplayer::renderNotification(===org.xwiki.notifications.CompositeEvent===) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "org.xwiki.eventstream.Event",
+                    "newType": "org.xwiki.notifications.CompositeEvent",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationDisplayer",
+                    "methodName": "renderNotification",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "NotificationDisplayer must handle a composite event instead of a raw event"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
+                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationManager",
+                    "methodName": "getEvents",
+                    "elementKind": "method",
+                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
+                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationManager",
+                    "methodName": "getEvents",
+                    "elementKind": "method",
+                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationRenderer::render(===org.xwiki.eventstream.Event===) throws org.xwiki.notifications.NotificationException",
+                    "new": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationRenderer::render(===org.xwiki.notifications.CompositeEvent===) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "org.xwiki.eventstream.Event",
+                    "newType": "org.xwiki.notifications.CompositeEvent",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationRenderer",
+                    "methodName": "render",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "NotificationRenderer must handle a composite event instead of a raw event"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
+                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
+                    "package": "org.xwiki.notifications.script",
+                    "classSimpleName": "NotificationScriptService",
+                    "methodName": "getEvents",
+                    "elementKind": "method",
+                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.lang.String[]) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.lang.String[]) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
+                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
+                    "package": "org.xwiki.notifications.script",
+                    "classSimpleName": "NotificationScriptService",
+                    "methodName": "getEvents",
+                    "elementKind": "method",
+                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
+                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
+                    "package": "org.xwiki.notifications.script",
+                    "classSimpleName": "NotificationScriptService",
+                    "methodName": "getEvents",
+                    "elementKind": "method",
+                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.script.NotificationScriptService::render(===org.xwiki.eventstream.Event===) throws org.xwiki.notifications.NotificationException",
+                    "new": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.script.NotificationScriptService::render(===org.xwiki.notifications.CompositeEvent===) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "org.xwiki.eventstream.Event",
+                    "newType": "org.xwiki.notifications.CompositeEvent",
+                    "package": "org.xwiki.notifications.script",
+                    "classSimpleName": "NotificationScriptService",
+                    "methodName": "render",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                  }
                 ]
               }
             }

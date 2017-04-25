@@ -26,7 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
+import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
@@ -54,7 +54,7 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
     private VelocityManager velocityManager;
 
     @Override
-    public Block renderNotification(Event eventNotification) throws NotificationException
+    public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
     {
         try {
             velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, eventNotification);

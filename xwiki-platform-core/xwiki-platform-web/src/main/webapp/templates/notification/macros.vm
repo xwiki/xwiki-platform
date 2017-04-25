@@ -1,0 +1,93 @@
+#**
+ * Default displayer for a notification
+ *#
+#macro(displayNotificationEvent $icon $application $compositeEvent)
+  #define($content)
+    #set ($document = $xwiki.getDocument($compositeEvent.document))
+    <p><strong>$escapetool.xml($application)</strong></p>
+    <p><strong>[$!escapetool.xml($compositeEvent.type)]</strong> <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a></p>
+    <p>$services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($compositeEvent.users)"])</p>
+    #set ($dates = $compositeEvent.dates)
+    #if ($dates.size() > 1)
+      <p><small>$services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($compositeEvent.dates.get(0))])</small></p>
+    #else
+      <p><small>$escapetool.xml($xwiki.formatDate($compositeEvent.dates.get(0)))</small></p>
+    #end
+  #end
+  #define($details)
+    #if ($compositeEvent.events.size() > 1)
+      #displayNotificationEventDetails($compositeEvent.events, $icon)
+    #end
+  #end
+  #displayNotificationEventSkeleton($icon, $content, $details)
+#end
+#**
+ * Display a skeleton for a notification
+ * @param $icon the name of the icon to display
+ * @param $content the content of the notification
+ * @param $details (optional) the "details" part at the botton
+ *#
+#macro(displayNotificationEventSkeleton $icon $content $details)
+  <div class="clearfix">
+    <div class="col-xs-2 notification-icon">
+      $services.icon.renderHTML($icon)
+    </div>
+    <div class="col-xs-10 notification-content">
+      $content
+    </div>
+    #if ($details)
+      $details
+    #end
+  </div>
+#end
+#**
+ * Default displayer for the notification details
+ * @param $events the events that composte the details of the notification
+ * @param $icon the name of the icon to display for each row
+ *#
+#macro(displayNotificationEventDetails $events $icon)
+  #define($rows)
+    #foreach($event in $events)
+      <tr>
+        <td>$services.icon.renderHTML($icon) $escapetool.xml($event.type)</td>
+        <td>#displayNotificationEventUser($event.user)</td>
+        <td class="text-right">$escapetool.xml($xwiki.formatDate($event.date))</td>
+      </tr>
+    #end
+  #end
+  #displayNotificationEventDetailsSkeletons($events.size(), $rows)
+#end
+#**
+ * Display a skeleton for the notification details.
+ * @param $number the number of events in the details list
+ * @param $rows the details rows to display inside the table
+ *#
+#macro(displayNotificationEventDetailsSkeletons $number $rows)
+  <button class="btn btn-xs toggle-notification-event-details" type="submit">
+    <span class="notification-event-arrow">▸</span> <small>$escapetool.xml($services.localization.render('notifications.menu.details', [$number]))</small>
+  </button>
+  <table class="notification-event-details">
+    $rows
+  </table>
+#end
+#**
+ * Display a line with a user (its name and a small avatar)
+ * @param $user the reference of the user to display
+ *#
+#macro(displayNotificationEventUser $user)
+  #set ($userDoc = $xwiki.getDocument($user))
+  #getUserAvatarURL($userDoc.documentReference, $avatarURL, 30)
+  #set ($userName = $xwiki.getUserName($user))
+  <span class="notification-event-user"><img src="$avatarURL.url" alt="$escapetool.xml($userDoc.name)"/> <a href="$userDoc.getURL()">$userName</a></span>
+#end
+#**
+ * Display a line with the name of all users
+ * @param $users the users to display
+ *#
+#macro(displayNotificationEventUsers $users)##
+## The indent is bad to not introduce space charaters in the results
+#foreach ($user in $users)##
+#if ($velocityCount > 1 and $velocityCount == $users.size()) &amp; #elseif($velocityCount > 1), #end##
+$xwiki.getUserName($user)##
+#end##
+#end##

@@ -52,12 +52,14 @@ notifications.menu.clearing=Clearing the notifications
 notifications.menu.cleared=Notifications have been cleared
 notifications.menu.nothing=No notification available!
 notifications.menu.more=Load older notifications
-notifications.menu.details=Details
+notifications.menu.details=Details ({0})
 notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
 notifications.settings.saving=Your settings are being saved...
 notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
+notifications.events.by=By {0}.
+notifications.events.lastChange=Last change: {0}.
 </content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>

@@ -570,7 +570,7 @@
 }
 
 .notification-event-details {
-  font-size: 0.9em;
+  font-size: 0.8em;
 }
 
 .notification-event-details td {
@@ -578,6 +578,11 @@
   width: 33%;
   max-width: 47px;
   overflow: hidden;
+}
+
+.notification-event-user &gt; img {
+  max-height: 15px;
+  max-width: 15px;
 }
 </code>
     </property>

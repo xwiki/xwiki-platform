@@ -48,7 +48,6 @@ public interface JobsResource
      * @param jobRequest the request controlling job behavior
      * @return the newly created job status
      * @throws XWikiRestException when failing to start job
-     * @since 9.0RC1
      */
     @PUT
     JobStatus executeJob(@QueryParam("jobType") String jobType,

@@ -30,9 +30,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
+import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.AbstractJob;
+import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -80,6 +82,19 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
     }
 
     protected abstract List<DistributionStep> createSteps();
+
+    @Override
+    protected R castRequest(Request request)
+    {
+        DistributionRequest distributionRequest;
+        if (request instanceof DistributionRequest) {
+            distributionRequest = (DistributionRequest) request;
+        } else {
+            distributionRequest = new DistributionRequest(request);
+        }
+
+        return (R) distributionRequest;
+    }
 
     @Override
     protected DistributionJobStatus createNewStatus(R request)

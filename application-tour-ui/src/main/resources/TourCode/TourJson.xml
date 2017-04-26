@@ -119,11 +119,7 @@
           #if ($element == 'body')
             #set ($element = '')
           #end
-          #if ($element == '')
-            #set ($orphan = true)
-          #else
-            #set ($orphan = false)
-          #end
+          #set ($orphan = $stringtool.isBlank($element))
           #set ($step = { 'element'  : $element,
                           'title'    : $services.localization.render($tourDoc.getValue('title', $stepObj)),
                           'content'  : $content,

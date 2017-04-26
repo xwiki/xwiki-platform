@@ -28,7 +28,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**

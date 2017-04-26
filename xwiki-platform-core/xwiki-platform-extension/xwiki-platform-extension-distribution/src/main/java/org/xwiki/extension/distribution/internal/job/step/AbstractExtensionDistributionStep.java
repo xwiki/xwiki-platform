@@ -28,6 +28,7 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -65,11 +66,15 @@ public abstract class AbstractExtensionDistributionStep extends AbstractDistribu
         installRequest.addExtension(extensionId);
         installRequest.addNamespace(namespace);
 
-        // Indicate if it's allowed to do modification on root namespace
+        // Indicate it's allowed to do modification on root namespace
         installRequest.setRootModificationsAllowed(true);
 
+        // Make sure the job is no interactive
         installRequest.setInteractive(false);
 
+        // Set the author to use
+        installRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
+            new DocumentReference("xwiki", "XWiki", XWikiRightService.SUPERADMIN_USER));
         installRequest.setExtensionProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
             XWikiRightService.SUPERADMIN_USER_FULLNAME);
 

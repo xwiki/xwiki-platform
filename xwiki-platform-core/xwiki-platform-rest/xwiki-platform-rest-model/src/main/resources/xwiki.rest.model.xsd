@@ -326,7 +326,7 @@
     	</element>
     	<element name="interactive" type="boolean"></element>
     	<element name="remote" type="boolean"></element>
-    	<element name="verbose" type="boolean"></element>
+    	<element name="verbose" type="boolean" default="true"></element>
     	<element name="property" type="xwiki:MapEntry" minOccurs="0" maxOccurs="unbounded"></element>
     </sequence>
   </complexType>

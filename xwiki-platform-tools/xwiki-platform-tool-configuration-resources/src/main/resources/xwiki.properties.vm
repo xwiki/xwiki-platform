@@ -792,5 +792,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=gwt
 #end
 
+#-------------------------------------------------------------------------------------
+# Notifications
+#-------------------------------------------------------------------------------------
+
+#-# [Since 9.4RC1]
+#-# Indicates if the notification module should be enabled on the platform.
+#-#
+#-# The defauult is :
+# notification.enabled = true
 
 $!xwikiPropertiesAdditionalProperties

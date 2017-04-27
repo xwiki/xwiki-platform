@@ -80,8 +80,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
 
-    private EntityReferenceSerializer<String> pathEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
+    private EntityReferenceSerializer<String> fsPathEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "fspath");
 
     /**
      * Pages for which to convert URL to local.
@@ -164,7 +164,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         if (exportedPages != null) {
             for (DocumentReference pageReference : exportedPages) {
                 getFilesystemExportContext().addExportedPage(
-                        this.pathEntityReferenceSerializer.serialize(pageReference));
+                        this.fsPathEntityReferenceSerializer.serialize(pageReference));
 
                 // Backward-compatibility, also set the exportedPages deprecated variable.
                 EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
@@ -452,7 +452,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             String wikiname = xwikidb == null ? context.getWikiId().toLowerCase() : xwikidb.toLowerCase();
 
-            String serializedReference = this.pathEntityReferenceSerializer.serialize(
+            String serializedReference = this.fsPathEntityReferenceSerializer.serialize(
                 new DocumentReference(wikiname, this.legacySpaceResolver.resolve(spaces), name));
             if (getFilesystemExportContext().hasExportedPage(serializedReference) && "view".equals(action)
                 && context.getLinksAction() == null)
@@ -507,7 +507,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         String db = (xwikidb == null ? context.getWikiId() : xwikidb);
         DocumentReference documentReference =
             new DocumentReference(db, this.legacySpaceResolver.resolve(spaces), name);
-        String serializedReference = this.pathEntityReferenceSerializer.serialize(
+        String serializedReference = this.fsPathEntityReferenceSerializer.serialize(
             new AttachmentReference(filename, documentReference));
         String path = "attachment/" + serializedReference;
 

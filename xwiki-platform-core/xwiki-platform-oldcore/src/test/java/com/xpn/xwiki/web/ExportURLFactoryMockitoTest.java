@@ -62,7 +62,7 @@ public class ExportURLFactoryMockitoTest
 
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
-    private EntityReferenceSerializer<String> pathEntityReferenceSerializer;
+    private EntityReferenceSerializer<String> fsPathEntityReferenceSerializer;
 
     private LegacySpaceResolver legacySpaceResolver;
 
@@ -107,8 +107,8 @@ public class ExportURLFactoryMockitoTest
             this.componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         this.defaultEntityReferenceSerializer =
             this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        this.pathEntityReferenceSerializer =
-            this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "path");
+        this.fsPathEntityReferenceSerializer =
+            this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "fspath");
         this.legacySpaceResolver = this.componentManager.registerMockComponent(LegacySpaceResolver.class);
 
         this.factory = new ExportURLFactory();
@@ -122,9 +122,9 @@ public class ExportURLFactoryMockitoTest
         when(this.defaultEntityReferenceSerializer.serialize(pageReference)).thenReturn("xwiki:Main.WebHome");
 
         when(this.legacySpaceResolver.resolve("Main")).thenReturn(Arrays.asList("Main"));
-        when(this.pathEntityReferenceSerializer.serialize(pageReference)).thenReturn("Main/WebHome");
+        when(this.fsPathEntityReferenceSerializer.serialize(pageReference)).thenReturn("Main/WebHome");
         DocumentReference pageReference2 = new DocumentReference("xwiki", "Main", "SomeOtherPage");
-        when(this.pathEntityReferenceSerializer.serialize(pageReference2)).thenReturn("Main/SomeOtherPage");
+        when(this.fsPathEntityReferenceSerializer.serialize(pageReference2)).thenReturn("Main/SomeOtherPage");
 
         when(this.relativeEntityReferenceResolver.resolve("Main", EntityType.SPACE)).thenReturn(
             new EntityReference("Main", EntityType.SPACE));
@@ -142,7 +142,7 @@ public class ExportURLFactoryMockitoTest
         when(this.defaultEntityReferenceSerializer.serialize(pageReference)).thenReturn("xwiki:Main.WebHome");
 
         when(this.legacySpaceResolver.resolve("Main")).thenReturn(Arrays.asList("Main"));
-        when(this.pathEntityReferenceSerializer.serialize(pageReference)).thenReturn("Main/WebHome");
+        when(this.fsPathEntityReferenceSerializer.serialize(pageReference)).thenReturn("Main/WebHome");
 
         when(this.relativeEntityReferenceResolver.resolve("Main", EntityType.SPACE)).thenReturn(
                 new EntityReference("Main", EntityType.SPACE));

@@ -41,6 +41,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -88,7 +89,7 @@ public class ExportURLFactoryTest
     }
 
     @Test
-    public void createAttachmentURL() throws Exception
+    public void createAttachmentURLWithWhitespacesInSpaceAndPageNames() throws Exception
     {
         // Prepare the exported document and attachment.
         XWikiDocument doc = new XWikiDocument(
@@ -105,7 +106,14 @@ public class ExportURLFactoryTest
 
         URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space1 .Space2", "Pa ge", "view", "", "Wiki",
             this.oldcoreRule.getXWikiContext());
-        assertEquals(new URL("file://../../../../attachment/Wiki/+Space1+/Space2/Pa+ge/img+%252Ejpg"), url);
+
+        // Verify generated URL
+        assertEquals(new URL("file://../../../../attachment/Wiki/+Space1+/Space2/Pa+ge/img+.jpg"), url);
+
+        // Verify that the file on the FS exists and that the name is ok
+        File generatedFile = new File(this.tmpDir, "attachment/Wiki/+Space1+/Space2/Pa+ge/img+.jpg");
+        assertTrue(generatedFile.exists());
+        assertEquals("img+.jpg", generatedFile.getName());
     }
 }
 

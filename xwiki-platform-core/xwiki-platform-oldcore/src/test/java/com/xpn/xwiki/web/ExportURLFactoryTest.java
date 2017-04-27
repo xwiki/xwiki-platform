@@ -26,93 +26,86 @@ import java.util.Arrays;
 
 import javax.inject.Provider;
 
-import org.apache.commons.io.FileUtils;
-import org.jmock.Mock;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
-import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Unit tests for {@link ExportURLFactory}.
+ *
+ * @version $Id$
+ */
+@AllComponents
+public class ExportURLFactoryTest
 {
-    private Mock mockXWiki;
+    @Rule
+    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
 
-    /** Temporary directory where to put exported files. Will be deleted at the end of the test. */
-    private File tmpDir;
+    @Rule
+    public TemporaryFolder tmpDirRule = new TemporaryFolder();
 
-    /** The tested instance. */
     private ExportURLFactory urlFactory;
+
+    private File tmpDir;
 
     private FilesystemExportContext exportContext;
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue("/xwiki"));
-        this.mockXWiki.stubs().method("Param").will(returnValue(null));
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
-        getContext().setURL(new URL("http://www.xwiki.org/"));
-
-        // The URLFactory uses a request to determine the values for the context and servlet path.
-        Mock mockXWikiResquest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
-        mockXWikiResquest.stubs().method("getScheme").will(returnValue("http"));
-        mockXWikiResquest.stubs().method("isSecure").will(returnValue(false));
-        mockXWikiResquest.stubs().method("getServletPath").will(returnValue("/bin"));
-        mockXWikiResquest.stubs().method("getContextPath").will(returnValue("/xwiki"));
-        mockXWikiResquest.stubs().method("getHeader").will(returnValue(null));
-        getContext().setRequest((XWikiRequest) mockXWikiResquest.proxy());
-
-        // Since the ExportURLFactory saves requested attachments to the disk, create a temporary folder to hold these
-        // files, which will be deleted after the test ends.
-        this.tmpDir = new File(System.getProperty("java.io.tmpdir"), "xwikitests");
-        this.tmpDir.mkdirs();
-        new File(this.tmpDir, "attachment").mkdir();
-
         this.urlFactory = new ExportURLFactory();
 
-        Provider<FilesystemExportContext> exportContextProvider = getComponentManager().getInstance(
+        this.tmpDir = this.tmpDirRule.newFolder("xwikitests");
+        new File(this.tmpDir, "attachment").mkdir();
+
+        Provider<FilesystemExportContext> exportContextProvider = this.oldcoreRule.getMocker().getInstance(
             new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
         this.exportContext = exportContextProvider.get();
-        this.urlFactory.init(null, this.tmpDir, exportContext, getContext());
+
+        doReturn("/xwiki").when(this.oldcoreRule.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
+
+        XWikiContext context = this.oldcoreRule.getXWikiContext();
+        XWikiRequest request = mock(XWikiRequest.class);
+        context.setRequest(request);
+        context.setURL(new URL("http://www.xwiki.org/"));
+
+        this.urlFactory.init(null, this.tmpDir, this.exportContext, context);
     }
 
-    /**
-     * Test that
-     * {@link ExportURLFactory#createAttachmentURL(String, String, String, String, String, com.xpn.xwiki.XWikiContext)}
-     * correctly escapes spaces into %20 when the exported document contains spaces in its name.
-     */
-    public void testCreateAttachmentURL() throws Exception
+    @Test
+    public void createAttachmentURL() throws Exception
     {
         // Prepare the exported document and attachment.
         XWikiDocument doc = new XWikiDocument(
-            new DocumentReference("xwiki", Arrays.asList(" Space1 ", "Space2"), "New  Page"));
+            new DocumentReference("Wiki", Arrays.asList(" Space1 ", "Space2"), "Pa ge"));
 
         // Simulate the doc depth (there are 4 levels since the doc will be placed in
-        // pages/xwiki/Space1/Space2/New%20%20Page).
+        // pages/Wiki/Space1/Space2/Pa%20Page).
         this.exportContext.setDocParentLevels(4);
 
         XWikiAttachment attachment = new XWikiAttachment(doc, "img .jpg");
         attachment.setContent(new ByteArrayInputStream("test".getBytes()));
         doc.getAttachmentList().add(attachment);
-        this.mockXWiki.stubs().method("getDocument").will(returnValue(doc));
+        this.oldcoreRule.getSpyXWiki().saveDocument(doc, this.oldcoreRule.getXWikiContext());
 
-        URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space1 .Space2", "Pa ge", "view", "", "x",
-            getContext());
-        assertEquals(new URL("file://../../../../attachment/x/+Space1+/Space2/Pa+ge/img+%252Ejpg"), url);
-    }
-
-    /** When the test is over, delete the folder where the exported attachments were placed. */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        FileUtils.deleteDirectory(this.tmpDir);
-        super.tearDown();
+        URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space1 .Space2", "Pa ge", "view", "", "Wiki",
+            this.oldcoreRule.getXWikiContext());
+        assertEquals(new URL("file://../../../../attachment/Wiki/+Space1+/Space2/Pa+ge/img+%252Ejpg"), url);
     }
 }
+

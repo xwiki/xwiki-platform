@@ -228,8 +228,8 @@ public class MockitoOldcoreRule implements MethodRule
 
         this.context = new XWikiContext();
 
-        this.context.setWikiId("xwiki");
-        this.context.setMainXWiki("xwiki");
+        getXWikiContext().setWikiId("xwiki");
+        getXWikiContext().setMainXWiki("xwiki");
 
         this.spyXWiki = spy(new XWiki());
         getXWikiContext().setWiki(this.spyXWiki);

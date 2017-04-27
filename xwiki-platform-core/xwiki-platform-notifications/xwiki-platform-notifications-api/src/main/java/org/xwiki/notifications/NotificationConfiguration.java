@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
 public interface NotificationConfiguration
 {
     /**
-     * @return true if the UI for the notification module should be enabled
+     * @return true if the notification module should be enabled
      */
     boolean isEnabled();
 

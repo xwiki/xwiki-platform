@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.stability.Unstable;
 
 /**
  * Default implementation for (@link {@link org.xwiki.notifications.NotificationConfiguration}.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  */
 @Component
 @Singleton
-@Unstable
 public class DefaultNotificationConfiguration implements NotificationConfiguration
 {
     private static final String CONFIGURATION_PREFIX = "notification.";
@@ -43,9 +41,7 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     @Inject
     private ConfigurationSource configurationSource;
 
-    /**
-     * @return true if the UI for the notification module should be enabled
-     */
+    @Override
     public boolean isEnabled()
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "enabled", true);

@@ -39,7 +39,7 @@ public class NotificationConfiguration
     @Inject
     private ConfigurationSource configurationSource;
 
-    /*
+    /**
      * @return true if the UI for the notification module should be enabled
      */
     public boolean isUIEnabled()

@@ -51,7 +51,7 @@ public class UndeleteAction extends XWikiAction
 
     private static final String TRUE = "true";
 
-    private Logger LOGGER = LoggerFactory.getLogger(UndeleteAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndeleteAction.class);
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

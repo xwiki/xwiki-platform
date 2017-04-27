@@ -292,6 +292,14 @@
                     "parameterIndex": "0",
                     "elementKind": "parameter",
                     "justification": "NotificationManager must return composite events instead of a raw events now"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "field org.xwiki.rest.model.jaxb.JobRequest.verbose",
+                    "new": "field org.xwiki.rest.model.jaxb.JobRequest.verbose",
+                    "annotationType": "javax.xml.bind.annotation.XmlElement",
+                    "elementKind": "annotation",
+                    "justification": "Align with Java API"
                   }
                 ]
               }

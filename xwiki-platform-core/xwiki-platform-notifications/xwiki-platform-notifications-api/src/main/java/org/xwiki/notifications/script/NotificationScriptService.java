@@ -92,8 +92,10 @@ public class NotificationScriptService implements ScriptService
     public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
     {
         return notificationManager.getEvents(
-            entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()), onyUnread,
-            expectedCount);
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onyUnread,
+                expectedCount
+        );
     }
 
     /**
@@ -105,11 +107,15 @@ public class NotificationScriptService implements ScriptService
      * @throws NotificationException if error happens
      */
     public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
-        throws NotificationException
+            throws NotificationException
     {
         return notificationManager.getEvents(
-            entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()), onyUnread,
-            expectedCount, untilDate, Arrays.asList(blackList));
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onyUnread,
+                expectedCount,
+                untilDate,
+                Arrays.asList(blackList)
+        );
     }
 
     /**
@@ -121,11 +127,15 @@ public class NotificationScriptService implements ScriptService
      * @throws NotificationException if error happens
      */
     public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
-        throws NotificationException
+            throws NotificationException
     {
         return notificationManager.getEvents(
-            entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()), onyUnread,
-            expectedCount, untilDate, blackList);
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onyUnread,
+                expectedCount,
+                untilDate,
+                blackList
+        );
     }
 
     /**
@@ -139,14 +149,17 @@ public class NotificationScriptService implements ScriptService
     public long getEventsCount(boolean onlyUnread, int maxCount) throws NotificationException
     {
         return notificationManager.getEventsCount(
-            entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()), onlyUnread, maxCount);
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
+                onlyUnread,
+                maxCount
+        );
     }
 
     /**
      * Generate a rendering Block for a given event to display as notification.
-     * 
      * @param event the event to render
      * @return a rendering block ready to display the event
+     * 
      * @throws NotificationException if an error happens
      */
     public Block render(CompositeEvent event) throws NotificationException
@@ -159,12 +172,13 @@ public class NotificationScriptService implements ScriptService
      *
      * @param events a list of events
      * @return the list of statuses corresponding to each pair or event/entity
+     *
      * @throws Exception if an error occurs
      */
     public List<EventStatus> getEventStatuses(List<Event> events) throws Exception
     {
         return eventStatusManager.getEventStatus(events,
-            Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+                Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
     }
 
     /**
@@ -172,13 +186,14 @@ public class NotificationScriptService implements ScriptService
      *
      * @param compositeEvents a list of composite events
      * @return the list of statuses corresponding to each pair or event/entity
+     *
      * @throws Exception if an error occurs
      * @since 9.4RC1
      */
     public List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents) throws Exception
     {
         return compositeEventStatusManager.getCompositeEventStatuses(compositeEvents,
-            entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()));
+                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()));
     }
 
     /**
@@ -193,7 +208,6 @@ public class NotificationScriptService implements ScriptService
 
     /**
      * Save a status for the current user.
-     * 
      * @param eventId id of the event
      * @param isRead either or not the current user has read the given event
      * @throws Exception if an error occurs

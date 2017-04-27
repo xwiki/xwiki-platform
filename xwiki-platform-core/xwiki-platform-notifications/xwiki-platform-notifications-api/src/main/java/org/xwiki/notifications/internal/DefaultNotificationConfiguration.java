@@ -17,24 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.internal;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.stability.Unstable;
 
 /**
- * Get the configuration options concerning the Notification module.
+ * Default implementation for (@link {@link org.xwiki.notifications.NotificationConfiguration}.
  * 
  * @version $Id$
  * @since 9.4RC1
  */
-@Role
+@Component
+@Singleton
 @Unstable
-public interface NotificationConfiguration
+public class DefaultNotificationConfiguration implements NotificationConfiguration
 {
+    private static final String CONFIGURATION_PREFIX = "notification.";
+
+    @Inject
+    private ConfigurationSource configurationSource;
+
     /**
      * @return true if the UI for the notification module should be enabled
      */
-    boolean isUIEnabled();
-
+    public boolean isUIEnabled()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "uienabled", true);
+    }
 }

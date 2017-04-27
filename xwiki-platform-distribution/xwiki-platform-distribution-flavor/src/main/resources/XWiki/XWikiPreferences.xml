@@ -539,15 +539,17 @@
     <ldap_fields_mapping>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>PureText</editor>
       <name>ldap_fields_mapping</name>
       <number>53</number>
       <picker>0</picker>
       <prettyName>Ldap user fields mapping</prettyName>
+      <rows>1</rows>
       <size>60</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </ldap_fields_mapping>
     <ldap_group_mapping>
       <customDisplay/>
@@ -2013,18 +2015,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </ldap_exclude_group>
-      <ldap_fields_mapping>
+        <ldap_fields_mapping>
         <customDisplay/>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>ldap_fields_mapping</name>
         <number>53</number>
         <picker>0</picker>
         <prettyName>Ldap user fields mapping</prettyName>
+        <rows>1</rows>
         <size>60</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </ldap_fields_mapping>
       <ldap_group_mapping>
         <customDisplay/>

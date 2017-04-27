@@ -165,7 +165,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);
         xclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
         xclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
-        xclass.addTextField("ldap_fields_mapping", "Ldap user fields mapping", 60);
+        xclass.addTextAreaField("ldap_fields_mapping", "Ldap user fields mapping", 60, 1, ContentType.PURE_TEXT);
         xclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
         xclass.addBooleanField("ldap_update_photo", "Update user photo from LDAP", "yesno");
         xclass.addTextField("ldap_photo_attachment_name", "Attachment name to save LDAP photo", 30);

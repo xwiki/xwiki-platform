@@ -867,7 +867,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.setFlushMode(FlushMode.MANUAL);
 
             try {
-                session.load(doc, new Long(doc.getId()));
+                session.load(doc, Long.valueOf(doc.getId()));
                 doc.setNew(false);
                 doc.setMostRecent(true);
                 // Fix for XWIKI-1651
@@ -1125,7 +1125,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiSpace space = new XWikiSpace(spaceReference, this);
 
         try {
-            session.load(space, new Long(space.getId()));
+            session.load(space, Long.valueOf(space.getId()));
         } catch (ObjectNotFoundException e) {
             // No space
             return null;
@@ -1797,7 +1797,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             query.setLong("docId", docId);
             if (query.uniqueResult() != null) {
                 lock = new XWikiLock();
-                session.load(lock, new Long(docId));
+                session.load(lock, Long.valueOf(docId));
             }
 
             if (bTransaction) {

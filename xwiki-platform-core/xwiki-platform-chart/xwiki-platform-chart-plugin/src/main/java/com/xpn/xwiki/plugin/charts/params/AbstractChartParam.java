@@ -208,7 +208,7 @@ public abstract class AbstractChartParam implements ChartParam
         while (it.hasNext()) {
             String value = (String) it.next();
             try {
-                result.add(new Float(value));
+                result.add(Float.valueOf(value));
             } catch (NumberFormatException e) {
                 throw new InvalidArgumentException("Invalid value for the parameter " + getName()
                     + ": Non-float value for " + name);

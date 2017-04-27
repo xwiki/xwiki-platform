@@ -48,7 +48,7 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     /**
      * The integer number used to determine if a boolean configuration property is set.
      */
-    private static final Integer ONE = new Integer(1);
+    private static final Integer ONE = Integer.valueOf(1);
 
     /**
      * A reference to the configuration XClass.

@@ -158,7 +158,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             List<XWikiRCSNodeInfo> nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
             archivedoc.setNodes(nodes);
         } catch (Exception e) {
-            Object[] args = { new Long(archivedoc.getId()) };
+            Object[] args = { Long.valueOf(archivedoc.getId()) };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT, "Exception while loading archive {0}", e,
                 args);

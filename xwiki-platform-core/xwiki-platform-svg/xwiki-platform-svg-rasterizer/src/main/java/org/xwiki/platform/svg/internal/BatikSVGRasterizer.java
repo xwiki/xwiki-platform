@@ -151,15 +151,15 @@ public class BatikSVGRasterizer implements SVGRasterizer
         PNGTranscoder transcoder = new PNGTranscoder();
 
         if (width > 0) {
-            transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, new Float(width));
+            transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, Float.valueOf(width));
         }
         if (height > 0) {
-            transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, new Float(height));
+            transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, Float.valueOf(height));
         }
 
         // Set maximum width and height to 8k to avoid DoS attacks
-        transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_MAX_WIDTH, new Float(8192));
-        transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_MAX_HEIGHT, new Float(8192));
+        transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_MAX_WIDTH, Float.valueOf(8192));
+        transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_MAX_HEIGHT, Float.valueOf(8192));
 
         try {
             transcoder.transcode(input, output);

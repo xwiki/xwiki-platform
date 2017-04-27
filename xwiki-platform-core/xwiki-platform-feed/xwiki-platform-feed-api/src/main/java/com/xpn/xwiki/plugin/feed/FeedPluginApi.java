@@ -810,7 +810,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
             blogMappings.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, blogPostClassName + "_content");
             blogMappings.put(SyndEntryDocumentSource.FIELD_CATEGORIES, blogPostClassName + "_category");
             blogMappings.put(SyndEntryDocumentSource.FIELD_PUBLISHED_DATE, blogPostClassName + "_publishDate");
-            blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
+            blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, Integer.valueOf(400));
         }
         SyndFeed blogFeed =
             getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), blogMappings),

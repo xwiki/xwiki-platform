@@ -251,7 +251,7 @@ public class XWikiMessageTool
                 if (docBundle != null) {
                     if (!docBundle.isNew()) {
                         // Checks for a name update
-                        Long docId = new Long(docBundle.getId());
+                        Long docId = Long.valueOf(docBundle.getId());
                         Date docDate = docBundle.getDate();
                         // Check for a doc modification
                         if (!docDate.equals(this.previousDates.get(docId))) {
@@ -374,7 +374,7 @@ public class XWikiMessageTool
         if (key != null) {
             for (XWikiDocument docBundle : getDocumentBundles()) {
                 if (docBundle != null) {
-                    Long docId = new Long(docBundle.getId());
+                    Long docId = Long.valueOf(docBundle.getId());
                     Properties props = null;
                     if (this.docsToRefresh.contains(docId) || !this.propsCache.containsKey(docId)) {
                         // Cache needs to be updated

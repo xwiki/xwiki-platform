@@ -318,7 +318,7 @@ public class PasswordClass extends StringClass
         byte bytes[] = new byte[32];
         random.nextBytes(bytes);
         for (byte temp : bytes) {
-            String s = Integer.toHexString(new Byte(temp));
+            String s = Integer.toHexString(Byte.valueOf(temp));
             while (s.length() < 2) {
                 s = "0" + s;
             }

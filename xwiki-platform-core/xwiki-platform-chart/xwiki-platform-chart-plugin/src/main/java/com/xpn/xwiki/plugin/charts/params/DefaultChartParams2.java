@@ -93,8 +93,8 @@ public class DefaultChartParams2 extends ChartParams
         set(BACKGROUND_COLOR, JFreeChart.DEFAULT_BACKGROUND_PAINT);
 
         set(PLOT_BACKGROUND_COLOR, Plot.DEFAULT_BACKGROUND_PAINT);
-        set(PLOT_BACKGROUND_ALPHA, new Float(Plot.DEFAULT_BACKGROUND_ALPHA));
-        set(PLOT_FOREGROUND_ALPHA, new Float(Plot.DEFAULT_FOREGROUND_ALPHA));
+        set(PLOT_BACKGROUND_ALPHA, Float.valueOf(Plot.DEFAULT_BACKGROUND_ALPHA));
+        set(PLOT_FOREGROUND_ALPHA, Float.valueOf(Plot.DEFAULT_FOREGROUND_ALPHA));
         set(PLOT_INSERTS, Plot.DEFAULT_INSETS);
         set(PLOT_OUTLINE_COLOR, Plot.DEFAULT_OUTLINE_PAINT);
         set(PLOT_OUTLINE_STROKE, Plot.DEFAULT_OUTLINE_STROKE);
@@ -154,8 +154,8 @@ public class DefaultChartParams2 extends ChartParams
         set(prefix + AXIS_TICK_LABEL_INSERTS_SUFFIX, Axis.DEFAULT_TICK_LABEL_INSETS);
 
         set(prefix + AXIS_TICK_MARK_VISIBLE_SUFFIX, new Boolean(Axis.DEFAULT_TICK_MARKS_VISIBLE));
-        set(prefix + AXIS_TICK_MARK_INSIDE_LENGTH_SUFFIX, new Float(Axis.DEFAULT_TICK_MARK_INSIDE_LENGTH));
-        set(prefix + AXIS_TICK_MARK_OUTSIDE_LENGTH_SUFFIX, new Float(Axis.DEFAULT_TICK_MARK_OUTSIDE_LENGTH));
+        set(prefix + AXIS_TICK_MARK_INSIDE_LENGTH_SUFFIX, Float.valueOf(Axis.DEFAULT_TICK_MARK_INSIDE_LENGTH));
+        set(prefix + AXIS_TICK_MARK_OUTSIDE_LENGTH_SUFFIX, Float.valueOf(Axis.DEFAULT_TICK_MARK_OUTSIDE_LENGTH));
         set(prefix + AXIS_TICK_MARK_COLOR_SUFFIX, Axis.DEFAULT_TICK_MARK_PAINT);
         set(prefix + AXIS_TICK_MARK_STROKE_SUFFIX, Axis.DEFAULT_TICK_MARK_STROKE);
 
@@ -164,12 +164,12 @@ public class DefaultChartParams2 extends ChartParams
         set(prefix + PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX, XYPlot.DEFAULT_GRIDLINE_STROKE);
 
         set(prefix + VALUE_AXIS_AUTO_RANGE_SUFFIX, new Boolean(ValueAxis.DEFAULT_AUTO_RANGE));
-        set(prefix + VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX, new Double(ValueAxis.DEFAULT_AUTO_RANGE_MINIMUM_SIZE));
+        set(prefix + VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX, Double.valueOf(ValueAxis.DEFAULT_AUTO_RANGE_MINIMUM_SIZE));
         set(prefix + VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX, new Boolean(ValueAxis.DEFAULT_AUTO_TICK_UNIT_SELECTION));
-        set(prefix + VALUE_AXIS_LOWER_BOUND_SUFFIX, new Double(ValueAxis.DEFAULT_LOWER_BOUND));
-        set(prefix + VALUE_AXIS_UPPER_BOUND_SUFFIX, new Double(ValueAxis.DEFAULT_UPPER_BOUND));
-        set(prefix + AXIS_LOWER_MARGIN_SUFFIX, new Double(ValueAxis.DEFAULT_LOWER_MARGIN));
-        set(prefix + AXIS_UPPER_MARGIN_SUFFIX, new Double(ValueAxis.DEFAULT_UPPER_MARGIN));
+        set(prefix + VALUE_AXIS_LOWER_BOUND_SUFFIX, Double.valueOf(ValueAxis.DEFAULT_LOWER_BOUND));
+        set(prefix + VALUE_AXIS_UPPER_BOUND_SUFFIX, Double.valueOf(ValueAxis.DEFAULT_UPPER_BOUND));
+        set(prefix + AXIS_LOWER_MARGIN_SUFFIX, Double.valueOf(ValueAxis.DEFAULT_LOWER_MARGIN));
+        set(prefix + AXIS_UPPER_MARGIN_SUFFIX, Double.valueOf(ValueAxis.DEFAULT_UPPER_MARGIN));
         set(prefix + VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX, Boolean.FALSE);
 
         set(prefix + NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX, new Boolean(
@@ -185,11 +185,11 @@ public class DefaultChartParams2 extends ChartParams
         set(prefix + DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX, DateTickMarkPosition.START);
         set(prefix + DATE_AXIS_DATE_TICK_UNIT_SUFFIX, DateAxis.DEFAULT_DATE_TICK_UNIT);
 
-        set(prefix + CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX, new Double(CategoryAxis.DEFAULT_CATEGORY_MARGIN));
+        set(prefix + CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX, Double.valueOf(CategoryAxis.DEFAULT_CATEGORY_MARGIN));
         set(prefix + CATEGORY_AXIS_LABEL_POSITIONS_SUFFIX, CategoryLabelPositions.STANDARD);
         set(prefix + CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX, 4);
         set(prefix + CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX, 1);
-        set(prefix + CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX, new Float(0.0f));
+        set(prefix + CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX, Float.valueOf(0.0f));
     }
 
     /*

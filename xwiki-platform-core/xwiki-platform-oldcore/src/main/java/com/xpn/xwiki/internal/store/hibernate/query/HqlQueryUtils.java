@@ -27,6 +27,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xpn.xwiki.XWiki;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -106,6 +111,8 @@ public final class HqlQueryUtils
         allowedSpaceFields.add(SPACE_FIELD_HIDDEN);
     }
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HqlQueryUtils.class);
+
     private HqlQueryUtils()
     {
 
@@ -126,7 +133,6 @@ public final class HqlQueryUtils
      */
     public static boolean isSafe(String statementString)
     {
-        Statement statement;
         try {
             // TODO: should probably use a more specific Hql parser
 
@@ -137,7 +143,7 @@ public final class HqlQueryUtils
             cleanedStatement = FROM_RCS.matcher(cleanedStatement).replaceAll(FROM_REPLACEMENT);
             cleanedStatement = FROM_VERSION.matcher(cleanedStatement).replaceAll(FROM_REPLACEMENT);
 
-            statement = CCJSqlParserUtil.parse(cleanedStatement);
+            Statement statement = CCJSqlParserUtil.parse(cleanedStatement);
 
             if (statement instanceof Select) {
                 Select select = (Select) statement;
@@ -160,7 +166,8 @@ public final class HqlQueryUtils
             }
         } catch (JSQLParserException e) {
             // We can't parse it so lets say it's not safe
-            e.printStackTrace();
+            LOGGER.warn("Failed to parse request [{}] ([{}]). Considering it not safe.", statementString,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return false;

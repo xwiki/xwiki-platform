@@ -44,7 +44,7 @@ public class DoubleChartParam extends AbstractChartParam
     public Object convert(String value) throws ParamException
     {
         try {
-            return new Double(value);
+            return Double.valueOf(value);
         } catch (NumberFormatException nfe) {
             throw new InvalidParamException("Non-double value for the " + getName() + " parameter", nfe);
         }

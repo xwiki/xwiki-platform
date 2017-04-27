@@ -44,7 +44,7 @@ public class FloatChartParam extends AbstractChartParam
     public Object convert(String value) throws ParamException
     {
         try {
-            return new Float(value);
+            return Float.valueOf(value);
         } catch (NumberFormatException nfe) {
             throw new InvalidParamException("Non-float value for the " + getName() + " parameter", nfe);
         }

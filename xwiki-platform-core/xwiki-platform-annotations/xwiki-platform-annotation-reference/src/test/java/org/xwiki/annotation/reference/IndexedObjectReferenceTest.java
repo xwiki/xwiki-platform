@@ -77,7 +77,7 @@ public class IndexedObjectReferenceTest
                 "Page", EntityType.DOCUMENT, new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki",
                     EntityType.WIKI)))));
         assertEquals("XWiki.Class", reference.getClassName());
-        assertEquals(new Integer(2), reference.getObjectNumber());
+        assertEquals(Integer.valueOf(2), reference.getObjectNumber());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class IndexedObjectReferenceTest
                 "Page", EntityType.DOCUMENT, new EntityReference("Space", EntityType.SPACE, new EntityReference("wiki",
                     EntityType.WIKI)))));
         assertEquals("XW[iki.C]lass", reference.getClassName());
-        assertEquals(new Integer(0), reference.getObjectNumber());
+        assertEquals(Integer.valueOf(0), reference.getObjectNumber());
     }
 
     @Test

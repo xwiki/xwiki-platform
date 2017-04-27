@@ -93,7 +93,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument document = (XWikiDocument) mockDocument.proxy();
         mockDocument.stubs().method("getTranslatedDocument").will(returnValue(document));
         mockDocument.stubs().method("isNew").will(returnValue(isNew));
-        mockDocument.stubs().method("getId").will(returnValue(new Long(id)));
+        mockDocument.stubs().method("getId").will(returnValue(Long.valueOf(id)));
         mockDocument.stubs().method("getDate").will(returnValue(new Date()));
         mockDocument.stubs().method("getContent").will(returnValue(content));
         mockDocument.stubs().method("getFullName").will(returnValue(name));
@@ -134,7 +134,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
             }
         });
         mockDocument.stubs().method("isNew").will(returnValue(isNew));
-        mockDocument.stubs().method("getId").will(returnValue(new Long(id)));
+        mockDocument.stubs().method("getId").will(returnValue(Long.valueOf(id)));
         mockDocument.stubs().method("getDate").will(returnValue(new Date()));
         mockDocument.stubs().method("getContent").will(returnValue(content));
         mockDocument.stubs().method("getFullName").will(returnValue(name));

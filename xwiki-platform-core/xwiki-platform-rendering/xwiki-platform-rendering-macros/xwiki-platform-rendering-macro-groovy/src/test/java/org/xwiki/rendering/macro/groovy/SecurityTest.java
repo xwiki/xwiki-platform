@@ -171,7 +171,7 @@ public class SecurityTest extends AbstractComponentTestCase
         });
 
         // Note: We execute something that works with the Groovy Security customizer...
-        executeGroovyMacro("new Integer(0)", isRestricted);
+        executeGroovyMacro("Integer.valueOf(0)", isRestricted);
     }
 
     private void executeGroovyMacro(String script) throws Exception

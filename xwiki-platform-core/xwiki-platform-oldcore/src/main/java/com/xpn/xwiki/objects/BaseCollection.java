@@ -402,7 +402,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         NumberProperty property = new FloatProperty();
         property.setName(name);
-        property.setValue(new Float(value));
+        property.setValue(Float.valueOf(value));
         safeput(name, property);
     }
 
@@ -424,7 +424,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         NumberProperty property = new DoubleProperty();
         property.setName(name);
-        property.setValue(new Double(value));
+        property.setValue(Double.valueOf(value));
         safeput(name, property);
     }
 

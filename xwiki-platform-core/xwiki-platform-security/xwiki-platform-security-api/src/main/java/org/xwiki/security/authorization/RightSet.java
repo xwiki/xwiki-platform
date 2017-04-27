@@ -138,7 +138,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     @Override
     public int hashCode()
     {
-        return new Long(rights).hashCode();
+        return Long.valueOf(rights).hashCode();
     }
 
     @Override

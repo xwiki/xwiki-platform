@@ -59,6 +59,16 @@ public class PathStringEntityReferenceSerializer extends AbstractStringEntityRef
             representation.append('/');
         }
 
+        representation.append(encodeReferenceName(currentReference.getName(), isLastReference));
+    }
+
+    /**
+     * @param name the reference name for this portion of the reference
+     * @param isLastReference true if this portion of the reference is the last one (ie the deepest one)
+     * @return the encoded reference name so that it can be used in a filesystem path.
+     */
+    protected String encodeReferenceName(String name, boolean isLastReference)
+    {
         try {
             // Note: We assume the FileSystem is case-sensitive. This is not the case for 16 bit Windows but we
             // consider that we don't support these. If we wanted to support case-insensitive File systems we would
@@ -71,11 +81,37 @@ public class PathStringEntityReferenceSerializer extends AbstractStringEntityRef
             // - On Windows, the star is a wildcard.
             // See https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words and
             // http://stackoverflow.com/questions/2304221/what-character-sequence-should-i-not-allow-in-a-filename
-            representation.append(
-                URLEncoder.encode(currentReference.getName(), "UTF-8").replace(".", "%2E").replace("*", "%2A"));
+            String encodedName = URLEncoder.encode(name, "UTF-8");
+            encodedName = replaceDot(encodedName, isLastReference);
+            encodedName = replaceStar(encodedName, isLastReference);
+            return encodedName;
         } catch (UnsupportedEncodingException e) {
             // This will never happen, UTF-8 is always available
             throw new RuntimeException("UTF-8 encoding is not present on the system!", e);
         }
+    }
+
+    /**
+     * Replace "." with the encoded equivalent.
+     *
+     * @param name the reference name for this portion of the reference
+     * @param isLastReference true if this portion of the reference is the last one (ie the deepest one)
+     * @return the reference name with "." encoded
+     */
+    protected String replaceDot(String name, boolean isLastReference)
+    {
+        return name.replace(".", "%2E");
+    }
+
+    /**
+     * Replace "*" with the encoded equivalent.
+     *
+     * @param name the reference name for this portion of the reference
+     * @param isLastReference true if this portion of the reference is the last one (ie the deepest one)
+     * @return the reference name with "*" encoded
+     */
+    protected String replaceStar(String name, boolean isLastReference)
+    {
+        return name.replace("*", "%2A");
     }
 }

@@ -26,6 +26,7 @@ org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver
 org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer
+org.xwiki.model.internal.reference.FSPathStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.PathStringDocumentReferenceResolver
 org.xwiki.model.internal.reference.DefaultSymbolScheme
 org.xwiki.model.internal.reference.converter.EntityReferenceConverter

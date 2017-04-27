@@ -35,6 +35,6 @@ public interface NotificationConfiguration
     /**
      * @return true if the UI for the notification module should be enabled
      */
-    boolean isUIEnabled();
+    boolean isEnabled();
 
 }

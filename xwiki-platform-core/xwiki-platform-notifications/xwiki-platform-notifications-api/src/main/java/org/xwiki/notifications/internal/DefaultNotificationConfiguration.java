@@ -46,8 +46,8 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     /**
      * @return true if the UI for the notification module should be enabled
      */
-    public boolean isUIEnabled()
+    public boolean isEnabled()
     {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "uienabled", true);
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "enabled", true);
     }
 }

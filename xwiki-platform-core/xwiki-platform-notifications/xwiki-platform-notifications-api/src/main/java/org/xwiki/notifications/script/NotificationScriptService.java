@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationRenderer;
@@ -58,6 +59,9 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class NotificationScriptService implements ScriptService
 {
+    @Inject
+    private NotificationConfiguration notificationConfiguration;
+
     @Inject
     private NotificationManager notificationManager;
 
@@ -155,6 +159,7 @@ public class NotificationScriptService implements ScriptService
      * Generate a rendering Block for a given event to display as notification.
      * @param event the event to render
      * @return a rendering block ready to display the event
+     * 
      * @throws NotificationException if an error happens
      */
     public Block render(CompositeEvent event) throws NotificationException
@@ -189,6 +194,16 @@ public class NotificationScriptService implements ScriptService
     {
         return compositeEventStatusManager.getCompositeEventStatuses(compositeEvents,
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()));
+    }
+
+    /**
+     * Get the status of the module.
+     * 
+     * @return true if the notification module is enabled in the platform configuration
+     */
+    public boolean isEnabled()
+    {
+        return notificationConfiguration.isEnabled();
     }
 
     /**

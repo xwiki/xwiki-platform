@@ -673,7 +673,7 @@
     </class>
     <property>
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
-#if ("$!xcontext.userReference" != '')
+#if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))

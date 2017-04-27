@@ -275,8 +275,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     if (!folder.exists()) {
                         folder.mkdirs();
                     }
-                    renderSkinFile(skinURL.getPath(), spaces, name, wikiId, file, StringUtils.countMatches(filePath, "/"),
-                        context);
+                    renderSkinFile(skinURL.getPath(), spaces, name, wikiId, file,
+                        StringUtils.countMatches(filePath, "/"), context);
                 }
 
                 followCssImports(file, spaces, name, wikiId, context);

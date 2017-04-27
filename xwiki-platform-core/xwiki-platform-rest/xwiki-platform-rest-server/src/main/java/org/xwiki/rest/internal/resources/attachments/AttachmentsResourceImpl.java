@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.Multipart;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;

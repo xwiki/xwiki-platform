@@ -125,6 +125,13 @@
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
+      <exclusions>
+        <!-- The recent one have a different id so we can't rely on dependencyManagement -->
+      	<exclusion>
+      		<groupId>javax.mail</groupId>
+      		<artifactId>mail</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <!-- Replace the version triggered by restlet by a more accurate and up to date one -->
     <dependency>

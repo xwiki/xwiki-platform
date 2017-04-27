@@ -40,11 +40,11 @@ public class NotificationConfiguration
     private ConfigurationSource configurationSource;
 
     /*
-     * @return true if the notification module is enabled
+     * @return true if the UI for the notification module should be enabled
      */
-    public boolean isEnabled()
+    public boolean isUIEnabled()
     {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "enabled", true);
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "uienabled", true);
     }
 
 }

@@ -182,13 +182,13 @@ public class NotificationScriptService implements ScriptService
     }
 
     /**
-     * Get the enabled status of the module
+     * Get the UI status of the module
      * 
-     * @return true if the Notification module is enabled in the platform configuration
+     * @return true if the UI for the notification module is enabled in the platform configuration
      */
-    public boolean isEnabled()
+    public boolean isUIEnabled()
     {
-        return notificationConfiguration.isEnabled();
+        return notificationConfiguration.isUIEnabled();
     }
 
     /**

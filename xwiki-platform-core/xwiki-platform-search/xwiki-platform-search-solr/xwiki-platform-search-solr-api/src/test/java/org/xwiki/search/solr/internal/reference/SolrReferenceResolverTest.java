@@ -37,16 +37,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
-import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -66,17 +57,12 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -92,20 +78,6 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentList({
-    DefaultModelContext.class,
-    DefaultModelConfiguration.class,
-    LocalStringEntityReferenceSerializer.class,
-    RelativeStringEntityReferenceResolver.class,
-    CurrentReferenceDocumentReferenceResolver.class,
-    CurrentReferenceEntityReferenceResolver.class,
-    CurrentEntityReferenceProvider.class,
-    CurrentMixedStringDocumentReferenceResolver.class,
-    CurrentMixedEntityReferenceProvider.class,
-    DefaultEntityReferenceProvider.class,
-    CompactWikiStringEntityReferenceSerializer.class,
-    DefaultStringDocumentReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class,
-    DefaultStringEntityReferenceSerializer.class,
     DefaultExecution.class,
     AttachmentSolrReferenceResolver.class,
     DefaultSolrReferenceResolver.class,
@@ -114,9 +86,8 @@ import static org.mockito.Mockito.when;
     ObjectSolrReferenceResolver.class,
     SpaceSolrReferenceResolver.class,
     WikiSolrReferenceResolver.class,
-    ExplicitStringEntityReferenceResolver.class,
-    DefaultSymbolScheme.class
 })
+@ReferenceComponentList
 public class SolrReferenceResolverTest
 {
     @Rule
@@ -598,7 +569,7 @@ public class SolrReferenceResolverTest
     public void getQueryObjectProperty() throws Exception
     {
         Assert.assertEquals(
-            "id:wiki1\\:space12.code.document122\\^wiki1\\:space11.data.class111\\[1\\].aStringProperty",
+            "id:wiki1\\:space12.code.document122\\^space11.data.class111\\[1\\].aStringProperty",
             this.defaultSolrReferenceResolver.getQuery(propertyReference12221));
     }
 

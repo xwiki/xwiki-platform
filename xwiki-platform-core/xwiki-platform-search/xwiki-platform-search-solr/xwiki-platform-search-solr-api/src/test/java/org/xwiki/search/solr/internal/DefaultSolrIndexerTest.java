@@ -24,26 +24,14 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -56,16 +44,12 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({DefaultModelContext.class, DefaultModelConfiguration.class, LocalStringEntityReferenceSerializer.class,
-RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
-CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceProvider.class,
-CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceProvider.class,
-DefaultEntityReferenceProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
+@ReferenceComponentList
 public class DefaultSolrIndexerTest
 {
     @Rule
-    public final MockitoComponentMockingRule<SolrIndexer> mocker = new MockitoComponentMockingRule<SolrIndexer>(
-        DefaultSolrIndexer.class);
+    public final MockitoComponentMockingRule<SolrIndexer> mocker =
+        new MockitoComponentMockingRule<SolrIndexer>(DefaultSolrIndexer.class);
 
     private XWikiContext xcontext;
 

@@ -113,7 +113,7 @@ public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTest
         try {
             engine.eval(script);
             Assert.fail("Should have thrown an exception here");
-        } catch (ScriptException e) {
+        } catch (ScriptException expected) {
             // Expected, test passed!
         }
     }

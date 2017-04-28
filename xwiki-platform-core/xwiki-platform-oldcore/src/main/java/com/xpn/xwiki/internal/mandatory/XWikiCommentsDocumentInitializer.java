@@ -24,9 +24,11 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
@@ -37,16 +39,44 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
  * @since 4.3M1
  */
 @Component
-@Named("XWiki.XWikiComments")
+@Named(XWikiCommentsDocumentInitializer.LOCAL_REFERENCE_STRING)
 @Singleton
 public class XWikiCommentsDocumentInitializer extends AbstractMandatoryClassInitializer
 {
+    /**
+     * The name of the initialized document.
+     * 
+     * @since 9.4RC1
+     */
+    public static final String NAME = "XWikiComments";
+
+    /**
+     * The local reference of the initialized document as String.
+     * 
+     * @since 9.4RC1
+     */
+    public static final String LOCAL_REFERENCE_STRING = XWiki.SYSTEM_SPACE + '.' + NAME;
+
+    /**
+     * The local reference of the initialized document as String.
+     * 
+     * @since 9.4RC1
+     */
+    public static final LocalDocumentReference LOCAL_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE, NAME);
+
+    /**
+     * A regex to match any object reference with initialized class.
+     * 
+     * @since 9.4RC1
+     */
+    public static final RegexEntityReference OBJECT_REFERENCE = BaseObjectReference.any(LOCAL_REFERENCE_STRING);
+
     /**
      * Default constructor.
      */
     public XWikiCommentsDocumentInitializer()
     {
-        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiComments"));
+        super(LOCAL_REFERENCE);
     }
 
     @Override

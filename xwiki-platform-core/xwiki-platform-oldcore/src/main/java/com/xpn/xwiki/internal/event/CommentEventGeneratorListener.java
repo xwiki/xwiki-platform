@@ -36,8 +36,8 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Produce comments related events based on {@link XObjectEvent object events}.
@@ -53,7 +53,8 @@ public class CommentEventGeneratorListener implements EventListener
     /**
      * The reference to match class XWiki.Comment on whatever wiki.
      */
-    private static final RegexEntityReference COMMENTCLASS_REFERENCE = BaseObjectReference.any("XWiki.XWikiComments");
+    private static final RegexEntityReference COMMENTCLASS_REFERENCE =
+        XWikiCommentsDocumentInitializer.OBJECT_REFERENCE;
 
     /**
      * The matched events.

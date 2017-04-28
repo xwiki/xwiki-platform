@@ -21,14 +21,12 @@ package com.xpn.xwiki.internal.event;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
@@ -39,6 +37,7 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Produce comments related events based on {@link XObjectEvent object events}.
@@ -54,8 +53,7 @@ public class CommentEventGeneratorListener implements EventListener
     /**
      * The reference to match class XWiki.Comment on whatever wiki.
      */
-    private static final RegexEntityReference COMMENTCLASS_REFERENCE = new RegexEntityReference(
-        Pattern.compile(".*:XWiki.XWikiComments\\[\\d*\\]"), EntityType.OBJECT);
+    private static final RegexEntityReference COMMENTCLASS_REFERENCE = BaseObjectReference.any("XWiki.XWikiComments");
 
     /**
      * The matched events.

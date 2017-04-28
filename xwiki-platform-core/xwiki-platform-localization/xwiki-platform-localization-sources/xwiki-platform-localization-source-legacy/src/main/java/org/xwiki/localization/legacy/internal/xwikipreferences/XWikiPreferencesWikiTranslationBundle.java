@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.DisposableCacheValue;
@@ -41,20 +40,20 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * @version $Id$
  * @since 4.3M2
  */
-public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBundle implements EventListener,
-    DisposableCacheValue
+public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBundle
+    implements EventListener, DisposableCacheValue
 {
     public static final String ID = XWikiPreferencesTranslationBundle.ID + ".wiki";
 
@@ -100,13 +99,11 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
 
         DocumentReference preferences = new DocumentReference(this.wiki, "XWiki", "XWikiPreferences");
 
-        EntityReference documentBundlesProperty =
-            new EntityReference(DOCUMENT_BUNDLE_PROPERTY, EntityType.OBJECT_PROPERTY, new RegexEntityReference(
-                Pattern.compile(this.wiki + ":XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT, preferences));
+        EntityReference documentBundlesProperty = new EntityReference(DOCUMENT_BUNDLE_PROPERTY,
+            EntityType.OBJECT_PROPERTY, BaseObjectReference.any("XWiki.XWikiPreferences", preferences));
 
-        this.events =
-            Arrays.<Event>asList(new XObjectPropertyAddedEvent(documentBundlesProperty),
-                new XObjectPropertyUpdatedEvent(documentBundlesProperty));
+        this.events = Arrays.<Event>asList(new XObjectPropertyAddedEvent(documentBundlesProperty),
+            new XObjectPropertyUpdatedEvent(documentBundlesProperty));
 
         this.observation.addListener(this);
     }
@@ -115,9 +112,8 @@ public class XWikiPreferencesWikiTranslationBundle extends AbstractTranslationBu
     {
         DocumentReference preferencesReference = new DocumentReference(this.wiki, "XWiki", "XWikiPreferences");
 
-        String documentNameListString =
-            (String) this.documentAccessBridge.getProperty(preferencesReference, preferencesReference,
-                DOCUMENT_BUNDLE_PROPERTY);
+        String documentNameListString = (String) this.documentAccessBridge.getProperty(preferencesReference,
+            preferencesReference, DOCUMENT_BUNDLE_PROPERTY);
 
         Set<DocumentReference> documents;
         if (documentNameListString != null) {

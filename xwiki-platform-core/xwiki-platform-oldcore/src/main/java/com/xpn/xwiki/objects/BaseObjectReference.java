@@ -22,11 +22,13 @@ package com.xpn.xwiki.objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.web.Utils;
 
@@ -119,6 +121,28 @@ public class BaseObjectReference extends ObjectReference
 
         // Indicate that the name does not need to be parsed
         this.nameParsed = true;
+    }
+
+    /**
+     * @param classReference the local reference of the class (e.g. "XWiki.XWikiPreferences")
+     * @return a reference used to match on object reference with the passed xclass
+     * @since 9.4RC1
+     */
+    public static RegexEntityReference any(String classReference)
+    {
+        return any(classReference, null);
+    }
+
+    /**
+     * @param classReference the local reference of the class (e.g. "XWiki.XWikiPreferences")
+     * @param parent the parent of the object reference
+     * @return a reference used to match on object reference with the passed xclass
+     * @since 9.4RC1
+     */
+    public static RegexEntityReference any(String classReference, EntityReference parent)
+    {
+        return new RegexEntityReference(Pattern.compile(Pattern.quote(classReference) + "\\[\\d*\\]"),
+            EntityType.OBJECT, parent);
     }
 
     private DocumentReference resolveClassReference(EntityReference classReference)

@@ -96,6 +96,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 
 @Component(roles = RepositoryManager.class)
@@ -108,8 +109,7 @@ public class RepositoryManager implements Initializable, Disposable
      */
     private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE =
         new RegexEntityReference(Pattern.compile(XWikiRepositoryModel.PROP_DEPENDENCY_ID), EntityType.OBJECT_PROPERTY,
-            new RegexEntityReference(Pattern.compile(".*:" + XWikiRepositoryModel.EXTENSION_CLASSNAME + "\\[\\d*\\]"),
-                EntityType.OBJECT));
+            BaseObjectReference.any(XWikiRepositoryModel.EXTENSION_CLASSNAME));
 
     private static final List<Event> EVENTS =
         Arrays.<Event>asList(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
@@ -951,8 +951,8 @@ public class RepositoryManager implements Initializable, Disposable
 
                             DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
                                 new DefaultVersionConstraint(xobjectConstraint));
-                            xobjectDependency.setRepositories(
-                                XWikiRepositoryModel.toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
+                            xobjectDependency.setRepositories(XWikiRepositoryModel
+                                .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
 
                             if (dependencies.size() > dependencyIndex) {
                                 ExtensionDependency dependency = dependencies.get(dependencyIndex);

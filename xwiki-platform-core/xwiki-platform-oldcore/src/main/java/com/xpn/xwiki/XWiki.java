@@ -52,7 +52,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Priority;
@@ -197,6 +196,7 @@ import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
@@ -6892,8 +6892,7 @@ public class XWiki implements EventListener
      * The reference to match properties "plugins" and "backlinks" of class XWiki.XWikiPreference on whatever wiki.
      */
     private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE =
-        new RegexEntityReference(Pattern.compile("backlinks"), EntityType.OBJECT_PROPERTY,
-            new RegexEntityReference(Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
+        BaseObjectReference.any("XWiki.XWikiPreferences");
 
     private static final List<Event> LISTENER_EVENTS =
         Arrays.<Event>asList(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),

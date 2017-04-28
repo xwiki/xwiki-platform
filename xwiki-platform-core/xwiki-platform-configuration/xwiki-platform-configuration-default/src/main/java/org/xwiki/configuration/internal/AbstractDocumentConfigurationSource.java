@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -39,7 +38,6 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -58,6 +56,7 @@ import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 
 /**
@@ -66,8 +65,8 @@ import com.xpn.xwiki.objects.BaseProperty;
  * @version $Id$
  * @since 2.0M2
  */
-public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource implements Initializable,
-    Disposable
+public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource
+    implements Initializable, Disposable
 {
     /**
      * Represents no value (ie the default value will be used) in xproperties.
@@ -164,8 +163,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     protected List<Event> getCacheCleanupEvents()
     {
         RegexEntityReference classMatcher =
-            new RegexEntityReference(Pattern.compile(".*:" + this.referenceSerializer.serialize(getClassReference())
-                + "\\[\\d*\\]"), EntityType.OBJECT);
+            BaseObjectReference.any(this.referenceSerializer.serialize(getClassReference()));
 
         return Arrays.<Event>asList(new XObjectAddedEvent(classMatcher), new XObjectDeletedEvent(classMatcher),
             new XObjectUpdatedEvent(classMatcher), new WikiDeletedEvent());

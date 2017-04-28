@@ -58,7 +58,7 @@ public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTest
         assertProtectedScript("\"Hello World\".value[0]");
 
         // Verify we can do a new and use Integer class
-        assertSafeScript("Integer.valueOf(6)");
+        assertSafeScript("new Integer(6)");
     }
 
     @Test

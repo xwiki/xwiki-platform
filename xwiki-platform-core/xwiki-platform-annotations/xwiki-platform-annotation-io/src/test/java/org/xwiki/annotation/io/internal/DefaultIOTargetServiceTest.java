@@ -230,7 +230,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(classResolver).resolve("XWiki.Class");
+                allowing(classResolver).resolve("XWiki.Class", new DocumentReference("wiki", "Space", "Page"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "Class")));
                 oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
                                            new DocumentReference("wiki", "XWiki", "Class"), 1, "property");
@@ -254,7 +254,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(classResolver).resolve("XWiki.Class");
+                allowing(classResolver).resolve("XWiki.Class", new DocumentReference("wiki", "Space", "Page"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "Class")));
                 oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
                                            new DocumentReference("wiki", "XWiki", "Class"), "property");
@@ -278,7 +278,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(classResolver).resolve("XWiki.Class");
+                allowing(classResolver).resolve("XWiki.Class", new DocumentReference("xwiki", "Main", "Page"));
                 will(returnValue(new DocumentReference("xwiki", "XWiki", "Class")));
                 oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "Page"),
                     new DocumentReference("xwiki", "XWiki", "Class"), "property");
@@ -325,7 +325,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         {
             {
                 // this will fail if defaults fail, not very well isolated
-                allowing(classResolver).resolve("Classes.Class");
+                allowing(classResolver).resolve("Classes.Class", new DocumentReference("xwiki", "Main", "WebHome"));
                 will(returnValue(new DocumentReference("xwiki", "Classes", "Class")));
                 oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "WebHome"),
                     new DocumentReference("xwiki", "Classes", "Class"), 3, "property");

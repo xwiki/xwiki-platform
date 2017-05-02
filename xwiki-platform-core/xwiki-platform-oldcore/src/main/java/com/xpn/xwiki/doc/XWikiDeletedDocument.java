@@ -25,12 +25,15 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateDeletedDocumentContent;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Archive of deleted document, stored in {@link com.xpn.xwiki.store.XWikiRecycleBinStoreInterface}. Immutable, because
@@ -178,6 +181,27 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     protected void setFullName(String docFullName)
     {
         this.fullName = docFullName;
+    }
+
+    /**
+     * @return the document reference for the deleted document, including any locale information
+     * @since 9.4RC1
+     */
+    public DocumentReference getDocumentReference()
+    {
+        DocumentReference documentReference = getDocumentReferenceResolver().resolve(getFullName());
+
+        Locale localeValue = getLocale();
+        if (localeValue != null) {
+            documentReference = new DocumentReference(documentReference, localeValue);
+        }
+
+        return documentReference;
+    }
+
+    private static DocumentReferenceResolver<String> getDocumentReferenceResolver()
+    {
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
     }
 
     /**

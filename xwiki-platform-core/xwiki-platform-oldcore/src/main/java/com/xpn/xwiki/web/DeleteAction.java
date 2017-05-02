@@ -108,7 +108,7 @@ public class DeleteAction extends XWikiAction
         boolean recycleIdIsValid = false;
         if (sindex != null) {
             long index = Long.parseLong(sindex);
-            if (context.getWiki().getRecycleBinStore().getDeletedDocument(doc, index, context, true) != null) {
+            if (context.getWiki().getRecycleBinStore().getDeletedDocument(index, context, true) != null) {
                 recycleIdIsValid = true;
             }
         }
@@ -150,7 +150,7 @@ public class DeleteAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
-        XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
+        XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(index, context, true);
         // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
         // don't try to delete it and instead redirect to the view page.
         if (dd != null) {
@@ -164,7 +164,7 @@ public class DeleteAction extends XWikiAction
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                     "The specified trash entry does not match the current document");
             }
-            xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+            xwiki.getRecycleBinStore().deleteFromRecycleBin(index, context, true);
         }
         sendRedirect(response, Utils.getRedirect("view", context));
     }

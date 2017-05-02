@@ -394,18 +394,31 @@ public class XWiki extends Api
     }
 
     /**
-     * @return specified documents in recycle bin
      * @param fullname - {@link XWikiDocument#getFullName()}
      * @param locale - {@link XWikiDocument#getLocale()}
+     * @param index - {@link XWikiDocument#getId()}
+     * @return the specified document from the recycle bin
      * @throws XWikiException if any error
+     * @deprecated since 9.4RC1. Use {@link #getDeletedDocument(String)} instead.
      */
+    @Deprecated
     public DeletedDocument getDeletedDocument(String fullname, String locale, String index) throws XWikiException
+    {
+        return getDeletedDocument(index);
+    }
+
+    /**
+     * @return the specified document from the recycle bin
+     * @throws XWikiException if any error
+     * @since 9.4RC1
+     */
+    public DeletedDocument getDeletedDocument(String index) throws XWikiException
     {
         if (!NumberUtils.isDigits(index)) {
             return null;
         }
-        XWikiDeletedDocument dd =
-            this.xwiki.getDeletedDocument(fullname, locale, Integer.parseInt(index), this.context);
+
+        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(Long.parseLong(index), this.context);
         if (dd == null) {
             return null;
         }

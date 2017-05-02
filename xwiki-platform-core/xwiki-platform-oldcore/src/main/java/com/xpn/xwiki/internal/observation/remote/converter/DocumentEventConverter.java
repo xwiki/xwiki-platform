@@ -128,7 +128,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         XWikiDeletedDocument[] deletedDocuments = store.getAllDeletedDocuments(origDoc, xcontext, true);
         if (deletedDocuments != null && deletedDocuments.length > 0) {
             long index = deletedDocuments[0].getId();
-            origDoc = store.restoreFromRecycleBin(doc, index, xcontext, true);
+            origDoc = store.restoreFromRecycleBin(index, xcontext, true);
         }
 
         doc.setOriginalDocument(origDoc);

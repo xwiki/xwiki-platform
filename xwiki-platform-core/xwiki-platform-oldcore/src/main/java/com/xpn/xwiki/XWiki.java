@@ -1934,14 +1934,23 @@ public class XWiki implements EventListener
 
     /**
      * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, String)
+     * @deprecated since 9.4RC1. Use {@link #getDeletedDocument(long, XWikiContext)} instead.
      */
+    @Deprecated
     public XWikiDeletedDocument getDeletedDocument(String fullname, String locale, int index, XWikiContext context)
         throws XWikiException
     {
+        return getDeletedDocument(index, context);
+    }
+
+    /**
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String)
+     * @since 9.4RC1
+     */
+    public XWikiDeletedDocument getDeletedDocument(long index, XWikiContext context) throws XWikiException
+    {
         if (hasRecycleBin(context)) {
-            XWikiDocument doc = new XWikiDocument(getCurrentMixedDocumentReferenceResolver().resolve(fullname));
-            doc.setLanguage(locale);
-            return getRecycleBinStore().getDeletedDocument(doc, index, context, true);
+            return getRecycleBinStore().getDeletedDocument(index, context, true);
         } else {
             return null;
         }
@@ -6480,13 +6489,29 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @throws XWikiException when failing to restore document
      * @since 5.4RC1
+     * @deprecated since 9.4RC1. Use {@link #restoreFromRecycleBin(long, String, XWikiContext)} instead.
      */
+    @Deprecated
     public void restoreFromRecycleBin(final XWikiDocument doc, long index, String comment, XWikiContext context)
         throws XWikiException
     {
-        XWikiDocument newdoc = getRecycleBinStore().restoreFromRecycleBin(doc, index, context, true);
+        restoreFromRecycleBin(index, comment, context);
+    }
+
+    /**
+     * Restore a document with passed index from recycle bin.
+     *
+     * @param index the index of the document in the recycle bin
+     * @param comment the comment to use when saving the document
+     * @param context see {@link XWikiContext}
+     * @throws XWikiException when failing to restore document
+     * @since 9.4RC1
+     */
+    public void restoreFromRecycleBin(long index, String comment, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument newdoc = getRecycleBinStore().restoreFromRecycleBin(index, context, true);
         saveDocument(newdoc, comment, context);
-        getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+        getRecycleBinStore().deleteFromRecycleBin(index, context, true);
     }
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException

@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -199,5 +200,14 @@ public class DeletedDocument extends Api
         }
 
         return null;
+    }
+
+    /**
+     * @return the document reference for the deleted document, including any locale information
+     * @since 9.4RC1
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return this.deletedDoc.getDocumentReference();
     }
 }

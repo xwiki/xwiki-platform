@@ -72,9 +72,21 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used while loading
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if error while loading
+     * @deprecated since 9.4RC1. The document parameter is useless and gets in the way. Use
+     *             {@link #restoreFromRecycleBin(long, XWikiContext, boolean)} instead.
      */
+    @Deprecated
     XWikiDocument restoreFromRecycleBin(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
         throws XWikiException;
+
+    /**
+     * @param index - what deleted document to restore. see {@link XWikiDeletedDocument#getId()}
+     * @param context - used while loading
+     * @param bTransaction - should use old transaction(false) or create new (true)
+     * @return the restored document from recycle bin
+     * @throws XWikiException if error while loading
+     */
+    XWikiDocument restoreFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
      * @return specified deleted document from recycle bin. null if not found.
@@ -83,8 +95,22 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used while loading
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if error while loading
+     * @deprecated since 9.4RC1. The document parameter is useless and gets in the way. Use
+     *             {@link #getDeletedDocument(long, XWikiContext, boolean)} instead.
      */
+    @Deprecated
     XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
+
+    /**
+     * @param index - what deleted document to restore. See {@link XWikiDeletedDocument#getId()}
+     * @param context - used while loading
+     * @param bTransaction - should use old transaction(false) or create new (true)
+     * @return specified deleted document from recycle bin or {@code null} if not found.
+     * @throws XWikiException if error while loading
+     * @since 9.4RC1
+     */
+    XWikiDeletedDocument getDeletedDocument(long index, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
     /**
@@ -116,7 +142,20 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used for environment
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if any error
+     * @deprecated since 9.4RC1. The document parameter is useless and gets in the way. Use
+     *             {@link #deleteFromRecycleBin(long, XWikiContext, boolean)} instead.
      */
+    @Deprecated
     void deleteFromRecycleBin(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
         throws XWikiException;
+
+    /**
+     * Permanently delete document from recycle bin.
+     *
+     * @param index - which instance document in recycle bin to delete
+     * @param context - used for environment
+     * @param bTransaction - should use old transaction(false) or create new (true)
+     * @throws XWikiException if any error
+     */
+    void deleteFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException;
 }

@@ -192,12 +192,13 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     private XWikiDeletedDocument resolveDeletedDocumentContent(XWikiDeletedDocument deletedDocument,
-        DocumentReference reference, boolean bTransaction) throws XWikiException
+        boolean bTransaction) throws XWikiException
     {
         XWikiRecycleBinContentStoreInterface contentStore =
             getXWikiRecycleBinContentStore(deletedDocument.getXmlStore());
 
         if (contentStore != null) {
+            DocumentReference reference = deletedDocument.getDocumentReference();
             XWikiDeletedDocumentContent content = contentStore.get(reference, deletedDocument.getId(), bTransaction);
 
             try {
@@ -231,14 +232,14 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         return trashdoc;
     }
 
-    private void deleteDeletedDocumentContent(XWikiDocument doc, XWikiDeletedDocument deletedDocument,
-        boolean bTransaction) throws XWikiException
+    private void deleteDeletedDocumentContent(XWikiDeletedDocument deletedDocument, boolean bTransaction)
+        throws XWikiException
     {
         XWikiRecycleBinContentStoreInterface contentStore =
             getXWikiRecycleBinContentStore(deletedDocument.getXmlStore());
 
         if (contentStore != null) {
-            contentStore.delete(doc.getDocumentReferenceWithLocale(), deletedDocument.getId(), bTransaction);
+            contentStore.delete(deletedDocument.getDocumentReference(), deletedDocument.getId(), bTransaction);
         }
     }
 
@@ -281,9 +282,16 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDocument restoreFromRecycleBin(final XWikiDocument doc, final long index,
         final XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        return restoreFromRecycleBin(index, inputxcontext, bTransaction);
+    }
+
+    @Override
+    public XWikiDocument restoreFromRecycleBin(long index, XWikiContext inputxcontext, boolean bTransaction)
+        throws XWikiException
+    {
         XWikiContext context = getXWikiContext(inputxcontext);
 
-        XWikiDeletedDocument deletedDocument = getDeletedDocument(doc, index, context, bTransaction);
+        XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, bTransaction);
         return deletedDocument.restoreDocument(context);
     }
 
@@ -291,11 +299,18 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, final long index, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
-        return getDeletedDocument(doc, index, context, true, bTransaction);
+        return getDeletedDocument(index, context, bTransaction);
     }
 
-    private XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, final long index, XWikiContext context,
-        boolean resolve, boolean bTransaction) throws XWikiException
+    @Override
+    public XWikiDeletedDocument getDeletedDocument(long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        return getDeletedDocument(index, context, true, bTransaction);
+    }
+
+    private XWikiDeletedDocument getDeletedDocument(final long index, XWikiContext context, boolean resolve,
+        boolean bTransaction) throws XWikiException
     {
         return executeRead(context, new HibernateCallback<XWikiDeletedDocument>()
         {
@@ -305,9 +320,11 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
                 XWikiDeletedDocument deletedDocument =
                     (XWikiDeletedDocument) session.get(XWikiDeletedDocument.class, Long.valueOf(index));
 
-                return resolve
-                    ? resolveDeletedDocumentContent(deletedDocument, doc.getDocumentReferenceWithLocale(), false)
-                    : deletedDocument;
+                if (deletedDocument != null && resolve) {
+                    deletedDocument = resolveDeletedDocumentContent(deletedDocument, false);
+                }
+
+                return deletedDocument;
             }
         });
     }
@@ -320,8 +337,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 
         // Resolve deleted document content if needed
         for (int i = 0; i < deletedDocuments.length; ++i) {
-            deletedDocuments[i] =
-                resolveDeletedDocumentContent(deletedDocuments[i], doc.getDocumentReferenceWithLocale(), bTransaction);
+            deletedDocuments[i] = resolveDeletedDocumentContent(deletedDocuments[i], bTransaction);
         }
 
         return deletedDocuments;
@@ -352,18 +368,24 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public void deleteFromRecycleBin(XWikiDocument doc, final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
+        deleteFromRecycleBin(index, context, bTransaction);
+    }
+
+    @Override
+    public void deleteFromRecycleBin(final long index, XWikiContext context, boolean bTransaction) throws XWikiException
+    {
         executeWrite(context, new HibernateCallback<Void>()
         {
             @Override
             public Void doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                XWikiDeletedDocument deletedDocument = getDeletedDocument(doc, index, context, false, bTransaction);
+                XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, false, bTransaction);
 
                 // Delete metadata
                 session.delete(deletedDocument);
 
                 // Delete content
-                deleteDeletedDocumentContent(doc, deletedDocument, bTransaction);
+                deleteDeletedDocumentContent(deletedDocument, bTransaction);
 
                 return null;
             }

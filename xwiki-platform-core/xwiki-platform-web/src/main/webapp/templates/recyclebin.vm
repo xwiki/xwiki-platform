@@ -1,5 +1,5 @@
 ## Preview deleted document in recycle bin
-#set ($deletedDocument = $xwiki.getDeletedDocument($tdoc.getFullName(), "$tdoc.locale", $request.get('id')))
+#set ($deletedDocument = $xwiki.getDeletedDocument($request.get('id')))
 #if ($deletedDocument)
   #if (!$deletedDocument.getDocument())
     #xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))

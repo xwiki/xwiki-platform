@@ -85,6 +85,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @return the restored document from recycle bin
      * @throws XWikiException if error while loading
+     * @since 9.4RC1
      */
     XWikiDocument restoreFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException;
 
@@ -156,6 +157,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used for environment
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if any error
+     * @since 9.4RC1
      */
     void deleteFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException;
 }

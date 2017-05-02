@@ -34,11 +34,6 @@ import org.xwiki.observation.ObservationManager;
 public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T>
 {
     /**
-     * Flag indicating if the job was canceled.
-     */
-    private boolean canceled;
-
-    /**
      * Creates a new instance.
      * 
      * @param request the request provided when the job was started
@@ -65,21 +60,5 @@ public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T
         LoggerManager loggerManager, JobStatus parentJobStatus)
     {
         super(jobType, request, parentJobStatus, observationManager, loggerManager);
-    }
-
-    /**
-     * Cancel the job.
-     */
-    public void cancel()
-    {
-        this.canceled = true;
-    }
-
-    /**
-     * @return {@code true} if the job was canceled, {@code false} otherwise
-     */
-    public boolean isCanceled()
-    {
-        return this.canceled;
     }
 }

@@ -22,6 +22,7 @@ package org.xwiki.platform.notifications.test.ui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
@@ -44,12 +45,9 @@ public class NotificationsTest extends AbstractTest
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
 
-    private void setUpUsers() throws Exception
+    @Before
+    public void setUpUsers() throws Exception
     {
-        // Remove any previous registered users
-        getUtil().rest().deletePage("XWiki", FIRST_USER_NAME);
-        getUtil().rest().deletePage("XWiki", FIRST_USER_NAME);
-
         // Create the two users we will be using
         getUtil().createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
         getUtil().createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
@@ -71,16 +69,13 @@ public class NotificationsTest extends AbstractTest
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
 
-        // Create the users
-        this.setUpUsers();
-
         // The user 1 creates a new page, the user 2 shouldn’t recieve any notification
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        getUtil().createPage("Main", "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().createPage(getTestClassName(), "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
+        getUtil().gotoPage(getTestClassName(), "WebHome");
 
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().gotoPage(getTestClassName(), "WebHome");
 
         tray = new NotificationsTrayPage();
         assertFalse(tray.areNotificationsAvailable());
@@ -93,13 +88,13 @@ public class NotificationsTest extends AbstractTest
         // We create a lot of pages in order to test the notification badge
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
-            getUtil().createPage("Main", "Page" + i, "Simple content", "Simple title");
+            getUtil().createPage(getTestClassName(), "Page" + i, "Simple content", "Simple title");
         }
-        getUtil().createPage("Main", "DTP", "Deletion test page", "Deletion test content");
+        getUtil().createPage(getTestClassName(), "DTP", "Deletion test page", "Deletion test content");
 
         // Check that the badge is showing «20+»
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().gotoPage(getTestClassName(), "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 
@@ -115,10 +110,10 @@ public class NotificationsTest extends AbstractTest
 
         // Delete the "Deletion test page" and test the notification
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        getUtil().deletePage("Main", "DTP");
+        getUtil().deletePage(getTestClassName(), "DTP");
         
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().gotoPage(getTestClassName(), "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(1, tray.getNotificationsCount());
         tray.clearAllNotifications();

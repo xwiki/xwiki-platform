@@ -47,12 +47,13 @@
 $xwiki.ssx.use('XWiki.DeletedDocuments')##
 $xwiki.jsx.use('XWiki.DeletedDocuments')##
 ##
-#set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'actions'])
+#set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'ddoc.batchId', 'actions'])
 #set($columnProperties = {
     'ddoc.fullName'  : { 'type' : 'text', 'size' : 10 },
     'ddoc.title'     : { 'type' : 'text', 'filterable' : false, 'sortable' : false },
     'ddoc.date'      : { 'type' : 'date', 'filterable' : false },
     'ddoc.deleter'   : { 'type' : 'text', 'size' : 10 },
+    'ddoc.batchId'   : { 'type' : 'text' },
     'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
   })##
 #set($options = {
@@ -81,7 +82,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 
   #else
   #macro(displayDeletedDoc $id)
-    #set($ddoc = $xwiki.getDeletedDocument($item))
+    #set($ddoc = $xwiki.getDeletedDocument($id))
     #set($originalDocument = $ddoc.getDocument())
     &lt;tr&gt;
       &lt;td&gt;&lt;a href="$originalDocument.getURL('view', "viewer=recyclebin&amp;amp;id=${id}")"&gt;$escapetool.xml($ddoc.fullName)&lt;/a&gt;&lt;/td&gt;

@@ -63,6 +63,11 @@ public interface RefactoringJobs
     String DELETE = GROUP_PREFIX + "delete";
 
     /**
+     * The role hint of the job that deletes entities.
+     */
+    String RESTORE = GROUP_PREFIX + "restore";
+
+    /**
      * The role hint of the job that creates entities.
      *
      * @since 7.4M2

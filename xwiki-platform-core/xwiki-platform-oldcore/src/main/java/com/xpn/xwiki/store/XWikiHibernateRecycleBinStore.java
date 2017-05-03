@@ -347,18 +347,24 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
+        XWikiDeletedDocument[] deletedDocuments = getAllDeletedDocuments(batchId, true, context, bTransaction);
+
+        return deletedDocuments;
+    }
+
+    @Override
+    public XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, boolean withContent, XWikiContext context,
+        boolean bTransaction) throws XWikiException
+    {
         XWikiDeletedDocument[] deletedDocuments =
             executeRead(context, new DeletedDocumentsBatchHibernateCallback(batchId));
 
         // Resolve deleted document content if needed
-        for (int i = 0; i < deletedDocuments.length; ++i) {
-            XWikiDeletedDocument deletedDocument = deletedDocuments[i];
-            DocumentReference simpleDocumentReference = this.defaultResolver.resolve(deletedDocument.getFullName());
-            DocumentReference documentReferenceWithLocale =
-                new DocumentReference(simpleDocumentReference, deletedDocument.getLocale());
-
-            deletedDocuments[i] =
-                resolveDeletedDocumentContent(deletedDocument, documentReferenceWithLocale, bTransaction);
+        if (withContent) {
+            for (int i = 0; i < deletedDocuments.length; ++i) {
+                XWikiDeletedDocument deletedDocument = deletedDocuments[i];
+                deletedDocuments[i] = resolveDeletedDocumentContent(deletedDocument, bTransaction);
+            }
         }
 
         return deletedDocuments;

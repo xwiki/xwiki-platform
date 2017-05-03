@@ -47,12 +47,14 @@ import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.DeletedDocument;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 
 /**
  * Default implementation of {@link ModelBridge} based on the old XWiki model.
- * 
+ *
  * @version $Id$
  * @since 7.4M2
  */
@@ -420,5 +422,104 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return value;
+    }
+
+    @Override
+    public boolean restoreDeletedDocument(long deletedDocumentId, boolean checkContextUser)
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        DocumentReference deletedDocumentReference = null;
+        try {
+            // Retrieve the deleted document by ID.
+            XWikiDeletedDocument deletedDocument = xwiki.getDeletedDocument(deletedDocumentId, context);
+            if (deletedDocument == null) {
+                logger.error("Deleted document with ID [{}] does not exist.", deletedDocumentId);
+                return false;
+            }
+
+            deletedDocumentReference = deletedDocument.getDocumentReference();
+
+            // If the document (or the translation) that we want to restore does not exist, restore it.
+            if (xwiki.exists(deletedDocumentReference, context)) {
+                // TODO: Add overwrite support maybe also with interactive (question/answer) mode.
+                // Default for now is to skip and log existing documents.
+                logger.warn("Document [{}] with ID [{}] has been skipped. Document already exists",
+                    deletedDocument.getFullName(), deletedDocumentId);
+            } else if (checkContextUser && !canRestoreDeletedDocument(deletedDocumentId, context.getUserReference())) {
+                logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,
+                    deletedDocumentId);
+            } else {
+                // Restore the document.
+                xwiki.restoreFromRecycleBin(deletedDocument.getId(), "Restored from recycle bin", context);
+
+                logger.info("Document [{}] has been restored", deletedDocumentReference);
+
+                return true;
+            }
+        } catch (Exception e) {
+            // Try to log the document reference since it`s more useful than the ID.
+            if (deletedDocumentReference != null) {
+                logger.error("Failed to restore document [{}] with ID [{}]", deletedDocumentReference,
+                    deletedDocumentId, e);
+            } else {
+                logger.error("Failed to restore deleted document with ID [{}]", deletedDocumentId, e);
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public List<Long> getDeletedDocumentIds(String batchId)
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        List<Long> result = new ArrayList<>();
+        try {
+            XWikiDeletedDocument[] deletedDocuments =
+                xwiki.getRecycleBinStore().getAllDeletedDocuments(batchId, false, context, true);
+            for (XWikiDeletedDocument deletedDocument : deletedDocuments) {
+                result.add(deletedDocument.getId());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to get deleted document IDs for batch [{}]", batchId);
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean canRestoreDeletedDocument(long deletedDocumentId, DocumentReference userReference)
+    {
+        boolean result = false;
+
+        XWikiContext context = this.xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        // Remember the context user.
+        DocumentReference currentUserReference = context.getUserReference();
+        try {
+            XWikiDeletedDocument deletedDocument =
+                xwiki.getRecycleBinStore().getDeletedDocument(deletedDocumentId, context, true);
+
+            // Reuse the DeletedDocument API to check rights.
+            DeletedDocument deletedDocumentApi = new DeletedDocument(deletedDocument, context);
+
+            // Note: DeletedDocument API works with the current context user.
+            context.setUserReference(userReference);
+
+            return deletedDocumentApi.canUndelete();
+        } catch (Exception e) {
+            logger.error("Failed to check restore rights on deleted document [{}] for user [{}]", deletedDocumentId,
+                userReference, e);
+        } finally {
+            // Restore the context user;
+            context.setUserReference(currentUserReference);
+        }
+
+        return result;
     }
 }

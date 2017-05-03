@@ -19,13 +19,18 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
+import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.RestoreRequest;
+import org.xwiki.refactoring.script.RefactoringScriptService;
+import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,9 +54,11 @@ public class UndeleteAction extends XWikiAction
 
     private static final String CONFIRM_PARAMETER = "confirm";
 
+    private static final String ASYNC_PARAM = "async";
+
     private static final String TRUE = "true";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UndeleteAction.class);
+    private static final String VIEW_ACTION = "view";
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -70,58 +77,49 @@ public class UndeleteAction extends XWikiAction
             return false;
         }
 
-        XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
-        Locale deletedDocumentLocale = null;
+        XWikiDeletedDocument deletedDocument = getDeletedDocument(context);
 
-        String sindex = request.getParameter(ID_PARAMETER);
-        if (xwiki.hasRecycleBin(context) && StringUtils.isNotBlank(sindex)) {
-            long index = Long.parseLong(sindex);
+        boolean redirected = false;
 
-            // See exactly what is it that we want to restore by looking at the language of the deleted document.
-            // FIXME: don`t use int type for index. Fix xwiki.getDeletedDocument to properly use long.
-            XWikiDeletedDocument deletedDocument =
-                xwiki.getDeletedDocument(StringUtils.EMPTY, StringUtils.EMPTY, (int) index, context);
-            if (deletedDocument != null) {
-                // Remember the locale that we might want to redirect to, later.
-                deletedDocumentLocale = deletedDocument.getLocale();
-
-                if (TRUE.equals(request.getParameter(INCLUDE_BATCH_PARAMETER))) {
-                    // Restore the entire batch.
-                    String batchId = deletedDocument.getBatchId();
-                    XWikiDeletedDocument[] batchDeletedDocuments =
-                        xwiki.getRecycleBinStore().getAllDeletedDocuments(batchId, context, true);
-                    for (XWikiDeletedDocument batchDeletedDocument : batchDeletedDocuments) {
-                        // FIXME: Replace this with a proper RestoreJob that does asynchronous work and reports
-                        // progress.
-
-                        // Avoid breaking the entire restore operation if some documents fail.
-                        try {
-                            restoreDocument(batchDeletedDocument, context);
-                        } catch (Exception e) {
-                            LOGGER.error("Failed to restore document [{}] from batch [{}]",
-                                batchDeletedDocument.getFullName(), batchId, e);
-                        }
-                    }
-                } else {
-                    // Restore just the current document.
-                    restoreDocument(deletedDocument, context);
-                }
-            }
+        if (deletedDocument != null) {
+            redirected = restoreDocument(deletedDocument, context);
         }
 
         // Redirect to the undeleted document. Make sure to redirect to the proper translation.
-        String queryString = getRedirectQueryString(context, xwiki, deletedDocumentLocale);
-        sendRedirect(response, doc.getURL("view", queryString, context));
+        if (!redirected) {
+            String queryString = getRedirectQueryString(context, deletedDocument.getLocale());
+            sendRedirect(response, doc.getURL(VIEW_ACTION, queryString, context));
+            redirected = true;
+        }
 
-        return false;
+        return redirected;
     }
 
-    private String getRedirectQueryString(XWikiContext context, XWiki xwiki, Locale deletedDocumentLocale)
+    private XWikiDeletedDocument getDeletedDocument(XWikiContext context) throws XWikiException
+    {
+        XWikiDeletedDocument result = null;
+
+        XWikiRequest request = context.getRequest();
+        XWiki xwiki = context.getWiki();
+
+        String sindex = request.getParameter(ID_PARAMETER);
+        if (StringUtils.isNotBlank(sindex)) {
+            long index = Long.parseLong(sindex);
+
+            result = xwiki.getDeletedDocument(index, context);
+        }
+
+        return result;
+    }
+
+    private String getRedirectQueryString(XWikiContext context, Locale deletedDocumentLocale)
     {
         String result = null;
+
+        XWiki xwiki = context.getWiki();
 
         if (deletedDocumentLocale != null && xwiki.isMultiLingual(context)) {
             result = String.format("language=%s", deletedDocumentLocale);
@@ -145,23 +143,70 @@ public class UndeleteAction extends XWikiAction
         return result;
     }
 
-    private void restoreDocument(XWikiDeletedDocument deletedDocument, XWikiContext context) throws XWikiException
+    private boolean restoreDocument(XWikiDeletedDocument deletedDocument, XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
+        Job restoreJob = startRestoreJob(deletedDocument, context);
 
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        DocumentReference deletedDocumentReference = resolver.resolve(deletedDocument.getFullName());
+        // If the user have asked for an asynchronous delete action...
+        if (isAsync(context.getRequest())) {
+            List<String> jobId = restoreJob.getRequest().getId();
+            // We redirect to the view action and accept the edge case when the restored document's rights might prevent
+            // the restoring user to view the result. In that case, an admin must be contacted to fix the rights.
+            sendRedirect(context.getResponse(),
+                Utils.getRedirect(VIEW_ACTION, "xpage=restore&jobId=" + serializeJobId(jobId), context));
 
-        // Since the RecycleBin expects an XWikiDocument, let`s produce one from the XWikiDeletedDocument.
-        // Note: Always include the locale of the deleted document, so that the correct deleted content is restored.
-        XWikiDocument doc = new XWikiDocument(deletedDocumentReference, deletedDocument.getLocale());
-
-        // If the document (or the translation) that we want to restore does not exist, restore it.
-        if (!xwiki.exists(doc.getDocumentReferenceWithLocale(), context)) {
-            xwiki.restoreFromRecycleBin(doc, deletedDocument.getId(), "Restored from recycle bin", context);
-        } else {
-            LOGGER.warn("Skipping restore for document [{}] of batch [{}]. Document already exists.",
-                deletedDocument.getFullName(), deletedDocument.getBatchId());
+            // A redirect has been performed.
+            return true;
         }
+
+        // Otherwise...
+        try {
+            restoreJob.join();
+        } catch (InterruptedException e) {
+            throw new XWikiException(String.format("Failed to restore [%s] from batch [%s]",
+                deletedDocument.getFullName(), deletedDocument.getBatchId()), e);
+        }
+
+        // No redirect has been performed.
+        return false;
+    }
+
+    private String serializeJobId(List<String> jobId)
+    {
+        return StringUtils.join(jobId, "/");
+    }
+
+    private Job startRestoreJob(XWikiDeletedDocument deletedDocument, XWikiContext context) throws XWikiException
+    {
+        XWikiRequest request = context.getRequest();
+
+        RefactoringScriptService refactoring =
+            (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
+
+        RestoreRequest restoreRequest = null;
+        if (TRUE.equals(request.getParameter(INCLUDE_BATCH_PARAMETER))) {
+            // Restore the entire batch, including the current document.
+            String batchId = deletedDocument.getBatchId();
+            restoreRequest = refactoring.createRestoreRequest(batchId);
+        } else {
+            // Restore just the current document.
+            restoreRequest = refactoring.createRestoreRequest(Arrays.asList(deletedDocument.getId()));
+        }
+        restoreRequest.setInteractive(isAsync(request));
+
+        try {
+            JobExecutor jobExecutor = Utils.getComponent(JobExecutor.class);
+            return jobExecutor.execute(RefactoringJobs.RESTORE, restoreRequest);
+        } catch (JobException e) {
+            throw new XWikiException(
+                String.format("Failed to schedule the restore job for deleted document [%s], id [%s] of batch [%s]",
+                    deletedDocument.getFullName(), deletedDocument.getId(), deletedDocument.getBatchId()),
+                e);
+        }
+    }
+
+    private boolean isAsync(XWikiRequest request)
+    {
+        return TRUE.equals(request.get(ASYNC_PARAM));
     }
 }

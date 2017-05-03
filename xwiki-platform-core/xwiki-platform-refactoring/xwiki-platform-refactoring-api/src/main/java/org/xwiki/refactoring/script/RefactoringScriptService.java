@@ -38,14 +38,17 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -92,6 +95,9 @@ public class RefactoringScriptService implements ScriptService
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @Inject
+    private ModelContext modelContext;
 
     /**
      * Creates a request to move the specified source entities to the specified destination entity (which becomes their
@@ -596,5 +602,61 @@ public class RefactoringScriptService implements ScriptService
     private void setError(Exception e)
     {
         this.execution.getContext().setProperty(REFACTORING_ERROR_KEY, e);
+    }
+
+    /**
+     * Creates a request to restore a specified batch of deleted documents from the recycle bin.
+     *
+     * @param batchId the ID of the batch of deleted documents to restore
+     * @return the restore request
+     * @since 9.4RC1
+     */
+    public RestoreRequest createRestoreRequest(String batchId)
+    {
+        RestoreRequest request = initializeRestoreRequest();
+        request.setBatchId(batchId);
+        return request;
+    }
+
+    /**
+     * Creates a request to restore a specified list of deleted documents from the recycle bin.
+     *
+     * @param deletedDocumentIds the list of IDs of the deleted documents to restore
+     * @return the restore request
+     * @since 9.4RC1
+     */
+    public RestoreRequest createRestoreRequest(List<Long> deletedDocumentIds)
+    {
+        RestoreRequest request = initializeRestoreRequest();
+        request.setDeletedDocumentIds(deletedDocumentIds);
+        return request;
+    }
+
+    private RestoreRequest initializeRestoreRequest()
+    {
+        RestoreRequest request = new RestoreRequest();
+
+        request.setId(generateJobId(RefactoringJobs.RESTORE));
+        request.setCheckRights(true);
+        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+        request.setWikiReference(getCurrentWikiReference());
+
+        return request;
+    }
+
+    private WikiReference getCurrentWikiReference()
+    {
+        WikiReference result = null;
+
+        EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
+        if (currentEntityReference != null) {
+            EntityReference wikiEntityReference =
+                this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
+            if (wikiEntityReference != null) {
+                result = new WikiReference(wikiEntityReference);
+            }
+        }
+
+        return result;
     }
 }

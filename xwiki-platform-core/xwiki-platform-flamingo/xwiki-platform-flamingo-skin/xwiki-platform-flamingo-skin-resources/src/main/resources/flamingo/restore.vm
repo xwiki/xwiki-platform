@@ -13,24 +13,31 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
-#template("startpage.vm")
-<div class="main">
-  <div id="mainContentArea">
-    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
-    #set($titleToDisplay = $services.localization.render('core.restore.title', [$title]))
-    <div class="xcontent">
-      #template('contentheader.vm')
-      #controller()
-      <div class="clearfloats"></div>
-    </div> ## xcontent
-  </div>## mainContentArea
-</div>## main
-#template("endpage.vm")
+#if ($xcontext.action == 'get' && "$!request.jobId" != '')
+  #handleStatusRequest()
+#else
+  #template("startpage.vm")
+  <div class="main">
+    <div id="mainContentArea">
+      #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+      #set($titleToDisplay = $services.localization.render('core.restore.title', [$title]))
+      <div class="xcontent">
+        #template('contentheader.vm')
+        #controller()
+        <div class="clearfloats"></div>
+      </div> ## xcontent
+    </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#end
 #######################################################
 ##                    CONTROLLER
 #######################################################
 #macro(controller)
-  #if("$!{request.showBatch}" == 'true')
+  #if("$!{request.jobId}" != '')
+    ## A restore job is running
+    #displayProgressBar()
+  #elseif("$!{request.showBatch}" == 'true')
     ## showBatch=true means that we are displaying the other documents that were deleted in the same batch as the
     ## current one, which we might want to restore as well.
     #displayConfirmationPage()
@@ -44,6 +51,61 @@
     #getBatch()
     #displayConfirmMessage()
   </form>
+#end
+#######################################################
+##              DISPLAY PROGRESS BAR
+#######################################################
+#macro(displayProgressBar)
+  #handleStatusRequest()
+#end
+#macro (handleStatusRequest)
+  #template('job_macros.vm')
+  #set ($jobStatus = $services.job.getJobStatus($stringtool.split($request.jobId, '/')))
+  #if ($jobStatus)
+    #if ($xcontext.action == 'get')
+      #outputJobStatusJSON($jobStatus)
+    #else
+      #displayJobStatus($jobStatus)
+    #end
+  #else
+    $response.setStatus(404)
+    <div class="box errormessage">
+      $services.localization.render('core.restore.status.notFound')
+    </div>
+  #end
+#end
+#macro (displayJobStatus $jobStatus)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($jobState = $jobStatus.state)
+  #set ($finished = $jobState == 'FINISHED')
+  #set ($jobRequest = $jobStatus.request)
+  ## FIXME: refactor jobs to use the /rest/jobstatus and /rest/joblog resources.
+  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+    'xpage': 'restore',
+    'outputSyntax': 'plain',
+    'jobId': $stringtool.join($jobRequest.id, '/')
+  })))
+  <div class="job-status" data-url="$jobStatusURL">
+    #if (!$finished)
+      <p>$services.localization.render('core.restore.waitmessage')</p>
+      #displayJobProgressBar($jobStatus)
+    #else
+      #displayJobFinishedMessage($jobStatus)
+    #end
+    #if ($isAdvancedUser || $isSuperAdmin)
+      #displayJobStatusLog($jobStatus true)
+    #end
+  </div>
+#end
+#macro (outputJobStatusJSON $jobStatus)
+  #getJobStatusJSON($jobStatus $json)
+  #set ($json.message = "#displayJobFinishedMessage($jobStatus)")
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+#macro (displayJobFinishedMessage $jobStatus)
+  #template('refactoringStatus_macros.vm')
+  #displayRefactoringJobFinishedMessage($jobStatus 'core.restore.status.success' 'core.restore.status.failure')
 #end
 #######################################################
 ##                  DISPLAY PANEL
@@ -63,7 +125,7 @@
 ##                    BATCH
 #######################################################
 #macro(getBatch)
-  #set ($deletedDocument = $xwiki.getDeletedDocument($tdoc.getFullName(), "$tdoc.locale", $request.get('id')))
+  #set ($deletedDocument = $xwiki.getDeletedDocument($request.get('id')))
   #set ($batchDeletedDocuments = $xwiki.getDeletedDocuments($deletedDocument.batchId))
   ## Only propose to restore the batch if it also contains other documents than the current one.
   #if ($batchDeletedDocuments.size() > 1)
@@ -90,9 +152,9 @@
       ##
       #set ($collist = ['doc.name', 'doc.location', '_actions'])
       #set ($colprops = {
-        'doc.name'    : { 'link' : 'view', 'filterable': false, 'sortable' : 'false' },
+        'doc.name'     : { 'link' : 'view', 'filterable': false, 'sortable' : 'false' },
         'doc.location' : { 'type' : 'text', 'link' : false, 'filterable': true, 'html': true},
-        '_actions' : { 'actions' : ['restore', 'delete'] }
+        '_actions'     : { 'actions' : ['restore', 'delete'] }
       })
       #set ($urlParameters = "xpage=getdeleteddocuments&doc.batchId=$!{escapetool.url($deletedDocument.batchId)}")
       #set ($options = { 

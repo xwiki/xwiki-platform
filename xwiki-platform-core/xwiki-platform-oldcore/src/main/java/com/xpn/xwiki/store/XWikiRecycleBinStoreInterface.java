@@ -61,6 +61,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @param context - used while saving
      * @throws XWikiException if error in saving
+     * @since 9.4RC1
      */
     void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId, XWikiContext context,
         boolean bTransaction) throws XWikiException;
@@ -131,9 +132,23 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used to load
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException - if error in loading
+     * @since 9.4RC1
      */
     XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
         throws XWikiException;
+
+    /**
+     * @param batchId - id of the operation that deleted multiple documents at the same time; useful when trying to
+     *            revert the operation
+     * @param withContent - {@code true} if the deleted document's content should also be loaded; {@code false} if
+     * @param context - used to load
+     * @param bTransaction - should use old transaction(false) or create new (true)
+     * @return info about all documents that were deleted in the same batch, as part of the same operation
+     * @throws XWikiException - if error in loading
+     * @since 9.4RC1
+     */
+    XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, boolean withContent, XWikiContext context,
+        boolean bTransaction) throws XWikiException;
 
     /**
      * Permanently delete document from recycle bin.

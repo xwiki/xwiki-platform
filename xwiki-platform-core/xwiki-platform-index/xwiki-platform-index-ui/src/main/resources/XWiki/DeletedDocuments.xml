@@ -81,7 +81,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 
   #else
   #macro(displayDeletedDoc $id)
-    #set($ddoc = $xwiki.getDeletedDocument('', '', "$id"))
+    #set($ddoc = $xwiki.getDeletedDocument($item))
     #set($originalDocument = $ddoc.getDocument())
     &lt;tr&gt;
       &lt;td&gt;&lt;a href="$originalDocument.getURL('view', "viewer=recyclebin&amp;amp;id=${id}")"&gt;$escapetool.xml($ddoc.fullName)&lt;/a&gt;&lt;/td&gt;

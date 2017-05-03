@@ -37,18 +37,6 @@
     <!-- The UI we are testing-->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency> 
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
@@ -69,9 +57,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <scope>test</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-activitystream-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     
     <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging

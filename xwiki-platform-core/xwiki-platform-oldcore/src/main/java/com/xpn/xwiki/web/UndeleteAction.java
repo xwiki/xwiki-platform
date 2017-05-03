@@ -147,7 +147,7 @@ public class UndeleteAction extends XWikiAction
     {
         Job restoreJob = startRestoreJob(deletedDocument, context);
 
-        // If the user have asked for an asynchronous delete action...
+        // If the user asked for an asynchronous action...
         if (isAsync(context.getRequest())) {
             List<String> jobId = restoreJob.getRequest().getId();
             // We redirect to the view action and accept the edge case when the restored document's rights might prevent

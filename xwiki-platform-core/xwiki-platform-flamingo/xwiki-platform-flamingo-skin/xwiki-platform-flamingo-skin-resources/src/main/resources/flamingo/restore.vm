@@ -88,9 +88,9 @@
       ##
       ## List the deleted documents in the batch using a livetable.
       ##
-      #set ($collist = ['doc.title', 'doc.location', '_actions'])
+      #set ($collist = ['doc.name', 'doc.location', '_actions'])
       #set ($colprops = {
-        'doc.title'    : { 'link' : 'view', 'filterable': false, 'sortable' : 'false' },
+        'doc.name'    : { 'link' : 'view', 'filterable': false, 'sortable' : 'false' },
         'doc.location' : { 'type' : 'text', 'link' : false, 'filterable': true, 'html': true},
         '_actions' : { 'actions' : ['restore', 'delete'] }
       })

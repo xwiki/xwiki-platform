@@ -1,41 +1,61 @@
 User-agent: *
-Disallow: /xwiki/bin/xmlrpc/
+# Prevent bots from executing all actions except "view" and
+# "download" since:
+# 1) we don't want bots to execute stuff in the wiki by
+#    following links! (for example delete pages, add comments,
+#    etc)
+# 2) we don't want bots to consume CPU and memory
+#   (for example to perform exports)
+Disallow: /xwiki/bin/viewattachrev/
+Disallow: /xwiki/bin/viewrev/
 Disallow: /xwiki/bin/pdf/
+Disallow: /xwiki/bin/tex/
 Disallow: /xwiki/bin/edit/
-Disallow: /xwiki/bin/admin/
+Disallow: /xwiki/bin/create/
 Disallow: /xwiki/bin/inline/
-Disallow: /xwiki/bin/import/
-Disallow: /xwiki/bin/export/
 Disallow: /xwiki/bin/preview/
 Disallow: /xwiki/bin/save/
 Disallow: /xwiki/bin/saveandcontinue/
+Disallow: /xwiki/bin/rollback/
+Disallow: /xwiki/bin/deleteversions/
 Disallow: /xwiki/bin/cancel/
 Disallow: /xwiki/bin/delete/
+Disallow: /xwiki/bin/deletespace/
 Disallow: /xwiki/bin/undelete/
-Disallow: /xwiki/bin/deleteversions/
+Disallow: /xwiki/bin/reset/
 Disallow: /xwiki/bin/register/
 Disallow: /xwiki/bin/propupdate/
 Disallow: /xwiki/bin/propadd/
+Disallow: /xwiki/bin/propdisable/
+Disallow: /xwiki/bin/propenable/
 Disallow: /xwiki/bin/propdelete/
 Disallow: /xwiki/bin/objectadd/
 Disallow: /xwiki/bin/commentadd/
+Disallow: /xwiki/bin/commentsave/
+Disallow: /xwiki/bin/objectsync/
 Disallow: /xwiki/bin/objectremove/
 Disallow: /xwiki/bin/attach/
 Disallow: /xwiki/bin/upload/
-Disallow: /xwiki/bin/download/
+Disallow: /xwiki/bin/temp/
+Disallow: /xwiki/bin/downloadrev/
 Disallow: /xwiki/bin/dot/
+Disallow: /xwiki/bin/svg/
 Disallow: /xwiki/bin/delattachment/
 Disallow: /xwiki/bin/skin/
+Disallow: /xwiki/bin/jsx/
+Disallow: /xwiki/bin/ssx/
 Disallow: /xwiki/bin/login/
 Disallow: /xwiki/bin/loginsubmit/
 Disallow: /xwiki/bin/loginerror/
 Disallow: /xwiki/bin/logout/
+Disallow: /xwiki/bin/charting/
 Disallow: /xwiki/bin/lock/
-Disallow: /xwiki/bin/status/
-Disallow: /xwiki/bin/lifeblog/
-Disallow: /xwiki/bin/viewrev/
-Disallow: /xwiki/bin/downloadrev/
-Disallow: /xwiki/bin/viewattachrev/
+Disallow: /xwiki/bin/redirect/
+Disallow: /xwiki/bin/admin/
 Disallow: /xwiki/bin/export/
-Disallow: /xwiki/bin/rollback/
-Disallow: /xwiki/bin/reset/
+Disallow: /xwiki/bin/import/
+Disallow: /xwiki/bin/get/
+Disallow: /xwiki/bin/distribution/
+Disallow: /xwiki/bin/imagecaptcha/
+Disallow: /xwiki/bin/unknown/
+Disallow: /xwiki/bin/webjars/

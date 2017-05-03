@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -31,11 +32,28 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class NotificationsTrayPage  extends ViewPage
 {
-    @FindBy(css = "div.notifications-area")
+    @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement noNotificationAvailable;
 
-    @FindBy(css = "a[title='Watchlist']")
+    @FindBy(css = "li#tmNotifications a[title='Watchlist']")
     private WebElement watchListButton;
+
+    @FindBy(css = "li#tmNotifications div.notifications-header div:first-child strong")
+    private WebElement notificationsHeader;
+
+    @FindBy(css = "li#tmNotifications span.notifications-count.badge")
+    private WebElement countBadge;
+
+    @FindBy(css = "li#tmNotifications div.notifications-header div.col-xs-12 a[href='#']")
+    private WebElement clearAllLink;
+
+    /**
+     * Constructor.
+     */
+    public NotificationsTrayPage()
+    {
+        this.waitUntilPageIsLoaded();
+    }
 
     /**
      * Test if the text "No notification available!" is displayed in the notification tray.
@@ -44,15 +62,54 @@ public class NotificationsTrayPage  extends ViewPage
      */
     public boolean areNotificationsAvailable()
     {
-        if (noNotificationAvailable == null) {
+        if (this.noNotificationAvailable == null) {
             return true;
         }
 
-        if (!noNotificationAvailable.isDisplayed()) {
-            watchListButton.click();
-        }
+        this.showNotificationTray();
 
-        return !noNotificationAvailable.getText().equals("No notification available!");
+        return !this.noNotificationAvailable.getText().equals("No notification available!");
+    }
+
+    /**
+     * Get the number of available notifications.
+     * 
+     * @return Number of unread notifications, 0 if no notification available and MAX_INT if 20+ notifications
+     */
+    public int getNotificationsCount()
+    {
+        if (!this.areNotificationsAvailable()) {
+            return 0;
+        } else if (this.countBadge.getText().equals("20+")) {
+            return Integer.MAX_VALUE;
+        } else {
+            return Integer.parseInt(this.countBadge.getText());
+        }
+    }
+
+    /**
+     * Click the button «Clear All» in the notification tray.
+     */
+    public void clearAllNotifications()
+    {
+        if (!this.areNotificationsAvailable()) {
+            return;
+        } else {
+            this.showNotificationTray();
+            this.clearAllLink.click();
+            this.sendKeys(Keys.ENTER);
+            this.waitForNotificationSuccessMessage("Notifications have been cleared");
+        }
+    }
+
+    /**
+     * Ensure that the notifications tray is visible.
+     */
+    private void showNotificationTray()
+    {
+        if (!this.notificationsHeader.isDisplayed()) {
+            this.watchListButton.click();
+        }
     }
 
 }

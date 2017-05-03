@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
@@ -39,6 +40,9 @@ public class NotificationsTest extends AbstractTest
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
+
+    // Number of pages that have to be created in order for the notifications badge to show «X+»
+    private static final int PAGES_TOP_CREATION_COUNT = 21;
 
     private void setUpUsers() throws Exception
     {
@@ -86,25 +90,37 @@ public class NotificationsTest extends AbstractTest
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.setPageCreated(true);
 
+        // We create a lot of pages in order to test the notification badge
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        getUtil().createPage("Main", "Page2", "Second content from " + FIRST_USER_NAME, "Second page title");
+        for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
+            getUtil().createPage("Main", "Page" + i, "Simple content", "Simple title");
+        }
+        getUtil().createPage("Main", "DTP", "Deletion test page", "Deletion test content");
 
+        // Check that the badge is showing «20+»
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         getUtil().gotoPage("Main", "WebHome");
-
         tray = new NotificationsTrayPage();
-        // assertTrue(tray.areNotificationsAvailable());
+        assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
+
+        // Reset the notifications count of the user 2
+        tray.clearAllNotifications();
+        assertEquals(0, tray.getNotificationsCount());
+        assertFalse(tray.areNotificationsAvailable());
 
         // The user 2 will get notifications only for pages deletions
-        getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.setPageCreated(false);
         p.setPageDeleted(true);
 
+        // Delete the "Deletion test page" and test the notification
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        getUtil().deletePage("Main", "Page2");
-
+        getUtil().deletePage("Main", "DTP");
+        
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         getUtil().gotoPage("Main", "WebHome");
+        tray = new NotificationsTrayPage();
+        assertEquals(1, tray.getNotificationsCount());
+        tray.clearAllNotifications();
     }
 }

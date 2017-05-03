@@ -33,16 +33,14 @@ public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
-    @FindBy(xpath = "//*[@id='notificationsPane']/div/table/tbody/tr[2]/td[2]/div/div/input")
-    private WebElement postCreatedCheckbox;
-
-    @FindBy(xpath = "//*[@id='notificationsPane']/div/table/tbody/tr[3]/td[2]/div/div/input")
+    @FindBy(css = "div#notificationsPane tr:nth-child(4) input")
     private WebElement pageCreatedCheckbox;
 
-    @FindBy(xpath = "//*[@id='notificationsPane']/div/table/tbody/tr[4]/td[2]/div/div/input")
+    @FindBy(css = "div#notificationsPane tr:nth-child(5) input")
     private WebElement pageDeletedCheckbox;
 
-    @FindBy(xpath = "//*[@id='notificationsPane']/div/table/tbody/tr[5]/td[2]/div/div/input")
+    // @FindBy(xpath = "//*[@id='notificationsPane']/div/table/tbody/tr[5]/td[2]/div/div/input")
+    @FindBy(css = "div#notificationsPane tr:nth-child(6) input")
     private WebElement pageUpdatedCheckbox;
 
     /**
@@ -53,16 +51,6 @@ public class NotificationsUserProfilePage extends ViewPage
     {
         getUtil().gotoPage("XWiki", username, "view", "category=notifications");
         return new NotificationsUserProfilePage();
-    }
-
-    /**
-     * Check if the postCreatedCheckbox is checked.
-     * 
-     * @return true if the checkbox is checked
-     */
-    public boolean isPostCreated()
-    {
-        return this.postCreatedCheckbox.isSelected();
     }
 
     /**
@@ -93,19 +81,6 @@ public class NotificationsUserProfilePage extends ViewPage
     public boolean isPageUpdated()
     {
         return this.pageUpdatedCheckbox.isSelected();
-    }
-
-    /**
-     * Change the status of the postCreatedCheckbox.
-     * 
-     * @param status New status
-     */
-    public void setPostCreated(boolean status)
-    {
-        if (status != this.isPostCreated()) {
-            this.postCreatedCheckbox.click();
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
-        }
     }
 
     /**

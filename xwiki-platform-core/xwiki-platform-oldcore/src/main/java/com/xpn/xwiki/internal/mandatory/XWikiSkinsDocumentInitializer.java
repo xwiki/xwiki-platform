@@ -82,7 +82,7 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitial
         // Use XWikiSkinsSheet to display documents having XWikiSkins objects if no other class sheet is specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {
             String wikiName = document.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "XWikiSkinsSheet");
+            DocumentReference sheet = new DocumentReference(wikiName, "SkinsCode", "XWikiSkinsSheet");
             needsUpdate |= this.classSheetBinder.bind(document, sheet);
         }
 

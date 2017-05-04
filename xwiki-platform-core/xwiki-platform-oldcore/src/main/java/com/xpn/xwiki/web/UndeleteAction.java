@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -35,6 +37,7 @@ import org.xwiki.script.service.ScriptService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.DeletedDocument;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -60,10 +63,21 @@ public class UndeleteAction extends XWikiAction
 
     private static final String VIEW_ACTION = "view";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndeleteAction.class);
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
+        XWikiDocument doc = context.getDoc();
+
+        // If the provided DeletedDocument ID is invalid, for any reason, redirect to view mode.
+        XWikiDeletedDocument deletedDocument = getDeletedDocument(context);
+        if (deletedDocument == null) {
+            sendRedirect(response, doc.getURL(VIEW_ACTION, context));
+            return false;
+        }
 
         // If showBatch=true and confirm=true then restore the page w/o the batch. If not, the render action will go to
         // the "restore" UI so that the user can confirm. That "restore" UI will then call the action again with
@@ -77,10 +91,11 @@ public class UndeleteAction extends XWikiAction
             return false;
         }
 
-        XWikiResponse response = context.getResponse();
-        XWikiDocument doc = context.getDoc();
-
-        XWikiDeletedDocument deletedDocument = getDeletedDocument(context);
+        // If the current user is not allowed to restore, render the "accessdenied" template.
+        DeletedDocument deletedDocumentAPI = new DeletedDocument(deletedDocument, context);
+        if (!deletedDocumentAPI.canDelete()) {
+            return true;
+        }
 
         boolean redirected = false;
 
@@ -106,38 +121,12 @@ public class UndeleteAction extends XWikiAction
         XWiki xwiki = context.getWiki();
 
         String sindex = request.getParameter(ID_PARAMETER);
-        if (StringUtils.isNotBlank(sindex)) {
+        try {
             long index = Long.parseLong(sindex);
 
             result = xwiki.getDeletedDocument(index, context);
-        }
-
-        return result;
-    }
-
-    private String getRedirectQueryString(XWikiContext context, Locale deletedDocumentLocale)
-    {
-        String result = null;
-
-        XWiki xwiki = context.getWiki();
-
-        if (deletedDocumentLocale != null && xwiki.isMultiLingual(context)) {
-            result = String.format("language=%s", deletedDocumentLocale);
-        }
-
-        return result;
-    }
-
-    @Override
-    public String render(XWikiContext context) throws XWikiException
-    {
-        String result = null;
-
-        XWikiRequest request = context.getRequest();
-
-        // If showBatch=true and user confirmation is required, display the "restore" UI.
-        if (TRUE.equals(request.get(SHOW_BATCH_PARAMETER)) && !TRUE.equals(request.get(CONFIRM_PARAMETER))) {
-            result = "restore";
+        } catch (Exception e) {
+            LOGGER.error("Failed to get deleted document with ID [{}]", sindex, e);
         }
 
         return result;
@@ -208,5 +197,44 @@ public class UndeleteAction extends XWikiAction
     private boolean isAsync(XWikiRequest request)
     {
         return TRUE.equals(request.get(ASYNC_PARAM));
+    }
+
+    private String getRedirectQueryString(XWikiContext context, Locale deletedDocumentLocale)
+    {
+        String result = null;
+
+        XWiki xwiki = context.getWiki();
+
+        if (deletedDocumentLocale != null && xwiki.isMultiLingual(context)) {
+            result = String.format("language=%s", deletedDocumentLocale);
+        }
+
+        return result;
+    }
+
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        String result = null;
+
+        XWikiRequest request = context.getRequest();
+
+        // If showBatch=true and user confirmation is required, display the "restore" UI.
+        if (TRUE.equals(request.get(SHOW_BATCH_PARAMETER)) && !TRUE.equals(request.get(CONFIRM_PARAMETER))) {
+            result = "restore";
+        }
+
+        // If the current user is not allowed to restore, display the "accessdenied" template.
+        XWikiDeletedDocument deletedDocument = getDeletedDocument(context);
+        if (deletedDocument != null) {
+            // Note: Checking for null because when the document is actually restored, it may no longer be in the
+            // recycle bin by the time render() gets called.
+            DeletedDocument deletedDocumentAPI = new DeletedDocument(deletedDocument, context);
+            if (!deletedDocumentAPI.canDelete()) {
+                return "accessdenied";
+            }
+        }
+
+        return result;
     }
 }

@@ -96,6 +96,8 @@
             -->
             <excludes>
               <exclude>**/gwt/**/client/**/*.java</exclude>
+              <!-- Since we override the exclude config from parent POM we also put back the excludes from there -->
+              <exclude>**/Abstract*Test.java</exclude>
             </excludes>
             <systemProperties combine.children="append">
               <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->

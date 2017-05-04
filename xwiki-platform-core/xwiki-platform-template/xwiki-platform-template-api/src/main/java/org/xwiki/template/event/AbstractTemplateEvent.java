@@ -51,7 +51,7 @@ public abstract class AbstractTemplateEvent implements TemplateEvent
     public boolean matches(Object otherEvent)
     {
         if (getClass() == otherEvent.getClass()) {
-            return Objects.equals(this.id, ((TemplateEvent) otherEvent).getId());
+            return this.id == null || Objects.equals(this.id, ((TemplateEvent) otherEvent).getId());
         }
 
         return false;

@@ -22,6 +22,8 @@
     #set ($message = 'core.recyclebin.showlistmsg')
   #end  
   #if($list && $list.size() > 0)
+    #set ($canDelete = $list[0].canDelete())
+    #set ($canRestore = $list[0].canUndelete())
     <hr />
     <div class="centered $!className">
       <p class="recyclebin-message">$escapetool.xml($services.localization.render($message))</p>
@@ -30,6 +32,9 @@
         <tr>
          <th>$escapetool.xml($services.localization.render('core.recyclebin.deleter'))</td>
          <th>$escapetool.xml($services.localization.render('core.recyclebin.deleteDate'))</td>
+         #if ($canRestore)
+           <th>$escapetool.xml($services.localization.render('core.recyclebin.batchId'))</td>
+         #end
          <th colspan="2">$escapetool.xml($services.localization.render('core.recyclebin.actions'))</th>
         </tr>
        </thead>
@@ -38,9 +43,18 @@
         <tr>
          <td>$xwiki.getUserName($dd.getDeleter())</td>
          <td><a href="$doc.getURL("view", "viewer=recyclebin&amp;id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
-         <td>#if($dd.canUndelete()) <a href="$xwiki.getURL($dd.getFullName(), "undelete", "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")" class="action-restore">$escapetool.xml($services.localization.render('core.recyclebin.restore'))</a> #end</td>
+         #if ($canRestore)
+           <td><a href="$doc.getURL('undelete', "id=$dd.id&amp;showBatch=true")">$dd.batchId</a></td>
+         #end
          <td>
-          #if($dd.canDelete())
+           #if($canRestore)
+             <a href="$xwiki.getURL($dd.getFullName(), 'undelete', "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")" class="action-restore">
+               $escapetool.xml($services.localization.render('core.recyclebin.restore'))
+             </a>
+           #end
+         </td>
+         <td>
+          #if($canDelete)
            <a href="$xwiki.getURL($dd.getFullName(), 'delete', "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")"
             onclick="if (confirm('$escapetool.javascript($services.localization.render('core.recyclebin.completelyDeleteConfirm'))')) {this.href += '&amp;confirm=1'; return true;} return false;" class="action-delete">
             $escapetool.xml($services.localization.render('core.recyclebin.delete'))

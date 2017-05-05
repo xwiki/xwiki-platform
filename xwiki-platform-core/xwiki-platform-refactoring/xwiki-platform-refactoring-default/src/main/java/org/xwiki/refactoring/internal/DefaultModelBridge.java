@@ -444,8 +444,8 @@ public class DefaultModelBridge implements ModelBridge
             // If the document (or the translation) that we want to restore does not exist, restore it.
             if (xwiki.exists(deletedDocumentReference, context)) {
                 // TODO: Add overwrite support maybe also with interactive (question/answer) mode.
-                // Default for now is to skip and log existing documents.
-                logger.warn("Document [{}] with ID [{}] has been skipped. Document already exists",
+                // Default for now is to skip and log as error to restore over existing documents.
+                logger.error("Document [{}] with ID [{}] can not be restored. Document already exists",
                     deletedDocument.getFullName(), deletedDocumentId);
             } else if (checkContextUser && !canRestoreDeletedDocument(deletedDocumentId, context.getUserReference())) {
                 logger.error("You are not allowed to restore document [{}] with ID [{}]", deletedDocumentReference,

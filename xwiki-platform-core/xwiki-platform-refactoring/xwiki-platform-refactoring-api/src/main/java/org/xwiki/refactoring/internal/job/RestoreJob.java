@@ -29,6 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.AbstractJobStatus;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
+import org.xwiki.job.Request;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -44,13 +47,17 @@ import org.xwiki.refactoring.job.RestoreRequest;
  */
 @Component
 @Named(RefactoringJobs.RESTORE)
-public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<RestoreRequest>>
+public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<RestoreRequest>> implements GroupedJob
 {
+    private static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
+
     @Inject
     protected ModelBridge modelBridge;
 
     @Inject
     protected ModelContext modelContext;
+
+    private JobGroupPath groupPath;
 
     @Override
     public String getType()
@@ -133,5 +140,27 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
         }
 
         return result;
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return groupPath;
+    }
+
+    @Override
+    public void initialize(Request request)
+    {
+        super.initialize(request);
+
+        // Build the job group path.
+        // Note: Because of the nature of the RestoreJob that works with with DeletedDocument IDs and BatchIDs (and not
+        // with EntityReferences), the only way we can try to avoid executing operation at the same time on the same
+        // reference is to use a group path at the wiki level, hoping most restore operations are fast and do not block
+        // for long.
+        WikiReference wikiReference = ((RestoreRequest) request).getWikiReference();
+        if (wikiReference != null) {
+            this.groupPath = new JobGroupPath(wikiReference.getName(), ROOT_GROUP);
+        }
     }
 }

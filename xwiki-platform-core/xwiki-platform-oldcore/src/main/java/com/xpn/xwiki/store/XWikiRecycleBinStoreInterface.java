@@ -66,10 +66,10 @@ public interface XWikiRecycleBinStoreInterface
     default void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
-        // Empty default implementation.
-        // XXX: the current signature does not return the saved document index so we can't delegate to the older
-        // saveToRecycleBin because we have no way of setting the batchId on the saved document, so we would not be
-        // respecting the new method's contract and would only do it's job partially.
+        // XXX: The current signature does not return the saved document index so we have no way of setting the batchId
+        // to the save document. This means we can`t completely respect the method`s contract, but at least the most
+        // important part of the work is done and the document can be individually restored.
+        saveToRecycleBin(doc, deleter, date, context, bTransaction);
     }
 
     /**

@@ -4019,7 +4019,7 @@ public class XWiki implements EventListener
 
             if (hasRecycleBin(context) && totrash) {
                 // Extract (safely) any existing batchId from the context.
-                Object batchIdValue = context.get("BATCH_ID");
+                Object batchIdValue = Utils.getComponent(Execution.class).getContext().getProperty("BATCH_ID");
                 String batchId = Objects.toString(batchIdValue, null);
 
                 // Save to recycle bin together with any determined batch ID.

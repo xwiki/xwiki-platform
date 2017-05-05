@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -119,6 +120,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
+
+    @Inject
+    private Execution execution;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -402,8 +406,7 @@ public class DefaultModelBridge implements ModelBridge
     public void setContextProperty(String name, Object value)
     {
         try {
-            XWikiContext context = xcontextProvider.get();
-            context.put(name, value);
+            execution.getContext().setProperty(name, value);
         } catch (Exception e) {
             this.logger.error("Failed to set context property [{}] with value [{}].", name, value, e);
         }
@@ -415,8 +418,7 @@ public class DefaultModelBridge implements ModelBridge
         Object value = null;
 
         try {
-            XWikiContext context = xcontextProvider.get();
-            value = context.get(name);
+            value = execution.getContext().getProperty(name);
         } catch (Exception e) {
             this.logger.error("Failed to get context property [{}]", name, e);
         }

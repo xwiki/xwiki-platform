@@ -1,6 +1,10 @@
 #set ($title = "$!{pdfdoc.display('title', 'rendered', '', $pdfobj)}")
 #if ($title == '')
-  $!{escapetool.xml($doc.space)} - $!{escapetool.xml($tdoc.plainTitle)}
+  #if ($doc.space != $tdoc.plainTitle)
+    $!{escapetool.xml($doc.space)} - $!{escapetool.xml($tdoc.plainTitle)}
+  #else
+    $!{escapetool.xml($doc.space)}
+  #end
 #else
   $escapetool.xml($title)
 #end

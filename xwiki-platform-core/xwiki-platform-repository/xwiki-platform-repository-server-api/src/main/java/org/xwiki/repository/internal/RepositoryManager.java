@@ -490,13 +490,12 @@ public class RepositoryManager implements Initializable, Disposable
     public ResourceReference getDownloadReference(XWikiDocument document, String extensionVersion) throws ResolveException {
 
         String downloadURL = null;
-        if(isVersionProxyingEnabled(document)){
+
+        BaseObject extensionVersionObject = getExtensionVersionObject(document, extensionVersion, false);
+        if (extensionVersionObject != null ){
+            downloadURL = getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD);
+        } else if(isVersionProxyingEnabled(document)){
             downloadURL = resolveExtensionDownloadURL(document, extensionVersion);
-        } else {
-            BaseObject extensionVersionObject = getExtensionVersionObject(document, extensionVersion);
-            if (extensionVersionObject != null ){
-                downloadURL = getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD);
-            }
         }
 
         ResourceReference resourceReference = null;
@@ -532,6 +531,9 @@ public class RepositoryManager implements Initializable, Disposable
 
     private String resolveExtensionDownloadURL(XWikiDocument extensionDocument, String extensionVersion) throws ResolveException {
         Extension extension = resolveExtensionVersion(extensionDocument, extensionVersion);
+        if(extension == null){
+            return null;
+        }
         return getDownloadURL(extension);
     }
 
@@ -735,6 +737,9 @@ public class RepositoryManager implements Initializable, Disposable
     public boolean isVersionProxyingEnabled(XWikiDocument extensionDocument)
     {
         BaseObject extensionProxyObject = extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
+        if(extensionProxyObject == null){
+            return false;
+        }
         return "version".equals(getValue(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_PROXYLEVEL, (String) null));
     }
 
@@ -1170,6 +1175,11 @@ public class RepositoryManager implements Initializable, Disposable
     }
 
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version) {
+        return getExtensionVersionObject(extensionDocument, version, true);
+    }
+
+    public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version, boolean allowProxying)
+    {
         if (version == null) {
             List<BaseObject> objects =
                     extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
@@ -1181,15 +1191,20 @@ public class RepositoryManager implements Initializable, Disposable
             }
         }
 
-        if( isVersionProxyingEnabled(extensionDocument) ){
+        BaseObject extensionVersionObject =
+                extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
+
+        if( extensionVersionObject == null && allowProxying && isVersionProxyingEnabled(extensionDocument) ){
              //no ExtensionVersionClass object so we need to create such object temporarily
             try {
                 addExtensionVersionObjectToDocument(extensionDocument, version);
+                extensionVersionObject =
+                        extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
             } catch (XWikiException | ResolveException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         }
 
-        return extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
+        return extensionVersionObject;
     }
 }

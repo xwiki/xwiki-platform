@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -26,7 +28,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.RestoreRequest;
+import org.xwiki.refactoring.script.RefactoringScriptService;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
@@ -34,17 +42,19 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link UndeleteAction}.
- * 
+ *
  * @version $Id$
  */
 public class UndeleteActionTest
@@ -75,18 +85,37 @@ public class UndeleteActionTest
      */
     private XWikiDocument document = mock(XWikiDocument.class);
 
+    private XWikiRightService rightsService = mock(XWikiRightService.class);
+
+    private RefactoringScriptService refactoringScriptService = mock(RefactoringScriptService.class);
+
+    private JobExecutor jobExecutor;
+
+    private Job job = mock(Job.class);
+
+    private RestoreRequest jobRequest;
+
     @Before
     public void setUp() throws Exception
     {
         mocker.registerMockComponent(CSRFToken.class);
+        mocker.registerComponent(ScriptService.class, "refactoring", refactoringScriptService);
         Utils.setComponentManager(mocker);
 
         when(context.getRequest()).thenReturn(mock(XWikiRequest.class));
 
         when(context.getWiki()).thenReturn(xwiki);
 
+        when(xwiki.getRightService()).thenReturn(rightsService);
+
         when(context.getDoc()).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("xwiki", "Main", "DeletedDocument"));
+
+        jobExecutor = mocker.registerMockComponent(JobExecutor.class);
+        when(jobExecutor.execute(anyString(), any())).thenReturn(job);
+
+        jobRequest = mock(RestoreRequest.class);
+        when(refactoringScriptService.createRestoreRequest(any(List.class))).thenReturn(jobRequest);
     }
 
     @Test
@@ -109,22 +138,27 @@ public class UndeleteActionTest
 
         when(xwiki.hasRecycleBin(context)).thenReturn(true);
 
-        when(context.getRequest().getParameter("id")).thenReturn("13");
+        long id = 13;
+
+        when(context.getRequest().getParameter("id")).thenReturn(String.valueOf(id));
 
         XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
-            deletedDocument);
-
         when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getId()).thenReturn(id);
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
+
+        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
         when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(false);
 
         assertFalse(undeleteAction.action(context));
 
-        verify(xwiki).restoreFromRecycleBin(document, 13, "Restored from recycle bin", context);
+        verify(refactoringScriptService).createRestoreRequest(Arrays.asList(id));
+        verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
+        verify(job).join();
     }
 
     /**
@@ -144,8 +178,7 @@ public class UndeleteActionTest
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
-            deletedDocument);
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
 
         when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
 
@@ -173,8 +206,7 @@ public class UndeleteActionTest
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
-            deletedDocument);
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
 
         when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
 

@@ -110,7 +110,7 @@ public class UndeleteAction extends XWikiAction
             redirected = true;
         }
 
-        return redirected;
+        return !redirected;
     }
 
     private XWikiDeletedDocument getDeletedDocument(XWikiContext context) throws XWikiException

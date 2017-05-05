@@ -23,6 +23,8 @@ import java.util.Arrays;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,6 +36,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,6 +56,16 @@ public class DeleteJobTest extends AbstractEntityJobTest
     protected MockitoComponentMockingRule<Job> getMocker()
     {
         return this.mocker;
+    }
+
+    @Override
+    public void configure() throws Exception
+    {
+        super.configure();
+
+        Execution execution = mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(execution.getContext()).thenReturn(executionContext);
     }
 
     @Test

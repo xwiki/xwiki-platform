@@ -403,30 +403,6 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void setContextProperty(String name, Object value)
-    {
-        try {
-            execution.getContext().setProperty(name, value);
-        } catch (Exception e) {
-            this.logger.error("Failed to set context property [{}] with value [{}].", name, value, e);
-        }
-    }
-
-    @Override
-    public Object getContextProperty(String name)
-    {
-        Object value = null;
-
-        try {
-            value = execution.getContext().getProperty(name);
-        } catch (Exception e) {
-            this.logger.error("Failed to get context property [{}]", name, e);
-        }
-
-        return value;
-    }
-
-    @Override
     public boolean restoreDeletedDocument(long deletedDocumentId, boolean checkContextUser)
     {
         XWikiContext context = this.xcontextProvider.get();

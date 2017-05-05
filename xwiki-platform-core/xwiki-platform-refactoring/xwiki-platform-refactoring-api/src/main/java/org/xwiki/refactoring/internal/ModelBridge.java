@@ -123,20 +123,6 @@ public interface ModelBridge
     void update(DocumentReference documentReference, Map<String, String> parameters);
 
     /**
-     * @param name the name of the execution context property to set
-     * @param value the value of the execution context property to set
-     * @since 9.4RC1
-     */
-    void setContextProperty(String name, Object value);
-
-    /**
-     * @param name the name of the property
-     * @return the execution context property value
-     * @since 9.4RC1
-     */
-    Object getContextProperty(String name);
-
-    /**
      * @param deletedDocumentId the ID of the deleted document to restore
      * @param checkContextUser {@code true} if rights should be checked for the context user, {@code false} otherwise
      * @return {@code true} if the document was restored successfully, {@code false} if the restore failed

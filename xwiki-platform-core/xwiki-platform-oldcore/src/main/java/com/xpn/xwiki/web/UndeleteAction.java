@@ -93,7 +93,7 @@ public class UndeleteAction extends XWikiAction
 
         // If the current user is not allowed to restore, render the "accessdenied" template.
         DeletedDocument deletedDocumentAPI = new DeletedDocument(deletedDocument, context);
-        if (!deletedDocumentAPI.canDelete()) {
+        if (!deletedDocumentAPI.canUndelete()) {
             return true;
         }
 
@@ -230,7 +230,7 @@ public class UndeleteAction extends XWikiAction
             // Note: Checking for null because when the document is actually restored, it may no longer be in the
             // recycle bin by the time render() gets called.
             DeletedDocument deletedDocumentAPI = new DeletedDocument(deletedDocument, context);
-            if (!deletedDocumentAPI.canDelete()) {
+            if (!deletedDocumentAPI.canUndelete()) {
                 return "accessdenied";
             }
         }

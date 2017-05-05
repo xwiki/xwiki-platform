@@ -63,8 +63,14 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException if error in saving
      * @since 9.4RC1
      */
-    void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId, XWikiContext context,
-        boolean bTransaction) throws XWikiException;
+    default void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId, XWikiContext context,
+        boolean bTransaction) throws XWikiException
+    {
+        // Empty default implementation.
+        // XXX: the current signature does not return the saved document index so we can't delegate to the older
+        // saveToRecycleBin because we have no way of setting the batchId on the saved document, so we would not be
+        // respecting the new method's contract and would only do it's job partially.
+    }
 
     /**
      * @return restored document from recycle bin
@@ -88,7 +94,14 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException if error while loading
      * @since 9.4RC1
      */
-    XWikiDocument restoreFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException;
+    default XWikiDocument restoreFromRecycleBin(long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        // XXX: Depending on how an older implementation handled the XWikiDocument argument, it's relatively safer to
+        // pass an empty document than null. However, if the document's reference is actually used, the result might be
+        // unpredictable.
+        return restoreFromRecycleBin(new XWikiDocument(), index, context, bTransaction);
+    }
 
     /**
      * @return specified deleted document from recycle bin. null if not found.
@@ -112,8 +125,14 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException if error while loading
      * @since 9.4RC1
      */
-    XWikiDeletedDocument getDeletedDocument(long index, XWikiContext context, boolean bTransaction)
-        throws XWikiException;
+    default XWikiDeletedDocument getDeletedDocument(long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        // XXX: Depending on how an older implementation handled the XWikiDocument argument, it's relatively safer to
+        // pass an empty document than null. However, if the document's reference is actually used, the result might be
+        // unpredictable.
+        return getDeletedDocument(new XWikiDocument(), index, context, bTransaction);
+    }
 
     /**
      * @return info about all delete actions of specific document. sorted by date.
@@ -134,8 +153,12 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException - if error in loading
      * @since 9.4RC1
      */
-    XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
-        throws XWikiException;
+    default XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        // Return no results as default implementation.
+        return new XWikiDeletedDocument[0];
+    }
 
     /**
      * @param batchId - id of the operation that deleted multiple documents at the same time; useful when trying to
@@ -147,8 +170,12 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException - if error in loading
      * @since 9.4RC1
      */
-    XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, boolean withContent, XWikiContext context,
-        boolean bTransaction) throws XWikiException;
+    default XWikiDeletedDocument[] getAllDeletedDocuments(String batchId, boolean withContent, XWikiContext context,
+        boolean bTransaction) throws XWikiException
+    {
+        // Return no results as default implementation.
+        return new XWikiDeletedDocument[0];
+    }
 
     /**
      * Permanently delete document from recycle bin.
@@ -174,5 +201,11 @@ public interface XWikiRecycleBinStoreInterface
      * @throws XWikiException if any error
      * @since 9.4RC1
      */
-    void deleteFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException;
+    default void deleteFromRecycleBin(long index, XWikiContext context, boolean bTransaction) throws XWikiException
+    {
+        // XXX: Depending on how an older implementation handled the XWikiDocument argument, it's relatively safer to
+        // pass an empty document than null. However, if the document's reference is actually used, the result might be
+        // unpredictable.
+        deleteFromRecycleBin(new XWikiDocument(), index, context, bTransaction);
+    }
 }

@@ -201,7 +201,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     private static DocumentReferenceResolver<String> getDocumentReferenceResolver()
     {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
     }
 
     /**

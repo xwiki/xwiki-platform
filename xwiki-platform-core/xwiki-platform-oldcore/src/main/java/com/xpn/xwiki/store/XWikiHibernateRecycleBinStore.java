@@ -39,7 +39,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -150,9 +149,6 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private DocumentReferenceResolver<String> defaultResolver;
 
     /**
      * @param context used for environment

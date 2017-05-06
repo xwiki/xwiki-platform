@@ -76,21 +76,14 @@ public class LinkExecutableUtils
         AnchorElement foundAncestorStart = null;
         AnchorElement foundAncestorEnd = null;
         // get the first leaf of the selection and check it out
-        Node firstLeaf = DOMUtils.getInstance().getFirstLeaf(range);
-        if (firstLeaf == range.getStartContainer()
-            && range.getStartOffset() == DOMUtils.getInstance().getLength(firstLeaf)) {
-            firstLeaf = DOMUtils.getInstance().getNextLeaf(firstLeaf);
-        }
+        Node firstLeaf = LinkExecutableUtils.getFirstLeaf(range);
         foundAncestorStart = (AnchorElement) DOMUtils.getInstance().getFirstAncestor(firstLeaf, ANCHOR_TAG_NAME);
         // if no anchor found for start, it's pointless to keep looking, won't find anything
         if (foundAncestorStart == null) {
             return null;
         }
         // check the other end
-        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
-        if (lastLeaf == range.getEndContainer() && range.getEndOffset() == 0) {
-            lastLeaf = DOMUtils.getInstance().getPreviousLeaf(lastLeaf);
-        }
+        Node lastLeaf = LinkExecutableUtils.getLastLeaf(range);
         foundAncestorEnd = (AnchorElement) DOMUtils.getInstance().getFirstAncestor(lastLeaf, ANCHOR_TAG_NAME);
 
         if (foundAncestorStart == foundAncestorEnd && foundAncestorStart != null) {
@@ -98,5 +91,24 @@ public class LinkExecutableUtils
         }
 
         return null;
+    }
+
+    private static Node getFirstLeaf(Range range)
+    {
+        Node firstLeaf = DOMUtils.getInstance().getFirstLeaf(range);
+        if (firstLeaf == range.getStartContainer()
+            && range.getStartOffset() == DOMUtils.getInstance().getLength(firstLeaf)) {
+            firstLeaf = DOMUtils.getInstance().getNextLeaf(firstLeaf);
+        }
+        return firstLeaf;
+    }
+
+    private static Node getLastLeaf(Range range)
+    {
+        Node lastLeaf = DOMUtils.getInstance().getLastLeaf(range);
+        if (lastLeaf == range.getEndContainer() && range.getEndOffset() == 0) {
+            lastLeaf = DOMUtils.getInstance().getPreviousLeaf(lastLeaf);
+        }
+        return lastLeaf;
     }
 }

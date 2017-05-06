@@ -378,12 +378,12 @@ public class MockitoOldcoreRule implements MethodRule
         if (!this.componentManager.hasComponent(CoreConfiguration.class)) {
             CoreConfiguration coreConfigurationMock =
                 this.componentManager.registerMockComponent(CoreConfiguration.class);
-            when(coreConfigurationMock.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_1_0);
+            when(coreConfigurationMock.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_2_1);
         } else {
             CoreConfiguration coreConfiguration =
                 this.componentManager.registerMockComponent(CoreConfiguration.class, false);
             if (MockUtil.isMock(coreConfiguration)) {
-                when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_1_0);
+                when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_2_1);
             }
         }
 

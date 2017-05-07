@@ -745,7 +745,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             }
         } catch (Throwable e) {
             // If we fail we consider there is no custom displayer
-            LOGGER.error("Error while trying to evaluate if a property has a custom displayer", e);
+            LOGGER.error("Error finding if property [{}] has a custom displayer. "
+                + "Considering that there's no custom displayer.", propertyClassName, e);
         }
 
         return null;

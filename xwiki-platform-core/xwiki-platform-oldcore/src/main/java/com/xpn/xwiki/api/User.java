@@ -97,7 +97,7 @@ public class User extends Api
         boolean result = false;
         try {
             if (this.user == null) {
-                LOGGER.warn("Invalid null user");
+                LOGGER.warn("User considered not part of group [{}] since user is null", groupName);
             } else {
                 result = this.user.isUserInGroup(groupName, getXWikiContext());
             }

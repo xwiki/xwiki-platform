@@ -8370,12 +8370,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * If there's no parser available for the specified syntax default to the XWiki 2.1 syntax.
+     */
     private Syntax getDefaultDocumentSyntax()
     {
-        // If there's no parser available for the specified syntax default to XWiki 2.1 syntax
         Syntax syntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
 
-        if (syntax == null || !Utils.getComponentManager().hasComponent(Parser.class, syntax.toIdString())) {
+        if (syntax == null || (!Utils.getComponentManager().hasComponent(Parser.class, syntax.toIdString())
+            && !Syntax.XWIKI_2_1.equals(syntax)))
+        {
             LOGGER.warn("Failed to find parser for the default syntax [{}]. Defaulting to xwiki/2.1 syntax.", syntax);
             syntax = Syntax.XWIKI_2_1;
         }

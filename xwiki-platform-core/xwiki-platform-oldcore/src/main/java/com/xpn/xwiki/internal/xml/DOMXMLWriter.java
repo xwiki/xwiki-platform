@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.EmptyStackException;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -108,8 +109,7 @@ public class DOMXMLWriter extends XMLWriter
      */
     public DOMXMLWriter(Document doc)
     {
-        this.format = DEFAULT_FORMAT;
-        this.doc = doc;
+        this(doc, DEFAULT_FORMAT);
     }
 
     /**
@@ -121,6 +121,14 @@ public class DOMXMLWriter extends XMLWriter
      */
     public DOMXMLWriter(Document doc, OutputFormat format)
     {
+        // Set an output stream in order to not use System.out. If close() is called on this writer, this would
+        // close System.out which wouldn't be a good thing!
+        // Thus we use a dummy output stream since it's not used anyway...
+        try {
+            setOutputStream(new ByteArrayOutputStream());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Failed to create DOMXMLWriter instance", e);
+        }
         this.format = format;
         this.doc = doc;
     }

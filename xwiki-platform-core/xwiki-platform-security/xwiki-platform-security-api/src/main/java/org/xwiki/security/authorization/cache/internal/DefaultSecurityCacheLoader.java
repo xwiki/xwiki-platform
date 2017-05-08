@@ -139,6 +139,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         throws AuthorizationException
     {
         int retries = 0;
+        Exception lastException;
 
         while (true) {
             rulesInvalidator.suspend();
@@ -147,11 +148,13 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                 retries++;
                 return loadRequiredEntries(user, entity);
             } catch (ParentEntryEvictedException e) {
+                lastException = e;
                 if (retries < MAX_RETRIES) {
                     this.logger.debug("The parent entry was evicted. Have tried {} times.  Trying again...", retries);
                     continue;
                 }
             } catch (ConflictingInsertionException e) {
+                lastException = e;
                 if (retries < MAX_RETRIES) {
                     this.logger.debug("There were conflicting insertions. Have tried {} times.  Retrying...", retries);
                     continue;
@@ -159,10 +162,10 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             } finally {
                 rulesInvalidator.resume();
             }
-            String message = String.format("Failed to load the cache in %d attempts.  Giving up.", retries);
+            String message = String.format("Failed to load the cache in %d attempts. Giving up.", retries);
             this.logger.error(message);
-            throw new AuthorizationException(user.getOriginalDocumentReference(),
-                                             entity.getOriginalReference(), message);
+            throw new AuthorizationException(user.getOriginalDocumentReference(), entity.getOriginalReference(),
+                message, lastException);
         }
     }
 

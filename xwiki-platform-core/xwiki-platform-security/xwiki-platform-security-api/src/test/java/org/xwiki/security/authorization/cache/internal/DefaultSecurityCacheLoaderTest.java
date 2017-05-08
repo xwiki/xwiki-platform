@@ -26,7 +26,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.junit.Assert;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,10 +47,13 @@ import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.internal.UserBridge;
 import org.xwiki.security.internal.XWikiBridge;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.AllLogRule;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -67,7 +70,7 @@ public class DefaultSecurityCacheLoaderTest
     public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 
     @Rule
-    public LogRule logCapture = new LogRule();
+    public AllLogRule logRule = new AllLogRule();
 
     private SecurityCacheLoader securityCacheLoader;
 
@@ -133,10 +136,15 @@ public class DefaultSecurityCacheLoaderTest
 
         try {
             securityCacheLoader.load(user, entity);
-            Assert.fail();
+            fail();
         } catch (AuthorizationException e) {
-            Assert.assertEquals("Failed to load the cache in 5 attempts.  Giving up. when checking  "
+            assertEquals("Failed to load the cache in 5 attempts. Giving up. when checking  "
                 + "access to [wiki:Space.Document] for user [wiki:Users.mflorea]", e.getMessage());
+            assertTrue(ExceptionUtils.getRootCauseMessage(e).contains("ConflictingInsertionException"));
         }
+
+        // Assert that we've also emitted a log
+        assertEquals(1, this.logRule.size());
+        assertEquals("Failed to load the cache in 5 attempts. Giving up.", this.logRule.getMessage(0));
     }
 }

@@ -72,17 +72,22 @@ public class UndeleteAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
-        // If the provided DeletedDocument ID is invalid, for any reason, redirect to view mode.
+        // If the provided DeletedDocument ID is invalid, for any reason, redirect to view mode to see the document does
+        // not exist screen.
         XWikiDeletedDocument deletedDocument = getDeletedDocument(context);
         if (deletedDocument == null) {
             sendRedirect(response, doc.getURL(VIEW_ACTION, context));
             return false;
         }
 
+        // Note: Check the ID validity before checking the showBatch parameter so that we validate the ID before
+        // displaying any restore batch UI.
+
         // If showBatch=true and confirm=true then restore the page w/o the batch. If not, the render action will go to
         // the "restore" UI so that the user can confirm. That "restore" UI will then call the action again with
         // confirm=true.
-        if (TRUE.equals(request.get(SHOW_BATCH_PARAMETER)) && !TRUE.equals(request.get(CONFIRM_PARAMETER))) {
+        if (TRUE.equals(request.getParameter(SHOW_BATCH_PARAMETER))
+            && !TRUE.equals(request.getParameter(CONFIRM_PARAMETER))) {
             return true;
         }
 
@@ -220,7 +225,8 @@ public class UndeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
 
         // If showBatch=true and user confirmation is required, display the "restore" UI.
-        if (TRUE.equals(request.get(SHOW_BATCH_PARAMETER)) && !TRUE.equals(request.get(CONFIRM_PARAMETER))) {
+        if (TRUE.equals(request.getParameter(SHOW_BATCH_PARAMETER))
+            && !TRUE.equals(request.getParameter(CONFIRM_PARAMETER))) {
             result = "restore";
         }
 

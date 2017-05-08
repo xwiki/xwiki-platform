@@ -42,13 +42,28 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultModelBridge}.
@@ -58,25 +73,26 @@ import static org.mockito.Mockito.*;
 public class DefaultModelBridgeTest
 {
     @Rule
-    public MockitoComponentMockingRule<ModelBridge> mocker = new MockitoComponentMockingRule<ModelBridge>(
-        DefaultModelBridge.class);
+    public MockitoComponentMockingRule<ModelBridge> mocker =
+        new MockitoComponentMockingRule<>(DefaultModelBridge.class);
 
     private XWikiContext xcontext = mock(XWikiContext.class);
+
+    private XWiki xwiki = mock(XWiki.class);
 
     @Before
     public void configure() throws Exception
     {
-        XWiki xwiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(xwiki);
 
         Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
 
         EntityReferenceProvider entityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
-        when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
-                new DocumentReference("what", "ever", "WebHome"));
-        when(entityReferenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(
-                new SpaceReference("whatever", "Main"));
+        when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(new DocumentReference("what", "ever", "WebHome"));
+        when(entityReferenceProvider.getDefaultReference(EntityType.SPACE))
+            .thenReturn(new SpaceReference("whatever", "Main"));
     }
 
     @Test
@@ -197,8 +213,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference child1Reference = new DocumentReference("wiki", "Space", "Child1");
         DocumentReference child2Reference = new DocumentReference("wiki", "Space", "Child2");
-        when(oldParentDocument.getChildrenReferences(this.xcontext)).thenReturn(
-            Arrays.asList(child1Reference, child2Reference));
+        when(oldParentDocument.getChildrenReferences(this.xcontext))
+            .thenReturn(Arrays.asList(child1Reference, child2Reference));
 
         JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
 
@@ -227,8 +243,8 @@ public class DefaultModelBridgeTest
         XWikiDocument oldParentDocument = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(oldParentReference, this.xcontext)).thenReturn(oldParentDocument);
 
-        when(oldParentDocument.getChildrenReferences(this.xcontext)).thenReturn(
-            Collections.<DocumentReference>emptyList());
+        when(oldParentDocument.getChildrenReferences(this.xcontext))
+            .thenReturn(Collections.<DocumentReference>emptyList());
 
         JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
 
@@ -313,7 +329,7 @@ public class DefaultModelBridgeTest
 
         verify(document, never()).setParentReference(any(DocumentReference.class));
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
-                any(XWikiContext.class));
+            any(XWikiContext.class));
     }
 
     @Test
@@ -332,5 +348,177 @@ public class DefaultModelBridgeTest
 
         verify(this.xcontext).setWikiId("bob");
         verify(this.xcontext).setWikiId("carol");
+    }
+
+    @Test
+    public void restoreDeletedDocument() throws Exception
+    {
+        long deletedDocumentId = 42;
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(documentReference);
+        when(deletedDocument.getId()).thenReturn(deletedDocumentId);
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
+
+        when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+
+        assertTrue(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+
+        verify(xwiki).restoreFromRecycleBin(deletedDocumentId, "Restored from recycle bin", xcontext);
+    }
+
+    @Test
+    public void restoreDeletedDocumentInvalidId() throws Exception
+    {
+        long deletedDocumentId = 42;
+
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(null);
+
+        assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+
+        verify(mocker.getMockedLogger()).error("Deleted document with ID [{}] does not exist.", deletedDocumentId);
+
+        verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
+    }
+
+    @Test
+    public void restoreDeletedDocumentAlreadyExists() throws Exception
+    {
+        long deletedDocumentId = 42;
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        String fullName = "space.page";
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(documentReference);
+        when(deletedDocument.getId()).thenReturn(deletedDocumentId);
+        when(deletedDocument.getFullName()).thenReturn(fullName);
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
+
+        when(xwiki.exists(documentReference, xcontext)).thenReturn(true);
+
+        assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+
+        verify(mocker.getMockedLogger()).error(
+            "Document [{}] with ID [{}] can not be restored. Document already exists", fullName, deletedDocumentId);
+
+        verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
+    }
+
+    /**
+     * @see "XWIKI-9567: Cannot restore document translations from recycle bin"
+     */
+    @Test
+    public void restoreDocumentTranslation() throws Exception
+    {
+        long deletedDocumentId = 42;
+        Locale locale = new Locale("ro");
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        DocumentReference translationDocumentReference = new DocumentReference(documentReference, locale);
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(translationDocumentReference);
+        when(deletedDocument.getId()).thenReturn(deletedDocumentId);
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
+
+        when(xwiki.exists(translationDocumentReference, xcontext)).thenReturn(false);
+
+        assertTrue(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, false));
+
+        verify(xwiki).restoreFromRecycleBin(deletedDocumentId, "Restored from recycle bin", xcontext);
+
+        // Make sure that the main document is not checked for existence, but the translated document which we actually
+        // want to restore.
+        verify(xwiki, never()).exists(documentReference, xcontext);
+        verify(xwiki).exists(translationDocumentReference, xcontext);
+    }
+
+    @Test
+    public void canRestoreDeletedDocument() throws Exception
+    {
+        long deletedDocumentId = 42;
+        String deletedDocumentFullName = "Space.DeletedDocument";
+
+        DocumentReference userReferenceToCheck = new DocumentReference("wiki", "Space", "User");
+
+        DocumentReference currentUserReference = new DocumentReference("wiki", "Space", "CurrentUser");
+
+        when(xcontext.getUserReference()).thenReturn(currentUserReference);
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getFullName()).thenReturn(deletedDocumentFullName);
+
+        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
+        when(recycleBin.getDeletedDocument(deletedDocumentId, xcontext, true)).thenReturn(deletedDocument);
+        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+
+        XWikiRightService rightService = mock(XWikiRightService.class);
+        when(xwiki.getRightService()).thenReturn(rightService);
+        when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+
+        assertTrue(mocker.getComponentUnderTest().canRestoreDeletedDocument(deletedDocumentId, userReferenceToCheck));
+
+        // Verify that the rights were checked with the specified user as context user.
+        verify(xcontext).setUserReference(userReferenceToCheck);
+        // Verify that the context user was restored. Note: We don`t know the order here, but maybe we don`t care that
+        // much.
+        verify(xcontext).setUserReference(currentUserReference);
+    }
+
+    @Test
+    public void restoreDeletedDocumentNoRights() throws Exception
+    {
+        long deletedDocumentId = 42;
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        String deletedDocumentFullName = "space.page";
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getDocumentReference()).thenReturn(documentReference);
+        when(deletedDocument.getId()).thenReturn(deletedDocumentId);
+        when(deletedDocument.getFullName()).thenReturn(deletedDocumentFullName);
+        when(xwiki.getDeletedDocument(deletedDocumentId, xcontext)).thenReturn(deletedDocument);
+
+        when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
+
+        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
+        when(recycleBin.getDeletedDocument(deletedDocumentId, xcontext, true)).thenReturn(deletedDocument);
+        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+
+        // No rights.
+        XWikiRightService rightService = mock(XWikiRightService.class);
+        when(xwiki.getRightService()).thenReturn(rightService);
+        when(rightService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+
+        assertFalse(mocker.getComponentUnderTest().restoreDeletedDocument(deletedDocumentId, true));
+
+        verify(mocker.getMockedLogger()).error("You are not allowed to restore document [{}] with ID [{}]",
+            documentReference, deletedDocumentId);
+
+        verify(xwiki, never()).restoreFromRecycleBin(any(), any(), any());
+    }
+
+    @Test
+    public void getDeletedDocumentIds() throws Exception
+    {
+        String batchId = "abc123";
+        long id1 = 1;
+        long id2 = 2;
+        XWikiDeletedDocument deletedDocument1 = mock(XWikiDeletedDocument.class);
+        when(deletedDocument1.getId()).thenReturn(id1);
+
+        XWikiDeletedDocument deletedDocument2 = mock(XWikiDeletedDocument.class);
+        when(deletedDocument2.getId()).thenReturn(id2);
+
+        XWikiDeletedDocument[] deletedDocuments = {deletedDocument1, deletedDocument2};
+
+        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
+        when(recycleBin.getAllDeletedDocuments(batchId, false, xcontext, true)).thenReturn(deletedDocuments);
+        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+
+        List<Long> result = mocker.getComponentUnderTest().getDeletedDocumentIds(batchId);
+
+        assertNotNull(result);
+        assertEquals(deletedDocuments.length, result.size());
+        assertThat(result, containsInAnyOrder(id1, id2));
     }
 }

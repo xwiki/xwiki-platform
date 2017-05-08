@@ -45,7 +45,7 @@ public class DeletePageOutcomePage extends ViewPage
     @FindBy(xpath = "//p[@class='xwikimessage']")
     private WebElement message;
 
-    @FindBy(xpath = "//*[@id = 'mainContentArea']//a[. = 'Restore']")
+    @FindBy(xpath = "//*[@id = 'mainContentArea']//a[@class = 'action-restore']")
     private WebElement restoreLink;
 
     /**

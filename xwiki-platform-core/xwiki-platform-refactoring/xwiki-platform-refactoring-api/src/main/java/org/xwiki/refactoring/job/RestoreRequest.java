@@ -110,12 +110,12 @@ public class RestoreRequest extends AbstractRequest
     }
 
     /**
-     * @param currentUserReference the user executing the restore operation. This is also the user for which any rights
+     * @param userReference the user executing the restore operation. This is also the user for which any rights
      *            might be checked if {@link #setCheckRights(boolean)} is enabled
      */
-    public void setUserReference(DocumentReference currentUserReference)
+    public void setUserReference(DocumentReference userReference)
     {
-        setProperty(USER_REFERENCE, currentUserReference);
+        setProperty(USER_REFERENCE, userReference);
     }
 
     /**

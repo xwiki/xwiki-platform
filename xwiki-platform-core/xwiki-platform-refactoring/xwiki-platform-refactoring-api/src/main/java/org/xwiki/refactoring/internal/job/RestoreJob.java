@@ -49,7 +49,7 @@ import org.xwiki.refactoring.job.RestoreRequest;
 @Named(RefactoringJobs.RESTORE)
 public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<RestoreRequest>> implements GroupedJob
 {
-    private static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
+    static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
 
     @Inject
     protected ModelBridge modelBridge;
@@ -106,15 +106,19 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
         this.progressManager.popLevelProgress(this);
     }
 
-    private void initializeContext(RestoreRequest request)
+    private void initializeContext(RestoreRequest request) throws IllegalArgumentException
     {
         // Set the context user to the one that made the request.
         DocumentReference userReference = request.getUserReference();
         modelBridge.setContextUserReference(userReference);
 
         // Set the context wiki to the one specified in the request.
-        // All DeletedDocuments API, specifically the IDs, is local to the current wiki.
+        // All DeletedDocuments APIs, specifically the IDs (single document or batch), are local to the current wiki.
         WikiReference wikiReference = request.getWikiReference();
+        // If the wiki is not specified, then we can not continue.
+        if (wikiReference == null) {
+            throw new IllegalArgumentException("No wiki reference was specified in the job request");
+        }
         modelContext.setCurrentEntityReference(wikiReference);
     }
 
@@ -160,6 +164,7 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
         // for long.
         WikiReference wikiReference = ((RestoreRequest) request).getWikiReference();
         if (wikiReference != null) {
+            // Note:
             this.groupPath = new JobGroupPath(wikiReference.getName(), ROOT_GROUP);
         }
     }

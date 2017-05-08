@@ -20,36 +20,35 @@
 package org.xwiki.refactoring.internal.job;
 
 import org.junit.Before;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.security.authorization.AuthorizationManager;
-
-import static org.mockito.Mockito.when;
+import org.xwiki.job.AbstractJob;
+import org.xwiki.job.Job;
+import org.xwiki.job.Request;
+import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
- * Base class for writing unit tests for jobs extending {@link AbstractEntityJob}.
+ * Base class for writing unit tests for refactoring jobs extending {@link AbstractJob}.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 9.4RC1
  */
-public abstract class AbstractEntityJobTest extends AbstractJobTest
+public abstract class AbstractJobTest
 {
-    protected AuthorizationManager authorization;
+    protected ModelBridge modelBridge;
 
-    protected ObservationManager observationManager;
-
-    @Override
     @Before
     public void configure() throws Exception
     {
-        super.configure();
-        this.authorization = getMocker().getInstance(AuthorizationManager.class);
-        this.observationManager = getMocker().getInstance(ObservationManager.class);
+        this.modelBridge = getMocker().getInstance(ModelBridge.class);
+    }
 
-        EntityReferenceProvider defaultEntityReferenceProvider = getMocker().getInstance(EntityReferenceProvider.class);
-        when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
-            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT, null));
+    protected abstract MockitoComponentMockingRule<Job> getMocker();
+
+    protected Job run(Request request) throws Exception
+    {
+        Job job = getMocker().getComponentUnderTest();
+        job.initialize(request);
+        job.run();
+        return job;
     }
 }

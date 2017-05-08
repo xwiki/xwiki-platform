@@ -72,8 +72,8 @@ public class DefaultModelBridge implements ModelBridge
     /**
      * The reference to the type of object used to create an automatic redirect when renaming or moving a document.
      */
-    private static final LocalDocumentReference REDIRECT_CLASS_REFERENCE = new LocalDocumentReference(
-        XWiki.SYSTEM_SPACE, "RedirectClass");
+    private static final LocalDocumentReference REDIRECT_CLASS_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "RedirectClass");
 
     @Inject
     private Logger logger;
@@ -151,8 +151,9 @@ public class DefaultModelBridge implements ModelBridge
             if (result) {
                 this.logger.info("Document [{}] has been copied to [{}].", source, destination);
             } else {
-                this.logger.warn("Cannot fully copy [{}] to [{}] because an orphan translation"
-                    + " exists at the destination.", source, destination);
+                this.logger.warn(
+                    "Cannot fully copy [{}] to [{}] because an orphan translation" + " exists at the destination.",
+                    source, destination);
             }
             return result;
         } catch (Exception e) {
@@ -256,9 +257,8 @@ public class DefaultModelBridge implements ModelBridge
         try {
             // At the moment we don't have a way to retrieve only the direct children so we select all the descendants.
             // This means we select all the documents from the specified space and from all the nested spaces.
-            String statement =
-                "select distinct(doc.fullName) from XWikiDocument as doc "
-                    + "where doc.space = :space or doc.space like :spacePrefix escape '/'";
+            String statement = "select distinct(doc.fullName) from XWikiDocument as doc "
+                + "where doc.space = :space or doc.space like :spacePrefix escape '/'";
             Query query = this.queryManager.createQuery(statement, Query.HQL);
             query.setWiki(spaceReference.getWikiReference().getName());
             String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
@@ -384,21 +384,21 @@ public class DefaultModelBridge implements ModelBridge
         boolean pageIsNotTerminal = documentReference.getName().equals(spaceHomePage);
 
         // Case 1: The document has the location A.B.C.WebHome
-        //         The parent should be A.B.WebHome
+        // The parent should be A.B.WebHome
         if (pageIsNotTerminal && parentOfTheSpace.getType() == EntityType.SPACE) {
             return new DocumentReference(spaceHomePage, new SpaceReference(parentOfTheSpace));
         }
 
         // Case 2: The document has the location A.WebHome
-        //         The parent should be Main.WebHome
+        // The parent should be Main.WebHome
         if (pageIsNotTerminal && parentOfTheSpace.getType() == EntityType.WIKI) {
-            return new DocumentReference(spaceHomePage, new SpaceReference(
-                    entityReferenceProvider.getDefaultReference(EntityType.SPACE).getName(),
+            return new DocumentReference(spaceHomePage,
+                new SpaceReference(entityReferenceProvider.getDefaultReference(EntityType.SPACE).getName(),
                     documentReference.getWikiReference()));
         }
 
         // Case 3: The document has the location A.B
-        //         The parent should be A.WebHome
+        // The parent should be A.WebHome
         return new DocumentReference(spaceHomePage, documentReference.getLastSpaceReference());
     }
 
@@ -489,7 +489,7 @@ public class DefaultModelBridge implements ModelBridge
             // Note: DeletedDocument API works with the current context user.
             context.setUserReference(userReference);
 
-            return deletedDocumentApi.canUndelete();
+            result = deletedDocumentApi.canUndelete();
         } catch (Exception e) {
             logger.error("Failed to check restore rights on deleted document [{}] for user [{}]", deletedDocumentId,
                 userReference, e);

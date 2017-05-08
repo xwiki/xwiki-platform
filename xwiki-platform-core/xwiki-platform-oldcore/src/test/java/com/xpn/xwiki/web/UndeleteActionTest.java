@@ -26,7 +26,6 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
@@ -41,15 +40,16 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,6 +75,8 @@ public class UndeleteActionTest
      * A mock {@link XWikiContext};
      */
     private XWikiContext context = mock(XWikiContext.class);
+
+    private XWikiRequest request = mock(XWikiRequest.class);
 
     /**
      * A mock {@link XWiki};
@@ -103,7 +105,7 @@ public class UndeleteActionTest
         mocker.registerComponent(ScriptService.class, "refactoring", refactoringScriptService);
         Utils.setComponentManager(mocker);
 
-        when(context.getRequest()).thenReturn(mock(XWikiRequest.class));
+        when(context.getRequest()).thenReturn(request);
 
         when(context.getWiki()).thenReturn(xwiki);
 
@@ -117,34 +119,21 @@ public class UndeleteActionTest
 
         jobRequest = mock(RestoreRequest.class);
         when(refactoringScriptService.createRestoreRequest(any(List.class))).thenReturn(jobRequest);
-    }
-
-    @Test
-    public void missingCSRFToken() throws Exception
-    {
-        assertFalse(undeleteAction.action(context));
-
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        verify(csrfToken).isTokenValid(null);
+        when(refactoringScriptService.createRestoreRequest(anyString())).thenReturn(jobRequest);
     }
 
     /**
-     * @see "XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin"
+     * Launches a RestoreJob with the current deleted document ID.
      */
     @Test
-    public void restore() throws Exception
+    public void restoreSingleDocument() throws Exception
     {
         CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
         when(csrfToken.isTokenValid(null)).thenReturn(true);
 
-        when(xwiki.hasRecycleBin(context)).thenReturn(true);
-
         long id = 13;
 
-        when(context.getRequest().getParameter("id")).thenReturn(String.valueOf(id));
-
-        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
         when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
@@ -153,8 +142,6 @@ public class UndeleteActionTest
 
         when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(false);
-
         assertFalse(undeleteAction.action(context));
 
         verify(refactoringScriptService).createRestoreRequest(Arrays.asList(id));
@@ -162,96 +149,182 @@ public class UndeleteActionTest
         verify(job).join();
     }
 
-    /**
-     * When the recycle bin is disabled, the document should not be restored.
-     */
     @Test
-    public void testRecycleBinDisabled() throws Exception
+    public void missingCSRFToken() throws Exception
     {
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(true);
+        // Valid Deleted document ID.
+        long id = 13;
 
-        when(xwiki.hasRecycleBin(context)).thenReturn(false);
-
-        when(context.getRequest().getParameter("id")).thenReturn("13");
-
-        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
         when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
 
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
-
-        when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(false);
+        // Invalid CSRF token.
+        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
+        when(csrfToken.isTokenValid(null)).thenReturn(false);
 
         assertFalse(undeleteAction.action(context));
 
-        verify(xwiki, Mockito.never()).restoreFromRecycleBin(document, 13, "Restored from recycle bin", context);
+        // Verify that the resubmission URL was retrieved to be used in the redirect.
+        verify(csrfToken).getResubmissionURL();
     }
 
     /**
-     * When the location where to restore the document already exists, don`t override.
+     * When the recycle bin is disabled or when the deleted document ID is invalid, the document should not be restored.
      */
     @Test
-    public void testDocumentAlreadyExists() throws Exception
+    public void recycleBinDisabledOrInvalidId() throws Exception
     {
         CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
         when(csrfToken.isTokenValid(null)).thenReturn(true);
 
-        when(xwiki.hasRecycleBin(context)).thenReturn(true);
+        long id = 13;
 
-        when(context.getRequest().getParameter("id")).thenReturn("13");
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
 
-        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+        // null is returned when the ID is invalid or the Recycle Bin is disabled.
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(null);
+
+        assertFalse(undeleteAction.action(context));
+
+        // Verify that we never get this far.
+        verify(refactoringScriptService, never()).createRestoreRequest(Arrays.asList(id));
+    }
+
+    /**
+     * Show the "restore" UI with the option to include the batch when restoring and to see the contents of the batch of
+     * the current deleted document.
+     */
+    @Test
+    public void showBatch() throws Exception
+    {
+        long id = 13;
+
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getId()).thenReturn(id);
         when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
 
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(request.getParameter("showBatch")).thenReturn("true");
 
-        when(xwiki.exists(any(DocumentReference.class), any(XWikiContext.class))).thenReturn(true);
+        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        assertFalse(undeleteAction.action(context));
+        assertTrue(undeleteAction.action(context));
+        // Render the "restore" template.
+        assertEquals("restore", undeleteAction.render(context));
 
-        verify(xwiki, Mockito.never()).restoreFromRecycleBin(document, 13, "Restored from recycle bin", context);
+        // Just make sure that we stop to the display, since the "confirm=true" parameter was not passed.
+        verify(refactoringScriptService, never()).createRestoreRequest(Arrays.asList(id));
     }
 
     /**
-     * @see "XWIKI-9567: Cannot restore document translations from recycle bin"
+     * Launches a RestoreJob with the batchId of the current deleted document.
      */
     @Test
-    public void testRestoringTranslation() throws Exception
+    public void restoreBatch() throws Exception
     {
         CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
         when(csrfToken.isTokenValid(null)).thenReturn(true);
 
-        when(xwiki.hasRecycleBin(context)).thenReturn(true);
+        long id = 13;
+        String batchId = "abc123";
 
-        when(context.getRequest().getParameter("id")).thenReturn("13");
-
-        XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
 
         XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(any(), any(), anyInt(), any(XWikiContext.class))).thenReturn(
-            deletedDocument);
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getId()).thenReturn(id);
+        when(deletedDocument.getBatchId()).thenReturn(batchId);
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
 
-        // Document to restore is a translation.
-        when(deletedDocument.getLocale()).thenReturn(new Locale("ro"));
+        // Go through the screen showing the option to include the batch and displaying its contents.
+        when(request.getParameter("showBatch")).thenReturn("true");
 
-        DocumentReference translationDocumentReference =
-            new DocumentReference(document.getDocumentReference(), deletedDocument.getLocale());
-        when(xwiki.exists(translationDocumentReference, context)).thenReturn(false);
+        // Option to include the entire batch when restoring is enabled.
+        when(request.getParameter("includeBatch")).thenReturn("true");
+
+        // Confirmation button pressed.
+        when(request.getParameter("confirm")).thenReturn("true");
+
+        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
         assertFalse(undeleteAction.action(context));
 
-        // Make sure that the main document is not checked for existence, but the translated document which we actually
-        // want to restore.
-        verify(xwiki, Mockito.never()).exists(document.getDocumentReference(), context);
-        verify(xwiki).exists(translationDocumentReference, context);
+        verify(refactoringScriptService).createRestoreRequest(batchId);
+        verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
+        verify(job).join();
+    }
 
-        verify(xwiki).restoreFromRecycleBin(document, 13, "Restored from recycle bin", context);
+    /**
+     * When trying to restore, rights are checked on the current deleted document, regardless if single or batch
+     * restore.
+     */
+    @Test
+    public void notAllowedToRestoreSinglePage() throws Exception
+    {
+        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
+        when(csrfToken.isTokenValid(null)).thenReturn(true);
+
+        long id = 13;
+
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getId()).thenReturn(id);
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
+
+        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+
+        assertTrue(undeleteAction.action(context));
+        // Render the "accessdenied" template.
+        assertEquals("accessdenied", undeleteAction.render(context));
+
+        // Just make sure we don`t go any further.
+        verify(refactoringScriptService, never()).createRestoreRequest(Arrays.asList(id));
+    }
+
+    /**
+     * When trying to restore, rights are checked on the current deleted document, regardless if single or batch
+     * restore.
+     */
+    @Test
+    public void notAllowedToRestoreBatch() throws Exception
+    {
+        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
+        when(csrfToken.isTokenValid(null)).thenReturn(true);
+
+        long id = 13;
+        String batchId = "abc123";
+
+        when(request.getParameter("id")).thenReturn(String.valueOf(id));
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getId()).thenReturn(id);
+        when(deletedDocument.getBatchId()).thenReturn(batchId);
+        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
+
+        // Go through the screen showing the option to include the batch and displaying its contents.
+        when(request.getParameter("showBatch")).thenReturn("true");
+
+        // Option to include the entire batch when restoring is enabled.
+        when(request.getParameter("includeBatch")).thenReturn("true");
+
+        // Confirmation button pressed.
+        when(request.getParameter("confirm")).thenReturn("true");
+
+        // No rights to restore the page when checking from the Action. The job will check individual rights.
+        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+
+        assertTrue(undeleteAction.action(context));
+        // Render the "accessdenied" template.
+        assertEquals("accessdenied", undeleteAction.render(context));
+
+        // Just make sure we don`t go any further.
+        verify(refactoringScriptService, never()).createRestoreRequest(batchId);
     }
 }

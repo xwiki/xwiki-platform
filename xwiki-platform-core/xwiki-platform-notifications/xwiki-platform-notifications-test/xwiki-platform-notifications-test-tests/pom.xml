@@ -28,6 +28,17 @@
   <artifactId>xwiki-platform-notifications-test-tests</artifactId>
   <name>XWiki Platform - Notifications - Test - Functional Tests</name>
   <properties>
+    <!-- Override in order to add the notifications dependencies -->
+    <xwikiCfgPlugins>\
+      com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
+      com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
+      com.xpn.xwiki.plugin.diff.DiffPlugin,\
+      com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
+      com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin
+    </xwikiCfgPlugins>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Mapping needed by the ActivityStream migrator since AS is a dependency of the User Directory -->
@@ -42,7 +53,7 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -62,7 +73,7 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
          systems go through SLF4J -->
     <dependency>

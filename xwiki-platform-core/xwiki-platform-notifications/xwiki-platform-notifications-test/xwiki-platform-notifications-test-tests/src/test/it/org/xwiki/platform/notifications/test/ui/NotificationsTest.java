@@ -98,6 +98,17 @@ public class NotificationsTest extends AbstractTest
         tray = new NotificationsTrayPage();
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 
+        // Ensure that the notification list is displaying the correct amount of unread notifications
+        // (max 5 notifications by default)
+        assertEquals(5, tray.getUnreadNotificationsCount());
+        assertEquals(0, tray.getReadNotificationsCount());
+        tray.markAsRead(0);
+        assertEquals(4, tray.getUnreadNotificationsCount());
+        assertEquals(1, tray.getReadNotificationsCount());
+
+        // Ensure that a notification has a correct type
+        assertEquals("[create]", tray.getNotificationType(0));
+
         // Reset the notifications count of the user 2
         tray.clearAllNotifications();
         assertEquals(0, tray.getNotificationsCount());

@@ -33,14 +33,13 @@ public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
-    @FindBy(css = "div#notificationsPane tr:nth-child(4) input")
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] input")
     private WebElement pageCreatedCheckbox;
 
-    @FindBy(css = "div#notificationsPane tr:nth-child(5) input")
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] input")
     private WebElement pageDeletedCheckbox;
 
-    // @FindBy(xpath = "//*[@id='notificationsPane']/div/table/tbody/tr[5]/td[2]/div/div/input")
-    @FindBy(css = "div#notificationsPane tr:nth-child(6) input")
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] input")
     private WebElement pageUpdatedCheckbox;
 
     /**

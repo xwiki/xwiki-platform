@@ -19,29 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-notifications</artifactId>
     <version>9.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications</artifactId>
-  <name>XWiki Platform - Notifications - Parent POM</name>
+  <artifactId>xwiki-platform-notifications-test</artifactId>
+  <name>XWiki Platform - Notifications - Test - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Modules related to the notifications</description>
+  <description>Integration tests for the Notifications module.</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-notifications-api</module>
-    <module>xwiki-platform-notifications-default</module>
-    <module>xwiki-platform-notifications-ui</module>
+    <module>xwiki-platform-notifications-test-pageobjects</module>
+    <module>xwiki-platform-notifications-test-tests</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-notifications-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

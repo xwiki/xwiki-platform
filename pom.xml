@@ -436,9 +436,6 @@
               <include>**/*Test.java</include>
               <include>**/*IntegrationTests.java</include>
             </includes>
-            <excludes>
-              <exclude>**/Abstract*Test.java</exclude>
-            </excludes>
             <!-- Verify that unit tests don't output anything to stdout/stderr -->
             <systemProperties combine.children="append">
               <!-- This property makes it simple for some module to exclude the check (for example for functional

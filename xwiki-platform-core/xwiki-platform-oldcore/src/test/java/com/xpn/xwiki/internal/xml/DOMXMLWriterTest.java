@@ -38,7 +38,7 @@ public class DOMXMLWriterTest
      * Before 3.0M2 there was a bug where write and writeOpen were reversed.
      * 
      * @throws IOException
-     * @see XWIKI-5937
+     * @see "XWIKI-5937"
      */
     @Test
     public void writeVersusWriteOpen() throws IOException

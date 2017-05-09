@@ -28,6 +28,7 @@ import java.util.EmptyStackException;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.io.NullOutputStream;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -125,7 +126,7 @@ public class DOMXMLWriter extends XMLWriter
         // close System.out which wouldn't be a good thing!
         // Thus we use a dummy output stream since it's not used anyway...
         try {
-            setOutputStream(new ByteArrayOutputStream());
+            setOutputStream(NullOutputStream.NULL_OUTPUT_STREAM);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Failed to create DOMXMLWriter instance", e);
         }

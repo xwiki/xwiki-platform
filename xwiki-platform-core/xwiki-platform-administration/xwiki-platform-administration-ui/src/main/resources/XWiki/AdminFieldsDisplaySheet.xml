@@ -56,7 +56,7 @@
   #set ($out = $configDoc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', ''))
   #set ($newId = "${configClassName}_${obj.number}_${prop.name}")
   &lt;label for="${newId}" class="$prop.name"&gt;##
-  #if ($out.indexOf('type=''checkbox''') != -1)
+  #if ($out.indexOf('type=''checkbox''') != -1 &amp;&amp; $out.indexOf('class="xwiki-form-listclass"') == -1)
     $out ##
     #set ($out = '')
   #end

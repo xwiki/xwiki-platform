@@ -305,8 +305,9 @@
           " ${escapetool.d}1=${escapetool.d}2$regextool.quoteReplacement($newId)"))
         ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
         &lt;dt&gt;&lt;label for="$newId"&gt;
-        #if ($out.indexOf('type=''checkbox''') != -1)
-          $out
+        #if ($out.indexOf('type=''checkbox''') != -1 &amp;&amp; $out.indexOf('class="xwiki-form-listclass"') == -1)
+          $out ##
+          #set ($out = '')
         #end
         $escapetool.xml($prettyName)
         &lt;/label&gt;
@@ -318,7 +319,7 @@
           &lt;span class="xHint"&gt;$hint&lt;/span&gt;
         #end
         &lt;/dt&gt;
-        #if ($out.indexOf('type=''checkbox''') == -1)
+        #if ($out != '')
           &lt;dd&gt;$out&lt;/dd&gt;
         #end
       #end## If property is in propertiesToShow

@@ -19,45 +19,49 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorContainer;
-import org.xwiki.eventstream.RecordableEventDescriptorManager;
 
 /**
- * Default implementation of {@link org.xwiki.eventstream.RecordableEventDescriptorManager}.
+ * Default implementation of {@link RecordableEventDescriptorContainer}.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 9.4RC1
  */
 @Component
 @Singleton
-public class DefaultRecordableEventDescriptorManager implements RecordableEventDescriptorManager
+public class DefaultRecordableEventDescriptorContainer implements RecordableEventDescriptorContainer
 {
-    @Inject
-    private ComponentManager componentManager;
+    private List<RecordableEventDescriptor> recordableEventDescriptorList;
 
-    @Inject
-    private RecordableEventDescriptorContainer recordableEventDescriptorContainer;
+    /**
+     * Constructs a new {@link DefaultRecordableEventDescriptorContainer}.
+     */
+    public DefaultRecordableEventDescriptorContainer()
+    {
+        this.recordableEventDescriptorList = new ArrayList<>();
+    }
 
     @Override
-    public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
+    public void addRecordableEventDescriptor(RecordableEventDescriptor recordableEventDescriptor)
     {
-        try {
-            List<RecordableEventDescriptor> recordableEventDescriptorList =
-                    componentManager.getInstanceList(RecordableEventDescriptor.class);
-            recordableEventDescriptorList.addAll(recordableEventDescriptorContainer.getAllRecordableEventDescriptor());
-            return recordableEventDescriptorList;
-        } catch (ComponentLookupException e) {
-            throw new EventStreamException("Failed to retrieve the list of RecordableEventDescriptor.", e);
-        }
+        this.recordableEventDescriptorList.add(recordableEventDescriptor);
+    }
+
+    @Override
+    public void deleteRecordableEventDescriptor(RecordableEventDescriptor recordableEventDescriptor)
+    {
+        this.recordableEventDescriptorList.remove(recordableEventDescriptor);
+    }
+
+    @Override
+    public List<RecordableEventDescriptor> getAllRecordableEventDescriptor() {
+        return this.recordableEventDescriptorList;
     }
 }

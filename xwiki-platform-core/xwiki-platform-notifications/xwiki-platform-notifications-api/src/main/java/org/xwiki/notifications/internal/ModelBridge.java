@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -60,4 +61,14 @@ public interface ModelBridge
      * @throws NotificationException if an error occurs
      */
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
+
+    /**
+     * Return the notification events of a given document.
+     *
+     * @param documentReference the document reference
+     * @return the list of applied notifications events
+     * @throws NotificationException if an error occurs
+     */
+    List<PageNotificationEventDescriptor> getPageNotificationEventDescriptors(DocumentReference documentReference)
+            throws NotificationException;
 }

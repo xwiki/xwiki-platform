@@ -28,11 +28,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.RecordableEventDescriptorContainer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -63,10 +65,19 @@ public class DefaultModelBridge implements ModelBridge
             "NotificationsStartDateClass", NOTIFICATION_CODE_SPACE
     );
 
+    private static final DocumentReference PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS = new DocumentReference(
+            "PageNotificationEventDescriptorClass", NOTIFICATION_CODE_SPACE
+    );
+
+    private static final String EVENT_TYPE = "eventType";
+
     private static final String START_DATE = "startDate";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private RecordableEventDescriptorContainer recordableEventDescriptorContainer;
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
@@ -87,7 +98,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
                         preferences.add(new NotificationPreference(
-                                obj.getStringValue("eventType"),
+                                obj.getStringValue(EVENT_TYPE),
                                 obj.getStringValue("applicationId"),
                                 obj.getIntValue("notificationEnabled", 0) == 1
                         ));
@@ -149,6 +160,48 @@ public class DefaultModelBridge implements ModelBridge
         } catch (Exception e) {
             throw new NotificationException(
                     String.format("Failed to set the user start date for [%s].", userReference), e);
+        }
+    }
+
+    @Override
+    public List<PageNotificationEventDescriptor> getPageNotificationEventDescriptors(
+            DocumentReference documentReference)
+        throws NotificationException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        PageNotificationEventDescriptor newDescriptor;
+
+        final DocumentReference pageNotificationEventDescriptorClass
+                = PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS.setWikiReference(documentReference.getWikiReference());
+
+        List<PageNotificationEventDescriptor> eventDescriptors = new ArrayList<>();
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(documentReference, context);
+            List<BaseObject> eventDescriptorObj = doc.getXObjects(pageNotificationEventDescriptorClass);
+            if (eventDescriptorObj != null) {
+                for (BaseObject obj : eventDescriptorObj) {
+                    if (obj != null) {
+                        newDescriptor = new PageNotificationEventDescriptor(
+                                obj.getStringValue("applicationName"),
+                                obj.getStringValue("eventId"),
+                                obj.getStringValue("eventPrettyName"),
+                                obj.getStringValue("eventIcon"),
+                                obj.getStringValue(EVENT_TYPE),
+                                obj.getStringValue("objectType"),
+                                obj.getStringValue("notificationTemplate")
+                        );
+                        eventDescriptors.add(newDescriptor);
+                    }
+                }
+            }
+
+            return eventDescriptors;
+        } catch (XWikiException e) {
+            throw new NotificationException(
+                    String.format("Failed to get the event descriptors for the user [%s].", documentReference), e);
         }
     }
 }

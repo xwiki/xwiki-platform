@@ -1,1 +1,2 @@
 org.xwiki.notifications.internal.DefaultModelBridge
+org.xwiki.notifications.internal.page.DefaultPageNotificationEventUpdater

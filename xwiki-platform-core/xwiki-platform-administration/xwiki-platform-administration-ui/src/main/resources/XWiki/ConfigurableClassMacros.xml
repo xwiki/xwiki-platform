@@ -304,7 +304,7 @@
         #set ($out = $out.replaceAll(" (id|for)=('|"")$regextool.quote($oldId)",
           " ${escapetool.d}1=${escapetool.d}2$regextool.quoteReplacement($newId)"))
         ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
-        &lt;dt&gt;&lt;label for="$newId"&gt;
+        &lt;dt&gt;&lt;label#if ($out.matches("(?s).*id=['""]${newId}['""].*")) for="${newId}"#end&gt;##
         #if ($out.indexOf('type=''checkbox''') != -1 &amp;&amp; $out.indexOf('class="xwiki-form-listclass"') == -1)
           $out ##
           #set ($out = '')

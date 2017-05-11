@@ -36,7 +36,9 @@
   #end
 #end
 #define($details)
-  #displayNotificationEventDetailsSkeletons($commentEvents.size(), $rows)
+  #if ($commentEvents.size() > 1)
+    #displayNotificationEventDetailsSkeletons($commentEvents.size(), $rows)
+  #end
 #end
 ###
 ### Finaly display the notification

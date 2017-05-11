@@ -64,13 +64,33 @@ public class XHTML2FOTest
     @Test
     public void transformWithFontStyle() throws Exception
     {
-        // Get the xhtml2fo.xsl stylesheet
-        InputStream xslt = getClass().getClassLoader().getResourceAsStream("xhtml2fo.xsl");
-        assertNotNull(xslt);
+        String xml = constructXML(
+            "<p style=\"display: block; margin: 1em 0; color: red; \">\n"
+            + "  <span style=\"font: 7px 14px Courier; \">Test</span>\n"
+            + "</p>");
 
-        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        String transformedXML = getTransformedXML(xml);
+        String expectedXML = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("xhtml2fo.expected"));
+
+        XMLUnit.setIgnoreWhitespace(true);
+        Diff diff = new Diff(expectedXML, transformedXML);
+        assertTrue("XML is not similar [" + diff.toString() + "]", diff.identical());
+    }
+
+    @Test
+    public void transformWhenUnrecognizedCSSProperties() throws Exception
+    {
+        String xml = constructXML(
+            "<div style=\"box-sizing: border-box; \"/>");
+        String transformedXML = getTransformedXML(xml);
+        assertFalse("Generated FO shouldn't contain 'box-sizing'", transformedXML.contains("box-sizing"));
+    }
+
+    private String constructXML(String xmlContent)
+    {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-                + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
             + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
             + "<head>\n"
             + "    <title>\n"
@@ -80,7 +100,7 @@ public class XHTML2FOTest
             + "    <meta content=\"en\" name=\"language\" />\n"
             + "</head>\n"
             + "<body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\" "
-                + "style=\"display: block; margin: 8pt; \">\n"
+            + "style=\"display: block; margin: 8pt; \">\n"
             + "    <div class=\"pdfheader\" style=\"display: block; \">\n"
             + "            Main.test2 - test2\n"
             + "        \n"
@@ -94,14 +114,18 @@ public class XHTML2FOTest
             + "<div id=\"xwikimaincontainer\" style=\"display: block; \">\n"
             + "    <div id=\"xwikimaincontainerinner\" style=\"display: block; \">\n"
             + "        <div id=\"xwikicontent\" style=\"display: block; \">\n"
-            + "            <p style=\"display: block; margin: 1em 0; color: red; \">\n"
-            + "                <span style=\"font: 7px 14px Courier; \">Test</span>\n"
-            + "            </p>\n"
+            + xmlContent + "\n"
             + "        </div>\n"
             + "    </div>\n"
             + "</div>\n"
             + "</body>\n"
             + "</html>\n";
+    }
+
+    private String getTransformedXML(String xml) throws Exception
+    {
+        InputStream xslt = getClass().getClassLoader().getResourceAsStream("xhtml2fo.xsl");
+        assertNotNull(xslt);
 
         XMLReaderFactory xmlReaderFactory = this.oldcore.getMocker().getInstance(XMLReaderFactory.class);
         XMLReader xmlReader = xmlReaderFactory.createXMLReader();
@@ -111,10 +135,6 @@ public class XHTML2FOTest
         SAXSource xsltSource = new SAXSource(xmlReader, new InputSource(xslt));
 
         String transformedXML = XMLUtils.transform(xmlSource, xsltSource);
-        String expectedXML = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("xhtml2fo.expected"));
-
-        XMLUnit.setIgnoreWhitespace(true);
-        Diff diff = new Diff(expectedXML, transformedXML);
-        assertTrue("XML is not similar [" + diff.toString() + "]", diff.identical());
+        return transformedXML;
     }
 }

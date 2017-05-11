@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.NotificationPreferenceScope;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -60,4 +61,7 @@ public interface ModelBridge
      * @throws NotificationException if an error occurs
      */
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
+
+    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
+            throws NotificationException;
 }

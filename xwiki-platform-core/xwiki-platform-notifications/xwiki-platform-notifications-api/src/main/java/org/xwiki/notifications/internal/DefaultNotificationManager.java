@@ -25,16 +25,20 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFilter;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
@@ -64,6 +68,7 @@ public class DefaultNotificationManager implements NotificationManager
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
+    @Named("cached")
     private ModelBridge modelBridge;
 
     @Inject
@@ -71,6 +76,9 @@ public class DefaultNotificationManager implements NotificationManager
 
     @Inject
     private SimilarityCalculator similarityCalculator;
+
+    @Inject
+    private ComponentManager componentManager;
 
     @Override
     public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount)
@@ -129,6 +137,11 @@ public class DefaultNotificationManager implements NotificationManager
                 if (document != null && !authorizationManager.hasAccess(Right.VIEW, userReference, document)) {
                     continue;
                 }
+
+                if (filterEvent(event, userReference)) {
+                    continue;
+                }
+
                 // Record this event
                 recordEvent(results, event);
                 // If the expected count is reached, stop now
@@ -148,6 +161,22 @@ public class DefaultNotificationManager implements NotificationManager
         } catch (Exception e) {
             throw new NotificationException("Fail to get the list of notifications.", e);
         }
+    }
+
+    private boolean filterEvent(Event event, DocumentReference user) throws NotificationException
+    {
+        try {
+            for (NotificationFilter filter :
+                    componentManager.<NotificationFilter>getInstanceList(NotificationFilter.class)) {
+                if (filter.filterEvent(event, user)) {
+                    return true;
+                }
+            }
+        } catch (ComponentLookupException e) {
+            throw new NotificationException("Failed to get the notification filters.", e);
+        }
+
+        return false;
     }
 
     private List<String> getEventsIds(List<Event> events)

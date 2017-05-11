@@ -27,12 +27,16 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.NotificationPreferenceScope;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -59,6 +63,10 @@ public class DefaultModelBridge implements ModelBridge
             "NotificationPreferenceClass", NOTIFICATION_CODE_SPACE
     );
 
+    private static final DocumentReference NOTIFICATION_PREFERENCE_SCOPE_CLASS = new DocumentReference(
+            "NotificationPreferenceScopeClass", NOTIFICATION_CODE_SPACE
+    );
+
     private static final DocumentReference NOTIFICATION_START_DATE_CLASS = new DocumentReference(
             "NotificationsStartDateClass", NOTIFICATION_CODE_SPACE
     );
@@ -67,6 +75,12 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private EntityReferenceResolver<String> entityReferenceResolver;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
@@ -150,5 +164,53 @@ public class DefaultModelBridge implements ModelBridge
             throw new NotificationException(
                     String.format("Failed to set the user start date for [%s].", userReference), e);
         }
+    }
+
+    @Override
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference)
+            throws NotificationException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        final DocumentReference notificationPreferencesScopeClass
+                = NOTIFICATION_PREFERENCE_SCOPE_CLASS.setWikiReference(userReference.getWikiReference());
+
+        List<NotificationPreferenceScope> preferences = new ArrayList<>();
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(userReference, context);
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
+            if (preferencesObj != null) {
+                for (BaseObject obj : preferencesObj) {
+                    if (obj != null) {
+                        String scopeType = obj.getStringValue("scope");
+                        EntityType type;
+                        if (scopeType.equals("pageOnly")) {
+                            type = EntityType.DOCUMENT;
+                        } else if (scopeType.equals("pageAndChildren")) {
+                            type = EntityType.SPACE;
+                        } else if (scopeType.equals("wiki")) {
+                            type = EntityType.WIKI;
+                        } else {
+                            logger.warn("Scope [{}] is not supported as a NotificationPreferenceScope (user [{}]).",
+                                    scopeType, userReference);
+                            continue;
+                        }
+
+                        preferences.add(new NotificationPreferenceScope(
+                                obj.getStringValue("eventType"),
+                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type)
+                        ));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to get the notification preferences scope for the user [%s].", userReference),
+                    e);
+        }
+
+        return preferences;
     }
 }

@@ -1091,7 +1091,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 </xsl:when>
                 <xsl:when test="$name = 'list-style'">
                 </xsl:when>
-                <!-- Not supported in FOP yet and needs to be ignored as otherwise they cause the export to fail with
+                <!-- Not supported in FOP and needs to be ignored as otherwise they cause the export to fail with
                      an exception raised -->
                 <xsl:when test="$name = 'border-image'"/>
                 <xsl:when test="$name = 'tab-stops'"/>
@@ -1100,6 +1100,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:when test="$name = 'quotes'"/>
                 <xsl:when test="$name = 'width' and self::html:img"/>
                 <xsl:when test="$name = 'height' and self::html:img"/>
+                <xsl:when test="$name = 'box-sizing'"/>
                 <xsl:when test="starts-with($name, 'list-')"/>
                 <xsl:when test="starts-with($name, 'outline')"/>
                 <!-- These are treated separately in the 'generic' template mode, since they can't be applied directly on the current element -->

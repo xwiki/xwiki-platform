@@ -81,9 +81,14 @@ public class XHTML2FOTest
     public void transformWhenUnrecognizedCSSProperties() throws Exception
     {
         String xml = constructXML(
-            "<div style=\"box-sizing: border-box; \"/>");
+            "<div style=\"box-sizing: border-box; \">\n"
+            + "<span style=\"text-justify: inter-ideograph; line-height: normal; text-autospace: none;\">text</span>\n"
+            + "</div>");
+
         String transformedXML = getTransformedXML(xml);
         assertFalse("Generated FO shouldn't contain 'box-sizing'", transformedXML.contains("box-sizing"));
+        assertFalse("Generated FO shouldn't contain 'text-justify'", transformedXML.contains("text-justify"));
+        assertFalse("Generated FO shouldn't contain 'text-autospace'", transformedXML.contains("text-autospace"));
     }
 
     private String constructXML(String xmlContent)

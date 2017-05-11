@@ -515,6 +515,8 @@
 .notifications-area {
   margin-top: 10px;
   min-height: 20px;
+  /* 320px is the width of the smallest smartphones right now, so we don't use a larger width */
+  min-width: 320px;
   overflow: hidden;
 }
 

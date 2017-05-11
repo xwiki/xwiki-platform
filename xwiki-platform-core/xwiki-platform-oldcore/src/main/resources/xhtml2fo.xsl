@@ -1101,6 +1101,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:when test="$name = 'width' and self::html:img"/>
                 <xsl:when test="$name = 'height' and self::html:img"/>
                 <xsl:when test="$name = 'box-sizing'"/>
+                <xsl:when test="$name = 'text-justify'"/>
+                <xsl:when test="$name = 'text-autospace'"/>
                 <xsl:when test="starts-with($name, 'list-')"/>
                 <xsl:when test="starts-with($name, 'outline')"/>
                 <!-- These are treated separately in the 'generic' template mode, since they can't be applied directly on the current element -->

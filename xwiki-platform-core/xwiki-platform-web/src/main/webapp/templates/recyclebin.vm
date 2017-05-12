@@ -1,4 +1,4 @@
-## {DEPRECATED} use viewrev action with "rev=deleted:<id>" instead
+##@deprecated since 9.4RC1, use viewrev action with "rev=deleted:<id>" instead
 ## Preview deleted document in recycle bin
 #set ($deletedDocument = $xwiki.getDeletedDocument($request.get('id')))
 #if ($deletedDocument)

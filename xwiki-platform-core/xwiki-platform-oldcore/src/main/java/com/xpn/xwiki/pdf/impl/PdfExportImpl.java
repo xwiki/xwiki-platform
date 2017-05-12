@@ -364,6 +364,9 @@ public class PdfExportImpl implements PdfExport
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 
+            // Transform FOP fatal errors into warnings so that the PDF export isn't stopped
+            foUserAgent.getEventBroadcaster().addEventListener(new XWikiFOPEventListener());
+
             // Construct fop with desired output format
             Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);
 

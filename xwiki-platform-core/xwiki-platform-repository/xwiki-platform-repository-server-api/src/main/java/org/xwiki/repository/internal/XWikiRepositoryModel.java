@@ -37,45 +37,59 @@ import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.RegexEntityReference;
+
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 public class XWikiRepositoryModel
 {
     // References
 
-    public static final String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
+    /**
+     * @since 9.4RC1
+     */
+    public static final String EXTENSION_SPACENAME = "ExtensionCode";
+
+    public static final String EXTENSION_CLASSNAME = EXTENSION_SPACENAME + "ExtensionClass";
 
     public static final String AVERAGERATING_CLASSNAME = "XWiki.AverageRatingsClass";
 
-    public static final String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
+    public static final String EXTENSIONVERSION_CLASSNAME = EXTENSION_SPACENAME + "ExtensionVersionClass";
 
-    public static final String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
+    public static final String EXTENSIONDEPENDENCY_CLASSNAME = EXTENSION_SPACENAME + "ExtensionDependencyClass";
 
-    public static final String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
+    public static final String EXTENSIONPROXY_CLASSNAME = EXTENSION_SPACENAME + "ExtensionProxyClass";
 
-    public static final EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSION_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionClass");
 
-    public static final EntityReference EXTENSIONVERSION_CLASSREFERENCE = new EntityReference("ExtensionVersionClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    /**
+     * Used to match any extension object.
+     * 
+     * @since 9.4RC1
+     */
+    public static final RegexEntityReference EXTENSION_OBJECTREFERENCE = BaseObjectReference.any(EXTENSION_CLASSNAME);
 
-    public static final EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
-        "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSIONVERSION_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionVersionClass");
 
-    public static final EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSIONDEPENDENCY_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionDependencyClass");
 
-    public static final EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSIONPROXY_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionProxyClass");
+
+    public static final LocalDocumentReference EXTENSION_TEMPLATEREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionTemplate");
 
     public static final String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
 
-    public static final EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference CONFIGURATION_CLASSREFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "RepositoryConfigClass");
 
-    public static final EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference CONFIGURATION_REFERENCE =
+        new LocalDocumentReference(EXTENSION_SPACENAME, "RepositoryConfig");
 
     // Properties
 

@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Get deleted document from the database.
+ * Get deleted document revisions from the database.
  * 
  * @version $Id$
  * @since 9.4RC1

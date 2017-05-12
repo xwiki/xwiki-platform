@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Get document revision from the database.
+ * Get document revisions from the database.
  * 
  * @version $Id$
  * @since 9.3RC1

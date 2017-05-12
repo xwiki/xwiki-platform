@@ -51,15 +51,15 @@ public class XWikiRepositoryModel
      */
     public static final String EXTENSION_SPACENAME = "ExtensionCode";
 
-    public static final String EXTENSION_CLASSNAME = EXTENSION_SPACENAME + "ExtensionClass";
+    public static final String EXTENSION_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionClass";
 
     public static final String AVERAGERATING_CLASSNAME = "XWiki.AverageRatingsClass";
 
-    public static final String EXTENSIONVERSION_CLASSNAME = EXTENSION_SPACENAME + "ExtensionVersionClass";
+    public static final String EXTENSIONVERSION_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionVersionClass";
 
-    public static final String EXTENSIONDEPENDENCY_CLASSNAME = EXTENSION_SPACENAME + "ExtensionDependencyClass";
+    public static final String EXTENSIONDEPENDENCY_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionDependencyClass";
 
-    public static final String EXTENSIONPROXY_CLASSNAME = EXTENSION_SPACENAME + "ExtensionProxyClass";
+    public static final String EXTENSIONPROXY_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionProxyClass";
 
     public static final LocalDocumentReference EXTENSION_CLASSREFERENCE =
         new LocalDocumentReference(EXTENSION_SPACENAME, "ExtensionClass");

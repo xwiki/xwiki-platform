@@ -90,10 +90,10 @@ import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.dom4j.XHTMLDocument;
-import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+import io.sf.carte.doc.dom4j.CSSStylableElement;
+import io.sf.carte.doc.dom4j.XHTMLDocument;
+import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
+import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 
 /**
  * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a

@@ -68,16 +68,9 @@
 
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
     <dependency>
-      <groupId>info.informatica</groupId>
+      <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>0.20</version>
-      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-      <exclusions>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>0.22</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -148,6 +141,14 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
       <version>3.6.9.Final</version>
+      <exclusions>
+        <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
+             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
+        <exclusion>
+          <groupId>dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -194,7 +195,7 @@
 
     <!-- XML processing -->
     <dependency>
-      <groupId>dom4j</groupId>
+      <groupId>org.dom4j</groupId>
       <artifactId>dom4j</artifactId>
     </dependency>
     <dependency>

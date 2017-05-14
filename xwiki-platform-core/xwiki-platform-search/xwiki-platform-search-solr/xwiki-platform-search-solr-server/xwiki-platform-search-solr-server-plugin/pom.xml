@@ -43,6 +43,14 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
+             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
+        <exclusion>
+          <groupId>dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Test Dependencies -->

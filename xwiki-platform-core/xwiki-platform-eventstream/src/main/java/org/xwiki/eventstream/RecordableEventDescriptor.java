@@ -44,7 +44,7 @@ public interface RecordableEventDescriptor
     String getApplicationName();
 
     /**
-     * @return the translation key of the description of the event type
+     * @return the description of the event type
      */
     String getDescription();
 

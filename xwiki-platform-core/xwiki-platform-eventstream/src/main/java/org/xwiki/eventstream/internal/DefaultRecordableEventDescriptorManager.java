@@ -19,7 +19,10 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,6 +33,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Default implementation of {@link org.xwiki.eventstream.RecordableEventDescriptorManager}.
@@ -44,6 +51,15 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private RecordableEventDescriptorManager recordableEventDescriptorManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private ModelContext modelContext;
+
     @Override
     public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
     {
@@ -52,5 +68,38 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
         } catch (ComponentLookupException e) {
             throw new EventStreamException("Failed to retrieve the list of RecordableEventDescriptor.", e);
         }
+    }
+
+    @Override
+    public List<RecordableEventDescriptor> getAllRecordableEventDescriptorsAllWikis() throws EventStreamException
+    {
+        if (isMainWiki()) {
+            // We use an hashSet to be sure we won't store the same descriptor twice (in case the same application
+            // is installed on several wikis).
+            Set<RecordableEventDescriptor> recordableEventDescriptors = new HashSet<>();
+
+            try {
+                for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
+                    for (RecordableEventDescriptor recordableEventDescriptor : getAllRecordableEventDescriptors()) {
+                        recordableEventDescriptors.add(recordableEventDescriptor);
+                    }
+                }
+            } catch (WikiManagerException e) {
+                throw new EventStreamException("Failed to get the list of all Recordable Event Descriptors.", e);
+            } finally {
+                modelContext.setCurrentEntityReference(new WikiReference(wikiDescriptorManager.getMainWikiId()));
+            }
+
+            return new ArrayList<>(recordableEventDescriptors);
+        }
+
+        return recordableEventDescriptorManager.getAllRecordableEventDescriptors();
+    }
+
+    private boolean isMainWiki()
+    {
+        return wikiDescriptorManager.getMainWikiId() != null
+                && wikiDescriptorManager.getMainWikiId().equals(wikiDescriptorManager.getCurrentWikiId());
     }
 }

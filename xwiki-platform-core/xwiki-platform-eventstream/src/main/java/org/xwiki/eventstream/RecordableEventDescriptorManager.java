@@ -39,4 +39,10 @@ public interface RecordableEventDescriptorManager
      * @throws EventStreamException if an error occurs
      */
     List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException;
+
+    /**
+     * @return all the available implementation of RecordableEventDescriptor
+     * @throws EventStreamException if an error occurs
+     */
+    List<RecordableEventDescriptor> getAllRecordableEventDescriptorsAllWikis() throws EventStreamException;
 }

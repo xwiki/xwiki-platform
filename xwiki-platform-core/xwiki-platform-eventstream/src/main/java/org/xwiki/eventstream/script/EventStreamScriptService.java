@@ -53,6 +53,6 @@ public class EventStreamScriptService implements ScriptService
      */
     public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
     {
-        return recordableEventDescriptorManager.getAllRecordableEventDescriptors();
+        return recordableEventDescriptorManager.getAllRecordableEventDescriptorsAllWikis();
     }
 }

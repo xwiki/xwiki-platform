@@ -50,7 +50,7 @@
   #end
   #set ($browseAppsURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=${section}&amp;search=application&amp;repo=recommended"))
 #else
-  #set ($browseAppsURL = 'http://extensions.xwiki.org/xwiki/bin/view/Extension/#|t=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application')
+  #set ($browseAppsURL = 'http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application')
 #end
 
 #set ($actionCards = [{
@@ -145,7 +145,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/#|t=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;View more applications&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;View more applications&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

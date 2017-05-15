@@ -34,8 +34,7 @@
  * Displays a submit button, i.e. an <tt>input</tt> element with <tt>type=submit</tt>.
  * For styling purposes, the button is wrapped in a span element.
  * @param name The value of the <tt>name</tt> attribute
- * @param shortcut The keyboard shortcut for this button. The value will be displayed
- *        as the title of the element. The actual shortcut is attached elsewhere, in
+ * @param shortcut The keyboard shortcut for this button. The value will be displayed as the title of the element. The actual shortcut is attached elsewhere, in
  *        the javascript code.
  * @param value The value of the <tt>value</tt> attribute, i.e. the text displayed on
  *        the button.
@@ -306,6 +305,13 @@
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
                 <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end /></td>
+              #elseif("$!colprop.type" == 'date')
+                #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
+                <td class="xwiki-livetable-display-header-filter">
+                  ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates
+                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" aria-hidden="true" />
+                  <input type="text" data-type="date" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end />
+                </td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>

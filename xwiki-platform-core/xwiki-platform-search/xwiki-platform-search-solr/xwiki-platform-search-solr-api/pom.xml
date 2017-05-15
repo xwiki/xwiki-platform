@@ -48,32 +48,6 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
-      <exclusions>
-        <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
-             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
-        <exclusion>
-          <groupId>dom4j</groupId>
-          <artifactId>dom4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-        <!-- TODO: Solr v6.4.2 draws org.restlet.jee:org.restlet.ext.servlet:2.3.0 but since we're using Restlet 2.0.14
-             we're excluding it, hoping that we're not using a solr feature requiring some restlet API only available
-             in Restlet 2.3.0... -->
-        <exclusion>
-          <groupId>org.restlet.jee</groupId>
-          <artifactId>org.restlet.ext.servlet</artifactId>
-        </exclusion>
-        <!-- TODO: Solr v6.4.2 draws javax.servlet:javax.servlet-api:3.1.0 but we're using Servlet 3.0.1 ATM so we're
-             excluding it, hoping that we're not using a solr feature requiring some restlet API only available in
-             Servlet 3.1.0. -->
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>javax.servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
       pull the right version here. -->

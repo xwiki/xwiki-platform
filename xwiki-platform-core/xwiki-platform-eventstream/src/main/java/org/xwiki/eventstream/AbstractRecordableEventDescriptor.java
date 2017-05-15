@@ -21,10 +21,15 @@ package org.xwiki.eventstream;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
+ * Abstract implementation of {@link RecordableEventDescriptor}.
+ *
  * @version $Id$
+ * @since 9.4RC1
  */
 public abstract class AbstractRecordableEventDescriptor implements RecordableEventDescriptor
 {
@@ -38,6 +43,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
     /**
      * Construct an AbstractRecordableEventDescriptor.
      * @param descriptionTranslationKey the name of the translation key that describe the event
+     * @param applicationTranslationKey the translation key of the name of the application that send this event
      */
     public AbstractRecordableEventDescriptor(String descriptionTranslationKey,
             String applicationTranslationKey)
@@ -56,5 +62,30 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
     public String getApplicationName()
     {
         return contextualLocalizationManager.getTranslationPlain(applicationTranslationKey);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(getApplicationName()).append(getEventType()).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == this) {
+            return true;
+        }
+
+        if (o instanceof RecordableEventDescriptor) {
+            RecordableEventDescriptor other = (RecordableEventDescriptor) o;
+            EqualsBuilder equalsBuilder = new EqualsBuilder();
+            equalsBuilder.append(other.getApplicationName(), this.getApplicationName());
+            equalsBuilder.append(other.getEventType(), this.getEventType());
+
+            return equalsBuilder.isEquals();
+        }
+
+        return false;
     }
 }

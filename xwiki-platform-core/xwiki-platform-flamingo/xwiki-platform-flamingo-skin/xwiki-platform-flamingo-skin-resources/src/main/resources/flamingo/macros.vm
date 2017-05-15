@@ -34,7 +34,8 @@
  * Displays a submit button, i.e. an <tt>input</tt> element with <tt>type=submit</tt>.
  * For styling purposes, the button is wrapped in a span element.
  * @param name The value of the <tt>name</tt> attribute
- * @param shortcut The keyboard shortcut for this button. The value will be displayed as the title of the element. The actual shortcut is attached elsewhere, in
+ * @param shortcut The keyboard shortcut for this button. The value will be displayed
+ *        as the title of the element. The actual shortcut is attached elsewhere, in
  *        the javascript code.
  * @param value The value of the <tt>value</tt> attribute, i.e. the text displayed on
  *        the button.

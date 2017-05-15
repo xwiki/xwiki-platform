@@ -43,7 +43,12 @@
 
 {{velocity output="false"}}
 #if ($hasAdmin)
-  #set ($browseAppsURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=XWiki.AddExtensions&amp;search=application&amp;repo=recommended'))
+  #set ($section = 'XWiki.Extensions')
+  #if (!$xwiki.exists($section))
+    ## Support for pre-9.2RC1 Administration Application
+    #set ($section = 'XWiki.AddExtensions')
+  #end
+  #set ($browseAppsURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=${section}&amp;search=application&amp;repo=recommended"))
 #else
   #set ($browseAppsURL = 'http://extensions.xwiki.org/xwiki/bin/view/Extension/#|t=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application')
 #end

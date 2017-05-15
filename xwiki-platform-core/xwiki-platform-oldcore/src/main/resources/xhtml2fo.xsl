@@ -1095,7 +1095,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                      an exception raised -->
                 <xsl:when test="$name = 'border-image'"/>
                 <xsl:when test="$name = 'tab-stops'"/>
-                <!-- These are not valid in XSL, so we ignore them -->
+                <!-- These are not valid in FO, so we ignore them -->
                 <xsl:when test="$name = 'cursor'"/>
                 <xsl:when test="$name = 'quotes'"/>
                 <xsl:when test="$name = 'width' and self::html:img"/>
@@ -1103,6 +1103,10 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:when test="$name = 'box-sizing'"/>
                 <xsl:when test="$name = 'text-justify'"/>
                 <xsl:when test="$name = 'text-autospace'"/>
+                <xsl:when test="$name = 'font-variant-ligatures'"/>
+                <xsl:when test="$name = 'font-variant-caps'"/>
+                <xsl:when test="$name = 'text-decoration-style'"/>
+                <xsl:when test="$name = 'text-decoration-color'"/>
                 <xsl:when test="starts-with($name, 'list-')"/>
                 <xsl:when test="starts-with($name, 'outline')"/>
                 <!-- These are treated separately in the 'generic' template mode, since they can't be applied directly on the current element -->

@@ -82,7 +82,7 @@
 #end
 (% class="xform" %)
 (((
-  ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_extensionPointId"&gt;{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label&gt;{{/html}}##
+  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_extensionPointId"#end&gt;{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label&gt;{{/html}}##
     (% class="xHint" %){{translation key="menu.uix.extensionPoint.hint"/}}
   #if ($xcontext.action == 'edit')
     : {{html}}&lt;select id="XWiki.UIExtensionClass_0_extensionPointId" name="XWiki.UIExtensionClass_0_extensionPointId"&gt;
@@ -115,7 +115,7 @@
   #end
   ##
   ##
-  ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_scope"&gt;{{translation key="menu.uix.scope.label"/}}&lt;/label&gt;{{/html}}##
+  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_scope"#end&gt;{{translation key="menu.uix.scope.label"/}}&lt;/label&gt;{{/html}}##
     (% class="xHint" %){{translation key="menu.uix.scope.hint"/}}
   : $doc.display('scope')
 )))

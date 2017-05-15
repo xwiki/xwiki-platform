@@ -44,25 +44,25 @@
 #set ($discard = $doc.use('Help.Applications.Movies.Code.MoviesClass'))
 (% class="xform" %)
 (((
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_title1"&gt;$escapetool.xml($doc.displayPrettyName('title1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_title1"#end&gt;$escapetool.xml($doc.displayPrettyName('title1', false, false))&lt;/label&gt;
   : $doc.display('title1')
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_longText1"&gt;$escapetool.xml($doc.displayPrettyName('longText1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_longText1"#end&gt;$escapetool.xml($doc.displayPrettyName('longText1', false, false))&lt;/label&gt;
   : $doc.display('longText1')
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_staticList1"&gt;$escapetool.xml($doc.displayPrettyName('staticList1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_staticList1"#end&gt;$escapetool.xml($doc.displayPrettyName('staticList1', false, false))&lt;/label&gt;
   : $doc.display('staticList1')
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_date1"&gt;$escapetool.xml($doc.displayPrettyName('date1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_date1"#end&gt;$escapetool.xml($doc.displayPrettyName('date1', false, false))&lt;/label&gt;
   : $doc.display('date1')
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_number1"&gt;$escapetool.xml($doc.displayPrettyName('number1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_number1"#end&gt;$escapetool.xml($doc.displayPrettyName('number1', false, false))&lt;/label&gt;
   : $doc.display('number1')
   #if ($context.display == 'edit')
     ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_boolean1"&gt;$doc.display('boolean1')$escapetool.xml($doc.displayPrettyName('boolean1', false, false))&lt;/label&gt;
   #else
-    ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_boolean1"&gt;$escapetool.xml($doc.displayPrettyName('boolean1', false, false))&lt;/label&gt;
+    ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_boolean1"#end&gt;$escapetool.xml($doc.displayPrettyName('boolean1', false, false))&lt;/label&gt;
     : $doc.display('boolean1')
   #end
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_databaseList1"&gt;$escapetool.xml($doc.displayPrettyName('databaseList1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_databaseList1"#end&gt;$escapetool.xml($doc.displayPrettyName('databaseList1', false, false))&lt;/label&gt;
   : $doc.display('databaseList1')
-  ; &lt;label for="Help.Applications.Movies.Code.MoviesClass_0_content1"&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Movies.Code.MoviesClass_0_content1"#end&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;
   : $doc.display('content1')
 )))
 {{/html}}

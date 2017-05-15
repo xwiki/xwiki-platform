@@ -44,15 +44,15 @@
 #set ($discard = $doc.use('Help.Applications.Contributors.Code.ContributorsClass'))
 (% class="xform" %)
 (((
-  ; &lt;label for="Help.Applications.Contributors.Code.ContributorsClass_0_longText1"&gt;$escapetool.xml($doc.displayPrettyName('longText1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Contributors.Code.ContributorsClass_0_longText1"#end&gt;$escapetool.xml($doc.displayPrettyName('longText1', false, false))&lt;/label&gt;
   : $doc.display('longText1')
-  ; &lt;label for="Help.Applications.Contributors.Code.ContributorsClass_0_title1"&gt;$escapetool.xml($doc.displayPrettyName('title1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Contributors.Code.ContributorsClass_0_title1"#end&gt;$escapetool.xml($doc.displayPrettyName('title1', false, false))&lt;/label&gt;
   : $doc.display('title1')
-  ; &lt;label for="Help.Applications.Contributors.Code.ContributorsClass_0_date1"&gt;$escapetool.xml($doc.displayPrettyName('date1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Contributors.Code.ContributorsClass_0_date1"#end&gt;$escapetool.xml($doc.displayPrettyName('date1', false, false))&lt;/label&gt;
   : $doc.display('date1')
-  ; &lt;label for="Help.Applications.Contributors.Code.ContributorsClass_0_staticList1"&gt;$escapetool.xml($doc.displayPrettyName('staticList1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Contributors.Code.ContributorsClass_0_staticList1"#end&gt;$escapetool.xml($doc.displayPrettyName('staticList1', false, false))&lt;/label&gt;
   : $doc.display('staticList1')
-  ; &lt;label for="Help.Applications.Contributors.Code.ContributorsClass_0_content1"&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="Help.Applications.Contributors.Code.ContributorsClass_0_content1"#end&gt;$escapetool.xml($doc.displayPrettyName('content1', false, false))&lt;/label&gt;
   : $doc.display('content1')
 )))
 {{/html}}

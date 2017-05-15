@@ -503,6 +503,13 @@
                   com.github.jnr:jnr-posix/3.0.9
                 </features>
               </extensionOverride>
+              <!-- We've moved to Dom4J 2.0.0+ which has a new groupId (dom4j -> org.dom4j) and thus extensions of XWiki
+                   of XWiki may depend on dom4j:dom4j:1.6 and without this they would install dom4j instead of using
+                   the version provided by the platform -->
+              <extensionOverride>
+                <id>dom4j:dom4j</id>
+                <features>org.dom4j:dom4j</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

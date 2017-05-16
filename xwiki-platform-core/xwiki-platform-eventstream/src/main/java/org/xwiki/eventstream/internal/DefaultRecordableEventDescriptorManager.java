@@ -52,9 +52,6 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     private ComponentManager componentManager;
 
     @Inject
-    private RecordableEventDescriptorManager recordableEventDescriptorManager;
-
-    @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
@@ -94,7 +91,7 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
             return new ArrayList<>(recordableEventDescriptors);
         }
 
-        return recordableEventDescriptorManager.getAllRecordableEventDescriptors();
+        return getAllRecordableEventDescriptors();
     }
 
     private boolean isMainWiki()

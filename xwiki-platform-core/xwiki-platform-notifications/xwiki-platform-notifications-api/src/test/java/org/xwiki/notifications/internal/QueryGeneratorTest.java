@@ -33,6 +33,7 @@ import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,6 +54,7 @@ public class QueryGeneratorTest
     private ModelBridge modelBridge;
     private EntityReferenceSerializer<String> serializer;
     private ConfigurationSource userPreferencesSource;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
@@ -65,6 +67,7 @@ public class QueryGeneratorTest
         modelBridge = mocker.getInstance(ModelBridge.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         userPreferencesSource = mocker.getInstance(ConfigurationSource.class, "user");
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         startDate = new Date(10);
 
         query = mock(Query.class);
@@ -77,6 +80,8 @@ public class QueryGeneratorTest
         when(modelBridge.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
         when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
+
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
     @Test
@@ -185,6 +190,29 @@ public class QueryGeneratorTest
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("endDate", untilDate);
         verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
+    }
+
+    @Test
+    public void generateQueryWithLocalUser() throws Exception
+    {
+        // Test
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        mocker.getComponentUnderTest().generateQuery(
+                new DocumentReference("xwiki", "XWiki", "UserA"),
+                true, null, null);
+
+        // Verify
+        verify(queryManager).createQuery(
+                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                        " AND event.hidden <> true AND " +
+                        "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
+                        "where status.activityEvent = event and status.entityId = :user and status.read = true))" +
+                        " AND event.wiki = :userWiki " +
+                        "order by event.date DESC", Query.HQL);
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("userWiki", "xwiki");
     }
 
 }

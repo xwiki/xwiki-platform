@@ -37,6 +37,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Generate a query to retrieve notifications events according to the preferences of the user.
@@ -60,6 +61,10 @@ public class QueryGenerator
     @Inject
     @Named("user")
     private ConfigurationSource userPreferencesSource;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
 
     /**
      * Generate the query.
@@ -102,6 +107,7 @@ public class QueryGenerator
         handleEndDate(endDate, hql);
         handleHiddenEvents(hql);
         handleEventStatus(onlyUnread, hql);
+        handleWiki(user, hql);
         handleOrder(hql);
 
         // The, generate the query
@@ -114,6 +120,7 @@ public class QueryGenerator
         handleApplications(apps, query);
         handleBlackList(blackList, query);
         handleEndDate(endDate, query);
+        handleWiki(user, query);
 
         // Return the query
         return query;
@@ -144,6 +151,14 @@ public class QueryGenerator
     {
         if (blackList != null && !blackList.isEmpty()) {
             hql.append(" AND event.id NOT IN (:blackList)");
+        }
+    }
+
+    private void handleWiki(DocumentReference user, StringBuilder hql)
+    {
+        // If the user is a local user
+        if (!user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
+            hql.append(" AND event.wiki = :userWiki");
         }
     }
 
@@ -209,5 +224,13 @@ public class QueryGenerator
             hql.append("event.type IN (:types)");
         }
         return types;
+    }
+
+    private void handleWiki(DocumentReference user, Query query)
+    {
+        // If the user is a local user
+        if (!user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
+            query.bindValue("userWiki", user.getWikiReference().getName());
+        }
     }
 }

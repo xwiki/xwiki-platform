@@ -457,9 +457,9 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @return the document with inlined style
      */
-    private String applyCSS(String html, String css, XWikiContext context)
+    String applyCSS(String html, String css, XWikiContext context)
     {
-        LOGGER.debug("Applying the following CSS:\n{}", css);
+        LOGGER.debug("Applying the following CSS [{}] to HTML [{}]", css, html);
         try {
             //System.setProperty("org.w3c.css.sac.parser", "org.apache.batik.css.parser.Parser");
 
@@ -488,11 +488,11 @@ public class PdfExportImpl implements PdfExport
             String result = out.toString();
             // Debug output
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("HTML with CSS applied: " + result);
+                LOGGER.debug("HTML with CSS applied [{}]", result);
             }
             return result;
-        } catch (Exception ex) {
-            LOGGER.warn("Failed to apply CSS: " + ex.getMessage(), ex);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);
             return html;
         }
     }

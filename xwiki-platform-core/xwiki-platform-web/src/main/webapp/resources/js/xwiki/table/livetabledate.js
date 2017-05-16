@@ -61,6 +61,22 @@ function($, moment) {
         input.on('apply.daterangepicker cancel.daterangepicker', function(ev, picker) {
             updateInput(this, ev, picker);
         });
+
+        input.on('hide.daterangepicker', function(event) {
+            // Overwrite at instance level the 'hide' function added by
+            // Prototype.js to the Element prototype. This removes the 'hide'
+            // function only for the event target.
+            this.hide = undefined;
+            // Restore the 'hide' function after the event is handled (i.e.
+            // after all the listeners have been called).
+            setTimeout(function () {
+                // This deletes the local 'hide' key from the instance, making
+                // the 'hide' inherited from the prototype visible again (the
+                // next calls to 'hide' won't find the key on the instance and
+                // thus it will go up the prototype chain).
+                delete event.target['hide'];
+            }, 0);
+        }); 
     };
 
     $('.xwiki-livetable').each(function(i, elem) {

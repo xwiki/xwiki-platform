@@ -36,7 +36,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
-import org.xwiki.notifications.NotificationPreferenceScope;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

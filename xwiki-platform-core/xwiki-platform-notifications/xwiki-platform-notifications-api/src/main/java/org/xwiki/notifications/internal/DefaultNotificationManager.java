@@ -30,8 +30,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
@@ -78,7 +76,7 @@ public class DefaultNotificationManager implements NotificationManager
     private SimilarityCalculator similarityCalculator;
 
     @Inject
-    private ComponentManager componentManager;
+    private NotificationFilterManager notificationFilterManager;
 
     @Override
     public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount)
@@ -165,15 +163,10 @@ public class DefaultNotificationManager implements NotificationManager
 
     private boolean filterEvent(Event event, DocumentReference user) throws NotificationException
     {
-        try {
-            for (NotificationFilter filter :
-                    componentManager.<NotificationFilter>getInstanceList(NotificationFilter.class)) {
-                if (filter.filterEvent(event, user)) {
-                    return true;
-                }
+        for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
+            if (filter.filterEvent(event, user)) {
+                return true;
             }
-        } catch (ComponentLookupException e) {
-            throw new NotificationException("Failed to get the notification filters.", e);
         }
 
         return false;

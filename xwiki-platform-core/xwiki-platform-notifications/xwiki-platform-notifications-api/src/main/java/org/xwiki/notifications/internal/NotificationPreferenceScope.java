@@ -17,12 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.internal;
 
 import org.xwiki.model.reference.EntityReference;
 
 /**
+ * Represent a preferences that filter some event type to given scope (a wiki, a space, a page...).
+ *
+ * Example: only get "update" events when it concern pages inside the space "xwiki:Space1".
+ *
  * @version $Id$
+ * @since 9.4RC1
  */
 public class NotificationPreferenceScope
 {
@@ -30,17 +35,29 @@ public class NotificationPreferenceScope
 
     private EntityReference scopeReference;
 
+    /**
+     * Construct a NotificationPreferenceScope.
+     *
+     * @param eventType name of the event type to refine
+     * @param scopeReference reference of the scope
+     */
     public NotificationPreferenceScope(String eventType, EntityReference scopeReference)
     {
         this.eventType = eventType;
         this.scopeReference = scopeReference;
     }
 
+    /**
+     * @return the name of the event type to refine
+     */
     public String getEventType()
     {
         return eventType;
     }
 
+    /**
+     * @return the reference of the scope
+     */
     public EntityReference getScopeReference()
     {
         return scopeReference;

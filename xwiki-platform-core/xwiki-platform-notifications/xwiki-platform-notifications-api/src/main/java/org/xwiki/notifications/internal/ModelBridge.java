@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
-import org.xwiki.notifications.NotificationPreferenceScope;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -62,6 +61,15 @@ public interface ModelBridge
      */
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
 
+    /**
+     * Get all notification preference scope of the given user.
+     *
+     * @param user user interested in the notifications
+     * @return the list of notification preference scopes.
+     * @throws NotificationException if error happens
+     *
+     * @since 9.4RC1
+     */
     List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
             throws NotificationException;
 }

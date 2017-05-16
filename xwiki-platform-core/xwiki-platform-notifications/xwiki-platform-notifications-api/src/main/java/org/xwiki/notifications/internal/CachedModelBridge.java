@@ -32,7 +32,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
-import org.xwiki.notifications.NotificationPreferenceScope;
 
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid

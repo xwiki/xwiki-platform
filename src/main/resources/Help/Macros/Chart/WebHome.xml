@@ -45,11 +45,11 @@
 
 **Chart Macro** displays graphical charts generated from miscellaneous data sources. [[Learn more&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro]]
 
-== Bar Chart ==
+== Pie Chart ==
 
 === Example 1 ===
 {{example}}
-{{chart type="pie" source="inline" params="range:B2-D5;series:columns;" title="Bar Chart" width="320" height="240"}}
+{{chart type="pie" source="inline" params="range:B2-D5;series:columns;" title="Pie Chart" width="320" height="240"}}
 |=|=X|=Y|=Z
 |Q1|1.2|3.4|1.3
 |Q2|4.5|3.4|2.3
@@ -60,7 +60,7 @@
 
 === Example 2 ===
 {{example}}
-{{chart type="pie" source="inline" params="range:B2-D5;series:columns;colors:d9534f,f0ad4e,337ab7,5cb85c;backgroundColor:FFFFFF;"}}
+{{chart type="pie" source="inline" params="range:B2-D5;series:columns;colors:d9534f,f0ad4e,337ab7,5cb85c;backgroundColor:FFFFFF;" title="Pie Chart"}}
 |=|=X|=Y|=Z
 |Chrome|32|56|7
 |Firefox|45|12|9
@@ -72,7 +72,7 @@
 == Bar Chart ==
 
 {{example}}
-{{chart type="bar" source="inline" params="range:B2-D5;series:columns;colors:C3E3F7,1D9FF5,015891,012A45;backgroundColor:FFFFFF;"}}
+{{chart type="bar" source="inline" params="range:B2-D5;series:columns;colors:C3E3F7,1D9FF5,015891,012A45;backgroundColor:FFFFFF;" title="Bar Chart"}}
 |=|=New Visitors|=Returning Visitors|=All Visitors
 |January|1.2|3.4|1.3
 |February|4.5|3.4|2.3
@@ -85,7 +85,7 @@
 == Time Series Chart ==
 
 {{example}}
-{{chart type="xy_line_and_shape" params="range:B2-C19;dataset:timetable_xy;domain_axis_type:date;domain_axis_date_format:MMM-yyyy;date_format:yyyy-MM;time_period:month;range_axis_lower:100;range_axis_upper:190"}}
+{{chart type="xy_line_and_shape" params="range:B2-C19;dataset:timetable_xy;domain_axis_type:date;domain_axis_date_format:MMM-yyyy;date_format:yyyy-MM;time_period:month;range_axis_lower:100;range_axis_upper:190" title="Time Series Chart"}}
 |=|=Series1|=Series2
 |2001-2|181.8|129.6
 |2001-3|167.3|123.2

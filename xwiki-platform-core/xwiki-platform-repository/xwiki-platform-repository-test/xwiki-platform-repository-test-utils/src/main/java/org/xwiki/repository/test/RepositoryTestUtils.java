@@ -21,12 +21,9 @@ package org.xwiki.repository.test;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.common.collect.ImmutableMap;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
@@ -39,6 +36,7 @@ import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
@@ -318,5 +316,11 @@ public class RepositoryTestUtils
     {
         // Make sure Solr queue is empty
         this.solrUtils.waitEmpyQueue();
+    }
+
+    public ObjectEditPage gotoExtensionObjectsEditPage(String extensionName) {
+        LocalDocumentReference extensionPageReference = getExtensionPageReference(extensionName);
+        testUtils.gotoPage(extensionPageReference, "edit", ImmutableMap.of("editor","object"));
+        return new ObjectEditPage();
     }
 }

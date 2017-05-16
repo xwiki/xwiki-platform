@@ -106,7 +106,6 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </repositoryURI>
     <proxyLevel>
-      <!--todo how to specify default value??-->
       <cache>0</cache>
       <customDisplay/>
       <disabled>0</disabled>

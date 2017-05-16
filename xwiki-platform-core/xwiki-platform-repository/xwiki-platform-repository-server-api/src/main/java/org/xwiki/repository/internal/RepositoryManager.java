@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -1037,7 +1038,7 @@ public class RepositoryManager implements Initializable, Disposable
         if(extensionObject == null){
             return null;
         }
-        String id = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null);
+        String extensionId = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null);
 
         BaseObject extensionProxyObject = extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
         if(extensionProxyObject == null){
@@ -1045,12 +1046,36 @@ public class RepositoryManager implements Initializable, Disposable
         }
         String repositoryId = getValue(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, (String) null);
 
-        if(id == null || repositoryId == null){
+        if(extensionId == null || repositoryId == null){
             return null;
         }
 
         ExtensionRepository repository = this.extensionRepositoryManager.getRepository(repositoryId);
-        return repository.resolve(new ExtensionId(id, extensionVersion));
+        if(isGivenVersionOneOfExtensionVersions(repository, extensionId, extensionVersion)) {
+            return repository.resolve(new ExtensionId(extensionId, extensionVersion));
+        }else {
+            return tryToResolveExtensionFromExtensionFeatures(repository, extensionObject, extensionVersion);
+        }
+    }
+
+    /**
+     *@return resolved extension version or null if extension is not resolvable
+     */
+    private Extension tryToResolveExtensionFromExtensionFeatures(ExtensionRepository repository, BaseObject extensionObject, String extensionVersion){
+        List<String> features = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES);
+        return features.stream().map(feature -> {
+            try {
+                String featureId = feature.split("/")[0];
+                return repository.resolve(new ExtensionId(featureId, extensionVersion));
+            } catch (ResolveException e) {
+                return null;
+            }
+        }).filter(extension -> extension != null).findFirst().orElse(null);
+    }
+
+    private boolean isGivenVersionOneOfExtensionVersions(ExtensionRepository repository, String extensionId, String extensionVersion) throws ResolveException {
+        IterableResult<Version> versions = repository.resolveVersions(extensionId, 0, -1);
+        return StreamSupport.stream(versions.spliterator(), false).anyMatch(version -> version.getValue().equals(extensionVersion));
     }
 
     public void addExtensionVersionObjectToDocument(XWikiDocument extensionDocument, String extensionVersion) throws XWikiException, ResolveException

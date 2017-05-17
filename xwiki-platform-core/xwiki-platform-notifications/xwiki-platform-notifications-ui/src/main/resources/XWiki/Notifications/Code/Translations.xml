@@ -62,7 +62,9 @@ notifications.events.by=By {0}.
 notifications.events.lastChange=Last change: {0}.
 notifications.events.lastComment=Last comment: {0}.
 notifications.events.addComment.description=The document {0} has been commented by {1}.
-</content>
+notifications.preferences.scope.table.scope=Scope
+notifications.preferences.scope.table.location=Location
+notifications.preferences.scope.table.actions=Actions</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

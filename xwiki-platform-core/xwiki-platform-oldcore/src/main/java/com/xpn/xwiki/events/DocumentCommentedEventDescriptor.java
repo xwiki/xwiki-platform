@@ -64,4 +64,9 @@ public class DocumentCommentedEventDescriptor extends AbstractRecordableEventDes
     {
         return "page";
     }
+
+    @Override
+    public EventFilter getFilter() {
+        return EventFilter.WIKI_SPACE_AND_DOCUMENT_FILTER;
+    }
 }

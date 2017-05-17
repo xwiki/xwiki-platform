@@ -52,6 +52,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
+    private static final String EVENT_TYPE_FIELD = "eventType";
+
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
         new SpaceReference("Notifications",
             new SpaceReference("XWiki", new WikiReference("toChange"))
@@ -100,7 +102,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
                         preferences.add(new NotificationPreference(
-                                obj.getStringValue("eventType"),
+                                obj.getStringValue(EVENT_TYPE_FIELD),
                                 obj.getStringValue("applicationId"),
                                 obj.getIntValue("notificationEnabled", 0) == 1
                         ));
@@ -198,7 +200,7 @@ public class DefaultModelBridge implements ModelBridge
                         }
 
                         preferences.add(new NotificationPreferenceScope(
-                                obj.getStringValue("eventType"),
+                                obj.getStringValue(EVENT_TYPE_FIELD),
                                 entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type)
                         ));
                     }

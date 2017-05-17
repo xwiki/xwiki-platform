@@ -39,18 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{template name="locationPicker_macros.vm" /}}
+
+{{velocity}}
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 (% class="profile-section highlighted-profile-section" %)
 (((
 ==$services.localization.render('notifications.settings.title')==
-{{html}}
+{{html wiki="true"}}
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th&gt;&lt;/th&gt;
+      &lt;th style="width: 250px;"&gt;&lt;/th&gt;
       &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.menu'))&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
@@ -61,7 +63,8 @@
         'applicationName' : "$!services.localization.render($descriptor.applicationName)",
         'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
         'description'     : "$!services.localization.render($descriptor.description)",
-        'eventType'       : "$!descriptor.eventType"
+        'eventType'       : "$!descriptor.eventType",
+        'filter'          : "$!descriptor.filter"
       }))
     #end
     #set ($lastApp = '')
@@ -81,13 +84,57 @@
       #end
       &lt;tr data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-objnumber="$!preference.number"&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
-        &lt;td&gt;&lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
+          #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
+            #displayScopeLivetable($type.eventType)
+          #elseif($type.filter == 'CUSTOM_FILTER')
+            $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
+          #end
+        &lt;/td&gt;
       &lt;/tr&gt;
     #end
   &lt;/tbody&gt;
 &lt;/table&gt;
 {{/html}}
 )))
+#macro(displayScopeLivetable $eventType)
+  #set ($count = 0)
+  #foreach ($obj in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
+    #if ($obj.getValue('eventType') == $eventType)
+      #set ($count = $count + 1)
+    #end
+  #end
+  &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;Filters ($count)&lt;/a&gt;&lt;/p&gt;
+  &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType"&gt;
+    #set($collist  = ['scope', 'location', 'actions'])
+    #set($colprops = {
+      'scope':          { 'sortable': false },
+      'location':       { 'sortable': false, 'html': true },
+      'actions':        { 'sortable': false }
+    })
+    #set($options  = {
+      'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceScopeLivetableResults',
+      'rowCount'          : 10,
+      'description'       : 'This table lists all watched elements.',
+      'translationPrefix' : 'notifications.preferences.scope.table.',
+      'extraParams'       : "eventType=${eventType}&amp;user=${services.model.serialize($doc.documentReference, 'default')}"
+    })
+    #livetable("notificationPreferenceScopeContainer-$eventType" $collist $colprops $options)
+    &lt;p&gt;&lt;button class="btn btn-primary"&gt;Add a filter&lt;/button&gt;&lt;/p&gt;
+    &lt;script language="javascript"&gt;
+      ## TODO: fix this
+      require(['jquery', 'bootstrap'], function($) {
+        $('#collapse-$eventType button').click(function(){
+          $('#collapse-$eventType .modal').modal('show');
+          $('#collapse-$eventType .location-tree').xtree();
+        });
+      });
+    &lt;/script&gt;
+    #documentPickerModal({
+      'wiki': true
+    })
+  &lt;/div&gt;
+#end
 {{/velocity}}
 </content>
   <object>

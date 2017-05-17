@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -33,13 +34,15 @@ public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] input")
+    private static final String INPUT_CHECKBOX_SELECTOR = "input[type='checkbox']";
+
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] " + INPUT_CHECKBOX_SELECTOR)
     private WebElement pageCreatedCheckbox;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] input")
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] " + INPUT_CHECKBOX_SELECTOR)
     private WebElement pageDeletedCheckbox;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] input")
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] " + INPUT_CHECKBOX_SELECTOR)
     private WebElement pageUpdatedCheckbox;
 
     /**
@@ -122,12 +125,56 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
-     * Disable every notification parameters.
+     * Disable every standard notification parameters.
      */
-    public void disableAllParameters()
+    public void disableAllStandardParameters()
     {
         this.setPageCreated(false);
         this.setPageDeleted(false);
         this.setPageUpdated(false);
+    }
+
+    /**
+     * Try to find a row corresponding to the notification parameter of the given type.
+     *
+     * @param eventType the event that has to be found
+     * @return the row corresponding to this element
+     */
+    public WebElement findNotificationParameterRow(String eventType)
+    {
+        return this.getDriver().findElement(
+                By.cssSelector("div#notificationsPane tr[data-eventtype='" + eventType + "'"));
+    }
+
+    /**
+     * Use the given row to enable a notification preference.
+     *
+     * @param notificationParameterRow the concerned notification preference row
+     */
+    public void enablePreference(WebElement notificationParameterRow)
+    {
+        WebElement input = notificationParameterRow.findElement(By.cssSelector(INPUT_CHECKBOX_SELECTOR));
+
+        if (!input.isSelected()) {
+            input.click();
+        }
+
+        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+    }
+
+    /**
+     * Use the given row to disable a notification preference.
+     *
+     * @param notificationParameterRow the concerned notification preference row
+     */
+    public void disablePreference(WebElement notificationParameterRow)
+    {
+        WebElement input = notificationParameterRow.findElement(By.cssSelector(INPUT_CHECKBOX_SELECTOR));
+
+        if (input.isSelected()) {
+            input.click();
+        }
+
+        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
     }
 }

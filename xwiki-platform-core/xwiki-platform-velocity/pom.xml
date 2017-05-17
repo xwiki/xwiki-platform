@@ -45,5 +45,11 @@
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity-tools</artifactId>
     </dependency>
+    <!-- Explicit dependency on dom4j since we're excluding it in the dependencyManagement section for
+         velocity-tools -->
+    <dependency>
+      <groupId>org.dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+    </dependency>
   </dependencies>
 </project>

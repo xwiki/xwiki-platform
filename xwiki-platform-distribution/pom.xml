@@ -241,23 +241,6 @@
                       <package>org.apache.regexp</package>
                     </packages>
                   </exception>
-                  <!-- css4j:0.13 depends on jclf:2.3.0 so the duplicate classes must be the same ones. -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>info.informatica</groupId>
-                        <artifactId>css4j</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>info.informatica</groupId>
-                        <artifactId>jclf</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>info.informatica.doc.DocumentException</class>
-                      <class>info.informatica.doc.RenderingException</class>
-                    </classes>
-                  </exception>
                   <!-- None of these should bundle org.w3c classes but at least they seem compatible.
                        See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
                        https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->
@@ -282,6 +265,22 @@
                       <class>org.w3c.dom.events.MouseEvent</class>
                       <class>org.w3c.dom.events.MutationEvent</class>
                       <class>org.w3c.dom.events.UIEvent</class>
+                    </classes>
+                  </exception>
+                  <!-- None of these should bundle org.w3c classes... Hoping that they are compatible... -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>jaxen</groupId>
+                        <artifactId>jaxen</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <classes>
+                      <class>org.w3c.dom.UserDataHandler</class>
                     </classes>
                   </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
@@ -413,6 +412,7 @@
                   <ignoredResourcePattern>about.html</ignoredResourcePattern>
                   <!-- Usually contain licenses often having same file name -->
                   <ignoredResourcePattern>license/.*.txt</ignoredResourcePattern>
+                  <ignoredResourcePattern>LICENSES.txt</ignoredResourcePattern>
                   <!-- ApplicationResources.properties is duplicated but that's ok since it's how we want it work, see:
                        http://extensions.xwiki.org/xwiki/bin/view/Extension/Localization+Module#HProvidetranslationbundleinajar
                    -->

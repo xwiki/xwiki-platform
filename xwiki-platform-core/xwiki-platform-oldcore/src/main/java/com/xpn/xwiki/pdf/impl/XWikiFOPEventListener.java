@@ -17,39 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package com.xpn.xwiki.pdf.impl;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.apache.fop.events.Event;
+import org.apache.fop.events.EventListener;
+import org.apache.fop.events.model.EventSeverity;
 
 /**
- * Provide a description for a specific implementation of RecordableEvent so that users can knows what the event is
- * about.
+ * Prevent errors happening in FOP from stopping the PDF export. For example unrecognized FOP properties are ignored
+ * and don't generate an exception.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 9.4RC1
  */
-@Role
-@Unstable
-public interface RecordableEventDescriptor
+public class XWikiFOPEventListener implements EventListener
 {
     /**
-     * @return the name of the event described by the descriptor, as it is stored in the event stream.
+     * @param event the FOP event received, see
+     *        <a href="https://xmlgraphics.apache.org/fop/trunk/events.html#consumer">FOP events</a>
      */
-    String getEventType();
-
-    /**
-     * @return the name of the application that provide this event
-     */
-    String getApplicationName();
-
-    /**
-     * @return the description of the event type
-     */
-    String getDescription();
-
-    /**
-     * @return the icon corresponding to the application
-     */
-    String getApplicationIcon();
+    public void processEvent(Event event)
+    {
+        // Transform fatal events into warnings in order to not stop the PDF export process
+        if (event.getSeverity().equals(EventSeverity.FATAL)) {
+            event.setSeverity(EventSeverity.WARN);
+        }
+    }
 }

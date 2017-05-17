@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="Menu.UIExtensionSheet" locale="">
   <web>Menu</web>
   <name>UIExtensionSheet</name>
   <language/>
@@ -82,7 +82,7 @@
 #end
 (% class="xform" %)
 (((
-  ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_extensionPointId"&gt;{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label&gt;{{/html}}##
+  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_extensionPointId"#end&gt;{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label&gt;{{/html}}##
     (% class="xHint" %){{translation key="menu.uix.extensionPoint.hint"/}}
   #if ($xcontext.action == 'edit')
     : {{html}}&lt;select id="XWiki.UIExtensionClass_0_extensionPointId" name="XWiki.UIExtensionClass_0_extensionPointId"&gt;
@@ -115,7 +115,7 @@
   #end
   ##
   ##
-  ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_scope"&gt;{{translation key="menu.uix.scope.label"/}}&lt;/label&gt;{{/html}}##
+  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_scope"#end&gt;{{translation key="menu.uix.scope.label"/}}&lt;/label&gt;{{/html}}##
     (% class="xHint" %){{translation key="menu.uix.scope.hint"/}}
   : $doc.display('scope')
 )))
@@ -151,14 +151,16 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -196,10 +198,10 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>

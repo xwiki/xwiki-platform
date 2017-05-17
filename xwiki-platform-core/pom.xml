@@ -300,7 +300,16 @@
                     "annotationType": "javax.xml.bind.annotation.XmlElement",
                     "elementKind": "annotation",
                     "justification": "Align with Java API"
-                  }
+                  },
+                  {
+                     "code": "java.method.addedToInterface",
+                     "new": "method java.util.List<org.xwiki.eventstream.RecordableEventDescriptor> org.xwiki.eventstream.RecordableEventDescriptorManager::getAllRecordableEventDescriptorsAllWikis() throws org.xwiki.eventstream.EventStreamException",
+                     "package": "org.xwiki.eventstream",
+                     "classSimpleName": "RecordableEventDescriptorManager",
+                     "methodName": "getAllRecordableEventDescriptorsAllWikis",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                   }
                 ]
               }
             }

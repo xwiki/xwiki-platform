@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.AbstractRecordableEventDescriptor;
 
 /**
  * Descriptor for the {@link org.xwiki.bridge.event.DocumentUpdatedEvent}.
@@ -34,30 +34,26 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 @Component
 @Singleton
 @Named(DocumentUpdatedEventDescriptor.EVENT_TYPE)
-public class DocumentUpdatedEventDescriptor implements RecordableEventDescriptor
+public class DocumentUpdatedEventDescriptor extends AbstractRecordableEventDescriptor
 {
     /**
      * Name of the supported type (as it is stored in Activity Stream).
      */
     public static final String EVENT_TYPE = "update";
 
+    /**
+     * Construct an DocumentUpdatedEventDescriptor.
+     */
+    public DocumentUpdatedEventDescriptor()
+    {
+        super("core.events.update.description", "XWiki");
+    }
+
     @Override
     public String getEventType()
     {
         // Match the name used by Activity Stream.
         return EVENT_TYPE;
-    }
-
-    @Override
-    public String getApplicationName()
-    {
-        return "XWiki";
-    }
-
-    @Override
-    public String getDescription()
-    {
-        return "core.events.update.description";
     }
 
     @Override

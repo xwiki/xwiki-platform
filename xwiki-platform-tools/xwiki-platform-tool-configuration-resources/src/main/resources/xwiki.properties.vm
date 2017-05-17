@@ -797,9 +797,9 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 
 #-# [Since 9.4RC1]
-#-# Indicates if the notification module should be enabled on the platform.
+#-# Indicates if the notifications module should be enabled on the platform.
 #-#
 #-# The default is :
-# notification.enabled = true
+# notifications.enabled = true
 
 $!xwikiPropertiesAdditionalProperties

@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - API</name>
   <description>Handle notifications</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.56</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications API</xwiki.extension.name>
   </properties>
@@ -64,6 +64,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-activitystream-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

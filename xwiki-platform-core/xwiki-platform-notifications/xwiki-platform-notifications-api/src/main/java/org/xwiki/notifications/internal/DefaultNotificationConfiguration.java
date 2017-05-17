@@ -36,7 +36,7 @@ import org.xwiki.notifications.NotificationConfiguration;
 @Singleton
 public class DefaultNotificationConfiguration implements NotificationConfiguration
 {
-    private static final String CONFIGURATION_PREFIX = "notification.";
+    private static final String CONFIGURATION_PREFIX = "notifications.";
 
     @Inject
     private ConfigurationSource configurationSource;

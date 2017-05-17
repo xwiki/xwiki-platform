@@ -73,7 +73,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -95,7 +94,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
-import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
@@ -107,14 +105,14 @@ public class RepositoryManager implements Initializable, Disposable
      * The reference to match property {@link XWikiRepositoryModel#PROP_EXTENSION_ID} of class
      * {@link XWikiRepositoryModel#EXTENSION_CLASSNAME} on whatever wiki.
      */
-    private static final RegexEntityReference XWIKIPREFERENCE_PROPERTY_REFERENCE =
-        new RegexEntityReference(Pattern.compile(XWikiRepositoryModel.PROP_DEPENDENCY_ID), EntityType.OBJECT_PROPERTY,
-            XWikiPreferencesDocumentInitializer.OBJECT_REFERENCE);
+    private static final EntityReference EXTENSIONID_PROPERTY_REFERENCE =
+        new EntityReference(XWikiRepositoryModel.PROP_EXTENSION_ID, EntityType.OBJECT_PROPERTY,
+            XWikiRepositoryModel.EXTENSION_OBJECTREFERENCE);
 
     private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
-            new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
-            new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
+        Arrays.<Event>asList(new XObjectPropertyAddedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+            new XObjectPropertyDeletedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+            new XObjectPropertyUpdatedEvent(EXTENSIONID_PROPERTY_REFERENCE));
 
     private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
 

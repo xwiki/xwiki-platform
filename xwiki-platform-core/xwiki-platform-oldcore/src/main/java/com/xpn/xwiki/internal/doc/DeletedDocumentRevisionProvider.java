@@ -17,50 +17,54 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.doc;
-
-import java.io.IOException;
+package com.xpn.xwiki.internal.doc;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.internal.converter.ExtensionIdConverter;
-import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.xar.XarException;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.doc.AbstractDocumentRevisionProvider;
 
 /**
- * Get document revision from an installed XAR extension.
+ * Get deleted document revisions from the database.
  * 
  * @version $Id$
- * @since 9.3RC1
+ * @since 9.4RC1
  */
 @Component
-@Named("xar")
+@Named("deleted")
 @Singleton
-public class XarDocumentRevisionProvider extends AbstractDocumentRevisionProvider
+public class DeletedDocumentRevisionProvider implements DocumentRevisionProvider
 {
     @Inject
-    private Packager packager;
+    private Provider<XWikiContext> xcontextProvider;
+
+    private XWikiDocument getRevision(String revision) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDeletedDocument deletedDocument = xcontext.getWiki().getDeletedDocument(Long.valueOf(revision), xcontext);
+
+        return deletedDocument != null ? deletedDocument.restoreDocument(xcontext) : null;
+    }
 
     @Override
     public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
     {
-        ExtensionId extensionId = ExtensionIdConverter.toExtensionId(revision, null);
+        return getRevision(revision);
+    }
 
-        try {
-            return this.packager.getXWikiDocument(reference, extensionId);
-        } catch (FilterException | IOException | ComponentLookupException | XarException e) {
-            throw new XWikiException("Failed to load extension document [" + reference + "] in [" + revision + "]", e);
-        }
+    @Override
+    public XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException
+    {
+        return getRevision(revision);
     }
 }

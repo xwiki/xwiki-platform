@@ -90,10 +90,10 @@ import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.dom4j.XHTMLDocument;
-import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+import io.sf.carte.doc.dom4j.CSSStylableElement;
+import io.sf.carte.doc.dom4j.XHTMLDocument;
+import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
+import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 
 /**
  * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a
@@ -364,6 +364,9 @@ public class PdfExportImpl implements PdfExport
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 
+            // Transform FOP fatal errors into warnings so that the PDF export isn't stopped
+            foUserAgent.getEventBroadcaster().addEventListener(new XWikiFOPEventListener());
+
             // Construct fop with desired output format
             Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);
 
@@ -454,9 +457,9 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @return the document with inlined style
      */
-    private String applyCSS(String html, String css, XWikiContext context)
+    String applyCSS(String html, String css, XWikiContext context)
     {
-        LOGGER.debug("Applying the following CSS:\n{}", css);
+        LOGGER.debug("Applying the following CSS [{}] to HTML [{}]", css, html);
         try {
             //System.setProperty("org.w3c.css.sac.parser", "org.apache.batik.css.parser.Parser");
 
@@ -485,11 +488,11 @@ public class PdfExportImpl implements PdfExport
             String result = out.toString();
             // Debug output
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("HTML with CSS applied: " + result);
+                LOGGER.debug("HTML with CSS applied [{}]", result);
             }
             return result;
-        } catch (Exception ex) {
-            LOGGER.warn("Failed to apply CSS: " + ex.getMessage(), ex);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);
             return html;
         }
     }

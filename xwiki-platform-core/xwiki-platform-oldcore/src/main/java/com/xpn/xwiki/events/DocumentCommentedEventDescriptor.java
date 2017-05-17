@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.AbstractRecordableEventDescriptor;
 
 import com.xpn.xwiki.internal.event.CommentAddedEvent;
 
@@ -36,30 +36,26 @@ import com.xpn.xwiki.internal.event.CommentAddedEvent;
 @Component
 @Singleton
 @Named(DocumentCommentedEventDescriptor.EVENT_TYPE)
-public class DocumentCommentedEventDescriptor implements RecordableEventDescriptor
+public class DocumentCommentedEventDescriptor extends AbstractRecordableEventDescriptor
 {
     /**
      * Name of the supported type (as it is stored in Activity Stream).
      */
     public static final String EVENT_TYPE = "addComment";
 
+    /**
+     * Construct a DocumentCommentedEventDescriptor.
+     */
+    public DocumentCommentedEventDescriptor()
+    {
+        super("core.events.comment.description", "XWiki");
+    }
+
     @Override
     public String getEventType()
     {
         // Match the name used by Activity Stream.
         return EVENT_TYPE;
-    }
-
-    @Override
-    public String getApplicationName()
-    {
-        return "XWiki";
-    }
-
-    @Override
-    public String getDescription()
-    {
-        return "core.events.comment.description";
     }
 
     @Override

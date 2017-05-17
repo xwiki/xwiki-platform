@@ -1,16 +1,16 @@
 require.config({
   paths: {
     'moment': "$services.webjars.url('momentjs', 'moment.js')",
-    'moment-jdateformatparser': "$services.webjars.url('org.webjars.bower:moment-jdateformatparser', 'moment-jdateformatparser.js')",
+    'jdateformatparser': "$services.webjars.url('org.webjars.bower:moment-jdateformatparser', 'moment-jdateformatparser.js')",
     'daterangepicker': "$services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')"
   },
   shim: {
-    'moment-jdateformatparser': ['moment'],
+    'moment': ['jdateformatparser'],
     'daterangepicker': ['jquery', 'bootstrap', 'moment']
   }
 });
 
-require(['jquery', 'moment', 'daterangepicker', 'moment-jdateformatparser'],
+require(['jquery', 'moment', 'daterangepicker'],
   function($, moment) {
     var dateFormat = moment().toMomentFormatString('$escapetool.javascript($xwiki.getXWikiPreference("dateformat", "yyyy/MM/dd HH:mm"))');
 
@@ -89,5 +89,5 @@ require(['jquery', 'moment', 'daterangepicker', 'moment-jdateformatparser'],
     $('.xwiki-livetable').each(function(i, element) {
       bindInputs(element);
     });
-
-  });
+  }
+);

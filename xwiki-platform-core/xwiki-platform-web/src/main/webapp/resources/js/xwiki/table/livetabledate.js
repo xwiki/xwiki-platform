@@ -5,11 +5,12 @@ require.config({
     'daterangepicker': "$services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')"
   },
   shim: {
-    'daterangepicker': ['jquery', 'bootstrap', 'moment', 'moment-jdateformatparser']
+    'moment-jdateformatparser': ['moment'],
+    'daterangepicker': ['jquery', 'bootstrap', 'moment']
   }
 });
 
-require(['jquery', 'moment', 'daterangepicker', 'xwiki-events-bridge'],
+require(['jquery', 'moment', 'daterangepicker', 'moment-jdateformatparser'],
   function($, moment) {
     var dateFormat = moment().toMomentFormatString('$escapetool.javascript($xwiki.getXWikiPreference("dateformat", "yyyy/MM/dd HH:mm"))');
 

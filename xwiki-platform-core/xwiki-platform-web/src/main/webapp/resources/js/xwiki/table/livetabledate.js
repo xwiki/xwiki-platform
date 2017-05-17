@@ -1,20 +1,17 @@
 require.config({
     paths: {
-        moment: "$services.webjars.url('momentjs', 'moment.js')",
-        daterangepicker: "$services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')"
+        'moment': "$services.webjars.url('momentjs', 'moment.js')",
+        'moment-jdateformatparser': "$services.webjars.url('org.webjars.bower:moment-jdateformatparser', 'moment-jdateformatparser.js')",
+        'daterangepicker': "$services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')"
     },
     shim: {
-        'daterangepicker': ['jquery', 'bootstrap', 'moment']
+        'daterangepicker': ['jquery', 'bootstrap', 'moment', 'moment-jdateformatparser']
     }
 });
 
 require(['jquery', 'moment', 'daterangepicker', 'xwiki-events-bridge'],
 function($, moment) {
-
-    // Load bootstrap-daterangepicker CSS only when needed
-    // This is a bit of a hack, but it's required until we have an API to
-    // include CSS from a webjar in Velocity.
-    $('head').append('<link rel="stylesheet" type="text/css" href="$services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')">');
+    var dateFormat = moment().toMomentFormatString('$escapetool.javascript($xwiki.getXWikiPreference("dateformat", "yyyy/MM/dd HH:mm"))');
 
     var bindInputs = function(id) {
         var input = $('#' + id + ' input[data-type="date"]');
@@ -27,60 +24,68 @@ function($, moment) {
             timePicker: true,
             timePicker24Hour: true,
             ranges: {
-                '$escapetool.javascript($services.localization.render("daterange.today"))': [moment().startOf('day'), moment().endOf('day')],
-                '$escapetool.javascript($services.localization.render("daterange.yesterday"))': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
-                '$escapetool.javascript($services.localization.render("daterange.lastSevenDays"))': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
-                '$escapetool.javascript($services.localization.render("daterange.lastThirtyDays"))': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
-                '$escapetool.javascript($services.localization.render("daterange.thisMonth"))': [moment().startOf('month'), moment().endOf('month')],
-                '$escapetool.javascript($services.localization.render("daterange.lastMonth"))': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                '$escapetool.javascript($services.localization.render("daterange.today"))':
+                    [moment().startOf('day'), moment().endOf('day')],
+                '$escapetool.javascript($services.localization.render("daterange.yesterday"))':
+                    [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+                '$escapetool.javascript($services.localization.render("daterange.lastSevenDays"))':
+                    [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+                '$escapetool.javascript($services.localization.render("daterange.lastThirtyDays"))':
+                    [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
+                '$escapetool.javascript($services.localization.render("daterange.thisMonth"))':
+                    [moment().startOf('month'), moment().endOf('month')],
+                '$escapetool.javascript($services.localization.render("daterange.lastMonth"))':
+                    [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             },
             locale: {
+                format: dateFormat,
                 cancelLabel: '$escapetool.javascript($services.localization.render("daterange.clear"))',
-                applyLabel: '$escapetool.javascript($services.localization.render("daterange.apply"))'
+                applyLabel: '$escapetool.javascript($services.localization.render("daterange.apply"))',
+                customRangeLabel: '$escapetool.javascript($services.localization.render("daterange.customRange"))',
+                fromLabel: '$escapetool.javascript($services.localization.render("daterange.from"))',
+                toLabel: '$escapetool.javascript($services.localization.render("daterange.to"))',
             }
         });
 
-        var updateInput = function(elem, ev, picker) {
-            if (ev.type == 'cancel')
-            {
+        var updateInput = function(elem, event, picker) {
+            if (event.type == 'cancel') {
                 input.val('');
                 hidden.val('');
             } else {
-                if (picker.startDate.isSame(picker.endDate, 'day'))
-                    input.val(picker.startDate.format('DD/MM/YYYY'));
-                else
-                    input.val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+                if (picker.startDate.isSame(picker.endDate, 'day')) {
+                    input.val(picker.startDate.format(dateFormat));
+                } else {
+                    input.val(picker.startDate.format(dateFormat) + ' - ' + picker.endDate.format(dateFormat));
+                }
                 hidden.val(picker.startDate.format('x') + '-' + picker.endDate.format('x'));
             }
-            if ('dispatchEvent' in elem)
+            if ('dispatchEvent' in elem) {
                 elem.dispatchEvent(new Event('change'));
-            else
+            } else {
                 elem.fireEvent('onchange');
+            }
         }
 
-        input.on('apply.daterangepicker cancel.daterangepicker', function(ev, picker) {
-            updateInput(this, ev, picker);
+        input.on('apply.daterangepicker cancel.daterangepicker', function(event, picker) {
+            updateInput(this, event, picker);
         });
 
         input.on('hide.daterangepicker', function(event) {
-            // Overwrite at instance level the 'hide' function added by
-            // Prototype.js to the Element prototype. This removes the 'hide'
-            // function only for the event target.
+            // Overwrite at instance level the 'hide' function added by Prototype.js to the Element prototype.
+            // This removes the 'hide' function only for the event target.
             this.hide = undefined;
-            // Restore the 'hide' function after the event is handled (i.e.
-            // after all the listeners have been called).
+            // Restore the 'hide' function after the event is handled (i.e. after all the listeners have been called).
             setTimeout(function () {
-                // This deletes the local 'hide' key from the instance, making
-                // the 'hide' inherited from the prototype visible again (the
-                // next calls to 'hide' won't find the key on the instance and
-                // thus it will go up the prototype chain).
+                // This deletes the local 'hide' key from the instance, making the 'hide' inherited from the prototype
+                // visible again (the next calls to 'hide' won't find the key on the instance and thus it will go up
+                // the prototype chain).
                 delete event.target['hide'];
             }, 0);
         }); 
     };
 
-    $('.xwiki-livetable').each(function(i, elem) {
-        bindInputs($(elem).attr('id'));
+    $('.xwiki-livetable').each(function(i, element) {
+        bindInputs($(element).attr('id'));
     });
 
 });

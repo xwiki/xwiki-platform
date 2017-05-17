@@ -305,13 +305,21 @@
                   </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end /></td>
+                <td class="xwiki-livetable-display-header-filter">
+                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text"
+                  #if("$!colprop.size" != '') size="${colprop.size}"
+                  title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+                  [$services.localization.render("${transprefix}${colname}")]))"#end />
+                </td>
               #elseif("$!colprop.type" == 'date')
                 #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
+                #set($ok = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
                 <td class="xwiki-livetable-display-header-filter">
                   ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates
-                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" aria-hidden="true" />
-                  <input type="text" data-type="date" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end />
+                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" />
+                  <input type="text" data-type="date" #if("$!colprop.size" != '') size="${colprop.size}"
+                  title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+                  [$services.localization.render("${transprefix}${colname}")]))"#end />
                 </td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)

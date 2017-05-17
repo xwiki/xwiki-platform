@@ -609,7 +609,7 @@
           #set ($discard = $whereParams.add("%${locationFilterValue}%"))
           ## We add the parameter twice because we use it twice in the WHERE clause (it's not a named parameter).
           #set ($discard = $whereParams.add("%${locationFilterValue}%"))
-        #elseif ($colName == 'doc.date')
+        #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
           #livetable_getTableAlias($colname)
           #livetable_filterDateProperty()
         #else

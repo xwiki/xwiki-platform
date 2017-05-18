@@ -34,16 +34,27 @@ public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
-    private static final String INPUT_CHECKBOX_SELECTOR = "input[type='checkbox']";
+    private static final String BOOTSTRAP_SWITCH_LABEL = "bootstrap-switch-label";
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] " + INPUT_CHECKBOX_SELECTOR)
-    private WebElement pageCreatedCheckbox;
+    @FindBy(id = "notificationsPane")
+    private WebElement notificationsPane;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] " + INPUT_CHECKBOX_SELECTOR)
-    private WebElement pageDeletedCheckbox;
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] .bootstrap-switch")
+    private WebElement pageCreatedSwitch;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] " + INPUT_CHECKBOX_SELECTOR)
-    private WebElement pageUpdatedCheckbox;
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] .bootstrap-switch")
+    private WebElement pageDeletedSwitch;
+
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] .bootstrap-switch")
+    private WebElement pageUpdatedSwitch;
+
+    /**
+     * Construct a NotificationsUserProfilePage (and for the browser page to be fully loaded).
+     */
+    public NotificationsUserProfilePage()
+    {
+        getDriver().waitUntilElementIsVisible(notificationsPane, By.className("bootstrap-switch"));
+    }
 
     /**
      * @param username the user profile document name
@@ -62,7 +73,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public boolean isPageCreated()
     {
-        return this.pageCreatedCheckbox.isSelected();
+        return isSwitchOn(this.pageCreatedSwitch);
     }
 
     /**
@@ -72,7 +83,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public boolean isPageDeleted()
     {
-        return this.pageDeletedCheckbox.isSelected();
+        return isSwitchOn(pageDeletedSwitch);
     }
 
     /**
@@ -82,7 +93,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public boolean isPageUpdated()
     {
-        return this.pageUpdatedCheckbox.isSelected();
+        return isSwitchOn(pageUpdatedSwitch);
     }
 
     /**
@@ -93,7 +104,7 @@ public class NotificationsUserProfilePage extends ViewPage
     public void setPageCreated(boolean status)
     {
         if (status != this.isPageCreated()) {
-            this.pageCreatedCheckbox.click();
+            clickOnSwitch(this.pageCreatedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -106,7 +117,7 @@ public class NotificationsUserProfilePage extends ViewPage
     public void setPageDeleted(boolean status)
     {
         if (status != this.isPageDeleted()) {
-            this.pageDeletedCheckbox.click();
+            clickOnSwitch(this.pageDeletedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -119,19 +130,9 @@ public class NotificationsUserProfilePage extends ViewPage
     public void setPageUpdated(boolean status)
     {
         if (status != this.isPageUpdated()) {
-            this.pageUpdatedCheckbox.click();
+            clickOnSwitch(this.pageUpdatedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
-    }
-
-    /**
-     * Disable every standard notification parameters.
-     */
-    public void disableAllStandardParameters()
-    {
-        this.setPageCreated(false);
-        this.setPageDeleted(false);
-        this.setPageUpdated(false);
     }
 
     /**
@@ -153,28 +154,32 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public void enablePreference(WebElement notificationParameterRow)
     {
-        WebElement input = notificationParameterRow.findElement(By.cssSelector(INPUT_CHECKBOX_SELECTOR));
-
-        if (!input.isSelected()) {
-            input.click();
+        if (!isSwitchOn(notificationParameterRow)) {
+            clickOnSwitch(notificationParameterRow);
         }
 
         this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
     }
 
     /**
-     * Use the given row to disable a notification preference.
-     *
-     * @param notificationParameterRow the concerned notification preference row
+     * Disable every standard notification parameters.
      */
-    public void disablePreference(WebElement notificationParameterRow)
+    public void disableAllStandardParameters()
     {
-        WebElement input = notificationParameterRow.findElement(By.cssSelector(INPUT_CHECKBOX_SELECTOR));
+        this.setPageCreated(false);
+        this.setPageDeleted(false);
+        this.setPageUpdated(false);
+    }
 
-        if (input.isSelected()) {
-            input.click();
-        }
+    private boolean isSwitchOn(WebElement webElement)
+    {
+        // TODO: create a generic widget object
+        return webElement.getAttribute("class").contains("bootstrap-switch-on");
+    }
 
-        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+    private void clickOnSwitch(WebElement webElement)
+    {
+        // TODO: create a generic widget object
+        webElement.findElement(By.className(BOOTSTRAP_SWITCH_LABEL)).click();
     }
 }

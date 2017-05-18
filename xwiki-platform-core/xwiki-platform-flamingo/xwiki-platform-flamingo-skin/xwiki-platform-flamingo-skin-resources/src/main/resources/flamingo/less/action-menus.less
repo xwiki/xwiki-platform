@@ -237,7 +237,7 @@
 #contentmenu {
   .text-right();
   
- .dropdown {
+  .dropdown {
     display: inline-block;
     font-size: @font-size-large;
     width: @font-size-large * 2.5;
@@ -246,6 +246,17 @@
       color: @headings-color;
       padding: @font-size-large;
     }
+  }
+
+  .btn-default {
+    box-shadow: none;
+    background-image: none;
+    background-color: @breadcrumb-bg;
+    border: 1px solid @btn-default-bg;
+  }
+
+  .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
+    border-color: darken(@btn-default-bg, 10%);
   }
 }
 

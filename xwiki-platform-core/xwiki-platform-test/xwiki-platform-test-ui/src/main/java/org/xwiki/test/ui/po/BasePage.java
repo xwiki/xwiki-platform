@@ -170,12 +170,12 @@ public class BasePage extends BaseElement
 
     /**
      * Perform a click on a "edit menu" sub-menu entry.
-     * 
+     *
      * @param id The id of the entry to follow
      */
     protected void clickEditSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmEdit']/a[contains(@role, 'button')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmEdit']/*[contains(@class, 'dropdown-toggle')]"), id);
     }
 
     /**
@@ -185,12 +185,7 @@ public class BasePage extends BaseElement
     {
         WebElement editMenuButton =
             getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@role, 'button')]"));
-        // The edit button is not the same depending on whether the user is advanced or not
-        if ("dropdown".equals(editMenuButton.getAttribute("data-toggle"))) {
-            clickEditSubMenuEntry("tmEditDefault");
-        } else {
-            editMenuButton.click();
-        }
+        editMenuButton.click();
     }
 
     /**
@@ -367,7 +362,7 @@ public class BasePage extends BaseElement
      */
     public void clickAdminActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmAdminActions']/a[contains(@role, 'button')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
     }
 
     /**

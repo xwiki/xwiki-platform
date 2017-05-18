@@ -8,7 +8,7 @@
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 
 ##
-## Display the 4 menus
+## Display the main menus
 ##
 #if ($displayContentMenu)
   #template("menus_macros.vm")
@@ -42,27 +42,19 @@
   #end
   #set ($discard = $topStaticExtensions.add( { 'content': "$!createMenu", 'order': 20000}))
   ##
-  ## ADMIN menu
-  ##
-  #define ($adminMenu)
-    #if ($displayAdminMenu)
-      #displayAdminMenu()
-    #end
-  #end
-  #set ($discard = $topStaticExtensions.add( { 'content': "$!adminMenu", 'order': 30000}))
-  ##
   ## MORE ACTIONS menu
   ##
-  #define ($moreActionsMenu)
-    #if ($displayMoreActionsMenu)
-      #diplayOptionsMenu()
+  #define ($actionsMenu)
+    ## Note: Both the admin actions and the more actions menus are now merged into one.
+    #if ($displayAdminMenu || $displayMoreActionsMenu)
+      #displayOptionsMenu()
       #if ($canView)
         #template("export_modal.vm")
         #exportModal()
       #end
     #end
   #end
-  #set ($discard = $topStaticExtensions.add( { 'content': "$!moreActionsMenu", 'order': 40000}))
+  #set ($discard = $topStaticExtensions.add( { 'content': "$!actionsMenu", 'order': 40000}))
   ##
   ## Display all the extensions points, including the static ones
   ##
@@ -87,19 +79,38 @@
  * @param $id the id of the menu
  * @param $icon the icon of the menu
  * @param $content the content of the menu
+ * @param $titleKey translation key of the link title to use
+ * @param $titleAsLabel if the link title should also be used as link label
+ * @param $actionUrl the link of the top menu entry. If not provided, the top menu entry will act as an activator for the dropdown
  *
  * @since 7.3M2
  *#
-#macro(displayMenu $id $icon $content $titleKey)
-  #set ($content = $content.toString())
-  #if ($stringtool.isNotBlank($content))
-    <div class="dropdown" id="$id">
-      <a href="" data-toggle="dropdown" role="button" title="$services.localization.render(${titleKey})"><span class="glyphicon glyphicon-$icon"></span></a>
+#macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl)
+  <div class="btn-group" id="$id">
+    <a class="btn btn-default #if ("$!actionUrl" == '')dropdown-toggle#end" title="$services.localization.render($titleKey)"
+    #if ("$!actionUrl" != '')
+      href="$actionUrl"
+    #else
+      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+    #end
+    role="button">
+      <span class="glyphicon glyphicon-$icon"></span>
+      #if ($titleAsLabel)
+        <span class="btn-label">$services.localization.render($titleKey)</span>
+      #end
+    </a>
+    #if ($stringtool.isNotBlank("$!menuContent"))
+      #if ("$!actionUrl" != '')
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">$services.localization.render('core.menu.toggleDropdown')</span>
+        </button>
+      #end
       <ul class="dropdown-menu">
-        $content
+        $menuContent
       </ul>
-    </div>
-  #end
+    #end
+  </div>
 #end
 
 #**
@@ -122,8 +133,13 @@
   #foreach($uix in $services.uix.getExtensions($name))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       #set ($separator = ("$!uix.getParameters().separator" == 'true'))
+      #set ($order = $mathtool.toInteger($uix.getParameters().order))
+      #if ("$!order" == '')
+        ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
+        #set ($order = 0)
+      #end
       #set ($uixMap = { 'content'  : $services.rendering.render($uix.execute(), 'html/5.0'),
-                        'order'    : $mathtool.toInteger($uix.getParameters().order),
+                        'order'    : $order,
                         'separator': $separator})
       #set ($discard = $extensions.add($uixMap))
     #end
@@ -146,13 +162,15 @@
   #setVariable("$count", $count)
 #end
 
+#macro (submenuheader $titleKey)
+  <li class="dropdown-header">$services.localization.render($titleKey)</li>
+#end
+
 #**
  * Display the create button
  *#
 #macro(displayCreateButton)
-  <div class="dropdown" id="tmCreate">
-    <a href="$doc.getURL('create')" role="button" title="$services.localization.render('core.menu.create')"><span class="glyphicon glyphicon-plus"></span></a>
-  </div>
+  #displayMenu('tmCreate', 'plus', '', 'core.menu.create', true, $doc.getURL('create'))
 #end
 
 #**
@@ -162,10 +180,6 @@
   #set ($defaultEditURL = $doc.getURL($doc.getDefaultEditMode(), $!languageparams))
   #set ($staticExtensions = [])
   #if ($isAdvancedUser)
-    ##
-    ## Default edit mode
-    ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($defaultEditURL, $services.localization.render('core.menu.edit'), 'tmEditDefault', '', 'pencil')", 'order': 10000}))
     ##
     ## WYSIWYG
     ##
@@ -219,55 +233,46 @@
   #define ($menuContent)
     #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)
   #end
-  #set ($menuContent    = $menuContent.toString())
-  #set ($menuHasContent = $stringtool.isNotBlank($menuContent))
-  ##
-  ## Display the menu
-  ##
-  <div class="dropdown" id="tmEdit">
-    <a href="$defaultEditURL" #if ($menuHasContent)data-toggle="dropdown"#end role="button" title="$services.localization.render('core.menu.edit')"><span class="glyphicon glyphicon-pencil"></span></a>
-    #if ($menuHasContent)
-      <ul class="dropdown-menu">
-        $menuContent
-      </ul>
-    #end
-  </div>
+  #displayMenu('tmEdit', 'pencil', $menuContent, 'core.menu.edit', true, $defaultEditURL)
 #end
 
 #**
- * Display admin menu
+ * Display admin actions
  *#
-#macro(displayAdminMenu)
+#macro(displayAdminActions)
   #set ($staticExtensions = [])
   ##
   ## COPY
   ##
   #if ($canCopy)
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')", 'order': 20000, 'separator': true}))
+    #define ($copy)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $copy, 'order': 20000}))
   #end
   ##
   ## DELETE / RENAME
   ##
   #if ($canDelete)
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')", 'order': 30000}))
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')", 'order': 40000}))
+    #define ($rename)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
+    #define ($delete)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $delete, 'order': 40000}))
   #end
   ##
   ## Display all the extensions points, including the static ones
   ##
-  #define ($menuContent)
-    #displaySecureUIX('org.xwiki.plaftorm.adminactions', $staticExtensions)
-  #end
-  ##
-  ## Display the menu only if there is some content
-  ##
-  #displayMenu('tmAdminActions', 'cog', $menuContent, 'core.menu.actions')
+  #displaySecureUIX('org.xwiki.plaftorm.adminactions', $staticExtensions)
 #end
 
 #**
- * Display options menu
+ * Display "more actions" entries
  *#
-#macro(diplayOptionsMenu)
+#macro(displayMoreActions)
   #set ($staticExtensions = [])
   ##
   ## EXPORT / PRINT / SOURCE / SHARE
@@ -279,7 +284,7 @@
     #define ($export)
       #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')
     #end
-    #set ($discard = $staticExtensions.add( { 'content': $export, 'order': 80000, 'separator': true}))
+    #set ($discard = $staticExtensions.add( { 'content': $export, 'order': 80000}))
     ##
     ## PRINT
     ##
@@ -310,23 +315,56 @@
   ##
   ## Display all the extensions points, including the static ones
   ##
+  #displaySecureUIX('org.xwiki.plaftorm.moreoptions', $staticExtensions)
+#end
+
+#**
+ * Display options menu
+ *#
+#macro(displayOptionsMenu)
+  ##
+  ## Display all the extensions points, including the static ones
+  ##
   #define ($menuContent)
-    #displaySecureUIX('org.xwiki.plaftorm.moreoptions', $staticExtensions $count)
-    ## ----------------------------
-    ## Display the shortcuts
-    ## ----------------------------
-    #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
-      ## Only display a separator if at least one menu entry has been displayed
-      #if ($count > 0)
-        #submenuseparator()
+    #set ($needsSeparator = false)
+    ## Admin actions UIXP
+    #if ($displayAdminMenu)
+      #set ($adminActions = "#displayAdminActions()")
+      #if ($stringtool.isNotBlank("$!adminActions"))
+        #submenuheader('core.menu.actions.main')
+        $adminActions
+        #set ($needsSeparator = true)
       #end
-      #template("shortcuts.vm")
+    #end
+    ## More actions UIXP
+    #if ($displayMoreActionsMenu)
+      #set ($moreActions = "#displayMoreActions()")
+      #if ($stringtool.isNotBlank("$!moreActions"))
+        #if ($needsSeparator)
+          #submenuseparator()
+        #end
+        #submenuheader('core.menu.actions.others')
+        $moreActions
+        #set ($needsSeparator = true)
+      #end
+      ## ----------------------------
+      ## Display the shortcuts
+      ## ----------------------------
+      #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
+        ## Only display a separator if at least one menu entry has been displayed
+        #if ($needsSeparator)
+          #submenuseparator()
+        #end
+        #submenuheader('core.menu.actions.viewers')
+        #template("shortcuts.vm")
+        #set ($needsSeparator = true)
+      #end
     #end
   #end
   ##
   ## Display the menu if it has some content
   ##
-  #displayMenu('tmMoreActions', 'option-vertical', $menuContent, 'core.menu.moreactions')
+  #displayMenu('tmMoreActions', 'option-vertical', $menuContent, 'core.menu.actions.label')
 #end
 
 #**

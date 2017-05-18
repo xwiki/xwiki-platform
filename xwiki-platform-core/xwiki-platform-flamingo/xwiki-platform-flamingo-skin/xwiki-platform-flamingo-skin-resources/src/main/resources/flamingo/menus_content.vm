@@ -89,10 +89,11 @@
   <div class="btn-group" id="$id">
     <a class="btn btn-default #if ("$!actionUrl" == '')dropdown-toggle#end" title="$services.localization.render($titleKey)"
     #if ("$!actionUrl" != '')
-      href="$actionUrl">
+      href="$actionUrl"
     #else
-      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
+    role="button">
       <span class="glyphicon glyphicon-$icon"></span>
       #if ($titleAsLabel)
         <span class="btn-label">$services.localization.render($titleKey)</span>

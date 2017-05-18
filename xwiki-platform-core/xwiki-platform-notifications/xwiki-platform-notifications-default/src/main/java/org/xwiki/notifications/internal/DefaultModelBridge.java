@@ -36,6 +36,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -69,7 +70,23 @@ public class DefaultModelBridge implements ModelBridge
             "PageNotificationEventDescriptorClass", NOTIFICATION_CODE_SPACE
     );
 
+    private static final String APPLICATION_NAME = "applicationName";
+
     private static final String EVENT_TYPE = "eventType";
+
+    private static final String EVENT_PRETTY_NAME = "eventPrettyName";
+
+    private static final String EVENT_ICON = "eventIcon";
+
+    private static final String EVENT_TRIGGER = "eventTrigger";
+
+    private static final String LISTEN_TO = "listenTo";
+
+    private static final String OBJECT_TYPE = "objectType";
+
+    private static final String VALIDATION_EXPRESSION = "validationExpression";
+
+    private static final String NOTIFICATION_TEMPLATE = "notificationTemplate";
 
     private static final String START_DATE = "startDate";
 
@@ -98,7 +115,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
                         preferences.add(new NotificationPreference(
-                                obj.getStringValue(EVENT_TYPE),
+                                obj.getStringValue(LISTEN_TO),
                                 obj.getStringValue("applicationId"),
                                 obj.getIntValue("notificationEnabled", 0) == 1
                         ));
@@ -184,15 +201,18 @@ public class DefaultModelBridge implements ModelBridge
             if (eventDescriptorObj != null) {
                 for (BaseObject obj : eventDescriptorObj) {
                     if (obj != null) {
-                        newDescriptor = new PageNotificationEventDescriptor(
-                                obj.getStringValue("applicationName"),
-                                obj.getStringValue("eventId"),
-                                obj.getStringValue("eventPrettyName"),
-                                obj.getStringValue("eventIcon"),
-                                obj.getStringValue(EVENT_TYPE),
-                                obj.getStringValue("objectType"),
-                                obj.getStringValue("notificationTemplate")
-                        );
+                        newDescriptor = new PageNotificationEventDescriptor(ImmutableMap.<String, String>builder()
+                                .put(APPLICATION_NAME, obj.getStringValue(APPLICATION_NAME))
+                                .put(EVENT_TYPE, obj.getStringValue(EVENT_TYPE))
+                                .put(EVENT_PRETTY_NAME, obj.getStringValue(EVENT_PRETTY_NAME))
+                                .put(EVENT_ICON, obj.getStringValue(EVENT_ICON))
+                                .put(EVENT_TRIGGER, obj.getStringValue(LISTEN_TO))
+                                .put(OBJECT_TYPE, obj.getStringValue(OBJECT_TYPE))
+                                .put(VALIDATION_EXPRESSION, obj.getStringValue(VALIDATION_EXPRESSION))
+                                .put(NOTIFICATION_TEMPLATE, obj.getStringValue(NOTIFICATION_TEMPLATE))
+                                .build(),
+                                doc.getAuthorReference());
+
                         eventDescriptors.add(newDescriptor);
                     }
                 }

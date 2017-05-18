@@ -19,8 +19,11 @@
  */
 package org.xwiki.notifications.page;
 
+import java.util.Map;
+
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorContainer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -34,46 +37,42 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
 {
     private String applicationName;
 
-    private String eventId;
+    private String eventType;
 
     private String eventPrettyName;
 
     private String eventIcon;
 
-    private String eventCanonicalName;
+    private String eventTrigger;
 
     private String objectType;
 
+    private String validationExpression;
+
     private String notificationTemplate;
+
+    private DocumentReference authorReference;
 
     private RecordableEventDescriptorContainer recordableEventDescriptorContainer;
 
     /**
      * Constructs a new PageNotificationEventDescriptor.
      *
-     * @param applicationName Name of the application
-     * @param eventId Event identifier
-     * @param eventPrettyName Displayed name of the event
-     * @param eventIcon Name of the icon used for the event
-     * @param eventCanonicalName Class path of the listener to use
-     * @param objectType Class path of the object to use
-     * @param notificationTemplate Custom notification template
+     * @param parameters A map of the objects parameters
+     * @param authorReference A reference to the XObject author (used in template rendering in order to avoid
+     * privilege escalation)
      */
-    public PageNotificationEventDescriptor(
-            String applicationName,
-            String eventId,
-            String eventPrettyName,
-            String eventIcon,
-            String eventCanonicalName,
-            String objectType,
-            String notificationTemplate) {
-        this.applicationName = applicationName;
-        this.eventId = eventId;
-        this.eventPrettyName = eventPrettyName;
-        this.eventIcon = eventIcon;
-        this.eventCanonicalName = eventCanonicalName;
-        this.objectType = objectType;
-        this.notificationTemplate = notificationTemplate;
+    public PageNotificationEventDescriptor(Map<String, String> parameters, DocumentReference authorReference)
+    {
+        this.applicationName = parameters.get("applicationName");
+        this.eventType = parameters.get("eventType");
+        this.eventPrettyName = parameters.get("eventPrettyName");
+        this.eventIcon = parameters.get("eventIcon");
+        this.eventTrigger = parameters.get("eventTrigger");
+        this.objectType = parameters.get("objectType");
+        this.validationExpression = parameters.get("validationExpression");
+        this.notificationTemplate = parameters.get("notificationTemplate");
+        this.authorReference = authorReference;
     }
 
     /**
@@ -99,7 +98,7 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
      */
     public String getEventName()
     {
-        return this.eventId;
+        return this.eventType;
     }
 
     /**
@@ -121,15 +120,31 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
     /**
      * @return the event canonical name
      */
-    public String getEventCanonicalName()
+    public String getEventTrigger()
     {
-        return this.eventCanonicalName;
+        return this.eventTrigger;
+    }
+
+    /**
+     * @return the event validation expression
+     */
+    public String getValidationExpression()
+    {
+        return this.validationExpression;
+    }
+
+    /**
+     * @return the author of the XObject
+     */
+    public DocumentReference getAuthorReference()
+    {
+        return this.authorReference;
     }
 
     @Override
     public String getEventType()
     {
-        return this.eventId;
+        return this.eventType;
     }
 
     @Override

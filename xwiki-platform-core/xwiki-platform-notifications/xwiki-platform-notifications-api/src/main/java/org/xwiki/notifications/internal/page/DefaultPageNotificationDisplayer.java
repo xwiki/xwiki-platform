@@ -56,7 +56,6 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
     /**
      * Event handled by the displayer.
      */
-    // XXX
     public static final String EVENT_TYPE = "org.xwiki.notifications.page.PageNotificationEvent";
 
     private static final String EVENT_BINDING_NAME = "event";
@@ -73,8 +72,8 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
     @Inject
     private VelocityManager velocityManager;
 
-    // XXX add default template
-    @Override public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
+    @Override
+    public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
     {
         try {
             velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, eventNotification);

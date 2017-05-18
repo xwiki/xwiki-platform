@@ -63,20 +63,20 @@
             <validationRegExp/>
             <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
         </applicationName>
-        <eventId>
+        <eventType>
             <customDisplay/>
             <defaultValue/>
             <disabled>0</disabled>
-            <name>eventId</name>
+            <name>eventType</name>
             <number>2</number>
             <picker>0</picker>
-            <prettyName>Event ID</prettyName>
+            <prettyName>Event type</prettyName>
             <size>64</size>
             <unmodifiable>0</unmodifiable>
             <validationMessage/>
             <validationRegExp/>
             <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-        </eventId>
+        </eventType>
         <eventPrettyName>
             <customDisplay/>
             <defaultValue/>
@@ -105,20 +105,20 @@
             <validationRegExp/>
             <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
         </eventIcon>
-        <eventType>
+        <listenTo>
             <customDisplay/>
             <defaultValue/>
             <disabled>0</disabled>
-            <name>eventType</name>
+            <name>listenTo</name>
             <number>5</number>
             <picker>0</picker>
-            <prettyName>Type of event</prettyName>
+            <prettyName>Listen to …</prettyName>
             <size>64</size>
             <unmodifiable>0</unmodifiable>
             <validationMessage/>
             <validationRegExp/>
             <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-        </eventType>
+        </listenTo>
         <objectType>
             <customDisplay/>
             <defaultValue/>
@@ -133,6 +133,19 @@
             <validationRegExp/>
             <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
         </objectType>
+        <validationExpression>
+            <customDisplay/>
+            <defaultValue/>
+            <disabled>0</disabled>
+            <name>validationExpression</name>
+            <number>6</number>
+            <picker>0</picker>
+            <prettyName>Validation expression</prettyName>
+            <unmodifiable>0</unmodifiable>
+            <validationMessage/>
+            <validationRegExp/>
+            <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        </validationExpression>
         <notificationTemplate>
             <contenttype>VelocityCode</contenttype>
             <disabled>0</disabled>

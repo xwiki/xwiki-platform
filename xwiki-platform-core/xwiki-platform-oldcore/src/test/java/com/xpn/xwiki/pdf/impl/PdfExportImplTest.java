@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -54,7 +53,6 @@ public class PdfExportImplTest
      * Verify that PDF Export can apply some CSS on the XHTML.
      */
     @Test
-    @Ignore("Test for XWIKI-14241 which is currently failing")
     public void applyCSSWhenStyleDefined() throws Exception
     {
         this.oldcoreRule.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
@@ -97,6 +95,6 @@ public class PdfExportImplTest
         when(doc.getExternalURL("view", xcontext)).thenReturn("http://localhost:8080/export");
         xcontext.setDoc(doc);
 
-        assertTrue(pdfExport.applyCSS(html, css, xcontext).contains("color: red"));
+        assertTrue(pdfExport.applyCSS(html, css, xcontext).contains("<span style=\"color: red; \">Hello</span>"));
     }
 }

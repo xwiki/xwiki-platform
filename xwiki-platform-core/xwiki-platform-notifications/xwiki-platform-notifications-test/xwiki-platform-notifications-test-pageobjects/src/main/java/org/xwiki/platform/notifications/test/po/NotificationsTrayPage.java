@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.ViewPage;
 public class NotificationsTrayPage  extends ViewPage
 {
     @FindBy(css = "li#tmNotifications div.notifications-area")
-    private WebElement noNotificationAvailable;
+    private WebElement notificationsArea;
 
     @FindBy(css = "li#tmNotifications a[title='Watchlist']")
     private WebElement watchListButton;
@@ -50,21 +50,12 @@ public class NotificationsTrayPage  extends ViewPage
     @FindBy(css = "li#tmNotifications div.notifications-header a.notification-event-clean")
     private WebElement clearAllLink;
 
-    @FindBy(css = "li#tmNotifications div.notification-event")
-    private List<WebElement> notificationsList;
-
-    @FindBy(css = "li#tmNotifications div.notification-event-unread")
-    private List<WebElement> unreadNotificationsList;
-
-    @FindBy(css = "li#tmNotifications div.notification-event:not(.notification-event-unread)")
-    private List<WebElement> readNotificationsList;
-
     /**
      * Constructor.
      */
     public NotificationsTrayPage()
     {
-        this.waitUntilPageIsLoaded();
+        getDriver().waitUntilCondition(d -> !notificationsArea.getAttribute("class").contains("loading"));
     }
 
     /**
@@ -74,13 +65,9 @@ public class NotificationsTrayPage  extends ViewPage
      */
     public boolean areNotificationsAvailable()
     {
-        if (this.noNotificationAvailable == null) {
-            return true;
-        }
-
         this.showNotificationTray();
 
-        return !this.noNotificationAvailable.getText().equals("No notification available!");
+        return !this.notificationsArea.getText().equals("No notification available!");
     }
 
     /**
@@ -124,6 +111,11 @@ public class NotificationsTrayPage  extends ViewPage
         }
     }
 
+    private List<WebElement> getNotifications()
+    {
+        return getDriver().findElementsWithoutWaiting(By.cssSelector("li#tmNotifications div.notification-event"));
+    }
+
     /**
      * Get the number of unread notifications.
      *
@@ -131,7 +123,8 @@ public class NotificationsTrayPage  extends ViewPage
      */
     public int getUnreadNotificationsCount()
     {
-        return this.unreadNotificationsList.size();
+        return getDriver().findElementsWithoutWaiting(By.cssSelector(
+                "li#tmNotifications div.notification-event-unread")).size();
     }
 
     /**
@@ -141,7 +134,8 @@ public class NotificationsTrayPage  extends ViewPage
      */
     public int getReadNotificationsCount()
     {
-        return this.readNotificationsList.size();
+        return getDriver().findElementsWithoutWaiting(By.cssSelector(
+                "li#tmNotifications div.notification-event:not(.notification-event-unread)")).size();
     }
 
     /**
@@ -151,7 +145,7 @@ public class NotificationsTrayPage  extends ViewPage
      */
     public int getNotificationsListCount()
     {
-        return this.notificationsList.size();
+        return this.getNotifications().size();
     }
 
     /**
@@ -166,7 +160,7 @@ public class NotificationsTrayPage  extends ViewPage
             throw new IndexOutOfBoundsException();
         }
 
-        return this.notificationsList.get(notificationNumber).findElement(By.cssSelector("p:nth-child(2) strong"))
+        return this.getNotifications().get(notificationNumber).findElement(By.cssSelector("p:nth-child(2) strong"))
             .getText();
     }
 
@@ -182,7 +176,8 @@ public class NotificationsTrayPage  extends ViewPage
             throw new IndexOutOfBoundsException();
         }
 
-        return this.notificationsList.get(notificationNumber).findElement(By.cssSelector("p:nth-child(2) a")).getText();
+        return this.getNotifications().get(notificationNumber).findElement(
+                By.cssSelector("p:nth-child(2) a")).getText();
     }
 
     /**
@@ -196,18 +191,11 @@ public class NotificationsTrayPage  extends ViewPage
             throw new IndexOutOfBoundsException();
         }
 
-        WebElement e = notificationsList.get(notificationNumber)
+        WebElement e = getNotifications().get(notificationNumber)
             .findElement(By.cssSelector("button.notification-event-read-button"));
 
         if (e != null) {
             e.click();
-
-            // Update the notification lists
-            this.unreadNotificationsList =
-                this.getDriver().findElements(By.cssSelector("li#tmNotifications div.notification-event-unread"));
-            this.readNotificationsList =
-                this.getDriver().findElements(
-                    By.cssSelector("li#tmNotifications div.notification-event:not(.notification-event-unread)"));
         }
     }
 }

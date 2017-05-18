@@ -65,7 +65,8 @@
       }))
     #end
     #set ($lastApp = '')
-    #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
+    #set ($discard = $sorttool.sort($types, ['applicationName', 'eventType']))
+    #foreach ($type in $types)
       #if ($lastApp != $type.applicationName)
         #set ($lastApp = $type.applicationName)
         &lt;tr&gt;

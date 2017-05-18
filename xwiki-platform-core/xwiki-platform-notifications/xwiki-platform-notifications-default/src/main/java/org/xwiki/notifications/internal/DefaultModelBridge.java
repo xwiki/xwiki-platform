@@ -115,7 +115,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
                         preferences.add(new NotificationPreference(
-                                obj.getStringValue(LISTEN_TO),
+                                obj.getStringValue(EVENT_TYPE),
                                 obj.getStringValue("applicationId"),
                                 obj.getIntValue("notificationEnabled", 0) == 1
                         ));

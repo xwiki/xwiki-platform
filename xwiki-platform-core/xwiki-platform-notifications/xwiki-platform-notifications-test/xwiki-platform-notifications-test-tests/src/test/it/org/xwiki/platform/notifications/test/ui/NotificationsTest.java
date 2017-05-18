@@ -186,13 +186,13 @@ public class NotificationsTest extends AbstractTest
 
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "applicationName"),
                 "Notifications Tests");
-        xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "eventId"),
+        xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "eventType"),
                 "test-xobject-notification");
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "eventPrettyName"),
                 "Test for XObject based notifications");
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "eventIcon"),
                 "rss");
-        xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "eventType"),
+        xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "listenTo"),
                 "org.xwiki.bridge.event.DocumentUpdatedEvent");
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "objectType"),
                 "xwiki:XWiki.TagClass");

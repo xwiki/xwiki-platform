@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -33,14 +34,25 @@ public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] input")
-    private WebElement pageCreatedCheckbox;
+    @FindBy(id = "notificationsPane")
+    private WebElement notificationsPane;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] input")
-    private WebElement pageDeletedCheckbox;
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] .bootstrap-switch")
+    private WebElement pageCreatedSwitch;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] input")
-    private WebElement pageUpdatedCheckbox;
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] .bootstrap-switch")
+    private WebElement pageDeletedSwitch;
+
+    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] .bootstrap-switch")
+    private WebElement pageUpdatedSwitch;
+
+    /**
+     * Construct a NotificationsUserProfilePage (and for the browser page to be fully loaded).
+     */
+    public NotificationsUserProfilePage()
+    {
+        getDriver().waitUntilElementIsVisible(notificationsPane, By.className("bootstrap-switch"));
+    }
 
     /**
      * @param username the user profile document name
@@ -59,7 +71,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public boolean isPageCreated()
     {
-        return this.pageCreatedCheckbox.isSelected();
+        return isSwitchOn(this.pageCreatedSwitch);
     }
 
     /**
@@ -69,7 +81,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public boolean isPageDeleted()
     {
-        return this.pageDeletedCheckbox.isSelected();
+        return isSwitchOn(pageDeletedSwitch);
     }
 
     /**
@@ -79,7 +91,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public boolean isPageUpdated()
     {
-        return this.pageUpdatedCheckbox.isSelected();
+        return isSwitchOn(pageUpdatedSwitch);
     }
 
     /**
@@ -90,7 +102,7 @@ public class NotificationsUserProfilePage extends ViewPage
     public void setPageCreated(boolean status)
     {
         if (status != this.isPageCreated()) {
-            this.pageCreatedCheckbox.click();
+            clickOnSwitch(this.pageCreatedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -103,7 +115,7 @@ public class NotificationsUserProfilePage extends ViewPage
     public void setPageDeleted(boolean status)
     {
         if (status != this.isPageDeleted()) {
-            this.pageDeletedCheckbox.click();
+            clickOnSwitch(this.pageDeletedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -116,7 +128,7 @@ public class NotificationsUserProfilePage extends ViewPage
     public void setPageUpdated(boolean status)
     {
         if (status != this.isPageUpdated()) {
-            this.pageUpdatedCheckbox.click();
+            clickOnSwitch(this.pageUpdatedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -129,5 +141,17 @@ public class NotificationsUserProfilePage extends ViewPage
         this.setPageCreated(false);
         this.setPageDeleted(false);
         this.setPageUpdated(false);
+    }
+
+    private boolean isSwitchOn(WebElement webElement)
+    {
+        // TODO: create a generic widget object
+        return webElement.getAttribute("class").contains("bootstrap-switch-on");
+    }
+
+    private void clickOnSwitch(WebElement webElement)
+    {
+        // TODO: create a generic widget object
+        webElement.findElement(By.className("bootstrap-switch-label")).click();
     }
 }

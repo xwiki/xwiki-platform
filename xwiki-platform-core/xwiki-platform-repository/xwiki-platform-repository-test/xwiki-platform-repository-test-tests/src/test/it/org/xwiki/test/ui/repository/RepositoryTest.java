@@ -468,7 +468,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         //set higher proxy level: "version" - in previously imported extension
         getUtil().updateObject(Arrays.asList("Extension", IMPORTED_EXTENSION_NAME), "WebHome",
-                XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel", "version");
+                XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel", "history");
 
         // refresh extension
         extensionPage.updateExtension();

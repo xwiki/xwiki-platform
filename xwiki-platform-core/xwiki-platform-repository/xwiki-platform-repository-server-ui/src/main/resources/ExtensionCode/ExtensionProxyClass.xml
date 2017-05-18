@@ -123,7 +123,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>file=File|version=File and Version</values>
+      <values>file=File|history=File and Previous Versions</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </proxyLevel>
   </class>

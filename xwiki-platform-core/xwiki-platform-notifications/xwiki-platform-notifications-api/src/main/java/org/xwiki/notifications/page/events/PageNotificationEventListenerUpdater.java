@@ -83,8 +83,7 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
             DocumentReference objectClassReference = objectReference.getXClassReference();
 
             // Only interested in PageNotificationEventDescriptorClass XObjects
-            if (objectClassReference.getName()
-                    .equals("PageNotificationEventDescriptorClass"))
+            if (objectClassReference.getName().equals("PageNotificationEventDescriptorClass"))
             {
                 pageNotificationEventUpdater.updateDescriptors();
             }

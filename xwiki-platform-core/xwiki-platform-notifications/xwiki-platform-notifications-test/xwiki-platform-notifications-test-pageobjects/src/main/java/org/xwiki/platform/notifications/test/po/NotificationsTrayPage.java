@@ -182,7 +182,23 @@ public class NotificationsTrayPage  extends ViewPage
             throw new IndexOutOfBoundsException();
         }
 
-        return this.notificationsList.get(notificationNumber).findElement(By.cssSelector("p:nth-child(2) a")).getText();
+        return this.getNotificationElement(notificationNumber)
+                .findElement(By.cssSelector("p:nth-child(2) a")).getText();
+    }
+
+    /**
+     * Get a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification
+     */
+    public WebElement getNotificationElement(int notificationNumber)
+    {
+        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return this.notificationsList.get(notificationNumber);
     }
 
     /**

@@ -143,7 +143,7 @@ public class NotificationsUserProfilePage extends ViewPage
     public WebElement findNotificationParameterRow(String eventType)
     {
         return this.getDriver().findElement(
-                By.cssSelector("div#notificationsPane tr[data-eventtype='" + eventType + "'"));
+                By.cssSelector("div#notificationsPane tr[data-eventtype='" + eventType + "']"));
     }
 
     /**

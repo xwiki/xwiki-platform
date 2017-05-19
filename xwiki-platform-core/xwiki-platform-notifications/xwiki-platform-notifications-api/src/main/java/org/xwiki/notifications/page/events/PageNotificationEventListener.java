@@ -92,7 +92,7 @@ public class PageNotificationEventListener extends AbstractEventListener
         @Override
         public Boolean call() throws Exception
         {
-            return contextProvider.get().getWiki().evaluateVelocity(content, "page-notification").equals("true");
+            return contextProvider.get().getWiki().evaluateVelocity(content, "page-notification").contains("true");
         }
     }
 
@@ -113,7 +113,7 @@ public class PageNotificationEventListener extends AbstractEventListener
         for (PageNotificationEventDescriptor descriptor : pageNotificationEventDescriptorContainer.getDescriptorList())
         {
             // If the event is expected by our descriptor
-            if (descriptor.getEventTrigger().equals(event.getClass().getCanonicalName())) {
+            if (descriptor.getEventTrigger().contains(event.getClass().getCanonicalName())) {
                 XWikiDocument document = (XWikiDocument) source;
                 Map<DocumentReference, List<BaseObject>> documentXObjects = document.getXObjects();
                 /*  We can’t create a DocumentReference when only using descriptor.objectType, so we will have to

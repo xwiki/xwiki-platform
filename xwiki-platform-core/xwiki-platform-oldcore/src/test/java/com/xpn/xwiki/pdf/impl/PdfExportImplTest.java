@@ -50,10 +50,11 @@ public class PdfExportImplTest
     public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
 
     /**
-     * Verify that PDF Export can apply some CSS on the XHTML.
+     * Verify that PDF Export can apply some CSS on the XHTML when that XHTML already has some style defined and in
+     * shorthand notation.
      */
     @Test
-    public void applyCSSWhenStyleDefined() throws Exception
+    public void applyCSSWhenExistingStyleDefinedUsingShorthandNotation() throws Exception
     {
         this.oldcoreRule.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
         this.oldcoreRule.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
@@ -65,6 +66,9 @@ public class PdfExportImplTest
 
         PdfExportImpl pdfExport = new PdfExportImpl();
 
+        // Note that the SPAN below already has some style defined in shorthand notation( "background" is shorthand,
+        // see https://www.w3schools.com/css/css_background.asp). That's important for the test since that's what was
+        // failing in the past and why this test was written.
         String html = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"

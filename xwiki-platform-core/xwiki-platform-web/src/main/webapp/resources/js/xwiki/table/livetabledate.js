@@ -12,12 +12,12 @@ require.config({
 
 require(['jquery', 'moment', 'daterangepicker'],
   function($, moment) {
-    var dateFormat = moment().toMomentFormatString('$escapetool.javascript($xwiki.getXWikiPreference("dateformat", "yyyy/MM/dd HH:mm"))');
-
     var bindInputs = function(bind) {
       $(bind).find('input[data-type="date"]').each(function(i, element) {
         var input = $(element);
         var hidden = input.prev('input[type="hidden"]');
+        var dateFormat = moment().toMomentFormatString(input.attr('data-dateformat'));
+
         input.daterangepicker({
           drops: 'down',
           opens: 'center',

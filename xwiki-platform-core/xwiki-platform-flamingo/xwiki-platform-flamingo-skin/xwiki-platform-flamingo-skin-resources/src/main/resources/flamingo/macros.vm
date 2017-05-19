@@ -317,7 +317,8 @@
                 <td class="xwiki-livetable-display-header-filter">
                   ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates
                   <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" />
-                  <input type="text" data-type="date" #if("$!colprop.size" != '') size="${colprop.size}"
+                  <input type="text" data-type="date" data-dateformat='$escapetool.html($xwiki.getXWikiPreference("dateformat",
+                  "yyyy/MM/dd HH:mm"))' #if("$!colprop.size" != '') size="${colprop.size}"
                   title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
                   [$services.localization.render("${transprefix}${colname}")]))"#end />
                 </td>

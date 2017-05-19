@@ -710,9 +710,15 @@
     #set ($dateProperty = "${safe_tableAlias}.value")
   #end
   #set ($timestamps = $filterValue.split('-'))
-  #set ($whereSql = "${whereSql} and $dateProperty >= ? and $dateProperty <= ?")
-  #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
-  #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
+  #if ($filterValue.contains('-') &amp;&amp; $timestamps.size() == 2)
+    #set ($whereSql = "${whereSql} and $dateProperty >= ? and $dateProperty <= ?")
+    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
+    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
+  #else
+    ## Fall back to the older string matching
+    #set ($whereSql = "${whereSql} and upper($dateProperty) like upper(?)")
+    #set ($discard = $whereParams.add($filterValue))
+  #end
 #end
 
 

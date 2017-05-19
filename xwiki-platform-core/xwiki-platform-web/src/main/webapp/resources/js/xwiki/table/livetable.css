@@ -167,7 +167,6 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
   color: $theme.textPrimaryColor;
   margin: 0;
   padding: 0 0 0 2px;
-  margin-top: 2px;
 }
 .xwiki-livetable-filter-active {
   background-color: $theme.highlightColor !important;

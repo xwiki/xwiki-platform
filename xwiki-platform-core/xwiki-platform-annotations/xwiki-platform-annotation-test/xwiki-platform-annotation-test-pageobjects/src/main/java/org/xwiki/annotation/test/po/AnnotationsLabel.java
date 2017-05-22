@@ -35,10 +35,6 @@ import org.xwiki.test.ui.po.BaseElement;
 
 public class AnnotationsLabel extends BaseElement
 {
-
-    @FindBy(xpath = "//a[@title='Delete this annotation']")
-    private WebElement deleteAnnotation;
-
     @FindBy(xpath = "//span[@class='annotationAuthor']")
     private WebElement annotationAuthor;
 
@@ -79,7 +75,9 @@ public class AnnotationsLabel extends BaseElement
     public void deleteAnnotationById(String idText)
     {
         this.showAnnotationById(idText);
-        this.deleteAnnotation.click();
+        // The id format is "ID<index>".
+        String index = idText.substring(2);
+        getDriver().findElementByCssSelector("#annotation_view_" + index + " a.delete").click();
         getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
         getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
     }

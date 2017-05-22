@@ -147,10 +147,9 @@
   &lt;div class="col-xs-12 col-md-5"&gt;
     &lt;div class="panel panel-primary" id="panel-theme-variables"&gt;
       &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.variables")&lt;/div&gt;
-        &lt;div class="panel-body"&gt;
-          #displayVariablesTabs()
-          #displayVariablesPanes()
-        &lt;/div&gt;
+      &lt;div class="panel-body"&gt;
+        #displayVariablesTabs()
+        #displayVariablesPanes()
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -161,7 +160,7 @@
 #macro(displayVariablesTabs)
   &lt;ul class="nav nav-pills nav-stacked col-xs-4"&gt;
     #foreach($category in $variables.keySet())
-      &lt;li #if($velocityCount==1)class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/li&gt;
+      &lt;li#if($velocityCount==1) class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/a&gt;&lt;/li&gt;
     #end
   &lt;/ul&gt;
 #end
@@ -272,14 +271,13 @@
   &lt;div class="col-xs-12 #if($isEdit)col-md-7#end"&gt;
     &lt;div class="panel panel-primary"&gt;
       &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.preview")&lt;/div&gt;
-        &lt;div class="panel-body"&gt;
-          #if($isEdit)
-            &lt;p&gt;&lt;input type="checkbox" id="autosync" checked="checked"/&gt; &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;&lt;/p&gt;
-          #end
-          &lt;p class="alert alert-info"&gt;&lt;input type="button" id="refresh" value="$services.localization.render("platform.flamingo.themes.refresh")" class="btn btn-primary" /&gt; $services.localization.render("platform.flamingo.themes.refreshwarning")&lt;/p&gt;
-          &lt;iframe src="$xwiki.getURL('Main.WebHome', 'view', 'colortheme=no')" class="col-xs-12" id="iframe" height="400"&gt;
-          &lt;/iframe&gt;
-        &lt;/div&gt;
+      &lt;div class="panel-body"&gt;
+        #if($isEdit)
+          &lt;p&gt;&lt;input type="checkbox" id="autosync" checked="checked"/&gt; &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;&lt;/p&gt;
+        #end
+        &lt;p class="alert alert-info"&gt;&lt;input type="button" id="refresh" value="$services.localization.render("platform.flamingo.themes.refresh")" class="btn btn-primary" /&gt; $services.localization.render("platform.flamingo.themes.refreshwarning")&lt;/p&gt;
+        &lt;iframe src="$xwiki.getURL('Main.WebHome', 'view', 'colortheme=no')" class="col-xs-12" id="iframe" height="400"&gt;
+        &lt;/iframe&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -308,8 +306,8 @@
 ############################
 ## MAIN
 ############################
-(%class="row"%)(((
-{{html}}
+{{html clean="false"}}
+&lt;div class="row"&gt;
   #if($isEdit)
     #displayVariablesPanel()
   #else
@@ -317,9 +315,9 @@
   #end
   #displayPreviewPanel()
   ## Special data for computing URLs
-  &lt;span class="hidden" id="attachmentsURL" data-value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')" /&gt;
+  &lt;span class="hidden" id="attachmentsURL" data-value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')"&gt;&lt;/span&gt;
+&lt;/div&gt;
 {{/html}}
-)))
 {{/velocity}}
 </content>
   <object>

@@ -1261,7 +1261,9 @@ public class RepositoryManager implements Initializable, Disposable
         if (extensionVersionObject == null && allowProxying && isVersionProxyingEnabled(extensionDocument)) {
             //no ExtensionVersionClass object so we need to create such object temporarily and delete it
             try {
-                //FIXME - see XWIKI-14138
+                //FIXME - see XWIKI-14138 - this is nasty hack for obtaining ExtensionVersion XObject, when its
+                //FIXME information should be proxied and not stored permanently behind extension document
+                //FIXME To be substitude by some better solution in the future
                 XWikiDocument extensionDocumentClone = extensionDocument.clone();
                 addExtensionVersionObjectToDocument(extensionDocumentClone, version);
                 extensionVersionObject =

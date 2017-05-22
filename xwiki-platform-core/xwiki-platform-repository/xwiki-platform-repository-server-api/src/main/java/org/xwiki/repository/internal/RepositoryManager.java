@@ -1264,11 +1264,12 @@ public class RepositoryManager implements Initializable, Disposable
         if (extensionVersionObject == null && allowProxying && isVersionProxyingEnabled(extensionDocument)) {
             //no ExtensionVersionClass object so we need to create such object temporarily and delete it
             try {
-                addExtensionVersionObjectToDocument(extensionDocument, version);
+                //FIXME - see XWIKI-14138
+                XWikiDocument extensionDocumentClone = extensionDocument.clone();
+                addExtensionVersionObjectToDocument(extensionDocumentClone, version);
                 extensionVersionObject =
-                        extensionDocument
+                        extensionDocumentClone
                                 .getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
-                removeExtensionVersionObjectToDocument(extensionDocument, extensionVersionObject);
             } catch (XWikiException | ResolveException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }

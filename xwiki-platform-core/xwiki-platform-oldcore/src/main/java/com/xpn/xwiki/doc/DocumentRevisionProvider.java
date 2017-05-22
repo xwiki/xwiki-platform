@@ -28,10 +28,11 @@ import com.xpn.xwiki.XWikiException;
  * Provide generic way of requesting a specific revision of a document from several sources (database, installed XAR
  * extension, etc.).
  * <p>
- * The revision syntax is {@code <provider hint>:<revision>} and the default is database.
+ * The revision syntax is {@code <provider hint>:<revision>}, default provide being database (the version of the
+ * document in the history).
  * 
  * @version $Id$
- * @since 9.3RC1
+ * @since 9.4RC1
  */
 @Role
 public interface DocumentRevisionProvider

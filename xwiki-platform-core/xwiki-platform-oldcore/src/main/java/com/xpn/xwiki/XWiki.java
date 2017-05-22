@@ -1835,8 +1835,9 @@ public class XWiki implements EventListener
 
     /**
      * @param reference the reference of the document
-     * @param revision the version of the document
-     * @since 9.3RC1
+     * @param revision the version of the document as defined by {@link DocumentRevisionProvider}
+     * @since 9.4RC1
+     * @see DocumentRevisionProvider
      */
     public XWikiDocument getDocument(DocumentReference reference, String revision, XWikiContext context)
         throws XWikiException
@@ -1846,8 +1847,9 @@ public class XWiki implements EventListener
 
     /**
      * @param doc the document
-     * @param revision the version of the document
+     * @param revision the version of the document as defined by {@link DocumentRevisionProvider}
      * @param context see {@link XWikiContext}
+     * @see DocumentRevisionProvider
      */
     public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException
     {

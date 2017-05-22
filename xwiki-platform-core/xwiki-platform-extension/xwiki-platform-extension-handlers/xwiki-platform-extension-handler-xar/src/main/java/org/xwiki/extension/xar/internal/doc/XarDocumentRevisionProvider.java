@@ -42,7 +42,7 @@ import com.xpn.xwiki.internal.doc.AbstractDocumentRevisionProvider;
  * Get document revision from an installed XAR extension.
  * 
  * @version $Id$
- * @since 9.3RC1
+ * @since 9.4RC1
  */
 @Component
 @Named("xar")

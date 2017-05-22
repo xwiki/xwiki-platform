@@ -62,11 +62,6 @@ public class AnnotationsLabel extends BaseElement
         hoverOnAnnotationById(idText);
     }
 
-    private void showAnnotationByText(String searchText)
-    {
-        showAnnotationById(getAnnotationIdByText(searchText));
-    }
-
     public void deleteAnnotationByText(String searchText)
     {
         this.deleteAnnotationById(this.getAnnotationIdByText(searchText));

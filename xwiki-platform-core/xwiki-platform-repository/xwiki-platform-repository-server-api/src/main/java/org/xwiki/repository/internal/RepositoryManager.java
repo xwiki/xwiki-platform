@@ -309,8 +309,7 @@ public class RepositoryManager implements Initializable, Disposable
         String lastVersion = findLastVersion(document);
 
         if (lastVersion != null && !StringUtils.equals(lastVersion,
-                getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null)))
-        {
+            getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
             BaseObject extensionObjectToSave = document.getXObject(extensionObject.getReference());
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
 
@@ -462,8 +461,7 @@ public class RepositoryManager implements Initializable, Disposable
                     this.logger.debug("Attachment [{}] does not exists", attachmentReference);
                 }
             } else if (ResourceType.URL.equals(resourceReference.getType())
-                    || ExtensionResourceReference.TYPE.equals(resourceReference.getType()))
-            {
+                || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
                 valid = true;
             } else {
                 valid = false;
@@ -513,7 +511,7 @@ public class RepositoryManager implements Initializable, Disposable
             String extensionId = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID);
 
             String fileName = extensionId + '-' + extensionVersion + '.'
-                    + getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+                + getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 
             XWikiAttachment attachment = document.getAttachment(fileName);
             if (attachment == null) {
@@ -528,7 +526,7 @@ public class RepositoryManager implements Initializable, Disposable
 
             if (attachment != null) {
                 resourceReference = new AttachmentResourceReference(
-                        this.entityReferenceSerializer.serialize(attachment.getReference()));
+                    this.entityReferenceSerializer.serialize(attachment.getReference()));
             }
         }
 
@@ -736,8 +734,8 @@ public class RepositoryManager implements Initializable, Disposable
             }
 
             xcontext.getWiki().saveDocument(document,
-                    "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]", true,
-                    xcontext);
+                "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]", true,
+                xcontext);
         }
 
         return document.getDocumentReference();
@@ -1226,11 +1224,10 @@ public class RepositoryManager implements Initializable, Disposable
     }
 
     private boolean updateCollection(BaseObject extensionObject, String fieldName, Collection<String> allowedNamespaces,
-            XWikiContext xcontext)
+        XWikiContext xcontext)
     {
         boolean needSave =
-                update(extensionObject, fieldName,
-                        allowedNamespaces != null ? allowedNamespaces : Collections.emptyList());
+            update(extensionObject, fieldName, allowedNamespaces != null ? allowedNamespaces : Collections.emptyList());
 
         String fieldNameEmpty = fieldName + XWikiRepositoryModel.PROPSUFFIX_EMPTYCOLLECTION;
         if (extensionObject.getXClass(xcontext).get(fieldNameEmpty) != null) {

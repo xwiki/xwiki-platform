@@ -179,19 +179,13 @@
 ## FIELD IMAGE
 ############################
 #macro(fieldImage $varName $obj)
-  #set($currentLogo = $obj.getValue($varName))
-  &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName" class="type-image"&gt;
-    #if ($varName == 'logo')
-      &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
-    #else
-      &lt;option value=""&gt;$services.localization.render("no")&lt;/option&gt;
-    #end
-    #foreach($attachment in $doc.getAttachmentList())
-      #if($attachment.isImage())
-        &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
-      #end
-    #end
-  &lt;/select&gt;
+  &lt;div id="var-$varName" class="type-image"&gt;
+  {{/html}}
+
+  {{attachmentSelector classname="FlamingoThemesCode.ThemeClass" property="$varName" savemode="form" displayImage="true" width="120" filter="png,jpg,gif,svg" defaultValue=""/}}
+
+  {{html clean="false"}}
+  &lt;/div&gt;
 #end
 ############################
 ## FIELD TEXT
@@ -474,7 +468,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         var variableInput = variableInputs[i];
         // 'logo' is handled by the 'setLogo' function
         // 'lessCode' is handled afterwards
-        if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
+        if (variableInput.value != '' &amp;&amp; !variableInput.name.match("_0_logo$") &amp;&amp; variableInput.id != 'var-lessCode') {
           var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
           var value = variableInput.value
           var input = $(variableInput);
@@ -509,7 +503,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     // Function called when an input is changed by the user
     var onChange = function () {
       var input = $(this);
-      if (autoSync.prop("checked") &amp;&amp; !input.hasClass('type-image')) {
+      if (autoSync.prop("checked") &amp;&amp; input.closest('.type-image').length == 0) {
         var oldValue = variableInput.value;
         setTimeout(function(){
           if (variableInput.value == oldValue) {
@@ -521,7 +515,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     
     // Function that change the logo in the iframe
     var setLogo = function(event) {
-      var value = $("#var-logo").val();
+      var value = $("#var-logo input").val();
       var iFrameLogo = iframe.contents().find("#companylogo &gt; a &gt; img");
       if (value == "") {
         var url = "$xwiki.getSkinFile('logo.svg')";
@@ -599,9 +593,24 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       $(variableInput).on("change", onChange);
     }
     // Event handler for the logo field
-    $("#var-logo").on("change", setLogo);
+    var logoFieldInput = $("#var-logo input");
+    logoFieldInput.on("change", setLogo);
+
+    // Since the input is hidden (by the attachmentSelector macro), we need to do some black magic (i.e. register a MutationObserver) to make it trigger the "change" event.
+    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+    var trackChange = function(element) {
+      var observer = new MutationObserver(function(mutations, observer) {
+        if (mutations[0].attributeName == "value") {
+          $(element).trigger("change");
+        }
+      });
+      observer.observe(element, {
+        attributes: true
+      });
+    }
+    // Enable change tracking for the logo field.
+    trackChange(logoFieldInput[0]);
   });
-  
 });
 </code>
     </property>

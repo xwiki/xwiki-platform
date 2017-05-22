@@ -105,7 +105,7 @@
     #end
   #end
   &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;Filters ($count)&lt;/a&gt;&lt;/p&gt;
-  &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType"&gt;
+  &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType" data-eventtype="$escapetool.xml($eventType)"&gt;
     #set($collist  = ['scope', 'location', 'actions'])
     #set($colprops = {
       'scope':          { 'sortable': false },
@@ -120,18 +120,10 @@
       'extraParams'       : "eventType=${eventType}&amp;user=${services.model.serialize($doc.documentReference, 'default')}"
     })
     #livetable("notificationPreferenceScopeContainer-$eventType" $collist $colprops $options)
-    &lt;p&gt;&lt;button class="btn btn-primary"&gt;Add a filter&lt;/button&gt;&lt;/p&gt;
-    &lt;script language="javascript"&gt;
-      ## TODO: fix this
-      require(['jquery', 'bootstrap'], function($) {
-        $('#collapse-$eventType button').click(function(){
-          $('#collapse-$eventType .modal').modal('show');
-          $('#collapse-$eventType .location-tree').xtree();
-        });
-      });
-    &lt;/script&gt;
+    &lt;p&gt;&lt;button class="btn btn-primary btn-addfilter"&gt;Add a filter&lt;/button&gt;&lt;/p&gt;
     #documentPickerModal({
-      'wiki': true
+      'wiki': true,
+      'showTerminalDocuments': true
     })
   &lt;/div&gt;
 #end
@@ -233,7 +225,7 @@ require.config({
 /**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'bootstrap-switch'], function ($, xm) {
+require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, xm) {
   'use strict';
 
   /**
@@ -289,6 +281,64 @@ require(['jquery', 'xwiki-meta', 'bootstrap-switch'], function ($, xm) {
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
     }
+  });
+
+  /**
+   * Make the location picker effective
+   */
+  $('.notificationPreferenceScopeContainer').each(function() {
+    var scope = $(this);
+    var modal = scope.find('.modal');
+    // Open the location picker
+    scope.find('.btn-addfilter').click(function(event) {
+      modal.modal('show');
+      scope.find('.location-tree').xtree();
+      modal.find('.modal-footer button.btn-primary').each(function() {
+        $(this).prop('disabled', 'disabled');
+      });
+    });
+    // Enable the "select" button when a selection is made on the tree.
+    scope.find('.location-tree').on('changed.jstree', function(e, data) {
+      if (data.selected.length &gt; 0) {
+        modal.find('.modal-footer button.btn-primary').prop('disabled', '');
+      }
+    });
+    // Callback called when the "select" button is clicked
+    modal.find('.modal-footer button.btn-primary').click(function() {
+      modal.modal('hide');
+      var tree = $.jstree.reference(scope.find('.location-tree'));
+      var nodes = tree.get_selected(true);
+      for (var i = 0; i &lt; nodes.length; ++i) {
+        var node = nodes[i];
+        console.log('id: ' + node.data.id);
+        console.log('type: ' + node.data.type);
+        var scopeType = 'pageOnly';
+        if (node.data.type == 'wiki') {
+          scopeType = 'wiki';
+        } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
+          scopeType = 'pageAndChildren';
+        }
+        // Saving
+        var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+        var restURL = xm.restURL + '/objects?media=json';
+        $.post(restURL, {
+          'className': 'XWiki.Notifications.Code.NotificationPreferenceScopeClass',
+          'property#eventType': scope.attr('data-eventtype'),
+          'property#scopeReference': node.data.id,
+          'property#scope': scopeType
+        }).done(function (data) {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+          // Reload the livetable
+          /*console.log(window['livetable_notificationPreferenceScopeContainer-' + scope.attr('data-eventtype')]);
+          window['livetable_notificationPreferenceScopeContainer-' + scope.attr('data-eventtype')].clearCache();
+          window['livetable_notificationPreferenceScopeContainer-' + scope.attr('data-eventtype')].showRows();*/
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        });
+      }
+    });
   });
 });
 </code>

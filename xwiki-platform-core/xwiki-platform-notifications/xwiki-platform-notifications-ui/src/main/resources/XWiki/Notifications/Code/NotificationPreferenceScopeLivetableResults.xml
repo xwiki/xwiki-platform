@@ -72,7 +72,7 @@
     'totalrows'   : $elements.size(),
     'reqNo'       : $request.reqNo,
     'returnedrows': $elements.size(),
-    'offset'      : $request.offset,
+    'offset'      : 0,
     'rows'        : $elements
   })
 #end

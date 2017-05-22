@@ -22,7 +22,6 @@ package org.xwiki.annotation.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -48,12 +47,7 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        WebElement annotationIcon = getDriver().findElement(By.id(annotationId));
-
-        // Move mouse to annotation icon
-        Actions builder = new Actions(getDriver());
-        builder.moveToElement(annotationIcon).build().perform();
-
+        getDriver().findElement(By.id(annotationId)).click();
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 

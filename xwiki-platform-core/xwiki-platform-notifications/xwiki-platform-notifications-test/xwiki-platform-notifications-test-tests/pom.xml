@@ -96,7 +96,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
-        <version>${platform.version}</version>
+        <version>${project.version}</version>
         <dependencies>
           <!-- TODO: remove the need for this dependency in the future. The reason we need it right now is because
                the Packager Mojo will use the Import Mojo to import XARs but since we've defined the

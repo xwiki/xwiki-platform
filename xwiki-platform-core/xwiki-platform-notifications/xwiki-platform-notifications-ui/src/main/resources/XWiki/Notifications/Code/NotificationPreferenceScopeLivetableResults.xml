@@ -46,6 +46,7 @@
   ## Build the list of NotificationPreferenceScope related to the specified event type.
   ##
   #set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
+  #set ($restBaseURL = $services.rest.url($document.documentReference))
   #set ($elements = [])
   #foreach ($obj in $document.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
     #if ($obj.getValue('eventType') == "$!request.eventType")
@@ -56,11 +57,20 @@
       #elseif ($obj.getValue('scope') == 'wiki')
         #set ($reference = $services.model.createWikiReference($obj.getValue('scopeReference')))
       #end
+      #set ($scope = $obj.getValue('scope'))
+      #if ($scope == 'pageOnly')
+        #set ($scopeIcon = 'page')
+      #elseif ($scope == 'pageAndChildren')
+        #set ($scopeIcon = 'chart-organisation')
+      #else
+        #set ($scopeIcon = 'wiki')
+      #end
       #set ($element = {
-        'scope'          : $obj.display('scope', 'view'),
+        'scope'          : $services.icon.renderHTML($scopeIcon),
         'scopeReference' : $obj.getValue('scopeReference'),
         'doc_viewable'   : true,
-        'location'       : "#hierarchy($reference, {'limit': 5, 'plain': false, 'local': false, 'displayTitle': false})"
+        'location'       : "#hierarchy($reference, {'limit': 5, 'plain': false, 'local': false, 'displayTitle': false})",
+        'doc_delete_url' : "${restBaseURL}/objects/XWiki.Notifications.Code.NotificationPreferenceScopeClass/${obj.reference.objectNumber}"
       })
       #set ($discard = $elements.add($element))
     #end
@@ -68,11 +78,16 @@
   ##
   ## JSON.
   ##
+  #set ($discard = $response.setContentType('application/json'))
+  #set ($offset = $numbertool.toNumber($request.offset))
+  #if (!$offset)
+    #set ($offset = 1)
+  #end
   $jsontool.serialize({
     'totalrows'   : $elements.size(),
     'reqNo'       : $request.reqNo,
     'returnedrows': $elements.size(),
-    'offset'      : 0,
+    'offset'      : $offset,
     'rows'        : $elements
   })
 #end

@@ -84,12 +84,15 @@
       #end
       &lt;tr data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-objnumber="$!preference.number"&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
-        &lt;td&gt;&lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
-          #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
-            #displayScopeLivetable($type.eventType)
-          #elseif($type.filter == 'CUSTOM_FILTER')
-            $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
+        &lt;td class="notificationTypeCell loading"&gt;
+          &lt;div class="hidden"&gt;
+            &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
+            #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
+              #displayScopeLivetable($type.eventType)
+            #elseif($type.filter == 'CUSTOM_FILTER')
+              $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
           #end
+          &lt;/div&gt;
         &lt;/td&gt;
       &lt;/tr&gt;
     #end
@@ -104,13 +107,13 @@
       #set ($count = $count + 1)
     #end
   #end
-  &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;Filters ($count)&lt;/a&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;Filters (&lt;span class="notificationPreferenceScopeCount"&gt;$count&lt;/span&gt;)&lt;/a&gt;&lt;/p&gt;
   &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType" data-eventtype="$escapetool.xml($eventType)"&gt;
-    #set($collist  = ['scope', 'location', 'actions'])
+    #set($collist  = ['scope', 'location', '_actions'])
     #set($colprops = {
-      'scope':          { 'sortable': false },
+      'scope':          { 'sortable': false, 'html': true},
       'location':       { 'sortable': false, 'html': true },
-      'actions':        { 'sortable': false }
+      '_actions':        { 'sortable': false, 'actions': ['delete']}
     })
     #set($options  = {
       'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceScopeLivetableResults',
@@ -225,8 +228,25 @@ require.config({
 /**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, xm) {
+require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm) {
   'use strict';
+
+  /**
+   * Enable or disable some DOM elemnts.
+   */
+  var enableDOMElements = function (elements, enable) {
+    elements.css('pointer-events', enable ? 'auto' : 'none').css('opacity', enable ? 1.0 : 0.4);
+  };
+
+  /**
+   * Disable all filters where the event type is not enabled
+   */
+  $('.notificationTypeCheckbox').each(function () {
+    var checkBox = $(this);
+    if (!checkBox.attr('checked')) {
+      enableDOMElements(checkBox.parents('td').find('.notificationPreferenceScopeContainer'), false);
+    }
+  });
 
   /**
    * Enable bootstrap switch.
@@ -247,6 +267,9 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     var tr           = input.parents('tr');
     var eventType    = tr.attr('data-eventtype');
     var objNumber    = tr.attr('data-objnumber');
+
+    // Change the state of the filter container
+    enableDOMElements(input.parents('td').find('.notificationPreferenceScopeContainer'), state);
 
     // Saving
     var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
@@ -284,6 +307,28 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
   });
 
   /**
+   * Handle the livetable 'delete' action
+   */
+  var handleFilterLivetableDelete = function (event) {
+    event.preventDefault();
+    var livetable = window['livetable_' + $(this).parents('.xwiki-livetable').attr('id')];
+    var filter = $(this).parents('.notificationPreferenceScopeContainer').parent().find('.notificationPreferenceScopeCount');
+    if (confirm('sure?')) {
+      $.ajax($(this).attr('href'), {
+        type: 'DELETE'
+      }).done(function() {
+        // Reload the livetable
+        livetable.refresh();
+        filter.text(parseInt(filter.text()) - 1);
+      });
+    }
+  };
+  $(document).on('xwiki:livetable:newrow', function (event, data) {
+    $(data.row).find('a.actiondelete').click(handleFilterLivetableDelete);
+  });
+  $('.notificationPreferenceScopeContainer .xwiki-livetable a.actiondelete').click(handleFilterLivetableDelete);
+
+  /**
    * Make the location picker effective
    */
   $('.notificationPreferenceScopeContainer').each(function() {
@@ -310,8 +355,6 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       var nodes = tree.get_selected(true);
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
-        console.log('id: ' + node.data.id);
-        console.log('type: ' + node.data.type);
         var scopeType = 'pageOnly';
         if (node.data.type == 'wiki') {
           scopeType = 'wiki';
@@ -330,15 +373,25 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
           // Reload the livetable
-          /*console.log(window['livetable_notificationPreferenceScopeContainer-' + scope.attr('data-eventtype')]);
-          window['livetable_notificationPreferenceScopeContainer-' + scope.attr('data-eventtype')].clearCache();
-          window['livetable_notificationPreferenceScopeContainer-' + scope.attr('data-eventtype')].showRows();*/
+          window['livetable_' + scope.find('.xwiki-livetable').attr('id')].refresh();
+          // Update the filter count
+          var filter = scope.parent().find('.notificationPreferenceScopeCount');
+          var filterValue = parseInt(filter.text());
+          filter.text(filterValue + 1);
         }).fail(function () {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
       }
     });
+  });
+
+  /**
+   * Disable the "loading" screens
+   */
+  $('td.notificationTypeCell').each(function(){
+    $(this).find('&gt; div.hidden').removeClass('hidden');
+    $(this).removeClass('loading');
   });
 });
 </code>

@@ -38,15 +38,7 @@ import org.xwiki.eventstream.RecordableEventDescriptorContainer;
 @Singleton
 public class DefaultRecordableEventDescriptorContainer implements RecordableEventDescriptorContainer
 {
-    private List<RecordableEventDescriptor> recordableEventDescriptorList;
-
-    /**
-     * Constructs a new {@link DefaultRecordableEventDescriptorContainer}.
-     */
-    public DefaultRecordableEventDescriptorContainer()
-    {
-        this.recordableEventDescriptorList = new ArrayList<>();
-    }
+    private List<RecordableEventDescriptor> recordableEventDescriptorList = new ArrayList<>();
 
     @Override
     public void addRecordableEventDescriptor(RecordableEventDescriptor recordableEventDescriptor)

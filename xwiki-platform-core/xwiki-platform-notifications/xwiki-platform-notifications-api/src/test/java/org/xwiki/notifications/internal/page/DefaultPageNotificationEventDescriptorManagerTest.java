@@ -39,11 +39,11 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class DefaultPageNotificationEventDescriptorContainerTest
+public class DefaultPageNotificationEventDescriptorManagerTest
 {
     @Rule
-    public final MockitoComponentMockingRule<DefaultPageNotificationEventDescriptorContainer> mocker =
-            new MockitoComponentMockingRule<>(DefaultPageNotificationEventDescriptorContainer.class);
+    public final MockitoComponentMockingRule<DefaultPageNotificationEventDescriptorManager> mocker =
+            new MockitoComponentMockingRule<>(DefaultPageNotificationEventDescriptorManager.class);
 
     private RecordableEventDescriptorContainer recordableEventDescriptorContainer;
 

@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Generic event for page-defined notifications.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Unstable
 public class PageNotificationEvent implements RecordableEvent

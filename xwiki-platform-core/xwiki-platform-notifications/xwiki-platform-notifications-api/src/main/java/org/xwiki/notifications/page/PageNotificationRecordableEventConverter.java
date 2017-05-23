@@ -36,7 +36,7 @@ import com.xpn.xwiki.plugin.activitystream.internal.DefaultRecordableEventConver
  * It overrides {@link DefaultRecordableEventConverter}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Singleton

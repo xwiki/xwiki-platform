@@ -21,18 +21,19 @@ package org.xwiki.notifications.page.events;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEvent;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
-import org.xwiki.notifications.page.PageNotificationEventDescriptorContainer;
+import org.xwiki.notifications.page.VelocityTemplateEvaluator;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AllEvent;
@@ -44,10 +45,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default implementation of {@link PageNotificationEventDescriptorContainer}.
+ * Default implementation of {@link PageNotificationEventDescriptorManager}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Singleton
@@ -63,38 +64,13 @@ public class PageNotificationEventListener extends AbstractEventListener
     private ObservationManager observationManager;
 
     @Inject
-    private PageNotificationEventDescriptorContainer pageNotificationEventDescriptorContainer;
+    private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Inject
     private AuthorExecutor authorExecutor;
-
-    private class VelocityTemplateBooleanEvaluator implements Callable<Boolean>
-    {
-        private String content;
-
-        private Provider<XWikiContext> contextProvider;
-
-        /**
-         * Constructs a {@link VelocityTemplateBooleanEvaluator}.
-         *
-         * @param contextProvider a reference to the XWikiContext provider component
-         * @param content the content of the template that will be evaluated
-         */
-        VelocityTemplateBooleanEvaluator(Provider<XWikiContext> contextProvider, String content)
-        {
-            this.contextProvider = contextProvider;
-            this.content = content;
-        }
-
-        @Override
-        public Boolean call() throws Exception
-        {
-            return contextProvider.get().getWiki().evaluateVelocity(content, "page-notification").contains("true");
-        }
-    }
 
     /**
      * Constructs a {@link PageNotificationEventListener}.
@@ -110,43 +86,46 @@ public class PageNotificationEventListener extends AbstractEventListener
         boolean xObjectFound;
 
         // Filter the event descriptors concerned by the event, then create the concerned events
-        for (PageNotificationEventDescriptor descriptor : pageNotificationEventDescriptorContainer.getDescriptorList())
+        for (PageNotificationEventDescriptor descriptor : pageNotificationEventDescriptorManager.getDescriptorList())
         {
             // If the event is expected by our descriptor
-            if (descriptor.getEventTrigger().contains(event.getClass().getCanonicalName())) {
-                XWikiDocument document = (XWikiDocument) source;
-                Map<DocumentReference, List<BaseObject>> documentXObjects = document.getXObjects();
-                /*  We can’t create a DocumentReference when only using descriptor.objectType, so we will have to
-                    iterate through the map */
-                xObjectFound = false;
-                for (DocumentReference documentReference : documentXObjects.keySet())  {
-                    if (this.checkXObject(documentReference, descriptor)) {
-                        xObjectFound = true;
-                        break;
-                    }
-                }
-
-                if (xObjectFound
+            if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())) {
+                if (checkXObjectCondition(descriptor, source)
                         && this.evaluateVelocityTemplate(descriptor.getAuthorReference(),
                             descriptor.getValidationExpression())) {
                     observationManager.notify(
                             new PageNotificationEvent(descriptor),
-                            "org.xwiki.platform:xwiki-platform-notifications-api", document);
+                            "org.xwiki.platform:xwiki-platform-notifications-api", source);
                 }
             }
         }
     }
 
     /**
-     * Ensure that the given XObject matches what the descriptor needs.
+     * Ensure that the given the source matches what the descriptor needs.
+     * If the source is an instance of XWikiDocument, will check if the document contains the XObject specified in
+     * the descriptor.
      *
-     * @param xObject A XObject
-     * @param descriptor Notification descriptor
-     * @return true if the descriptor object field is empty or if the XObject matches
+     * @param descriptor the event descriptor
+     * @param source the event source
+     * @return
      */
-    private boolean checkXObject(DocumentReference xObject, PageNotificationEventDescriptor descriptor)
-    {
-        return (descriptor.getObjectType().isEmpty() || xObject.toString().equals(descriptor.getObjectType()));
+    private boolean checkXObjectCondition(PageNotificationEventDescriptor descriptor, Object source) {
+        if (StringUtils.isBlank(descriptor.getObjectType())) {
+            // If no XObject is specified in the Object Type field, we don’t need to check the source.
+            return true;
+        } else if (source instanceof XWikiDocument) {
+            XWikiDocument document = (XWikiDocument) source;
+            Map<DocumentReference, List<BaseObject>> documentXObjects = document.getXObjects();
+            /*  We can’t create a DocumentReference when only using descriptor.objectType, so we will have to
+                    iterate through the map */
+            for (DocumentReference documentReference : documentXObjects.keySet())  {
+                if (documentReference.toString().equals(descriptor.getObjectType())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -159,10 +138,10 @@ public class PageNotificationEventListener extends AbstractEventListener
     private boolean evaluateVelocityTemplate(DocumentReference userReference, String template)
     {
         try {
-            return template.isEmpty()
+            return StringUtils.isBlank(template)
                     || this.authorExecutor.call(
-                            new VelocityTemplateBooleanEvaluator(this.contextProvider, template),
-                            userReference);
+                            new VelocityTemplateEvaluator(this.contextProvider, template),
+                            userReference).trim().equals("true");
         } catch (Exception e) {
             return false;
         }

@@ -25,12 +25,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.internal.ModelBridge;
-import org.xwiki.notifications.page.PageNotificationEventDescriptorContainer;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.notifications.page.PageNotificationEventUpdater;
 import org.xwiki.query.Query;
@@ -41,14 +41,14 @@ import org.xwiki.query.QueryManager;
  * This is the default implementation of {@link PageNotificationEventUpdater}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Singleton
 public class DefaultPageNotificationEventUpdater implements PageNotificationEventUpdater
 {
     @Inject
-    private PageNotificationEventDescriptorContainer pageNotificationEventListenerContainer;
+    private PageNotificationEventDescriptorManager pageNotificationEventListenerContainer;
 
     @Inject
     private ModelBridge modelBridge;
@@ -61,6 +61,9 @@ public class DefaultPageNotificationEventUpdater implements PageNotificationEven
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Fetch every registered PageNotificationEventDescriptorClass XObjects in the wiki, then update the
@@ -81,11 +84,14 @@ public class DefaultPageNotificationEventUpdater implements PageNotificationEven
 
             for (String descriptor: descriptors) {
                 DocumentReference document = documentReferenceResolver.resolve(descriptor);
-                descriptorList.addAll(modelBridge.getPageNotificationEventDescriptors(document));
+                descriptorList.add(modelBridge.getPageNotificationEventDescriptor(document));
             }
             this.pageNotificationEventListenerContainer.updateDescriptorList(descriptorList);
         } catch (Exception e) {
-            // TODO: Handle this exception
+            logger.warn(String.format(
+                    "Unable to update the list of in-page notifications. Exception : %s\nStacktrace : %s",
+                    e.getMessage(),
+                    e.getStackTrace()));
         }
     }
 }

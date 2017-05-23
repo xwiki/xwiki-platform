@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.page;
 
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.eventstream.RecordableEventDescriptor;
@@ -30,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * Represent a custom user-defined notification.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Unstable
 public class PageNotificationEventDescriptor implements RecordableEventDescriptor
@@ -43,7 +44,7 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
 
     private String eventIcon;
 
-    private String eventTrigger;
+    private List<String> eventTriggers;
 
     private String objectType;
 
@@ -57,18 +58,24 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
 
     /**
      * Constructs a new PageNotificationEventDescriptor.
+     * We use a map in order to pass less arguments to the PageNotificationEventDescriptor constructor.
+     * See CheckStyle ParameterNumber rule.
      *
      * @param parameters A map of the objects parameters
+     * @param eventTriggerList A list of the events that should trigger the notification
      * @param authorReference A reference to the XObject author (used in template rendering in order to avoid
      * privilege escalation)
      */
-    public PageNotificationEventDescriptor(Map<String, String> parameters, DocumentReference authorReference)
+    public PageNotificationEventDescriptor(
+            Map<String, String> parameters,
+            List<String> eventTriggerList,
+            DocumentReference authorReference)
     {
         this.applicationName = parameters.get("applicationName");
         this.eventType = parameters.get("eventType");
         this.eventPrettyName = parameters.get("eventPrettyName");
         this.eventIcon = parameters.get("eventIcon");
-        this.eventTrigger = parameters.get("eventTrigger");
+        this.eventTriggers = eventTriggerList;
         this.objectType = parameters.get("objectType");
         this.validationExpression = parameters.get("validationExpression");
         this.notificationTemplate = parameters.get("notificationTemplate");
@@ -120,9 +127,9 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
     /**
      * @return the event canonical name
      */
-    public String getEventTrigger()
+    public List<String> getEventTriggers()
     {
-        return this.eventTrigger;
+        return this.eventTriggers;
     }
 
     /**

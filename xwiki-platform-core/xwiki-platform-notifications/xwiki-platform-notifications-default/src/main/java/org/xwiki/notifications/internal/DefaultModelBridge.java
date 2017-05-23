@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -181,14 +182,14 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public List<PageNotificationEventDescriptor> getPageNotificationEventDescriptors(
+    public PageNotificationEventDescriptor getPageNotificationEventDescriptor(
             DocumentReference documentReference)
         throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        PageNotificationEventDescriptor newDescriptor;
+        PageNotificationEventDescriptor newDescriptor = null;
 
         final DocumentReference pageNotificationEventDescriptorClass
                 = PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS.setWikiReference(documentReference.getWikiReference());
@@ -197,28 +198,24 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument doc = xwiki.getDocument(documentReference, context);
-            List<BaseObject> eventDescriptorObj = doc.getXObjects(pageNotificationEventDescriptorClass);
+            BaseObject eventDescriptorObj = doc.getXObject(pageNotificationEventDescriptorClass);
             if (eventDescriptorObj != null) {
-                for (BaseObject obj : eventDescriptorObj) {
-                    if (obj != null) {
-                        newDescriptor = new PageNotificationEventDescriptor(ImmutableMap.<String, String>builder()
-                                .put(APPLICATION_NAME, obj.getStringValue(APPLICATION_NAME))
-                                .put(EVENT_TYPE, obj.getStringValue(EVENT_TYPE))
-                                .put(EVENT_PRETTY_NAME, obj.getStringValue(EVENT_PRETTY_NAME))
-                                .put(EVENT_ICON, obj.getStringValue(EVENT_ICON))
-                                .put(EVENT_TRIGGER, obj.getStringValue(LISTEN_TO))
-                                .put(OBJECT_TYPE, obj.getStringValue(OBJECT_TYPE))
-                                .put(VALIDATION_EXPRESSION, obj.getStringValue(VALIDATION_EXPRESSION))
-                                .put(NOTIFICATION_TEMPLATE, obj.getStringValue(NOTIFICATION_TEMPLATE))
-                                .build(),
-                                doc.getAuthorReference());
-
-                        eventDescriptors.add(newDescriptor);
-                    }
+                if (eventDescriptorObj != null) {
+                    newDescriptor = new PageNotificationEventDescriptor(ImmutableMap.<String, String>builder()
+                            .put(APPLICATION_NAME, eventDescriptorObj.getStringValue(APPLICATION_NAME))
+                            .put(EVENT_TYPE, eventDescriptorObj.getStringValue(EVENT_TYPE))
+                            .put(EVENT_PRETTY_NAME, eventDescriptorObj.getStringValue(EVENT_PRETTY_NAME))
+                            .put(EVENT_ICON, eventDescriptorObj.getStringValue(EVENT_ICON))
+                            .put(OBJECT_TYPE, eventDescriptorObj.getStringValue(OBJECT_TYPE))
+                            .put(VALIDATION_EXPRESSION, eventDescriptorObj.getStringValue(VALIDATION_EXPRESSION))
+                            .put(NOTIFICATION_TEMPLATE, eventDescriptorObj.getStringValue(NOTIFICATION_TEMPLATE))
+                            .build(),
+                            eventDescriptorObj.getListValue(LISTEN_TO),
+                            doc.getAuthorReference());
                 }
             }
 
-            return eventDescriptors;
+            return newDescriptor;
         } catch (XWikiException e) {
             throw new NotificationException(
                     String.format("Failed to get the event descriptors for the user [%s].", documentReference), e);

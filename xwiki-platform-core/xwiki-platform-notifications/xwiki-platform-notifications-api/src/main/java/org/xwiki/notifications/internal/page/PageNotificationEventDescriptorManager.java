@@ -17,23 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.page;
+package org.xwiki.notifications.internal.page;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.page.PageNotificationEvent;
+import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.stability.Unstable;
 
 /**
  * Send a {@link PageNotificationEvent} when a custom event is triggered.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Role
 @Unstable
-public interface PageNotificationEventDescriptorContainer
+public interface PageNotificationEventDescriptorManager
 {
     /**
      * Update the object descriptorList.

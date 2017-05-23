@@ -19,24 +19,37 @@
  */
 package org.xwiki.notifications.page;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
-import org.xwiki.stability.Unstable;
+import java.util.concurrent.Callable;
+
+import javax.inject.Provider;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * This role allows the {@link PageNotificationEventDescriptorManager} to always have
- * a up-to-date list of {@link PageNotificationEventDescriptor} to work on.
- *
  * @version $Id$
  * @since 9.5RC1
  */
-@Role
-@Unstable
-public interface PageNotificationEventUpdater
+public class VelocityTemplateEvaluator implements Callable<String>
 {
+    private String content;
+
+    private Provider<XWikiContext> contextProvider;
+
     /**
-     * Fetch every registered PageNotificationEventDescriptorClass XObjects in the wiki, then update the
-     * {@link PageNotificationEventDescriptorManager}.
+     * Constructs a {@link VelocityTemplateEvaluator}.
+     *
+     * @param contextProvider a reference to the XWikiContext provider component
+     * @param content the content of the template that will be evaluated
      */
-    void updateDescriptors();
+    public VelocityTemplateEvaluator(Provider<XWikiContext> contextProvider, String content)
+    {
+        this.contextProvider = contextProvider;
+        this.content = content;
+    }
+
+    @Override
+    public String call() throws Exception
+    {
+        return contextProvider.get().getWiki().evaluateVelocity(content, "page-notification");
+    }
 }

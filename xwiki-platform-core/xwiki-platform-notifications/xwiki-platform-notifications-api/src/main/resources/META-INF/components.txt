@@ -6,7 +6,7 @@ org.xwiki.notifications.internal.DefaultNotificationRenderer
 org.xwiki.notifications.internal.QueryGenerator
 org.xwiki.notifications.internal.SimilarityCalculator
 org.xwiki.notifications.internal.page.DefaultPageNotificationDisplayer
-org.xwiki.notifications.internal.page.DefaultPageNotificationEventDescriptorContainer
+org.xwiki.notifications.internal.page.DefaultPageNotificationEventDescriptorManager
 org.xwiki.notifications.page.events.PageNotificationEventListener
 org.xwiki.notifications.page.events.PageNotificationEventListenerUpdater
 org.xwiki.notifications.page.PageNotificationRecordableEventConverter

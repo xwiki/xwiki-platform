@@ -63,12 +63,12 @@ public interface ModelBridge
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
 
     /**
-     * Return the notification events of a given document.
+     * Return the notification event of a given document.
      *
      * @param documentReference the document reference
      * @return the list of applied notifications events
      * @throws NotificationException if an error occurs
      */
-    List<PageNotificationEventDescriptor> getPageNotificationEventDescriptors(DocumentReference documentReference)
+    PageNotificationEventDescriptor getPageNotificationEventDescriptor(DocumentReference documentReference)
             throws NotificationException;
 }

@@ -109,6 +109,12 @@
             <customDisplay/>
             <defaultValue/>
             <disabled>0</disabled>
+            <cache>0</cache>
+            <displayType>input</displayType>
+            <multiSelect>1</multiSelect>
+            <separator> </separator>
+            <separators> ,|</separators>
+            <sort>none</sort>
             <name>listenTo</name>
             <number>5</number>
             <picker>0</picker>
@@ -117,7 +123,7 @@
             <unmodifiable>0</unmodifiable>
             <validationMessage/>
             <validationRegExp/>
-            <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+            <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
         </listenTo>
         <objectType>
             <customDisplay/>

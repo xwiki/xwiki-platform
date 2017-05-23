@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * {@link PageNotificationEvent} registered by the {@link PageNotificationEventDescriptor}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Singleton

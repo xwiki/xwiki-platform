@@ -29,18 +29,17 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.RecordableEventDescriptorContainer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
-import org.xwiki.notifications.page.PageNotificationEventDescriptorContainer;
 
 /**
- * Default implementation of {@link PageNotificationEventDescriptorContainer}.
+ * Default implementation of {@link PageNotificationEventDescriptorManager}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Singleton
-public class DefaultPageNotificationEventDescriptorContainer implements
-        PageNotificationEventDescriptorContainer
+public class DefaultPageNotificationEventDescriptorManager implements
+        PageNotificationEventDescriptorManager
 {
     private List<PageNotificationEventDescriptor> descriptorList = new ArrayList<>();
 

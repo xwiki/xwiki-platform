@@ -153,8 +153,14 @@ public class NotificationsTest extends AbstractTest
         tray.clearAllNotifications();
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.disableAllStandardParameters();
+    }
 
-        // Now, let’s test the XObject based notification types
+    @Test
+    public void testPageNotifications() throws Exception
+    {
+        NotificationsUserProfilePage p;
+        NotificationsTrayPage tray;
+
         /* Process :
            - As FIRST_USER_NAME, create a page with a XObject «XWiki.TagClass»
              (no particular reason, it should work with any XObject)

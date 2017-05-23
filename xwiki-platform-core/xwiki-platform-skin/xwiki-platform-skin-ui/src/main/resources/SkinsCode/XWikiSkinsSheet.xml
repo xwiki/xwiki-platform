@@ -84,7 +84,7 @@
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
     ; $prop.prettyName
-    : #if($prop.name == 'logo'){{attachmentSelector classname="${className}" property="${prop.name}" filter="png,jpg,gif" displayImage="true"/}}#else $doc.display($prop.name)#end
+    : #if($prop.name == 'logo'){{attachmentSelector classname="${className}" property="${prop.name}" filter="png,jpg,gif,svg" displayImage="true"/}}#else $doc.display($prop.name)#end
     
     #else
       #set($discard = $deprecatedProperties.add($prop))

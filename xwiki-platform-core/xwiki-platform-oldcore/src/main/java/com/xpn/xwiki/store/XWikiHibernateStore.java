@@ -37,7 +37,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -681,22 +680,24 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void updateXWikiSpaceTable(XWikiDocument document, Session session)
     {
-        if (!document.isNew()) {
-            // If the hidden state of an existing document did not changed there is nothing to do
-            if (document.isHidden() != document.getOriginalDocument().isHidden()) {
-                if (document.isHidden()) {
-                    // If the document became hidden it's possible the space did too
-                    maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
-                        document.getFullName(), session);
-                } else {
-                    // If the document became visible then all its parents should be visible as well
-                    makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
+        if (document.getLocale().equals(Locale.ROOT)) {
+            if (!document.isNew()) {
+                // If the hidden state of an existing document did not changed there is nothing to do
+                if (document.isHidden() != document.getOriginalDocument().isHidden()) {
+                    if (document.isHidden()) {
+                        // If the document became hidden it's possible the space did too
+                        maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
+                            document.getFullName(), session);
+                    } else {
+                        // If the document became visible then all its parents should be visible as well
+                        makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
+                    }
                 }
+            } else {
+                // It's possible the space of a new document does not yet exist
+                maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(),
+                    document.getFullName(), session);
             }
-        } else {
-            // It's possible the space of a new document does not yet exist
-            maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(),
-                document.getFullName(), session);
         }
     }
 
@@ -1075,7 +1076,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             doc.setOriginalDocument(doc.clone());
 
             // Update space table if needed
-            maybeDeleteXWikiSpace(doc.getDocumentReference(), session);
+            maybeDeleteXWikiSpace(doc, session);
 
             if (bTransaction) {
                 endTransaction(context, true);
@@ -1100,10 +1101,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void maybeDeleteXWikiSpace(DocumentReference deletedDocument, Session session)
+    private void maybeDeleteXWikiSpace(XWikiDocument deletedDocument, Session session)
     {
-        maybeDeleteXWikiSpace(deletedDocument.getLastSpaceReference(),
-            this.localEntityReferenceSerializer.serialize(deletedDocument), session);
+        if (deletedDocument.getLocale().equals(Locale.ROOT)) {
+            DocumentReference documentReference = deletedDocument.getDocumentReference();
+            maybeDeleteXWikiSpace(documentReference.getLastSpaceReference(),
+                this.localEntityReferenceSerializer.serialize(documentReference), session);
+        }
     }
 
     private void maybeDeleteXWikiSpace(SpaceReference spaceReference, String deletedDocument, Session session)

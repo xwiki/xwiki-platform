@@ -560,7 +560,19 @@ XWiki.widgets.LiveTable = Class.create({
          self.showRows(1, self.limit);
       });
    });
-  }
+  },
+
+	/**
+	 * Refresh the display of the livetable (clear the cache and fetch content again).
+	 * @since 9.5RC1
+	 */
+	refresh: function() {
+		var start = Math.max(this.lastOffset, 1);
+		var end   = this.limit;
+	  this.clearCache();
+		this.getRows(start, end, start, end);
+	}
+
 });
 
 /**

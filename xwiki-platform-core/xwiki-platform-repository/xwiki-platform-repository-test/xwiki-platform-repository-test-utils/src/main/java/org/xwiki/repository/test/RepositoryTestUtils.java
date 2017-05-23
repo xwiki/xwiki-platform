@@ -323,6 +323,9 @@ public class RepositoryTestUtils
         this.solrUtils.waitEmpyQueue();
     }
 
+    /**
+     * @since 9.5RC1
+     */
     public ObjectEditPage gotoExtensionObjectsEditPage(String extensionName)
     {
         LocalDocumentReference extensionPageReference = getExtensionPageReference(extensionName);

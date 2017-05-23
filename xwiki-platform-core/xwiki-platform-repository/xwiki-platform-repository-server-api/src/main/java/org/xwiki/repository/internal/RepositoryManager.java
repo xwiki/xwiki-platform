@@ -488,6 +488,9 @@ public class RepositoryManager implements Initializable, Disposable
         }
     }
 
+    /**
+     * @since 9.5RC1
+     */
     public ResourceReference getDownloadReference(XWikiDocument document, String extensionVersion)
             throws ResolveException
     {
@@ -741,6 +744,9 @@ public class RepositoryManager implements Initializable, Disposable
         return document.getDocumentReference();
     }
 
+    /**
+     * @since 9.5RC1
+     */
     public boolean isVersionProxyingEnabled(XWikiDocument extensionDocument)
     {
         BaseObject extensionProxyObject =
@@ -1044,6 +1050,7 @@ public class RepositoryManager implements Initializable, Disposable
     /**
      * This method factually resolves extension from remote source (when it's possible).
      * Call it only when the data that is going to be obtained cannot be got from extension document xobject
+     * @since 9.5RC1
      */
     public Extension resolveExtensionVersion(XWikiDocument extensionDocument, String extensionVersion)
             throws ResolveException
@@ -1237,11 +1244,17 @@ public class RepositoryManager implements Initializable, Disposable
         return needSave;
     }
 
+    /**
+     * @since 9.5RC1
+     */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version)
     {
         return getExtensionVersionObject(extensionDocument, version, true);
     }
 
+    /**
+     * @since 9.5RC1
+     */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version, boolean allowProxying)
     {
         if (version == null) {

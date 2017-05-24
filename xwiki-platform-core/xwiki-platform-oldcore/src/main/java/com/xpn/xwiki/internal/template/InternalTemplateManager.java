@@ -59,6 +59,7 @@ import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.RawProperties;
+import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyId;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -352,6 +353,13 @@ public class InternalTemplateManager
             return this.content;
         }
 
+        @PropertyHidden
+        @Override
+        public boolean isAuthorProvided()
+        {
+            return this.authorProvided;
+        }
+
         @PropertyId("author")
         @Override
         public DocumentReference getAuthorReference()
@@ -637,16 +645,14 @@ public class InternalTemplateManager
                 reposirory != null ? getTemplate(templateName, reposirory) : getTemplate(templateName);
 
             if (template != null) {
-                final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
-
-                if (content.authorProvided) {
+                if (template.getContent().isAuthorProvided()) {
                     this.authorExecutor.call(() -> {
-                        render(template, content, writer);
+                        render(template, template.getContent(), writer);
 
                         return null;
-                    }, content.getAuthorReference());
+                    }, template.getContent().getAuthorReference());
                 } else {
-                    render(template, content, writer);
+                    render(template, template.getContent(), writer);
                 }
             }
         } finally {
@@ -656,14 +662,12 @@ public class InternalTemplateManager
 
     public void render(Template template, Writer writer) throws Exception
     {
-        DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
-
-        render(template, content, writer);
+        render(template, template.getContent(), writer);
     }
 
-    private void render(Template template, DefaultTemplateContent content, Writer writer) throws Exception
+    private void render(Template template, TemplateContent content, Writer writer) throws Exception
     {
-        if (content.sourceSyntax != null) {
+        if (content.getSourceSyntax() != null) {
             XDOM xdom = execute(template, content);
 
             render(xdom, writer);
@@ -720,7 +724,7 @@ public class InternalTemplateManager
         return xdom;
     }
 
-    private XDOM execute(Template template, DefaultTemplateContent content) throws Exception
+    private XDOM execute(Template template, TemplateContent content) throws Exception
     {
         XDOM xdom = getXDOM(template, content);
 
@@ -734,12 +738,11 @@ public class InternalTemplateManager
         final Template template = getTemplate(templateName);
 
         if (template != null) {
-            final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
-
-            if (content.authorProvided) {
-                return this.authorExecutor.call(() -> execute(template, content), content.getAuthorReference());
+            if (template.getContent().isAuthorProvided()) {
+                return this.authorExecutor.call(() -> execute(template, template.getContent()),
+                    template.getContent().getAuthorReference());
             } else {
-                return execute(template, content);
+                return execute(template, template.getContent());
             }
         }
 
@@ -749,12 +752,11 @@ public class InternalTemplateManager
     public XDOM execute(Template template) throws Exception
     {
         if (template != null) {
-            final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
-
-            if (content.authorProvided) {
-                return this.authorExecutor.call(() -> execute(template, content), content.getAuthorReference());
+            if (template.getContent().isAuthorProvided()) {
+                return this.authorExecutor.call(() -> execute(template, template.getContent()),
+                    template.getContent().getAuthorReference());
             } else {
-                return execute(template, content);
+                return execute(template, template.getContent());
             }
         }
 

@@ -35,6 +35,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Functional tests for the Tour Application.
+ *
  * @version $Id: $
  * @since 0.2
  */
@@ -65,8 +67,7 @@ public class TourApplicationTest extends AbstractTest
         stepEditModal.save();
     }
 
-
-    private void cleanUp(String page) throws Exception
+    private void deleteTour(String page) throws Exception
     {
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         ViewPage tourPage = tourHomePage.getTourPage(page);
@@ -74,12 +75,25 @@ public class TourApplicationTest extends AbstractTest
     }
 
     @Test
-    public void testTour() throws Exception
+    public void verifyTourFeatures() throws Exception
+    {
+        // Use a scenario since it's a best practice but also because each tour test has consequences on the other one.
+        // For example, the second test binds to a TourClass and thus when displaying the first tour page (which
+        // also contains a TourClass) it would display the second tour...
+
+        getUtil().deletePage("Tour", "Test");
+        getUtil().deletePage("Tour", "NewTest");
+
+        tourBoundToPage();
+        tourBoundToClass();
+    }
+
+    private void tourBoundToPage() throws Exception
     {
         // First, we need to create a tour
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         TourEditPage tourEditPage = tourHomePage.addNewEntry("Test");
-        setUpTour(tourEditPage, "My nice description", true, "Tour.WebHome", "");
+        setUpTour(tourEditPage, "My nice description", true, "Tour.StartTour", "");
 
         // Test to put a translation key, use the translation macro
         setUpStep(tourEditPage, "body", "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}",
@@ -91,7 +105,6 @@ public class TourApplicationTest extends AbstractTest
         setUpStep(tourEditPage, "body", "to remove", "to remove", false, "");
         // Object 4 used to test the Multipage feature ('targetPage' field)
         setUpStep(tourEditPage, "body", "Title 4", "Step 4", true, "TourCode.TourClass");
-
 
         // Test that we can change the order of a step
         StepEditModal stepEditModal = tourEditPage.editStep(2);
@@ -119,10 +132,12 @@ public class TourApplicationTest extends AbstractTest
         // Save the tour...
         tourEditPage.clickSaveAndView();
 
-        // And let's try it!
+        // Verify that the tour is displayed in the LT
         tourHomePage = TourHomePage.gotoPage();
-        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.WebHome", true, "-")));
+        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.StartTour", true, "-")));
 
+        // Try the tour by navigating to its target page (it'll be started automatically)
+        getUtil().gotoPage("Tour", "StartTour");
         PageWithTour homePage = new PageWithTour();
         assertTrue(homePage.isTourDisplayed());
 
@@ -229,11 +244,11 @@ public class TourApplicationTest extends AbstractTest
         assertFalse(homePage.hasEndButton());
         homePage.close();
 
-        cleanUp("Test");
+        // Verify that we can delete a tour in the LT UI
+        deleteTour("Test");
     }
 
-    @Test
-    public void testBindedToClassTour() throws Exception
+    private void tourBoundToClass() throws Exception
     {
         // First, we need to create a tour
         TourHomePage tourHomePage = TourHomePage.gotoPage();
@@ -248,7 +263,5 @@ public class TourApplicationTest extends AbstractTest
         PageWithTour homePage = PageWithTour.gotoPage("Tour", "NewTest");
         assertTrue(homePage.isTourDisplayed());
         homePage.end();
-
-        cleanUp("NewTest");
     }
 }

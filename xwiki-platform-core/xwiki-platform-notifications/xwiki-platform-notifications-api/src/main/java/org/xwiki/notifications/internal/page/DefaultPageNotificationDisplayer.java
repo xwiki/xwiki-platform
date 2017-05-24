@@ -24,27 +24,20 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
-import org.xwiki.notifications.page.VelocityTemplateEvaluator;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.helpers.StringTemplate;
 import org.xwiki.velocity.VelocityManager;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Implement a {@link NotificationDisplayer} for the event type
@@ -69,19 +62,10 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
     private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
     private TemplateManager templateManager;
 
     @Inject
     private VelocityManager velocityManager;
-
-    @Inject
-    private AuthorExecutor authorExecutor;
-
-    @Inject
-    private Logger logger;
 
     @Override
     public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
@@ -102,32 +86,22 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
 
                 // If we can’t find such template, render the default notification template.
                 return (template != null)
-                        ? templateManager.execute(template)
-                        : templateManager.execute("notification/default.vm");
+                        ? templateManager.executeNoException(template)
+                        : templateManager.executeNoException("notification/default.vm");
             }
 
-            return new RawBlock(executeTemplate(eventDescriptor.getAuthorReference(),
-                    eventDescriptor.getNotificationTemplate()), Syntax.HTML_5_0);
+            Template customTemplate = new StringTemplate(
+                    eventDescriptor.getNotificationTemplate(),
+                    Syntax.PLAIN_1_0,
+                    Syntax.PLAIN_1_0,
+                    eventDescriptor.getAuthorReference());
+
+            return templateManager.executeNoException(customTemplate);
+
         } catch (Exception e) {
             throw new NotificationException("Unable to render notification template.", e);
         } finally {
             velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
-        }
-    }
-
-    private String executeTemplate(DocumentReference userReference, String templateContent)
-    {
-
-        try {
-            return this.authorExecutor.call(
-                    new VelocityTemplateEvaluator(this.contextProvider, templateContent),
-                    userReference);
-        } catch (Exception e) {
-            this.logger.debug(String.format(
-                    "Unable to evaluate template content. %s\n%s",
-                    e.getMessage(),
-                    e.getStackTrace()));
-            return "";
         }
     }
 

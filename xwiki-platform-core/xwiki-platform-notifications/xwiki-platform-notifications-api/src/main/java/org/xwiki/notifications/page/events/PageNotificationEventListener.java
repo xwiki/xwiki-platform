@@ -19,28 +19,31 @@
  */
 package org.xwiki.notifications.page.events;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEvent;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
-import org.xwiki.notifications.page.VelocityTemplateEvaluator;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.template.helpers.StringTemplate;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -67,10 +70,10 @@ public class PageNotificationEventListener extends AbstractEventListener
     private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private TemplateManager templateManager;
 
     @Inject
-    private AuthorExecutor authorExecutor;
+    private Logger logger;
 
     /**
      * Constructs a {@link PageNotificationEventListener}.
@@ -83,20 +86,17 @@ public class PageNotificationEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        boolean xObjectFound;
-
         // Filter the event descriptors concerned by the event, then create the concerned events
         for (PageNotificationEventDescriptor descriptor : pageNotificationEventDescriptorManager.getDescriptorList())
         {
             // If the event is expected by our descriptor
-            if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())) {
-                if (checkXObjectCondition(descriptor, source)
-                        && this.evaluateVelocityTemplate(descriptor.getAuthorReference(),
-                            descriptor.getValidationExpression())) {
-                    observationManager.notify(
-                            new PageNotificationEvent(descriptor),
-                            "org.xwiki.platform:xwiki-platform-notifications-api", source);
-                }
+            if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
+                    && checkXObjectCondition(descriptor, source)
+                    && this.evaluateVelocityTemplate(descriptor.getAuthorReference(),
+                    descriptor.getValidationExpression())) {
+                observationManager.notify(
+                        new PageNotificationEvent(descriptor),
+                        "org.xwiki.platform:xwiki-platform-notifications-api", source);
             }
         }
     }
@@ -132,17 +132,29 @@ public class PageNotificationEventListener extends AbstractEventListener
      * Evaluate the given velocity template and return a boolean.
      *
      * @param userReference a user reference used to build context
-     * @param template the velocity template that should be evaluated
+     * @param templateContent the velocity template that should be evaluated
      * @return true if the template evaluation returned «true» or if the template is empty
      */
-    private boolean evaluateVelocityTemplate(DocumentReference userReference, String template)
+    private boolean evaluateVelocityTemplate(DocumentReference userReference, String templateContent)
     {
         try {
-            return StringUtils.isBlank(template)
-                    || this.authorExecutor.call(
-                            new VelocityTemplateEvaluator(this.contextProvider, template),
-                            userReference).trim().equals("true");
+            // We don’t need to evaluate the template if it’s empty
+            if (StringUtils.isBlank(templateContent)) {
+                return true;
+            }
+
+            Template customTemplate = new StringTemplate(
+                    templateContent,
+                    Syntax.PLAIN_1_0,
+                    Syntax.PLAIN_1_0,
+                    userReference);
+            Writer writer = new StringWriter();
+
+            templateManager.render(customTemplate, writer);
+
+            return writer.toString().trim().equals("true");
         } catch (Exception e) {
+            logger.debug("Error while rendering velocity template : " + e.getMessage() + "\n" + e.getStackTrace());
             return false;
         }
     }

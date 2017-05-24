@@ -20,7 +20,6 @@
 package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

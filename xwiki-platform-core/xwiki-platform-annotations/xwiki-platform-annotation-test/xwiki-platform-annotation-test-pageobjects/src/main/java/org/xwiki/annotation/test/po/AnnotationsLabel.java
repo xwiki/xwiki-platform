@@ -22,7 +22,6 @@ package org.xwiki.annotation.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -35,10 +34,6 @@ import org.xwiki.test.ui.po.BaseElement;
 
 public class AnnotationsLabel extends BaseElement
 {
-
-    @FindBy(xpath = "//a[@title='Delete this annotation']")
-    private WebElement deleteAnnotation;
-
     @FindBy(xpath = "//span[@class='annotationAuthor']")
     private WebElement annotationAuthor;
 
@@ -52,23 +47,13 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        WebElement annotationIcon = getDriver().findElement(By.id(annotationId));
-
-        // Move mouse to annotation icon
-        Actions builder = new Actions(getDriver());
-        builder.moveToElement(annotationIcon).build().perform();
-
+        getDriver().findElement(By.id(annotationId)).click();
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 
     private void showAnnotationById(String idText)
     {
         hoverOnAnnotationById(idText);
-    }
-
-    private void showAnnotationByText(String searchText)
-    {
-        showAnnotationById(getAnnotationIdByText(searchText));
     }
 
     public void deleteAnnotationByText(String searchText)
@@ -79,7 +64,9 @@ public class AnnotationsLabel extends BaseElement
     public void deleteAnnotationById(String idText)
     {
         this.showAnnotationById(idText);
-        this.deleteAnnotation.click();
+        // The id format is "ID<index>".
+        String index = idText.substring(2);
+        getDriver().findElementByCssSelector("#annotation_view_" + index + " a.delete").click();
         getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
         getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
     }

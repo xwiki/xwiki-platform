@@ -46,7 +46,8 @@ public class DocumentUpdatedEventDescriptor extends AbstractRecordableEventDescr
      */
     public DocumentUpdatedEventDescriptor()
     {
-        super("core.events.update.description", "XWiki");
+        super("core.events.update.description",
+                "core.events.appName");
     }
 
     @Override

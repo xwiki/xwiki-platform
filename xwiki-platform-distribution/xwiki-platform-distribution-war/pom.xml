@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>9.4-SNAPSHOT</version>
+    <version>9.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war</artifactId>
   <name>XWiki Platform - Distribution - War</name>
@@ -82,19 +82,6 @@
                 </artifactItem>
               </artifactItems>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Generate extension descriptor for each artifact of the WAR -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>war</id>
-            <goals>
-              <goal>war</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

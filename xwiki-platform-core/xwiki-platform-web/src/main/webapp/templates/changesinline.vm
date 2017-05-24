@@ -10,7 +10,7 @@
   #set($origdoc = $xwiki.getDocument($tdoc.documentReferenceWithLocale, $rev1))
 #end
 #if ($tdoc.version == $rev2)
-  #set($newdoc = $toc)
+  #set($newdoc = $tdoc)
 #else
   ## Search for the revision
   #set($newdoc = $xwiki.getDocument($tdoc.documentReferenceWithLocale, $rev2))

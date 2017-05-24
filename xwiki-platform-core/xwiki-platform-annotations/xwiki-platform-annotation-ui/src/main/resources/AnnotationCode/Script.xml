@@ -1164,35 +1164,27 @@ XWiki.Annotation = Class.create({
       var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
       lastSpan.insert({after: markerSpan});
       // annotations are displayed on mouseover
-      markerSpan.observe('mouseover', this.onMarkerMouseOver.bindAsEventListener(this, item.annotationId));
+      markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, item.annotationId));
     }.bind(this));
   },
 
   // maybe this should be moved in a function to display a bubble from an address, to call for all dialogs for different parameters
-  onMarkerMouseOver : function(event, id) {
-    // TODO: this.bubbles should work as a cache for these bubbles but to make things simple for the moment...
-    // create the bubble
-    var newBubble = this.displayLoadingBubble(event.element().cumulativeOffset().top, event.element().cumulativeOffset().left);
-    // and the mouseover observer to close the bubble when mouse goes out
-    newBubble.observe('mouseout', function(event, newBubble) {
-      // mouse is going out of something in the annotation bubble or the bubble itself to something which is not under the bubble, so close the dialog
-      // get the relatedTarget cross browser way, although relatedTarget seems to work on IE as well
-      var relatedTarget = event.relatedTarget || event.toElement;
-      if ((event.element() == newBubble || event.element().up('.annotation-bubble')) &amp;&amp; (relatedTarget == null || relatedTarget.up('.annotation-bubble') == null)) {
-        // enough propagation
-        event.stop();
-        this.hideBubble(newBubble);
-        if (!this.displayHighlight) {
-          this.toggleAnnotationHighlight(id, false);
-        }
-      }
-    }.bindAsEventListener(this, newBubble));
+  onMarkerClick : function(event, id) {
+    var bubbleId = 'annotation-bubble-' + id;
+    var bubble = $(bubbleId);
     if (!this.displayHighlight) {
-      this.toggleAnnotationHighlight(id, true);
+      this.toggleAnnotationHighlight(id, !bubble);
     }
-
-    // and fetch the annotations display in it
-    this.fetchAndShowAnnotationDetails(id, newBubble);
+    if (bubble) {
+      // Close the bubble.
+      this.hideBubble(bubble);
+    } else {
+      // Show the bubble and fetch the annotation display in it.
+      var bubble = this.displayLoadingBubble(event.element().cumulativeOffset().top,
+        event.element().cumulativeOffset().left);
+      bubble.writeAttribute('id', bubbleId);
+      this.fetchAndShowAnnotationDetails(id, bubble);
+    }
   },
 
   fetchAndShowAnnotationDetails : function(annotationId, container) {

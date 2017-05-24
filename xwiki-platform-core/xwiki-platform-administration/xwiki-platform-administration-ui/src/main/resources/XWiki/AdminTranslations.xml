@@ -69,7 +69,7 @@ XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user whe
 
 # Look &amp; Feel Sections
 admin.themes=Themes
-admin.themes.description=Customize the color and icon themes.
+admin.themes.description=Customize the color and icon themes, skin and logo.
 admin.colorthemes.local=Local
 admin.colorthemes.global=Global
 XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.

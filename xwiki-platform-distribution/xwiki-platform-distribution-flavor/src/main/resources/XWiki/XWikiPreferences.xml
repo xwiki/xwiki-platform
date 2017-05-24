@@ -2015,7 +2015,7 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </ldap_exclude_group>
-        <ldap_fields_mapping>
+      <ldap_fields_mapping>
         <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>

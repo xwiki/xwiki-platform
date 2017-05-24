@@ -48,7 +48,8 @@ public class DocumentCommentedEventDescriptor extends AbstractRecordableEventDes
      */
     public DocumentCommentedEventDescriptor()
     {
-        super("core.events.comment.description", "XWiki");
+        super("core.events.comment.description",
+                "core.events.appName");
     }
 
     @Override

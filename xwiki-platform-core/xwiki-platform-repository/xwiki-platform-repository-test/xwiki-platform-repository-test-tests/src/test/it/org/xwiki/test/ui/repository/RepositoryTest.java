@@ -22,6 +22,7 @@ package org.xwiki.test.ui.repository;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -39,6 +40,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.repository.Resources;
+import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.repository.test.TestExtension;
 import org.xwiki.repository.test.po.ExtensionImportPage;
 import org.xwiki.repository.test.po.ExtensionPage;
@@ -47,6 +49,8 @@ import org.xwiki.repository.test.po.ExtensionsPage;
 import org.xwiki.repository.test.po.RepositoryAdminPage;
 import org.xwiki.repository.test.po.editor.ExtensionInlinePage;
 import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedTest;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 /**
  * Repository Test.
@@ -101,13 +105,14 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
     @Test
     public void validateAllFeatures() throws Exception
     {
+        setUpXWiki();
         addExtension();
-        importExtension();
+        ExtensionPage importedExtensionPage = importExtension();
+        enableProxying(importedExtensionPage);
         validateRecommendations();
     }
 
-    private void addExtension() throws Exception
-    {
+    private void setUpXWiki() {
         // Set id prefix
 
         RepositoryAdminPage repositoryAdminPage = RepositoryAdminPage.gotoPage();
@@ -115,10 +120,14 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         repositoryAdminPage.setDefaultIdPrefix(IDPREFIX);
         repositoryAdminPage.clickUpdateButton();
 
-        // Create extension
-
         getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), "first_name",
-            "User", "last_name", "Name");
+                "User", "last_name", "Name");
+
+    }
+
+    private void addExtension() throws Exception
+    {
+        // Create extension
 
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
@@ -361,7 +370,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         return extension;
     }
 
-    private void importExtension() throws Exception
+    private ExtensionPage importExtension() throws Exception
     {
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
@@ -376,6 +385,18 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("1.1", extensionPage.getMetaDataValue("version"));
         Assert.assertTrue(extensionPage.isValidExtension());
 
+        testRestAccessToImportedExtension();
+
+        // Import again
+
+        extensionPage = extensionPage.updateExtension();
+
+        Assert.assertEquals("1.1", extensionPage.getMetaDataValue("version"));
+
+        return extensionPage;
+    }
+
+    private void testRestAccessToImportedExtension() throws Exception {
         // 2.0
 
         TestExtension emptyExtension =
@@ -436,11 +457,44 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(fileSize,
             getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "0.9").length);
 
-        // Import again
+    }
 
-        extensionPage = extensionPage.updateExtension();
+    private void enableProxying(ExtensionPage extensionPage) throws Exception {
 
-        Assert.assertEquals("1.1", extensionPage.getMetaDataValue("version"));
+        String IMPORTED_EXTENSION_NAME = "name";
+        //assert that this test is going to make sense at all
+        Assert.assertTrue(getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME) > 1);
+        Assert.assertTrue(getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME) > 1);
+
+        //set higher proxy level: "version" - in previously imported extension
+        getUtil().updateObject(Arrays.asList("Extension", IMPORTED_EXTENSION_NAME), "WebHome",
+                XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel", "history");
+
+        // refresh extension
+        extensionPage.updateExtension();
+
+        // assert that the object to be proxied are now absent
+        Assert.assertEquals(1, getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME));
+        Assert.assertEquals(1, getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME));
+
+        // in rest access nothing should change after enabling proxy
+        testRestAccessToImportedExtension();
+    }
+
+    private int getNumberOfExtensionVersionsObjects(String extensionName) {
+        ObjectEditPage objectEditPage = goToObjectEditPage(extensionName);
+        List<ObjectEditPane> versionObjects = objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
+        return versionObjects.size();
+    }
+
+    private int getNumberOfExtensionVersionsDependenciesObjects(String extensionName) {
+        ObjectEditPage objectEditPage = goToObjectEditPage(extensionName);
+        List<ObjectEditPane> dependenciesObjects = objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
+        return dependenciesObjects.size();
+    }
+
+    private ObjectEditPage goToObjectEditPage(String extensionName) {
+        return getRepositoryTestUtils().gotoExtensionObjectsEditPage(extensionName);
     }
 
     private void validateRecommendations() throws Exception

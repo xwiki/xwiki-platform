@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Main.SolrTranslations" locale="hr">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Main.SolrSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1385047506000</creationDate>
+  <date>1433258948000</date>
+  <contentUpdateDate>1433258948000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
+solr.admin.error.notallowed=Nemate ovlast za obavljanje ove akcije.
+solr.admin.indexing.action.hint=Akcija za izvršiti nad indeksom.
+solr.admin.indexing.action.label=Akcija
+solr.admin.indexing.action.select_delete=Obriši iz indeksa
+solr.admin.indexing.action.select_index=Dodaj indeksu
+solr.admin.indexing.action.select_reindex=Ponovno indeksiraj
+solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će utjecati odabrana akcija nad indeksom.
+solr.admin.indexing.query.label=Korisnički prilagođeni upit
+solr.admin.indexing.title=Indeksiranje
+solr.admin.indexing.wiki.hint=Wiki na čije će sve dokumente utjecati odabrana akcija.
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.select_farm=Cijela farma
+solr.admin.status.queueSize.hint=Broj preostalih entiteta za indeksiranje, ponovno indeksiranje ili brisanje iz indeksa (ovisno o izvršenoj akciji).
+solr.admin.status.queueSize.label=Veličina reda čekanja
+solr.admin.status.title=Status
+solr.admin.submit=Primijeni
+solr.admin.title=Administracija Solr pretrage
+solr.facet.date.after=Nakon {0}
+solr.facet.date.any=Bilo koji datum
+solr.facet.date.applyCustomInterval=Primijeni
+solr.facet.date.before=Prije {0}
+solr.facet.date.between=Od {0} do {1}
+solr.facet.date.customInterval=Korisnički interval datuma i vremena
+solr.facet.date.end=Datum i vrijeme završetka
+solr.facet.date.last30Days=Posljednjih 30 dana
+solr.facet.date.last7Days=Posljednjih 7 dana
+solr.facet.date.olderThan30Days=Starije od 30 dana
+solr.facet.date.start=Datum i vrijeme početka
+solr.facet.date.today=Danas
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.image.icon=Ikona
+solr.facet.fileType.other.octet-stream=Binarni podaci
+solr.facet.fileType.text.java-source=Java izvorišni kôd
+solr.facet.fileType.text.javascript=JavaScript kôd
+solr.facet.fileType.text.plain=Obični tekst
+solr.facet.fileType.text.sh=Skripta ljuske
+solr.facet.size.any=Bilo koja veličina
+solr.facet.size.between=Između {0} i {1}
+solr.facet.size.large=Veliko
+solr.facet.size.lessThan=Manje od {0}
+solr.facet.size.medium=Srednje
+solr.facet.size.moreThan=Više od {0}
+solr.facet.size.small=Malo
+solr.facet.size.tiny=Sićušno
+solr.facets.collapseAll=Sažmi sve
+solr.facets.emptyValue=Prazna vrijednost
+solr.facets.expandAll=Raširi sve
+solr.facets.hint=Odaberite kategoriju i aktivirajte filtre na trenutnim rezultatima
+solr.facets.moreValues=još {0}
+solr.facets.resetAll=Ponovo postavi sve
+solr.facets.title=Razradite vašu pretragu
+solr.field.attauthor=Otpremio/la
+solr.field.attauthor_display=Otpremio/la
+solr.field.attcontent=Sadržaj privitka
+solr.field.attdate=Datum otpreme
+solr.field.attsize=Veličina datoteke
+solr.field.author=Posljednji autor
+solr.field.author_display=Posljednji autor
+solr.field.class=Tip objekta
+solr.field.class.definedBy=Definirao/la {0} » {1}
+solr.field.comment=Komentari
+solr.field.creationdate=Datum izrade
+solr.field.creator=Tvorac
+solr.field.creator_display=Tvorac
+solr.field.date=Datum posljednje izmjene
+solr.field.doccontent=Interpretirani sadržaj dokumenta
+solr.field.doccontentraw=Sirovi sadržaj dokumenta
+solr.field.filename=Ime privitka
+solr.field.locale=Jezik
+solr.field.locale.emptyValue=Nema jezika
+solr.field.locale.emptyValue.hint=Neki dokumenti nemaju postavljen jezik zato što sadrže skripte (koje nisu pisane prirodnim jezikom) ili dotjeruju korisničko sučelje koje se prikazuje na trenutnom jeziku (poput ove stranice).
+solr.field.mimetype=Tip datoteke
+solr.field.name=Stranica
+solr.field.name_exact=Stranica
+solr.field.objcontent=Objekti
+solr.field.propertyname=Ime svojstva
+solr.field.propertyvalue=Vrijednost svojstva
+solr.field.space=Lokacija
+solr.field.space_exact=Lokacija
+solr.field.space_facet=Lokacija
+solr.field.spaces=Lokacija
+solr.field.title=Naslov
+solr.field.type=Tip rezultata
+solr.field.wiki=Wiki
+solr.filterBy.fileType.archive=Arhiv
+solr.filterBy.fileType.audio=Zvuk
+solr.filterBy.fileType.font=Font
+solr.filterBy.fileType.image=Slika
+solr.filterBy.fileType.office=Office datoteka
+solr.filterBy.fileType.other=Ostalo
+solr.filterBy.fileType.presentation=Prezentacija
+solr.filterBy.fileType.spreadsheet=Proračunska tablica
+solr.filterBy.fileType.text=Tekst
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.word=Word datoteka
+solr.filterBy.type.attachment=Privitak
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.object=Objekt
+solr.filterBy.type.object_property=Svojstvo objekta
+solr.options=Prikaži\:
+solr.options.facet=Facete
+solr.options.facet.title=Omogući dodatno filtriranje rezultata
+solr.options.highlight=Označavanje
+solr.options.highlight.title=Prikaži ekstrakt onoga što je odgovaralo u rezultatu
+solr.result.author=Izmijenio/la {0} {1}
+solr.result.highlightAll=Označi sva podudaranja
+solr.result.language=Jezik
+solr.result.locatedIn=Na lokaciji
+solr.result.location=Na lokaciji {0} » {1} » {2}
+solr.result.mediaType=Datoteka tipa {0}
+solr.result.uploadedBy=Otpremio/la {0} {1} ({2})
+solr.sortBy=Poredaj po\:
+solr.sortBy.attauthor_display_sort=Otpremitelju
+solr.sortBy.attdate_sort=Datumu otpreme
+solr.sortBy.attsize_sort=Veličini datoteke
+solr.sortBy.author_display_sort=Posljednjem autoru
+solr.sortBy.date=Datumu posljednje izmjene
+solr.sortBy.filename_sort=Imenu datoteke
+solr.sortBy.score=Relevantnosti
+solr.sortBy.title_sort=Naslovu
+solr.sortOrder.asc=Uzlazno
+solr.sortOrder.desc=Silazno
+solr.uix.attachmentdoesnotexist.title=Jeste li umjesto toga tražili jednog od sljedećih privitaka?
+solr.uix.docdoesnotexist.title=Jeste li umjesto toga tražili jednu od sljedećih stranica?
+</content>
+</xwikidoc>

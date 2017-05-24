@@ -46,7 +46,8 @@ public class DocumentCreatedEventDescriptor extends AbstractRecordableEventDescr
      */
     public DocumentCreatedEventDescriptor()
     {
-        super("core.events.create.description", "XWiki");
+        super("core.events.create.description",
+                "core.events.appName");
     }
 
     @Override

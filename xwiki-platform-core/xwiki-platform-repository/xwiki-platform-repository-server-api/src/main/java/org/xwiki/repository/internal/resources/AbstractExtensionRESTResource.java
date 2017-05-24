@@ -42,6 +42,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionScmConnection;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
@@ -274,27 +275,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return getExtensionObject(getExistingExtensionDocumentById(extensionId));
     }
 
-    protected BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version)
-    {
-        if (version == null) {
-            List<BaseObject> objects =
-                extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
-
-            if (objects == null || objects.isEmpty()) {
-                return null;
-            } else {
-                return objects.get(objects.size() - 1);
-            }
-        }
-
-        return extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
-    }
-
-    protected BaseObject getExtensionVersionObject(String extensionId, String version)
-        throws XWikiException, QueryException
-    {
-        return getExtensionVersionObject(getExistingExtensionDocumentById(extensionId), version);
-    }
 
     protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
     {
@@ -313,7 +293,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             extensionVersion = null;
             extensionVersionObject = null;
         } else {
-            extensionVersionObject = getExtensionVersionObject(extensionDocument, version);
+            extensionVersionObject = repositoryManager.getExtensionVersionObject(extensionDocument, version);
 
             if (extensionVersionObject == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);

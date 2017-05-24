@@ -88,10 +88,11 @@
           &lt;div class="hidden"&gt;
             &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
             #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
-              #displayScopeLivetable($type.eventType)
+              #displayScopeLivetable($type.eventType, $type.filter)
             #elseif($type.filter == 'CUSTOM_FILTER')
+              ## TODO: handle UIX from other wikis
               $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
-          #end
+            #end
           &lt;/div&gt;
         &lt;/td&gt;
       &lt;/tr&gt;
@@ -100,20 +101,21 @@
 &lt;/table&gt;
 {{/html}}
 )))
-#macro(displayScopeLivetable $eventType)
+#macro(displayScopeLivetable $eventType $filterType)
   #set ($count = 0)
   #foreach ($obj in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
     #if ($obj.getValue('eventType') == $eventType)
       #set ($count = $count + 1)
     #end
   #end
-  &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;Filters (&lt;span class="notificationPreferenceScopeCount"&gt;$count&lt;/span&gt;)&lt;/a&gt;&lt;/p&gt;
-  &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType" data-eventtype="$escapetool.xml($eventType)"&gt;
+  #set ($showTerminalDocuments = ($filterType == 'WIKI_SPACE_AND_DOCUMENT_FILTER'))
+  &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;$services.localization.render('notifications.settings.filters', ["&lt;span class='notificationPreferenceScopeCount'&gt;$count&lt;/span&gt;"])&lt;/a&gt;&lt;/p&gt;
+  &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType" data-eventtype="$escapetool.xml($eventType)" data-filter="${filterType}"&gt;
     #set($collist  = ['scope', 'location', '_actions'])
     #set($colprops = {
       'scope':          { 'sortable': false, 'html': true},
       'location':       { 'sortable': false, 'html': true },
-      '_actions':        { 'sortable': false, 'actions': ['delete']}
+      '_actions':       { 'sortable': false, 'actions': ['delete']}
     })
     #set($options  = {
       'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceScopeLivetableResults',
@@ -123,10 +125,12 @@
       'extraParams'       : "eventType=${eventType}&amp;user=${services.model.serialize($doc.documentReference, 'default')}"
     })
     #livetable("notificationPreferenceScopeContainer-$eventType" $collist $colprops $options)
-    &lt;p&gt;&lt;button class="btn btn-primary btn-addfilter"&gt;Add a filter&lt;/button&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;button class="btn btn-primary btn-addfilter"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/button&gt;&lt;/p&gt;
+    ## TODO: handle properly the "WIKI" filter with a wiki picker instead
+    ## TODO: add an option so the user can select a page without its children
     #documentPickerModal({
       'wiki': true,
-      'showTerminalDocuments': true
+      'showTerminalDocuments': $showTerminalDocuments
     })
   &lt;/div&gt;
 #end
@@ -311,17 +315,23 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
    */
   var handleFilterLivetableDelete = function (event) {
     event.preventDefault();
-    var livetable = window['livetable_' + $(this).parents('.xwiki-livetable').attr('id')];
+    var link = $(this);
+    var livetable = window['livetable_' + link.parents('.xwiki-livetable').attr('id')];
     var filter = $(this).parents('.notificationPreferenceScopeContainer').parent().find('.notificationPreferenceScopeCount');
-    if (confirm('sure?')) {
-      $.ajax($(this).attr('href'), {
-        type: 'DELETE'
-      }).done(function() {
-        // Reload the livetable
-        livetable.refresh();
-        filter.text(parseInt(filter.text()) - 1);
-      });
-    }
+    // Ask a confirmation
+    new XWiki.widgets.ConfirmationBox({
+      onYes: function() {
+        // Delete on confirmation
+        // This is done thanks to a REST URL with the "delete" action
+        $.ajax(link.attr('href'), {
+          type: 'DELETE'
+        }).done(function() {
+          // Reload the livetable
+          livetable.refresh();
+          filter.text(parseInt(filter.text()) - 1);
+        });
+      }
+    });
   };
   $(document).on('xwiki:livetable:newrow', function (event, data) {
     $(data.row).find('a.actiondelete').click(handleFilterLivetableDelete);
@@ -353,6 +363,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
       modal.modal('hide');
       var tree = $.jstree.reference(scope.find('.location-tree'));
       var nodes = tree.get_selected(true);
+      var filterType = scope.attr('data-filter');
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
         var scopeType = 'pageOnly';
@@ -360,6 +371,12 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
           scopeType = 'wiki';
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
           scopeType = 'pageAndChildren';
+        }
+        // Don't save a preference scope if we expect to have a wiki and the selected data is a page
+        if (filterType == 'WIKI_FILTER' &amp;&amp; scopeType != 'wiki') {
+          // TODO: would be even better if the picker was not suggesting pages...
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.errorFilterWiki'))", 'error');
+          continue;
         }
         // Saving
         var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');

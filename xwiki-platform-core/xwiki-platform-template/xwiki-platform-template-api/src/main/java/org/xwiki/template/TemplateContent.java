@@ -76,4 +76,13 @@ public interface TemplateContent
      * @return the author of the template
      */
     DocumentReference getAuthorReference();
+
+    /**
+     * @return used to make the difference between null author and no author
+     * @since 9.4RC1
+     */
+    default boolean isAuthorProvided()
+    {
+        return true;
+    }
 }

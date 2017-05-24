@@ -64,7 +64,7 @@ public class TourHomePage extends ViewPage
     
     private TourFromLivetable getTourFromRow(WebElement row)
     {
-        WebElement name     = row.findElement(By.xpath("//td[contains(@class, 'doc_title')]/a"));
+        WebElement name     = row.findElement(By.xpath("td[contains(@class, 'doc_title')]/a"));
         WebElement isActive = row.findElement(By.className("isActive"));
         WebElement targetPage   = row.findElement(By.className("targetPage"));
         WebElement targetClass   = row.findElement(By.className("targetClass"));
@@ -83,7 +83,7 @@ public class TourHomePage extends ViewPage
     public ViewPage getTourPage(String tourName)
     {
         for (WebElement row : tours) {
-            WebElement name = row.findElement(By.xpath("//td[contains(@class, 'doc_title')]/a"));
+            WebElement name = row.findElement(By.xpath("td[contains(@class, 'doc_title')]/a"));
             if (tourName.equals(name.getText())) {
                 name.click();
                 return new ViewPage();

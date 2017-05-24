@@ -181,53 +181,43 @@ public class TourApplicationTest extends AbstractTest
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
 
-        // Resume (to step 4)
+        // Resume (to step 1, as we have ended the tour)
         secondPage.resume();
         assertTrue(secondPage.isTourDisplayed());
         assertFalse(secondPage.hasResumeButton());
-        assertEquals("Title 4", secondPage.getStepTitle());
-        assertEquals("Step 4", secondPage.getStepDescription());
-        assertFalse(secondPage.hasNextStep());
+        assertEquals("Tour", secondPage.getStepTitle());
+        assertEquals("Description", secondPage.getStepDescription());
+        assertTrue(secondPage.hasNextStep());
+        assertFalse(secondPage.hasPreviousStep());
+        assertFalse(secondPage.hasEndButton());
+
+        // Go one step forward
+        secondPage.nextStep();
+        assertEquals("Title 2", secondPage.getStepTitle());
+        assertEquals("Step 2", secondPage.getStepDescription());
+        assertTrue(secondPage.hasNextStep());
         assertTrue(secondPage.hasPreviousStep());
-        assertTrue(secondPage.hasEndButton());
+        assertFalse(secondPage.hasEndButton());
+
+        // Close the tour (it should start from where we left it)
+        secondPage.close();
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
+
+        // Resume the tour
+        secondPage.resume();
+        assertTrue(secondPage.isTourDisplayed());
+        assertFalse(secondPage.hasResumeButton());
+        assertEquals("Title 2", secondPage.getStepTitle());
+        assertEquals("Step 2", secondPage.getStepDescription());
+        assertTrue(secondPage.hasNextStep());
+        assertTrue(secondPage.hasPreviousStep());
+        assertFalse(secondPage.hasEndButton());
 
         // Close
         secondPage.close();
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
-
-        // Go to an other page and then go back
-        TourHomePage.gotoPage();
-        secondPage = PageWithTour.gotoPage("TourCode", "TourClass");
-        assertFalse(secondPage.isTourDisplayed());
-        assertTrue(secondPage.hasResumeButton());
-
-        // Resume (to step 4)
-        secondPage.resume();
-        assertTrue(secondPage.isTourDisplayed());
-        assertFalse(secondPage.hasResumeButton());
-        assertEquals("Title 4", secondPage.getStepTitle());
-        assertEquals("Step 4", secondPage.getStepDescription());
-        assertFalse(secondPage.hasNextStep());
-        assertTrue(secondPage.hasPreviousStep());
-        assertTrue(secondPage.hasEndButton());
-
-        // End
-        secondPage.end();
-        assertFalse(secondPage.isTourDisplayed());
-        assertTrue(secondPage.hasResumeButton());
-
-        // Go back to the tour homepage
-        TourHomePage.gotoPage();
-        // Launch the tour
-        homePage = tourHomePage.startTour("Test");
-        // So the step 1 is active
-        assertEquals("Tour", homePage.getStepTitle());
-        assertEquals("Description", homePage.getStepDescription());
-        assertTrue(homePage.hasNextStep());
-        assertFalse(homePage.hasPreviousStep());
-        assertFalse(homePage.hasEndButton());
-        homePage.close();
 
         cleanUp("Test");
     }

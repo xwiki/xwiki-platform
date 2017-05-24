@@ -532,9 +532,7 @@ public class InternalTemplateManager
         XDOM xdom;
 
         if (template != null) {
-            DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
-
-            xdom = getXDOM(template, content);
+            xdom = getXDOM(template, template.getContent());
         } else {
             xdom = new XDOM(Collections.<Block>emptyList());
         }
@@ -542,15 +540,15 @@ public class InternalTemplateManager
         return xdom;
     }
 
-    private XDOM getXDOM(Template template, DefaultTemplateContent content) throws Exception
+    private XDOM getXDOM(Template template, TemplateContent content) throws Exception
     {
         XDOM xdom;
 
-        if (content.sourceSyntax != null) {
-            xdom = this.parser.parse(content.content, content.sourceSyntax);
+        if (content.getSourceSyntax() != null) {
+            xdom = this.parser.parse(content.getContent(), content.getSourceSyntax());
         } else {
             String result = evaluateContent(template, content);
-            xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
+            xdom = new XDOM(Arrays.asList(new RawBlock(result, content.getRawSyntax())));
         }
 
         return xdom;
@@ -757,7 +755,7 @@ public class InternalTemplateManager
         return null;
     }
 
-    private String evaluateContent(Template template, DefaultTemplateContent content) throws Exception
+    private String evaluateContent(Template template, TemplateContent content) throws Exception
     {
         Writer writer = new StringWriter();
 
@@ -766,7 +764,7 @@ public class InternalTemplateManager
         return writer.toString();
     }
 
-    private void evaluateContent(Template template, DefaultTemplateContent content, Writer writer) throws Exception
+    private void evaluateContent(Template template, TemplateContent content, Writer writer) throws Exception
     {
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
         // by Velocity as a cache index key for caching macros.
@@ -787,7 +785,7 @@ public class InternalTemplateManager
         }
 
         try {
-            this.velocityManager.evaluate(writer, namespace, new StringReader(content.content));
+            this.velocityManager.evaluate(writer, namespace, new StringReader(content.getContent()));
         } finally {
             // Get rid of temporary rendering context
             if (renderingContextPushed) {

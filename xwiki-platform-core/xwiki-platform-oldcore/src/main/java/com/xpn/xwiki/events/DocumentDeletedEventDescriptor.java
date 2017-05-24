@@ -46,7 +46,8 @@ public class DocumentDeletedEventDescriptor extends AbstractRecordableEventDescr
      */
     public DocumentDeletedEventDescriptor()
     {
-        super("core.events.delete.description", "XWiki");
+        super("core.events.delete.description",
+                "core.events.appName");
     }
 
     @Override

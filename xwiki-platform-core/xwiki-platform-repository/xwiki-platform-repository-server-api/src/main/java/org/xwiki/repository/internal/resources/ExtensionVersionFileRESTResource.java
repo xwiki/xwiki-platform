@@ -118,13 +118,10 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         checkRights(extensionDocument);
 
-        BaseObject extensionObject = getExtensionObject(extensionDocument);
-        BaseObject extensionVersionObject = getExtensionVersionObject(extensionDocument, extensionVersion);
+
+        ResourceReference resourceReference = repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
 
         ResponseBuilder response = null;
-
-        ResourceReference resourceReference =
-            this.repositoryManager.getDownloadReference(extensionDocument, extensionVersionObject);
 
         if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
             // It's an attachment
@@ -175,6 +172,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                         ? new MediaType(entity.getContentType().getValue()) : MediaType.APPLICATION_OCTET_STREAM,
                     entity.getContentLength());
 
+            BaseObject extensionObject = getExtensionObject(extensionDocument);
             String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 
             Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);

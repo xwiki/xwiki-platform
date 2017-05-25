@@ -21,6 +21,11 @@
   'use strict';
   var $ = jQuery;
 
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-macro'] = CKEDITOR.config['xwiki-macro'] || {
+    __namespace: true
+  };
+
   // Macro widget template is different depending on whether the macro is in-line or not.
   var blockMacroWidgetTemplate =
     '<div class="macro" data-macro="">' +

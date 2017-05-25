@@ -323,7 +323,46 @@ define('xwiki-ckeditor', [
   var oldReplace = ckeditor.replace;
   ckeditor.replace = function(element, config) {
     // Take into account the configuration options specified on the target element.
-    return oldReplace.call(this, element, ckeditor.tools.extend(config || {}, getConfig(element)));
+    return oldReplace.call(this, element, ckeditor.tools.extend(getConfig(element), config || {}, true));
+  };
+
+  //
+  // Add support for configuration namespaces.
+  //
+  ckeditor.tools.extend = function(target) {
+    var argsLength = arguments.length, overwrite, propertiesList;
+    if (typeof (overwrite = arguments[argsLength - 1]) == 'boolean') {
+      argsLength--;
+    } else if (typeof (overwrite = arguments[argsLength - 2]) == 'boolean') {
+      propertiesList = arguments[argsLength - 1];
+      argsLength -= 2;
+    }
+    for (var i = 1; i &lt; argsLength; i++) {
+      var source = arguments[i];
+      extendObject(target, arguments[i], overwrite, propertiesList);
+    }
+    return target;
+  };
+
+  var extendObject = function(target, source, overwrite, propertiesList) {
+    for (var propertyName in source) {
+      // Only copy existing fields if in overwrite mode.
+      if (overwrite === true || target[propertyName] == null) {
+        // Only copy specified fields if list is provided.
+        if (!propertiesList || (propertyName in propertiesList)) {
+          extendProperty(target, source, propertyName);
+        }
+      }
+    }
+  };
+
+  var extendProperty = function(target, source, propertyName) {
+    if ($.isPlainObject(target[propertyName]) &amp;&amp; target[propertyName].__namespace === true &amp;&amp;
+      $.isPlainObject(source[propertyName])) {
+      ckeditor.tools.extend(target[propertyName], source[propertyName], true);
+    } else {
+      target[propertyName] = source[propertyName];
+    }
   };
 
   require([

@@ -20,6 +20,12 @@
 (function (){
   'use strict';
   var $ = jQuery;
+
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-save'] = CKEDITOR.config['xwiki-save'] || {
+    __namespace: true
+  };
+
   CKEDITOR.plugins.add('xwiki-save', {
     requires: 'xwiki-cache,xwiki-localization',
     editors: [],

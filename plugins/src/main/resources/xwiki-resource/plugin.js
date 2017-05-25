@@ -20,6 +20,11 @@
 require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
   'use strict';
 
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-resource'] = CKEDITOR.config['xwiki-resource'] || {
+    __namespace: true
+  };
+
   CKEDITOR.plugins.add('xwiki-resource', {
     requires: 'xwiki-marker,xwiki-dialog,xwiki-localization'
   });

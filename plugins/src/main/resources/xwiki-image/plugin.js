@@ -19,6 +19,12 @@
  */
 (function (){
   'use strict';
+
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-image'] = CKEDITOR.config['xwiki-image'] || {
+    __namespace: true
+  };
+
   CKEDITOR.plugins.add('xwiki-image', {
     requires: 'xwiki-marker,xwiki-resource',
 

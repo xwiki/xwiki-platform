@@ -19,6 +19,12 @@
  */
 (function (){
   'use strict';
+
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-link'] = CKEDITOR.config['xwiki-link'] || {
+    __namespace: true
+  };
+
   var $ = jQuery;
   var wikiLinkClassPattern =  /\bwiki(\w*)link\b/i;
   var resourceTypeToLinkType = {

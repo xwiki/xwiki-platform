@@ -19,6 +19,12 @@
  */
 (function() {
   'use strict';
+
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-source'] = CKEDITOR.config['xwiki-source'] || {
+    __namespace: true
+  };
+
   CKEDITOR.plugins.add('xwiki-source', {
     requires: 'sourcearea,notification,xwiki-localization',
 

@@ -41,6 +41,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -64,6 +65,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
@@ -577,5 +579,32 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Verify the results.
         Assert.assertTrue(this.xwiki.checkAccess("skin", doc1, getContext()));
         Assert.assertTrue(this.xwiki.checkAccess("skin", doc2, getContext()));
+    }
+
+    public void testCheckActiveSuperadmin() throws Exception
+    {
+        // Make sure the check for superadmin stops before looking at the configuration.
+        Mock mockConfiguration = registerMockComponent(ConfigurationSource.class, "wiki");
+        mockConfiguration.expects(never()).method("getProperty").with(eq("auth_active_check"), eq(String.class));
+
+        int isUserActive = this.xwiki.checkActive(XWikiRightService.SUPERADMIN_USER_FULLNAME, this.getContext());
+
+        Assert.assertEquals(1, isUserActive);
+    }
+
+    /**
+     * XWIKI-14300: Superadmin is locked out of subwikis with "AUTHENTICATION ACTIVE CHECK" enabled
+     */
+    public void testCheckActivePrefixedSuperadmin() throws Exception
+    {
+        // Make sure the check for superadmin stops before looking at the configuration.
+        Mock mockConfiguration = registerMockComponent(ConfigurationSource.class, "wiki");
+        mockConfiguration.expects(never()).method("getProperty").with(eq("auth_active_check"), eq(String.class));
+
+        // In a subwiki, the superadmin always logs in as a global user.
+        int isUserActive =
+            this.xwiki.checkActive("xwiki:" + XWikiRightService.SUPERADMIN_USER_FULLNAME, this.getContext());
+
+        Assert.assertEquals(1, isUserActive);
     }
 }

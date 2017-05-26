@@ -23,18 +23,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.NotificationFilter;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -55,6 +58,7 @@ public class QueryGeneratorTest
     private EntityReferenceSerializer<String> serializer;
     private ConfigurationSource userPreferencesSource;
     private WikiDescriptorManager wikiDescriptorManager;
+    private NotificationFilterManager notificationFilterManager;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
@@ -64,10 +68,12 @@ public class QueryGeneratorTest
     public void setUp() throws Exception
     {
         queryManager = mocker.getInstance(QueryManager.class);
-        modelBridge = mocker.getInstance(ModelBridge.class);
+        modelBridge = mocker.getInstance(ModelBridge.class, "cached");
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         userPreferencesSource = mocker.getInstance(ConfigurationSource.class, "user");
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
+
         startDate = new Date(10);
 
         query = mock(Query.class);
@@ -213,6 +219,55 @@ public class QueryGeneratorTest
         verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("userWiki", "xwiki");
+    }
+
+    @Test
+    public void generateQueryWithFilters() throws Exception
+    {
+        Date untilDate = new Date();
+
+        // Mocks
+        NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
+        NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
+        when(notificationFilterManager.getAllNotificationFilters(any(DocumentReference.class))).thenReturn(
+                Arrays.asList(notificationFilter1, notificationFilter2)
+        );
+
+        when(notificationFilter1.queryFilterOR(any(DocumentReference.class))).thenReturn("event.date = :someDate");
+        when(notificationFilter2.queryFilterOR(any(DocumentReference.class))).thenReturn("event.eventType = :someVal");
+
+        when(notificationFilter1.queryFilterAND(any(DocumentReference.class))).thenReturn("1=1");
+        when(notificationFilter2.queryFilterAND(any(DocumentReference.class))).thenReturn("2=2");
+
+
+        when(notificationFilter1.queryFilterParams(any(DocumentReference.class))).thenReturn(new HashedMap() {{
+            put("someDate", "someValue1");
+        }});
+        when(notificationFilter2.queryFilterParams(any(DocumentReference.class))).thenReturn(new HashedMap() {{
+            put("someVal", "someValue2");
+        }});
+
+        // Test
+        mocker.getComponentUnderTest().generateQuery(
+                new DocumentReference("xwiki", "XWiki", "UserA"),
+                true, untilDate, Arrays.asList("event1", "event2"));
+
+        // Verify
+        verify(queryManager).createQuery(
+                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                        " AND (event.date = :someDate OR event.eventType = :someVal)" +
+                        " AND 1=1 AND 2=2" +
+                        " AND event.id NOT IN (:blackList) AND event.date <= :endDate AND event.hidden <> true AND " +
+                        "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
+                        "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
+                        "order by event.date DESC", Query.HQL);
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("endDate", untilDate);
+        verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
+        verify(query).bindValue("someDate", "someValue1");
+        verify(query).bindValue("someVal", "someValue2");
     }
 
 }

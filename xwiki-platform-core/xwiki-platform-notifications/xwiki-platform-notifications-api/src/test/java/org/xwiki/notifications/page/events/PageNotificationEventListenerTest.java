@@ -129,18 +129,18 @@ public class PageNotificationEventListenerTest
         when(descriptor1.getObjectType()).thenReturn(StringUtils.EMPTY);
 
         when(descriptor2.getValidationExpression()).thenReturn(
-                "{{velocity}}#if(1==1) true #else false #end{{/velocity}}");
+                "{{velocity}} #if(1==1) true #else false #end {{/velocity}}");
         when(descriptor2.getObjectType()).thenReturn("xwiki:XWiki.TagClass");
 
         when(descriptor3.getValidationExpression()).thenReturn(
-                "{{velocity}}#if(1!=1) true #else false #end{{/velocity}}");
+                "{{velocity}} #if(1!=1) true #else false #end {{/velocity}}");
         when(descriptor3.getObjectType()).thenReturn(StringUtils.EMPTY);
 
         when(descriptor4.getValidationExpression()).thenReturn("  ");
         when(descriptor4.getObjectType()).thenReturn("xwiki:XWiki.TagClass");
 
         when(descriptor5.getValidationExpression()).thenReturn(
-                "{{velocity}}#if(2==2) true #else false #end{{/velocity}}");
+                "{{velocity}}\n#if(2==2) true #else false #end\n{{/velocity}}");
         when(descriptor5.getObjectType()).thenReturn(StringUtils.EMPTY);
 
         when(this.pageNotificationEventDescriptorManager.getDescriptorList()).thenReturn(Arrays.asList(
@@ -162,7 +162,7 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(event, source, null);
 
-        verify(this.observationManager, never()).notify(any(), any(), any());
+        verify(this.observationManager, never()).notify(any(), any());
     }
 
     @Test
@@ -174,7 +174,7 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(registeredEvent1, source, null);
 
-        verify(this.observationManager, times(1)).notify(any(), any(), any());
+        verify(this.observationManager, times(1)).notify(any(), any());
     }
 
     @Test
@@ -197,7 +197,7 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(registeredEvent4, source, null);
 
-        verify(this.observationManager, times(1)).notify(any(), any(), any());
+        verify(this.observationManager, times(1)).notify(any(), any());
     }
 
     @Test
@@ -209,18 +209,6 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(registeredEvent3, source, null);
 
-        verify(this.observationManager, never()).notify(any(), any(), any());
+        verify(this.observationManager, never()).notify(any(), any());
     }
-
-    /*@Test
-    public void onEventWithCorrectEventAndBlankXObjectAndCorrectValidation() throws Exception
-    {
-        Object source = mock(Object.class);
-
-        mockPageNotificationEventDescriptorManager();
-
-        mocker.getComponentUnderTest().onEvent(registeredEvent5, source, null);
-
-        verify(this.observationManager, times(1)).notify(any(), any(), any());
-    }*/
 }

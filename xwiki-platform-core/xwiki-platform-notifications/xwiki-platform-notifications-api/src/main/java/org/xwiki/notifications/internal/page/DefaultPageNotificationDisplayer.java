@@ -92,11 +92,11 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
 
             Template customTemplate = new StringTemplate(
                     eventDescriptor.getNotificationTemplate(),
-                    Syntax.PLAIN_1_0,
+                    Syntax.XWIKI_2_1,
                     Syntax.PLAIN_1_0,
                     eventDescriptor.getAuthorReference());
 
-            return templateManager.executeNoException(customTemplate);
+            return templateManager.getXDOM(customTemplate);
 
         } catch (Exception e) {
             throw new NotificationException("Unable to render notification template.", e);

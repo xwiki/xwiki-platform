@@ -28,7 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * Represent a custom user-defined notification.
+ * Represent a notification type described in a wiki page.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -125,7 +125,7 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
     }
 
     /**
-     * @return the event canonical name
+     * @return a list of event canonical names that should trigger the notification
      */
     public List<String> getEventTriggers()
     {
@@ -133,6 +133,10 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
     }
 
     /**
+     * The event validation expression should be written in XWiki syntax. If this expression contains `true` when
+     * evaluated, then the notification can be triggered. Note that if the validation is blank, it is not taken into
+     * account when triggering the notification.
+     *
      * @return the event validation expression
      */
     public String getValidationExpression()
@@ -148,6 +152,9 @@ public class PageNotificationEventDescriptor implements RecordableEventDescripto
         return this.authorReference;
     }
 
+    /**
+     * @return the event type specified in the PageNotificationEventDescriptorClass XObject
+     */
     @Override
     public String getEventType()
     {

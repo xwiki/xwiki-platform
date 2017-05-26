@@ -27,9 +27,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.RecordableEventDescriptorContainer;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -62,6 +64,10 @@ public class DefaultModelBridge implements ModelBridge
             "NotificationPreferenceClass", NOTIFICATION_CODE_SPACE
     );
 
+    private static final DocumentReference NOTIFICATION_PREFERENCE_SCOPE_CLASS = new DocumentReference(
+            "NotificationPreferenceScopeClass", NOTIFICATION_CODE_SPACE
+    );
+
     private static final DocumentReference NOTIFICATION_START_DATE_CLASS = new DocumentReference(
             "NotificationsStartDateClass", NOTIFICATION_CODE_SPACE
     );
@@ -78,8 +84,6 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String EVENT_ICON = "eventIcon";
 
-    private static final String EVENT_TRIGGER = "eventTrigger";
-
     private static final String LISTEN_TO = "listenTo";
 
     private static final String OBJECT_TYPE = "objectType";
@@ -94,7 +98,10 @@ public class DefaultModelBridge implements ModelBridge
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private RecordableEventDescriptorContainer recordableEventDescriptorContainer;
+    private EntityReferenceResolver<String> entityReferenceResolver;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
@@ -182,12 +189,11 @@ public class DefaultModelBridge implements ModelBridge
 
     @Override
     public PageNotificationEventDescriptor getPageNotificationEventDescriptor(
-            DocumentReference documentReference)
-        throws NotificationException
+            DocumentReference documentReference) throws NotificationException
+
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
-
         PageNotificationEventDescriptor newDescriptor = null;
 
         final DocumentReference pageNotificationEventDescriptorClass
@@ -199,19 +205,17 @@ public class DefaultModelBridge implements ModelBridge
             XWikiDocument doc = xwiki.getDocument(documentReference, context);
             BaseObject eventDescriptorObj = doc.getXObject(pageNotificationEventDescriptorClass);
             if (eventDescriptorObj != null) {
-                if (eventDescriptorObj != null) {
-                    newDescriptor = new PageNotificationEventDescriptor(ImmutableMap.<String, String>builder()
-                            .put(APPLICATION_NAME, eventDescriptorObj.getStringValue(APPLICATION_NAME))
-                            .put(EVENT_TYPE, eventDescriptorObj.getStringValue(EVENT_TYPE))
-                            .put(EVENT_PRETTY_NAME, eventDescriptorObj.getStringValue(EVENT_PRETTY_NAME))
-                            .put(EVENT_ICON, eventDescriptorObj.getStringValue(EVENT_ICON))
-                            .put(OBJECT_TYPE, eventDescriptorObj.getStringValue(OBJECT_TYPE))
-                            .put(VALIDATION_EXPRESSION, eventDescriptorObj.getStringValue(VALIDATION_EXPRESSION))
-                            .put(NOTIFICATION_TEMPLATE, eventDescriptorObj.getStringValue(NOTIFICATION_TEMPLATE))
-                            .build(),
-                            eventDescriptorObj.getListValue(LISTEN_TO),
-                            doc.getAuthorReference());
-                }
+                newDescriptor = new PageNotificationEventDescriptor(ImmutableMap.<String, String>builder()
+                        .put(APPLICATION_NAME, eventDescriptorObj.getStringValue(APPLICATION_NAME))
+                        .put(EVENT_TYPE, eventDescriptorObj.getStringValue(EVENT_TYPE))
+                        .put(EVENT_PRETTY_NAME, eventDescriptorObj.getStringValue(EVENT_PRETTY_NAME))
+                        .put(EVENT_ICON, eventDescriptorObj.getStringValue(EVENT_ICON))
+                        .put(OBJECT_TYPE, eventDescriptorObj.getStringValue(OBJECT_TYPE))
+                        .put(VALIDATION_EXPRESSION, eventDescriptorObj.getStringValue(VALIDATION_EXPRESSION))
+                        .put(NOTIFICATION_TEMPLATE, eventDescriptorObj.getStringValue(NOTIFICATION_TEMPLATE))
+                        .build(),
+                        eventDescriptorObj.getListValue(LISTEN_TO),
+                        doc.getAuthorReference());
             }
 
             return newDescriptor;
@@ -219,5 +223,53 @@ public class DefaultModelBridge implements ModelBridge
             throw new NotificationException(
                     String.format("Failed to get the event descriptors for the user [%s].", documentReference), e);
         }
+    }
+
+    @Override
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference)
+        throws NotificationException
+    {
+        final DocumentReference notificationPreferencesScopeClass
+                = NOTIFICATION_PREFERENCE_SCOPE_CLASS.setWikiReference(userReference.getWikiReference());
+
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        List<NotificationPreferenceScope> preferences = new ArrayList<>();
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(userReference, context);
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
+            if (preferencesObj != null) {
+                for (BaseObject obj : preferencesObj) {
+                    if (obj != null) {
+                        String scopeType = obj.getStringValue("scope");
+                        EntityType type;
+                        if (scopeType.equals("pageOnly")) {
+                            type = EntityType.DOCUMENT;
+                        } else if (scopeType.equals("pageAndChildren")) {
+                            type = EntityType.SPACE;
+                        } else if (scopeType.equals("wiki")) {
+                            type = EntityType.WIKI;
+                        } else {
+                            logger.warn("Scope [{}] is not supported as a NotificationPreferenceScope (user [{}]).",
+                                    scopeType, userReference);
+                            continue;
+                        }
+
+                        preferences.add(new NotificationPreferenceScope(
+                                obj.getStringValue(EVENT_TYPE),
+                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type)
+                        ));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to get the notification preferences scope for the user [%s].", userReference),
+                    e);
+        }
+
+        return preferences;
     }
 }

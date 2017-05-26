@@ -19,37 +19,31 @@
  */
 package org.xwiki.notifications.page;
 
-import java.util.concurrent.Callable;
+import java.util.List;
 
-import javax.inject.Provider;
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.eventstream.RecordableEvent;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWikiContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @version $Id$
- * @since 9.5RC1
  */
-public class VelocityTemplateEvaluator implements Callable<String>
+public class PageNotificationRecordableEventConverterTest
 {
-    private String content;
+    @Rule
+    public final MockitoComponentMockingRule<PageNotificationRecordableEventConverter> mocker =
+            new MockitoComponentMockingRule<>(PageNotificationRecordableEventConverter.class);
 
-    private Provider<XWikiContext> contextProvider;
-
-    /**
-     * Constructs a {@link VelocityTemplateEvaluator}.
-     *
-     * @param contextProvider a reference to the XWikiContext provider component
-     * @param content the content of the template that will be evaluated
-     */
-    public VelocityTemplateEvaluator(Provider<XWikiContext> contextProvider, String content)
+    @Test
+    public void supportedEvents() throws Exception
     {
-        this.contextProvider = contextProvider;
-        this.content = content;
-    }
+        List<RecordableEvent> eventsList = mocker.getComponentUnderTest().getSupportedEvents();
 
-    @Override
-    public String call() throws Exception
-    {
-        return contextProvider.get().getWiki().evaluateVelocity(content, "page-notification");
+        assertEquals(1, eventsList.size());
+        assertTrue(eventsList.get(0) instanceof PageNotificationEvent);
     }
 }

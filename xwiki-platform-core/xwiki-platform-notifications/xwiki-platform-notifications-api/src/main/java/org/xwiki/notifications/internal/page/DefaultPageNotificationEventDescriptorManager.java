@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal.page;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -50,8 +51,11 @@ public class DefaultPageNotificationEventDescriptorManager implements
     public void updateDescriptorList(List<PageNotificationEventDescriptor> descriptorList)
     {
         // Remove the «old» descriptors from their RecordableEventDescriptorContainer …
-        for (PageNotificationEventDescriptor descriptor : this.descriptorList) {
-            descriptor.unRegister();
+        Iterator<PageNotificationEventDescriptor> it = this.descriptorList.iterator();
+
+        while (it.hasNext()) {
+            it.next().unRegister();
+            it.remove();
         }
 
         // … and register the new descriptors

@@ -153,13 +153,6 @@ public class NotificationsTest extends AbstractTest
         tray.clearAllNotifications();
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.disableAllStandardParameters();
-    }
-
-    @Test
-    public void testPageNotifications() throws Exception
-    {
-        NotificationsUserProfilePage p;
-        NotificationsTrayPage tray;
 
         /* Process :
            - As FIRST_USER_NAME, create a page with a XObject «XWiki.TagClass»

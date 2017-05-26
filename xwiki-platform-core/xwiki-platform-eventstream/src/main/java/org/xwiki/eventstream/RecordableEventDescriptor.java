@@ -34,6 +34,23 @@ import org.xwiki.stability.Unstable;
 public interface RecordableEventDescriptor
 {
     /**
+     * The different filters we support to retrieve event.
+     * @since 9.4RC1
+     */
+    enum EventFilter {
+        /** There is no filter (except the event type) on this kind of events. */
+        NO_FILTER,
+        /** There is a custom filter on this kind of events. */
+        CUSTOM_FILTER,
+        /** There is a filter to enable the event on some wikis. */
+        WIKI_FILTER,
+        /** There is a filter to enable the event on some wikis and some spaces. */
+        WIKI_AND_SPACE_FILTER,
+        /** There is a filter to enable the event on some wikis, some spaces and/or some pages. */
+        WIKI_SPACE_AND_DOCUMENT_FILTER
+    }
+
+    /**
      * @return the name of the event described by the descriptor, as it is stored in the event stream.
      */
     String getEventType();
@@ -52,4 +69,12 @@ public interface RecordableEventDescriptor
      * @return the icon corresponding to the application
      */
     String getApplicationIcon();
+
+    /**
+     * @return the kind of filter to use for this event type
+     * @since 9.4RC1
+     */
+    default EventFilter getFilter() {
+        return EventFilter.NO_FILTER;
+    }
 }

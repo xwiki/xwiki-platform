@@ -80,7 +80,7 @@ public class DefaultNotificationManagerTest
         queryGenerator = mocker.getInstance(QueryGenerator.class);
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        modelBridge = mocker.getInstance(ModelBridge.class);
+        modelBridge = mocker.getInstance(ModelBridge.class, "cached");
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         startDate = new Date(10);
 

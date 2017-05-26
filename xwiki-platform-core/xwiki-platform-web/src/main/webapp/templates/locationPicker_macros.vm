@@ -192,12 +192,13 @@
           ## If we don't show the wikis then we need to show the root node (the current wiki) in order to be able to
           ## target top level documents (e.g. create a top level document, move a document to the top level, etc.).
           #set ($showRoot = !$showWikis)
+          #set ($showTerminalDocuments = false || $options.showTerminalDocuments)
           #documentTree({
             'class': 'location-tree',
             'finder': true,
             'showAttachments': false,
             'showRoot': $showRoot,
-            'showTerminalDocuments': false,
+            'showTerminalDocuments': $showTerminalDocuments,
             'showTranslations': false,
             'showWikis': $showWikis
           })

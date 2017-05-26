@@ -63,12 +63,24 @@ public interface ModelBridge
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
 
     /**
-     * Return the notification event of a given document.
+     * Return the notification event descriptor of a given document.
      *
      * @param documentReference the document reference
-     * @return the list of applied notifications events
+     * @return the applied notification event descriptor
      * @throws NotificationException if an error occurs
      */
     PageNotificationEventDescriptor getPageNotificationEventDescriptor(DocumentReference documentReference)
+            throws NotificationException;
+
+    /**
+     * Get all notification preference scope of the given user.
+     *
+     * @param user user interested in the notifications
+     * @return the list of notification preference scopes.
+     * @throws NotificationException if error happens
+     *
+     * @since 9.4RC1
+     */
+    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
             throws NotificationException;
 }

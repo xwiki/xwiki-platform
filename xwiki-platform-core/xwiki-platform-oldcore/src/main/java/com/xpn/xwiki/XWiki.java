@@ -4777,9 +4777,9 @@ public class XWiki implements EventListener
     {
         int active = 1;
 
-        // These users are necessarily active
+        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
         if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)
-            || (user.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
+            || (user.endsWith(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
             return active;
         }
 

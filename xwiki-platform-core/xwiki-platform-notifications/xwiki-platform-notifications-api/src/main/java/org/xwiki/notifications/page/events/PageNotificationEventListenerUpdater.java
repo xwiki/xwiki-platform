@@ -99,7 +99,7 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
         EntityReference objectReference = objectEvent.getReference();
         BaseObjectReference baseObjectReference = null;
         if (objectReference instanceof BaseObjectReference) {
-            baseObjectReference = (BaseObjectReference) objectEvent.getReference();
+            baseObjectReference = (BaseObjectReference) objectReference;
         } else {
             baseObjectReference = new BaseObjectReference(objectEvent.getReference());
         }

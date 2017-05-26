@@ -20,7 +20,6 @@
 package org.xwiki.notifications.page.events;
 
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
@@ -95,8 +94,7 @@ public class PageNotificationEventListener extends AbstractEventListener
                     && this.evaluateVelocityTemplate(descriptor.getAuthorReference(),
                     descriptor.getValidationExpression())) {
                 observationManager.notify(
-                        new PageNotificationEvent(descriptor),
-                        "org.xwiki.platform:xwiki-platform-notifications-api", source);
+                        new PageNotificationEvent(descriptor), source);
             }
         }
     }
@@ -145,16 +143,19 @@ public class PageNotificationEventListener extends AbstractEventListener
 
             Template customTemplate = new StringTemplate(
                     templateContent,
-                    Syntax.PLAIN_1_0,
+                    Syntax.XWIKI_2_1,
                     Syntax.PLAIN_1_0,
                     userReference);
-            Writer writer = new StringWriter();
 
+            StringWriter writer = new StringWriter();
             templateManager.render(customTemplate, writer);
 
-            return writer.toString().trim().equals("true");
+            return writer.toString().trim().contains("true");
         } catch (Exception e) {
-            logger.debug("Error while rendering velocity template : " + e.getMessage() + "\n" + e.getStackTrace());
+            logger.warn(String.format(
+                    "Unable to render a notification validation template. Error : %s\nStack trace : %s",
+                    e.getMessage(),
+                    e.getStackTrace()));
             return false;
         }
     }

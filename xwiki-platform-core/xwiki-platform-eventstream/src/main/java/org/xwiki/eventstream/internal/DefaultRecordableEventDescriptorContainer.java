@@ -32,7 +32,7 @@ import org.xwiki.eventstream.RecordableEventDescriptorContainer;
  * Default implementation of {@link RecordableEventDescriptorContainer}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Singleton

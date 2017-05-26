@@ -23,13 +23,6 @@ You need Maven 3.1+ in order to build this extension.
 
     ## Release the new version in JIRA and create the next version.
 
-    ## Update the version hard-coded in the wiki pages.
-    ## This is required because on older versions of XWiki the WebJar version is not automatically detected.
-    ## If you are releasing the version X.Y then search for X.Y-SNAPSHOT in the UI module sources and replace
-    ## each occurrence that refers to the CKEditor webjar with X.Y (i.e. replace the snapshot with the final
-    ## version). Normally, you should get 3 occurrences, 2 in EditSheet and 1 in VelocityMacros.
-    ## Commit the changes with the message "[release] Update version before release".
-
     ## Update the translations.
     ## * download the translation pack from l10n and unpack
     ##   http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Contrib.CKEditorIntegration&app=Contrib
@@ -52,12 +45,6 @@ You need Maven 3.1+ in order to build this extension.
     ## Restore the Java version.
     sudo update-alternatives --config java
     sudo update-alternatives --config javac
-
-    ## Update the version hard-coded in the wiki pages.
-    ## Put back the snapshot version in the wiki pags, but using the next version. So if you released X.Y
-    ## then look for X.Y in the UI module sources and replace it with <X.Y+1>-SNAPSHOT. As in the second step,
-    ## there should be only 3 occurrence normally.
-    ## Commit the changes with the message "[release] Update version after release".
 
     ## Finish the release on http://nexus.xwiki.org (Staging Repositories)
 

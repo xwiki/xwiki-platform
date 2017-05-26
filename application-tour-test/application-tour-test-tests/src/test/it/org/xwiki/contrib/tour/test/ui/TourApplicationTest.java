@@ -234,9 +234,31 @@ public class TourApplicationTest extends AbstractTest
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
 
+        // Go to an other page and then go back
+        secondPage = PageWithTour.gotoPage("TourCode", "TourClass");
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
+
+        getUtil().gotoPage("Tour", "StartTour");
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
+
+        // Resume the tour
+        secondPage.resume();
+        assertTrue(secondPage.isTourDisplayed());
+        assertFalse(secondPage.hasResumeButton());
+        assertEquals("Title 2", secondPage.getStepTitle());
+        assertEquals("Step 2", secondPage.getStepDescription());
+        assertTrue(secondPage.hasNextStep());
+        assertTrue(secondPage.hasPreviousStep());
+        assertFalse(secondPage.hasEndButton());
+
+        // Close
+        secondPage.close();
+
         // Go back to the tour homepage
         TourHomePage.gotoPage();
-        // Launch the tour
+        // Launch the tour (from the livetable)
         homePage = tourHomePage.startTour("Test");
         // So the step 1 is active
         assertEquals("Tour", homePage.getStepTitle());

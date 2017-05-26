@@ -33,18 +33,12 @@ You need Maven 3.1+ in order to build this extension.
     ## Prepare the tag for the new version.
     mvn org.apache.maven.plugins:maven-release-plugin:2.5:prepare -DautoVersionSubmodules -DskipTests -Darguments="-DskipTests" -Pintegration-tests
 
-    ## Select Java 7 in order to silence the enforcer (even if we don't have Java code ATM,
-    ## a WebJar is a Jar and we support older versions of XWiki that run on Java 7).
-    sudo update-alternatives --config java
-    sudo update-alternatives --config javac
-
     ## Perform the release
-    ## We don't release the tests module ATM because it requires Java 8 and we need to build with Java 7.
-    mvn org.apache.maven.plugins:maven-release-plugin:2.5:perform
-
-    ## Restore the Java version.
-    sudo update-alternatives --config java
-    sudo update-alternatives --config javac
+    ## We skip the enforcer because the functional test modules have a recent parent that requires the latest Java while
+    ## the actual code has an older parent (in order to support older versions of XWiki) that requires an older version
+    ## of Java. Fortunately, we can release with the latest Java because ATM we don't have Java code outside the
+    ## functional test modules.
+    mvn org.apache.maven.plugins:maven-release-plugin:2.5:perform -DskipTests -Darguments="-DskipTests -Dxwiki.enforcer.skip=true" -Pintegration-tests
 
     ## Finish the release on http://nexus.xwiki.org (Staging Repositories)
 

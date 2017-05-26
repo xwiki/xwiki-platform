@@ -180,7 +180,12 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       if (createPopover) {
         button.popover('destroy');
       }
-      tour.restart();
+
+      if (window.localStorage.getItem(tour._options.name + '_current_step') != tour._options.steps.length - 1) {
+        tour.start(true);
+      } else {
+        tour.restart();
+      }
       button.remove();
     });
     var popoverContent = "#tr('tour.popover.show.hint')";
@@ -274,11 +279,13 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       tour.init();
       if (forceStart) {
         tour.restart();
+      } else if (window.localStorage.getItem(tourName + '_end') == null) {
+        tour.start();
       }
       
       // Create a resume button if the tour has already been closed by the user in the past
       if (window.localStorage.getItem(tourName + '_end') == 'yes') {
-        createResumeButton(tour, false);
+        createResumeButton(tour, false, tourName);
       }
     });
   };

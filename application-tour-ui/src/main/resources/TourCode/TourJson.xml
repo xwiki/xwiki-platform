@@ -71,13 +71,10 @@
       #set ($tourObj = $tourDoc.getObject('TourCode.TourClass'))
       ## the targetPage property takes precedence over targetClass property.
       ## the targetClass property is used only when targetPage is empty.
-      #set ($targetPage = "$!tourDoc.getValue('targetPage', $tourObj)")
       #if ("$!tourDoc.getValue('targetClass', $tourObj)" != '' &amp;&amp; "$!tourDoc.getValue('targetPage', $tourObj)" == '')
-        ## Path is the URL where the Tour should be visible. Here, $targetDoc is a page holding some objects concerned
-        ## by this tour so the URL should be the one of the document.
-        #set ($path = $xwiki.getURL($targetDoc))
+        #set ($targetPage = "$!request.tourDoc")
       #else
-        #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $tourObj)))
+        #set ($targetPage = "$!tourDoc.getValue('targetPage', $tourObj)")
       #end
       ## Verify that the user who has saved this tour has the edit right on the target page
       #if ($services.security.authorization.hasAccess('edit', $tourDoc.authorReference, $targetRef))

@@ -94,7 +94,9 @@
 #end
 
 #macro (importCKEditorCSS $path $evaluate)
-  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' '1.15-SNAPSHOT' $path $evaluate)
+  #set ($ckeditorWebJarVersion = $services.extension.installed.getInstalledExtension(
+    'org.xwiki.contrib:application-ckeditor-webjar', "wiki:$xcontext.database").id.version)
+  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' $ckeditorWebJarVersion $path $evaluate)
 #end
 
 #macro (importCKEditorResources)

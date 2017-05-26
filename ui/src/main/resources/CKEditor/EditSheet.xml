@@ -307,7 +307,8 @@ define('xwiki-ckeditor', [
       // This is used in CKEditor.FileUploader so we must keep them in sync.
       fileTools_defaultFileName: '__fileCreatedFromDataURI__',
       height: $(element).height(),
-      language: $('html').attr('xml:lang'),
+      // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
+      language: ($('html').attr('xml:lang') || '').toLowerCase().replace('_', '-'),
       'xwiki-link': {
         labelGenerator: sourceDocument.getURL('get', 'sheet=CKEditor.LinkLabelGenerator&amp;outputSyntax=plain')
       },

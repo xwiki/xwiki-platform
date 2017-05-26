@@ -238,7 +238,7 @@ $xwiki.ssx.use('Help.SupportPanel.WebHome')
     </property>
     <property>
       <code>.SupportPanel ul {
-  list-style-type: square; 
+  list-style-type: inherit; 
   list-style-position: inside; 
   margin: 0;
 }</code>

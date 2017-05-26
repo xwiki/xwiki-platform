@@ -10,13 +10,14 @@ require.config({
   }
 });
 
-require(['jquery', 'moment', 'daterangepicker'],
+require(['jquery', 'moment', 'daterangepicker', 'xwiki-events-bridge'],
   function($, moment) {
     var bindInputs = function(bind) {
       $(bind).find('input[data-type="date"]').each(function(i, element) {
         var input = $(element);
         var hidden = input.prev('input[type="hidden"]');
         var dateFormat = moment().toMomentFormatString(input.attr('data-dateformat'));
+        var livetable = input.closest('.xwiki-livetable');
 
         input.daterangepicker({
           drops: 'down',
@@ -60,11 +61,7 @@ require(['jquery', 'moment', 'daterangepicker'],
             }
             hidden.val(picker.startDate.format('x') + '-' + picker.endDate.format('x'));
           }
-          if ('dispatchEvent' in element) {
-            element.dispatchEvent(new Event('change'));
-          } else {
-            element.fireEvent('onchange');
-          }
+          $(document).trigger("xwiki:livetable:" + livetable.attr('id') + ":filtersChanged");
         }
 
         input.on('apply.daterangepicker cancel.daterangepicker', function(event, picker) {

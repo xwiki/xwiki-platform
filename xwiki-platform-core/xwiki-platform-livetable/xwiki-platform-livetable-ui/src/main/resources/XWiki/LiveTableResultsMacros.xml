@@ -711,7 +711,7 @@
   #end
   #set ($timestamps = $filterValue.split('-'))
   #if ($timestamps.size() == 2)
-    #set ($whereSql = "${whereSql} and $dateProperty >= ? and $dateProperty <= ?")
+    #set ($whereSql = "${whereSql} and $dateProperty >= ? and $dateProperty &lt;= ?")
     #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
     #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
   #else

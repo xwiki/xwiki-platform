@@ -27,8 +27,8 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
-import org.xwiki.notifications.page.PageNotificationEventUpdater;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -39,7 +39,7 @@ import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
- * This listener triggers {@link PageNotificationEventUpdater} when needed in order to refresh the
+ * This listener triggers {@link PageNotificationEventDescriptorManager} when needed in order to refresh the
  * {@link org.xwiki.notifications.page.PageNotificationEvent} registered by the {@link PageNotificationEventDescriptor}.
  *
  * @version $Id$
@@ -56,7 +56,7 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
     public static final String NAME = "Page Notification Event Listener Updater";
 
     @Inject
-    private PageNotificationEventUpdater pageNotificationEventUpdater;
+    private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
     /**
      * Constructs a DefaultPageNotificationEventUpdater.
@@ -74,7 +74,7 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof ApplicationReadyEvent) {
-            pageNotificationEventUpdater.updateDescriptors();
+            pageNotificationEventDescriptorManager.updateDescriptors();
         } else if (event instanceof XObjectAddedEvent
                 || event instanceof XObjectDeletedEvent
                 || event instanceof XObjectUpdatedEvent) {
@@ -85,7 +85,7 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
             // Only interested in PageNotificationEventDescriptorClass XObjects
             if (objectClassReference.getName().equals("PageNotificationEventDescriptorClass"))
             {
-                pageNotificationEventUpdater.updateDescriptors();
+                pageNotificationEventDescriptorManager.updateDescriptors();
             }
         }
     }

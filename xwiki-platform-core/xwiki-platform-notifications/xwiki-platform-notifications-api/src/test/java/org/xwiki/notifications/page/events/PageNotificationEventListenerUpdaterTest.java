@@ -26,7 +26,7 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.notifications.page.PageNotificationEventUpdater;
+import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
@@ -50,13 +50,13 @@ public class PageNotificationEventListenerUpdaterTest
     public final MockitoComponentMockingRule<PageNotificationEventListenerUpdater> mocker =
             new MockitoComponentMockingRule<>(PageNotificationEventListenerUpdater.class);
 
-    private PageNotificationEventUpdater pageNotificationEventUpdater;
+    private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
     @Before
     public void setUp() throws Exception
     {
-        pageNotificationEventUpdater =
-                mocker.registerMockComponent(PageNotificationEventUpdater.class);
+        pageNotificationEventDescriptorManager =
+                mocker.registerMockComponent(PageNotificationEventDescriptorManager.class);
     }
 
     private void mockEventWithCorrectBaseObjectReference(XObjectEvent event)
@@ -77,7 +77,7 @@ public class PageNotificationEventListenerUpdaterTest
         mocker.getComponentUnderTest().onEvent(mock(DocumentCreatedEvent.class),
                 mock(Object.class), mock(Object.class));
 
-        verify(this.pageNotificationEventUpdater, never()).updateDescriptors();
+        verify(this.pageNotificationEventDescriptorManager, never()).updateDescriptors();
     }
 
     @Test
@@ -86,7 +86,7 @@ public class PageNotificationEventListenerUpdaterTest
         mocker.getComponentUnderTest().onEvent(mock(ApplicationReadyEvent.class),
                 mock(Object.class), mock(Object.class));
 
-        verify(this.pageNotificationEventUpdater, times(1)).updateDescriptors();
+        verify(this.pageNotificationEventDescriptorManager, times(1)).updateDescriptors();
     }
 
     @Test
@@ -97,7 +97,7 @@ public class PageNotificationEventListenerUpdaterTest
 
         mocker.getComponentUnderTest().onEvent(event, mock(Object.class), mock(Object.class));
 
-        verify(this.pageNotificationEventUpdater, times(1)).updateDescriptors();
+        verify(this.pageNotificationEventDescriptorManager, times(1)).updateDescriptors();
     }
 
     @Test
@@ -108,7 +108,7 @@ public class PageNotificationEventListenerUpdaterTest
 
         mocker.getComponentUnderTest().onEvent(event, mock(Object.class), mock(Object.class));
 
-        verify(this.pageNotificationEventUpdater, times(1)).updateDescriptors();
+        verify(this.pageNotificationEventDescriptorManager, times(1)).updateDescriptors();
     }
 
     @Test
@@ -119,7 +119,7 @@ public class PageNotificationEventListenerUpdaterTest
 
         mocker.getComponentUnderTest().onEvent(event, mock(Object.class), mock(Object.class));
 
-        verify(this.pageNotificationEventUpdater, times(1)).updateDescriptors();
+        verify(this.pageNotificationEventDescriptorManager, times(1)).updateDescriptors();
     }
 
     @Test
@@ -137,6 +137,6 @@ public class PageNotificationEventListenerUpdaterTest
 
         mocker.getComponentUnderTest().onEvent(event, mock(Object.class), mock(Object.class));
 
-        verify(this.pageNotificationEventUpdater, never()).updateDescriptors();
+        verify(this.pageNotificationEventDescriptorManager, never()).updateDescriptors();
     }
 }

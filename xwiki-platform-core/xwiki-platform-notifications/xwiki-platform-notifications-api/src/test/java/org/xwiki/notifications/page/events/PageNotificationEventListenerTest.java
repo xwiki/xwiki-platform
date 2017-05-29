@@ -37,7 +37,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -143,7 +142,7 @@ public class PageNotificationEventListenerTest
                 "{{velocity}}\n#if(2==2) true #else false #end\n{{/velocity}}");
         when(descriptor5.getObjectType()).thenReturn(StringUtils.EMPTY);
 
-        when(this.pageNotificationEventDescriptorManager.getDescriptorList()).thenReturn(Arrays.asList(
+        when(this.pageNotificationEventDescriptorManager.getDescriptors()).thenReturn(Arrays.asList(
                 descriptor1,
                 descriptor2,
                 descriptor3,

@@ -67,7 +67,7 @@ public class DefaultPageNotificationEventDescriptorManagerTest
     @Test
     public void descriptorListWithoutElements() throws Exception
     {
-        assertEquals(0, mocker.getComponentUnderTest().getDescriptorList().size());
+        assertEquals(0, mocker.getComponentUnderTest().getDescriptors().size());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class DefaultPageNotificationEventDescriptorManagerTest
 
         mocker.getComponentUnderTest().updateDescriptorList(eventDescriptorList);
 
-        List<PageNotificationEventDescriptor> result = mocker.getComponentUnderTest().getDescriptorList();
+        List<PageNotificationEventDescriptor> result = mocker.getComponentUnderTest().getDescriptors();
         assertEquals(2, result.size());
         assertTrue(result.containsAll(eventDescriptorList));
     }

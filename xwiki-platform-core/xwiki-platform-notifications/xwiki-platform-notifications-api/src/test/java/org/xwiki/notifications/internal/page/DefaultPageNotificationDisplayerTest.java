@@ -117,7 +117,7 @@ public class DefaultPageNotificationDisplayerTest
     @Test
     public void getSupportedEventsWithNoSupportedEvents() throws Exception
     {
-        when(pageNotificationEventDescriptorManager.getDescriptorList()).thenReturn(new ArrayList<>());
+        when(pageNotificationEventDescriptorManager.getDescriptors()).thenReturn(new ArrayList<>());
         assertTrue(mocker.getComponentUnderTest().getSupportedEvents().isEmpty());
     }
 
@@ -129,7 +129,7 @@ public class DefaultPageNotificationDisplayerTest
         PageNotificationEventDescriptor eventDescriptor2 = mock(PageNotificationEventDescriptor.class);
         when(eventDescriptor2.getEventType()).thenReturn("eventType2");
 
-        when(pageNotificationEventDescriptorManager.getDescriptorList())
+        when(pageNotificationEventDescriptorManager.getDescriptors())
                 .thenReturn(Arrays.asList(eventDescriptor1, eventDescriptor2));
 
         List<String> result = mocker.getComponentUnderTest().getSupportedEvents();

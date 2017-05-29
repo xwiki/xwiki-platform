@@ -36,6 +36,7 @@ import org.xwiki.notifications.page.PageNotificationEventUpdater;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * This is the default implementation of {@link PageNotificationEventUpdater}.
@@ -61,6 +62,9 @@ public class DefaultPageNotificationEventUpdater implements PageNotificationEven
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private Logger logger;

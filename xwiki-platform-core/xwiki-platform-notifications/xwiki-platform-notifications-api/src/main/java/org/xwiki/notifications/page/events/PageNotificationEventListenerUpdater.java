@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * This listener triggers {@link PageNotificationEventUpdater} when needed in order to refresh the
- * {@link PageNotificationEvent} registered by the {@link PageNotificationEventDescriptor}.
+ * {@link org.xwiki.notifications.page.PageNotificationEvent} registered by the {@link PageNotificationEventDescriptor}.
  *
  * @version $Id$
  * @since 9.5RC1

@@ -67,7 +67,7 @@ public class DefaultPageNotificationEventDescriptorManager implements
     }
 
     @Override
-    public List<PageNotificationEventDescriptor> getDescriptorList()
+    public List<PageNotificationEventDescriptor> getDescriptors()
     {
         return this.descriptorList;
     }

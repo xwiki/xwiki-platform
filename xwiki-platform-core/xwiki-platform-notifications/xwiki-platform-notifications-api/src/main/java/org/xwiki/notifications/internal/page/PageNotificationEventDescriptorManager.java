@@ -46,7 +46,7 @@ public interface PageNotificationEventDescriptorManager
     /**
      * @return the list of event descriptors
      */
-    List<PageNotificationEventDescriptor> getDescriptorList();
+    List<PageNotificationEventDescriptor> getDescriptors();
 
     /**
      * Find a descriptor corresponding to the given type.

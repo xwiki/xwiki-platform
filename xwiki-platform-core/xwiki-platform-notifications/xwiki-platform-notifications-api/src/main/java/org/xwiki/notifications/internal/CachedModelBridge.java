@@ -99,6 +99,8 @@ public class CachedModelBridge implements ModelBridge
     public PageNotificationEventDescriptor getPageNotificationEventDescriptor(DocumentReference documentReference)
             throws NotificationException
     {
+        /* This method is called only when a PageNotificationEventDescriptorClass XObject is added / updated or deleted,
+           or at application startup time (see PageNotificationEventListenerUpdater), so no caching is needed. */
         return modelBridge.getPageNotificationEventDescriptor(documentReference);
     }
 

@@ -24,7 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.notifications.page.PageNotificationEventUpdater;
@@ -56,7 +55,8 @@ public class PageNotificationEventListenerUpdaterTest
     @Before
     public void setUp() throws Exception
     {
-        pageNotificationEventUpdater = mocker.registerMockComponent(PageNotificationEventUpdater.class);
+        pageNotificationEventUpdater =
+                mocker.registerMockComponent(PageNotificationEventUpdater.class);
     }
 
     private void mockEventWithCorrectBaseObjectReference(XObjectEvent event)

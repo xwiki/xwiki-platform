@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.page.events;
 
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEvent;
@@ -38,6 +38,10 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
@@ -72,6 +76,9 @@ public class PageNotificationEventListener extends AbstractEventListener
     private TemplateManager templateManager;
 
     @Inject
+    private ContextComponentManagerProvider componentManagerProvider;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -86,7 +93,7 @@ public class PageNotificationEventListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // Filter the event descriptors concerned by the event, then create the concerned events
-        for (PageNotificationEventDescriptor descriptor : pageNotificationEventDescriptorManager.getDescriptorList())
+        for (PageNotificationEventDescriptor descriptor : pageNotificationEventDescriptorManager.getDescriptors())
         {
             // If the event is expected by our descriptor
             if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
@@ -147,10 +154,14 @@ public class PageNotificationEventListener extends AbstractEventListener
                     Syntax.PLAIN_1_0,
                     userReference);
 
-            StringWriter writer = new StringWriter();
-            templateManager.render(customTemplate, writer);
+            XDOM templateXDOM = templateManager.execute(customTemplate);
 
-            return writer.toString().trim().contains("true");
+            WikiPrinter printer = new DefaultWikiPrinter();
+            BlockRenderer renderer =
+                    this.componentManagerProvider.get().getInstance(BlockRenderer.class, "plain");
+            renderer.render(templateXDOM, printer);
+
+            return printer.toString().trim().equals("true");
         } catch (Exception e) {
             logger.warn(String.format(
                     "Unable to render a notification validation template. Error : %s\nStack trace : %s",

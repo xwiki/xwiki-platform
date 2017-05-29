@@ -110,7 +110,7 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
     {
         List<String> supportedEvents = new ArrayList<>();
 
-        for (PageNotificationEventDescriptor descriptor: pageNotificationEventDescriptorManager.getDescriptorList()) {
+        for (PageNotificationEventDescriptor descriptor: pageNotificationEventDescriptorManager.getDescriptors()) {
             supportedEvents.add(descriptor.getEventType());
         }
 

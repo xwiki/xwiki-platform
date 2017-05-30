@@ -19,9 +19,6 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
-import org.xwiki.observation.EventListener;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
@@ -48,19 +45,13 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Singleton
 @Named("CommentEventGeneratorListener")
-public class CommentEventGeneratorListener implements EventListener
+public class CommentEventGeneratorListener extends AbstractEventListener
 {
     /**
      * The reference to match class XWiki.Comment on whatever wiki.
      */
     private static final RegexEntityReference COMMENTCLASS_REFERENCE =
         XWikiCommentsDocumentInitializer.OBJECT_REFERENCE;
-
-    /**
-     * The matched events.
-     */
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new XObjectAddedEvent(COMMENTCLASS_REFERENCE),
-        new XObjectDeletedEvent(COMMENTCLASS_REFERENCE), new XObjectUpdatedEvent(COMMENTCLASS_REFERENCE));
 
     /**
      * Used to serializer document.
@@ -71,16 +62,13 @@ public class CommentEventGeneratorListener implements EventListener
     @Inject
     private ObservationManager observation;
 
-    @Override
-    public String getName()
+    /**
+     * Default constructor.
+     */
+    public CommentEventGeneratorListener()
     {
-        return "CommentEventGeneratorListener";
-    }
-
-    @Override
-    public List<Event> getEvents()
-    {
-        return EVENTS;
+        super("CommentEventGeneratorListener", new XObjectAddedEvent(COMMENTCLASS_REFERENCE),
+            new XObjectDeletedEvent(COMMENTCLASS_REFERENCE), new XObjectUpdatedEvent(COMMENTCLASS_REFERENCE));
     }
 
     @Override

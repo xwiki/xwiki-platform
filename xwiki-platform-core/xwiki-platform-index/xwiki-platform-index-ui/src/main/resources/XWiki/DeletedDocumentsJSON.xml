@@ -125,7 +125,7 @@ $response.setContentType('application/json')
      "deletername" : "$escapetool.javascript($xwiki.getUserName($ddoc.deleter, false))",
      "deleterurl" : "$escapetool.javascript($xwiki.getURL($ddoc.deleter, 'view'))",
      "language" : "$ddoc.locale",
-     "batchId" : "$ddoc.batchId",
+     "batchId" : "$!ddoc.batchId",
      "batchId_url" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;showBatch=true"))"
    }
 #end

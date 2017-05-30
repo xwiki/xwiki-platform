@@ -20,8 +20,10 @@
 package org.xwiki.notifications.internal.page;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,6 +40,7 @@ import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Send a {@link org.xwiki.notifications.page.PageNotificationEvent} when a custom event is triggered.
@@ -63,6 +66,9 @@ public class PageNotificationEventDescriptorManager
 
     @Inject
     private ModelBridge modelBridge;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private Logger logger;
@@ -127,12 +133,18 @@ public class PageNotificationEventDescriptorManager
 
         // Fetch every PageNotificationEventDescriptors in the farm
         try {
-            final List<String> newDescriptors = (List<String>) (List) this.queryManager.createQuery(
-                    "from doc.object(XWiki.Notifications.Code.PageNotificationEventDescriptorClass)"
-                            + " as document",
-                    Query.XWQL)
-                    .addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "unique"))
-                    .execute();
+            Set<String> newDescriptors = new HashSet<String>();
+
+            // Retrieve every descriptor XObject contained in every wiki of the current farm
+            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                newDescriptors.addAll((List<String>) (List) this.queryManager.createQuery(
+                        "from doc.object(XWiki.Notifications.Code.PageNotificationEventDescriptorClass)"
+                                + " as document",
+                        Query.XWQL)
+                        .addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "unique"))
+                        .setWiki(wikiId)
+                        .execute());
+            }
 
             for (String descriptor: newDescriptors) {
                 DocumentReference document = documentReferenceResolver.resolve(descriptor);

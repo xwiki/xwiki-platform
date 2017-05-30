@@ -19,7 +19,10 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Singleton;
@@ -38,7 +41,7 @@ import org.xwiki.eventstream.RecordableEventDescriptorContainer;
 @Singleton
 public class DefaultRecordableEventDescriptorContainer implements RecordableEventDescriptorContainer
 {
-    private List<RecordableEventDescriptor> recordableEventDescriptorList = new ConcurrentLinkedQueue<>();
+    private Queue<RecordableEventDescriptor> recordableEventDescriptorList = new ConcurrentLinkedQueue<>();
 
     @Override
     public void addRecordableEventDescriptor(RecordableEventDescriptor recordableEventDescriptor)
@@ -54,6 +57,6 @@ public class DefaultRecordableEventDescriptorContainer implements RecordableEven
 
     @Override
     public List<RecordableEventDescriptor> getAllRecordableEventDescriptor() {
-        return this.recordableEventDescriptorList;
+        return new ArrayList(this.recordableEventDescriptorList);
     }
 }

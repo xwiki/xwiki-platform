@@ -45,10 +45,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.template.helpers.StringTemplate;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -160,12 +158,7 @@ public class PageNotificationEventListener extends AbstractEventListener
                 return true;
             }
 
-            Template customTemplate = new StringTemplate(
-                    templateContent,
-                    Syntax.XWIKI_2_1,
-                    Syntax.PLAIN_1_0,
-                    userReference);
-
+            Template customTemplate = templateManager.createStringTemplate(templateContent, userReference);
             XDOM templateXDOM = templateManager.execute(customTemplate);
 
             WikiPrinter printer = new DefaultWikiPrinter();

@@ -85,6 +85,7 @@ import org.xwiki.template.TemplateContent;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
@@ -893,5 +894,21 @@ public class InternalTemplateManager
         }
 
         return template;
+    }
+
+    /**
+     * Create a DefaultTemplate with the given content and the given author.
+     *
+     * @param content the template content
+     * @param author the template author
+     * @return the template
+     */
+    public Template createStringTemplate(String content, DocumentReference author)
+    {
+        DefaultTemplate newTemplate = new DefaultTemplate(null);
+        newTemplate.content.setAuthorReference(author);
+        newTemplate.content.content = content;
+
+        return newTemplate;
     }
 }

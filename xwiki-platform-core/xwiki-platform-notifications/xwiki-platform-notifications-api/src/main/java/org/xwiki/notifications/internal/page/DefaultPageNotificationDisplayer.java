@@ -33,10 +33,8 @@ import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.template.helpers.StringTemplate;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -90,10 +88,8 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
                         : templateManager.executeNoException("notification/default.vm");
             }
 
-            Template customTemplate = new StringTemplate(
+            Template customTemplate = templateManager.createStringTemplate(
                     eventDescriptor.getNotificationTemplate(),
-                    Syntax.XWIKI_2_1,
-                    Syntax.PLAIN_1_0,
                     eventDescriptor.getAuthorReference());
 
             return templateManager.getXDOM(customTemplate);

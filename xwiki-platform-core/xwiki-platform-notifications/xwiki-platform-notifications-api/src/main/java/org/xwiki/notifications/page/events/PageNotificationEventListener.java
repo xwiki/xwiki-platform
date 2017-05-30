@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEvent;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
@@ -79,6 +81,9 @@ public class PageNotificationEventListener extends AbstractEventListener
     private ContextComponentManagerProvider componentManagerProvider;
 
     @Inject
+    private DocumentReferenceResolver documentReferenceResolver;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -122,10 +127,14 @@ public class PageNotificationEventListener extends AbstractEventListener
         } else if (source instanceof XWikiDocument) {
             XWikiDocument document = (XWikiDocument) source;
             Map<DocumentReference, List<BaseObject>> documentXObjects = document.getXObjects();
+
+            LocalDocumentReference localXObjectReference =
+                    documentReferenceResolver.resolve(descriptor.getObjectType()).getLocalDocumentReference();
+
             /*  We can’t create a DocumentReference when only using descriptor.objectType, so we will have to
                     iterate through the map */
             for (DocumentReference documentReference : documentXObjects.keySet())  {
-                if (documentReference.toString().equals(descriptor.getObjectType())) {
+                if (documentReference.getLocalDocumentReference().equals(localXObjectReference)) {
                     return true;
                 }
             }

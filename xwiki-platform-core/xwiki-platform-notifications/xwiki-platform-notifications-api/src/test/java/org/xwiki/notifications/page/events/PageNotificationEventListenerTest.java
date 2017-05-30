@@ -34,6 +34,8 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.observation.ObservationManager;
@@ -65,6 +67,8 @@ public class PageNotificationEventListenerTest
 
     private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
+    private DocumentReferenceResolver documentReferenceResolver;
+
     private TemplateManager templateManager;
 
     private DocumentUpdatingEvent registeredEvent1;
@@ -72,6 +76,9 @@ public class PageNotificationEventListenerTest
     private DocumentDeletedEvent registeredEvent3;
     private DocumentCreatingEvent registeredEvent4;
     private DocumentCreatedEvent registeredEvent5;
+
+    private LocalDocumentReference tagClassLocalReference;
+    private LocalDocumentReference randomClassLocalReference;
 
     @Before
     public void setUp() throws Exception
@@ -81,12 +88,17 @@ public class PageNotificationEventListenerTest
                 mocker.registerMockComponent(PageNotificationEventDescriptorManager.class);
         templateManager = mocker.registerMockComponent(TemplateManager.class);
 
+        documentReferenceResolver = mocker.registerMockComponent(DocumentReferenceResolver.class);
+
         // registeredEvent{1, 2, 3, 4, 5, 6} are events that will pass the «Event Triggers» tests
         registeredEvent1 = mock(DocumentUpdatingEvent.class);
         registeredEvent2 = mock(DocumentUpdatedEvent.class);
         registeredEvent3 = mock(DocumentDeletedEvent.class);
         registeredEvent4 = mock(DocumentCreatingEvent.class);
         registeredEvent5 = mock(DocumentCreatedEvent.class);
+
+        tagClassLocalReference = mock(LocalDocumentReference.class);
+        randomClassLocalReference = mock(LocalDocumentReference.class);
     }
 
     /**
@@ -129,14 +141,14 @@ public class PageNotificationEventListenerTest
 
         when(descriptor2.getValidationExpression()).thenReturn(
                 "{{velocity}} #if(1==1) true #else false #end {{/velocity}}");
-        when(descriptor2.getObjectType()).thenReturn("xwiki:XWiki.TagClass");
+        when(descriptor2.getObjectType()).thenReturn("XWiki.TagClass");
 
         when(descriptor3.getValidationExpression()).thenReturn(
                 "{{velocity}} #if(1!=1) true #else false #end {{/velocity}}");
         when(descriptor3.getObjectType()).thenReturn(StringUtils.EMPTY);
 
         when(descriptor4.getValidationExpression()).thenReturn("  ");
-        when(descriptor4.getObjectType()).thenReturn("xwiki:XWiki.TagClass");
+        when(descriptor4.getObjectType()).thenReturn("XWiki.TagClass");
 
         when(descriptor5.getValidationExpression()).thenReturn(
                 "{{velocity}}\n#if(2==2) true #else false #end\n{{/velocity}}");
@@ -149,6 +161,15 @@ public class PageNotificationEventListenerTest
                 descriptor4,
                 descriptor5
         ));
+
+        DocumentReference tagClassReference = mock(DocumentReference.class);
+        when(tagClassReference.getLocalDocumentReference()).thenReturn(this.tagClassLocalReference);
+        when(this.documentReferenceResolver.resolve("XWiki.TagClass")).thenReturn(tagClassReference);
+
+        DocumentReference randomClassReference = mock(DocumentReference.class);
+        when(randomClassReference.getLocalDocumentReference()).thenReturn(this.randomClassLocalReference);
+        when(this.documentReferenceResolver.resolve("XWiki.AnotherRandomClass"))
+                .thenReturn(randomClassReference);
     }
 
     @Test
@@ -182,9 +203,9 @@ public class PageNotificationEventListenerTest
         XWikiDocument source = mock(XWikiDocument.class);
 
         DocumentReference xObject1 = mock(DocumentReference.class);
-        when(xObject1.toString()).thenReturn("xwiki:XWiki.TagClass");
+        when(xObject1.getLocalDocumentReference()).thenReturn(this.tagClassLocalReference);
         DocumentReference xObject2 = mock(DocumentReference.class);
-        when(xObject2.toString()).thenReturn("xwiki:AnotherRandomClass");
+        when(xObject2.getLocalDocumentReference()).thenReturn(this.randomClassLocalReference);
 
         when(source.getXObjects()).thenReturn(
                 new ImmutableMap.Builder<DocumentReference, List<BaseObject>>()

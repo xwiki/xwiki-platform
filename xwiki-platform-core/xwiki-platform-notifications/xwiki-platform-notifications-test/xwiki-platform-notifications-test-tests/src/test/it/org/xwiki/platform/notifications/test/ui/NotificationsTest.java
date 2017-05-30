@@ -194,7 +194,7 @@ public class NotificationsTest extends AbstractTest
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "listenTo"),
                 "org.xwiki.bridge.event.DocumentUpdatedEvent");
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "objectType"),
-                "xwiki:XWiki.TagClass");
+                "XWiki.TagClass");
         xObjects.get(0).setFieldValue(By.name(XOBJECT_PAGE_NOTIFICATION_PREFIX + "notificationTemplate"),
                 "Static template");
 

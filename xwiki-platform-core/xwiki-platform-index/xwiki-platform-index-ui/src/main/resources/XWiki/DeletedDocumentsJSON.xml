@@ -103,7 +103,7 @@ $response.setContentType('application/json')
      #set($originalDocument = $ddoc.getDocument())
      "fullname"  : "$escapetool.javascript($originalDocument.fullName)",
      "title"  : "$escapetool.javascript($originalDocument.displayTitle)",
-     "url" : "$escapetool.javascript($originalDocument.getURL('view', "viewer=recyclebin&amp;id=${item}"))",
+     "url" : "$escapetool.javascript($originalDocument.getURL('viewrev', $escapetool.url({'rev' : "deleted:${item}"})))",
      "originalUrl" : "$escapetool.javascript($originalDocument.getURL())",
      "canDelete" : $ddoc.canDelete(),
      "deleteUrl" : "$escapetool.javascript($originalDocument.getURL('delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",

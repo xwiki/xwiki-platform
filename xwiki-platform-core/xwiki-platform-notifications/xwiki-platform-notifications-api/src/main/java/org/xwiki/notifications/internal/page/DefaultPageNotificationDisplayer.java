@@ -35,7 +35,6 @@ import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.velocity.VelocityManager;
 
 /**
  * Implement a {@link NotificationDisplayer} for the event type
@@ -62,15 +61,10 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
     @Inject
     private TemplateManager templateManager;
 
-    @Inject
-    private VelocityManager velocityManager;
-
     @Override
     public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
     {
         try {
-            velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, eventNotification);
-
             PageNotificationEventDescriptor eventDescriptor =
                     pageNotificationEventDescriptorManager.getDescriptorByType(
                             eventNotification.getEvents().get(0).getType());
@@ -96,8 +90,6 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
 
         } catch (Exception e) {
             throw new NotificationException("Unable to render notification template.", e);
-        } finally {
-            velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
         }
     }
 

@@ -609,6 +609,9 @@
           #set ($discard = $whereParams.add("%${locationFilterValue}%"))
           ## We add the parameter twice because we use it twice in the WHERE clause (it's not a named parameter).
           #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+        #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
+          #livetable_getTableAlias($colname)
+          #livetable_filterDateProperty()
         #else
           #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
           #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
@@ -701,9 +704,21 @@
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterDateProperty)
-  ## TODO: The date filter should be smarter than this..
-  #set ($whereSql = "${whereSql} and upper(str(${safe_tableAlias}.value)) like upper(?)")
-  #set ($discard = $whereParams.add("%$filterValue%"))
+  #if ($safe_tableAlias.startsWith('doc.'))
+    #set ($dateProperty = $safe_tableAlias)
+  #else
+    #set ($dateProperty = "${safe_tableAlias}.value")
+  #end
+  #set ($timestamps = $filterValue.split('-'))
+  #if ($timestamps.size() == 2)
+    #set ($whereSql = "${whereSql} and $dateProperty >= ? and $dateProperty &lt;= ?")
+    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
+    #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
+  #else
+    ## Fall back to the older string matching
+    #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")
+    #set ($discard = $whereParams.add("%$filterValue%"))
+  #end
 #end
 
 

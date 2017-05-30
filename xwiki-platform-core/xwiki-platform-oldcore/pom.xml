@@ -66,11 +66,16 @@
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
-    <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
+    <!-- Remove once the CSS4J project uploads its artifacts to Maven Central, see http://bit.ly/2rbTJoc -->
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>0.24.1</version>
+      <version>0.26</version>
+    </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>css4j-dom4j</artifactId>
+      <version>0.26</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->

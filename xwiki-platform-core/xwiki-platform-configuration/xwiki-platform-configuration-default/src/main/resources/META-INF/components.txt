@@ -7,3 +7,4 @@ org.xwiki.configuration.internal.DefaultConfigurationSource
 org.xwiki.configuration.internal.RestrictedConfigurationSource
 org.xwiki.configuration.internal.AllConfigurationSource
 org.xwiki.configuration.internal.DocumentsConfigurationSource
+500:org.xwiki.configuration.internal.cache.XWikiCacheManagerConfiguration

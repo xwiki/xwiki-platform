@@ -55,8 +55,6 @@
 
 #xdocFooter, #docextrapanes {
   border: 0;
-  padding-left: 10px;
-  padding-right: 10px;
 }
 
 #xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a {
@@ -77,6 +75,13 @@
   box-shadow: none;
   float: none !important;
   overflow: visible !important;
+}
+
+#mainContentArea, #xdocFooter, #docextrapanes {
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+  box-shadow: none;
 }
 
 /* Remove shortcuts */

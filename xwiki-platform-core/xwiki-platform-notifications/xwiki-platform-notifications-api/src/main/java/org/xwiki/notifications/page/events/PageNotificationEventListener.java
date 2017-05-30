@@ -83,6 +83,9 @@ public class PageNotificationEventListener extends AbstractEventListener
     private DocumentReferenceResolver documentReferenceResolver;
 
     @Inject
+    private BlockRenderer blockRenderer;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -162,9 +165,7 @@ public class PageNotificationEventListener extends AbstractEventListener
             XDOM templateXDOM = templateManager.execute(customTemplate);
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer =
-                    this.componentManagerProvider.get().getInstance(BlockRenderer.class, "plain");
-            renderer.render(templateXDOM, printer);
+            blockRenderer.render(templateXDOM, printer);
 
             return printer.toString().trim().equals("true");
         } catch (Exception e) {

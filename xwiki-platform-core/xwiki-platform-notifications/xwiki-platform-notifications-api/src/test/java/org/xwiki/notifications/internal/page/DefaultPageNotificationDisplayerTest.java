@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.script.ScriptContext;
+
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,11 +33,14 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.text.StringUtils;
 import org.xwiki.velocity.VelocityManager;
+
+import sun.font.Script;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -61,6 +66,8 @@ public class DefaultPageNotificationDisplayerTest
 
     private CompositeEvent eventNotification;
 
+    private ScriptContextManager scriptContextManager;
+
     @Before
     public void setUp() throws Exception
     {
@@ -69,6 +76,10 @@ public class DefaultPageNotificationDisplayerTest
 
         this.templateManager = mocker.registerMockComponent(TemplateManager.class);
         this.mockTemplateManager();
+
+        this.scriptContextManager = mocker.registerMockComponent(ScriptContextManager.class);
+        ScriptContext currentScriptContext = mock(ScriptContext.class);
+        when(scriptContextManager.getCurrentScriptContext()).thenReturn(currentScriptContext);
 
         this.velocityManager = mocker.registerMockComponent(VelocityManager.class);
         this.velocityContext = mock(VelocityContext.class);

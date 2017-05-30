@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -33,6 +34,7 @@ import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -61,10 +63,18 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
     @Inject
     private TemplateManager templateManager;
 
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
     @Override
     public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
     {
         try {
+            scriptContextManager.getCurrentScriptContext().setAttribute(
+                    EVENT_BINDING_NAME,
+                    eventNotification,
+                    ScriptContext.ENGINE_SCOPE);
+
             PageNotificationEventDescriptor eventDescriptor =
                     pageNotificationEventDescriptorManager.getDescriptorByType(
                             eventNotification.getEvents().get(0).getType());
@@ -90,6 +100,10 @@ public class DefaultPageNotificationDisplayer implements NotificationDisplayer
 
         } catch (Exception e) {
             throw new NotificationException("Unable to render notification template.", e);
+        } finally {
+            scriptContextManager.getCurrentScriptContext().removeAttribute(
+                    EVENT_BINDING_NAME,
+                    ScriptContext.ENGINE_SCOPE);
         }
     }
 

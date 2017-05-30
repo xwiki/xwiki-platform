@@ -138,6 +138,7 @@ public class NotificationsUserProfilePage extends ViewPage
     /**
      * Try to find a row corresponding to the notification parameter of the given type.
      *
+     * @since 9.5RC1
      * @param eventType the event that has to be found
      * @return the row corresponding to this element
      */
@@ -150,6 +151,7 @@ public class NotificationsUserProfilePage extends ViewPage
     /**
      * Use the given row to enable a notification preference.
      *
+     * @since 9.5RC1
      * @param notificationParameterRow the concerned notification preference row
      */
     public void enablePreference(WebElement notificationParameterRow)
@@ -163,6 +165,8 @@ public class NotificationsUserProfilePage extends ViewPage
 
     /**
      * Disable every standard notification parameters.
+     *
+     * @since 9.5RC1
      */
     public void disableAllStandardParameters()
     {

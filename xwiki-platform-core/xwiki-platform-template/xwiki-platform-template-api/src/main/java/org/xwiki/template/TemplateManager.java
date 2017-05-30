@@ -224,6 +224,7 @@ public interface TemplateManager
     /**
      * Create a new template using a given content and a specific author.
      *
+     * @since 9.5RC1
      * @param content the template content
      * @param author the template author
      * @return the template

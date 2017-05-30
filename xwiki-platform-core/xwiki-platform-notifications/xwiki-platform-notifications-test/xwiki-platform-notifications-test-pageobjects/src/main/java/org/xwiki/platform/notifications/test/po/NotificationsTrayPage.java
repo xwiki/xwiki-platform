@@ -183,6 +183,7 @@ public class NotificationsTrayPage  extends ViewPage
     /**
      * Get a notification.
      *
+     * @since 9.5RC1
      * @param notificationNumber index of the notification in the list
      * @return notification
      */

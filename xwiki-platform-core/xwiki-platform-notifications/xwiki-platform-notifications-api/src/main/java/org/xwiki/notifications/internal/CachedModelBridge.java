@@ -38,7 +38,7 @@ import org.xwiki.notifications.NotificationPreference;
  * fetching them several time during the same HTTP request.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Named("cached")

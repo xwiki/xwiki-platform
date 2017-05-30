@@ -27,7 +27,7 @@ import org.xwiki.model.reference.EntityReference;
  * Example: only get "update" events when it concern pages inside the space "xwiki:Space1".
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 public class NotificationPreferenceScope
 {

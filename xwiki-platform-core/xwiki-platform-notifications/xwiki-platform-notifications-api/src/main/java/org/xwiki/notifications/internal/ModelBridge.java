@@ -68,7 +68,7 @@ public interface ModelBridge
      * @return the list of notification preference scopes.
      * @throws NotificationException if error happens
      *
-     * @since 9.4RC1
+     * @since 9.5RC1
      */
     List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
             throws NotificationException;

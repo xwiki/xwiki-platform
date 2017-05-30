@@ -39,7 +39,7 @@ import org.xwiki.notifications.NotificationFilter;
  * Notification filter that handle the generic {@link NotificationPreferenceScope}.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component
 @Named("scope")

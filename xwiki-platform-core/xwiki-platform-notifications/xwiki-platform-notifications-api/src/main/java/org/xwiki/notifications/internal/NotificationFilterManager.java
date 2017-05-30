@@ -39,7 +39,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * Retrieve all notification filters.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Component(roles = NotificationFilterManager.class)
 @Singleton

@@ -24,14 +24,16 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Enable or disable notifications from the event stream (for customization purpose).
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Role
+@Unstable
 public interface NotificationFilter
 {
     /**

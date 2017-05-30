@@ -115,6 +115,8 @@ public class CreateAction extends XWikiAction
         // put the available templates on the context, for the .vm to not compute them again
         scontext.setAttribute("availableTemplateProviders", handler.getAvailableTemplateProviders(),
             ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("recommendedTemplateProviders", handler.getRecommendedTemplateProviders(),
+            ScriptContext.ENGINE_SCOPE);
 
         DocumentReference newDocumentReference = handler.getNewDocumentReference();
         if (newDocumentReference == null) {

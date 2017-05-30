@@ -21,8 +21,10 @@ package com.xpn.xwiki.web;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.script.ScriptContext;
 
@@ -37,6 +39,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
@@ -198,6 +201,8 @@ public class CreateActionRequestHandler
     private BaseObject templateProvider;
 
     private List<Document> availableTemplateProviders;
+
+    private List<Document> recommendedTemplateProviders;
 
     private String type;
 
@@ -419,7 +424,7 @@ public class CreateActionRequestHandler
         DocumentReference templateClassReference, XWikiContext context)
     {
         XWiki wiki = context.getWiki();
-        List<Document> templates = new ArrayList<Document>();
+        List<Document> templates = new ArrayList<>();
         try {
             // resolver to use to resolve references received in request parameters
             DocumentReferenceResolver<String> resolver =
@@ -435,6 +440,8 @@ public class CreateActionRequestHandler
             // remove the java code below, thus improving performance by not loading all the documents, but only the
             // documents we need.
 
+            List<XWikiDocument> recommendedTemplates = new ArrayList<>();
+
             List<String> templateProviderDocNames = query.execute();
             for (String templateProviderName : templateProviderDocNames) {
                 // get the document and template provider object
@@ -445,10 +452,55 @@ public class CreateActionRequestHandler
                 // Check the template provider's visibility restrictions.
                 if (isTemplateProviderAllowedInSpace(templateObject, spaceReference,
                     TP_VISIBILITY_RESTRICTIONS_PROPERTY)) {
-                    // create a Document and put it in the list
-                    templates.add(new Document(templateDoc, context));
+
+                    List<String> creationRestrictions =
+                        getTemplateProviderRestrictions(templateObject, TP_CREATION_RESTRICTIONS_PROPERTY);
+                    if (creationRestrictions.size() > 0 && isTemplateProviderAllowedInSpace(templateObject,
+                        spaceReference, TP_CREATION_RESTRICTIONS_PROPERTY)) {
+                        // Consider providers that have creations restrictions matching the current space as
+                        // "recommended" and handle them separately.
+                        recommendedTemplates.add(templateDoc);
+                    } else {
+                        // Other visible providers.
+                        templates.add(new Document(templateDoc, context));
+                    }
                 }
             }
+
+            EntityReferenceSerializer<String> localSerializer =
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
+            String spaceStringReference = localSerializer.serialize(spaceReference);
+
+            // Sort the recommended providers and promote the most specific ones.
+            recommendedTemplates.sort(Comparator.comparing((XWikiDocument templateProviderDocument) -> {
+                BaseObject templateProviderObject = templateProviderDocument.getXObject(templateClassReference);
+
+                // Look at any set creation restrictions.
+                List<String> restrictions =
+                    getTemplateProviderRestrictions(templateProviderObject, TP_CREATION_RESTRICTIONS_PROPERTY);
+
+                // Return the longest (max) matching restriction reference size as being the most specific.
+                return restrictions.stream()
+                    // Filter only restrictions matching the current space.
+                    .filter(restriction -> matchesRestriction(spaceStringReference, restriction))
+                    // Score them based on which has the most specific restriction.
+                    .mapToInt(restriction -> {
+                        SpaceReferenceResolver<String> spaceResolver =
+                            Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
+                        SpaceReference restrictionSpaceReference = spaceResolver.resolve(restriction);
+                        // The specificity score.
+                        int specificity = restrictionSpaceReference.getReversedReferenceChain().size();
+                        return specificity;
+                    }).max()
+                    // Or 0 if no restrictions are set or if none match the current space.
+                    .orElse(0);
+            }).reversed());
+
+            this.recommendedTemplateProviders = recommendedTemplates.stream()
+                .map(recommendedTemplate -> new Document(recommendedTemplate, context)).collect(Collectors.toList());
+
+            // Give priority to the providers that that specify creation restrictions
+            templates.addAll(0, recommendedTemplateProviders);
         } catch (Exception e) {
             LOGGER.warn("There was an error getting the available templates for space {0}", spaceReference, e);
         }
@@ -459,12 +511,6 @@ public class CreateActionRequestHandler
     private boolean isTemplateProviderAllowedInSpace(BaseObject templateObject, SpaceReference spaceReference,
         String restrictionsProperty)
     {
-        // Handle the special case for creation restrictions when they are only suggestions and can be ignored.
-        if (TP_CREATION_RESTRICTIONS_PROPERTY.equals(restrictionsProperty)
-            && templateObject.getIntValue(TP_CREATION_RESTRICTIONS_ARE_SUGGESTIONS_PROPERTY, 0) == 1) {
-            return true;
-        }
-
         // Check the allowed spaces list.
         List<String> restrictions = getTemplateProviderRestrictions(templateObject, restrictionsProperty);
         if (restrictions.size() > 0) {
@@ -474,8 +520,7 @@ public class CreateActionRequestHandler
 
             for (String allowedSpace : restrictions) {
                 // Exact match or parent space (i.e. prefix) match.
-                if (allowedSpace.equals(spaceStringReference)
-                    || StringUtils.startsWith(spaceStringReference, String.format("%s.", allowedSpace))) {
+                if (matchesRestriction(spaceStringReference, allowedSpace)) {
                     return true;
                 }
             }
@@ -484,8 +529,14 @@ public class CreateActionRequestHandler
             return false;
         }
 
-        // No creation restrictions exist, allowed by default.
+        // No restrictions exist, allowed by default.
         return true;
+    }
+
+    private boolean matchesRestriction(String spaceStringReferenceToTest, String allowedSpaceRestriction)
+    {
+        return allowedSpaceRestriction.equals(spaceStringReferenceToTest)
+            || StringUtils.startsWith(spaceStringReferenceToTest, String.format("%s.", allowedSpaceRestriction));
     }
 
     private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)
@@ -571,8 +622,12 @@ public class CreateActionRequestHandler
         // - Cancel the redirect
         // - Set an error on the context, to be read by the create.vm
         if (templateProvider != null) {
-            // Check using the template provider's creation restrictions.
-            if (!isTemplateProviderAllowedInSpace(templateProvider, spaceReference,
+            // Check if the creation restrictions are enforced.
+            boolean creationRestrictionsEnforced =
+                templateProvider.getIntValue(TP_CREATION_RESTRICTIONS_ARE_SUGGESTIONS_PROPERTY, 0) == 0;
+
+            // Check using the template provider's creation restrictions, only when they are enforced.
+            if (creationRestrictionsEnforced && !isTemplateProviderAllowedInSpace(templateProvider, spaceReference,
                 TP_CREATION_RESTRICTIONS_PROPERTY)) {
                 // put an exception on the context, for create.vm to know to display an error
                 Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, name};
@@ -718,6 +773,14 @@ public class CreateActionRequestHandler
     public List<Document> getAvailableTemplateProviders()
     {
         return availableTemplateProviders;
+    }
+
+    /**
+     * @return the recommended template providers, from the list of available ones
+     */
+    public List<Document> getRecommendedTemplateProviders()
+    {
+        return recommendedTemplateProviders;
     }
 
     /**

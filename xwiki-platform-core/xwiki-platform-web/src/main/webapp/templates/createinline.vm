@@ -190,7 +190,11 @@
     </dt>
     #set ($defaultValue = $request.type)
     #if ("$!defaultValue" == '')
-      #set ($defaultValue = 'blank')
+      #if ($recommendedTemplateProviders.size() > 0)
+        #set ($defaultValue = $services.model.serialize($recommendedTemplateProviders[0].documentReference, 'local'))
+      #else
+        #set ($defaultValue = 'blank')
+      #end
     #end
     <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-adaptable-medium', '', true)</dd>
   #else

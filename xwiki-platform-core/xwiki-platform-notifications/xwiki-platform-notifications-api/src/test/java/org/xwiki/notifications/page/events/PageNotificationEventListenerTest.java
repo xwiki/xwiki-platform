@@ -182,7 +182,7 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(event, source, null);
 
-        verify(this.observationManager, never()).notify(any(), any());
+        verify(this.observationManager, never()).notify(any(), any(), any());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(registeredEvent1, source, null);
 
-        verify(this.observationManager, times(1)).notify(any(), any());
+        verify(this.observationManager, times(1)).notify(any(), any(), any());
     }
 
     @Test
@@ -217,7 +217,7 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(registeredEvent4, source, null);
 
-        verify(this.observationManager, times(1)).notify(any(), any());
+        verify(this.observationManager, times(1)).notify(any(), any(), any());
     }
 
     @Test
@@ -229,6 +229,6 @@ public class PageNotificationEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(registeredEvent3, source, null);
 
-        verify(this.observationManager, never()).notify(any(), any());
+        verify(this.observationManager, never()).notify(any(), any(), any());
     }
 }

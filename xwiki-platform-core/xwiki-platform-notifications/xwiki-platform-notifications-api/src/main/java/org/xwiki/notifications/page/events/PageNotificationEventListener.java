@@ -24,12 +24,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -78,7 +79,7 @@ public class PageNotificationEventListener extends AbstractEventListener
     private TemplateManager templateManager;
 
     @Inject
-    private ContextComponentManagerProvider componentManagerProvider;
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private DocumentReferenceResolver documentReferenceResolver;
@@ -106,7 +107,9 @@ public class PageNotificationEventListener extends AbstractEventListener
                     && this.evaluateVelocityTemplate(descriptor.getAuthorReference(),
                     descriptor.getValidationExpression())) {
                 observationManager.notify(
-                        new PageNotificationEvent(descriptor), source);
+                        new PageNotificationEvent(descriptor),
+                        "org.xwiki.platform:xwiki-platform-notifications-api",
+                        source);
             }
         }
     }

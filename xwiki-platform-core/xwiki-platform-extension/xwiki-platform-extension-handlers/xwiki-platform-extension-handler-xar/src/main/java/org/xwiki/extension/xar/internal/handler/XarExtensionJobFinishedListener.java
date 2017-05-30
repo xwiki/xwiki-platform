@@ -37,6 +37,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -261,8 +262,8 @@ public class XarExtensionJobFinishedListener implements EventListener
         PackageConfiguration configuration = new PackageConfiguration();
 
         configuration.setInteractive(false);
-        configuration
-            .setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE, request));
+        configuration.setUser(
+            XarExtensionHandler.getRequestUserReference(AbstractExtensionValidator.PROPERTY_USERREFERENCE, request));
         configuration.setWiki(wiki);
         configuration.setVerbose(request.isVerbose());
         configuration.setSkipMandatorytDocuments(true);

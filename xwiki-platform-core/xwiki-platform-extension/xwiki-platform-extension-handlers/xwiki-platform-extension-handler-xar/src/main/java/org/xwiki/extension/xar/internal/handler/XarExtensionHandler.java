@@ -44,6 +44,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -75,12 +76,6 @@ import com.xpn.xwiki.XWikiContext;
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
     public static final String TYPE = "xar";
-
-    protected static final String PROPERTY_USERREFERENCE = "user.reference";
-
-    protected static final String PROPERTY_CALLERREFERENCE = "caller.reference";
-
-    protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
     private static final TranslationMarker LOG_EXTENSIONPLAN_BEGIN =
         new TranslationMarker("extension.xar.log.extensionplan.begin");
@@ -274,7 +269,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 PackageConfiguration configuration = new PackageConfiguration();
                 context.setProperty(CONTEXTKEY_PACKAGECONFIGURATION, configuration);
 
-                DocumentReference userReference = getRequestUserReference(PROPERTY_USERREFERENCE, request);
+                DocumentReference userReference =
+                    getRequestUserReference(AbstractExtensionValidator.PROPERTY_USERREFERENCE, request);
 
                 configuration.setInteractive(request.isInteractive());
                 configuration.setUser(userReference);
@@ -335,7 +331,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         } else {
             configuration = new PackageConfiguration();
 
-            DocumentReference userReference = getRequestUserReference(PROPERTY_USERREFERENCE, request);
+            DocumentReference userReference =
+                getRequestUserReference(AbstractExtensionValidator.PROPERTY_USERREFERENCE, request);
 
             configuration.setInteractive(request.isInteractive());
             configuration.setUser(userReference);

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
@@ -54,26 +55,25 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
-    private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
-        new SpaceReference("Notifications",
-            new SpaceReference("XWiki", new WikiReference("toChange"))
-        )
-    );
+    private static final WikiReference WIKI_REFERENCE = new WikiReference(XWiki.DEFAULT_MAIN_WIKI);
+
+    private static final List<String> NOTIFICATION_CODE_SPACE =
+            Arrays.asList(XWiki.SYSTEM_SPACE, "Notifications", "Code");
 
     private static final DocumentReference NOTIFICATION_PREFERENCE_CLASS = new DocumentReference(
-            "NotificationPreferenceClass", NOTIFICATION_CODE_SPACE
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationPreferenceClass"), WIKI_REFERENCE
     );
 
     private static final DocumentReference NOTIFICATION_PREFERENCE_SCOPE_CLASS = new DocumentReference(
-            "NotificationPreferenceScopeClass", NOTIFICATION_CODE_SPACE
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationPreferenceScopeClass"), WIKI_REFERENCE
     );
 
     private static final DocumentReference NOTIFICATION_START_DATE_CLASS = new DocumentReference(
-            "NotificationsStartDateClass", NOTIFICATION_CODE_SPACE
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationsStartDateClass"), WIKI_REFERENCE
     );
 
     private static final DocumentReference PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS = new DocumentReference(
-            "PageNotificationEventDescriptorClass", NOTIFICATION_CODE_SPACE
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "PageNotificationEventDescriptorClass"), WIKI_REFERENCE
     );
 
     private static final String APPLICATION_NAME = "applicationName";

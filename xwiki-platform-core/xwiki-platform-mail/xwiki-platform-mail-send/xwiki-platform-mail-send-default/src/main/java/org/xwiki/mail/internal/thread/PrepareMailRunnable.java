@@ -180,15 +180,15 @@ public class PrepareMailRunnable extends AbstractMailRunnable
             return;
         }
 
-        // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
-        // Extract the wiki id from the context
-        this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getUniqueMessageId(),
-            item.getSession(), listener, item.getBatchId(), extractWikiId(item)));
-
-        // Step 4: Notify the user that the MimeMessage is prepared
+        // Step 3: Notify the user that the MimeMessage is prepared
         if (listener != null) {
             listener.onPrepareMessageSuccess(message, Collections.<String, Object>emptyMap());
         }
+
+        // Step 4: Put the MimeMessage id on the Mail Send Queue for sending
+        // Extract the wiki id from the context
+        this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getUniqueMessageId(),
+            item.getSession(), listener, item.getBatchId(), extractWikiId(item)));
 
     }
 

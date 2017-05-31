@@ -86,10 +86,6 @@
   <!-- Deactivate JGroups warnings -->
   <logger name="org.jgroups" level="error"/>
 
-  <!-- TODO: Remove once flickering Mail Test is fixed, see http://jira.xwiki.org/browse/XWIKI-12802. This is added
-       to try to understand what's going wrong in the test. -->
-  <logger name="org.xwiki.mail" level="debug"/>
-
   <!-- By default everything that is of severity WARN, ERROR or FATAL is logged to the console.
        Since the console output is captured and redirected by the servlet container in most cases,
        the logs will end up the container's logs, for example in catalina.out in Tomcat.

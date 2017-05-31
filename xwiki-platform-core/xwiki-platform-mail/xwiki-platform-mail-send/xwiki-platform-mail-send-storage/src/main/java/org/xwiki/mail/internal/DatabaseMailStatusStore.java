@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
@@ -54,6 +55,9 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 public class DatabaseMailStatusStore implements MailStatusStore
 {
     private static final String ID_PARAMETER_NAME = "id";
+
+    @Inject
+    private Logger logger;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -85,6 +89,9 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     return null;
                 }
             });
+
+            // Log the save for debugging purpose
+            this.logger.debug("Saved mail status [{}]", status);
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to save mail status [%s] to the database.", status), e);
         } finally {
@@ -118,8 +125,11 @@ public class DatabaseMailStatusStore implements MailStatusStore
         // Compute the Query string based on the passed filter map
         final String queryString = computeSelectQueryString(filterMap, sortField, sortAscending);
 
+        // Log query and parameters
+        logQuery(queryString, filterMap);
+
         try {
-            return store.executeRead(xwikiContext,
+            List<MailStatus> mailStatuses = store.executeRead(xwikiContext,
                 new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
                 {
                     @Override
@@ -137,7 +147,18 @@ public class DatabaseMailStatusStore implements MailStatusStore
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
                     }
-                });
+                }
+            );
+
+            // Log loaded statuses
+            if (this.logger.isDebugEnabled()) {
+                for (MailStatus mailStatus : mailStatuses) {
+                    this.logger.debug("Loaded mail status [{}]", mailStatus);
+                }
+            }
+
+            return mailStatuses;
+
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to load mail statuses matching the filter [%s] from the database.", filterMap), e);
@@ -246,5 +267,33 @@ public class DatabaseMailStatusStore implements MailStatusStore
     {
         return computeQueryString(String.format("from %s", MailStatus.class.getName()),
             filterMap, sortField, sortAscending);
+    }
+
+    private void logQuery(String queryString, Map<String, Object> filterMap)
+    {
+        if (this.logger.isDebugEnabled()) {
+            StringBuilder builder = new StringBuilder();
+            Iterator<Map.Entry<String, Object>> entryIterator = filterMap.entrySet().iterator();
+            while (entryIterator.hasNext()) {
+                Map.Entry<String, Object> entry = entryIterator.next();
+                addEntryTolog(builder, entry);
+                if (entryIterator.hasNext()) {
+                    builder.append(',').append((' '));
+                }
+            }
+            this.logger.debug("Find mail statuses for query [{}] and parameters [{}]", queryString, builder.toString());
+        }
+    }
+
+    private void addEntryTolog(StringBuilder builder, Map.Entry<String, Object> entry)
+    {
+        addValueTolog(builder, entry.getKey());
+        builder.append(" = ");
+        addValueTolog(builder, entry.getValue());
+    }
+
+    private void addValueTolog(StringBuilder builder, Object value)
+    {
+        builder.append('[').append(value).append(']');
     }
 }

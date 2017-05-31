@@ -157,7 +157,7 @@ public class DefaultTemplateManager implements TemplateManager
     }
 
     @Override
-    public Template createStringTemplate(String content, DocumentReference author)
+    public Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
         return this.templateManager.createStringTemplate(content, author);
     }

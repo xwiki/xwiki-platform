@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -65,6 +67,11 @@ public class PageNotificationEventListener extends AbstractEventListener
      */
     public static final String NAME = "Page Notification Event Listener";
 
+    /**
+     * The binding name of the event when a validation expression is rendered.
+     */
+    public static final String EVENT_BINDING_NAME = "event";
+
     @Inject
     private ObservationManager observationManager;
 
@@ -76,10 +83,13 @@ public class PageNotificationEventListener extends AbstractEventListener
 
     @Inject
     @Named("plain/1.0")
-    private BlockRenderer blockRenderer;
+    private BlockRenderer plainRenderer;
 
     @Inject
     private DocumentReferenceResolver documentReferenceResolver;
+
+    @Inject
+    private ScriptContextManager scriptContextManager;
 
     @Inject
     private Logger logger;
@@ -101,8 +111,8 @@ public class PageNotificationEventListener extends AbstractEventListener
             // If the event is expected by our descriptor
             if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
                     && checkXObjectCondition(descriptor, source)
-                    && this.evaluateVelocityTemplate(descriptor.getAuthorReference(),
-                    descriptor.getValidationExpression())) {
+                    && this.evaluateVelocityTemplate(
+                            event, descriptor.getAuthorReference(), descriptor.getValidationExpression())) {
                 observationManager.notify(
                         new PageNotificationEvent(descriptor),
                         "org.xwiki.platform:xwiki-platform-notifications-api",
@@ -145,11 +155,12 @@ public class PageNotificationEventListener extends AbstractEventListener
     /**
      * Evaluate the given velocity template and return a boolean.
      *
+     * @param event the event that should be bound to the script context
      * @param userReference a user reference used to build context
      * @param templateContent the velocity template that should be evaluated
      * @return true if the template evaluation returned «true» or if the template is empty
      */
-    private boolean evaluateVelocityTemplate(DocumentReference userReference, String templateContent)
+    private boolean evaluateVelocityTemplate(Event event, DocumentReference userReference, String templateContent)
     {
         try {
             // We don’t need to evaluate the template if it’s empty
@@ -157,11 +168,20 @@ public class PageNotificationEventListener extends AbstractEventListener
                 return true;
             }
 
+            scriptContextManager.getCurrentScriptContext().setAttribute(
+                    EVENT_BINDING_NAME,
+                    event,
+                    ScriptContext.ENGINE_SCOPE);
+
             Template customTemplate = templateManager.createStringTemplate(templateContent, userReference);
             XDOM templateXDOM = templateManager.execute(customTemplate);
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            blockRenderer.render(templateXDOM, printer);
+            plainRenderer.render(templateXDOM, printer);
+
+            scriptContextManager.getCurrentScriptContext().removeAttribute(
+                    EVENT_BINDING_NAME,
+                    ScriptContext.ENGINE_SCOPE);
 
             return printer.toString().trim().equals("true");
         } catch (Exception e) {
@@ -169,6 +189,11 @@ public class PageNotificationEventListener extends AbstractEventListener
                     "Unable to render a notification validation template. Error : %s\nStack trace : %s",
                     e.getMessage(),
                     e.getStackTrace()));
+
+            scriptContextManager.getCurrentScriptContext().removeAttribute(
+                    EVENT_BINDING_NAME,
+                    ScriptContext.ENGINE_SCOPE);
+
             return false;
         }
     }

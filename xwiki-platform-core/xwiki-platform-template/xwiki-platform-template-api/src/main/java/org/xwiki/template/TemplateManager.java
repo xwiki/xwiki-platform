@@ -227,9 +227,10 @@ public interface TemplateManager
      * @param content the template content
      * @param author the template author
      * @return the template
+     * @throws Exception if an error occurred during template instanciation
      * @since 9.5RC1
      */
-    default Template createStringTemplate(String content, DocumentReference author)
+    default Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
         throw new UnsupportedOperationException(
                 "org.xwiki.template.TemplateManager#createStringTemplate() "

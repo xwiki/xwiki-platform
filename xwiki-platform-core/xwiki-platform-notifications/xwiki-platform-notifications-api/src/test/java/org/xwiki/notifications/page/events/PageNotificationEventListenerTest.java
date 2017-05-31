@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,6 +42,7 @@ import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorMana
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -69,6 +72,8 @@ public class PageNotificationEventListenerTest
 
     private DocumentReferenceResolver documentReferenceResolver;
 
+    private ScriptContextManager scriptContextManager;
+
     private TemplateManager templateManager;
 
     private DocumentUpdatingEvent registeredEvent1;
@@ -87,6 +92,9 @@ public class PageNotificationEventListenerTest
         pageNotificationEventDescriptorManager =
                 mocker.registerMockComponent(PageNotificationEventDescriptorManager.class);
         templateManager = mocker.registerMockComponent(TemplateManager.class);
+
+        scriptContextManager = mocker.registerMockComponent(ScriptContextManager.class);
+        when(scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
 
         documentReferenceResolver = mocker.registerMockComponent(DocumentReferenceResolver.class);
 

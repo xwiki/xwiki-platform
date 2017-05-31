@@ -34,7 +34,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
@@ -55,26 +54,20 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
-    private static final WikiReference WIKI_REFERENCE = new WikiReference(XWiki.DEFAULT_MAIN_WIKI);
-
     private static final List<String> NOTIFICATION_CODE_SPACE =
             Arrays.asList(XWiki.SYSTEM_SPACE, "Notifications", "Code");
 
-    private static final DocumentReference NOTIFICATION_PREFERENCE_CLASS = new DocumentReference(
-            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationPreferenceClass"), WIKI_REFERENCE
-    );
+    private static final LocalDocumentReference NOTIFICATION_PREFERENCE_CLASS =
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationPreferenceClass");
 
-    private static final DocumentReference NOTIFICATION_PREFERENCE_SCOPE_CLASS = new DocumentReference(
-            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationPreferenceScopeClass"), WIKI_REFERENCE
-    );
+    private static final LocalDocumentReference NOTIFICATION_PREFERENCE_SCOPE_CLASS =
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationPreferenceScopeClass");
 
-    private static final DocumentReference NOTIFICATION_START_DATE_CLASS = new DocumentReference(
-            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationsStartDateClass"), WIKI_REFERENCE
-    );
+    private static final LocalDocumentReference NOTIFICATION_START_DATE_CLASS =
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "NotificationsStartDateClass");
 
-    private static final DocumentReference PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS = new DocumentReference(
-            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "PageNotificationEventDescriptorClass"), WIKI_REFERENCE
-    );
+    private static final LocalDocumentReference PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS =
+            new LocalDocumentReference(NOTIFICATION_CODE_SPACE, "PageNotificationEventDescriptorClass");
 
     private static final String APPLICATION_NAME = "applicationName";
 
@@ -110,8 +103,8 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        final DocumentReference notificationPreferencesClass
-                = NOTIFICATION_PREFERENCE_CLASS.setWikiReference(userReference.getWikiReference());
+        final DocumentReference notificationPreferencesClass =
+                new DocumentReference(NOTIFICATION_PREFERENCE_CLASS, userReference.getWikiReference());
 
         List<NotificationPreference> preferences = new ArrayList<>();
 
@@ -146,7 +139,7 @@ public class DefaultModelBridge implements ModelBridge
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
             final DocumentReference notificationStartDateClass
-                    = NOTIFICATION_START_DATE_CLASS.setWikiReference(userReference.getWikiReference());
+                    = new DocumentReference(NOTIFICATION_START_DATE_CLASS, userReference.getWikiReference());
 
             BaseObject obj = document.getXObject(notificationStartDateClass);
             if (obj != null) {
@@ -174,7 +167,7 @@ public class DefaultModelBridge implements ModelBridge
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
             final DocumentReference notificationStartDateClass
-                    = NOTIFICATION_START_DATE_CLASS.setWikiReference(userReference.getWikiReference());
+                    = new DocumentReference(NOTIFICATION_START_DATE_CLASS, userReference.getWikiReference());
 
             BaseObject obj = document.getXObject(notificationStartDateClass, true, context);
             obj.setDateValue(START_DATE, startDate);
@@ -197,7 +190,7 @@ public class DefaultModelBridge implements ModelBridge
         PageNotificationEventDescriptor newDescriptor = null;
 
         final DocumentReference pageNotificationEventDescriptorClass
-                = PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS.setWikiReference(documentReference.getWikiReference());
+                = new DocumentReference(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS, documentReference.getWikiReference());
 
         List<PageNotificationEventDescriptor> eventDescriptors = new ArrayList<>();
 
@@ -230,7 +223,7 @@ public class DefaultModelBridge implements ModelBridge
         throws NotificationException
     {
         final DocumentReference notificationPreferencesScopeClass
-                = NOTIFICATION_PREFERENCE_SCOPE_CLASS.setWikiReference(userReference.getWikiReference());
+                = new DocumentReference(NOTIFICATION_PREFERENCE_SCOPE_CLASS, userReference.getWikiReference());
 
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();

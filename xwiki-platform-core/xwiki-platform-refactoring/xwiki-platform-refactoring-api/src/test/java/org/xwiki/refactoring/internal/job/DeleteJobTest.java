@@ -31,8 +31,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +49,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ComponentList(DefaultBatchOperationExecutor.class)
 public class DeleteJobTest extends AbstractEntityJobTest
 {
     @Rule

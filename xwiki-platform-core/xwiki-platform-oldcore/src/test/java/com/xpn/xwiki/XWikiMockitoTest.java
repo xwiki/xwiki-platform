@@ -40,6 +40,9 @@ import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -54,8 +57,10 @@ import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
@@ -84,9 +89,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWiki}.
- * 
+ *
  * @version $Id$
  */
+@ComponentList({DefaultBatchOperationExecutor.class, DefaultExecution.class})
 public class XWikiMockitoTest
 {
     /**
@@ -148,6 +154,10 @@ public class XWikiMockitoTest
         this.documentRevisionProvider = this.mocker.registerMockComponent(DocumentRevisionProvider.class);
 
         this.xwikiCfgConfigurationSource = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikicfg");
+
+        Execution execution = this.mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        execution.setContext(executionContext);
     }
 
     /**

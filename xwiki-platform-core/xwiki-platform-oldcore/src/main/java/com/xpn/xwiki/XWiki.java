@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -137,6 +136,7 @@ import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -4020,9 +4020,8 @@ public class XWiki implements EventListener
             }
 
             if (hasRecycleBin(context) && totrash) {
-                // Extract (safely) any existing batchId from the context.
-                Object batchIdValue = Utils.getComponent(Execution.class).getContext().getProperty("BATCH_ID");
-                String batchId = Objects.toString(batchIdValue, null);
+                // Extract any existing batchId from the context.
+                String batchId = Utils.getComponent(BatchOperationExecutor.class).getCurrentBatchId();
 
                 // Save to recycle bin together with any determined batch ID.
                 getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), batchId, context, true);
@@ -5888,14 +5887,18 @@ public class XWiki implements EventListener
 
     public void deleteAllDocuments(XWikiDocument doc, boolean toTrash, XWikiContext context) throws XWikiException
     {
-        // Delete all translation documents
-        for (Locale locale : doc.getTranslationLocales(context)) {
-            XWikiDocument tdoc = doc.getTranslatedDocument(locale, context);
-            deleteDocument(tdoc, toTrash, context);
-        }
+        // Wrap the work as a batch operation.
+        BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
+        batchOperationExecutor.execute(() -> {
+            // Delete all translation documents
+            for (Locale locale : doc.getTranslationLocales(context)) {
+                XWikiDocument tdoc = doc.getTranslatedDocument(locale, context);
+                deleteDocument(tdoc, toTrash, context);
+            }
 
-        // Delete the default document
-        deleteDocument(doc, toTrash, context);
+            // Delete the default document
+            deleteDocument(doc, toTrash, context);
+        });
     }
 
     public void refreshLinks(XWikiContext context) throws XWikiException

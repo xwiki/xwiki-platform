@@ -20,16 +20,15 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -46,11 +45,8 @@ import org.xwiki.security.authorization.Right;
 @Named(RefactoringJobs.DELETE)
 public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
 {
-    /** Context property used to save the batchId in the recycle bin. */
-    private static final String BATCH_ID_PROPERTY = "BATCH_ID";
-
     @Inject
-    private Execution execution;
+    private BatchOperationExecutor batchOperationExecutor;
 
     @Override
     public String getType()
@@ -61,14 +57,8 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
     @Override
     protected void process(Collection<EntityReference> entityReferences)
     {
-        // Generate the batch ID and set it in the context.
-        String deleteBatchId = UUID.randomUUID().toString();
-        execution.getContext().setProperty(BATCH_ID_PROPERTY, deleteBatchId);
-
-        super.process(entityReferences);
-
-        // Clean the context when done.
-        execution.getContext().setProperty(BATCH_ID_PROPERTY, null);
+        // Wrap the work as a batch operation.
+        batchOperationExecutor.execute(() -> super.process(entityReferences));
     }
 
     @Override

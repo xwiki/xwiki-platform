@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.refactoring.batch.BatchOperationExecutor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -60,12 +61,16 @@ public class DeleteVersionsAction extends XWikiAction
 
             // Is this the last remaining version? If so, then recycle the document.
             if (archive.getLatestVersion() == null) {
-                if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
-                    context.getWiki().deleteAllDocuments(doc, context);
-                } else {
-                    // Only delete the translation
-                    context.getWiki().deleteDocument(tdoc, context);
-                }
+                // Wrap the work as a batch operation.
+                BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
+                batchOperationExecutor.execute(() -> {
+                    if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
+                        context.getWiki().deleteAllDocuments(doc, context);
+                    } else {
+                        // Only delete the translation
+                        context.getWiki().deleteDocument(tdoc, context);
+                    }
+                });
             } else {
                 // There are still some versions left.
                 // If we delete the most recent (current) version, then rollback to latest undeleted version.

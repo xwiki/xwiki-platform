@@ -72,15 +72,6 @@ public class PageNotificationEventListenerUpdaterTest
     }
 
     @Test
-    public void onEventWithWrongEvent() throws Exception
-    {
-        mocker.getComponentUnderTest().onEvent(mock(DocumentCreatedEvent.class),
-                mock(Object.class), mock(Object.class));
-
-        verify(this.pageNotificationEventDescriptorManager, never()).updateDescriptors();
-    }
-
-    @Test
     public void onEventWithApplicationReadyEvent() throws Exception
     {
         mocker.getComponentUnderTest().onEvent(mock(ApplicationReadyEvent.class),
@@ -120,23 +111,5 @@ public class PageNotificationEventListenerUpdaterTest
         mocker.getComponentUnderTest().onEvent(event, mock(Object.class), mock(Object.class));
 
         verify(this.pageNotificationEventDescriptorManager, times(1)).updateDescriptors();
-    }
-
-    @Test
-    public void onEventWithWrongXObject() throws Exception
-    {
-        XObjectAddedEvent event = mock(XObjectAddedEvent.class);
-        BaseObjectReference objectReference = mock(BaseObjectReference.class);
-        SpaceReference spaceReference = mock(SpaceReference.class);
-
-        DocumentReference xClassReference = new DocumentReference("AnotherXObjectClass",
-                spaceReference);
-
-        when(objectReference.getXClassReference()).thenReturn(xClassReference);
-        when(event.getReference()).thenReturn(objectReference);
-
-        mocker.getComponentUnderTest().onEvent(event, mock(Object.class), mock(Object.class));
-
-        verify(this.pageNotificationEventDescriptorManager, never()).updateDescriptors();
     }
 }

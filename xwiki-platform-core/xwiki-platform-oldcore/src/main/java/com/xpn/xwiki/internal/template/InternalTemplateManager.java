@@ -85,7 +85,6 @@ import org.xwiki.template.TemplateContent;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
@@ -253,6 +252,23 @@ public class InternalTemplateManager
                 return new DefaultTemplateContent(content, ((WikiResource<?>) this.resource).getAuthorReference());
             } else {
                 return new DefaultTemplateContent(content);
+            }
+        }
+    }
+
+    private class StringTemplate extends DefaultTemplate
+    {
+        StringTemplate(String content, DocumentReference authorReference) {
+            super(new StringResource(content));
+            try {
+                // Initialize the template content
+                // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
+                ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
+            } catch (Exception e) {
+                logger.warn(String.format(
+                                "Unable to instanciate StringTemplate properly.\nError : %s\nStackTrace : %s",
+                                e.getMessage(),
+                                e.getStackTrace()));
             }
         }
     }
@@ -899,16 +915,13 @@ public class InternalTemplateManager
     /**
      * Create a DefaultTemplate with the given content and the given author.
      *
+     * @since 9.5RC1
      * @param content the template content
      * @param author the template author
      * @return the template
      */
     public Template createStringTemplate(String content, DocumentReference author)
     {
-        DefaultTemplate newTemplate = new DefaultTemplate(null);
-        newTemplate.content.setAuthorReference(author);
-        newTemplate.content.content = content;
-
-        return newTemplate;
+        return new StringTemplate(content, author);
     }
 }

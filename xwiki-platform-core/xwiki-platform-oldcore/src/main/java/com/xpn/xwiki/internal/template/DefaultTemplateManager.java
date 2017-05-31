@@ -161,5 +161,4 @@ public class DefaultTemplateManager implements TemplateManager
     {
         return this.templateManager.createStringTemplate(content, author);
     }
-
 }

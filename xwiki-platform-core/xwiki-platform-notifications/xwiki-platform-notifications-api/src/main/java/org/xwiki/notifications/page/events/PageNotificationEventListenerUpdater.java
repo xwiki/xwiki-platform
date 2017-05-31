@@ -25,8 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.notifications.internal.page.PageNotificationEventDescriptorManager;
 import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 import org.xwiki.observation.AbstractEventListener;
@@ -34,7 +33,6 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
@@ -55,6 +53,13 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
      */
     public static final String NAME = "Page Notification Event Listener Updater";
 
+    /**
+     * The reference to match the XObject PageNotificationEventDescriptorClass.
+     */
+    private static final RegexEntityReference PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS_REFERENCE =
+            BaseObjectReference.any("XWiki.Notifications.Code.PageNotificationEventDescriptorClass");
+
+
     @Inject
     private PageNotificationEventDescriptorManager pageNotificationEventDescriptorManager;
 
@@ -65,44 +70,14 @@ public class PageNotificationEventListenerUpdater extends AbstractEventListener
     {
         super(NAME,
                 new ApplicationReadyEvent(),
-                new XObjectAddedEvent(),
-                new XObjectDeletedEvent(),
-                new XObjectUpdatedEvent());
+                new XObjectAddedEvent(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS_REFERENCE),
+                new XObjectDeletedEvent(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS_REFERENCE),
+                new XObjectUpdatedEvent(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS_REFERENCE));
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof ApplicationReadyEvent) {
-            pageNotificationEventDescriptorManager.updateDescriptors();
-        } else if (event instanceof XObjectAddedEvent
-                || event instanceof XObjectDeletedEvent
-                || event instanceof XObjectUpdatedEvent) {
-            // Extract the BaseObjectReference to be able to inspect the XClassReference.
-            BaseObjectReference objectReference = getBaseObjectReference((XObjectEvent) event);
-            DocumentReference objectClassReference = objectReference.getXClassReference();
-
-            // Only interested in PageNotificationEventDescriptorClass XObjects
-            if (objectClassReference.getName().equals("PageNotificationEventDescriptorClass"))
-            {
-                pageNotificationEventDescriptorManager.updateDescriptors();
-            }
-        }
-    }
-
-    /**
-     * @param objectEvent the event involving an object
-     * @return the {@link BaseObjectReference} of the object corresponding to the object event
-     */
-    private BaseObjectReference getBaseObjectReference(XObjectEvent objectEvent)
-    {
-        EntityReference objectReference = objectEvent.getReference();
-        BaseObjectReference baseObjectReference = null;
-        if (objectReference instanceof BaseObjectReference) {
-            baseObjectReference = (BaseObjectReference) objectReference;
-        } else {
-            baseObjectReference = new BaseObjectReference(objectEvent.getReference());
-        }
-        return baseObjectReference;
+        pageNotificationEventDescriptorManager.updateDescriptors();
     }
 }

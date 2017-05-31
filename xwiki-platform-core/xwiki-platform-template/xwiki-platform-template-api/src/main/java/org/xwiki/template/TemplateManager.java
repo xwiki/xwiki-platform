@@ -224,10 +224,15 @@ public interface TemplateManager
     /**
      * Create a new template using a given content and a specific author.
      *
-     * @since 9.5RC1
      * @param content the template content
      * @param author the template author
      * @return the template
+     * @since 9.5RC1
      */
-    Template createStringTemplate(String content, DocumentReference author);
+    default Template createStringTemplate(String content, DocumentReference author)
+    {
+        throw new UnsupportedOperationException(
+                "org.xwiki.template.TemplateManager#createStringTemplate() "
+                        + "has been called without being reimplemented.");
+    }
 }

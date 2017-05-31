@@ -24,13 +24,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -77,13 +75,11 @@ public class PageNotificationEventListener extends AbstractEventListener
     private TemplateManager templateManager;
 
     @Inject
-    private Provider<ComponentManager> componentManagerProvider;
+    @Named("plain/1.0")
+    private BlockRenderer blockRenderer;
 
     @Inject
     private DocumentReferenceResolver documentReferenceResolver;
-
-    @Inject
-    private BlockRenderer blockRenderer;
 
     @Inject
     private Logger logger;

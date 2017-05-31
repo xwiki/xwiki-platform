@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -65,6 +66,7 @@ public class PageNotificationEventDescriptorManager
     private DocumentReferenceResolver documentReferenceResolver;
 
     @Inject
+    @Named("cached")
     private ModelBridge modelBridge;
 
     @Inject

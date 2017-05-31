@@ -68,6 +68,7 @@ public interface ModelBridge
      * @param documentReference the document reference
      * @return the applied notification event descriptor
      * @throws NotificationException if an error occurs
+     * @since 9.5RC1
      */
     PageNotificationEventDescriptor getPageNotificationEventDescriptor(DocumentReference documentReference)
             throws NotificationException;

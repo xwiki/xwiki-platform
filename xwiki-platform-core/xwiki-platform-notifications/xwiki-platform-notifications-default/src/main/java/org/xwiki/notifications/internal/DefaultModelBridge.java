@@ -103,14 +103,11 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        final DocumentReference notificationPreferencesClass =
-                new DocumentReference(NOTIFICATION_PREFERENCE_CLASS, userReference.getWikiReference());
-
         List<NotificationPreference> preferences = new ArrayList<>();
 
         try {
             XWikiDocument doc = xwiki.getDocument(userReference, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesClass);
+            List<BaseObject> preferencesObj = doc.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
@@ -138,10 +135,7 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            final DocumentReference notificationStartDateClass
-                    = new DocumentReference(NOTIFICATION_START_DATE_CLASS, userReference.getWikiReference());
-
-            BaseObject obj = document.getXObject(notificationStartDateClass);
+            BaseObject obj = document.getXObject(NOTIFICATION_START_DATE_CLASS);
             if (obj != null) {
                 Date date = obj.getDateValue(START_DATE);
                 if (date != null) {
@@ -166,10 +160,7 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            final DocumentReference notificationStartDateClass
-                    = new DocumentReference(NOTIFICATION_START_DATE_CLASS, userReference.getWikiReference());
-
-            BaseObject obj = document.getXObject(notificationStartDateClass, true, context);
+            BaseObject obj = document.getXObject(NOTIFICATION_START_DATE_CLASS, true, context);
             obj.setDateValue(START_DATE, startDate);
 
             xwiki.saveDocument(document, "Update start date for the notifications.", context);
@@ -189,14 +180,9 @@ public class DefaultModelBridge implements ModelBridge
         XWiki xwiki = context.getWiki();
         PageNotificationEventDescriptor newDescriptor = null;
 
-        final DocumentReference pageNotificationEventDescriptorClass
-                = new DocumentReference(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS, documentReference.getWikiReference());
-
-        List<PageNotificationEventDescriptor> eventDescriptors = new ArrayList<>();
-
         try {
-            XWikiDocument doc = xwiki.getDocument(documentReference, context);
-            BaseObject eventDescriptorObj = doc.getXObject(pageNotificationEventDescriptorClass);
+            XWikiDocument doc = xwiki.getDocument(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS, context);
+            BaseObject eventDescriptorObj = doc.getXObject(PAGE_NOTIFICATION_EVENT_DESCRIPTOR_CLASS);
             if (eventDescriptorObj != null) {
                 newDescriptor = new PageNotificationEventDescriptor(ImmutableMap.<String, String>builder()
                         .put(APPLICATION_NAME, eventDescriptorObj.getStringValue(APPLICATION_NAME))
@@ -222,9 +208,6 @@ public class DefaultModelBridge implements ModelBridge
     public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference)
         throws NotificationException
     {
-        final DocumentReference notificationPreferencesScopeClass
-                = new DocumentReference(NOTIFICATION_PREFERENCE_SCOPE_CLASS, userReference.getWikiReference());
-
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
@@ -232,7 +215,7 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument doc = xwiki.getDocument(userReference, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
+            List<BaseObject> preferencesObj = doc.getXObjects(NOTIFICATION_PREFERENCE_SCOPE_CLASS);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {

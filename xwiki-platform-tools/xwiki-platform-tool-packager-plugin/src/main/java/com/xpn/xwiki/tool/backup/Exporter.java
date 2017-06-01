@@ -34,6 +34,14 @@ import com.xpn.xwiki.plugin.packaging.PackageException;
 public class Exporter extends AbstractPackager
 {
     /**
+     * Default constructor.
+     */
+    public Exporter()
+    {
+        super(null);
+    }
+
+    /**
      * Export documents from an existing loaded XWiki database. The database is defined by its passed name and by an
      * Hibernate configuration file.
      *

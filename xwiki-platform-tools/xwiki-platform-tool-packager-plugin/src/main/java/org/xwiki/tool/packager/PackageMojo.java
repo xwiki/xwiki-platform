@@ -80,38 +80,26 @@ import com.xpn.xwiki.tool.backup.Importer;
  * @version $Id$
  * @since 3.4M1
  */
-@Mojo(
-    name = "package",
-    defaultPhase = LifecyclePhase.PACKAGE,
-    requiresDependencyResolution = ResolutionScope.RUNTIME,
-    requiresProject = true,
-    threadSafe = true
-)
+@Mojo(name = "package", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME, requiresProject = true, threadSafe = true)
 public class PackageMojo extends AbstractExtensionMojo
 {
     /**
      * The directory where to create the packaging.
      */
-    @Parameter(defaultValue="${project.build.directory}/xwiki", required = true)
+    @Parameter(defaultValue = "${project.build.directory}/xwiki", required = true)
     private File outputPackageDirectory;
 
     /**
      * The directory where classes are put.
      */
-    @Parameter(defaultValue="${project.build.outputDirectory}", required = true)
+    @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
     private File outputClassesDirectory;
 
     /**
      * The directory where the HSQLDB database is generated.
      */
-    @Parameter(defaultValue="${project.build.directory}/database", required = true)
+    @Parameter(defaultValue = "${project.build.directory}/database", required = true)
     private File databaseDirectory;
-
-    /**
-     * The maven project.
-     */
-    @Parameter(property = "project", required = true, readonly = true)
-    protected MavenProject project;
 
     /**
      * Used to look up Artifacts in the remote repository.
@@ -175,7 +163,7 @@ public class PackageMojo extends AbstractExtensionMojo
     private boolean test;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void executeInternal() throws MojoExecutionException, MojoFailureException
     {
         if (isSkipExecution()) {
             getLog().info("Skipping execution");
@@ -183,8 +171,6 @@ public class PackageMojo extends AbstractExtensionMojo
             return;
         }
         LogUtils.configureXWikiLogs();
-
-        initializeComponents();
 
         getLog().info("Using platform version: " + getXWikiPlatformVersion());
 
@@ -242,12 +228,9 @@ public class PackageMojo extends AbstractExtensionMojo
         }
 
         // Step 8: Import specified XAR files into the database
-        getLog().info(
-            String.format("Import XAR dependencies %s...", this.importUser == null ? "as a backup pack"
-                : "using user [" + this.importUser + "]"));
+        getLog().info(String.format("Import XAR dependencies %s...",
+            this.importUser == null ? "as a backup pack" : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
-
-        disposeComponents();
     }
 
     protected void installJAR(Artifact artifact, File libDirectory) throws MojoExecutionException
@@ -257,7 +240,7 @@ public class PackageMojo extends AbstractExtensionMojo
         copyFile(artifact.getFile(), libDirectory);
 
         // Generate XED file
-        saveExtension(artifact, libDirectory);
+        this.extensionHelper.serializeExtension(artifact, libDirectory);
     }
 
     protected boolean isSkipExecution()
@@ -282,9 +265,8 @@ public class PackageMojo extends AbstractExtensionMojo
         unzip(jettyArtifact.getFile(), this.outputPackageDirectory);
 
         // Replace properties in start shell scripts
-        Collection<File> startFiles =
-            org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory, new WildcardFileFilter(
-                "start_xwiki*.*"), null);
+        Collection<File> startFiles = org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory,
+            new WildcardFileFilter("start_xwiki*.*"), null);
 
         VelocityContext velocityContext = createVelocityContext();
         for (File startFile : startFiles) {
@@ -342,9 +324,8 @@ public class PackageMojo extends AbstractExtensionMojo
         }
 
         // Resolve the artifact
-        Artifact artifact =
-            this.repositorySystem.createArtifact(artifactItem.getGroupId(), artifactItem.getArtifactId(), version, "",
-                type);
+        Artifact artifact = this.repositorySystem.createArtifact(artifactItem.getGroupId(),
+            artifactItem.getArtifactId(), version, "", type);
         resolveArtifact(artifact);
         return artifact;
     }
@@ -383,12 +364,12 @@ public class PackageMojo extends AbstractExtensionMojo
     {
         Set<Artifact> xarArtifacts = resolveXARs();
         if (!xarArtifacts.isEmpty()) {
-            Importer importer = new Importer(this.componentManager);
+            Importer importer = new Importer(this.extensionHelper.getComponentManager());
             // Make sure that we generate the Database in the right directory
             // TODO: In the future control completely the Hibernate config from inside the packager plugin and not in
             // the project using the packager plugin
-            System.setProperty(Environment.URL, "jdbc:hsqldb:file:" + this.databaseDirectory
-                + "/xwiki_db;shutdown=true");
+            System.setProperty(Environment.URL,
+                "jdbc:hsqldb:file:" + this.databaseDirectory + "/xwiki_db;shutdown=true");
 
             XWikiContext xcontext;
             try {
@@ -411,8 +392,8 @@ public class PackageMojo extends AbstractExtensionMojo
 
                     getLog().info("  .... Imported " + nb + " documents");
                 } catch (Exception e) {
-                    throw new MojoExecutionException(
-                        String.format("Failed to import XAR [%s]", xarArtifact.toString()), e);
+                    throw new MojoExecutionException(String.format("Failed to import XAR [%s]", xarArtifact.toString()),
+                        e);
                 }
             }
 
@@ -514,9 +495,8 @@ public class PackageMojo extends AbstractExtensionMojo
 
         // If the Jetty artifact wasn't defined, try to resolve the default Jetty artifact
         if (jettyArtifact == null) {
-            jettyArtifact =
-                this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-tool-jetty-resources",
-                    getXWikiPlatformVersion(), "", "zip");
+            jettyArtifact = this.repositorySystem.createArtifact("org.xwiki.platform",
+                "xwiki-platform-tool-jetty-resources", getXWikiPlatformVersion(), "", "zip");
         }
 
         if (jettyArtifact != null) {
@@ -706,10 +686,10 @@ public class PackageMojo extends AbstractExtensionMojo
         // Get the platform's pom.xml to get the versions of some needed externals dependencies, so that we do not
         // hardcode them.
         MavenProject platformPomProject = getPlatformPOMProject();
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
-            "bootstrap", getDependencyManagementVersion(platformPomProject, "org.webjars", "bootstrap"), null, "jar"));
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
-            "requirejs", getDependencyManagementVersion(platformPomProject, "org.webjars", "requirejs"), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars", "bootstrap",
+            getDependencyManagementVersion(platformPomProject, "org.webjars", "bootstrap"), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars", "requirejs",
+            getDependencyManagementVersion(platformPomProject, "org.webjars", "requirejs"), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",
@@ -729,24 +709,22 @@ public class PackageMojo extends AbstractExtensionMojo
 
     private Set<Artifact> resolveTransitively(Set<Artifact> artifacts) throws MojoExecutionException
     {
-        AndArtifactFilter filter =
-            new AndArtifactFilter(Arrays.asList(new ScopeArtifactFilter("runtime"),
-                // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
-                // log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
-                // - Exclude batik-js to prevent conflict with the patched version of Rhino used by yuicompressor used
-                // for JSX. See https://jira.xwiki.org/browse/XWIKI-6151 for more details.
-                new ExcludesArtifactFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
-                    "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
+        AndArtifactFilter filter = new AndArtifactFilter(Arrays.asList(new ScopeArtifactFilter("runtime"),
+            // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
+            // log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
+            // - Exclude batik-js to prevent conflict with the patched version of Rhino used by yuicompressor used
+            // for JSX. See https://jira.xwiki.org/browse/XWIKI-6151 for more details.
+            new ExcludesArtifactFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
+                "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
 
-        ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest().setArtifact(this.project.getArtifact()).setArtifactDependencies(artifacts)
-                .setCollectionFilter(filter).setRemoteRepositories(this.remoteRepositories)
-                .setLocalRepository(this.localRepository).setManagedVersionMap(getManagedVersionMap())
-                .setResolveRoot(false);
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact(this.project.getArtifact())
+            .setArtifactDependencies(artifacts).setCollectionFilter(filter)
+            .setRemoteRepositories(this.remoteRepositories).setLocalRepository(this.localRepository)
+            .setManagedVersionMap(getManagedVersionMap()).setResolveRoot(false);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
-            throw new MojoExecutionException(String.format("Failed to resolve artifacts [%s]", artifacts,
-                resolutionResult.getExceptions().get(0)));
+            throw new MojoExecutionException(
+                String.format("Failed to resolve artifacts [%s]", artifacts, resolutionResult.getExceptions().get(0)));
         }
 
         return resolutionResult.getArtifacts();
@@ -770,14 +748,14 @@ public class PackageMojo extends AbstractExtensionMojo
 
     private MavenProject getTopLevelPOMProject() throws MojoExecutionException
     {
-        return getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.commons", "xwiki-commons",
-            getXWikiCommonsVersion()));
+        return this.extensionHelper.getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.commons",
+            "xwiki-commons", getXWikiCommonsVersion()));
     }
 
     private MavenProject getPlatformPOMProject() throws MojoExecutionException
     {
-        return getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.platform", "xwiki-platform-core",
-            getXWikiPlatformVersion()));
+        return this.extensionHelper.getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.platform",
+            "xwiki-platform-core", getXWikiPlatformVersion()));
     }
 
     /**
@@ -791,8 +769,8 @@ public class PackageMojo extends AbstractExtensionMojo
 
     /**
      * @return the version of the XWiki Platform project, either configured in the project's pom using this plugin or
-     *         taken from the {@code platform.version} property if defined, defaulting to the current project version
-     *         if not defined
+     *         taken from the {@code platform.version} property if defined, defaulting to the current project version if
+     *         not defined
      */
     private String getXWikiPlatformVersion()
     {
@@ -817,8 +795,9 @@ public class PackageMojo extends AbstractExtensionMojo
                 return dependency.getVersion();
             }
         }
-        throw new MojoExecutionException(String.format("Failed to find artifact [%s:%s] in dependency management "
-            + "for [%s]", groupId, artifactId, project.toString()));
+        throw new MojoExecutionException(
+            String.format("Failed to find artifact [%s:%s] in dependency management " + "for [%s]", groupId, artifactId,
+                project.toString()));
     }
 
     /**
@@ -839,8 +818,8 @@ public class PackageMojo extends AbstractExtensionMojo
         try {
             FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
         } catch (IOException e) {
-            throw new MojoExecutionException(String.format("Failed to copy directory [%] to [%]", sourceDirectory,
-                targetDirectory), e);
+            throw new MojoExecutionException(
+                String.format("Failed to copy directory [%] to [%]", sourceDirectory, targetDirectory), e);
         }
     }
 
@@ -860,7 +839,7 @@ public class PackageMojo extends AbstractExtensionMojo
         try {
             File xedFile = new File(warDirectory, "META-INF/extension.xed");
             xedFile.getParentFile().mkdirs();
-            saveExtension(xedFile, warArtifact);
+            this.extensionHelper.serializeExtension(xedFile, warArtifact);
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to generate distribution's extension.xed descriptor", e);
         }
@@ -877,20 +856,19 @@ public class PackageMojo extends AbstractExtensionMojo
             unArchiver.setOverwrite(true);
             unArchiver.extract();
         } catch (Exception e) {
-            throw new MojoExecutionException(String.format("Error unpacking file [%s] into [%s]", source,
-                targetDirectory), e);
+            throw new MojoExecutionException(
+                String.format("Error unpacking file [%s] into [%s]", source, targetDirectory), e);
         }
     }
 
     private void resolveArtifact(Artifact artifact) throws MojoExecutionException
     {
-        ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest().setArtifact(artifact).setRemoteRepositories(this.remoteRepositories)
-                .setLocalRepository(this.localRepository);
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact(artifact)
+            .setRemoteRepositories(this.remoteRepositories).setLocalRepository(this.localRepository);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
-            throw new MojoExecutionException(String.format("Failed to resolve artifact [%s]", artifact,
-                resolutionResult.getExceptions().get(0)));
+            throw new MojoExecutionException(
+                String.format("Failed to resolve artifact [%s]", artifact, resolutionResult.getExceptions().get(0)));
         }
     }
 
@@ -946,11 +924,12 @@ public class PackageMojo extends AbstractExtensionMojo
         props.setProperty("xwikiDbHbmFeeds", "feeds.hbm.xml");
 
         // Default configuration data for xwiki.cfg
-        props.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
-            + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
-            + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
-            + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
-            + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
+        props.setProperty("xwikiCfgPlugins",
+            "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
         props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");
         props.setProperty("xwikiCfgDefaultSkin", "flamingo");

@@ -45,10 +45,10 @@ public class ImportMojo extends AbstractImportMojo
     protected File sourceDirectory;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void executeInternal() throws MojoExecutionException, MojoFailureException
     {
         LogUtils.configureXWikiLogs();
-        Importer importer = new Importer();
+        Importer importer = new Importer(this.extensionHelper.getComponentManager());
 
         System.setProperty("xwiki.data.dir", this.xwikiDataDir.getAbsolutePath());
         // If the package mojo was executed before, it might have left a different database connection URL in the

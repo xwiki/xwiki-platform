@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1465277605000</creationDate>
+  <date>1467283422000</date>
+  <contentUpdateDate>1467283422000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>Tour.HomepageTour.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>ab4274a6-4065-49eb-a7e7-2dea8cf8d51e</guid>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+  <content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=Welcome to XWiki
+tour.homepageTour.welcome.content=In the next couple of minutes you will discover your wiki's interface and basic functionalities.
+tour.homepageTour.panels.title=Panels
+tour.homepageTour.panels.contentA=The current panels allow you to access your wiki's applications and pages.
+tour.homepageTour.panels.contentB=Administrators can customise them and decide which panels are shown.
+tour.homepageTour.breadcrumbs.title=Breadcrumbs
+tour.homepageTour.breadcrumbs.contentA=The breadcrumbs allow you to identify where your page is located and navigate the hierarchy.
+tour.homepageTour.breadcrumbs.contentB=The {0} button will always take you to the wiki's home page.
+tour.homepageTour.pageContent.title=Page Content
+tour.homepageTour.pageContent.contentA=This is the place where the content of the current page is displayed.
+tour.homepageTour.pageContent.contentB=Edit this page to add tables, lists, macros and structure in order to organize your knowledge.
+tour.homepageTour.pageMenu.title=Page Menu
+tour.homepageTour.pageMenu.contentA=This menu contains page related actions. With the appropriate rights, you can edit, create, administer or delete pages.
+tour.homepageTour.pageMenu.contentB=The {0} button reveals more actions like: Export, Print, Share, etc.
+tour.homepageTour.pageTabs.title=Page Tabs
+tour.homepageTour.pageTabs.contentA=Comments are a great way for users to discuss the page content.
+tour.homepageTour.pageTabs.contentB=You can also attach files, compare page versions or see page information.
+tour.homepageTour.header.title=Header
+tour.homepageTour.header.contentA=You can Search for content, Watch for page changes or access your User Profile.
+tour.homepageTour.header.contentB=The {0} button, opens a Drawer which contains wiki related actions, like Administration and Indexes.
+tour.homepageTour.tourComplete.title=Tour Complete
+tour.homepageTour.tourComplete.contentA=This completes your tour on XWiki's interface and basic functionalities.
+tour.homepageTour.tourComplete.contentB=For more details on each feature, access the {0}documentation{1}.</content>
+</xwikidoc>

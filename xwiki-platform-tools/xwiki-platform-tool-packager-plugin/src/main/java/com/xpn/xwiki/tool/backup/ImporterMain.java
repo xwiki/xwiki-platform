@@ -21,6 +21,8 @@ package com.xpn.xwiki.tool.backup;
 
 import java.io.File;
 
+import org.xwiki.component.embed.EmbeddableComponentManager;
+
 /**
  * Class to call from the command line to import XWiki documents into database.
  *
@@ -50,6 +52,11 @@ public final class ImporterMain
         String databaseName = args[1];
         File hibernateConfig = new File(args[2]);
 
-        new Importer().importDocuments(sourceDirectory, databaseName, hibernateConfig);
+        EmbeddableComponentManager componentManager =
+            (EmbeddableComponentManager) org.xwiki.environment.System.initialize();
+
+        new Importer(componentManager).importDocuments(sourceDirectory, databaseName, hibernateConfig);
+
+        componentManager.dispose();
     }
 }

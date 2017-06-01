@@ -1,0 +1,58 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<assembly>
+  <id>distribution</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <dependencySets>
+    <!-- Unpack the data files to package it in the distribution -->
+    <dependencySet>
+      <includes>
+        <include>org.xwiki.platform:xwiki-platform-distribution-data-hsqldb</include>
+      </includes>
+      <outputDirectory>/data</outputDirectory>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <useDefaultExcludes>false</useDefaultExcludes>
+      </unpackOptions>
+      <!-- Needed to prevent warning since our project has a pom packaging which is not associated to any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+  </dependencySets>
+  <fileSets>
+    <!-- Standard XWiki jetty-hsqldb package -->
+    <!-- Unzipped by dependency plugin. Could not find any way to do all that directly with a dependencySet... -->
+    <fileSet>
+      <useDefaultExcludes>false</useDefaultExcludes>
+      <directory>${project.build.directory}/xwiki-platform-distribution-jetty-hsqldb-${project.version}</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <!-- Add extension descriptor -->
+    <fileSet>
+      <directory>${project.build.outputDirectory}/META-INF</directory>
+      <outputDirectory>webapps/xwiki/META-INF</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

@@ -384,13 +384,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Watchlist -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-watchlist-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- Edit API Implementation -->
     <dependency>
@@ -413,6 +406,17 @@
       <artifactId>xwiki-platform-wysiwyg-war</artifactId>
       <version>${project.version}</version>
       <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Stuff filled with Maven hacks making them hard to install as extension right now -->
+
+    <!-- Search -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-rest</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -475,13 +479,13 @@
     </dependency>
 
     <!-- ********************************************************************** -->
-    <!-- Add dependencies on the base flavor for the mainwiki and for subwikis so that we transitively
-         include all JAR dependencies in the generated WAR -->
+    <!-- Base UI (to get the JARs) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor</artifactId>
+      <artifactId>xwiki-platform-distribution-ui-base</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
+      <type>pom</type>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

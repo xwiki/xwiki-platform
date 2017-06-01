@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="hr">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1465277605000</creationDate>
+  <date>1467283422000</date>
+  <contentUpdateDate>1467283422000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Prijevodi</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## Vodič kroz početnu stranicu (po koracima)
+tour.homepageTour.welcome.title=Dobrodošli u XWiki
+tour.homepageTour.welcome.content=U sljedećih nekoliko minuta otkrit ćete sučelje i osnovne funkcionalnosti vašeg wikija.
+tour.homepageTour.panels.title=Paneli
+tour.homepageTour.panels.contentA=Postojeći paneli omogućavaju vam da pristupite aplikacijama i stranicama vašeg wikija.
+tour.homepageTour.panels.contentB=Administratori ih mogu prilagoditi i odlučiti koji paneli se prikazuju.
+tour.homepageTour.breadcrumbs.title=Mrvice
+tour.homepageTour.breadcrumbs.contentA=Mrvice vam omogućavaju identifikaciju lokacije vaše stranice i navigaciju kroz hijerarhiju.
+tour.homepageTour.breadcrumbs.contentB=Gumb {0} će vas uvijek odvesti na početnu stranicu.
+tour.homepageTour.pageContent.title=Sadržaj stranice
+tour.homepageTour.pageContent.contentA=Ovo je mjesto u kojem se prikazuje sadržaj tekuće stranice.
+tour.homepageTour.pageContent.contentB=Uredite ovu stranicu kako biste dodali tablice, liste, makroe i strukture za organiziranje vašeg znanja.
+tour.homepageTour.pageMenu.title=Izbornik stranice
+tour.homepageTour.pageMenu.contentA=Ovaj izbornik sadrži akcije vezane uz stranicu. S odgovarajućim pravima možete uređivati, izrađivati, administrirati ili brisati stranice.
+tour.homepageTour.pageMenu.contentB=Gumb {0} otkriva dodatne akcije poput: Izvezi, Ispiši, Podijeli, itd.
+tour.homepageTour.pageTabs.title=Kartice stranice
+tour.homepageTour.pageTabs.contentA=Komentari su izvrstan način za korisnike da diskutiraju o sadržaju stranice.
+tour.homepageTour.pageTabs.contentB=Također možete dodati datoteke, uspoređivati verzije stranice ili vidjeti informacije o stranici.
+tour.homepageTour.header.title=Zaglavlje
+tour.homepageTour.header.contentA=Možete Pretraživati sadržaj, Motriti promjene stranice ili pristupiti vašem korisničkom profilu.
+tour.homepageTour.header.contentB=Gumb {0} otvara Ladicu koja sadrži akcije vezane uz wiki, poput Administracije i Indeksa.
+tour.homepageTour.tourComplete.title=Vodič dovršen
+tour.homepageTour.tourComplete.contentA=Ovim je završen vaš vodič kroz sučelje i osnovne funkcionalnosti XWikija.
+tour.homepageTour.tourComplete.contentB=Za više detalja o svakoj značajki, pristupite {0}dokumentaciji{1}.</content>
+</xwikidoc>

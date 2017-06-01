@@ -27,28 +27,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingResult;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.InstallException;
-import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepositoryException;
-import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
-import org.xwiki.properties.ConverterManager;
+import org.xwiki.extension.InstalledExtension;
+import org.xwiki.tool.extension.util.AbstractExtensionMojo;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -60,7 +43,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @since 9.0RC1
  * @since 8.4.2
  */
-public abstract class AbstractImportMojo extends AbstractMojo
+public abstract class AbstractImportMojo extends AbstractExtensionMojo
 {
     public static final String MPKEYPREFIX = "xwiki.extension.";
 
@@ -71,57 +54,6 @@ public abstract class AbstractImportMojo extends AbstractMojo
     public static final String MPNAME_WEBSITE = "website";
 
     public static final String MPNAME_FEATURES = "features";
-
-    public static class ExcludeArtifact
-    {
-        private String groupId;
-
-        private String artifactId;
-
-        private String version;
-
-        private String type;
-
-        public String getGroupId()
-        {
-            return groupId;
-        }
-
-        public void setGrouId(String grouId)
-        {
-            this.groupId = grouId;
-        }
-
-        public String getArtifactId()
-        {
-            return artifactId;
-        }
-
-        public void setArtifactId(String artifactId)
-        {
-            this.artifactId = artifactId;
-        }
-
-        public String getVersion()
-        {
-            return version;
-        }
-
-        public void setVersion(String version)
-        {
-            this.version = version;
-        }
-
-        public String getType()
-        {
-            return type;
-        }
-
-        public void setType(String type)
-        {
-            this.type = type;
-        }
-    }
 
     /**
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
@@ -152,24 +84,6 @@ public abstract class AbstractImportMojo extends AbstractMojo
      */
     @Parameter(defaultValue = XWikiRightService.SUPERADMIN_USER_FULLNAME)
     protected String installUser;
-
-    /**
-     * The maven project.
-     */
-    @Parameter(property = "project", required = true, readonly = true)
-    protected MavenProject project;
-
-    /**
-     * The current Maven session being executed.
-     */
-    @Parameter(defaultValue = "${session}", readonly = true)
-    protected MavenSession session;
-
-    /**
-     * Project builder -- builds a model from a pom.xml.
-     */
-    @Component
-    protected ProjectBuilder projectBuilder;
 
     /**
      * @param importer the importer
@@ -222,12 +136,10 @@ public abstract class AbstractImportMojo extends AbstractMojo
         getLog().info("  ..... Imported " + nb + " documents");
 
         // Install extension
-        installExtension(artifact, (ComponentManager) xcontext.get(ComponentManager.class.getName()),
-            this.xarNamespace);
+        installExtension(artifact, this.xarNamespace);
     }
 
-    protected void installExtension(Artifact artifact, ComponentManager componentManager, String namespace)
-        throws ComponentLookupException, InstallException, LocalExtensionRepositoryException, MojoExecutionException
+    protected void installExtension(Artifact artifact, String namespace) throws MojoExecutionException
     {
         // We need to distinguish between extensions installed explicitly and their transitive dependencies.
         // We have to create our own Set because Maven changes the fields from the dependency Artifacts (e.g. resolves
@@ -235,42 +147,10 @@ public abstract class AbstractImportMojo extends AbstractMojo
         // result the #contains(Artifact) method doesn't work as expected because it uses the new hash code.
         Set<Artifact> directDependencies = new HashSet<>(this.project.getDependencyArtifacts());
 
-        LocalExtensionRepository localExtensionRepository =
-            componentManager.getInstance(LocalExtensionRepository.class);
-        InstalledExtensionRepository installedExtensionRepository =
-            componentManager.getInstance(InstalledExtensionRepository.class);
+        InstalledExtension installedExtension =
+            this.extensionHelper.registerInstalledExtension(artifact, namespace, !directDependencies.contains(artifact),
+                Collections.<String, Object>singletonMap("user.reference", this.installUser));
 
-        MavenProject dependencyProject = getMavenProject(artifact);
-
-        ConverterManager converter = componentManager.getInstance(ConverterManager.class);
-        Extension mavenExtension = converter.convert(Extension.class, dependencyProject.getModel());
-
-        DefaultLocalExtension extension = new DefaultLocalExtension(null, mavenExtension);
-
-        extension.setFile(artifact.getFile());
-
-        LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
-        installedExtensionRepository.installExtension(localExtension, namespace, !directDependencies.contains(artifact),
-            Collections.<String, Object>singletonMap("user.reference", this.installUser));
-
-        getLog().info("  ... Registered extension [" + extension + "]");
-    }
-
-    protected MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
-    {
-        try {
-            ProjectBuildingRequest request = new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest())
-                // We don't want to execute any plugin here
-                .setProcessPlugins(false)
-                // It's not this plugin job to validate this pom.xml
-                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
-                // Use the repositories configured for the built project instead of the default Maven ones
-                .setRemoteRepositories(this.session.getCurrentProject().getRemoteArtifactRepositories());
-            // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
-            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
-            return result.getProject();
-        } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
-        }
+        getLog().info("  ... Registered extension [" + installedExtension + "]");
     }
 }

@@ -32,19 +32,18 @@
   <packaging>pom</packaging>
   <description>Parent pom of the default XWiki distribution. Can also be used as parent for custom distributions.</description>
   <modules>
-    <module>xwiki-platform-distribution-flavor</module>
+    <module>xwiki-platform-distribution-ui</module>
     <module>xwiki-platform-distribution-war-dependencies</module>
     <module>xwiki-platform-distribution-war-legacydependencies</module>
     <module>xwiki-platform-distribution-war</module>
     <module>xwiki-platform-distribution-jetty-hsqldb</module>
+    <module>xwiki-platform-distribution-flavor</module>
     <module>xwiki-platform-distribution-debian</module>
   </modules>
   <properties>
     <!-- Flavors known to be valid with the current distribution -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor/${platform.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${platform.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${platform.version}
+        org.xwiki.platform:xwiki-platform-distribution-ui-flavor/${platform.version}
     </xwiki.extension.knownFlavors>
 
     <!-- Hibernate configuration -->
@@ -82,8 +81,9 @@
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-  com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
-  com.xpn.xwiki.plugin.tag.TagPlugin
+  com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin,\
+  com.xpn.xwiki.plugin.tag.TagPlugin,\
+  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
     </platform.xwiki.cfg.plugins.default>
     <!-- Legacy plugin list -->
     <platform.xwiki.cfg.plugins.legacy>${platform.xwiki.cfg.plugins.default},\
@@ -136,14 +136,93 @@
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
   </properties>
+    <!-- Avoid enforce-upper-bounds rule complains (it's actually false positive since Extension Manager is not affected by that) -->
+  <dependencyManagement>
+    <dependencies>
+      <!-- application-help-center -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-icon-script</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-skin-skinx</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-administration-ui</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-extension-ui</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-macro-toc</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-chart-macro</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-index-tree-macro</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-index-ui</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-rendering-wikimacro-ui</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-help-ui</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <!-- application-tour-ui -->
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
+        <version>9.5-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-security-script</artifactId>
+        <version>9.5-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-          <version>${commons.version}</version>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
@@ -430,14 +509,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <!-- Needed to add support for the XAR packaging -->
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
   </build>
   <profiles>
     <!-- Add Legacy modules -->

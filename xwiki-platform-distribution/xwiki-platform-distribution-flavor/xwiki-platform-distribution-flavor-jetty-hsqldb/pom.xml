@@ -24,53 +24,62 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution</artifactId>
+    <artifactId>xwiki-platform-distribution-flavor</artifactId>
     <version>9.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-jetty-hsqldb</artifactId>
-  <name>XWiki Platform - Distribution - Jetty HSQLDB</name>
+  <artifactId>xwiki-platform-distribution-flavor-jetty-hsqldb</artifactId>
+  <name>XWiki Platform - Distribution - Flavor - Jetty HSQLDB</name>
   <packaging>pom</packaging>
   <description>Jetty and HSQLDB based all in one package</description>
   <properties>
     <!-- Put the name of the distribution which will be displayed in the footer -->
-    <xwiki.extension.name>XWiki Jetty HSQLDB</xwiki.extension.name>
+    <xwiki.extension.name>XWiki Base Jetty HSQLDB</xwiki.extension.name>
 
     <xwiki.extension.features>xwiki</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <artifactId>xwiki-platform-distribution-jetty-hsqldb</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <optional>true</optional>
     </dependency>
-    <!-- Add the database JAR so that it's included in the expanded WAR since it's not included
-         by default in the Platform WAR. -->
     <dependency>
-      <groupId>${xwiki.db.jdbc.groupId}</groupId>
-      <artifactId>${xwiki.db.jdbc.artifactId}</artifactId>
-      <version>${xwiki.db.jdbc.version}</version>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-data-hsqldb</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
       <optional>true</optional>
     </dependency>
   </dependencies>
   <build>
     <plugins>
+      <!-- Could not find any way to select a subfolder directly from dependency with assembly plugin... -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-jetty-hsqldb</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-distribution-jetty-hsqldb</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Generate extension descriptor -->
       <plugin>
         <groupId>org.xwiki.commons</groupId>
@@ -80,19 +89,6 @@
             <id>register</id>
             <goals>
               <goal>register</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Inject Hibernate's configuration for the specified database -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-remote-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>xwiki-platform-tool-configuration-resources</id>
-            <goals>
-              <goal>process</goal>
             </goals>
           </execution>
         </executions>

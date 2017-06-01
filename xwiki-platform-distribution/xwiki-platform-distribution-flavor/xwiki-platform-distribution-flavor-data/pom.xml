@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution-flavor</artifactId>
+    <version>9.5-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
+  <name>XWiki Platform - Distribution - Flavor - Data</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Distribution - Flavor - Data</description>
+  <dependencies>
+    <!-- Make sure to build those before data module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-ui-admin-user</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Step 1: Copy and filter the Hibernate config file which will be used by the packager
+           plugin -->
+        <!-- Step 2: Import the XAR dependencies into the database -->
+        <plugin>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+          <version>${project.version}</version>
+          <configuration>
+            <hibernateConfig>
+              ${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml
+            </hibernateConfig>
+          </configuration>
+          <dependencies>
+            <!-- Since we're building XWiki Enterprise, we need to add the ActivityStream plugin as a dependency,
+                 which has its own mapping and migrators. -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-activitystream-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-annotation-io</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- WikiMacro classes are automatically generated. -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Instance module has its own Hibernate mapping file -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-instance</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Wiki Workspaces migrator migrates subwikis -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-wiki-workspaces-migrator</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Wiki User Default implementation has a migrator to upgrade subwikis -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-wiki-user-default</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Wiki Template Default implementation has a migrator to create WikiManager.WikiTemplateClass objects -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-wiki-template-default</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Wiki Default implementation has a migrator to set pretty names to wikis that does not have -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-wiki-default</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Mail Sender module has its own Hibernate mapping file -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-mail-send-storage</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Watchlist API has a migrator to change property types from StaticList to DBList -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-watchlist-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- We need the Servlet API dep since it's used by the Packager and since it has
+                 a provided scope in XWiki core it's not inherited as part of transitive deps -->
+            <dependency>
+              <groupId>javax.servlet</groupId>
+              <artifactId>javax.servlet-api</artifactId>
+              <version>3.0.1</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>data</goal>
+              </goals>
+              <configuration>
+                <includes>
+                  <include>
+                    <groupId>org.xwiki.platform</groupId>
+                    <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
+                    <version>${project.version}</version>
+                    <type>xar</type>
+                  </include>
+                  <include>
+                    <groupId>org.xwiki.platform</groupId>
+                    <artifactId>xwiki-platform-distribution-ui-admin-user</artifactId>
+                    <version>${project.version}</version>
+                    <type>xar</type>
+                  </include>
+                </includes>
+                <coreExtensions>
+                  <!-- We exclude what is already in the WAR -->
+                  <coreExtension>
+                    <groupId>org.xwiki.platform</groupId>
+                    <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type>
+                  </coreExtension>
+                </coreExtensions>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Step 3: Zip the generated data -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <configuration>
+            <descriptors>
+              <descriptor>${basedir}/src/assemble/data.xml</descriptor>
+            </descriptors>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  <modules>
+    <module>xwiki-platform-distribution-flavor-data-hsqldb</module>
+  </modules>
+</project>

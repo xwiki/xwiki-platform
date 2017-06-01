@@ -47,14 +47,6 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 public class Importer extends AbstractPackager
 {
     /**
-     * Default constructor.
-     */
-    public Importer()
-    {
-
-    }
-
-    /**
      * @param componentManager the component manager
      */
     public Importer(ComponentManager componentManager)

@@ -425,9 +425,26 @@
         <artifactId>xwiki-commons-tool-webjar-handlers</artifactId>
         <version>${commons.version}</version>
       </extension>
+      <!-- Needed to add support for the "xar" packaging -->
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+      <!-- Needed to add support for the "xip" packaging -->
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+        <version>${commons.version}</version>
+      </extension>
     </extensions>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+          <version>${commons.version}</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -481,15 +498,20 @@
           <version>${commons.version}</version>
           <configuration>
             <extensionOverrides>
-              <!-- Should ok for any version of jcl-over-slf4j (since commons-logging is dead) -->
               <extensionOverride>
                 <id>org.slf4j:jcl-over-slf4j</id>
+                <!-- Should be ok for any version of jcl-over-slf4j (since commons-logging is dead) -->
                 <features>commons-logging:commons-logging/1.2</features>
               </extensionOverride>
-              <!-- Should ok for any version of log4j-over-slf4j (since log4j 1.x is dead) -->
               <extensionOverride>
                 <id>org.slf4j:log4j-over-slf4j</id>
-                <features>log4j:log4j/1.2.17</features>
+                <features>
+                  <!-- Should be ok for any version of log4j-over-slf4j (since log4j 1.x is dead) -->
+                  log4j:log4j/1.2.17,
+
+                  <!-- Does not make sense to have both at the same time -->
+                  org.slf4j:slf4j-log4j12
+                </features>
               </extensionOverride>
               <!-- For Jython 2.7.0 (don't forget to refresh it when Jython version id changed !) -->
               <extensionOverride>

@@ -31,9 +31,6 @@
   <name>XWiki Platform - Distribution - Flavor - Data - HSQLDB</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Data - HSQLDB</description>
-  <properties>
-    <xwiki.db.connection.url>jdbc:hsqldb:file:${project.build.directory}/data/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.hsqldb</groupId>

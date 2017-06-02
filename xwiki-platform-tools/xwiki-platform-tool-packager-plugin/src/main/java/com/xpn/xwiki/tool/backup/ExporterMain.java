@@ -21,6 +21,8 @@ package com.xpn.xwiki.tool.backup;
 
 import java.io.File;
 
+import org.xwiki.tool.utils.OldCoreHelper;
+
 /**
  * Class to call from the command line to export XWiki documents found in a database to the file system.
  *
@@ -49,6 +51,8 @@ public final class ExporterMain
         String databaseName = args[1];
         File hibernateConfig = new File(args[2]);
 
-        new Exporter().exportDocuments(exportDirectory, databaseName, hibernateConfig);
+        try (OldCoreHelper oldCore = OldCoreHelper.create(databaseName, hibernateConfig)) {
+            new Exporter(oldCore).exportDocuments(exportDirectory, databaseName);
+        }
     }
 }

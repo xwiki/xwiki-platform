@@ -37,9 +37,6 @@
     <xwiki.extension.distribution.ui.version>${platform.version}</xwiki.extension.distribution.ui.version>
     <xwiki.extension.distribution.wikiui>org.xwiki.platform:xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui>
     <xwiki.extension.distribution.wikiui.version>${platform.version}</xwiki.extension.distribution.wikiui.version>
-
-    <!-- Use CKEditor by default in XE -->
-    <xwiki.properties.defaultWysiwygEditor>ckeditor</xwiki.properties.defaultWysiwygEditor>
   </properties>
 
   <modules>
@@ -51,4 +48,13 @@
     <module>xwiki-platform-distribution-flavor-jetty-hsqldb</module>
     <module>xwiki-platform-distribution-flavor-xip</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>flavor-integration-tests</id>
+      <modules>
+        <module>xwiki-platform-distribution-flavor-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -1,1 +1,2 @@
 500:org.xwiki.tool.packager.internal.MavenBuildJarExtensionHandler
+org.xwiki.tool.utils.OldCoreHelper

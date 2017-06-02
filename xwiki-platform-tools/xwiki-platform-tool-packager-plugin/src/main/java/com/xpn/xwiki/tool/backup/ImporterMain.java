@@ -21,7 +21,7 @@ package com.xpn.xwiki.tool.backup;
 
 import java.io.File;
 
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.tool.utils.OldCoreHelper;
 
 /**
  * Class to call from the command line to import XWiki documents into database.
@@ -52,11 +52,8 @@ public final class ImporterMain
         String databaseName = args[1];
         File hibernateConfig = new File(args[2]);
 
-        EmbeddableComponentManager componentManager =
-            (EmbeddableComponentManager) org.xwiki.environment.System.initialize();
-
-        new Importer(componentManager).importDocuments(sourceDirectory, databaseName, hibernateConfig);
-
-        componentManager.dispose();
+        try (OldCoreHelper oldCore = OldCoreHelper.create(databaseName, hibernateConfig)) {
+            new Importer(oldCore).importDocuments(sourceDirectory, databaseName);
+        }
     }
 }

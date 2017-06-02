@@ -22,7 +22,8 @@ package com.xpn.xwiki.tool.backup;
 import java.io.File;
 import java.io.IOException;
 
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.tool.utils.OldCoreHelper;
+
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageException;
 
@@ -31,14 +32,16 @@ import com.xpn.xwiki.plugin.packaging.PackageException;
  *
  * @version $Id$
  */
-public class Exporter extends AbstractPackager
+public class Exporter
 {
+    private OldCoreHelper oldCoreHelper;
+
     /**
-     * Default constructor.
+     * @param oldCoreHelper various tools to manipulate oldcore APIs
      */
-    public Exporter()
+    public Exporter(OldCoreHelper oldCoreHelper)
     {
-        super(null);
+        this.oldCoreHelper = oldCoreHelper;
     }
 
     /**
@@ -47,28 +50,22 @@ public class Exporter extends AbstractPackager
      *
      * @param exportDirectory the directory where to export the documents
      * @param databaseName some database name (TODO: find out what this name is really)
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
-     *            password, etc)
      * @throws Exception if the export failed for any reason
      */
     // TODO: Replace the Hibernate config file with a list of parameters required for the exportation
-    public void exportDocuments(File exportDirectory, String databaseName, File hibernateConfig) throws Exception
+    public void exportDocuments(File exportDirectory, String databaseName) throws Exception
     {
-        XWikiContext xcontext = createXWikiContext(databaseName, hibernateConfig);
-
         Package pack = new Package();
         pack.setWithVersions(false);
-        pack.addAllWikiDocuments(xcontext);
+        pack.addAllWikiDocuments(this.oldCoreHelper.getXWikiContext());
 
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
         // See https://jira.xwiki.org/browse/XWIKI-458
         try {
-            pack.exportToDir(exportDirectory, xcontext);
+            pack.exportToDir(exportDirectory, this.oldCoreHelper.getXWikiContext());
         } catch (IOException e) {
-            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to export documents to ["
-                + exportDirectory + "]", e);
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
+                "Failed to export documents to [" + exportDirectory + "]", e);
         }
-
-        disposeXWikiContext(xcontext);
     }
 }

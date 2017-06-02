@@ -67,11 +67,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.hibernate.cfg.Environment;
-import org.xwiki.tool.extension.util.AbstractExtensionMojo;
+import org.xwiki.tool.utils.AbstractOldCoreMojo;
 import org.xwiki.tool.utils.LogUtils;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.tool.backup.Importer;
 
 /**
@@ -81,7 +79,7 @@ import com.xpn.xwiki.tool.backup.Importer;
  * @since 3.4M1
  */
 @Mojo(name = "package", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME, requiresProject = true, threadSafe = true)
-public class PackageMojo extends AbstractExtensionMojo
+public class PackageMojo extends AbstractOldCoreMojo
 {
     /**
      * The directory where to create the packaging.
@@ -94,12 +92,6 @@ public class PackageMojo extends AbstractExtensionMojo
      */
     @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
     private File outputClassesDirectory;
-
-    /**
-     * The directory where the HSQLDB database is generated.
-     */
-    @Parameter(defaultValue = "${project.build.directory}/database", required = true)
-    private File databaseDirectory;
 
     /**
      * Used to look up Artifacts in the remote repository.
@@ -161,6 +153,15 @@ public class PackageMojo extends AbstractExtensionMojo
      */
     @Parameter(defaultValue = "true")
     private boolean test;
+
+    @Override
+    protected void before() throws MojoExecutionException
+    {
+        // Put the permanent directory in the XWiki instance directory
+        this.permanentDirectory = new File(this.outputPackageDirectory, "data");
+
+        super.before();
+    }
 
     @Override
     public void executeInternal() throws MojoExecutionException, MojoFailureException
@@ -230,7 +231,7 @@ public class PackageMojo extends AbstractExtensionMojo
         // Step 8: Import specified XAR files into the database
         getLog().info(String.format("Import XAR dependencies %s...",
             this.importUser == null ? "as a backup pack" : "using user [" + this.importUser + "]"));
-        importXARs(webInfDirectory);
+        importXARs();
     }
 
     protected void installJAR(Artifact artifact, File libDirectory) throws MojoExecutionException
@@ -360,27 +361,15 @@ public class PackageMojo extends AbstractExtensionMojo
         }
     }
 
-    private void importXARs(File webInfDirectory) throws MojoExecutionException
+    private void importXARs() throws MojoExecutionException
     {
         Set<Artifact> xarArtifacts = resolveXARs();
         if (!xarArtifacts.isEmpty()) {
-            Importer importer = new Importer(this.extensionHelper.getComponentManager());
-            // Make sure that we generate the Database in the right directory
-            // TODO: In the future control completely the Hibernate config from inside the packager plugin and not in
-            // the project using the packager plugin
-            System.setProperty(Environment.URL,
-                "jdbc:hsqldb:file:" + this.databaseDirectory + "/xwiki_db;shutdown=true");
-
-            XWikiContext xcontext;
-            try {
-                xcontext = importer.createXWikiContext("xwiki", new File(webInfDirectory, "hibernate.cfg.xml"));
-            } catch (Exception e) {
-                throw new MojoExecutionException("Failed to create context to import XAR files", e);
-            }
+            Importer importer = new Importer(this.oldCoreHelper);
 
             // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an
             // ordered LinkedHashSet behind the scene)
-            List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(xarArtifacts);
+            List<Artifact> dependenciesFirstArtifacts = new ArrayList<>(xarArtifacts);
             Collections.reverse(dependenciesFirstArtifacts);
 
             // Import the xars
@@ -388,34 +377,14 @@ public class PackageMojo extends AbstractExtensionMojo
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {
-                    int nb = importer.importXAR(xarArtifact.getFile(), this.importUser, xcontext);
+                    int nb = importer.importXAR(xarArtifact.getFile(), this.importUser,
+                        this.oldCoreHelper.getXWikiContext());
 
                     getLog().info("  .... Imported " + nb + " documents");
                 } catch (Exception e) {
                     throw new MojoExecutionException(String.format("Failed to import XAR [%s]", xarArtifact.toString()),
                         e);
                 }
-            }
-
-            // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
-            // to disk and will be lost. In practice this means the last Document imported has a
-            // very high chance of not making it...
-            // TODO: Find a way to implement this generically for all databases and inside
-            // XWikiHibernateStore (cf https://jira.xwiki.org/browse/XWIKI-471).
-            try {
-                importer.shutdownHSQLDB(xcontext);
-            } catch (Exception e) {
-                throw new MojoExecutionException("Failed to shutdown hsqldb database", e);
-            }
-
-            // Copy database files to XWiki's data directory.
-            File dataDir = new File(this.outputPackageDirectory, "data");
-            copyDirectory(this.databaseDirectory, new File(dataDir, "database"));
-
-            try {
-                importer.disposeXWikiContext(xcontext);
-            } catch (Exception e) {
-                throw new MojoExecutionException("Failed to dispose XWiki context", e);
             }
         }
     }

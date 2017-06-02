@@ -27,7 +27,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.hibernate.cfg.Environment;
 import org.xwiki.tool.utils.LogUtils;
 
 /**
@@ -48,22 +47,17 @@ public class ImportMojo extends AbstractImportMojo
     public void executeInternal() throws MojoExecutionException, MojoFailureException
     {
         LogUtils.configureXWikiLogs();
-        Importer importer = new Importer(this.extensionHelper.getComponentManager());
-
-        System.setProperty("xwiki.data.dir", this.xwikiDataDir.getAbsolutePath());
-        // If the package mojo was executed before, it might have left a different database connection URL in the
-        // environment, which apparently overrides the value in the configuration file
-        System.clearProperty(Environment.URL);
+        Importer importer = new Importer(this.oldCoreHelper);
 
         if (this.sourceDirectory != null) {
             try {
-                importer.importDocuments(this.sourceDirectory, this.databaseName, this.hibernateConfig);
+                importer.importDocuments(this.sourceDirectory, this.wiki);
             } catch (Exception e) {
                 throw new MojoExecutionException("Failed to import XWiki documents", e);
             }
         } else {
             try {
-                importDependencies(importer, this.databaseName, this.hibernateConfig);
+                importDependencies(importer, this.wiki, this.hibernateConfig);
             } catch (Exception e) {
                 throw new MojoExecutionException("Failed to import XAR dependencies", e);
             }

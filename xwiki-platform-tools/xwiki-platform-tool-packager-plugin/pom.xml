@@ -312,7 +312,8 @@
                 **/DataMojo.java,
                 **/ImportMojo.java,
                 **/ExportMojo.java,
-                **/PackageMojo.java
+                **/PackageMojo.java,
+                **/OldCoreHelper.java
               </excludes>
             </configuration>
           </execution>

@@ -21,11 +21,11 @@ package com.xpn.xwiki.tool.backup;
 
 import java.io.File;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.xwiki.tool.utils.AbstractOldCoreMojo;
 
 /**
  * Maven 2 plugin to export a set of XWiki documents from an existing database to the file system.
@@ -33,36 +33,24 @@ import org.apache.maven.plugins.annotations.Parameter;
  * @version $Id$
  */
 @Mojo(name = "export")
-public class ExportMojo extends AbstractMojo
+public class ExportMojo extends AbstractOldCoreMojo
 {
     /**
      * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
      */
-    @Parameter(defaultValue="xwiki")
-    private String databaseName;
-
-    /**
-     * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
-     */
-    @Parameter(defaultValue="${basedir}/src/main/packager/hibernate.cfg.xml")
-    private File hibernateConfig;
-
-    /**
-     * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
-     */
-    @Parameter(defaultValue="${project.build.directory}/export")
+    @Parameter(defaultValue = "${project.build.directory}/export")
     private File exportDirectory;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void executeInternal() throws MojoExecutionException, MojoFailureException
     {
         // Ensure that the export directory exists before performing the export
         this.exportDirectory.mkdirs();
 
-        Exporter exporter = new Exporter();
+        Exporter exporter = new Exporter(this.oldCoreHelper);
 
         try {
-            exporter.exportDocuments(this.exportDirectory, this.databaseName, this.hibernateConfig);
+            exporter.exportDocuments(this.exportDirectory, this.wiki);
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to export XWiki documents", e);
         }

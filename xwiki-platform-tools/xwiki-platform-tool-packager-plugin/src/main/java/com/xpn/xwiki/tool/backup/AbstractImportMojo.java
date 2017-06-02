@@ -29,9 +29,8 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.tool.extension.util.AbstractExtensionMojo;
+import org.xwiki.tool.utils.AbstractOldCoreMojo;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -43,7 +42,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @since 9.0RC1
  * @since 8.4.2
  */
-public abstract class AbstractImportMojo extends AbstractExtensionMojo
+public abstract class AbstractImportMojo extends AbstractOldCoreMojo
 {
     public static final String MPKEYPREFIX = "xwiki.extension.";
 
@@ -54,24 +53,6 @@ public abstract class AbstractImportMojo extends AbstractExtensionMojo
     public static final String MPNAME_WEBSITE = "website";
 
     public static final String MPNAME_FEATURES = "features";
-
-    /**
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
-     */
-    @Parameter(defaultValue = "xwiki")
-    protected String databaseName;
-
-    /**
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
-     */
-    @Parameter(defaultValue = "${basedir}/src/main/packager/hibernate.cfg.xml")
-    protected File hibernateConfig;
-
-    /**
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
-     */
-    @Parameter(defaultValue = "${project.build.directory}/data/")
-    protected File xwikiDataDir;
 
     /**
      * The namespace where to register the XAR extensions.
@@ -94,8 +75,6 @@ public abstract class AbstractImportMojo extends AbstractExtensionMojo
      */
     protected void importDependencies(Importer importer, String databaseName, File hibernateConfig) throws Exception
     {
-        XWikiContext xcontext = importer.createXWikiContext(databaseName, hibernateConfig);
-
         // We need to distinguish between extensions installed explicitly and their transitive dependencies.
         // We have to create our own Set because Maven changes the fields from the dependency Artifacts (e.g. resolves
         // their version) after they are added to the Set of dependencies and this causes the hash code to change. As a
@@ -110,22 +89,13 @@ public abstract class AbstractImportMojo extends AbstractExtensionMojo
         for (Artifact artifact : dependenciesFirstArtifacts) {
             if (!artifact.isOptional()) {
                 if ("xar".equals(artifact.getType())) {
-                    installXAR(artifact, importer, xcontext);
+                    installXAR(artifact, importer, this.oldCoreHelper.getXWikiContext());
                 }
             }
         }
-
-        // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
-        // to disk and will be lost. In practice this means the last Document imported has a
-        // very high chance of not making it...
-        // TODO: Find a way to implement this generically for all databases and inside
-        // XWikiHibernateStore (cf https://jira.xwiki.org/browse/XWIKI-471).
-        importer.shutdownHSQLDB(xcontext);
-
-        importer.disposeXWikiContext(xcontext);
-
     }
 
+    // TODO: actually use Extension Manager instead
     protected void installXAR(Artifact artifact, Importer importer, XWikiContext xcontext) throws Exception
     {
         getLog().info("  ... Importing XAR file: " + artifact.getFile());

@@ -24,34 +24,30 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.hibernate.Session;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.HSQLDialect;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.tool.utils.OldCoreHelper;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageException;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * Import a set of XWiki documents into an existing database.
  *
  * @version $Id$
  */
-public class Importer extends AbstractPackager
+public class Importer
 {
+    private OldCoreHelper oldCoreHelper;
+
     /**
-     * @param componentManager the component manager
+     * @param oldCoreHelper various tools to manipulate oldcore APIs
      */
-    public Importer(ComponentManager componentManager)
+    public Importer(OldCoreHelper oldCoreHelper)
     {
-        super(componentManager);
+        this.oldCoreHelper = oldCoreHelper;
     }
 
     /**
@@ -65,14 +61,12 @@ public class Importer extends AbstractPackager
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param wikiId id of the wiki into which to import the documents (e.g. {@code xwiki})
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
-     *            password, etc)
      * @throws Exception if the import failed for any reason
      */
     // TODO: Replace the Hibernate config file with a list of parameters required for the import
-    public void importDocuments(File sourceDirectory, String wikiId, File hibernateConfig) throws Exception
+    public void importDocuments(File sourceDirectory, String wikiId) throws Exception
     {
-        importDocuments(sourceDirectory, wikiId, hibernateConfig, null);
+        importDocuments(sourceDirectory, wikiId, null);
     }
 
     /**
@@ -86,39 +80,25 @@ public class Importer extends AbstractPackager
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param wikiId id of the wiki into which to import the documents (e.g. {@code xwiki})
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
-     *            password, etc)
      * @param importUser optionally the user under which to perform the import (useful for example when importing pages
      *            that need to have Programming Rights and the page author is not the same as the importing user)
      * @throws Exception if the import failed for any reason
      */
     // TODO: Replace the Hibernate config file with a list of parameters required for the import
-    public void importDocuments(File sourceDirectory, String wikiId, File hibernateConfig, String importUser)
-        throws Exception
+    public void importDocuments(File sourceDirectory, String wikiId, String importUser) throws Exception
     {
-        XWikiContext xcontext = createXWikiContext(wikiId, hibernateConfig);
-
         Package pack = new Package();
         pack.setWithVersions(false);
 
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
         // See https://jira.xwiki.org/browse/XWIKI-458
         try {
-            pack.readFromDir(sourceDirectory, xcontext);
+            pack.readFromDir(sourceDirectory, this.oldCoreHelper.getXWikiContext());
         } catch (IOException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
                 "Failed to import documents from [" + sourceDirectory + "]", e);
         }
-        installWithUser(importUser, pack, xcontext);
-
-        // We MUST shutdown HSQLDB because otherwise the last transactions will not be flushed
-        // to disk and will be lost. In practice this means the last Document imported has a
-        // very high chance of not making it...
-        // TODO: Find a way to implement this generically for all databases and inside
-        // XWikiHibernateStore (cf https://jira.xwiki.org/browse/XWIKI-471).
-        shutdownHSQLDB(xcontext);
-
-        disposeXWikiContext(xcontext);
+        installWithUser(importUser, pack, this.oldCoreHelper.getXWikiContext());
     }
 
     /**
@@ -173,58 +153,11 @@ public class Importer extends AbstractPackager
             int code = pack.install(context);
             if (code != DocumentInfo.INSTALL_OK) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Failed to import XAR with code [" + code + "]");
+                    "Failed to import XAR with code [" + code + "] and errors [" + pack.getErrors(context) + "]");
             }
         } finally {
             // Restore context user as before
             context.setUserReference(currentUserReference);
         }
-    }
-
-    /**
-     * Shutdowns HSQLDB.
-     *
-     * @param context the XWiki Context object from which we can retrieve the Store implementation
-     * @throws XWikiException in case of shutdown error
-     */
-    public void shutdownHSQLDB(XWikiContext context) throws XWikiException
-    {
-        XWikiStoreInterface store = context.getWiki().getStore();
-        if (XWikiCacheStore.class.isAssignableFrom(store.getClass())) {
-            store = ((XWikiCacheStore) store).getStore();
-        }
-
-        if (XWikiHibernateStore.class.isAssignableFrom(store.getClass())) {
-            XWikiHibernateStore hibernateStore = (XWikiHibernateStore) store;
-
-            // check that is HSQLDB
-            Dialect dialect = hibernateStore.getDialect();
-            if (!(dialect instanceof HSQLDialect)) {
-                return;
-            }
-
-            boolean bTransaction = true;
-            try {
-                hibernateStore.checkHibernate(context);
-                bTransaction = hibernateStore.beginTransaction(false, context);
-                Session session = hibernateStore.getSession(context);
-                session.connection().createStatement().execute("SHUTDOWN");
-                if (bTransaction) {
-                    hibernateStore.endTransaction(context, false, false);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to shutdown database", e);
-            } finally {
-                try {
-                    if (bTransaction) {
-                        hibernateStore.endTransaction(context, false, false);
-                    }
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
-
     }
 }

@@ -409,6 +409,26 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- XAR Support -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xar-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- ********************************************************************** -->
     <!-- Stuff filled with Maven hacks making them hard to install as extension right now -->
 
@@ -444,23 +464,11 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- XAR Support -->
+    <!-- ZIP Explorer -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-xar-script</artifactId>
-      <version>${project.version}</version>
+      <artifactId>xwiki-platform-zipexplorer</artifactId>
+      <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
 

@@ -171,25 +171,6 @@ public class OldCoreHelper implements AutoCloseable
         return xcontext;
     }
 
-    private void setHibernate()
-    {
-        if (!this.hibernateConfig.exists()) {
-            // Setup hsqldb by default
-            System.setProperty(Environment.URL, "jdbc:hsqldb:file:"
-                + environment.getPermanentDirectory().getAbsolutePath() + "/database/xwiki_db;shutdown=true");
-            System.setProperty(Environment.USER, "sa");
-            System.setProperty(Environment.DRIVER, "org.hsqldb.jdbcDriver");
-            System.setProperty(Environment.DIALECT, "org.hibernate.dialect.HSQLDialect");
-        } else {
-            // If the package mojo was executed before, it might have left a different database connection URL in the
-            // environment, which apparently overrides the value in the configuration file
-            System.clearProperty(Environment.URL);
-            System.clearProperty(Environment.USER);
-            System.clearProperty(Environment.DRIVER);
-            System.clearProperty(Environment.DIALECT);
-        }
-    }
-
     /**
      * @param wikiId id of the wiki for which to prepare the XWiki Context (e.g. {@code xwiki})
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
@@ -200,8 +181,6 @@ public class OldCoreHelper implements AutoCloseable
     // TODO: Replace the Hibernate config file with a list of parameters required for the packaging operation
     private XWikiContext createXWikiContext() throws Exception
     {
-        setHibernate();
-
         Utils.setComponentManager(this.componentManager);
 
         this.xcontext = new XWikiContext();

@@ -157,7 +157,8 @@ public class PackageMojo extends AbstractOldCoreMojo
     @Override
     protected void before() throws MojoExecutionException
     {
-        // Put the permanent directory in the XWiki instance directory
+        // Adapt standard directories to XWiki instance
+        this.hibernateConfig = new File(this.outputPackageDirectory, "webapps/xwiki/WEB-INF/hibernate.cfg.xml");
         this.permanentDirectory = new File(this.outputPackageDirectory, "data");
 
         super.before();

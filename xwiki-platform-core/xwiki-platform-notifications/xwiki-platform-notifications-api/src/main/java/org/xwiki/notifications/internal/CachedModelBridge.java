@@ -32,6 +32,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.page.PageNotificationEventDescriptor;
 
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
@@ -92,6 +93,15 @@ public class CachedModelBridge implements ModelBridge
     {
         // Obviously, there is no possible cache here
         modelBridge.setStartDateForUser(userReference, startDate);
+    }
+
+    @Override
+    public PageNotificationEventDescriptor getPageNotificationEventDescriptor(DocumentReference documentReference)
+            throws NotificationException
+    {
+        /* This method is called only when a PageNotificationEventDescriptorClass XObject is added / updated or deleted,
+           or at application startup time (see PageNotificationEventListenerUpdater), so no caching is needed. */
+        return modelBridge.getPageNotificationEventDescriptor(documentReference);
     }
 
     @Override

@@ -181,6 +181,21 @@ public class NotificationsTrayPage  extends ViewPage
     }
 
     /**
+     * Get a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification
+     */
+    public WebElement getNotificationElement(int notificationNumber)
+    {
+        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return this.getNotifications().get(notificationNumber);
+    }
+
+    /**
      * Mark a notification as read.
      *
      * @param notificationNumber index of the notification in the list

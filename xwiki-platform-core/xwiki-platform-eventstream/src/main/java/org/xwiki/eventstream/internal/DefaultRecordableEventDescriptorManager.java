@@ -32,6 +32,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.RecordableEventDescriptorContainer;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
@@ -52,6 +53,9 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     private ComponentManager componentManager;
 
     @Inject
+    private RecordableEventDescriptorContainer recordableEventDescriptorContainer;
+
+    @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
@@ -61,7 +65,10 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
     {
         try {
-            return componentManager.getInstanceList(RecordableEventDescriptor.class);
+            List<RecordableEventDescriptor> recordableEventDescriptorList =
+                    componentManager.getInstanceList(RecordableEventDescriptor.class);
+            recordableEventDescriptorList.addAll(recordableEventDescriptorContainer.getAllRecordableEventDescriptor());
+            return recordableEventDescriptorList;
         } catch (ComponentLookupException e) {
             throw new EventStreamException("Failed to retrieve the list of RecordableEventDescriptor.", e);
         }

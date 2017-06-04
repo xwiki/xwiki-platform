@@ -34,6 +34,8 @@ public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
+    private static final String BOOTSTRAP_SWITCH_LABEL = "bootstrap-switch-label";
+
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
 
@@ -134,9 +136,39 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
-     * Disable every notification parameters.
+     * Try to find a row corresponding to the notification parameter of the given type.
+     *
+     * @since 9.5RC1
+     * @param eventType the event that has to be found
+     * @return the row corresponding to this element
      */
-    public void disableAllParameters()
+    public WebElement findNotificationParameterRow(String eventType)
+    {
+        return this.getDriver().findElement(
+                By.cssSelector("div#notificationsPane tr[data-eventtype='" + eventType + "']"));
+    }
+
+    /**
+     * Use the given row to enable a notification preference.
+     *
+     * @since 9.5RC1
+     * @param notificationParameterRow the concerned notification preference row
+     */
+    public void enablePreference(WebElement notificationParameterRow)
+    {
+        if (!isSwitchOn(notificationParameterRow)) {
+            clickOnSwitch(notificationParameterRow);
+        }
+
+        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+    }
+
+    /**
+     * Disable every standard notification parameters.
+     *
+     * @since 9.5RC1
+     */
+    public void disableAllStandardParameters()
     {
         this.setPageCreated(false);
         this.setPageDeleted(false);
@@ -152,6 +184,6 @@ public class NotificationsUserProfilePage extends ViewPage
     private void clickOnSwitch(WebElement webElement)
     {
         // TODO: create a generic widget object
-        webElement.findElement(By.className("bootstrap-switch-label")).click();
+        webElement.findElement(By.className(BOOTSTRAP_SWITCH_LABEL)).click();
     }
 }

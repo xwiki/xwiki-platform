@@ -142,9 +142,6 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   ## CSRF prevention
   <input type="hidden" id="form_token" name="form_token" value="$!{services.csrf.getToken()}" />
   <input type="hidden" name="xcontinue" value="$doc.getURL('edit', 'editor=class')"/>
-  ## A submit button that captures "enter" on the form, placed before the "propadd" submit button,
-  ## to prevent from accidentally adding properties when pressing enter.
-  #editActionButton('preview', 'preview')
 </div>
 <div id="xwikiclassproperties">
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">

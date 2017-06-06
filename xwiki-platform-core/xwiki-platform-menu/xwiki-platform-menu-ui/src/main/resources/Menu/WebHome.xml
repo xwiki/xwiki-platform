@@ -35,7 +35,7 @@
   <date>1372190329000</date>
   <contentUpdateDate>1372190329000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('platform.appwithinminutes.appHomePageTitle', [$doc.space])</title>
+  <title/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

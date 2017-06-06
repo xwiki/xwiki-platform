@@ -321,6 +321,9 @@
     <span class='buttonwrapper'>
       <input type='submit' class='button' value="$services.localization.render('create')"/>
     </span>
+    <span class="buttonwrapper">
+      <a class="secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a>
+    </span>
   </div>
 
 </form>

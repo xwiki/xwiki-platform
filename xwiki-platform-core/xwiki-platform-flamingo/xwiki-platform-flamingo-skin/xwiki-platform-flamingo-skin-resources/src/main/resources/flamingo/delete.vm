@@ -203,13 +203,13 @@
       <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
     #end
   </div>
-  <button class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> $services.localization.render('core.delete.confirm.yes')</button>
+  <button class="btn btn-danger">$services.localization.render('delete')</button>
   #if("$!{request.xredirect}" != '')
     #set($cancelUrl = "$request.xredirect")
   #else
     #set($cancelUrl = $doc.getURL())
   #end
-  <a class="btn btn-primary" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('core.delete.confirm.no')</a>
+  <a class="btn btn-default" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('cancel')</a>
 #end
 #######################################################
 ##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE

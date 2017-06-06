@@ -196,5 +196,8 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       updateTerminalCheckboxFromTemplateProviderInput(type);
       updateParentReferenceFromTemplateProviderInput(type);
     });
+
+    // Initialize the UI with any pre-selected template provider's preferences.
+    form.find('.xwiki-select').trigger('xwiki:select:updated');
   });
 });

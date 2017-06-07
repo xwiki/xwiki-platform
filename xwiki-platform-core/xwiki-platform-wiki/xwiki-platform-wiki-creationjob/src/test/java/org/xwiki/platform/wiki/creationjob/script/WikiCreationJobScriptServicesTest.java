@@ -122,7 +122,7 @@ public class WikiCreationJobScriptServicesTest
         assertNull(mocker.getComponentUnderTest().createWiki(wikiCreationRequest));
         Exception lastError = mocker.getComponentUnderTest().getLastError();
         assertNotNull(lastError);
-        assertEquals("The extension [badExtension-version] is not authorized.", lastError.getMessage());
+        assertEquals("The extension [badExtension/version] is not authorized.", lastError.getMessage());
         verify(mocker.getMockedLogger()).warn("Failed to create a new wiki.", lastError);
     }
 

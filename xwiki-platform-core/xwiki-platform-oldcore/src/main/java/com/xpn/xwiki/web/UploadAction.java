@@ -196,21 +196,28 @@ public class UploadAction extends XWikiAction
         // Calculate and store mime type
         attachment.resetMimeType(context);
 
-        // Adding a comment with the name and revision of the added attachment.
-        String comment;
+        // Add a comment to both document and attachment history. Include the attachment name, revision and comment in
+        // the document comment.
+        String attachmentComment = context.getRequest().getParameter("comment");
+        String documentComment;
         String nextRev = attachment.getNextVersion();
         ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
-        params.add(nextRev);
-        if (attachment.isImage(context)) {
-            comment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());
+        if (StringUtils.isBlank(attachmentComment)) {
+            params.add(nextRev);
         } else {
-            comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
+            params.add(String.format("%s (%s)", nextRev, attachmentComment));
+            attachment.setComment(attachmentComment);
+        }
+        if (attachment.isImage(context)) {
+            documentComment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());
+        } else {
+            documentComment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
         // Save the document.
         try {
-            context.getWiki().saveDocument(doc, comment, context);
+            context.getWiki().saveDocument(doc, documentComment, context);
         } catch (XWikiException e) {
             // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {

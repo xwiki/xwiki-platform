@@ -143,14 +143,19 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *#
 #macro (attachmentPicker_displayAttachmentDetails $attachment $options)
   #if ($attachment)
+    ## Compute the attachment reference because there's no getter.
+    #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
+      $attachment.filename))
+    #set ($attachmentStringReference = $services.model.serialize($attachmentReference, 'default'))
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
-      #set ($attachmentDocument = $attachment.getDocument())
-[[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=180]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
+      ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
+      #set ($queryString = $escapetool.url({'version': $attachment.version}))
+      [[[[image:$attachmentStringReference||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
     #else
       * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.longSize))
       * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
-      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
+      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:$attachmentStringReference||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
     #end
   #end
 #end
@@ -198,7 +203,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #if (${options.rawfilter} != '')
       &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}]))&lt;/span&gt;
     #end
-    &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
+    &lt;input type="file" name="filepath" id="attachfile" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
     &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
     &lt;input type="hidden" name="docname" value="$!{escapetool.xml($targetDocument.fullName)}" /&gt;
     &lt;input type="hidden" name="classname" value="$!{escapetool.xml($options.get('classname'))}" /&gt;
@@ -206,6 +211,27 @@ $xwiki.jsx.use($attachmentPickerDocName)
     &lt;input type="hidden" name="property" value="$!{escapetool.xml($options.get('property'))}" /&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
   &lt;/div&gt;
+  #if ("$!currentValue" != '' &amp;&amp; $currentValue != $options.defaultValue)
+    &lt;div&gt;
+      &lt;label&gt;
+        &lt;input type="checkbox" name="filename" value="$!escapetool.xml($currentValue)"
+          /&gt;$services.localization.render('attachmentSelector.replace',
+          ["&lt;strong&gt;$!escapetool.xml($currentValue)&lt;/strong&gt;"])
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('attachmentSelector.replace.hint'))&lt;/span&gt;
+    &lt;/div&gt;
+  #end
+  #if ($xwiki.hasEditComment() &amp;&amp; $options.versionSummary)
+    &lt;div&gt;
+    #if ($xwiki.isEditCommentFieldHidden())
+      &lt;input type="hidden" name="comment" value="$!escapetool.xml($request.comment)" /&gt;
+    #else
+      &lt;label for="commentinput"&gt;$services.localization.render('core.comment')&lt;/label&gt;
+      &lt;input type="text" name="comment" id="commentinput" value="$!escapetool.xml($request.comment)"
+        title="$services.localization.render('core.comment.tooltip')" /&gt;
+    #end
+    &lt;/div&gt;
+  #end
   &lt;div class="buttons"&gt;
     &lt;span class="buttonwrapper"&gt;
     &lt;input type="submit" name="action_upload" class="button " value='$services.localization.render("${translationPrefix}.upload.submit")'  title='$services.localization.render("${translationPrefix}.upload.submit")'/&gt;
@@ -304,7 +330,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
     'defaultValue' : "$!{request.defaultValue}",
     'rawfilter': "$!{rawfilter}",
     'filter': ${filter},
-    'sortAttachmentsBy': ${sortAttachmentsBy}
+    'sortAttachmentsBy': ${sortAttachmentsBy},
+    'versionSummary': $request.versionSummary.equals('true')
   })
   $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
   #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
@@ -436,7 +463,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
      * and saves the underlying form (if any) so that any unsaved changes won't be lost.
      */
     filterFormUpload : function() {
-      this.gallery.select('.uploadAttachment input.attachment').each(function(fileInput) {
+      this.gallery.select('.uploadAttachment input[type="file"]').each(function(fileInput) {
         fileInput.__allowedExtensions = fileInput.title.toLowerCase().replace(/\s*[,|; ]\s*/g, " ").strip();
         if (fileInput.__allowedExtensions != '') {
           fileInput.__allowedExtensions = fileInput.__allowedExtensions.split(" ");
@@ -448,7 +475,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         event.stop();
         var uploadForm = event.element();
         var hasErrors = false;
-        uploadForm.select('input.attachment').each(function(fileInput) {
+        uploadForm.select('input[type="file"]').each(function(fileInput) {
           if (fileInput.value == '') {
             new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
             hasErrors = true;
@@ -464,7 +491,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
             uploadForm.submit();
           } else {
             // FIXME This fails in HTML5, will deal with it later:
-            // this.property.down('input').value = uploadForm.down('.attachment').value;
+            // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
             // uploadForm.xredirect.value = window.location.pathname;
             document.observe('xwiki:document:saved', function() {
               new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
@@ -1077,23 +1104,28 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   background-repeat: no-repeat;
   padding-left: 16px;
 }
-.gallery_upload form {
-  height: ${imgSize}px;
+.gallery_upload .gallery_attachmentframe {
+  height: auto;
 }
-.gallery_upload .xHint {
-  text-transform: none !important;
+.gallery_upload_input {
+  margin-bottom: 10px;
 }
-.gallery_upload input.attachment {
-  font-size: 83.3%;
-  margin: 0; /* Overrides viewers/attachments.css */
-  padding: 0; /* Overrides viewers/attachments.css */
+.gallery_upload input[type="file"] {
+  font-size: 86%;
   width: ${mathtool.sub($uploadBoxSize, $mathtool.mul($boxPadding, 2))}px;
 }
 .gallery_upload .buttonwrapper {
   margin: 0;
 }
-.gallery_upload .button {
-  font-size: .65em;
+.gallery_upload .button,
+.gallery_upload label {
+  font-size: 86%;
+}
+.gallery_upload input[type="checkbox"] {
+  vertical-align: text-bottom;
+}
+.gallery_upload label[for="commentinput"] {
+  margin-top: 10px;
 }
 
 /* ------------------------------------ */
@@ -1363,7 +1395,24 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 ##  1. Edit the current page
 ##  2. View the target attachment page. (can be the same page)
 #macro (attachmentPicker_displayButton)
-  #if ($hasEdit &amp;&amp; $targetPermView)(% class="buttonwrapper" %)[[${buttontext}&gt;&gt;${xcontext.macro.doc.fullName}||queryString="#if ($hasTargetDoc)targetdocname=${escapetool.url($targetdoc.fullName)}&amp;#{end}docname=${escapetool.url($doc.fullName)}&amp;classname=${classname}&amp;property=${property}&amp;object=${object}&amp;savemode=${savemode}&amp;defaultValue=$escapetool.url($defaultValue)&amp;filter=$!{filter}&amp;displayImage=${displayImage}" class="attachment-picker-start button" title="${buttontext}"]](%%)#end
+  #if ($hasEdit &amp;&amp; $targetPermView)
+    #set ($queryString = {
+      'docname': $doc.fullName,
+      'classname': $classname,
+      'property': $property,
+      'object': $object,
+      'savemode': $savemode,
+      'defaultValue': $defaultValue,
+      'filter': $filter,
+      'displayImage': $displayImage,
+      'versionSummary': $xcontext.macro.params.versionSummary.equals('true')
+    })
+    #if ($hasTargetDoc)
+      #set ($queryString.targetdocname = $targetdoc.fullName)
+    #end
+    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;$xcontext.macro.doc.fullName||queryString="$escapetool.url($queryString)"
+      class="attachment-picker-start button" title="$buttontext"]](%%)##
+  #end
 #end
 {{/velocity}}
 
@@ -2327,6 +2376,72 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>targetdocname</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>19</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>8f5e90e1-5171-4519-b6e9-e11cc36529f1</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Whether to allow the user to enter a version summary that will be recorded in the history. An automatic message is used when no version summary is provided or if the version summary input is not displayed.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>versionSummary</name>
     </property>
   </object>
 </xwikidoc>

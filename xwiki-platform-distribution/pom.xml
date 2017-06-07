@@ -138,6 +138,7 @@
 
     <!-- The module triggering all WAR dependencies. Put in a property to be changed when legacy profile is enabled. -->
     <war.dependencies.artifactId>xwiki-platform-distribution-war-dependencies</war.dependencies.artifactId>
+    <war.dependencies.artifactId.legacy>xwiki-platform-distribution-war-legacydependencies</war.dependencies.artifactId.legacy>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (it's actually false positive since Extension Manager is not affected by that) -->
@@ -522,7 +523,7 @@
         <!-- Set legacy list of plugins -->
         <xwiki.cfg.plugins>${xwiki.cfg.plugins.legacy}</xwiki.cfg.plugins>
         <!-- Set legacy dependencies -->
-        <war.dependencies.artifactId>xwiki-platform-distribution-war-legacydependencies</war.dependencies.artifactId>
+        <war.dependencies.artifactId>${war.dependencies.artifactId.legacy}</war.dependencies.artifactId>
         <!-- We depend on legacy artifacts on purpose -->
         <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
       </properties>

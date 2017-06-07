@@ -36,8 +36,6 @@
     <xwiki.extension.name>XWiki</xwiki.extension.name>
 
     <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
-
-    <war.dependencies.artifactId>xwiki-platform-distribution-war-dependencies</war.dependencies.artifactId>
   </properties>
   <dependencies>
    <dependency>

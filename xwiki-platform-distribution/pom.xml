@@ -135,8 +135,11 @@
     <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+
+    <war.dependencies.artifactId>xwiki-platform-distribution-war-dependencies</war.dependencies.artifactId>
   </properties>
-    <!-- Avoid enforce-upper-bounds rule complains (it's actually false positive since Extension Manager is not affected by that) -->
+
+  <!-- Avoid enforce-upper-bounds rule complains (it's actually false positive since Extension Manager is not affected by that) -->
   <dependencyManagement>
     <dependencies>
       <!-- application-help-center -->

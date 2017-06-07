@@ -190,7 +190,6 @@ wrench = wrench
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
-add = plus-circle
 anchor = anchor
 application = square-o
 application_osx_terminal = terminal

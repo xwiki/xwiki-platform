@@ -477,6 +477,22 @@
                       <resource>META-INF/cxf/bus-extensions.txt</resource>
                     </resources>
                   </exception>
+                  <!-- According to https://issues.apache.org/jira/browse/TIKA-2368 this is "OK" -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>edu.usc.ir</groupId>
+                        <artifactId>sentiment-analysis-parser</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.apache.tika</groupId>
+                        <artifactId>tika-parsers</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <classes>
+                      <class>org.apache.tika.parser.sentiment.analysis.SentimentParser</class>
+                    </classes>
+                  </exception>
                 </exceptions>
                 <ignoredResourcePatterns>
                   <!-- Exclude XWiki's Component registration file -->

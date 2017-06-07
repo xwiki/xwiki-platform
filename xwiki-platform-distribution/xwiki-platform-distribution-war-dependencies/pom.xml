@@ -471,13 +471,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Watchlist -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-watchlist-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Skin -->

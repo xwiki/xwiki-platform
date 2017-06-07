@@ -2,7 +2,7 @@
  * Display an element inside the drawer.
  *
  * @param $url the url of the link of the element
- * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
+ * @param $icon the name of the icon of the element
  * @param $text the text to display in the element
  * @param $id (optional) the HTML id of the element
  *#
@@ -10,7 +10,7 @@
   <li class="drawer-menu-item">
     <a href="$url" #if($id)id="$id"#end>
       <div class="drawer-menu-item-icon">
-        <span class="glyphicon glyphicon-${icon}"></span>
+        $services.icon.renderHTML($icon)
       </div>
       <div class="drawer-menu-item-text">$text</div>
     </a>
@@ -19,7 +19,7 @@
 #**
  * Display the top element of a foldable drawer item.
  *
- * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
+ * @param $icon the name of the icon of the element
  * @param $text the text to display in the element
  * @param $id (optional) the HTML id of the element
  *#
@@ -27,7 +27,7 @@
   <li class="drawer-menu-item">
     <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu">
       <div class="drawer-menu-item-icon">
-        <span class="glyphicon glyphicon-${icon}"></span>
+        $services.icon.renderHTML($icon)
       </div>
       <div class="drawer-menu-item-text">$text</div>
     </a>

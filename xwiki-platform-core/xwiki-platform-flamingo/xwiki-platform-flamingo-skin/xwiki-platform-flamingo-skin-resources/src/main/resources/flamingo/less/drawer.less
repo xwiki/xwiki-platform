@@ -22,77 +22,77 @@
 
 .drawer-default {
   background-color: @xwiki-drawer-bg;
-  
+
   // Brand =================================================================
   .drawer-brand {
     background-color: @xwiki-drawer-brand-bg;
     border-bottom: 1px solid @xwiki-drawer-brand-border;
     padding: 20px 16px;
-  
+
     a {
       color: @xwiki-drawer-brand-link-color;
       padding: 0;
-      
+
       &:hover, &:focus {
         color: @xwiki-drawer-brand-link-hover-color;
         text-decoration: none;
       }
     }
-    
-    img {
+
+    .avatar {
       border-radius: 50%;
       float: left;
       height: 50px;
       width: 50px;
     }
-    
+
     .brand-links {
       float: left;
       margin-left: 16px;
       margin-top: 8px;
-      
+
       a {
         font-size: 14px;
       }
-      
+
       .brand-user {
         color: @xwiki-drawer-brand-user-color;
         font-weight: 400;
       }
     }
   }
-  
-  
+
+
   // Menu Item =============================================================
   .drawer-menu-item {
     padding: 0;
-     
+
     a {
       font-size: @xwiki-drawer-menu-item-size;
       font-weight: 400;
       margin-top: 0;
       padding: @xwiki-drawer-menu-item-padding;
-    
+
       &, &:hover, &:focus {
         background-color: @xwiki-drawer-menu-item-bg;
         color: @xwiki-drawer-menu-item-color;
         text-decoration: none;
       }
-      
+
       &:hover {
         background-color: @xwiki-drawer-menu-item-hover-bg;
         color: @xwiki-drawer-menu-item-hover-color;
       }
     }
   }
-  
+
   // Sub Item =============================================================
   .drawer-menu-sub-item {
     a {
       padding-left: @xwiki-drawer-menu-subitem-indent;
     }
   }
-  
+
   // Menu Category ========================================================
   .drawer-category-header {
     background-color: @xwiki-drawer-menu-category-bg;
@@ -111,7 +111,7 @@
   display: inline-block;
   vertical-align: middle;
   white-space: normal;
-  
+
   .glyphicon {
     padding-left: @xwiki-drawer-menu-item-icon-padding;
   }
@@ -125,7 +125,7 @@
 // Special styling for login/logout/register =============================
 #tmLogin, #tmLogout, #tmRegister {
   font-style: italic;
-  
+
   .glyphicon {
     font-size: @font-size-small;
   }

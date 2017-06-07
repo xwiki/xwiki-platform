@@ -61,7 +61,14 @@
     $attachment.filename))
   <div class="attachment $!escapetool.xml($options.cssClass)">
     <span class="mime" data-type="$!escapetool.xml($attachment.mimeType)">
-      #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
+      #if ($attachment.isImage())
+        <span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))">
+          <img src="$xwiki.getURL($attachmentReference, 'download', 'width=48')"
+            alt="$escapetool.xml($attachment.filename)"/>
+        </span>
+      #else
+        #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
+      #end
     </span>
     <div class="information">
       <span class="name">

@@ -23,6 +23,20 @@
   font-size: 1.35em;
 }
 
+.attachment .mime {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  height: 48px;
+  line-height: 48px;
+  text-align: center;
+  width: 48px;
+}
+
+.attachment .mime > span > * {
+  max-height: 85%;
+  vertical-align: text-top;
+}
+
 .attachment .meta {
   clear: left;
 }

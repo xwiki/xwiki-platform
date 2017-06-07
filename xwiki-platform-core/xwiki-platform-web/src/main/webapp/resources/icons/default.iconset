@@ -145,6 +145,15 @@ list-numbers = text_list_numbers
 sun = weather_sun
 world = world
 wrench = wrench
+menu=text_align_justify
+more-vertical=bullet_arrow_down
+edit=page_edit
+copy=page_copy
+move=page_go
+download=application_put
+log-in=user_go
+log-out=user_go
+th=application_view_tile
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

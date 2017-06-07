@@ -128,7 +128,7 @@ flag = flag
 search = search
 search-plus = search-plus
 search-minus = search-minus
-folder = folder
+folder = folder-open
 user = user
 group = group
 heart = heart
@@ -187,6 +187,15 @@ list-numbers = list-ol
 sun = sun-o
 world = globe
 wrench = wrench
+menu=bars
+more-vertical=ellipsis-v
+edit=edit
+copy=copy
+move=external-link
+download=download
+log-in=sign-in
+log-out=sign-out
+th=th
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check

@@ -88,6 +88,7 @@ public class DefaultNotificationManager implements NotificationManager
                 onlyUnread,
                 expectedCount,
                 null,
+                null,
                 new ArrayList<>()
         );
     }
@@ -97,7 +98,15 @@ public class DefaultNotificationManager implements NotificationManager
             List<String> blackList) throws NotificationException
     {
         return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
-                new ArrayList<>(blackList));
+                null, new ArrayList<>(blackList));
+    }
+
+    @Override
+    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
+            Date fromDate, List<String> blackList) throws NotificationException
+    {
+        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), onlyUnread, expectedCount,
+                untilDate, fromDate, new ArrayList<>(blackList));
     }
 
     @Override
@@ -106,20 +115,21 @@ public class DefaultNotificationManager implements NotificationManager
         DocumentReference user = documentReferenceResolver.resolve(userId);
 
         List<CompositeEvent> events = getEvents(new ArrayList<>(), user, onlyUnread, maxCount,
-                null, new ArrayList<>());
+                null, null, new ArrayList<>());
 
         return events.size();
     }
 
     private List<CompositeEvent> getEvents(List<CompositeEvent> results, DocumentReference userReference,
-            boolean onlyUnread, int expectedCount, Date endDate, List<String> blackList) throws NotificationException
+            boolean onlyUnread, int expectedCount, Date endDate, Date fromDate, List<String> blackList)
+            throws NotificationException
     {
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
         final int batchSize = expectedCount * 2;
         try {
             // Create the query
-            Query query = queryGenerator.generateQuery(userReference, onlyUnread, endDate, blackList);
+            Query query = queryGenerator.generateQuery(userReference, onlyUnread, endDate, fromDate, blackList);
             if (query == null) {
                 return Collections.emptyList();
             }
@@ -152,7 +162,7 @@ public class DefaultNotificationManager implements NotificationManager
             if (results.size() < expectedCount && batch.size() == batchSize) {
                 blackList.addAll(getEventsIds(batch));
                 getEvents(results, userReference, onlyUnread, expectedCount - results.size(), endDate,
-                        blackList);
+                        fromDate, blackList);
             }
 
             return results;

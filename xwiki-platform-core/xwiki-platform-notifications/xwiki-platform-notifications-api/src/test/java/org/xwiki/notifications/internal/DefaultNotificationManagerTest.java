@@ -86,8 +86,8 @@ public class DefaultNotificationManagerTest
 
         when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
         query = mock(Query.class);
-        when(queryGenerator.generateQuery(any(DocumentReference.class), anyBoolean(), nullable(Date.class), nullable(List.class)))
-                .thenReturn(query);
+        when(queryGenerator.generateQuery(any(DocumentReference.class), anyBoolean(), nullable(Date.class),
+                nullable(Date.class), nullable(List.class))).thenReturn(query);
 
 
         when(modelBridge.getUserStartDate(userReference)).thenReturn(startDate);
@@ -156,7 +156,7 @@ public class DefaultNotificationManagerTest
     {
         // Mocks
         NotificationException exception = new NotificationException("Error");
-        when(queryGenerator.generateQuery(eq(userReference), eq(true), isNull(), any(List.class))).thenThrow(exception);
+        when(queryGenerator.generateQuery(eq(userReference), eq(true), isNull(), isNull(), any(List.class))).thenThrow(exception);
 
         // Test
         NotificationException caughtException = null;

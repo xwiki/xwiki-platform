@@ -304,6 +304,15 @@
                      "methodName": "getAllRecordableEventDescriptorsAllWikis",
                      "elementKind": "method",
                      "justification": "Young API"
+                   },
+                   {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationManager",
+                    "methodName": "getEvents",
+                    "elementKind": "method",
+                    "justification": "Young API"
                    }
                 ]
               }

@@ -96,7 +96,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, null, null);
+                true, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -119,7 +119,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, null, null);
+                true, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -139,7 +139,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                false, null, null);
+                false, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -159,7 +159,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, untilDate, Collections.emptyList());
+                true, untilDate, null, Collections.emptyList());
 
         // Verify
         verify(queryManager).createQuery(
@@ -182,7 +182,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, untilDate, Arrays.asList("event1", "event2"));
+                true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
         verify(queryManager).createQuery(
@@ -205,7 +205,7 @@ public class QueryGeneratorTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, null, null);
+                true, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -250,7 +250,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, untilDate, Arrays.asList("event1", "event2"));
+                true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
         verify(queryManager).createQuery(

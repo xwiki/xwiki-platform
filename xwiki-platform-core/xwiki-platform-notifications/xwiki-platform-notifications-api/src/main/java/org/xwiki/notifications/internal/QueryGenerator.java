@@ -79,13 +79,14 @@ public class QueryGenerator
      * @param user user interested in the notifications
      * @param onlyUnread f only unread events should be returned
      * @param endDate do not return events happened after this date
+     * @param startDate do not return events happened before this date
      * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
      * @return the query to execute
      *
      * @throws NotificationException if error happens
      * @throws QueryException if error happens
      */
-    public Query generateQuery(DocumentReference user, boolean onlyUnread, Date endDate, List<String> blackList)
+    public Query generateQuery(DocumentReference user, boolean onlyUnread, Date endDate, Date startDate, List<String> blackList)
             throws NotificationException, QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
@@ -124,7 +125,7 @@ public class QueryGenerator
         Query query = queryManager.createQuery(hql.toString(), Query.HQL);
 
         // Bind values
-        query.bindValue("startDate", modelBridge.getUserStartDate(user));
+        query.bindValue("startDate", startDate != null ? startDate : modelBridge.getUserStartDate(user));
         query.bindValue("user", serializer.serialize(user));
         handleEventTypes(types, query);
         handleApplications(apps, query);

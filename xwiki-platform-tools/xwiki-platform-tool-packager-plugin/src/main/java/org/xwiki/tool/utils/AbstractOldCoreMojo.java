@@ -33,15 +33,9 @@ import org.xwiki.tool.extension.util.AbstractExtensionMojo;
  */
 public abstract class AbstractOldCoreMojo extends AbstractExtensionMojo
 {
-    /**
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
-     */
     @Parameter(defaultValue = "xwiki")
     protected String wiki;
 
-    /**
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
-     */
     @Parameter(defaultValue = "${basedir}/src/main/packager/hibernate.cfg.xml")
     protected File hibernateConfig;
 

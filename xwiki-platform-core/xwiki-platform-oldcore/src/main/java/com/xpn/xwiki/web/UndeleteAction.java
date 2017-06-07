@@ -144,10 +144,14 @@ public class UndeleteAction extends XWikiAction
         // If the user asked for an asynchronous action...
         if (isAsync(context.getRequest())) {
             List<String> jobId = restoreJob.getRequest().getId();
+
+            // Note: We use spaceRedirect=false to fix the link to the document when view mode would normally try to
+            // modify the context document to a non-terminal one but the restored document is actually terminal.
+            String queryString = "xpage=restore&jobId=" + serializeJobId(jobId) + "&spaceRedirect=false";
+
             // We redirect to the view action and accept the edge case when the restored document's rights might prevent
             // the restoring user to view the result. In that case, an admin must be contacted to fix the rights.
-            sendRedirect(context.getResponse(),
-                Utils.getRedirect(VIEW_ACTION, "xpage=restore&jobId=" + serializeJobId(jobId), context));
+            sendRedirect(context.getResponse(), Utils.getRedirect(VIEW_ACTION, queryString, context));
 
             // A redirect has been performed.
             return true;

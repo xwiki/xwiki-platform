@@ -96,7 +96,7 @@ public class ExtensionInstallerTest
         
         // Verify
         assertNotNull(caughtException);
-        assertEquals("Failed to install the extension [extensionId-version] on the wiki [wikiId].",
+        assertEquals("Failed to install the extension [extensionId/version] on the wiki [wikiId].",
                 caughtException.getMessage());
         assertTrue(caughtException.getCause() instanceof ComponentLookupException);
     }

@@ -42,7 +42,7 @@ import org.xwiki.refactoring.batch.BatchOperationExecutor;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultBatchOperationExecutor implements BatchOperationExecutor
 {
-    private static final String CONTEXT_PROPERTY = "BATCH_ID";
+    static final String CONTEXT_PROPERTY = "BATCH_ID";
 
     @Inject
     private Execution execution;
@@ -65,7 +65,7 @@ public class DefaultBatchOperationExecutor implements BatchOperationExecutor
             if (StringUtils.isBlank(batchIdToUse)) {
                 batchIdToUse = generateBatchId();
             }
-            execution.getContext().setProperty(CONTEXT_PROPERTY, batchId);
+            execution.getContext().setProperty(CONTEXT_PROPERTY, batchIdToUse);
 
             // Remember that we`ve set it and we have to clean it when done.
             cleanBatchId = true;

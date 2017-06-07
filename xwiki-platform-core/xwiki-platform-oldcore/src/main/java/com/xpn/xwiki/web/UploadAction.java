@@ -196,18 +196,19 @@ public class UploadAction extends XWikiAction
         // Calculate and store mime type
         attachment.resetMimeType(context);
 
-        // Add a comment to both document and attachment history. Include the attachment name, revision and comment in
-        // the document comment.
-        String attachmentComment = context.getRequest().getParameter("comment");
+        // Add a comment to the attachment history.
+        String attachmentComment = StringUtils.defaultString(context.getRequest().getParameter("comment"));
+        attachment.setComment(attachmentComment);
+
+        // Add a comment to the document history. Include the attachment name, revision and comment.
         String documentComment;
-        String nextRev = attachment.getNextVersion();
         ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
+        String nextRev = attachment.getNextVersion();
         if (StringUtils.isBlank(attachmentComment)) {
             params.add(nextRev);
         } else {
             params.add(String.format("%s (%s)", nextRev, attachmentComment));
-            attachment.setComment(attachmentComment);
         }
         if (attachment.isImage(context)) {
             documentComment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());

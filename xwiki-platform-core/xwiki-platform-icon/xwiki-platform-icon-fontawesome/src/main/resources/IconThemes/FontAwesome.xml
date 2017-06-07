@@ -362,6 +362,7 @@ text_underline = underline
 time = clock-o
 transmit = rss
 user = user
+vcard = vcard-o
 weather_clouds = cloud
 weather_sun = sun-o
 webcam = video-camera

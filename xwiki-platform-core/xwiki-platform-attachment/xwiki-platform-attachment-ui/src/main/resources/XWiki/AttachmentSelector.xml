@@ -540,6 +540,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
                    if (this.gallery.down('.gallery_emptyChoice')) {
                      this.gallery.down('.gallery_emptyChoice').addClassName('current');
                    }
+                   // Disable the replace feature because there's no selection.
+                   var fileNameInput = this.gallery.down('input[type="checkbox"][name="filename"]');
+                   fileNameInput.disabled = true;
+                   // Empty the displayed selected file name.
+                   fileNameInput.up('label').down('strong').update('');
                    if (!this.directSave) {
                      this.property.down('input').value = this.defaultValue;
                    }

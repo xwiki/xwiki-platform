@@ -39,7 +39,7 @@
   #end
 ##
 #set ($documentExtensions = $services.extension.xar.getInstalledExtensions($doc.getDocumentReferenceWithLocale()))
-#set ($displayCompare = $totalVersions > 1 || ($totalVersions == 1 && !$documentExtensions.isEmpty()))
+#set ($displayCompare = $totalVersions > 1 || ($totalVersions == 1 && $documentExtensions.size() > 0))
 ## Pagination style
 $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 ##

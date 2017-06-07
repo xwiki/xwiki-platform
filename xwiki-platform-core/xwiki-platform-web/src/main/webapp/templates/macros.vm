@@ -1221,11 +1221,11 @@ $sz bytes##
 #set($ksz = $mathtool.div($sz, 1024))
 #set($ksz = $mathtool.roundTo(1, $ksz))
 #if($ksz < 1024)
-${ksz}kb##
+$ksz KB##
 #else
 #set($Msz = $mathtool.div($sz, 1048576))
 #set($Msz = $mathtool.roundTo(1, $Msz))
-${Msz}Mb##
+$Msz MB##
 #end##
 #end##
 #end

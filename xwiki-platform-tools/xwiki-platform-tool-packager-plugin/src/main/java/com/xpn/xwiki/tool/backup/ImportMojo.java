@@ -38,7 +38,7 @@ import org.xwiki.tool.utils.LogUtils;
 public class ImportMojo extends AbstractImportMojo
 {
     /**
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String)
      */
     @Parameter
     protected File sourceDirectory;

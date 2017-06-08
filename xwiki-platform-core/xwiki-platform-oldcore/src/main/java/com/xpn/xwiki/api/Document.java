@@ -2214,8 +2214,15 @@ public class Document extends Api
     }
 
     /**
-     * @return "inline" if the document should be edited in inline mode by default or "edit" otherwise.
-     * @throws XWikiException if an error happens when computing the edit mode
+     * Gets the default edit mode for this document. An edit mode (other than the default "edit") can be enforced by
+     * creating an {@code XWiki.EditModeClass} object in the current document, with the appropriate value for the
+     * defaultEditMode property, or by adding this object in a sheet included by the document. This function also falls
+     * back on the old {@code SheetClass}, deprecated since 3.1M2, which can be attached to included documents to
+     * specify that the current document should be edited inline.
+     *
+     * @return the default edit mode for this document ("edit" or "inline" usually)
+     * @throws XWikiException since XWiki 6.3M1 it's not used anymore and "edit" is returned in case of error, with an
+     *             error log
      */
     public String getDefaultEditMode() throws XWikiException
     {

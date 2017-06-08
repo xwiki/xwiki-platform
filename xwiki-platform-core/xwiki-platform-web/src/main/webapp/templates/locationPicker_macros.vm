@@ -74,7 +74,7 @@
     ## Location advanced edit button.
     #if ($isAdvancedUser)
       <a href="#" class="location-action location-action-edit">
-        <span class="glyphicon glyphicon-pencil"></span>
+        $services.icon.renderHTML('pencil')
       </a>
     #end
   </div>

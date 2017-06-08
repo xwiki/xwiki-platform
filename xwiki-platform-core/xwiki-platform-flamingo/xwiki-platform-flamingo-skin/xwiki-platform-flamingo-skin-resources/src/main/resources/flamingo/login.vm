@@ -39,7 +39,7 @@
     #end
   </dt>
   <dd class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+    <span class="input-group-addon">$services.icon.renderHTML('user')</span>
     <input class="form-control" type="text" id="j_username" size="60" name="j_username" value="" tabindex="100"/>
   </dd>
   <dt>
@@ -49,7 +49,7 @@
     #end
   </dt>
   <dd class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+    <span class="input-group-addon">$services.icon.renderHTML('lock')</span>
     <input type="password" id="j_password" size="60" name="j_password" value="" tabindex="200"/>
   </dd>
   <dt></dt>

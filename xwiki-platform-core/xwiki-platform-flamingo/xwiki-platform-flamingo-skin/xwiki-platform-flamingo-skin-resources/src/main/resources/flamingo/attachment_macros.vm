@@ -84,7 +84,7 @@
             href="$attachment.document.getURL('view', $escapetool.url({
               'xpage': 'office',
               'attachment': $attachment.filename
-            }))">#glyphicon('eye-open')</a>
+            }))">$services.icon.renderHTML('eye')</a>
         #end
         #if ($hasEdit || $hasAdmin)
           ## Delete attachment link
@@ -93,7 +93,7 @@
             href="$xwiki.getURL($attachmentReference, 'delattachment', $escapetool.url({
               'form_token': $services.csrf.token,
               'xredirect': $options.redirect
-            }))">#glyphicon('remove')</a>
+            }))">$services.icon.renderHTML('cross')</a>
         #end
       </div>
       <span class="version">

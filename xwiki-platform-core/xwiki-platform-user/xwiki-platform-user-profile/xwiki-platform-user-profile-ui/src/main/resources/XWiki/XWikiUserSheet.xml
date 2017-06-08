@@ -56,10 +56,10 @@
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
 #if($isMyProfile &amp;&amp; $hasWatch)
-  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'glyphicon': 'eye-open'}))
+  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'glyphicon': 'eye'}))
 #end
 #if($isMyProfile)
-  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'glyphicon': 'globe'}))
+  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'glyphicon': 'world'}))
   ## TODO: add an enhancement system instead
   #set($notificationsSheet = $services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet'))
   #if ($xwiki.exists($notificationsSheet))

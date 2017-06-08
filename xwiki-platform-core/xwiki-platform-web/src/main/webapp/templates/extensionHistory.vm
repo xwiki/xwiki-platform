@@ -235,7 +235,7 @@
     #displayExtensionHistoryRecords($records)
     <div class="extension-history-actions">
       <button class="btn btn-default" name="action" value="export" type="submit">
-        <span class="glyphicon glyphicon-download-alt"></span>
+        $services.icon.renderHTML('download')
         $services.localization.render('extension.history.records.export')
       </button>
       #if ($hasGlobalAdmin)

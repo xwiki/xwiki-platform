@@ -27,9 +27,11 @@ import org.xwiki.notifications.NotificationException;
  * @version $Id$
  */
 @Role
-public interface NotificationEmailDisplayer
+public interface NotificationEmailRenderer
 {
-    String display(CompositeEvent compositeEvent) throws NotificationException;
+    String renderHTML(CompositeEvent compositeEvent) throws NotificationException;
 
-    String generateEmailSubject(CompositeEvent compositeEvent) throws NotificationException;
+    String renderPlainText(CompositeEvent compositeEvent) throws NotificationException;
+
+    String renderEmailSubject(CompositeEvent compositeEvent) throws NotificationException;
 }

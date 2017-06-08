@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.MailTemplate" locale="">
+  <web>XWiki.Notifications</web>
+  <name>MailTemplate</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1496927914000</creationDate>
+  <parent>xwiki:XWiki.Notifications.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1496928175000</date>
+  <contentUpdateDate>1496927914000</contentUpdateDate>
+  <version>1.1</version>
+  <title>MailTemplate</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content></content>
+  <object>
+    <name>XWiki.Notifications.MailTemplate</name>
+    <number>0</number>
+    <className>XWiki.Mail</className>
+    <guid>210e4c75-4db5-4e8f-ae8e-f872e0c87da2</guid>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <property>
+      <html>&lt;h1&gt;Events on the wiki:&lt;/h1&gt;
+
+#foreach ($event in $htmlEvents)
+  &lt;div class="notification"&gt;
+    $event
+  &lt;/div&gt;
+  &lt;hr /&gt;
+#end</html>
+    </property>
+    <property>
+      <language>en</language>
+    </property>
+    <property>
+      <subject>$events.size() events on the wiki</subject>
+    </property>
+    <property>
+      <text>Events on the wiki:
+
+#foreach ($event in $plainTextEvents)
+  * $event
+#end</text>
+    </property>
+  </object>
+</xwikidoc>

@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.email;
+package org.xwiki.notifications.internal.email;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.internal.plugin.rightsmanager.ReferenceUserIterator;
 import com.xpn.xwiki.plugin.scheduler.AbstractJob;
@@ -72,6 +74,9 @@ public class NotificationEmailJob extends AbstractJob
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     public void test() throws JobExecutionException
     {
         this.executeJob(null);
@@ -81,15 +86,15 @@ public class NotificationEmailJob extends AbstractJob
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
         List<DocumentReference> list = new ArrayList<>();
-        list.add(new DocumentReference("xwiki", "XWiki", "XWikiAllGroup"));
+        list.add(new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), "XWiki", "XWikiAllGroup"));
 
         ReferenceUserIterator userIterator = new ReferenceUserIterator(list, null, documentReferenceResolver,
                 execution);
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("velocityVariables", new HashMap<String, Object>());
 
-        DocumentReference templateReference = new DocumentReference("xwiki", "XWiki", "Mail2");
+        DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
+                Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
         NotificationMimeMessageIterator notificationMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
         notificationMimeMessageIterator.initialize(userIterator, parameters, new Date(0L), templateReference);

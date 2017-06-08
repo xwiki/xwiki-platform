@@ -22,6 +22,7 @@ package org.xwiki.notifications.internal.email;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -197,11 +197,21 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
         }
 
         // Put in the velocity parameters all the events and their rendered version
-        Map<String, Object> velocityVariables = factoryParameters.get(VELOCITY_VARIABLES) != null ?
-                (Map<String, Object>) factoryParameters.get(VELOCITY_VARIABLES) : new HashedMap();
+        Map<String, Object> velocityVariables = getVelocityVariables();
         velocityVariables.put(EVENTS, currentEvents);
         velocityVariables.put(HTML_EVENTS, htmlEvents);
         velocityVariables.put(PLAIN_TEXT_EVENTS, plainTextEvents);
+    }
+
+    private Map<String, Object> getVelocityVariables()
+    {
+        Object velocityVariables = factoryParameters.get(VELOCITY_VARIABLES);
+        if (velocityVariables == null) {
+            velocityVariables = new HashMap<String, Object>();
+            factoryParameters.put(VELOCITY_VARIABLES, velocityVariables);
+        }
+
+        return (Map<String, Object>) velocityVariables;
     }
 
     private String getUserEmail(DocumentReference user)

@@ -80,6 +80,7 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
 
     protected String renderPlainText(Block block)
     {
+        // TODO: this does not work at all (templates enforce HTML syntax I guess)
         WikiPrinter printer = new DefaultWikiPrinter();
         plainTextBlockRenderer.render(block, printer);
         return printer.toString();

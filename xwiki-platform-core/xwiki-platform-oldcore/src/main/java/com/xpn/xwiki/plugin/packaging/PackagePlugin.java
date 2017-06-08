@@ -24,6 +24,11 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
+/**
+ * @version $Id$
+ * @deprecated since 5.2, use Filter framework instead
+ */
+@Deprecated
 public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     public PackagePlugin(String name, String className, XWikiContext context)

@@ -31,6 +31,11 @@ import com.xpn.xwiki.util.Util;
 
 import net.sf.json.JSONObject;
 
+/**
+ * @version $Id$
+ * @deprecated since 5.2, use Filter framework instead
+ */
+@Deprecated
 public class PackageAPI extends Api
 {
     Package pack;

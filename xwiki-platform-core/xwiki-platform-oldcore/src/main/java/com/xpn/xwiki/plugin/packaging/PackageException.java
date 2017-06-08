@@ -21,6 +21,11 @@ package com.xpn.xwiki.plugin.packaging;
 
 import com.xpn.xwiki.plugin.PluginException;
 
+/**
+ * @version $Id$
+ * @deprecated since 5.2, use Filter framework instead
+ */
+@Deprecated
 public class PackageException extends PluginException
 {
     static String plugName = "Package";

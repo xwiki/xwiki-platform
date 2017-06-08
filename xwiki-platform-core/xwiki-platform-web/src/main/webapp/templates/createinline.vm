@@ -231,12 +231,16 @@
   <input type="hidden" name="templateprovider" id="templateprovider" value="" />
 
   <div class='row'>
-    ## Hide the first column when displayed in an AJAX call by clicking on a Wanted Link.
-    #if (!$request.ajax)
+    ## Hide the first column when displayed in an AJAX call by clicking on a Wanted Link (because we know the target
+    ## location from the link reference) or when the current document is new (because the create action uses the location
+    ## of the current document as target in this case).
+    #if (!$request.ajax && !$doc.isNew())
       ## Determine the parent reference for the new document.
       #set ($parentReference = $spaceReference)
       #if (!$parentReference)
         ## No parent reference specified.
+        ## We keep this code although we tested above that the current document is not new because in the future we may
+        ## want to support changing the target location even if the current document is new.
         #if ($doc.isNew())
           ## Encourage the user to create the current document.
           #set ($parentReference = $doc.documentReference.parent)

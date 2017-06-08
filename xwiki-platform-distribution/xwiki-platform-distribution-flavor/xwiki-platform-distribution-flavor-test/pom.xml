@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform</artifactId>
+    <version>9.5-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
+  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</description>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.w3c.css</groupId>
+        <artifactId>css-validator</artifactId>
+        <version>20100131</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <testSourceDirectory>src/test/it</testSourceDirectory>
+    <pluginManagement>
+      <plugins>
+        <!--  Force compilation of tests as the packaging being pom tests won't be compiled
+          with the default pom lifecycle -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>testCompile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!--  Force copy of test resources file as the packaging being pom resource files won't
+          be copied with the default pom lifecycle -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>testResources</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Create jar containing integration tests which will be installed -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Unpack the XWiki application -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>unzip-application</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.xwiki.platform</groupId>
+                    <artifactId>${xwikiExecutionArtifactId}</artifactId>
+                    <version>${project.version}</version>
+                    <type>zip</type>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+                <!-- Allow skipping the unpack -->
+                <skip>${xwiki.test.skipUnpack}</skip>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Export documents -->
+        <plugin>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+          <version>${project.version}</version>
+          <executions>
+            <execution>
+              <id>export-documents</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>export</goal>
+              </goals>
+              <configuration>
+                <exportDirectory>${pathToDocuments}</exportDirectory>
+                <permanentDirectory>${xwikiExecutionDirectory}/data</permanentDirectory>
+                <hibernateConfig>${xwikiExecutionDirectory}/webapps/xwiki/WEB-INF/hibernate.cfg.xml</hibernateConfig>
+
+                <!-- Don't export if unpack is skipped -->
+                <skip>${xwiki.test.skipUnpack}</skip>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-activitystream-api</artifactId>
+              <version>${project.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-instance</artifactId>
+              <version>${project.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-mail-send-storage</artifactId>
+              <version>${project.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <!-- Start XWiki, Execute the tests and Stop XWiki.
+          Note: To execute a single test case run mvn install -Dpattern=<test class name> -DpatternMethod=<test method name>
+          For example: mvn install -Dpattern=DeletePageTest -DpatternMethod=testDeletePageCanDoRedirect
+          For example: mvn install -Dpattern=.*Wysiwyg.*
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>integration-test</phase>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <includes>
+              <include>**/AllTests.java</include>
+            </includes>
+            <systemProperties combine.children="append">
+              <property>
+                <name>pattern</name>
+                <value>${pattern}</value>
+              </property>
+              <property>
+                <name>patternMethod</name>
+                <value>${patternMethod}</value>
+              </property>
+              <property>
+                <name>xwiki.test.baseURL</name>
+                <value>${xwiki.test.baseURL}</value>
+              </property>
+              <property>
+                <name>xwikiPort</name>
+                <value>${port}</value>
+              </property>
+              <property>
+                <name>xwikiStopPort</name>
+                <value>${stopport}</value>
+              </property>
+              <property>
+                <name>seleniumPort</name>
+                <value>${seleniumPort}</value>
+              </property>
+              <property>
+                <name>rmiPort</name>
+                <value>${rmiport}</value>
+              </property>
+              <property>
+                <name>xwikiExecutionDirectory</name>
+                <value>${xwikiExecutionDirectory}</value>
+              </property>
+              <property>
+                <name>screenshotDirectory</name>
+                <value>${basedir}/target/screenshots</value>
+              </property>
+              <property>
+                <name>xwikiExecutionStartCommand</name>
+                <value>${xwikiExecutionStartCommand}</value>
+              </property>
+              <property>
+                <name>xwikiExecutionStopCommand</name>
+                <value>${xwikiExecutionStopCommand}</value>
+              </property>
+              <property>
+                <name>debug</name>
+                <value>${debug}</value>
+              </property>
+              <property>
+                <name>browser</name>
+                <value>${browser}</value>
+              </property>
+              <!-- Avoid running tests with snapshots extension repository enabled. -->
+              <property>
+                <name>skipSnapshotModules</name>
+                <value>true</value>
+              </property>
+              <property>
+                <name>patternExcludeFiles</name><!-- NOTE: Only affects automatic tests -->
+                <!-- list of regex patterns -->
+                <value>
+                  <!-- TODO Files that must be tested manually
+                    -->
+                    Blog/Publisher\.xml <!-- expects xredirect to be a valid URL -->
+                    templates/changemyavatar\.vm <!-- target page must be user page -->
+                    templates/comments2\.vm <!-- needs a page with comments -->
+                    templates/createinline\.vm <!-- expects xredirect to be a valid URL -->
+                    templates/deleteversionsconfirm\.vm <!-- needs both rev1 and rev2, otherwise returns 400 (Bad Request) -->
+                    templates/leftpanels\.vm <!-- empty response if parameter "forceLeftPanels" is not set -->
+                    templates/login\.vm <!-- expects xredirect to be a valid URL -->
+                    templates/office\.vm <!-- expects attachment to be a valid attachment -->
+                    templates/passwd\.vm <!-- must be tested on a user document, otherwise returns status 400 -->
+                    templates/plain\.vm <!-- need raw=1 -->
+                    templates/recyclebinlist\.vm <!-- page must have been deleted before -->
+                    templates/rename\.vm <!-- step=1 renders renameStep1.vm, otherwise needs correct form_token and renames the document -->
+                    templates/rendercontent\.vm <!-- page must exist, otherwise empty -->
+                    templates/rightpanels\.vm <!-- empty response if parameter "forceRightPanels" is not set -->
+                    templates/textarea_wysiwyg\.vm <!-- probably need to set default editor to wysiwyg -->
+                    templates/getdocuments\.vm <!-- generates JSON and our Test currently only supports validating XML -->
+                    skins/flamingo/leftpanels\.vm <!-- empty response if parameter "forceLeftPanels" is not set -->
+                    skins/flamingo/rightpanels\.vm <!-- empty response if parameter "forceRightPanels" is not set -->
+                    skins/flamingo/menus_wiki\.vm <!-- empty response if parameter "forceWikiMenu" is not set -->
+                  <!-- False positives
+                    -->
+                    templates/accessdenied\.vm <!-- simply returns 403 -->
+                    templates/ad\.vm <!-- not used, needs special configuration -->
+                    templates/analytics\.vm <!-- commented out -->
+                    templates/attach\.vm <!-- only redirects to attachments.vm -->
+                    templates/changeavatar\.vm <!-- does not produce any output, just redirects -->
+                    templates/deletegroupmember\.vm <!-- does not produce any output, expects "fullname" to be a valid user name -->
+                    templates/deprecatedMacros\.vm <!-- does not produce any output -->
+                    templates/docalreadyexists\.vm <!-- returns 409 and shows an error message -->
+                    templates/get\.vm <!-- just renders the page content using rendercontent.vm -->
+                    templates/recyclebin\.vm <!-- output only comes from contentview.vm and docextra.vm parameter "id" must be an integer -->
+                    templates/saverights\.vm <!-- expects correct form_token and modifies the document -->
+                    templates/templatedoesnotexist\.vm <!-- returns 400 and shows an error message -->
+                    templates/textarea_text\.vm <!-- empty, not used any more -->
+                    templates/titlevars\.vm <!-- needs defined $renderedContent, already tested with editinline.vm and contentview.vm -->
+                    templates/uploadfailure\.vm <!-- returns a 500 error and shows an error message -->
+                    templates/watch\.vm <!-- expects xredirect to be a valid URL, does not display anything -->
+                    templates/wysiwyg\.vm <!-- redirects to editwysiwyg.vm, recursive redirection error with some parameters -->
+                    templates/xpart\.vm <!-- avoid recursive include -->
+                    templates/init\.vm <!-- escaping does not like it but it does not take any parameter anyway -->
+                    templates/xml\.vm <!-- it's not escaping test job to validate XML format -->
+                </value>
+              </property>
+              <property>
+                <name>pathToXWikiWar</name>
+                <value>org/xwiki/platform/xwiki-platform-distribution-war/${project.version}/xwiki-platform-distribution-war-${project.version}.war</value>
+              </property>
+              <!-- Used in webstandards tests and escaping tests -->
+              <property>
+                <name>pathToDocuments</name>
+                <value>${pathToDocuments}</value>
+              </property>
+              <!-- Used only in webstandards tests -->
+              <property>
+                <name>urlsToTestAsAdmin</name>
+                <value>
+                  /xwiki/bin/admin/XWiki/XWikiPreferences
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=General
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Presentation
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Programming
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Users
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Groups
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Templates
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.OfficeImporterAdmin
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
+                  /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Search
+                  /xwiki/bin/import/XWiki/Import?editor=globaladmin&amp;section=Import
+                  /xwiki/bin/admin/XWiki/Export?editor=globaladmin&amp;section=Export
+                  /xwiki/bin/edit/XWiki/XWikiPreferences?editor=wysiwyg
+                  /xwiki/bin/edit/XWiki/XWikiPreferences?editor=wiki
+                  /xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
+                  /xwiki/bin/edit/XWiki/XWikiPreferences?editor=class
+                  /xwiki/bin/edit/XWiki/XWikiPreferences?editor=rights
+                  /xwiki/bin/inline/Panels/QuickLinks
+                  /xwiki/bin/view/XWiki/Admin?category=preferences
+                  /xwiki/bin/view/XWiki/Admin?category=watchlist
+                  /xwiki/bin/create/Main/?tocreate=page
+                  /xwiki/bin/create/Main/?tocreate=space
+                  /xwiki/bin/view/Main/?xpage=rename&amp;step=1
+                  /xwiki/bin/view/Main/?xpage=copy
+                  /xwiki/bin/view/Main/?xpage=print
+                  /xwiki/bin/view/Main/?viewer=code
+                  /xwiki/bin/view/Main/?viewer=comments
+                  /xwiki/bin/view/Main/?viewer=information
+                  /xwiki/bin/view/Main/?viewer=attachments
+                  /xwiki/bin/view/Main/?viewer=history
+                  /xwiki/bin/delete/Main/
+                  /xwiki/bin/register/XWiki/Register
+                  /xwiki/bin/view/Main/AllDocs?view=orphans
+                  /xwiki/bin/view/Main/AllDocs?view=attachments
+                  /xwiki/bin/view/Main/AllDocs?view=deletedDocs
+                  /xwiki/bin/view/Main/AllDocs?view=deletedAttachments
+                </value>
+              </property>
+              <property>
+                <name>urlsToTestAsGuest</name>
+                <value>
+                </value>
+              </property>
+              <property>
+                <name>rssUrlsToTestAsAdmin</name>
+                <value>
+                  /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
+                  /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki
+                </value>
+              </property>
+              <property>
+                <name>rssUrlsToTestAsGuest</name>
+                <value>
+                  /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
+                  /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki
+                </value>
+              </property>
+              <!-- Used only in office importer tests -->
+              <property>
+                <name>openOfficeExecutable</name>
+                <value>${openOfficeExecutable}</value>
+              </property>
+            </systemProperties>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  <properties>
+    <!-- This is to allow users to override this property on the command line to choose what
+      test to run. For example to run only the DeletePageTest#testDeletePageCanDoRedirect()
+      you would type:
+      mvn install -Dpattern=DeletePageTest -DpatternMethod=testDeletePageCanDoRedirect
+    -->
+    <pattern>.*</pattern>
+    <patternMethod>.*</patternMethod>
+    <port>8080</port>
+    <stopport>8079</stopport>
+    <rmiport>6666</rmiport>
+    <seleniumPort>4444</seleniumPort>
+    <!-- Allow skipping the unpack -->
+    <xwiki.test.skipUnpack>false</xwiki.test.skipUnpack>
+    <!-- Specify the part of the URL before the port number where the XWiki instance is running. This is used when running tests on a remote instance.
+         Do not add a trailing slash. Example:
+         http://localhost
+         https://testmachine.mynetwork.net
+         See also "port" for defining the port to connect to.
+    -->
+    <xwiki.test.baseURL>http://localhost</xwiki.test.baseURL>
+    <!-- Run tests on Firefox by default. You can use a different browser by activating the corresponding profile,
+         e.g. -Pchrome -->
+    <browser>*firefox</browser>
+    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <!-- We expect a log of log during tests -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    
+    <pathToDocuments>${project.build.directory}/documents</pathToDocuments>
+    <xwikiExecutionArtifactId>xwiki-platform-distribution-flavor-jetty-hsqldb</xwikiExecutionArtifactId>
+    <xwikiExecutionDirectory>${project.build.directory}/${xwikiExecutionArtifactId}-${project.version}</xwikiExecutionDirectory>
+  </properties>
+  <profiles>
+    <profile>
+      <id>unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>bash stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
+      </properties>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <xwikiExecutionStartCommand>bash start_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>bash stop_xwiki.sh -p ${port} -sp ${stopport}</xwikiExecutionStopCommand>
+      </properties>
+    </profile>
+    <!-- This profile must come after the "mac" profile so that it overrides it when it's active.
+         Note: You must define the ${profilePath} property in your settings.xml file or in a
+         profiles.xml one. For example in settings.xml:
+         
+           <settings>
+             <profiles>
+               <profile>
+                 <id>xwiki</id>
+                 <properties>
+                   <profilerPath>/Applications/YourKit Java Profiler 7.0.11.app/bin/mac</profilerPath>
+                 </properties>
+             [...]
+             <activeProfiles>
+               <activeProfile>xwiki</activeProfile>
+             [...]
+    -->    
+    <profile>
+      <id>macprofiler</id>
+      <properties>
+        <xwikiExecutionStartCommand>sh start_xwiki_debug.sh ${port} ${stopport} profiler "${profilerPath}"</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>sh stop_xwiki.sh ${stopport}</xwikiExecutionStopCommand>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <xwikiExecutionStartCommand>cmd /c start_xwiki.bat ${port} ${stopport}</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>cmd /c stop_xwiki.bat ${stopport}</xwikiExecutionStopCommand>
+      </properties>
+    </profile>
+    <!-- This profile must come after the "windows" profile so that it overrides it when it's active.
+         Note: You must define the ${profilePath} property in your settings.xml file or in a
+         profiles.xml one. No spaces are allowed in this path, 8.3 DOS path format should be used.
+         Use the "dir /X" command (in command prompt) within a directory to get 8.3 DOS path.
+         For example (win32) in settings.xml:
+           <settings>
+             <profiles>
+               <profile>
+                 <id>xwiki</id>
+                 <properties>
+                   <profilerPath>C:\PROGRA~1\YOURKI~1.11\bin\win32</profilerPath>                   
+                 </properties>
+             [...]
+             <activeProfiles>
+               <activeProfile>xwiki</activeProfile>
+             [...]
+    -->    
+    <profile>
+      <id>winprofiler</id>
+      <properties>
+        <xwikiExecutionStartCommand>cmd /c start_xwiki_debug.bat ${port} ${stopport} profiler ${profilerPath}</xwikiExecutionStartCommand>
+        <xwikiExecutionStopCommand>cmd /c stop_xwiki.bat ${stopport}</xwikiExecutionStopCommand>
+      </properties>
+    </profile>
+    <profile>
+      <!-- Make sure we add the Clover JAR to the classpath since instrumented code will need it -->
+      <id>clover</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.atlassian.clover</groupId>
+          <artifactId>clover</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <!-- Browser profiles for both Selenium 1 and Selenium 2 tests. -->
+    <profile>
+      <id>firefox</id>
+      <!-- Not necessary to define the browser property since it's defined to be firefox by default. We keep this
+           profile simply to be symmetrical with other profiles -->
+    </profile>
+    <profile>
+      <id>iexplore</id>
+      <properties>
+        <browser>*iexplore</browser>
+      </properties>
+    </profile>
+    <profile>
+      <id>chrome</id>
+      <properties>
+        <browser>*chrome</browser>
+      </properties>
+    </profile>
+    <profile>
+      <id>otherbrowser</id>
+      <properties>
+        <browser>*custom ${browserPath}</browser>
+      </properties>
+    </profile>
+  </profiles>
+  <modules>
+    <module>xwiki-platform-distribution-flavor-test-misc</module>
+    <module>xwiki-platform-distribution-flavor-test-pageobjects</module>
+    <module>xwiki-platform-distribution-flavor-test-ui</module>
+    <module>xwiki-platform-distribution-flavor-test-selenium</module>
+    <module>xwiki-platform-distribution-flavor-test-webdav</module>
+    <module>xwiki-platform-distribution-flavor-test-webstandards</module>
+    <module>xwiki-platform-distribution-flavor-test-escaping</module>
+    <module>xwiki-platform-distribution-flavor-test-storage</module>
+    <module>xwiki-platform-distribution-flavor-test-wysiwyg</module>
+    <module>xwiki-platform-distribution-flavor-test-jmeter</module>
+  </modules>
+</project>

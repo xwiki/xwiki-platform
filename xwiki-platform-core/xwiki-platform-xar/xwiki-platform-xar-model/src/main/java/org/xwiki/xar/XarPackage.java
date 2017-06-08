@@ -20,6 +20,7 @@
 package org.xwiki.xar;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -123,10 +124,9 @@ public class XarPackage
      */
     private boolean packageBackupPack;
 
-    private final Map<LocalDocumentReference, XarEntry> packageFiles =
-        new LinkedHashMap<LocalDocumentReference, XarEntry>();
+    private final Map<LocalDocumentReference, XarEntry> packageFiles = new LinkedHashMap<>();
 
-    private final Map<LocalDocumentReference, XarEntry> entries = new LinkedHashMap<LocalDocumentReference, XarEntry>();
+    private final Map<LocalDocumentReference, XarEntry> entries = new LinkedHashMap<>();
 
     /**
      * Default constructor.
@@ -153,12 +153,12 @@ public class XarPackage
      */
     public XarPackage(File file) throws IOException, XarException
     {
-        ZipFile zipFile = new ZipFile(file);
-
-        try {
-            read(zipFile);
-        } finally {
-            zipFile.close();
+        if (file.isDirectory()) {
+            read(file);
+        } else {
+            try (ZipFile zipFile = new ZipFile(file)) {
+                read(zipFile);
+            }
         }
     }
 
@@ -196,7 +196,7 @@ public class XarPackage
         try {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
                 if (!entry.isDirectory() && zis.canReadEntryData(entry)) {
-                    readEntry(zis, entry);
+                    readEntry(zis, entry.getName());
                 }
             }
         } finally {
@@ -222,7 +222,7 @@ public class XarPackage
                 InputStream stream = zipFile.getInputStream(entry);
 
                 try {
-                    readEntry(stream, entry);
+                    readEntry(stream, entry.getName());
                 } finally {
                     stream.close();
                 }
@@ -230,9 +230,40 @@ public class XarPackage
         }
     }
 
-    private void readEntry(InputStream stream, ZipArchiveEntry entry) throws XarException, IOException
+    /**
+     * Find and add the entries located in the passed XAR directory.
+     * 
+     * @param directory the expended XAR file
+     * @throws IOException when failing to read the file
+     * @throws XarException when failing to parse the XAR package
+     * @since 9.5RC1
+     */
+    public void read(File directory) throws IOException, XarException
     {
-        if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
+        String directoryName = directory.getPath();
+        directoryName += File.separator;
+
+        read(directory, directoryName);
+    }
+
+    private void read(File directory, String rootDirectory) throws IOException, XarException
+    {
+        for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+                read(file, rootDirectory);
+            } else {
+                try (FileInputStream stream = new FileInputStream(file)) {
+                    String entryName = file.getPath();
+                    entryName = entryName.substring(rootDirectory.length(), entryName.length());
+                    readEntry(stream, entryName);
+                }
+            }
+        }
+    }
+
+    private void readEntry(InputStream stream, String entryName) throws XarException, IOException
+    {
+        if (entryName.equals(XarModel.PATH_PACKAGE)) {
             readDescriptor(stream);
         } else {
             LocalDocumentReference reference = XarUtils.getReference(stream);
@@ -241,7 +272,7 @@ public class XarPackage
             int defaultAction = getDefaultAction(reference);
 
             // Create entry
-            XarEntry xarEntry = new XarEntry(reference, entry.getName(), defaultAction);
+            XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction);
 
             // Register entry
             this.entries.put(xarEntry, xarEntry);

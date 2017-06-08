@@ -19,6 +19,10 @@
  */
 package org.xwiki.xar.internal;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
@@ -50,6 +54,25 @@ public final class XarUtils
     private XarUtils()
     {
         // Utility class
+    }
+
+    /**
+     * Extract {@link LocalDocumentReference} from a XAR document XML file.
+     * 
+     * @param documentFile the file to parse
+     * @return the reference extracted from the stream
+     * @throws XarException when failing to parse the document stream
+     * @since 9.5RC1
+     */
+    public static LocalDocumentReference getReference(File documentFile) throws XarException
+    {
+        try (FileInputStream stream = new FileInputStream(documentFile)) {
+            return getReference(stream);
+        } catch (FileNotFoundException e) {
+            throw new XarException("Cannot find file", e);
+        } catch (IOException e) {
+            throw new XarException("Failed close file stream", e);
+        }
     }
 
     /**

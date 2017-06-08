@@ -224,7 +224,7 @@
 
   ## Deprecated: Pass along any received page parent.
   <input type='hidden' name='parent' value="$!{escapetool.xml($parent)}"/>
-  
+
   ## The "templateprovider" field is needed by the CreateAction, even empty.
   ## By the past, it was "xwiki/create.js" which created this field, but it was causing problems when the user sent the
   ## form before the JavaScript code was executed.
@@ -236,14 +236,22 @@
       ## Determine the parent reference for the new document.
       #set ($parentReference = $spaceReference)
       #if (!$parentReference)
-        ## No space reference specified.
-        ## Use the current document's space reference as parent for the new document.
-        #set ($parentReference = $doc.documentReference.lastSpaceReference)
-        #getWikiHomePageReference($doc.wiki $homeReference)
-        #if ($parentReference.equals($homeReference.lastSpaceReference))
-          ## We want to discourage ending up with all the pages children of the homepage so we
-          ## default to top level documents, unless the user explicitly says otherwise.
-          #set ($parentReference = $parentReference.wikiReference)
+        ## No parent reference specified.
+        #if ($doc.isNew())
+          ## Encourage the user to create the current document.
+          #set ($parentReference = $doc.documentReference.parent)
+          #if ($doc.name == 'WebHome')
+            #set ($parentReference = $parentReference.parent)
+          #end
+        #else
+          #getWikiHomePageReference($doc.wiki $homeReference)
+          #if ($doc.documentReference.equals($homeReference))
+            ## Encourage the user to create top level documents from the home page.
+            #set ($parentReference = $doc.documentReference.wikiReference)
+          #else
+            ## Encourage the user to create a child or sibling of the current document.
+            #set ($parentReference = $doc.documentReference.lastSpaceReference)
+          #end
         #end
       #end
 

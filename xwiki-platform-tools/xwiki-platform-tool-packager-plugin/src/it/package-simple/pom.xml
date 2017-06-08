@@ -37,26 +37,6 @@
     <module>package</module>
     <module>package-xwiki-8960</module>
   </modules>
-  <build>
-    <extensions>
-      <!-- Needed to add support for the "xar" packaging -->
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
-    <!-- TODO: Remove once http://jira.codehaus.org/browse/MENFORCER-133 is fixed. -->
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-          <version>${commons.version}</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
   <!-- The Packager plugin uses XWiki oldcore which gets Clovered and thus we need to have the Clover JAR in the
        execution classpath of the plugin. -->
   <profiles>

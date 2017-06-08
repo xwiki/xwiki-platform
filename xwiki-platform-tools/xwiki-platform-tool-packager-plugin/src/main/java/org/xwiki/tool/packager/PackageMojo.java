@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -154,12 +155,29 @@ public class PackageMojo extends AbstractOldCoreMojo
     @Parameter(defaultValue = "true")
     private boolean test;
 
+    private File webappsDirectory;
+
+    private File xwikiWebappDirectory;
+
+    private File webInfDirectory;
+
+    private File libDirectory;
+
     @Override
     protected void before() throws MojoExecutionException
     {
-        // Adapt standard directories to XWiki instance
-        this.hibernateConfig = new File(this.outputPackageDirectory, "webapps/xwiki/WEB-INF/hibernate.cfg.xml");
+        // Setup folders
+        this.webappsDirectory = new File(this.outputPackageDirectory, "webapps");
+        this.xwikiWebappDirectory = new File(this.webappsDirectory, "xwiki");
+        this.webInfDirectory = new File(this.xwikiWebappDirectory, "WEB-INF");
+        this.libDirectory = new File(this.webInfDirectory, "lib");
+
         this.permanentDirectory = new File(this.outputPackageDirectory, "data");
+        this.hibernateConfig = new File(this.webInfDirectory, "hibernate.cfg.xml");
+
+        // Generate and copy config files.
+        getLog().info("Copying Configuration files ...");
+        generateConfigurationFiles(webInfDirectory);
 
         super.before();
     }
@@ -167,11 +185,6 @@ public class PackageMojo extends AbstractOldCoreMojo
     @Override
     public void executeInternal() throws MojoExecutionException, MojoFailureException
     {
-        if (isSkipExecution()) {
-            getLog().info("Skipping execution");
-
-            return;
-        }
         LogUtils.configureXWikiLogs();
 
         getLog().info("Using platform version: " + getXWikiPlatformVersion());
@@ -182,10 +195,9 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // Step 2: Get the WAR dependencies and expand them in the package output directory.
         getLog().info("Expanding WAR dependencies ...");
-        File webappsDirectory = new File(this.outputPackageDirectory, "webapps");
         for (Artifact warArtifact : resolveWarArtifacts()) {
             getLog().info("  ... Unzipping WAR: " + warArtifact.getFile());
-            File warDirectory = new File(webappsDirectory, getContextPath(warArtifact));
+            File warDirectory = new File(this.webappsDirectory, getContextPath(warArtifact));
             unzip(warArtifact.getFile(), warDirectory);
             // Only generate the extension.xed descriptor for the distribution war
             if (warArtifact.getArtifactId().equals("xwiki-platform-web")) {
@@ -195,12 +207,9 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // Step 3: Copy all JARs dependencies to the expanded WAR directory in WEB-INF/lib
         getLog().info("Copying JAR dependencies ...");
-        File xwikiWebappDirectory = new File(webappsDirectory, "xwiki");
-        File webInfDirectory = new File(xwikiWebappDirectory, "WEB-INF");
-        File libDirectory = new File(webInfDirectory, "lib");
-        createDirectory(libDirectory);
+        createDirectory(this.libDirectory);
         for (Artifact artifact : resolveJarArtifacts()) {
-            installJAR(artifact, libDirectory);
+            installJAR(artifact, this.libDirectory);
         }
 
         // Step 4: Copy compiled classes in the WEB-INF/Classes directory. This allows the tests to provide custom
@@ -213,18 +222,14 @@ public class PackageMojo extends AbstractOldCoreMojo
             copyDirectory(this.outputClassesDirectory, classesDirectory);
         }
 
-        // Step 5: Generate and copy config files.
-        getLog().info("Copying Configuration files ...");
-        generateConfigurationFiles(webInfDirectory);
-
         // Step 6: Copy HSQLDB JDBC Driver
         getLog().info("Copying HSQLDB JDBC Driver JAR ...");
         Artifact hsqldbArtifact = resolveHSQLDBArtifact();
-        installJAR(hsqldbArtifact, libDirectory);
+        installJAR(hsqldbArtifact, this.libDirectory);
 
         // Step 7: Unzip the specified Skins. If no skin is specified then unzip the Flamingo skin only.
         getLog().info("Copying Skins ...");
-        File skinsDirectory = new File(xwikiWebappDirectory, "skins");
+        File skinsDirectory = new File(this.xwikiWebappDirectory, "skins");
         for (Artifact skinArtifact : getSkinArtifacts()) {
             unzip(skinArtifact.getFile(), skinsDirectory);
         }
@@ -245,9 +250,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         this.extensionHelper.serializeExtension(artifact, libDirectory);
     }
 
+    @Override
     protected boolean isSkipExecution()
     {
-        return isSkipTests();
+        return super.isSkipExecution() || isSkipTests();
     }
 
     private boolean isSkipTests()
@@ -274,7 +280,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         for (File startFile : startFiles) {
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));
             try {
-                String content = org.apache.commons.io.FileUtils.readFileToString(startFile);
+                String content = org.apache.commons.io.FileUtils.readFileToString(startFile, StandardCharsets.UTF_8);
                 OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
                 writer.write(replaceProperty(content, velocityContext));
                 writer.close();
@@ -352,7 +358,7 @@ public class PackageMojo extends AbstractOldCoreMojo
                     getLog().info("Writing config file: " + outputFile);
                     // Note: Init is done once even if this method is called several times...
                     Velocity.init();
-                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
+                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream, StandardCharsets.UTF_8));
                     writer.close();
                     jarInputStream.closeEntry();
                 }

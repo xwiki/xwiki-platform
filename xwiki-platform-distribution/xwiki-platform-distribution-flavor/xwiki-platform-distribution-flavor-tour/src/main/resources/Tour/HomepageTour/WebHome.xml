@@ -452,7 +452,7 @@ $services.localization.render('tour.homepageTour.panels.contentB')
 $services.localization.render('tour.homepageTour.breadcrumbs.contentA')
 
 
-$services.localization.render('tour.homepageTour.breadcrumbs.contentB', ['{{html clean="false"}}&lt;span class="fa fa-home"&gt;&lt;/span&gt;{{/html}}'])
+$services.localization.render('tour.homepageTour.breadcrumbs.contentB', [" $services.icon.render('home') "])
 {{velocity}}</content>
     </property>
     <property>
@@ -740,7 +740,7 @@ $services.localization.render('tour.homepageTour.pageContent.contentB')
 $services.localization.render('tour.homepageTour.pageMenu.contentA')
 
 
-$services.localization.render('tour.homepageTour.pageMenu.contentB', ['{{html clean="false"}}&lt;span class="glyphicon glyphicon-option-vertical"&gt;&lt;/span&gt;{{/html}}'])
+$services.localization.render('tour.homepageTour.pageMenu.contentB', [" $services.icon.render('more-vertical') "])
 {{velocity}}</content>
     </property>
     <property>
@@ -1028,7 +1028,7 @@ $services.localization.render('tour.homepageTour.pageTabs.contentB')
 $services.localization.render('tour.homepageTour.header.contentA')
 
 
-$services.localization.render('tour.homepageTour.header.contentB', ['{{html clean="false"}}&lt;span class="glyphicon glyphicon-menu-hamburger"&gt;&lt;/span&gt;{{/html}}'])
+$services.localization.render('tour.homepageTour.header.contentB', [" $services.icon.render('menu') "])
 {{velocity}}</content>
     </property>
     <property>

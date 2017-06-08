@@ -261,7 +261,7 @@
               notification.hide();
               new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.cleared'))", 'done');
               // Remove the notifications from the UI and display the "nothing!" message instead.
-              $('.notifications-area').html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+              $('.notifications-area').html($('&lt;p&gt;').addClass('text-center noitems').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
               // Update the notifications counter
               updateNotificationCount(0);
             });
@@ -356,7 +356,7 @@
       $('.notifications-load-more').remove();
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; !untilDate) {
-        area.html($('&lt;p&gt;').addClass('text-center').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+        area.html($('&lt;p&gt;').addClass('text-center noitems').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
       } else if (untilDate == 0) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.

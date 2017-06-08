@@ -19,7 +19,7 @@
   #set($discard = $queryStringMap.putAll($request.parameterMap))
   #set($discard = $queryStringMap.put('language', $currentLanguage))
   #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
-  #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) <span class='glyphicon glyphicon-ok'></span>")
+  #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) $services.icon.renderHTML('tick')")
   #foreach($lang in $additionallangs)
     #set($discard = $queryStringMap.put('language', $lang))
     #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")

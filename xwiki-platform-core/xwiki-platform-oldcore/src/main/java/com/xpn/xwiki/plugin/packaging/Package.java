@@ -79,6 +79,11 @@ import com.xpn.xwiki.web.Utils;
 
 import net.sf.json.JSONObject;
 
+/**
+ * @version $Id$
+ * @deprecated since 5.2, use Filter framework instead
+ */
+@Deprecated
 public class Package
 {
     public static final int OK = 0;

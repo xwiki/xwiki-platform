@@ -26,6 +26,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * @version $Id$
+ * @deprecated since 5.2, use Filter framework instead
+ */
+@Deprecated
 public class DocumentInfo
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentInfo.class);

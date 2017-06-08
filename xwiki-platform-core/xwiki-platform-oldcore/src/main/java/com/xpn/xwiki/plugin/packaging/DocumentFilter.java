@@ -22,6 +22,11 @@ package com.xpn.xwiki.plugin.packaging;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * @version $Id$
+ * @deprecated since 5.2, use Filter framework instead
+ */
+@Deprecated
 public interface DocumentFilter
 {
     /**

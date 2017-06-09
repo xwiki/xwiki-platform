@@ -43,7 +43,8 @@
   <properties>
     <!-- Flavors known to be valid with the current distribution -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-ui-flavor/${platform.version}
+        org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
+        org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
 
     <!-- Hibernate configuration -->

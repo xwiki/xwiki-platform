@@ -181,10 +181,10 @@
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')
             #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[(%class="glyphicon glyphicon-download-alt"%)(%%)Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="btn btn-primary"]]##
+              [[$services.icon.render('download')  Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="btn btn-primary"]]##
             #end
           #else
-            [[(%class="glyphicon glyphicon-download-alt"%) (%%)Download v$version&gt;&gt;$download||class="btn btn-primary"]]##
+            [[$services.icon.render('download')  Download v$version&gt;&gt;$download||class="btn btn-primary"]]##
           #end
         #end
         ##------- Source --------

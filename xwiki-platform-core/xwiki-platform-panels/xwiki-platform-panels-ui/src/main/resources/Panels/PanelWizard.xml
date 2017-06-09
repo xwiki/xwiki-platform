@@ -284,7 +284,7 @@
         (((
           #set ($categPanels = $categoryMap.get($category))
           #if ($categPanels.size() == 0)
-            $services.localization.render('panelwizard.nopanels')
+            (%class="noitems"%)$services.localization.render('panelwizard.nopanels')(%%)
           #else
             #foreach ($item in $categPanels)
               #set ($panelDoc = $xwiki.getDocument($item))

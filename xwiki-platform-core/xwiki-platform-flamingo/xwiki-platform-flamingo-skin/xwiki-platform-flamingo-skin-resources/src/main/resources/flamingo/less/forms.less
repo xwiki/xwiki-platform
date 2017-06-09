@@ -17,7 +17,7 @@ select.input-lg, input[type="text"].input-lg, input[type="password"].input-lg {
   .input-lg;
 }
 
-input[type="radio"], 
+input[type="radio"],
 input[type="checkbox"] {
   display: inline-block;
   margin-right: (@padding-base-horizontal / 2);
@@ -106,14 +106,19 @@ select[size="0"], select[size="1"] {
   display: block;
 }
 
-/* Validation messages do not have the place to be displayed at the right of the input field, because the width of the fields is 100%. */
+// Validation messages do not have the place to be displayed at the right of the input field, because the width of the fields is 100%.
 .LV_validation_message {
   display: block;
 }
 
-// Forms on the navbar ==================================================
+// Forms on the navbar
 @media screen and (max-width: @screen-xs-max) {
   .navbar-form {
     margin: 0 0;
   }
+}
+
+// Images inside input groups
+.input-group img {
+  max-width: inherit;
 }

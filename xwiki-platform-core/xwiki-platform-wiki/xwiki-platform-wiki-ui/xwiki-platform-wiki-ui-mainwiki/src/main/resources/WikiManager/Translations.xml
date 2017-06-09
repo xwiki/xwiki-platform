@@ -156,8 +156,6 @@ platform.wiki.users.profile.activity.show=show activity
 ## Wiki Deletion
 platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
 platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
-platform.wiki.delete.confirmation.no=No, take me back!
 platform.wiki.delete.error.wikiIdDoesNotMatch=You must type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
 
@@ -298,6 +296,12 @@ platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system 
 platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
 platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
 platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
+platform.wiki.delete.confirmation.no=No, take me back!
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

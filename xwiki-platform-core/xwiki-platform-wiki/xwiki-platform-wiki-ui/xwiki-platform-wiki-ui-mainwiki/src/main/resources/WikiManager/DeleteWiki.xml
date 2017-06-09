@@ -40,6 +40,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set ($docextras=[])
 #macro (printException $exception)
   #if($exception.message)
     {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$exception.message]){{/error}}
@@ -102,15 +103,15 @@
           #end
         #end
         {{box}}
-          **$services.localization.render('platform.wiki.delete.confirmation', [$wikiMainPageLinkStart, $wikiId, $wikiMainPageLinkEnd])**
+          $services.localization.render('platform.wiki.delete.confirmation', [$wikiMainPageLinkStart, $wikiId, $wikiMainPageLinkEnd])
           ((({{html}}
             &lt;form action="$doc.getURL()" method="post"&gt;
-              &lt;fieldset&gt;
-                &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
-                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-                &lt;label for="wikiDeleteConfirmation"&gt;$services.localization.render('platform.wiki.delete.confirmation.retypeWikiId') &lt;input type="text" name="wikiIdConfirm" value="$!{escapetool.xml($wikiIdConfirm)}" id="wikiDeleteConfirmation" class="required" /&gt;&lt;/label&gt;&lt;br /&gt;
-                &lt;span class="buttonwrapper"&gt;&lt;button class="button btn-danger" id="confirmButton"&gt;#glyphicon('remove') $services.localization.render('platform.wiki.delete.confirmation.yes')&lt;/button&gt; &lt;a class="cancel button" href="$backUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.no')&lt;/a&gt;&lt;/span&gt;
-              &lt;/fieldset&gt;
+              &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+              &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+              &lt;p&gt;$services.localization.render('platform.wiki.delete.confirmation.retypeWikiId') &lt;input type="text" name="wikiIdConfirm" value="$!{escapetool.xml($wikiIdConfirm)}" id="wikiDeleteConfirmation" class="required" /&gt;
+              &lt;/p&gt;
+              &lt;button class="btn btn-danger" id="confirmButton"&gt;$services.localization.render('delete')&lt;/button&gt;
+              &lt;a class="btn btn-default" href="$backUrl"&gt;$services.localization.render('cancel')&lt;/a&gt;
             &lt;/form&gt;
           {{/html}})))
         {{/box}}

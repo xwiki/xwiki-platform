@@ -305,8 +305,21 @@
                   </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
+                #if($colprop.get('class'))
+                  #set($propClassName = $colprop.get('class'))
+                #else
+                  #set($propClassName = $classname)
+                #end
+                #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
+                #set($classType = $class.get($colname).classType)
                 <td class="xwiki-livetable-display-header-filter">
-                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text"
+                  #if("$!classType" == 'DBList')
+                    #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetabledblist.js', true))
+                    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" />
+                    <input type="text" data-type="suggest" autocomplete="off" data-xclass="$escapetool.html($propClassName)"
+                  #else
+                    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text"
+                  #end
                   #if("$!colprop.size" != '') size="${colprop.size}"
                   title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
                   [$services.localization.render("${transprefix}${colname}")]))"#end />

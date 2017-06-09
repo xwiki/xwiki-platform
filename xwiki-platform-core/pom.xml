@@ -397,7 +397,6 @@
     <module>xwiki-platform-vfs</module>
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
-    <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>

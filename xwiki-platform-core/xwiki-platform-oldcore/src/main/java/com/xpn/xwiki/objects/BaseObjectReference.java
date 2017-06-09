@@ -141,7 +141,7 @@ public class BaseObjectReference extends ObjectReference
      */
     public static RegexEntityReference any(String classReference, EntityReference parent)
     {
-        return new RegexEntityReference(Pattern.compile(Pattern.quote(classReference) + "\\[\\d*\\]"),
+        return new RegexEntityReference(Pattern.compile("([^:]*:)?" + Pattern.quote(classReference) + "\\[\\d*\\]"),
             EntityType.OBJECT, parent);
     }
 

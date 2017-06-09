@@ -72,9 +72,9 @@
       &lt;div class="input-group"&gt;
         &lt;input type="search" name="text" class="form-control withTip useTitleAsTip"
           title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
-        &lt;span class="input-group-btn buttonwrapper"&gt;
+        &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;
-            &lt;span class="glyphicon glyphicon-search"&gt;&lt;/span&gt;
+            $services.icon.renderHTML('search')
             &lt;span class="sr-only"&gt;$services.localization.render('search.page.bar.submit')&lt;/span&gt;
           &lt;/button&gt;
         &lt;/span&gt;

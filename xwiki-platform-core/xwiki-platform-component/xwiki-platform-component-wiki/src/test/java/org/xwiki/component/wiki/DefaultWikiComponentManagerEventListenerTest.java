@@ -20,6 +20,7 @@
 package org.xwiki.component.wiki;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,10 +30,12 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.component.wiki.internal.DefaultWikiComponent;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentManagerEventListener;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
+import org.xwiki.component.wiki.internal.WikiComponentManagerRegistrationHelper;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -47,25 +50,35 @@ import static org.mockito.Mockito.*;
  */
 public class DefaultWikiComponentManagerEventListenerTest implements WikiComponentConstants
 {
-    private static final String ROLE_HINT = "roleHint";
-
     private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
-
-    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
     @Rule
     public MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
         DefaultWikiComponentManagerEventListener.class);
 
+    private WikiComponentManagerRegistrationHelper wikiComponentManagerRegistrationHelper;
+
+    private ComponentManager componentManager;
+
     private WikiComponentBuilder wikiComponentBuilder;
 
-    private WikiComponentManager wikiComponentManager;
+    private WikiComponent wikiComponent;
 
     @Before
     public void setUp() throws Exception
     {
-        wikiComponentBuilder = mocker.registerMockComponent(WikiComponentBuilder.class);
-        wikiComponentManager = mocker.getInstance(WikiComponentManager.class);
+        this.wikiComponentManagerRegistrationHelper =
+                this.mocker.registerMockComponent(WikiComponentManagerRegistrationHelper.class);
+
+        this.wikiComponent = mock(WikiComponent.class);
+
+        this.wikiComponentBuilder = mock(WikiComponentBuilder.class);
+        when(this.wikiComponentBuilder.getDocumentReferences()).thenReturn(Arrays.asList(DOC_REFERENCE));
+        when(this.wikiComponentBuilder.buildComponents(DOC_REFERENCE)).thenReturn(Arrays.asList(this.wikiComponent));
+
+        this.componentManager = this.mocker.registerMockComponent(ComponentManager.class);
+        when(this.componentManager.getInstanceList(WikiComponentBuilder.class))
+                .thenReturn(Arrays.asList(this.wikiComponentBuilder));
     }
 
     @Test
@@ -73,8 +86,8 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     {
         mocker.getComponentUnderTest().onEvent(null, null, null);
 
-        verify(wikiComponentManager, never()).registerWikiComponent(any(WikiComponent.class));
-        verify(wikiComponentManager, never()).unregisterWikiComponents(any(DocumentReference.class));
+        verify(this.wikiComponentManagerRegistrationHelper, never()).registerComponentList(any());
+        verify(this.wikiComponentManagerRegistrationHelper, never()).unregisterComponents(any(EntityReference.class));
     }
 
     @Test
@@ -85,38 +98,46 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
 
         mocker.getComponentUnderTest().onEvent(null, componentDocument, null);
 
-        verify(wikiComponentManager, never()).registerWikiComponent(any(WikiComponent.class));
-        verify(wikiComponentManager, never()).unregisterWikiComponents(any(DocumentReference.class));
+        verify(this.wikiComponentManagerRegistrationHelper, never()).registerComponentList(any());
+        verify(this.wikiComponentManagerRegistrationHelper, never()).unregisterComponents(any(EntityReference.class));
     }
 
     @Test
     public void onDocumentCreated() throws Exception
     {
         onDocumentCreatedOrUpdated(new DocumentCreatedEvent(DOC_REFERENCE));
+
+        verify(this.wikiComponentManagerRegistrationHelper, times(2))
+                .registerComponentList(Arrays.asList(this.wikiComponent));
+        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+                .unregisterComponents(any());
     }
 
     @Test
     public void onDocumentUpdated() throws Exception
     {
         onDocumentCreatedOrUpdated(new DocumentUpdatedEvent(DOC_REFERENCE));
+
+        verify(this.wikiComponentManagerRegistrationHelper, times(2))
+                .registerComponentList(Arrays.asList(this.wikiComponent));
+        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+                .unregisterComponents(DOC_REFERENCE);
     }
 
     @Test
     public void onDocumentUpdatedWhenTwoComponents() throws Exception
     {
-        DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
-        when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
-        when(wikiComponentBuilder.getDocumentReferences()).thenReturn(Arrays.asList(DOC_REFERENCE));
+        // We create a second WikiComponent and register it against our standard WikiComponentBuilder
+        WikiComponent secondWikiComponent = mock(WikiComponent.class);
+        when(this.wikiComponentBuilder.buildComponents(DOC_REFERENCE))
+                .thenReturn(Arrays.asList(this.wikiComponent, secondWikiComponent));
 
-        WikiComponent component =
-            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
-                WikiComponentScope.WIKI);
-        when(wikiComponentBuilder.buildComponents(DOC_REFERENCE)).thenReturn(Arrays.asList(component, component));
+        this.onDocumentCreatedOrUpdated(new DocumentUpdatedEvent(DOC_REFERENCE));
 
-        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(DOC_REFERENCE), componentDocument, null);
-
-        verify(wikiComponentManager, times(1)).unregisterWikiComponents(DOC_REFERENCE);
-        verify(wikiComponentManager, times(2)).registerWikiComponent(component);
+        verify(this.wikiComponentManagerRegistrationHelper, times(2))
+                .registerComponentList(Arrays.asList(this.wikiComponent, secondWikiComponent));
+        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+                .unregisterComponents(DOC_REFERENCE);
     }
 
     @Test
@@ -127,41 +148,31 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
 
         mocker.getComponentUnderTest().onEvent(new DocumentDeletedEvent(DOC_REFERENCE), componentDocument, null);
 
-        verify(wikiComponentManager, times(1)).unregisterWikiComponents(DOC_REFERENCE);
+        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+                .unregisterComponents(DOC_REFERENCE);
     }
 
     @Test
     public void onApplicationReady() throws Exception
     {
-        DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
-        when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
-        when(wikiComponentBuilder.getDocumentReferences()).thenReturn(Arrays.asList(DOC_REFERENCE));
-
-        WikiComponent component =
-            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
-                WikiComponentScope.WIKI);
-        when(wikiComponentBuilder.buildComponents(DOC_REFERENCE)).thenReturn(Arrays.asList(component));
-
         mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), null, null);
 
-        verify(wikiComponentManager, times(1)).registerWikiComponent(component);
+        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+                .registerComponentList(any());
     }
 
     private void onDocumentCreatedOrUpdated(Event event) throws Exception
     {
         DocumentModelBridge componentDocument = mock(DocumentModelBridge.class);
         when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
-        when(wikiComponentBuilder.getDocumentReferences()).thenReturn(Arrays.asList(DOC_REFERENCE));
 
-        WikiComponent component =
-            new DefaultWikiComponent(DOC_REFERENCE, AUTHOR_REFERENCE, TestRole.class, ROLE_HINT,
-                WikiComponentScope.WIKI);
-        when(wikiComponentBuilder.buildComponents(DOC_REFERENCE)).thenReturn(Arrays.asList(component));
-
+        /**
+         * Here, {@link WikiComponentManagerRegistrationHelper#registerComponentList(List)} is called two times
+         * because we have to "initialize" the tested event listener with an ApplicationReadyEvent() before sending
+         * our custom event. Therefore, the tested WikiComponent will be registered two times.
+         */
+        mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), null, null);
         mocker.getComponentUnderTest().onEvent(event, componentDocument, null);
-
-        verify(wikiComponentManager, times(1)).unregisterWikiComponents(DOC_REFERENCE);
-        verify(wikiComponentManager, times(1)).registerWikiComponent(component);
     }
 
 }

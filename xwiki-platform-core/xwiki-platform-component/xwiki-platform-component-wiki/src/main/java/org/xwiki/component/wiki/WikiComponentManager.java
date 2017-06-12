@@ -21,12 +21,13 @@ package org.xwiki.component.wiki;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * A WikiComponentManager is responsible for registering and unregistering components that are defined as wiki pages.
- * Each {@link WikiComponent} managed by such manager is associated to a {@link DocumentReference}. The
- * referred document contains XObjects that define the role, hint and behavior (method bodies) of the component. This
- * document may also define requirements (other components to be binded in the method bodies execution context) and
+ * Each {@link WikiComponent} managed by such manager is associated to a {@link EntityReference}. The
+ * referred entity is or contains XObjects that define the role, hint and behavior (method bodies) of the component.
+ * This document may also define requirements (other components to be binded in the method bodies execution context) and
  * possible extra interfaces (for example to implement {@link org.xwiki.component.phase.Initializable}).
  * 
  * @version $Id$
@@ -50,4 +51,17 @@ public interface WikiComponentManager
      * @throws WikiComponentException when failed to unregister the component from the CM.
      */
     void unregisterWikiComponents(DocumentReference reference) throws WikiComponentException;
+
+    /**
+     * Just as {@link #unregisterWikiComponents(DocumentReference)},
+     * unregisters the wiki component(s) associated with the passed reference.
+     *
+     * @param reference the reference to the document holding the component to unregister
+     * @throws WikiComponentException when failed to unregister the component from the CM.
+     * @since 9.5RC1
+     */
+    default void unregisterWikiComponents(EntityReference reference) throws WikiComponentException
+    {
+        this.unregisterWikiComponents((DocumentReference) reference);
+    }
 }

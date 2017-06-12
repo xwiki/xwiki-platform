@@ -1,0 +1,180 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.component.wiki;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
+import org.xwiki.component.wiki.internal.DefaultWikiObjectComponentManagerEventListener;
+import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerRegistererProxy;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.event.Event;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.objects.BaseObjectReference;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for {@link DefaultWikiObjectComponentManagerEventListener}.
+ *
+ * @version $Id$
+ * @since 9.5RC1
+ */
+public class DefaultWikiObjectComponentManagerEventListenerTest
+{
+    @Rule
+    public MockitoComponentMockingRule<DefaultWikiObjectComponentManagerEventListener> mocker =
+            new MockitoComponentMockingRule<>(DefaultWikiObjectComponentManagerEventListener.class);
+
+    private WikiObjectComponentManagerRegistererProxy wikiObjectComponentManagerRegistererProxy;
+
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        this.wikiObjectComponentManagerRegistererProxy =
+                this.mocker.registerMockComponent(WikiObjectComponentManagerRegistererProxy.class);
+        this.entityReferenceSerializer =
+                this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+
+        when(this.wikiObjectComponentManagerRegistererProxy.getWikiObjectsList())
+                .thenReturn(Arrays.asList("xObjectName1", "xObjectName2"));
+    }
+
+    @Test
+    public void supportedEvents() throws Exception
+    {
+        List<Event> events = this.mocker.getComponentUnderTest().getEvents();
+
+        assertEquals(5, events.size());
+    }
+
+    @Test
+    public void correctListenerName() throws Exception
+    {
+        assertEquals("defaultObjectWikiComponentManagerEventListener",
+                this.mocker.getComponentUnderTest().getName());
+    }
+
+    @Test
+    public void testComponentInitializationOnApplicationReady() throws Exception
+    {
+        this.mocker.getComponentUnderTest().onEvent(new WikiReadyEvent(), null, null);
+
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+                .collectWikiObjectsList();
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+                .registerAllObjectComponents();
+    }
+
+    @Test
+    public void testComponentInitializationOnWikiReady() throws Exception
+    {
+        this.mocker.getComponentUnderTest().onEvent(new WikiReadyEvent(), null, null);
+
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+                .collectWikiObjectsList();
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+                .registerAllObjectComponents();
+    }
+
+    @Test
+    public void testOnEventWithUncompatibleEvent() throws Exception
+    {
+        this.mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
+
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+                .collectWikiObjectsList();
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+                .registerAllObjectComponents();
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+                .unregisterObjectComponents(any());
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+                .registerObjectComponents(any(), any());
+    }
+
+    @Test
+    public void testOnXObjectAddedEvent() throws Exception
+    {
+        this.verifyXObjectAddOrUpdate(mock(XObjectAddedEvent.class));
+    }
+
+    @Test
+    public void testOnXObjectUpdatedEvent() throws Exception
+    {
+        this.verifyXObjectAddOrUpdate(mock(XObjectUpdatedEvent.class));
+    }
+
+    @Test
+    public void testOnXObjectDeletedEvent() throws Exception
+    {
+        XObjectDeletedEvent event = mock(XObjectDeletedEvent.class);
+
+        BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
+        DocumentReference xClassReference = mock(DocumentReference.class);
+        when(xObjectReference.getXClassReference()).thenReturn(xClassReference);
+        when(this.entityReferenceSerializer.serialize(any())).thenReturn("xObjectName1");
+
+        when(event.getReference()).thenReturn(xObjectReference);
+
+        this.mocker.getComponentUnderTest().onEvent(event, null, null);
+
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+                .unregisterObjectComponents(xObjectReference);
+    }
+
+    private void verifyXObjectAddOrUpdate(XObjectEvent event) throws Exception
+    {
+        XWikiDocument fakeSource = mock(XWikiDocument.class);
+
+        // We only need one object name contained in wikiObjectComponentManagerRegistererProxy objects list
+        BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
+        DocumentReference xClassReference = mock(DocumentReference.class);
+        when(xObjectReference.getXClassReference()).thenReturn(xClassReference);
+        when(this.entityReferenceSerializer.serialize(any())).thenReturn("xObjectName1");
+
+        when(event.getReference()).thenReturn(xObjectReference);
+
+        this.mocker.getComponentUnderTest().onEvent(event, fakeSource, null);
+
+        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+                .registerObjectComponents(xObjectReference, fakeSource);
+    }
+}

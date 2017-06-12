@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,16 +35,14 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.component.wiki.WikiComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * An {@link EventListener} responsible for registering all the wiki components when the application starts. It also
@@ -67,25 +64,16 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
     private Logger logger;
 
     /**
-     * The wiki component manager that knows how to register component definition against the underlying CM.
-     */
-    @Inject
-    private WikiComponentManager wikiComponentManager;
-
-    /**
      * The wiki component stores, used to retrieve component definitions.
      */
     @Inject
     private List<WikiComponentBuilder> wikiComponentProviders;
 
-    /**
-     * Used to access the current {@link XWikiContext}.
-     */
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private ComponentManager componentManager;
 
     @Inject
-    private ObservationContext observationContext;
+    private WikiComponentManagerRegistrationHelper wikiComponentManagerRegistrationHelper;
 
     @Override
     public List<Event> getEvents()
@@ -108,55 +96,60 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (source instanceof DocumentModelBridge) {
+            // Get the document reference
             DocumentModelBridge document = (DocumentModelBridge) source;
             DocumentReference documentReference = document.getDocumentReference();
 
-            if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
-                registerComponents(document);
+            if (event instanceof  DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
+                registerDocumentComponents(document.getDocumentReference());
             } else if (event instanceof DocumentDeletedEvent) {
                 // Unregister components from the deleted document, if any
-                unregisterComponents(documentReference);
+                this.wikiComponentManagerRegistrationHelper.unregisterComponents(documentReference);
             }
+        /* If we are at application startup time, we have to instanciate every document or object that we can find
+         * in the wiki */
         } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
             // These 2 events are created when the database is ready. We register all wiki components.
-            registerAllComponents();
+            registerAllDocumentComponents();
         }
     }
 
     /**
-     * Register all the wiki components in the current wiki.
+     * Register all the wiki components that come from a document in the current wiki.
      */
-    private void registerAllComponents()
+    private void registerAllDocumentComponents()
     {
-        // Retrieve all components definitions and register them.
-        for (WikiComponentBuilder provider : this.wikiComponentProviders) {
-            for (DocumentReference reference : provider.getDocumentReferences()) {
-                try {
-                    List<WikiComponent> components = provider.buildComponents(reference);
-                    for (WikiComponent component : components) {
-                        this.wikiComponentManager.registerWikiComponent(component);
+        try {
+            // Retrieve all components definitions and register them.
+            this.wikiComponentProviders = this.componentManager.getInstanceList(WikiComponentBuilder.class);
+            for (WikiComponentBuilder provider : this.wikiComponentProviders) {
+                for (DocumentReference reference : provider.getDocumentReferences()) {
+                    try {
+                        List<WikiComponent> components = provider.buildComponents(reference);
+                        this.wikiComponentManagerRegistrationHelper.registerComponentList(components);
+                    } catch (WikiComponentException e) {
+                        this.logger.warn("Failed to build the wiki component located in the document [{}]: {}",
+                                reference, ExceptionUtils.getRootCauseMessage(e));
                     }
-                } catch (Exception e) {
-                    this.logger.warn("Failed to register the wiki component located in the document [{}]: {}",
-                        reference, e);
                 }
             }
+        } catch (ComponentLookupException e) {
+            this.logger.warn(String.format("Unable to get a list of registered WikiComponentBuilder: %s", e));
         }
     }
 
     /**
-     * Register wiki components from a given document.
-     * 
-     * @param document the document to register the components for
+     * Registers the components linked to the given document. For that, we get a list of providers that can build a
+     * component using this document, then the first available provider is selected in order to register a component.
+     *
+     * @param documentReference the document used to create the component
      */
-    private void registerComponents(DocumentModelBridge document)
+    private void registerDocumentComponents(DocumentReference documentReference)
     {
-        DocumentReference documentReference = document.getDocumentReference();
-
-        // Unregister all wiki components registered under this document. We do this as otherwise we would need to
-        // handle the specific cases of xobject added, xobject updated, xobject deleted, etc. Instead we unregister
-        // all wiki components and re-register them all.
-        unregisterComponents(documentReference);
+        // Unregister all wiki components registered under the given entity. We do this as otherwise we would need to
+        // handle the specific cases of elements added, elements updated and elements deleted, etc.
+        // Instead we unregister all wiki components and re-register them all.
+        this.wikiComponentManagerRegistrationHelper.unregisterComponents(documentReference);
 
         // Re-register all wiki components in the passed document
         for (WikiComponentBuilder provider : this.wikiComponentProviders) {
@@ -164,36 +157,15 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             if (provider.getDocumentReferences().contains(documentReference)) {
                 try {
                     List<WikiComponent> components = provider.buildComponents(documentReference);
-                    for (WikiComponent component : components) {
-                        // Register the component.
-                        try {
-                            this.wikiComponentManager.registerWikiComponent(component);
-                        } catch (WikiComponentException e) {
-                            this.logger.warn("Unable to register component(s) from document [{}]: {}",
-                                component.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
-                        }
-                    }
+                    this.wikiComponentManagerRegistrationHelper.registerComponentList(components);
                 } catch (WikiComponentException e) {
                     this.logger.warn("Failed to create wiki component(s) for document [{}]: {}", documentReference,
-                        ExceptionUtils.getRootCauseMessage(e));
+                            ExceptionUtils.getRootCauseMessage(e));
                 }
                 break;
             }
         }
     }
 
-    /**
-     * Helper method to unregister a wiki component.
-     * 
-     * @param documentReference the reference to the document for which to unregister the held wiki component.
-     */
-    private void unregisterComponents(DocumentReference documentReference)
-    {
-        try {
-            this.wikiComponentManager.unregisterWikiComponents(documentReference);
-        } catch (WikiComponentException e) {
-            this.logger.warn("Unable to unregister component(s) from document [{}]: {}", documentReference,
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-    }
+
 }

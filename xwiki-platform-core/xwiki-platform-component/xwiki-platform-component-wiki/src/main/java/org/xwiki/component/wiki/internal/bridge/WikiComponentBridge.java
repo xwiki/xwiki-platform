@@ -31,6 +31,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * A bridge allowing to isolate the {@link org.xwiki.component.wiki.WikiComponentManager} from the old model.
  *
@@ -120,4 +122,13 @@ public interface WikiComponentBridge
      * @throws WikiComponentException if the document can't be retrieved
      */
     boolean hasProgrammingRights(DocumentReference reference) throws WikiComponentException;
+
+    /**
+     * Get the XWikiDocument corresponding to the given Document Reference.
+     *
+     * @param reference the document reference
+     * @return the found XWikiDocument
+     * @throws WikiComponentException if an error occurs
+     */
+    XWikiDocument getDocument(DocumentReference reference) throws WikiComponentException;
 }

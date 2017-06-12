@@ -229,13 +229,13 @@
           <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
         #end
       </div>
-      <div class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('yes')"/></div>
+      <input type="submit" class="btn btn-primary" value="$services.localization.render('yes')"/>
       #if("$!{request.xredirect}" != '')
         #set($cancelUrl = "$request.xredirect")
       #else
         #set($cancelUrl = $doc.getURL())
       #end
-      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a></div>
+      <a class="btn btn-default" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a>
     </form>
   #xwikimessageboxend()
 #end

@@ -210,8 +210,14 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
         return componentObject;
     }
 
-    @Override
-    public XWikiDocument getDocument(DocumentReference reference) throws WikiComponentException
+    /**
+     * Get the XWikiDocument corresponding to the given Document Reference.
+     *
+     * @param reference the document reference
+     * @return the found XWikiDocument
+     * @throws WikiComponentException if an error occurs
+     */
+    private XWikiDocument getDocument(DocumentReference reference) throws WikiComponentException
     {
         try {
             XWikiContext xcontext = this.xcontextProvider.get();

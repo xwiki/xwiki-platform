@@ -40,9 +40,9 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 9.5RC1
  */
-@Component(roles = WikiComponentManagerRegistrationHelper.class)
+@Component(roles = WikiComponentManagerEventListenerHelper.class)
 @Singleton
-public class WikiComponentManagerRegistrationHelper
+public class WikiComponentManagerEventListenerHelper
 {
     /**
      * The wiki component manager that knows how to register component definition against the underlying CM.

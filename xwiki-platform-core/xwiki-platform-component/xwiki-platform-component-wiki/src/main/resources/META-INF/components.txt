@@ -7,5 +7,5 @@ org.xwiki.component.wiki.internal.DefaultWikiComponentManagerContext
 org.xwiki.component.wiki.internal.DefaultWikiComponentManagerEventListener
 org.xwiki.component.wiki.internal.DefaultWikiObjectComponentManagerEventListener
 org.xwiki.component.wiki.internal.DefaultWikiComponentMethodExecutor
-org.xwiki.component.wiki.internal.WikiComponentManagerRegistrationHelper
-org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerRegistererProxy
+org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper
+org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy

@@ -28,10 +28,8 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.wiki.internal.DefaultWikiObjectComponentManagerEventListener;
-import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerRegistererProxy;
-import org.xwiki.model.EntityType;
+import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.event.Event;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -62,19 +60,19 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     public MockitoComponentMockingRule<DefaultWikiObjectComponentManagerEventListener> mocker =
             new MockitoComponentMockingRule<>(DefaultWikiObjectComponentManagerEventListener.class);
 
-    private WikiObjectComponentManagerRegistererProxy wikiObjectComponentManagerRegistererProxy;
+    private WikiObjectComponentManagerEventListenerProxy wikiObjectComponentManagerEventListenerProxy;
 
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Before
     public void setUp() throws Exception
     {
-        this.wikiObjectComponentManagerRegistererProxy =
-                this.mocker.registerMockComponent(WikiObjectComponentManagerRegistererProxy.class);
+        this.wikiObjectComponentManagerEventListenerProxy =
+                this.mocker.registerMockComponent(WikiObjectComponentManagerEventListenerProxy.class);
         this.entityReferenceSerializer =
                 this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
-        when(this.wikiObjectComponentManagerRegistererProxy.getWikiObjectsList())
+        when(this.wikiObjectComponentManagerEventListenerProxy.getWikiObjectsList())
                 .thenReturn(Arrays.asList("xObjectName1", "xObjectName2"));
     }
 
@@ -89,7 +87,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     @Test
     public void correctListenerName() throws Exception
     {
-        assertEquals("defaultObjectWikiComponentManagerEventListener",
+        assertEquals("defaultWikiObjectComponentManagerEventListener",
                 this.mocker.getComponentUnderTest().getName());
     }
 
@@ -98,9 +96,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     {
         this.mocker.getComponentUnderTest().onEvent(new WikiReadyEvent(), null, null);
 
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
-                .collectWikiObjectsList();
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(1))
                 .registerAllObjectComponents();
     }
 
@@ -109,9 +105,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     {
         this.mocker.getComponentUnderTest().onEvent(new WikiReadyEvent(), null, null);
 
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
-                .collectWikiObjectsList();
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(1))
                 .registerAllObjectComponents();
     }
 
@@ -120,13 +114,11 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     {
         this.mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
 
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
-                .collectWikiObjectsList();
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(0))
                 .registerAllObjectComponents();
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(0))
                 .unregisterObjectComponents(any());
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(0))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(0))
                 .registerObjectComponents(any(), any());
     }
 
@@ -156,7 +148,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
 
         this.mocker.getComponentUnderTest().onEvent(event, null, null);
 
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(1))
                 .unregisterObjectComponents(xObjectReference);
     }
 
@@ -164,7 +156,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     {
         XWikiDocument fakeSource = mock(XWikiDocument.class);
 
-        // We only need one object name contained in wikiObjectComponentManagerRegistererProxy objects list
+        // We only need one object name contained in wikiObjectComponentManagerEventListenerProxy objects list
         BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
         DocumentReference xClassReference = mock(DocumentReference.class);
         when(xObjectReference.getXClassReference()).thenReturn(xClassReference);
@@ -174,7 +166,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
 
         this.mocker.getComponentUnderTest().onEvent(event, fakeSource, null);
 
-        verify(this.wikiObjectComponentManagerRegistererProxy, times(1))
+        verify(this.wikiObjectComponentManagerEventListenerProxy, times(1))
                 .registerObjectComponents(xObjectReference, fakeSource);
     }
 }

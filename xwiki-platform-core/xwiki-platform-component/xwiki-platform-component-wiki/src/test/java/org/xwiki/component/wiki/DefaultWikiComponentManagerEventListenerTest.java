@@ -33,7 +33,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentManagerEventListener;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
-import org.xwiki.component.wiki.internal.WikiComponentManagerRegistrationHelper;
+import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
@@ -56,7 +56,7 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     public MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
         DefaultWikiComponentManagerEventListener.class);
 
-    private WikiComponentManagerRegistrationHelper wikiComponentManagerRegistrationHelper;
+    private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
 
     private ComponentManager componentManager;
 
@@ -67,8 +67,8 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     @Before
     public void setUp() throws Exception
     {
-        this.wikiComponentManagerRegistrationHelper =
-                this.mocker.registerMockComponent(WikiComponentManagerRegistrationHelper.class);
+        this.wikiComponentManagerEventListenerHelper =
+                this.mocker.registerMockComponent(WikiComponentManagerEventListenerHelper.class);
 
         this.wikiComponent = mock(WikiComponent.class);
 
@@ -86,8 +86,8 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     {
         mocker.getComponentUnderTest().onEvent(null, null, null);
 
-        verify(this.wikiComponentManagerRegistrationHelper, never()).registerComponentList(any());
-        verify(this.wikiComponentManagerRegistrationHelper, never()).unregisterComponents(any(EntityReference.class));
+        verify(this.wikiComponentManagerEventListenerHelper, never()).registerComponentList(any());
+        verify(this.wikiComponentManagerEventListenerHelper, never()).unregisterComponents(any(EntityReference.class));
     }
 
     @Test
@@ -98,8 +98,8 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
 
         mocker.getComponentUnderTest().onEvent(null, componentDocument, null);
 
-        verify(this.wikiComponentManagerRegistrationHelper, never()).registerComponentList(any());
-        verify(this.wikiComponentManagerRegistrationHelper, never()).unregisterComponents(any(EntityReference.class));
+        verify(this.wikiComponentManagerEventListenerHelper, never()).registerComponentList(any());
+        verify(this.wikiComponentManagerEventListenerHelper, never()).unregisterComponents(any(EntityReference.class));
     }
 
     @Test
@@ -107,9 +107,9 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     {
         onDocumentCreatedOrUpdated(new DocumentCreatedEvent(DOC_REFERENCE));
 
-        verify(this.wikiComponentManagerRegistrationHelper, times(2))
+        verify(this.wikiComponentManagerEventListenerHelper, times(2))
                 .registerComponentList(Arrays.asList(this.wikiComponent));
-        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+        verify(this.wikiComponentManagerEventListenerHelper, times(1))
                 .unregisterComponents(any());
     }
 
@@ -118,9 +118,9 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     {
         onDocumentCreatedOrUpdated(new DocumentUpdatedEvent(DOC_REFERENCE));
 
-        verify(this.wikiComponentManagerRegistrationHelper, times(2))
+        verify(this.wikiComponentManagerEventListenerHelper, times(2))
                 .registerComponentList(Arrays.asList(this.wikiComponent));
-        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+        verify(this.wikiComponentManagerEventListenerHelper, times(1))
                 .unregisterComponents(DOC_REFERENCE);
     }
 
@@ -134,9 +134,9 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
 
         this.onDocumentCreatedOrUpdated(new DocumentUpdatedEvent(DOC_REFERENCE));
 
-        verify(this.wikiComponentManagerRegistrationHelper, times(2))
+        verify(this.wikiComponentManagerEventListenerHelper, times(2))
                 .registerComponentList(Arrays.asList(this.wikiComponent, secondWikiComponent));
-        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+        verify(this.wikiComponentManagerEventListenerHelper, times(1))
                 .unregisterComponents(DOC_REFERENCE);
     }
 
@@ -148,7 +148,7 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
 
         mocker.getComponentUnderTest().onEvent(new DocumentDeletedEvent(DOC_REFERENCE), componentDocument, null);
 
-        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+        verify(this.wikiComponentManagerEventListenerHelper, times(1))
                 .unregisterComponents(DOC_REFERENCE);
     }
 
@@ -157,7 +157,7 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
     {
         mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), null, null);
 
-        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+        verify(this.wikiComponentManagerEventListenerHelper, times(1))
                 .registerComponentList(any());
     }
 
@@ -167,7 +167,7 @@ public class DefaultWikiComponentManagerEventListenerTest implements WikiCompone
         when(componentDocument.getDocumentReference()).thenReturn(DOC_REFERENCE);
 
         /**
-         * Here, {@link WikiComponentManagerRegistrationHelper#registerComponentList(List)} is called two times
+         * Here, {@link WikiComponentManagerEventListenerHelper#registerComponentList(List)} is called two times
          * because we have to "initialize" the tested event listener with an ApplicationReadyEvent() before sending
          * our custom event. Therefore, the tested WikiComponent will be registered two times.
          */

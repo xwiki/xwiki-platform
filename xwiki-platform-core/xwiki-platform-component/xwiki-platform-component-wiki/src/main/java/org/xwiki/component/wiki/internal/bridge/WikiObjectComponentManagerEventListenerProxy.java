@@ -24,43 +24,42 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.ApplicationReadyEvent;
-import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiObjectComponentBuilder;
 import org.xwiki.component.wiki.internal.DefaultWikiObjectComponentManagerEventListener;
-import org.xwiki.component.wiki.internal.WikiComponentManagerRegistrationHelper;
+import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * This component allows the {@link DefaultWikiObjectComponentManagerEventListener} to easily register new XObject based
- * components against the {@link WikiComponentManagerRegistrationHelper}.
+ * components against the {@link WikiComponentManagerEventListenerHelper}.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-@Component(roles = WikiObjectComponentManagerRegistererProxy.class)
+@Component(roles = WikiObjectComponentManagerEventListenerProxy.class)
 @Singleton
-public class WikiObjectComponentManagerRegistererProxy
+public class WikiObjectComponentManagerEventListenerProxy
 {
     @Inject
     private Logger logger;
@@ -69,13 +68,13 @@ public class WikiObjectComponentManagerRegistererProxy
     private ComponentManager componentManager;
 
     @Inject
-    private WikiComponentManagerRegistrationHelper wikiComponentManagerRegistrationHelper;
+    private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
 
     @Inject
     private QueryManager queryManager;
 
     @Inject
-    private WikiComponentBridge wikiComponentBridge;
+    private Provider<XWikiContext> xWikiContextProvider;
 
     @Inject
     @Named("local")
@@ -86,41 +85,39 @@ public class WikiObjectComponentManagerRegistererProxy
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
-     * This list contains every XObject classes that can produce a component through a {@link WikiComponentBuilder}.
-     * The list is initialized through {@link #collectWikiObjectsList()}, which is called on
-     * {@link ApplicationReadyEvent} and {@link WikiReadyEvent}.
-     */
-    private List<String> wikiObjectsList;
-
-    /**
      * This method is responsible look through every {@link WikiObjectComponentBuilder} and get their role hints, which
      * is also the class name of the wiki object they should be working with.
      */
-    public void collectWikiObjectsList()
+    private List<String> collectWikiObjectsList()
     {
+        List<String> wikiObjectsList = new ArrayList<>();
+
         try {
             // Get a list of WikiObjectComponentBuilder
             List<WikiObjectComponentBuilder> componentBuilders =
                     this.componentManager.getInstanceList(WikiObjectComponentBuilder.class);
 
-            this.wikiObjectsList = new ArrayList<>();
             for (WikiObjectComponentBuilder componentBuilder : componentBuilders) {
-                this.wikiObjectsList.add(componentBuilder.getClassReference().getName());
+                wikiObjectsList.add(this.entityReferenceSerializer.serialize(componentBuilder.getClassReference()));
             }
         } catch (ComponentLookupException e) {
             logger.warn("Unable to collect a list of wiki objects components: %s", e);
         }
+
+        return wikiObjectsList;
     }
 
     /**
      * This method goes through every XObject known
-     * (using {@link WikiObjectComponentManagerRegistererProxy#collectWikiObjectsList()})
+     * (using {@link WikiObjectComponentManagerEventListenerProxy#collectWikiObjectsList()})
      * to be able to create a component and then builds those components.
      */
     public void registerAllObjectComponents()
     {
+        XWikiContext xWikiContext = this.xWikiContextProvider.get();
+
         // For every classes subject to WikiComponents
-        for (String xObjectClass : this.wikiObjectsList) {
+        for (String xObjectClass : this.collectWikiObjectsList()) {
             LocalDocumentReference xObjectLocalDocumentReference = new LocalDocumentReference(
                     this.currentDocumentReferenceResolver.resolve(xObjectClass));
 
@@ -135,11 +132,10 @@ public class WikiObjectComponentManagerRegistererProxy
                 DocumentReference sourceDocumentReference;
                 for (String result : results) {
                     sourceDocumentReference = this.currentDocumentReferenceResolver.resolve(result);
-                    XWikiDocument document = this.wikiComponentBridge.getDocument(sourceDocumentReference);
+                    XWikiDocument document = xWikiContext.getWiki().getDocument(sourceDocumentReference, xWikiContext);
 
                     for (BaseObject xObject : document.getXObjects(xObjectLocalDocumentReference)) {
-                        this.registerObjectComponents(
-                                xObject.getReference(), this.wikiComponentBridge.getDocument(sourceDocumentReference));
+                        this.registerObjectComponents(xObject.getReference(), document);
                     }
                 }
             } catch (Exception e) {
@@ -152,45 +148,45 @@ public class WikiObjectComponentManagerRegistererProxy
     }
 
     /**
-     * This method uses the given entityReference and a XWikiDocument that is the source of every
+     * This method uses the given objectReference and a XWikiDocument that is the source of every
      * {@link com.xpn.xwiki.internal.event.XObjectEvent} to build and register the component(s) contained in
      * this entity reference.
      *
-     * @param entityReference the reference containing the parameters needed to instanciate the new component(s)
+     * @param objectReference the reference containing the parameters needed to instanciate the new component(s)
      * @param source the source of the event triggering this method
      */
-    public void registerObjectComponents(EntityReference entityReference, XWikiDocument source)
+    public void registerObjectComponents(ObjectReference objectReference, XWikiDocument source)
     {
         // Unregister all wiki components registered under the given entity. We do this as otherwise we would need to
         // handle the specific cases of elements added, elements updated and elements deleted, etc.
         // Instead we unregister all wiki components and re-register them all.
-        this.wikiComponentManagerRegistrationHelper.unregisterComponents(entityReference);
+        this.wikiComponentManagerEventListenerHelper.unregisterComponents(objectReference);
 
         try {
             // Try to retrieve a WikiObjectComponentBuilder related to the XObject
             WikiObjectComponentBuilder componentBuilder =
                     this.componentManager.getInstance(WikiObjectComponentBuilder.class,
                             entityReferenceSerializer.serialize(
-                                    ((BaseObjectReference) entityReference).getXClassReference()));
+                                    ((BaseObjectReference) objectReference).getXClassReference()));
 
             /* If we are dealing with a WikiBaseObjectComponentBuilder, we directly get the base object corresponding to
              * the current event and build the components from it. */
             List<WikiComponent> wikiComponents;
             if (componentBuilder instanceof WikiBaseObjectComponentBuilder) {
                 wikiComponents = ((WikiBaseObjectComponentBuilder) componentBuilder)
-                        .buildComponents(source.getXObject(entityReference));
+                        .buildComponents(source.getXObject(objectReference));
             } else {
-                wikiComponents = componentBuilder.buildComponents(entityReference);
+                wikiComponents = componentBuilder.buildComponents(objectReference);
             }
 
-            this.wikiComponentManagerRegistrationHelper.registerComponentList(wikiComponents);
+            this.wikiComponentManagerEventListenerHelper.registerComponentList(wikiComponents);
         } catch (ComponentLookupException e) {
             logger.warn(String.format(
                     "Unable to retrieve the WikiObjectComponentBuilder associated with [%s]: %s",
-                    entityReference, ExceptionUtils.getRootCauseMessage(e)));
+                    objectReference, ExceptionUtils.getRootCauseMessage(e)));
         } catch (WikiComponentException e) {
             logger.warn(String.format(
-                    "Unable to register the component associated to [%s]: %s", entityReference,
+                    "Unable to register the component associated to [%s]: %s", objectReference,
                     ExceptionUtils.getRootCauseMessage(e)));
         }
     }
@@ -200,9 +196,9 @@ public class WikiObjectComponentManagerRegistererProxy
      *
      * @param xObjectReference the reference containing every component that should be removed from the CM
      */
-    public void unregisterObjectComponents(EntityReference xObjectReference)
+    public void unregisterObjectComponents(ObjectReference xObjectReference)
     {
-        this.wikiComponentManagerRegistrationHelper.unregisterComponents(xObjectReference);
+        this.wikiComponentManagerEventListenerHelper.unregisterComponents(xObjectReference);
     }
 
     /**
@@ -213,6 +209,6 @@ public class WikiObjectComponentManagerRegistererProxy
      */
     public List<String> getWikiObjectsList()
     {
-        return this.wikiObjectsList;
+        return this.collectWikiObjectsList();
     }
 }

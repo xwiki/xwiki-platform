@@ -26,6 +26,7 @@ import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiObjectComponentBuilder;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -50,10 +51,10 @@ public interface WikiBaseObjectComponentBuilder extends WikiObjectComponentBuild
 
     /**
      * As we’re currently extending a public interface for its internal use, we can discard the default implementation
-     * of {@link WikiObjectComponentBuilder#buildComponents(EntityReference)}.
+     * of {@link WikiObjectComponentBuilder#buildComponents(ObjectReference)}.
      */
     @Override
-    default List<WikiComponent> buildComponents(EntityReference entityReference) throws WikiComponentException
+    default List<WikiComponent> buildComponents(ObjectReference objectReference) throws WikiComponentException
     {
         throw new UnsupportedOperationException("This component builder does not support entity references. Please use "
                 + "WikiObjectComponentBuilder.");

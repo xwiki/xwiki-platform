@@ -21,19 +21,22 @@ package org.xwiki.component.wiki;
 
 import java.util.Arrays;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.internal.WikiComponentManagerRegistrationHelper;
+import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
-import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerRegistererProxy;
-import org.xwiki.model.EntityType;
+import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -46,20 +49,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link WikiObjectComponentManagerRegistererProxy}.
+ * Unit tests for {@link WikiObjectComponentManagerEventListenerProxy}.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-public class WikiObjectComponentManagerRegistererProxyTest
+public class WikiObjectComponentManagerEventListenerProxyTest
 {
     @Rule
-    public MockitoComponentMockingRule<WikiObjectComponentManagerRegistererProxy> mocker =
-            new MockitoComponentMockingRule<>(WikiObjectComponentManagerRegistererProxy.class);
+    public MockitoComponentMockingRule<WikiObjectComponentManagerEventListenerProxy> mocker =
+            new MockitoComponentMockingRule<>(WikiObjectComponentManagerEventListenerProxy.class);
 
     private ComponentManager componentManager;
 
-    private WikiComponentManagerRegistrationHelper wikiComponentManagerRegistrationHelper;
+    private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
 
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -67,8 +70,8 @@ public class WikiObjectComponentManagerRegistererProxyTest
     public void setUp() throws Exception
     {
         this.componentManager = this.mocker.registerMockComponent(ComponentManager.class);
-        this.wikiComponentManagerRegistrationHelper =
-                this.mocker.registerMockComponent(WikiComponentManagerRegistrationHelper.class);
+        this.wikiComponentManagerEventListenerHelper =
+                this.mocker.registerMockComponent(WikiComponentManagerEventListenerHelper.class);
         this.entityReferenceSerializer =
                 this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
     }
@@ -79,16 +82,16 @@ public class WikiObjectComponentManagerRegistererProxyTest
         WikiObjectComponentBuilder builder1 = mock(WikiObjectComponentBuilder.class);
         WikiObjectComponentBuilder builder2 = mock(WikiObjectComponentBuilder.class);
 
-        EntityReference builder1Reference = new EntityReference("builder1", EntityType.OBJECT);
-        EntityReference builder2Reference = new EntityReference("builder2", EntityType.OBJECT);
+        ObjectReference builder1Reference =
+                new ObjectReference("builder1", mock(DocumentReference.class));
+        ObjectReference builder2Reference =
+                new ObjectReference("builder2", mock(DocumentReference.class));
 
         when(builder1.getClassReference()).thenReturn(builder1Reference);
         when(builder2.getClassReference()).thenReturn(builder2Reference);
 
         when(this.componentManager.getInstanceList(WikiObjectComponentBuilder.class))
                 .thenReturn(Arrays.asList(builder1, builder2));
-
-        this.mocker.getComponentUnderTest().collectWikiObjectsList();
 
         assertEquals(2, this.mocker.getComponentUnderTest().getWikiObjectsList().size());
     }
@@ -120,10 +123,10 @@ public class WikiObjectComponentManagerRegistererProxyTest
     @Test
     public void testUnregisterObjectComponents() throws Exception
     {
-        EntityReference testReference = new EntityReference("test", EntityType.OBJECT);
+        ObjectReference testReference = mock(ObjectReference.class);
         this.mocker.getComponentUnderTest().unregisterObjectComponents(testReference);
 
-        verify(this.wikiComponentManagerRegistrationHelper, times(1))
+        verify(this.wikiComponentManagerEventListenerHelper, times(1))
                 .unregisterComponents(testReference);
     }
 
@@ -132,7 +135,7 @@ public class WikiObjectComponentManagerRegistererProxyTest
     {
         DocumentReference objectXClassReference = mock(DocumentReference.class);
 
-        when(source.getXObject(any(EntityReference.class))).thenReturn(mock(BaseObject.class));
+        when(source.getXObject(any(ObjectReference.class))).thenReturn(mock(BaseObject.class));
         when(objectReference.getXClassReference()).thenReturn(objectXClassReference);
         when(this.entityReferenceSerializer.serialize(any())).thenReturn("referencePath");
         when(this.componentManager.getInstance(WikiObjectComponentBuilder.class, "referencePath"))

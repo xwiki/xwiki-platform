@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectReference;
 
 /**
  * Allows to build one or more {@link WikiComponent} based on the XObjects contained in an EntityReference.
@@ -35,20 +36,20 @@ import org.xwiki.model.reference.EntityReference;
 public interface WikiObjectComponentBuilder
 {
     /**
-     * Get the class that should trigger {@link #buildComponents(EntityReference)} when one XObject implementing
+     * Get the class that should trigger {@link #buildComponents(ObjectReference)} when one XObject implementing
      * this very class is added, updated or deleted in the wiki.
      *
      * @return an {@link EntityReference} to the correct class.
      */
-    EntityReference getClassReference();
+    ObjectReference getClassReference();
 
     /**
-     * Build the components that is linked to the given {@link EntityReference}.
+     * Build the components that is linked to the given {@link ObjectReference}.
      *
      * @param reference the reference of the object that should be used to create the component.
      * @return the new component
-     * @throws WikiComponentException if the given {@link EntityReference} is incompatible with the current builder or
+     * @throws WikiComponentException if the given {@link ObjectReference} is incompatible with the current builder or
      * if the {@link WikiComponentBuilder} has not been able to instanciate the component.
      */
-    List<WikiComponent> buildComponents(EntityReference reference) throws WikiComponentException;
+    List<WikiComponent> buildComponents(ObjectReference reference) throws WikiComponentException;
 }

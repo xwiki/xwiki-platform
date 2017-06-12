@@ -19,9 +19,6 @@
  */
 package org.xwiki.component.wiki.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,9 +26,11 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerRegistererProxy;
+import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -50,33 +49,30 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @since 9.5RC1
  */
 @Component
-@Named("defaultWikiObjectComponentManagerEventListener")
+@Named(DefaultWikiObjectComponentManagerEventListener.EVENT_LISTENER_NAME)
 @Singleton
-public class DefaultWikiObjectComponentManagerEventListener implements EventListener
+public class DefaultWikiObjectComponentManagerEventListener extends AbstractEventListener
 {
+    /**
+     * The event listener name.
+     */
+    public static final String EVENT_LISTENER_NAME = "defaultWikiObjectComponentManagerEventListener";
 
     @Inject
-    private WikiObjectComponentManagerRegistererProxy wikiObjectComponentManagerRegistererProxy;
+    private WikiObjectComponentManagerEventListenerProxy wikiObjectComponentManagerEventListenerProxy;
 
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    @Override
-    public List<Event> getEvents()
+    /**
+     * Builds a new {@link DefaultWikiObjectComponentManagerEventListener}.
+     */
+    public DefaultWikiObjectComponentManagerEventListener()
     {
-        return Arrays.asList(
-            new ApplicationReadyEvent(),
-            new WikiReadyEvent(),
-            new XObjectAddedEvent(),
-            new XObjectUpdatedEvent(),
-            new XObjectDeletedEvent());
-    }
-
-    @Override
-    public String getName()
-    {
-        return "defaultObjectWikiComponentManagerEventListener";
+        super(DefaultWikiObjectComponentManagerEventListener.EVENT_LISTENER_NAME,
+                new ApplicationReadyEvent(), new WikiReadyEvent(),
+                new XObjectAddedEvent(), new XObjectUpdatedEvent(), new XObjectDeletedEvent());
     }
 
     @Override
@@ -91,14 +87,15 @@ public class DefaultWikiObjectComponentManagerEventListener implements EventList
             EntityReference xObject = xObjectEvent.getReference();
 
             // If the modified XObject can produce a WikiComponent
-            if (this.wikiObjectComponentManagerRegistererProxy.getWikiObjectsList()
+            if (this.wikiObjectComponentManagerEventListenerProxy.getWikiObjectsList()
                     .contains(entityReferenceSerializer.serialize(
                                     ((BaseObjectReference) xObject).getXClassReference()))) {
                 if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
-                    this.wikiObjectComponentManagerRegistererProxy
-                            .registerObjectComponents(xObject, (XWikiDocument) source);
+                    this.wikiObjectComponentManagerEventListenerProxy
+                            .registerObjectComponents((ObjectReference) xObject, (XWikiDocument) source);
                 } else if (event instanceof XObjectDeletedEvent) {
-                    this.wikiObjectComponentManagerRegistererProxy.unregisterObjectComponents(xObject);
+                    this.wikiObjectComponentManagerEventListenerProxy
+                            .unregisterObjectComponents((ObjectReference) xObject);
                 }
             }
         /* If we are at application startup time, we have to instanciate every document or object that we can find
@@ -106,8 +103,7 @@ public class DefaultWikiObjectComponentManagerEventListener implements EventList
         } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
             // These 2 events are created when the database is ready. We register all wiki components.
             // Collect every WikiObjectComponentBuilder
-            this.wikiObjectComponentManagerRegistererProxy.collectWikiObjectsList();
-            this.wikiObjectComponentManagerRegistererProxy.registerAllObjectComponents();
+            this.wikiObjectComponentManagerEventListenerProxy.registerAllObjectComponents();
         }
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.xwiki.component.wiki.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,6 +40,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -53,10 +53,15 @@ import org.xwiki.observation.event.Event;
  * @since 4.2M3
  */
 @Component
-@Named("defaultWikiComponentManagerEventListener")
+@Named(DefaultWikiComponentManagerEventListener.EVENT_LISTENER_NAME)
 @Singleton
-public class DefaultWikiComponentManagerEventListener implements EventListener
+public class DefaultWikiComponentManagerEventListener extends AbstractEventListener
 {
+    /**
+     * The event listener name.
+     */
+    public static final String EVENT_LISTENER_NAME = "defaultWikiComponentManagerEventListener";
+
     /**
      * The logger to log.
      */
@@ -73,23 +78,16 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
     private ComponentManager componentManager;
 
     @Inject
-    private WikiComponentManagerRegistrationHelper wikiComponentManagerRegistrationHelper;
+    private WikiComponentManagerEventListenerHelper wikiComponentManagerEventListenerHelper;
 
-    @Override
-    public List<Event> getEvents()
+    /**
+     * Builds a new {@link DefaultWikiComponentManagerEventListener}.
+     */
+    public DefaultWikiComponentManagerEventListener()
     {
-        return Arrays.asList(
-            new DocumentCreatedEvent(),
-            new DocumentUpdatedEvent(),
-            new DocumentDeletedEvent(),
-            new ApplicationReadyEvent(),
-            new WikiReadyEvent());
-    }
-
-    @Override
-    public String getName()
-    {
-        return "defaultWikiComponentManagerEventListener";
+        super(DefaultWikiComponentManagerEventListener.EVENT_LISTENER_NAME,
+                new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
+                new ApplicationReadyEvent(), new WikiReadyEvent());
     }
 
     @Override
@@ -104,7 +102,7 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                 registerDocumentComponents(document.getDocumentReference());
             } else if (event instanceof DocumentDeletedEvent) {
                 // Unregister components from the deleted document, if any
-                this.wikiComponentManagerRegistrationHelper.unregisterComponents(documentReference);
+                this.wikiComponentManagerEventListenerHelper.unregisterComponents(documentReference);
             }
         /* If we are at application startup time, we have to instanciate every document or object that we can find
          * in the wiki */
@@ -126,7 +124,7 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                 for (DocumentReference reference : provider.getDocumentReferences()) {
                     try {
                         List<WikiComponent> components = provider.buildComponents(reference);
-                        this.wikiComponentManagerRegistrationHelper.registerComponentList(components);
+                        this.wikiComponentManagerEventListenerHelper.registerComponentList(components);
                     } catch (WikiComponentException e) {
                         this.logger.warn("Failed to build the wiki component located in the document [{}]: {}",
                                 reference, ExceptionUtils.getRootCauseMessage(e));
@@ -149,7 +147,7 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
         // Unregister all wiki components registered under the given entity. We do this as otherwise we would need to
         // handle the specific cases of elements added, elements updated and elements deleted, etc.
         // Instead we unregister all wiki components and re-register them all.
-        this.wikiComponentManagerRegistrationHelper.unregisterComponents(documentReference);
+        this.wikiComponentManagerEventListenerHelper.unregisterComponents(documentReference);
 
         // Re-register all wiki components in the passed document
         for (WikiComponentBuilder provider : this.wikiComponentProviders) {
@@ -157,7 +155,7 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
             if (provider.getDocumentReferences().contains(documentReference)) {
                 try {
                     List<WikiComponent> components = provider.buildComponents(documentReference);
-                    this.wikiComponentManagerRegistrationHelper.registerComponentList(components);
+                    this.wikiComponentManagerEventListenerHelper.registerComponentList(components);
                 } catch (WikiComponentException e) {
                     this.logger.warn("Failed to create wiki component(s) for document [{}]: {}", documentReference,
                             ExceptionUtils.getRootCauseMessage(e));

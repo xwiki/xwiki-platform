@@ -75,7 +75,7 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
     }
 
     @Override
-    public String renderEmailSubject(CompositeEvent event) throws NotificationException
+    public String generateEmailSubject(CompositeEvent event) throws NotificationException
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {

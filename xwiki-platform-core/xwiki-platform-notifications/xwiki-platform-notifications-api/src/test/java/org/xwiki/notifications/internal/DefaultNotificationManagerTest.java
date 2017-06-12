@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -86,7 +87,8 @@ public class DefaultNotificationManagerTest
 
         when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
         query = mock(Query.class);
-        when(queryGenerator.generateQuery(any(DocumentReference.class), anyBoolean(), nullable(Date.class),
+        when(queryGenerator.generateQuery(any(DocumentReference.class), any(NotificationFormat.class),
+                anyBoolean(), nullable(Date.class),
                 nullable(Date.class), nullable(List.class))).thenReturn(query);
 
 
@@ -156,7 +158,8 @@ public class DefaultNotificationManagerTest
     {
         // Mocks
         NotificationException exception = new NotificationException("Error");
-        when(queryGenerator.generateQuery(eq(userReference), eq(true), isNull(), isNull(), any(List.class))).thenThrow(exception);
+        when(queryGenerator.generateQuery(eq(userReference), any(NotificationFormat.class), eq(true), isNull(),
+                isNull(), any(List.class))).thenThrow(exception);
 
         // Test
         NotificationException caughtException = null;

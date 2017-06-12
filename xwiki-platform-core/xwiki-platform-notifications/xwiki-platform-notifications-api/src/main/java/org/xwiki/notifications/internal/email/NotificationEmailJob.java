@@ -49,7 +49,10 @@ import com.xpn.xwiki.internal.plugin.rightsmanager.ReferenceUserIterator;
 import com.xpn.xwiki.plugin.scheduler.AbstractJob;
 
 /**
+ * Job that send emails about notifications.
+ *
  * @version $Id$
+ * @since 9.5RC1
  */
 @Component(roles = NotificationEmailJob.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -77,6 +80,10 @@ public class NotificationEmailJob extends AbstractJob
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    /**
+     * To remove.
+     * @throws JobExecutionException on error
+     */
     public void test() throws JobExecutionException
     {
         this.executeJob(null);
@@ -85,8 +92,10 @@ public class NotificationEmailJob extends AbstractJob
     @Override
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
+        final String xwiki = "XWiki";
+
         List<DocumentReference> list = new ArrayList<>();
-        list.add(new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), "XWiki", "XWikiAllGroup"));
+        list.add(new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), xwiki, "XWikiAllGroup"));
 
         ReferenceUserIterator userIterator = new ReferenceUserIterator(list, null, documentReferenceResolver,
                 execution);
@@ -94,7 +103,7 @@ public class NotificationEmailJob extends AbstractJob
         Map<String, Object> parameters = new HashMap<>();
 
         DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
-                Arrays.asList("XWiki", "Notifications"), "MailTemplate");
+                Arrays.asList(xwiki, "Notifications"), "MailTemplate");
 
         NotificationMimeMessageIterator notificationMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
         notificationMimeMessageIterator.initialize(userIterator, parameters, new Date(0L), templateReference);

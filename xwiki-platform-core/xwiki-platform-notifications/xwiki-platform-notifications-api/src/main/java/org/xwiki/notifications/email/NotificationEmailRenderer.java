@@ -24,14 +24,31 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 
 /**
+ * Render a notification for email sendings.
+ *
  * @version $Id$
  */
 @Role
 public interface NotificationEmailRenderer
 {
+    /**
+     * @param compositeEvent the event to render
+     * @return the HTML rendered version of the event
+     * @throws NotificationException of error occurs
+     */
     String renderHTML(CompositeEvent compositeEvent) throws NotificationException;
 
+    /**
+     * @param compositeEvent the event to render
+     * @return the plain text rendered version of the event
+     * @throws NotificationException of error occurs
+     */
     String renderPlainText(CompositeEvent compositeEvent) throws NotificationException;
 
-    String renderEmailSubject(CompositeEvent compositeEvent) throws NotificationException;
+    /**
+     * @param compositeEvent the event to render
+     * @return the plain text subject for the email
+     * @throws NotificationException of error occurs
+     */
+    String generateEmailSubject(CompositeEvent compositeEvent) throws NotificationException;
 }

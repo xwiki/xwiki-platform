@@ -31,6 +31,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -96,6 +97,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 true, null, null, null);
 
         // Verify
@@ -119,6 +121,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 true, null, null, null);
 
         // Verify
@@ -139,6 +142,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 false, null, null, null);
 
         // Verify
@@ -159,6 +163,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 true, untilDate, null, Collections.emptyList());
 
         // Verify
@@ -182,6 +187,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
@@ -205,6 +211,7 @@ public class QueryGeneratorTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 true, null, null, null);
 
         // Verify
@@ -250,6 +257,7 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
                 true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify

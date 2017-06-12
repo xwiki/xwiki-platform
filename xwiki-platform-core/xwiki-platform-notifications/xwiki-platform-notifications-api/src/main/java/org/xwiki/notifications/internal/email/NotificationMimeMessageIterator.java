@@ -51,7 +51,10 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.internal.plugin.rightsmanager.ReferenceUserIterator;
 
 /**
+ * Iterator used to generate emails for notifications. Generate MimeMessages.
+ *
  * @version $Id$
+ * @since 9.5RC1
  */
 @Component(roles = NotificationMimeMessageIterator.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -70,6 +73,8 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
     private static final String TO = "to";
 
     private static final String VELOCITY_VARIABLES = "velocityVariables";
+
+    private static final String ERROR_MESSAGE = "Failed to generate an email for the user [{}].";
 
     @Inject
     private NotificationManager notificationManager;
@@ -112,6 +117,14 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
 
     private boolean hasNext;
 
+    /**
+     * Initialize the iterator.
+     *
+     * @param userIterator iterator that returns all users
+     * @param factoryParameters parameters for the email factory
+     * @param lastTrigger time of the last email sent
+     * @param templateReference reference to the mail template
+     */
     public void initialize(ReferenceUserIterator userIterator,
             Map<String, Object> factoryParameters, Date lastTrigger, DocumentReference templateReference)
     {
@@ -142,7 +155,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
                 this.currentEvents = notificationManager.getEvents(serializer.serialize(currentUser), false,
                         Integer.MAX_VALUE / 4, null, lastTrigger, Collections.emptyList());
             } catch (NotificationException e) {
-                logger.error("Failed to generate an email for the user [{}].", this.currentUser, e);
+                logger.error(ERROR_MESSAGE, this.currentUser, e);
             }
         }
 
@@ -163,7 +176,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
             updateFactoryParameters();
             message = this.factory.createMessage(templateReference, factoryParameters);
         } catch (Exception e) {
-            logger.error("Failed to generate an email for the user [{}].", this.currentUser, e);
+            logger.error(ERROR_MESSAGE, this.currentUser, e);
         }
 
         // Look for the next email to send

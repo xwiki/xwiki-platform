@@ -42,7 +42,10 @@ import com.xpn.xwiki.web.ExternalServletURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
+ * Helper for NotificationEmailRenderer that use the Template Manager to render notifications.
+ *
  * @version $Id$
+ * @since 9.5RC1
  */
 public abstract class AbstractNotificationEmailRenderer implements NotificationEmailRenderer
 {
@@ -69,7 +72,8 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
     @Inject
     protected RenderingContext renderingContext;
 
-    protected Block executeTemplate(CompositeEvent event, String templatePath, Syntax syntax) throws NotificationException
+    protected Block executeTemplate(CompositeEvent event, String templatePath, Syntax syntax)
+            throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWikiURLFactory originalURLFactory = context.getURLFactory();
@@ -77,7 +81,7 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
         try {
             velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, event);
             context.setURLFactory(new ExternalServletURLFactory(context));
-            ((MutableRenderingContext)renderingContext).setTargetSyntax(syntax);
+            ((MutableRenderingContext) renderingContext).setTargetSyntax(syntax);
 
             String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
             Template template = templateManager.getTemplate(templateName);
@@ -86,7 +90,7 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         } finally {
-            ((MutableRenderingContext)renderingContext).setTargetSyntax(originalSyntax);
+            ((MutableRenderingContext) renderingContext).setTargetSyntax(originalSyntax);
             context.setURLFactory(originalURLFactory);
             velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
         }

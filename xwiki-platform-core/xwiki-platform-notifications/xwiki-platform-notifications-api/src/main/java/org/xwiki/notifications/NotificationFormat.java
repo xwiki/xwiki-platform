@@ -28,12 +28,12 @@ package org.xwiki.notifications;
 public enum NotificationFormat
 {
     /**
-     * Notification displayed in the UI (as an "alert")
+     * Notification displayed in the UI (as an "alert").
      */
     ALERT,
 
     /**
-     * Notification sent by email
+     * Notification sent by email.
      */
     EMAIL
 }

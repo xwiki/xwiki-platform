@@ -46,4 +46,10 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "enabled", true);
     }
+
+    @Override
+    public boolean areEmailsEnabled()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "emails.enabled", true);
+    }
 }

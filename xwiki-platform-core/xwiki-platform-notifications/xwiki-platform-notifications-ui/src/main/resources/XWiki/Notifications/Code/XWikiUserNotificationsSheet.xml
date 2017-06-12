@@ -81,7 +81,9 @@
       &lt;tr&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
         #displayPreference($type, 'alert')
-        #displayPreference($type, 'email')
+        #if ($services.notification.areEmailsEnabled())
+          #displayPreference($type, 'email')
+        #end
       &lt;/tr&gt;
     #end
   &lt;/tbody&gt;

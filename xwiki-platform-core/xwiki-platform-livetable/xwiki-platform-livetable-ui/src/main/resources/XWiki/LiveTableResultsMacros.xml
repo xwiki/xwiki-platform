@@ -744,7 +744,7 @@
   #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
     #set ($joinOperator = 'AND')
   #end
-  #set ($filterQuery = "concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) LIKE upper(?)")
+  #set ($filterQuery = " concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) LIKE upper(?) ")
   #set ($constraints = $stringtool.repeat($filterQuery, $joinOperator, $filterValues.size()))
   #set ($whereSql = "${whereSql} and ( $constraints )")
   #foreach ($filterValue in $filterValues)

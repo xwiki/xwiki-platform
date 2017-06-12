@@ -5,7 +5,7 @@
 #end
 #set ($document = $xwiki.getDocument($event.document))
 <p><strong>$escapetool.xml($app)</strong></p>
-<p><strong>[$!escapetool.xml($event.type)]</strong> <a href="$!escapetool.xml($document.getExternalURL())">$!escapetool.xml($document.getRenderedTitle('xhtml/1.0'))</a></p>
+<p><strong>[$!escapetool.xml($event.type)]</strong> <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('xhtml/1.0'))</a></p>
 <p>$services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users)"])</p>
 #set ($dates = $event.dates)
 #if ($dates.size() > 1)

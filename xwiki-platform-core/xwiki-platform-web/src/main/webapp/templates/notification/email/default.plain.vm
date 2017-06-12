@@ -5,7 +5,7 @@
 #end
 #set ($document = $xwiki.getDocument($event.document))
 $app:
-  [$event.type] $document.getRenderedTitle('plain/1.0')) $services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users)"])
+  [$event.type] [$document.getRenderedTitle('plain/1.0')] $services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users, false)"])
 #set ($dates = $event.dates)
 #if ($dates.size() > 1)
     $services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])

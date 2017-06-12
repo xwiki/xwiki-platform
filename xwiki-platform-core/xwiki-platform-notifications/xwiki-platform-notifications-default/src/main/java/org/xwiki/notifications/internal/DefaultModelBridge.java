@@ -35,7 +35,9 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -101,10 +103,14 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
+                        String objFormat = obj.getStringValue("format");
                         preferences.add(new NotificationPreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
                                 obj.getStringValue("applicationId"),
-                                obj.getIntValue("notificationEnabled", 0) == 1
+                                obj.getIntValue("notificationEnabled", 0) != 0,
+                                StringUtils.isNotBlank(objFormat)
+                                        ? NotificationFormat.valueOf(objFormat.toUpperCase())
+                                        : NotificationFormat.ALERT
                         ));
                     }
                 }

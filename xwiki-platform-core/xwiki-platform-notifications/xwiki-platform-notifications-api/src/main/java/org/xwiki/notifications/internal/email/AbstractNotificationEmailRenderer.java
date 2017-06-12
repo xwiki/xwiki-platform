@@ -21,17 +21,25 @@ package org.xwiki.notifications.internal.email;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.email.NotificationEmailRenderer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.ExternalServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * @version $Id$
@@ -55,10 +63,21 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
     @Inject
     protected VelocityManager velocityManager;
 
-    protected Block executeTemplate(CompositeEvent event, String templatePath) throws NotificationException
+    @Inject
+    protected Provider<XWikiContext> contextProvider;
+
+    @Inject
+    protected RenderingContext renderingContext;
+
+    protected Block executeTemplate(CompositeEvent event, String templatePath, Syntax syntax) throws NotificationException
     {
+        XWikiContext context = contextProvider.get();
+        XWikiURLFactory originalURLFactory = context.getURLFactory();
+        Syntax originalSyntax = renderingContext.getTargetSyntax();
         try {
             velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, event);
+            context.setURLFactory(new ExternalServletURLFactory(context));
+            ((MutableRenderingContext)renderingContext).setTargetSyntax(syntax);
 
             String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
             Template template = templateManager.getTemplate(templateName);
@@ -67,6 +86,8 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         } finally {
+            ((MutableRenderingContext)renderingContext).setTargetSyntax(originalSyntax);
+            context.setURLFactory(originalURLFactory);
             velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
         }
     }

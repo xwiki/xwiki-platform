@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content/>
   <object>
     <name>XWiki.Notifications.MailTemplate</name>
     <number>0</number>
@@ -101,10 +101,12 @@
       <html>&lt;h1&gt;Events on the wiki:&lt;/h1&gt;
 
 #foreach ($event in $htmlEvents)
+  #if ($velocityCount &gt; 1)
+    &lt;hr /&gt;
+  #end
   &lt;div class="notification"&gt;
     $event
   &lt;/div&gt;
-  &lt;hr /&gt;
 #end</html>
     </property>
     <property>

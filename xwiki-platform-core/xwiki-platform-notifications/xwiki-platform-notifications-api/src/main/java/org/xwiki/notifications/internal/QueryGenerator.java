@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -77,6 +78,7 @@ public class QueryGenerator
      * Generate the query.
      *
      * @param user user interested in the notifications
+     * @param format only match notifications enabled for that format
      * @param onlyUnread f only unread events should be returned
      * @param endDate do not return events happened after this date
      * @param startDate do not return events happened before this date
@@ -86,8 +88,8 @@ public class QueryGenerator
      * @throws NotificationException if error happens
      * @throws QueryException if error happens
      */
-    public Query generateQuery(DocumentReference user, boolean onlyUnread, Date endDate, Date startDate, List<String> blackList)
-            throws NotificationException, QueryException
+    public Query generateQuery(DocumentReference user, NotificationFormat format, boolean onlyUnread, Date endDate,
+            Date startDate, List<String> blackList) throws NotificationException, QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
         // TODO: create unit tests for all use-cases
@@ -100,8 +102,8 @@ public class QueryGenerator
         StringBuilder hql = new StringBuilder();
         hql.append("where event.date >= :startDate AND event.user <> :user AND (");
 
-        List<String> types = handleEventTypes(hql, preferences);
-        List<String> apps  = handleApplications(hql, preferences, types);
+        List<String> types = handleEventTypes(hql, preferences, format);
+        List<String> apps  = handleApplications(hql, preferences, types, format);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
@@ -251,11 +253,12 @@ public class QueryGenerator
     }
 
     private List<String> handleApplications(StringBuilder hql, List<NotificationPreference> preferences,
-            List<String> types)
+            List<String> types, NotificationFormat format)
     {
         List<String> apps = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())
+                    && format.equals(preference.getFormat())) {
                 apps.add(preference.getApplicationId());
             }
         }
@@ -265,11 +268,13 @@ public class QueryGenerator
         return apps;
     }
 
-    private List<String> handleEventTypes(StringBuilder hql, List<NotificationPreference> preferences)
+    private List<String> handleEventTypes(StringBuilder hql, List<NotificationPreference> preferences,
+            NotificationFormat format)
     {
         List<String> types = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())
+                    && format.equals(preference.getFormat())) {
                 types.add(preference.getEventType());
             }
         }

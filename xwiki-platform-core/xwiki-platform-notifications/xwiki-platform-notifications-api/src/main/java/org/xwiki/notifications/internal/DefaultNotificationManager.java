@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
@@ -85,6 +86,7 @@ public class DefaultNotificationManager implements NotificationManager
         return getEvents(
                 new ArrayList<>(),
                 documentReferenceResolver.resolve(userId),
+                NotificationFormat.ALERT,
                 onlyUnread,
                 expectedCount,
                 null,
@@ -97,16 +99,24 @@ public class DefaultNotificationManager implements NotificationManager
     public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int count, Date untilDate,
             List<String> blackList) throws NotificationException
     {
-        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
-                null, new ArrayList<>(blackList));
+        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), NotificationFormat.ALERT,
+                onlyUnread, count, untilDate, null, new ArrayList<>(blackList));
     }
 
     @Override
     public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
             Date fromDate, List<String> blackList) throws NotificationException
     {
-        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), onlyUnread, expectedCount,
-                untilDate, fromDate, new ArrayList<>(blackList));
+        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), NotificationFormat.ALERT,
+                onlyUnread, expectedCount, untilDate, fromDate, new ArrayList<>(blackList));
+    }
+
+    @Override
+    public List<CompositeEvent> getEvents(String userId, NotificationFormat format, boolean onlyUnread,
+            int expectedCount, Date untilDate, Date fromDate, List<String> blackList) throws NotificationException
+    {
+        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), format,
+                onlyUnread, expectedCount, untilDate, fromDate, new ArrayList<>(blackList));
     }
 
     @Override
@@ -114,22 +124,22 @@ public class DefaultNotificationManager implements NotificationManager
     {
         DocumentReference user = documentReferenceResolver.resolve(userId);
 
-        List<CompositeEvent> events = getEvents(new ArrayList<>(), user, onlyUnread, maxCount,
+        List<CompositeEvent> events = getEvents(new ArrayList<>(), user, NotificationFormat.ALERT, onlyUnread, maxCount,
                 null, null, new ArrayList<>());
 
         return events.size();
     }
 
     private List<CompositeEvent> getEvents(List<CompositeEvent> results, DocumentReference userReference,
-            boolean onlyUnread, int expectedCount, Date endDate, Date fromDate, List<String> blackList)
-            throws NotificationException
+            NotificationFormat format, boolean onlyUnread, int expectedCount, Date endDate, Date fromDate,
+            List<String> blackList) throws NotificationException
     {
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
         final int batchSize = expectedCount * 2;
         try {
             // Create the query
-            Query query = queryGenerator.generateQuery(userReference, onlyUnread, endDate, fromDate, blackList);
+            Query query = queryGenerator.generateQuery(userReference, format, onlyUnread, endDate, fromDate, blackList);
             if (query == null) {
                 return Collections.emptyList();
             }
@@ -161,7 +171,7 @@ public class DefaultNotificationManager implements NotificationManager
             // If we haven't get the expected number of events, perform a new batch
             if (results.size() < expectedCount && batch.size() == batchSize) {
                 blackList.addAll(getEventsIds(batch));
-                getEvents(results, userReference, onlyUnread, expectedCount - results.size(), endDate,
+                getEvents(results, userReference, format, onlyUnread, expectedCount - results.size(), endDate,
                         fromDate, blackList);
             }
 

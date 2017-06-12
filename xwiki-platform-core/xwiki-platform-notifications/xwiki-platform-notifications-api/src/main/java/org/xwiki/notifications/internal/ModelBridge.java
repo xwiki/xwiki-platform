@@ -44,8 +44,8 @@ public interface ModelBridge
      *
      * @throws NotificationException if an error occurs
      */
-    List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference) throws
-            NotificationException;
+    List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
+        throws NotificationException;
 
     /**
      * @param userReference the document reference of a user

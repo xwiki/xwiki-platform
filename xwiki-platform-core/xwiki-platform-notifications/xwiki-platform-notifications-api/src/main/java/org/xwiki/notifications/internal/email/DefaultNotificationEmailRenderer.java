@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.email.NotificationEmailRenderer;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * @version $Id$
@@ -56,7 +57,8 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
             return renderer.renderHTML(event);
         }
 
-        return renderHTML(executeTemplate(event, "notification/email/html/%s.vm"));
+        return renderHTML(executeTemplate(event, "notification/email/%s.html.vm",
+                Syntax.XHTML_1_0));
     }
 
 
@@ -68,7 +70,8 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
             return renderer.renderPlainText(event);
         }
 
-        return renderPlainText(executeTemplate(event, "notification/email/plain/%s.vm"));
+        return renderPlainText(executeTemplate(event, "notification/email/%s.plain.vm",
+                Syntax.PLAIN_1_0));
     }
 
     @Override
@@ -79,6 +82,7 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
             return renderer.renderPlainText(event);
         }
 
-        return renderPlainText(executeTemplate(event, "notification/email/subject/%s.vm"));
+        return renderPlainText(executeTemplate(event, "notification/email/%s.subject.vm",
+                Syntax.PLAIN_1_0));
     }
 }

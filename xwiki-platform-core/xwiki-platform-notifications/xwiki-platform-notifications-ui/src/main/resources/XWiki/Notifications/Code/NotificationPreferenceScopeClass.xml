@@ -62,6 +62,27 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </eventType>
+    <format>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>format</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>format</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>alert=Alert|email=E-mail</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </format>
     <scope>
       <cache>0</cache>
       <customDisplay/>

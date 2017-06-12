@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="PanelsCode.ApplicationsPanelConfiguration" locale="">
+  <web>PanelsCode</web>
+  <name>ApplicationsPanelConfiguration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1413881092000</creationDate>
+  <parent>Panels.Applications</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1413991041000</date>
+  <contentUpdateDate>1413991041000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>0</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>8e3fc209-fed9-48bd-a4e5-e0084ab7ed90</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.scheduler.invitationApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>1</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>9c75947d-9734-46f4-9f91-83a118c4d7c4</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.panels.panelApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>2</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>dbae2a33-4d65-462d-99c1-779a2fb42c65</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.scheduler.schedulerApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>3</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>c60e123a-1fa2-4a1c-9aa8-4a82dd717c43</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.panels.userDirectoryApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>4</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>75151565-2fe0-4d15-8667-b6bcd1cbc793</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.panels.TourApplication</applicationId>
+    </property>
+  </object>
+</xwikidoc>

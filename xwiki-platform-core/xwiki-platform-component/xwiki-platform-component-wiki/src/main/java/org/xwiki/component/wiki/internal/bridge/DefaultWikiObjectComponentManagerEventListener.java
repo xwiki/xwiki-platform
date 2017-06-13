@@ -44,7 +44,7 @@ import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * This {@link EventListener} is responsible for registering wiki components derived from XObjects using the same
@@ -103,18 +103,19 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
             if (event instanceof XObjectDeletedEvent) {
                 document = document.getOriginalDocument();
             }
-            BaseObjectReference baseObjectReference = document.getXObject().getReference();
+            BaseObject baseObject =
+                    document.getXObject(((XObjectEvent) event).getReference());
 
             // If the modified XObject can produce a WikiComponent
             WikiObjectComponentBuilder componentBuilder =
-                    this.getAssociatedComponentBuilder(baseObjectReference.getXClassReference());
+                    this.getAssociatedComponentBuilder(baseObject.getXClassReference());
             if (componentBuilder != null) {
                 if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
-                            .registerObjectComponents(baseObjectReference, document, componentBuilder);
+                            .registerObjectComponents(baseObject.getReference(), baseObject, componentBuilder);
                 } else if (event instanceof XObjectDeletedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
-                            .unregisterObjectComponents(baseObjectReference);
+                            .unregisterObjectComponents(baseObject.getReference());
                 }
             }
         /* If we are at application startup time, we have to instanciate every document or object that we can find

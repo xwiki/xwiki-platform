@@ -136,7 +136,7 @@ public class WikiObjectComponentManagerEventListenerProxy
                         BaseObjectReference xObjectReference = xObject.getReference();
                         builderHelper = this.entityReferenceSerializer.serialize(xObjectReference.getXClassReference());
 
-                        this.registerObjectComponents(xObjectReference, document,
+                        this.registerObjectComponents(xObjectReference, xObject,
                                 this.componentManager.getInstance(WikiObjectComponentBuilder.class, builderHelper));
                     }
                 }
@@ -155,10 +155,10 @@ public class WikiObjectComponentManagerEventListenerProxy
      * this entity reference.
      *
      * @param objectReference the reference containing the parameters needed to instanciate the new component(s)
-     * @param source the source of the event triggering this method
+     * @param baseObject the base object corresponding to the XObject
      * @param componentBuilder the builder that should be used in order to build the component
      */
-    public void registerObjectComponents(ObjectReference objectReference, XWikiDocument source,
+    public void registerObjectComponents(ObjectReference objectReference, BaseObject baseObject,
             WikiObjectComponentBuilder componentBuilder)
     {
         // Unregister all wiki components registered under the given entity. We do this as otherwise we would need to
@@ -171,8 +171,7 @@ public class WikiObjectComponentManagerEventListenerProxy
              * the current event and build the components from it. */
             List<WikiComponent> wikiComponents;
             if (componentBuilder instanceof WikiBaseObjectComponentBuilder) {
-                wikiComponents = ((WikiBaseObjectComponentBuilder) componentBuilder)
-                        .buildComponents(source.getXObject(objectReference));
+                wikiComponents = ((WikiBaseObjectComponentBuilder) componentBuilder).buildComponents(baseObject);
             } else {
                 wikiComponents = componentBuilder.buildComponents(objectReference);
             }

@@ -98,14 +98,12 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
         /* If we are dealing with an XObject related event, then it might be related to a
          * WikiObjectComponentBuilder */
         if (event instanceof XObjectEvent) {
-            // Get the entity source
-            XObjectEvent xObjectEvent = (XObjectEvent) event;
-
-            XWikiDocument eventDocument = (XWikiDocument) source;
+            XWikiDocument document = (XWikiDocument) source;
+            // If we are dealing with a XObjectDeletedEvent, we have to retrieve the original XObject document.
             if (event instanceof XObjectDeletedEvent) {
-                eventDocument = eventDocument.getOriginalDocument();
+                document = document.getOriginalDocument();
             }
-            BaseObjectReference baseObjectReference = eventDocument.getXObject().getReference();
+            BaseObjectReference baseObjectReference = document.getXObject().getReference();
 
             // If the modified XObject can produce a WikiComponent
             WikiObjectComponentBuilder componentBuilder =
@@ -113,8 +111,7 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
             if (componentBuilder != null) {
                 if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
-                            .registerObjectComponents(baseObjectReference, (XWikiDocument) source,
-                                    componentBuilder);
+                            .registerObjectComponents(baseObjectReference, document, componentBuilder);
                 } else if (event instanceof XObjectDeletedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
                             .unregisterObjectComponents(baseObjectReference);

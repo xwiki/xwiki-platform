@@ -19,99 +19,109 @@
  */
 package org.xwiki.notifications.internal.email;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.mail.Session;
-
+import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.context.Execution;
-import org.xwiki.mail.MailListener;
-import org.xwiki.mail.MailSender;
-import org.xwiki.mail.SessionFactory;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.notifications.email.NotificationEmailInterval;
+import org.xwiki.notifications.internal.ModelBridge;
 
-import com.xpn.xwiki.internal.plugin.rightsmanager.ReferenceUserIterator;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.plugin.scheduler.AbstractJob;
+import com.xpn.xwiki.web.Utils;
 
 /**
- * Job that send emails about notifications.
+ * Scheduler job that send emails about notifications.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-@Component(roles = NotificationEmailJob.class)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class NotificationEmailJob extends AbstractJob
+public class NotificationEmailJob extends AbstractJob implements Job
 {
-    @Inject
-    private MailSender mailSender;
+    private static final String LAST_FIRE_TIME = "lastFireTime";
 
-    @Inject
-    private SessionFactory sessionFactory;
+    private static final String XWIKI_SPACE = "XWiki";
 
-    @Inject
-    @Named("database")
-    private Provider<MailListener> mailListenerProvider;
-
-    @Inject
-    private Provider<NotificationMimeMessageIterator> notificationMimeMessageIteratorProvider;
-
-    @Inject
-    private Execution execution;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    /**
-     * To remove.
-     * @throws JobExecutionException on error
-     */
-    public void test() throws JobExecutionException
-    {
-        this.executeJob(null);
-    }
+    private static final String NOTIFICATIONS_SPACE = "Notifications";
 
     @Override
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
-        final String xwiki = "XWiki";
+        DocumentReference schedulerJobDocument = getSchedulerJobDocument(jobContext);
+        BaseObjectReference emailJobObjectReference = getNotificationEmailJobObjectReference(schedulerJobDocument);
 
-        List<DocumentReference> list = new ArrayList<>();
-        list.add(new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), xwiki, "XWikiAllGroup"));
+        NotificationUserIterator userIterator = Utils.getComponent(NotificationUserIterator.class);
+        userIterator.initialize(getJobInterval(schedulerJobDocument));
 
-        ReferenceUserIterator userIterator = new ReferenceUserIterator(list, null, documentReferenceResolver,
-                execution);
+        NotificationEmailSender mailSender = Utils.getComponent(NotificationEmailSender.class);
+        mailSender.sendEmails(getPreviousFireTime(emailJobObjectReference), userIterator);
 
-        Map<String, Object> parameters = new HashMap<>();
+        setPreviousFireTime(emailJobObjectReference);
+    }
 
-        DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
-                Arrays.asList(xwiki, "Notifications"), "MailTemplate");
+    private DocumentReference getSchedulerJobDocument(JobExecutionContext jobContext)
+    {
+        JobDataMap data = jobContext.getJobDetail().getJobDataMap();
 
-        NotificationMimeMessageIterator notificationMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
-        notificationMimeMessageIterator.initialize(userIterator, parameters, new Date(0L), templateReference);
+        BaseObject schedulerJobObject = (BaseObject) data.get("xjob");
+        BaseObjectReference schedulerJobObjectReference = schedulerJobObject.getReference();
+        return (DocumentReference) schedulerJobObjectReference.getParent();
+    }
 
-        Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
-        MailListener mailListener = mailListenerProvider.get();
+    private BaseObjectReference getNotificationEmailJobObjectReference(DocumentReference schedulerJobDocument)
+    {
+        DocumentReference emailJobDocument = new DocumentReference(
+                schedulerJobDocument.getWikiReference().getName(),
+                Arrays.asList(XWIKI_SPACE, NOTIFICATIONS_SPACE),
+                schedulerJobDocument.getName()
+        );
 
-        // Pass it to the message sender to send it asynchronously.
-        mailSender.sendAsynchronously(notificationMimeMessageIterator, session, mailListener);
+        return new BaseObjectReference(
+                new DocumentReference(schedulerJobDocument.getWikiReference().getName(),
+                        Arrays.asList(XWIKI_SPACE, NOTIFICATIONS_SPACE, "Code"), "EmailJobClass"),
+                0,
+                emailJobDocument
+        );
+    }
+
+    private NotificationEmailInterval getJobInterval(DocumentReference schedulerJobDocument)
+    {
+        if (schedulerJobDocument.getName().contains("Hourly")) {
+            return NotificationEmailInterval.HOURLY;
+        } else if (schedulerJobDocument.getName().contains("Weekly")) {
+            return NotificationEmailInterval.WEEKLY;
+        }
+        return NotificationEmailInterval.DAILY;
+    }
+
+    private Date getPreviousFireTime(BaseObjectReference emailJobObject)
+    {
+        return (Date) getDocumentAccessBridge().getProperty(emailJobObject, LAST_FIRE_TIME);
+    }
+
+    private void setPreviousFireTime(BaseObjectReference emailJobObject) throws JobExecutionException
+    {
+        try {
+            getModelBridge().savePropertyInHiddenDocument(emailJobObject, LAST_FIRE_TIME, new Date());
+        } catch (Exception e) {
+            throw new JobExecutionException(
+                    String.format("Failed to update the last fire time property of [{}].", emailJobObject), e);
+        }
+    }
+
+    private DocumentAccessBridge getDocumentAccessBridge()
+    {
+        return Utils.getComponent(DocumentAccessBridge.class);
+    }
+
+    private ModelBridge getModelBridge()
+    {
+        return Utils.getComponent(ModelBridge.class);
     }
 }

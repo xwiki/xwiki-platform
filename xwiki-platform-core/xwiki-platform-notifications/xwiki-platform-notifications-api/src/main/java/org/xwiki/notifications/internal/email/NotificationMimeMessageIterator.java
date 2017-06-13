@@ -48,8 +48,6 @@ import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.email.NotificationEmailRenderer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import com.xpn.xwiki.internal.plugin.rightsmanager.ReferenceUserIterator;
-
 /**
  * Iterator used to generate emails for notifications. Generate MimeMessages.
  *
@@ -101,7 +99,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
-    private ReferenceUserIterator userIterator;
+    private NotificationUserIterator userIterator;
 
     private Map<String, Object> factoryParameters;
 
@@ -125,7 +123,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
      * @param lastTrigger time of the last email sent
      * @param templateReference reference to the mail template
      */
-    public void initialize(ReferenceUserIterator userIterator,
+    public void initialize(NotificationUserIterator userIterator,
             Map<String, Object> factoryParameters, Date lastTrigger, DocumentReference templateReference)
     {
         this.userIterator = userIterator;

@@ -31,7 +31,10 @@ import org.xwiki.notifications.email.NotificationEmailRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
+ * Default implementation of {@link NotificationEmailRenderer}.
+ *
  * @version $Id$
+ * @since 9.5RC1
  */
 @Component
 @Singleton

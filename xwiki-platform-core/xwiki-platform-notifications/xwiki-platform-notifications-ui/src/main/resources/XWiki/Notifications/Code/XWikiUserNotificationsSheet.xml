@@ -90,6 +90,22 @@
         #end
       &lt;/tr&gt;
     #end
+    &lt;tr&gt;
+      &lt;td&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;/td&gt;
+      &lt;td&gt;
+        #set ($interval = 'daily')
+        #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+        #if ("$!objInterval" != '')
+          #set ($interval = $objInterval.getValue('interval'))
+        #end
+        &lt;select class="notificationEmailInterval"&gt;
+          &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;Hourly&lt;/option&gt;
+          &lt;option value="daily" #if($interval == 'daily')selected="selected"#end&gt;Daily&lt;/option&gt;
+          &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;Weekly&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
 {{/html}}
@@ -451,6 +467,21 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
       }
+    });
+  });
+
+  /**
+   * Handle the notification email interval
+   */
+  $('.notificationEmailInterval').change(function () {
+    var intervalSelect = $(this);
+    var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    $.post(serviceURL, {
+      'interval': intervalSelect.val()
+    }).done(function (data) {
+      notification.hide();
+      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
     });
   });
 

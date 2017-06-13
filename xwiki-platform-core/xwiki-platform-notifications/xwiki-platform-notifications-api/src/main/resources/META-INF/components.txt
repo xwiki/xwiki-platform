@@ -1,6 +1,7 @@
 org.xwiki.notifications.internal.email.DefaultNotificationEmailRenderer
-org.xwiki.notifications.internal.email.NotificationEmailJob
+org.xwiki.notifications.internal.email.NotificationEmailSender
 org.xwiki.notifications.internal.email.NotificationMimeMessageIterator
+org.xwiki.notifications.internal.email.NotificationUserIterator
 org.xwiki.notifications.internal.CachedModelBridge
 org.xwiki.notifications.internal.DefaultCompositeEventStatusManager
 org.xwiki.notifications.internal.DefaultNotificationConfiguration

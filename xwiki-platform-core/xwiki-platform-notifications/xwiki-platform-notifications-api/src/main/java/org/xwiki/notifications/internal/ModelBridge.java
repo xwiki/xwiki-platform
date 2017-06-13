@@ -27,6 +27,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 
+import com.xpn.xwiki.objects.BaseObjectReference;
+
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
  *
@@ -71,5 +73,18 @@ public interface ModelBridge
      * @since 9.5RC1
      */
     List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
+            throws NotificationException;
+
+    /**
+     * Save an object's property in an hidden document.
+     *
+     * @param objectReference reference of the object to save
+     * @param property the name of the property to set
+     * @param value the value of the property to set
+     * @throws NotificationException if error happens
+     *
+     * @since 9.5RC1
+     */
+    void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
             throws NotificationException;
 }

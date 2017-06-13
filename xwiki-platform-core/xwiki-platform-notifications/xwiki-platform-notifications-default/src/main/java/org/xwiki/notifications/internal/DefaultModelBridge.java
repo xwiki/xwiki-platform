@@ -44,6 +44,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Default implementation for {@link ModelBridge}.
@@ -219,5 +220,24 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    @Override
+    public void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
+            throws NotificationException
+    {
+        try {
+            XWikiContext xcontext = contextProvider.get();
+            DocumentReference documentReference = (DocumentReference) objectReference.getParent();
+            XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+            doc.setHidden(true);
+            BaseObject obj = doc.getXObject(objectReference.getXClassReference(), true, xcontext);
+            if (obj != null) {
+                obj.set(property, value, xcontext);
+                xcontext.getWiki().saveDocument(doc, String.format("Property [%s] set.", property), xcontext);
+            }
+        } catch (XWikiException e) {
+            throw new NotificationException(String.format("Failed to update the object [%s].", objectReference), e);
+        }
     }
 }

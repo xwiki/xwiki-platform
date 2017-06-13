@@ -33,6 +33,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationPreference;
 
+import com.xpn.xwiki.objects.BaseObjectReference;
+
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
  * fetching them several time during the same HTTP request.
@@ -107,5 +109,13 @@ public class CachedModelBridge implements ModelBridge
         context.setProperty(USER_NOTIFICATIONS_PREFERENCES_SCOPE, preferences);
 
         return preferences;
+    }
+
+    @Override
+    public void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
+            throws NotificationException
+    {
+        // Obviously there is nothing to cache
+        modelBridge.savePropertyInHiddenDocument(objectReference, property, value);
     }
 }

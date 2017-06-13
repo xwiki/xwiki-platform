@@ -55,6 +55,7 @@ notifications.menu.more=Load older notifications
 notifications.menu.details=Details ({0})
 notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
+notifications.settings.email=Email
 notifications.settings.saving=Your settings are being saved...
 notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings

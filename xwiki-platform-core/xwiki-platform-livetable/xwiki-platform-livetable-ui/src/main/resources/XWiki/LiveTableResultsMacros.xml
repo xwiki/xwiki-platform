@@ -754,8 +754,17 @@
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterStringListProperty)
-  #set ($whereSql = "${whereSql} and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
-  #set ($discard = $whereParams.add("%|$filterValue|%"))
+  #set ($filterValues = $request.getParameterValues($colname))
+  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+  #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+    #set ($joinOperator = 'AND')
+  #end
+  #set ($filterQuery = " concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) LIKE upper(?) ")
+  #set ($constraints = $stringtool.repeat($filterQuery, $joinOperator, $filterValues.size()))
+  #set ($whereSql = "${whereSql} and ( $constraints )")
+  #foreach ($filterValue in $filterValues)
+    #set ($discard = $whereParams.add("%|$filterValue|%"))
+  #end
 #end
 
 

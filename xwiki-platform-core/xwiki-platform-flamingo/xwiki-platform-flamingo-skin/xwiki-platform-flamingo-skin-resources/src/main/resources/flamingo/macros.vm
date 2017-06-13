@@ -279,6 +279,8 @@
                 #set($list = $class.get($colname).getListValues())
                 <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'
                 #if("$!colprop.type" == 'multilist')
+                  #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetablemulti.js', true))
+                  #set($ok = $xwiki.linkx.use($services.webjars.url('bootstrap-select', 'css/bootstrap-select.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
                   class='xwiki-livetable-multilist' multiple='multiple'>
                 #else
                   ><option value=''>$services.localization.render('platform.livetable.selectAll')</option>

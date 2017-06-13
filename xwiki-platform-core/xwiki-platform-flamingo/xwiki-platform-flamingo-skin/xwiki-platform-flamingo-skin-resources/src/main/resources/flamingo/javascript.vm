@@ -101,6 +101,7 @@ require.config({
   paths: {
     'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
     'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap", "js/bootstrap${jsExtension}"))',
+    'bootstrap-select': '#removeJsSuffix($services.webjars.url("bootstrap-select", "1.10.0/dist/js/bootstrap-select${jsExtension}"))',
     'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')',
     'xwiki-events-bridge': "$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js')",
     'iscroll': '#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))',
@@ -109,6 +110,12 @@ require.config({
   },
   shim: {
     'bootstrap' : ['jquery'],
+    'bootstrap-select': {
+            deps: ['jquery', 'bootstrap'],
+            init: function ($) {
+               'use strict';
+            }
+        },
     'drawer': ['jquery', 'iscroll']
   },
   ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
@@ -120,6 +127,9 @@ require.config({
       'jquery': 'jquery'
     },
   }
+});
+requirejs(['jquery', 'bootstrap-select'],
+    function   ($) {
 });
 define('jQueryNoConflict', ['jquery'], function ($) {
     return $.noConflict();

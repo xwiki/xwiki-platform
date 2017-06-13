@@ -279,7 +279,7 @@
                 #set($list = $class.get($colname).getListValues())
                 <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'
                 #if("$!colprop.type" == 'multilist')
-                  class='xwiki-livetable-multilist' multiple='multiple'>
+                  class="xwiki-livetable-multilist selectpicker" multiple="multiple"  data-selected-text-format="count &gt; 1" data-actions-box="true" data-width="fit">
                 #else
                   ><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
                   <option disabled='disabled'>────</option>

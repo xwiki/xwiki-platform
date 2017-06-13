@@ -28,6 +28,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.email.NotificationEmailInterval;
 import org.xwiki.notifications.internal.ModelBridge;
 
@@ -53,6 +54,12 @@ public class NotificationEmailJob extends AbstractJob implements Job
     @Override
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
+        NotificationConfiguration configuration = Utils.getComponent(NotificationConfiguration.class);
+        if (!configuration.isEnabled() || !configuration.areEmailsEnabled()) {
+            // do nothing
+            return;
+        }
+
         DocumentReference schedulerJobDocument = getSchedulerJobDocument(jobContext);
         BaseObjectReference emailJobObjectReference = getNotificationEmailJobObjectReference(schedulerJobDocument);
 

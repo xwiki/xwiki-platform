@@ -39,8 +39,8 @@ import org.xwiki.component.wiki.internal.DefaultWikiObjectComponentManagerEventL
 import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -88,9 +88,9 @@ public class WikiObjectComponentManagerEventListenerProxy
      * This method is responsible look through every {@link WikiObjectComponentBuilder} and get their role hints, which
      * is also the class name of the wiki object they should be working with.
      */
-    private List<String> collectWikiObjectsList()
+    private List<EntityReference> collectWikiObjectsList()
     {
-        List<String> wikiObjectsList = new ArrayList<>();
+        List<EntityReference> wikiObjectsList = new ArrayList<>();
 
         try {
             // Get a list of WikiObjectComponentBuilder
@@ -98,7 +98,7 @@ public class WikiObjectComponentManagerEventListenerProxy
                     this.componentManager.getInstanceList(WikiObjectComponentBuilder.class);
 
             for (WikiObjectComponentBuilder componentBuilder : componentBuilders) {
-                wikiObjectsList.add(this.entityReferenceSerializer.serialize(componentBuilder.getClassReference()));
+                wikiObjectsList.add(componentBuilder.getClassReference());
             }
         } catch (ComponentLookupException e) {
             logger.warn("Unable to collect a list of wiki objects components: %s", e);
@@ -117,15 +117,13 @@ public class WikiObjectComponentManagerEventListenerProxy
         XWikiContext xWikiContext = this.xWikiContextProvider.get();
 
         // For every classes subject to WikiComponents
-        for (String xObjectClass : this.collectWikiObjectsList()) {
-            LocalDocumentReference xObjectLocalDocumentReference = new LocalDocumentReference(
-                    this.currentDocumentReferenceResolver.resolve(xObjectClass));
-
+        for (EntityReference xObjectClass : this.collectWikiObjectsList()) {
             try {
                 // Query every document having an XObject of the given class attached
                 Query query =
                         queryManager.createQuery("select distinct doc.fullName from Document doc, "
-                                                + "doc.object(" + xObjectClass + ") as document", Query.XWQL);
+                                                + "doc.object(" + this.entityReferenceSerializer.serialize(xObjectClass)
+                                                + ") as document", Query.XWQL);
 
                 List<String> results = query.execute();
 
@@ -134,7 +132,7 @@ public class WikiObjectComponentManagerEventListenerProxy
                     sourceDocumentReference = this.currentDocumentReferenceResolver.resolve(result);
                     XWikiDocument document = xWikiContext.getWiki().getDocument(sourceDocumentReference, xWikiContext);
 
-                    for (BaseObject xObject : document.getXObjects(xObjectLocalDocumentReference)) {
+                    for (BaseObject xObject : document.getXObjects(xObjectClass)) {
                         this.registerObjectComponents(xObject.getReference(), document);
                     }
                 }
@@ -207,7 +205,7 @@ public class WikiObjectComponentManagerEventListenerProxy
      *
      * @return the list of classes
      */
-    public List<String> getWikiObjectsList()
+    public List<EntityReference> getWikiObjectsList()
     {
         return this.collectWikiObjectsList();
     }

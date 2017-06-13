@@ -88,8 +88,7 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
 
             // If the modified XObject can produce a WikiComponent
             if (this.wikiObjectComponentManagerEventListenerProxy.getWikiObjectsList()
-                    .contains(entityReferenceSerializer.serialize(
-                                    ((BaseObjectReference) xObject).getXClassReference()))) {
+                    .contains(((BaseObjectReference) xObject).getXClassReference())) {
                 if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
                             .registerObjectComponents((ObjectReference) xObject, (XWikiDocument) source);

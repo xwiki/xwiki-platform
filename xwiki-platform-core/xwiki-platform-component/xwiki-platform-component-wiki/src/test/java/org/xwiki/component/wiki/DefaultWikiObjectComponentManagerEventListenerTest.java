@@ -22,6 +22,8 @@ package org.xwiki.component.wiki;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.print.Doc;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +32,9 @@ import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.wiki.internal.DefaultWikiObjectComponentManagerEventListener;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -64,6 +68,8 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
 
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    private List<EntityReference> xClassReferences;
+
     @Before
     public void setUp() throws Exception
     {
@@ -72,8 +78,14 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
         this.entityReferenceSerializer =
                 this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
+        xClassReferences = Arrays.asList(
+                new DocumentReference("wiki1", "space1","xClass1"),
+                new DocumentReference("wiki1", "space1", "xClass2"));
+
         when(this.wikiObjectComponentManagerEventListenerProxy.getWikiObjectsList())
-                .thenReturn(Arrays.asList("xObjectName1", "xObjectName2"));
+                .thenReturn(Arrays.asList(
+                        new LocalDocumentReference(this.xClassReferences.get(0)),
+                        this.xClassReferences.get(1)));
     }
 
     @Test
@@ -140,9 +152,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
         XObjectDeletedEvent event = mock(XObjectDeletedEvent.class);
 
         BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
-        DocumentReference xClassReference = mock(DocumentReference.class);
-        when(xObjectReference.getXClassReference()).thenReturn(xClassReference);
-        when(this.entityReferenceSerializer.serialize(any())).thenReturn("xObjectName1");
+        when(xObjectReference.getXClassReference()).thenReturn((DocumentReference) this.xClassReferences.get(0));
 
         when(event.getReference()).thenReturn(xObjectReference);
 
@@ -158,9 +168,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
 
         // We only need one object name contained in wikiObjectComponentManagerEventListenerProxy objects list
         BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
-        DocumentReference xClassReference = mock(DocumentReference.class);
-        when(xObjectReference.getXClassReference()).thenReturn(xClassReference);
-        when(this.entityReferenceSerializer.serialize(any())).thenReturn("xObjectName1");
+        when(xObjectReference.getXClassReference()).thenReturn((DocumentReference) this.xClassReferences.get(0));
 
         when(event.getReference()).thenReturn(xObjectReference);
 

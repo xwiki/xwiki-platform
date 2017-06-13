@@ -133,15 +133,9 @@ public class WikiObjectComponentManagerEventListenerProxyTest
     private void testWithWikiObjectComponentBuilder(WikiObjectComponentBuilder buider,
             BaseObjectReference objectReference, XWikiDocument source) throws Exception
     {
-        DocumentReference objectXClassReference = mock(DocumentReference.class);
-
         when(source.getXObject(any(ObjectReference.class))).thenReturn(mock(BaseObject.class));
-        when(objectReference.getXClassReference()).thenReturn(objectXClassReference);
-        when(this.entityReferenceSerializer.serialize(any())).thenReturn("referencePath");
-        when(this.componentManager.getInstance(WikiObjectComponentBuilder.class, "referencePath"))
-                .thenReturn(buider);
 
-        this.mocker.getComponentUnderTest().registerObjectComponents(objectReference, source);
+        this.mocker.getComponentUnderTest().registerObjectComponents(objectReference, source, buider);
     }
 
 }

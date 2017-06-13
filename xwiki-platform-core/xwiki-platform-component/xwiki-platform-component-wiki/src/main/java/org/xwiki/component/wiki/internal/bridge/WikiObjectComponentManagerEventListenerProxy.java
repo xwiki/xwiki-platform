@@ -115,6 +115,7 @@ public class WikiObjectComponentManagerEventListenerProxy
     public void registerAllObjectComponents()
     {
         XWikiContext xWikiContext = this.xWikiContextProvider.get();
+        String builderHelper;
 
         // For every classes subject to WikiComponents
         for (EntityReference xObjectClass : this.collectWikiObjectsList()) {
@@ -133,12 +134,16 @@ public class WikiObjectComponentManagerEventListenerProxy
                     XWikiDocument document = xWikiContext.getWiki().getDocument(sourceDocumentReference, xWikiContext);
 
                     for (BaseObject xObject : document.getXObjects(xObjectClass)) {
-                        this.registerObjectComponents(xObject.getReference(), document);
+                        BaseObjectReference xObjectReference = xObject.getReference();
+                        builderHelper = this.entityReferenceSerializer.serialize(xObjectReference.getXClassReference());
+
+                        this.registerObjectComponents(xObjectReference, document,
+                                this.componentManager.getInstance(WikiObjectComponentBuilder.class, builderHelper));
                     }
                 }
             } catch (Exception e) {
                 logger.warn(
-                        String.format("Unable to fetch document references for [%s] XObjects: %s",
+                        String.format("Unable to register the components for [%s] XObjects: %s",
                                 xObjectClass,
                                 e.getMessage()));
             }
@@ -152,8 +157,10 @@ public class WikiObjectComponentManagerEventListenerProxy
      *
      * @param objectReference the reference containing the parameters needed to instanciate the new component(s)
      * @param source the source of the event triggering this method
+     * @param componentBuilder the builder that should be used in order to build the component
      */
-    public void registerObjectComponents(ObjectReference objectReference, XWikiDocument source)
+    public void registerObjectComponents(ObjectReference objectReference, XWikiDocument source,
+            WikiObjectComponentBuilder componentBuilder)
     {
         // Unregister all wiki components registered under the given entity. We do this as otherwise we would need to
         // handle the specific cases of elements added, elements updated and elements deleted, etc.
@@ -161,12 +168,6 @@ public class WikiObjectComponentManagerEventListenerProxy
         this.wikiComponentManagerEventListenerHelper.unregisterComponents(objectReference);
 
         try {
-            // Try to retrieve a WikiObjectComponentBuilder related to the XObject
-            WikiObjectComponentBuilder componentBuilder =
-                    this.componentManager.getInstance(WikiObjectComponentBuilder.class,
-                            entityReferenceSerializer.serialize(
-                                    ((BaseObjectReference) objectReference).getXClassReference()));
-
             /* If we are dealing with a WikiBaseObjectComponentBuilder, we directly get the base object corresponding to
              * the current event and build the components from it. */
             List<WikiComponent> wikiComponents;
@@ -178,10 +179,6 @@ public class WikiObjectComponentManagerEventListenerProxy
             }
 
             this.wikiComponentManagerEventListenerHelper.registerComponentList(wikiComponents);
-        } catch (ComponentLookupException e) {
-            logger.warn(String.format(
-                    "Unable to retrieve the WikiObjectComponentBuilder associated with [%s]: %s",
-                    objectReference, ExceptionUtils.getRootCauseMessage(e)));
         } catch (WikiComponentException e) {
             logger.warn(String.format(
                     "Unable to register the component associated to [%s]: %s", objectReference,

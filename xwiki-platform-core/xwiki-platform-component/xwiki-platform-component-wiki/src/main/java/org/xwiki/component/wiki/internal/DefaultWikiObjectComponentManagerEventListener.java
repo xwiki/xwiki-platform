@@ -26,7 +26,11 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.WikiObjectComponentBuilder;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
@@ -59,6 +63,9 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
     public static final String EVENT_LISTENER_NAME = "defaultWikiObjectComponentManagerEventListener";
 
     @Inject
+    private ComponentManager componentManager;
+
+    @Inject
     private WikiObjectComponentManagerEventListenerProxy wikiObjectComponentManagerEventListenerProxy;
 
     @Inject
@@ -87,11 +94,13 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
             EntityReference xObject = xObjectEvent.getReference();
 
             // If the modified XObject can produce a WikiComponent
-            if (this.wikiObjectComponentManagerEventListenerProxy.getWikiObjectsList()
-                    .contains(((BaseObjectReference) xObject).getXClassReference())) {
+            WikiObjectComponentBuilder componentBuilder =
+                    this.getAssociatedComponentBuilder(((BaseObjectReference) xObject).getXClassReference());
+            if (componentBuilder != null) {
                 if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
-                            .registerObjectComponents((ObjectReference) xObject, (XWikiDocument) source);
+                            .registerObjectComponents((ObjectReference) xObject, (XWikiDocument) source,
+                                    componentBuilder);
                 } else if (event instanceof XObjectDeletedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
                             .unregisterObjectComponents((ObjectReference) xObject);
@@ -103,6 +112,32 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
             // These 2 events are created when the database is ready. We register all wiki components.
             // Collect every WikiObjectComponentBuilder
             this.wikiObjectComponentManagerEventListenerProxy.registerAllObjectComponents();
+        }
+    }
+
+    /**
+     * Get the {@link WikiObjectComponentBuilder} associated to the given {@link DocumentReference}.
+     * This method checks if a component builder exists for the document reference and then for the local document
+     * reference. If no builder can is found, returns null.
+     *
+     * @param xClassReference the class reference used when searching for the component builder
+     * @return the first component builder that has been found, null if no builder is found
+     */
+    private WikiObjectComponentBuilder getAssociatedComponentBuilder(DocumentReference xClassReference)
+    {
+        // First, try to find a component that has a hint related to the DocumentReference of the XClass
+        try {
+            return this.componentManager.getInstance(WikiObjectComponentBuilder.class,
+                    this.entityReferenceSerializer.serialize(xClassReference));
+        } catch (ComponentLookupException e1) {
+            try {
+                // Try to find a component using the LocalDocumentReference of the XClass
+                return this.componentManager.getInstance(WikiObjectComponentBuilder.class,
+                        this.entityReferenceSerializer.serialize(xClassReference.getLocalDocumentReference()));
+            } catch (ComponentLookupException e2) {
+                return null;
+            }
+
         }
     }
 }

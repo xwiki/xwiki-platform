@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentManager;
+import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
 import org.xwiki.model.reference.EntityReference;
 
 /**

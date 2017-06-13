@@ -17,27 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.wiki.internal;
+package org.xwiki.component.wiki.internal.bridge;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiObjectComponentBuilder;
-import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
+import org.xwiki.component.wiki.internal.DefaultWikiComponentManagerEventListener;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -69,8 +70,17 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
     private WikiObjectComponentManagerEventListenerProxy wikiObjectComponentManagerEventListenerProxy;
 
     @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
     @Named("local")
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Builds a new {@link DefaultWikiObjectComponentManagerEventListener}.
@@ -91,19 +101,23 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
             // Get the entity source
             XObjectEvent xObjectEvent = (XObjectEvent) event;
 
-            EntityReference xObject = xObjectEvent.getReference();
+            XWikiDocument eventDocument = (XWikiDocument) source;
+            if (event instanceof XObjectDeletedEvent) {
+                eventDocument = eventDocument.getOriginalDocument();
+            }
+            BaseObjectReference baseObjectReference = eventDocument.getXObject().getReference();
 
             // If the modified XObject can produce a WikiComponent
             WikiObjectComponentBuilder componentBuilder =
-                    this.getAssociatedComponentBuilder(((BaseObjectReference) xObject).getXClassReference());
+                    this.getAssociatedComponentBuilder(baseObjectReference.getXClassReference());
             if (componentBuilder != null) {
                 if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
-                            .registerObjectComponents((ObjectReference) xObject, (XWikiDocument) source,
+                            .registerObjectComponents(baseObjectReference, (XWikiDocument) source,
                                     componentBuilder);
                 } else if (event instanceof XObjectDeletedEvent) {
                     this.wikiObjectComponentManagerEventListenerProxy
-                            .unregisterObjectComponents((ObjectReference) xObject);
+                            .unregisterObjectComponents(baseObjectReference);
                 }
             }
         /* If we are at application startup time, we have to instanciate every document or object that we can find
@@ -125,19 +139,29 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
      */
     private WikiObjectComponentBuilder getAssociatedComponentBuilder(DocumentReference xClassReference)
     {
-        // First, try to find a component that has a hint related to the DocumentReference of the XClass
         try {
-            return this.componentManager.getInstance(WikiObjectComponentBuilder.class,
-                    this.entityReferenceSerializer.serialize(xClassReference));
-        } catch (ComponentLookupException e1) {
-            try {
-                // Try to find a component using the LocalDocumentReference of the XClass
-                return this.componentManager.getInstance(WikiObjectComponentBuilder.class,
-                        this.entityReferenceSerializer.serialize(xClassReference.getLocalDocumentReference()));
-            } catch (ComponentLookupException e2) {
-                return null;
+            // First, try to find a component that has a hint related to the DocumentReference of the XClass
+            String serializedXClassReference = this.defaultEntityReferenceSerializer.serialize(xClassReference);
+            if (this.componentManager.hasComponent(WikiObjectComponentBuilder.class, serializedXClassReference)) {
+                return this.componentManager.getInstance(WikiObjectComponentBuilder.class, serializedXClassReference);
+            } else {
+                // If no component has been found, try again with a LocalDocumentReference
+                serializedXClassReference =
+                        this.localEntityReferenceSerializer.serialize(xClassReference);
+                if (this.componentManager.hasComponent(WikiObjectComponentBuilder.class, serializedXClassReference)) {
+                    return this.componentManager.getInstance(
+                            WikiObjectComponentBuilder.class, serializedXClassReference);
+                } else {
+                    return null;
+                }
             }
-
+        } catch (ComponentLookupException e) {
+            /* As we test if a component is present in the component manager before fetching it, we shouldn't get any
+             * exception at this point. */
+            this.logger.warn(String.format(
+                    "Unable to find a WikiObjectComponentBuilder associated to the helper [%s]: %s",
+                    xClassReference, e.getMessage()));
+            return null;
         }
     }
 }

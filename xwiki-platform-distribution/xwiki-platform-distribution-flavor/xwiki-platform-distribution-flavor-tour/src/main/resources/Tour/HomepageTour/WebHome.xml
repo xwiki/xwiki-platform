@@ -165,7 +165,7 @@
     <property>
       <content>{{velocity}}
 $services.localization.render('tour.homepageTour.welcome.content')
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>body</element>
@@ -309,7 +309,7 @@ $services.localization.render('tour.homepageTour.panels.contentA')
 
 
 $services.localization.render('tour.homepageTour.panels.contentB')
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>#leftPanels</element>
@@ -453,7 +453,7 @@ $services.localization.render('tour.homepageTour.breadcrumbs.contentA')
 
 
 $services.localization.render('tour.homepageTour.breadcrumbs.contentB', [" $services.icon.render('home') "])
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>#hierarchy</element>
@@ -597,7 +597,7 @@ $services.localization.render('tour.homepageTour.pageContent.contentA')
 
 
 $services.localization.render('tour.homepageTour.pageContent.contentB')
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>#xwikicontent</element>
@@ -741,7 +741,7 @@ $services.localization.render('tour.homepageTour.pageMenu.contentA')
 
 
 $services.localization.render('tour.homepageTour.pageMenu.contentB', [" $services.icon.render('more-vertical') "])
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>#contentmenu</element>
@@ -885,7 +885,7 @@ $services.localization.render('tour.homepageTour.pageTabs.contentA')
 
 
 $services.localization.render('tour.homepageTour.pageTabs.contentB')
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>#xwikidatacontents</element>
@@ -1029,7 +1029,7 @@ $services.localization.render('tour.homepageTour.header.contentA')
 
 
 $services.localization.render('tour.homepageTour.header.contentB', [" $services.icon.render('menu') "])
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>#xwikimainmenu &gt; ul.navbar-right</element>
@@ -1173,7 +1173,7 @@ $services.localization.render('tour.homepageTour.tourComplete.contentA')
 
 
 $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', '&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/Main/Features]]'])
-{{velocity}}</content>
+{{/velocity}}</content>
     </property>
     <property>
       <element>body</element>

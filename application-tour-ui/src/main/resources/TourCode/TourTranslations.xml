@@ -82,6 +82,7 @@ tour.steps=Steps
 tour.steps.new_step=New step
 tour.steps.add_step=Add step
 tour.steps.edit_step=Edit step
+tour.steps.save_step=Save
 tour.steps.delete_confirm=Are you sure you want to delete the step?
 tour.steps.delete_done=Delete step done!
 tour.steps.deleting=Deleting step...

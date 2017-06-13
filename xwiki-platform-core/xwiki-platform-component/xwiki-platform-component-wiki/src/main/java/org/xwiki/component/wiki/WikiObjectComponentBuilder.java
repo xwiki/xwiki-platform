@@ -37,7 +37,7 @@ public interface WikiObjectComponentBuilder
 {
     /**
      * Get the class that should trigger {@link #buildComponents(ObjectReference)} when one XObject implementing
-     * this very class is added, referenceupdated or deleted in the wiki. The returned reference should be local if the
+     * this very class is added, updated or deleted in the wiki. The returned reference should be local if the
      * builder is supposed to be used globally, or absolute if the builder is only used in a particular wiki.
      *
      * @return an {@link EntityReference} to the correct class.

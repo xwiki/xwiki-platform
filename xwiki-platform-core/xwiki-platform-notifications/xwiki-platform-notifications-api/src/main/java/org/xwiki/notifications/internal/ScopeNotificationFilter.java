@@ -49,7 +49,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 {
     private static final String ERROR = "Failed to filter the notifications.";
 
-    private static final String PREFIX_FORMAT = "scopeNotifFilter%d";
+    private static final String PREFIX_FORMAT = "scopeNotifFilter_%s";
 
     @Inject
     @Named("cached")
@@ -90,33 +90,34 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public String queryFilterOR(DocumentReference user, NotificationFormat format)
+    public String queryFilterOR(DocumentReference user, NotificationFormat format, String type)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
         String separator = "";
 
         try {
-            int count = 0;
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
+                if (!scope.getEventType().equals(type)) {
+                    continue;
+                }
                 stringBuilder.append(separator);
                 stringBuilder.append("(");
-                stringBuilder.append(String.format("event.type = '%s'", scope.getEventType()));
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, count++);
+                final String suffix = String.format(PREFIX_FORMAT, Integer.toHexString(type.hashCode()));
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
-                        stringBuilder.append(String.format(" AND event.wiki = :wiki_%s AND event.page = :page_%s",
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s AND event.page = :page_%s",
                                 suffix, suffix));
                         break;
                     case SPACE:
-                        stringBuilder.append(String.format(" AND event.wiki = :wiki_%s AND event.space LIKE :space_%s",
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s AND event.space LIKE :space_%s",
                                 suffix, suffix));
                         break;
                     case WIKI:
-                        stringBuilder.append(String.format(" AND event.wiki = :wiki_%s", suffix));
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s", suffix));
                         break;
                     default:
                         break;
@@ -133,7 +134,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public String queryFilterAND(DocumentReference user, NotificationFormat format)
+    public String queryFilterAND(DocumentReference user, NotificationFormat format, String type)
     {
         return null;
     }
@@ -144,11 +145,11 @@ public class ScopeNotificationFilter implements NotificationFilter
         Map<String, Object> params = new HashedMap();
 
         try {
-            int count = 0;
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, count++);
+                final String suffix = String.format(PREFIX_FORMAT,
+                        Integer.toHexString(scope.getEventType().hashCode()));
                 final String wikiParam = "wiki_%s";
 
                 switch (scope.getScopeReference().getType()) {

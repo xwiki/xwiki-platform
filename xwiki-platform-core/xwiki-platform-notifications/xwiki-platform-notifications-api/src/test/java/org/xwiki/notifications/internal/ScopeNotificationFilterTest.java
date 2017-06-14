@@ -126,19 +126,33 @@ public class ScopeNotificationFilterTest
         // Mocks
         createPreferenceScopeMocks();
 
-        // Test
-        String result = mocker.getComponentUnderTest().queryFilterOR(
-                new DocumentReference("xwiki", "XWiki", "User"), NotificationFormat.ALERT
-        );
-
         // Verify
         assertEquals(
-                "(event.type = 'event1' AND event.wiki = :wiki_scopeNotifFilter0)" +
-                " OR " +
-                "(event.type = 'event2' AND event.wiki = :wiki_scopeNotifFilter1 AND event.space LIKE :space_scopeNotifFilter1)" +
-                " OR " +
-                "(event.type = 'event3' AND event.wiki = :wiki_scopeNotifFilter2 AND event.page = :page_scopeNotifFilter2)" ,
-                result);
+                String.format("(event.wiki = :wiki_scopeNotifFilter_%s)",
+                    Integer.toHexString("event1".hashCode())),
+                mocker.getComponentUnderTest().queryFilterOR(
+                    new DocumentReference("xwiki", "XWiki", "User"),
+                    NotificationFormat.ALERT,
+                "event1"
+        ));
+
+        assertEquals(
+                String.format("(event.wiki = :wiki_scopeNotifFilter_%s AND event.space LIKE :space_scopeNotifFilter_%s)",
+                    Integer.toHexString("event2".hashCode()), Integer.toHexString("event2".hashCode())),
+                mocker.getComponentUnderTest().queryFilterOR(
+                    new DocumentReference("xwiki", "XWiki", "User"),
+                    NotificationFormat.ALERT,
+                "event2"
+        ));
+
+        assertEquals(
+                String.format("(event.wiki = :wiki_scopeNotifFilter_%s AND event.page = :page_scopeNotifFilter_%s)",
+                    Integer.toHexString("event3".hashCode()), Integer.toHexString("event3".hashCode())),
+                mocker.getComponentUnderTest().queryFilterOR(
+                    new DocumentReference("xwiki", "XWiki", "User"),
+                    NotificationFormat.ALERT,
+                "event3"
+        ));
     }
 
     private void createPreferenceScopeMocks() throws NotificationException
@@ -172,7 +186,8 @@ public class ScopeNotificationFilterTest
         assertNull(
                 mocker.getComponentUnderTest().queryFilterAND(
                         new DocumentReference("xwiki", "XWiki", "User"),
-                        NotificationFormat.ALERT
+                        NotificationFormat.ALERT,
+                        "type1"
                 )
         );
     }
@@ -193,11 +208,16 @@ public class ScopeNotificationFilterTest
         );
 
         // Verify
-        assertEquals("wiki1", results.get("wiki_scopeNotifFilter0"));
-        assertEquals("wiki2", results.get("wiki_scopeNotifFilter1"));
-        assertEquals("space2.", results.get("space_scopeNotifFilter1"));
-        assertEquals("wiki3", results.get("wiki_scopeNotifFilter2"));
-        assertEquals("space3.page3", results.get("page_scopeNotifFilter2"));
+        assertEquals("wiki1", results.get(
+                String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event1".hashCode()))));
+        assertEquals("wiki2", results.get(
+                String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
+        assertEquals("space2.", results.get(
+                String.format("space_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
+        assertEquals("wiki3", results.get(
+                String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event3".hashCode()))));
+        assertEquals("space3.page3", results.get(
+                String.format("page_scopeNotifFilter_%s", Integer.toHexString("event3".hashCode()))));
         assertEquals(5, results.size());
     }
 }

@@ -54,6 +54,10 @@ public class QueryGenerator
 {
     private static final String OR = " OR ";
 
+    private static final String LEFT_PARENTHESIS = "(";
+
+    private static final String RIGHT_PARENTHESIS = ")";
+
     @Inject
     private QueryManager queryManager;
 
@@ -102,7 +106,7 @@ public class QueryGenerator
         StringBuilder hql = new StringBuilder();
         hql.append("where event.date >= :startDate AND event.user <> :user AND (");
 
-        List<String> types = handleEventTypes(hql, preferences, format);
+        List<String> types = handleEventTypes(user, hql, preferences, format);
         List<String> apps  = handleApplications(hql, preferences, types, format);
 
         // No notification is returned if nothing is saved in the user settings
@@ -111,10 +115,7 @@ public class QueryGenerator
             return null;
         }
 
-        hql.append(")");
-
-        handleFiltersOR(user, hql, format);
-        handleFiltersAND(user, hql, format);
+        hql.append(RIGHT_PARENTHESIS);
 
         handleBlackList(blackList, hql);
         handleEndDate(endDate, hql);
@@ -141,14 +142,15 @@ public class QueryGenerator
         return query;
     }
 
-    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationFormat format)
+    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationFormat format,
+            String type)
             throws NotificationException
     {
         StringBuilder query = new StringBuilder();
         String separator = "";
 
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterOR(user, format);
+            String filterQuery = filter.queryFilterOR(user, format, type);
             if (StringUtils.isNotBlank(filterQuery)) {
                 query.append(separator);
                 query.append(filterQuery);
@@ -161,11 +163,11 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationFormat format)
+    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationFormat format, String type)
             throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterAND(user, format);
+            String filterQuery = filter.queryFilterAND(user, format, type);
             if (StringUtils.isNotBlank(filterQuery)) {
                 hql.append(" AND ");
                 hql.append(filterQuery);
@@ -250,8 +252,9 @@ public class QueryGenerator
 
     private void handleEventTypes(List<String> types, Query query)
     {
-        if (!types.isEmpty()) {
-            query.bindValue("types", types);
+        int number = 0;
+        for (String type : types) {
+            query.bindValue(String.format("type_%d", number++), type);
         }
     }
 
@@ -271,8 +274,8 @@ public class QueryGenerator
         return apps;
     }
 
-    private List<String> handleEventTypes(StringBuilder hql, List<NotificationPreference> preferences,
-            NotificationFormat format)
+    private List<String> handleEventTypes(DocumentReference user, StringBuilder hql,
+            List<NotificationPreference> preferences, NotificationFormat format) throws NotificationException
     {
         List<String> types = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
@@ -282,7 +285,18 @@ public class QueryGenerator
             }
         }
         if (!types.isEmpty()) {
-            hql.append("event.type IN (:types)");
+            hql.append(LEFT_PARENTHESIS);
+            String separator = "";
+            int number = 0;
+            for (String type : types) {
+                hql.append(separator);
+                hql.append(String.format("(event.type = :type_%d", number++));
+                handleFiltersOR(user, hql, format, type);
+                handleFiltersAND(user, hql, format, type);
+                hql.append(RIGHT_PARENTHESIS);
+                separator = OR;
+            }
+            hql.append(RIGHT_PARENTHESIS);
         }
         return types;
     }

@@ -52,9 +52,10 @@ public interface NotificationFilter
      *
      * @param user the user interested in the notifications
      * @param format format of the notification
+     * @param type event type to filter
      * @return the HQL code to inject
      */
-    String queryFilterOR(DocumentReference user, NotificationFormat format);
+    String queryFilterOR(DocumentReference user, NotificationFormat format, String type);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "AND" statement (can
@@ -62,9 +63,10 @@ public interface NotificationFilter
      *
      * @param user the user interested in the notifications
      * @param format format of the notification
+     * @param type event type to filter
      * @return the HQL code to inject
      */
-    String queryFilterAND(DocumentReference user, NotificationFormat format);
+    String queryFilterAND(DocumentReference user, NotificationFormat format, String type);
 
     /**
      * Parameters to add to the query using bindValue().

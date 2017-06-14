@@ -102,13 +102,13 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                "where event.date >= :startDate AND event.user <> :user AND (((event.type = :type_0)))" +
                         " AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
     }
 
@@ -126,13 +126,13 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                "where event.date >= :startDate AND event.user <> :user AND (((event.type = :type_0)))" +
                         " AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
     }
 
@@ -147,11 +147,11 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                "where event.date >= :startDate AND event.user <> :user AND (((event.type = :type_0)))" +
                         " AND event.hidden <> true " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
     }
 
@@ -168,13 +168,13 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                "where event.date >= :startDate AND event.user <> :user AND (((event.type = :type_0)))" +
                         " AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("endDate", untilDate);
     }
@@ -192,13 +192,13 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                "where event.date >= :startDate AND event.user <> :user AND (((event.type = :type_0)))" +
                         " AND event.id NOT IN (:blackList) AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("endDate", untilDate);
         verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
@@ -216,14 +216,14 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
+                "where event.date >= :startDate AND event.user <> :user AND (((event.type = :type_0)))" +
                         " AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true))" +
                         " AND event.wiki = :userWiki " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("userWiki", "xwiki");
     }
@@ -240,14 +240,14 @@ public class QueryGeneratorTest
                 Arrays.asList(notificationFilter1, notificationFilter2)
         );
 
-        when(notificationFilter1.queryFilterOR(any(DocumentReference.class), any(NotificationFormat.class)))
+        when(notificationFilter1.queryFilterOR(any(DocumentReference.class), any(NotificationFormat.class), anyString()))
                 .thenReturn("event.date = :someDate");
-        when(notificationFilter2.queryFilterOR(any(DocumentReference.class), any(NotificationFormat.class)))
+        when(notificationFilter2.queryFilterOR(any(DocumentReference.class), any(NotificationFormat.class), anyString()))
                 .thenReturn("event.eventType = :someVal");
 
-        when(notificationFilter1.queryFilterAND(any(DocumentReference.class), any(NotificationFormat.class)))
+        when(notificationFilter1.queryFilterAND(any(DocumentReference.class), any(NotificationFormat.class), anyString()))
                 .thenReturn("1=1");
-        when(notificationFilter2.queryFilterAND(any(DocumentReference.class), any(NotificationFormat.class)))
+        when(notificationFilter2.queryFilterAND(any(DocumentReference.class), any(NotificationFormat.class), anyString()))
                 .thenReturn("2=2");
 
 
@@ -268,15 +268,14 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.date >= :startDate AND event.user <> :user AND (event.type IN (:types))" +
-                        " AND (event.date = :someDate OR event.eventType = :someVal)" +
-                        " AND 1=1 AND 2=2" +
+                "where event.date >= :startDate AND event.user <> :user AND " +
+                        "(((event.type = :type_0 AND (event.date = :someDate OR event.eventType = :someVal) AND 1=1 AND 2=2)))" +
                         " AND event.id NOT IN (:blackList) AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        verify(query).bindValue(eq("types"), eq(Arrays.asList("create")));
+        verify(query).bindValue(eq("type_0"), eq("create"));
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("endDate", untilDate);
         verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));

@@ -44,6 +44,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.email.NotificationEmailRenderer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -150,8 +151,9 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
             try {
                 // TODO: in a next version, it will be import to paginate these results and to send several emails
                 // if there is too much content
-                this.currentEvents = notificationManager.getEvents(serializer.serialize(currentUser), false,
-                        Integer.MAX_VALUE / 4, null, lastTrigger, Collections.emptyList());
+                this.currentEvents = notificationManager.getEvents(serializer.serialize(currentUser),
+                        NotificationFormat.EMAIL, false, Integer.MAX_VALUE / 4, null,
+                        lastTrigger, Collections.emptyList());
             } catch (NotificationException e) {
                 logger.error(ERROR_MESSAGE, this.currentUser, e);
             }

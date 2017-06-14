@@ -113,8 +113,8 @@ public class QueryGenerator
 
         hql.append(")");
 
-        handleFiltersOR(user, hql);
-        handleFiltersAND(user, hql);
+        handleFiltersOR(user, hql, format);
+        handleFiltersAND(user, hql, format);
 
         handleBlackList(blackList, hql);
         handleEndDate(endDate, hql);
@@ -135,19 +135,20 @@ public class QueryGenerator
         handleEndDate(endDate, query);
         handleWiki(user, query);
 
-        handleFiltersParams(user, query);
+        handleFiltersParams(user, query, format);
 
         // Return the query
         return query;
     }
 
-    private void handleFiltersOR(DocumentReference user, StringBuilder hql) throws NotificationException
+    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationFormat format)
+            throws NotificationException
     {
         StringBuilder query = new StringBuilder();
         String separator = "";
 
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterOR(user);
+            String filterQuery = filter.queryFilterOR(user, format);
             if (StringUtils.isNotBlank(filterQuery)) {
                 query.append(separator);
                 query.append(filterQuery);
@@ -160,10 +161,11 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersAND(DocumentReference user, StringBuilder hql) throws NotificationException
+    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationFormat format)
+            throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterAND(user);
+            String filterQuery = filter.queryFilterAND(user, format);
             if (StringUtils.isNotBlank(filterQuery)) {
                 hql.append(" AND ");
                 hql.append(filterQuery);
@@ -171,10 +173,11 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersParams(DocumentReference user, Query query) throws NotificationException
+    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format)
+            throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<String, Object> params = filter.queryFilterParams(user);
+            Map<String, Object> params = filter.queryFilterParams(user, format);
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 query.bindValue(entry.getKey(), entry.getValue());
             }

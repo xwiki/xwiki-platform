@@ -109,7 +109,12 @@ public class NotificationEmailJob extends AbstractJob implements Job
 
     private Date getPreviousFireTime(BaseObjectReference emailJobObject)
     {
-        return (Date) getDocumentAccessBridge().getProperty(emailJobObject, LAST_FIRE_TIME);
+        Object previousFireTime = getDocumentAccessBridge().getProperty(emailJobObject, LAST_FIRE_TIME);
+        if (previousFireTime != null) {
+            return (Date) previousFireTime;
+        }
+
+        return new Date(0L);
     }
 
     private void setPreviousFireTime(BaseObjectReference emailJobObject) throws JobExecutionException

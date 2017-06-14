@@ -31,6 +31,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -76,47 +77,47 @@ public class ScopeNotificationFilterTest
         when(event1.getType()).thenReturn("event1");
         when(event1.getDocument()).thenReturn(
                 new DocumentReference("wiki1", "Main", "WebHome"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event1, user));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(event1, user, NotificationFormat.ALERT));
 
         Event event2 = mock(Event.class);
         when(event2.getType()).thenReturn("event1");
         when(event2.getDocument()).thenReturn(
                 new DocumentReference("someOtherWiki", "Main", "WebHome"));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event2, user));
+        assertTrue(mocker.getComponentUnderTest().filterEvent(event2, user, NotificationFormat.ALERT));
 
         Event event3 = mock(Event.class);
         when(event3.getType()).thenReturn("event2");
         when(event3.getDocument()).thenReturn(
                 new DocumentReference("wiki2", "space2", "WebHome"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event3, user));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(event3, user, NotificationFormat.ALERT));
 
         Event event3bis = mock(Event.class);
         when(event3bis.getType()).thenReturn("event2");
         when(event3bis.getDocument()).thenReturn(
                 new DocumentReference("wiki2", Arrays.asList("space2", "subspace"), "WebHome"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event3bis, user));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(event3bis, user, NotificationFormat.ALERT));
 
         Event event4 = mock(Event.class);
         when(event4.getType()).thenReturn("event2");
         when(event4.getDocument()).thenReturn(
                 new DocumentReference("wiki2", "otherSpace", "WebHome"));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event4, user));
+        assertTrue(mocker.getComponentUnderTest().filterEvent(event4, user, NotificationFormat.ALERT));
 
         Event event5 = mock(Event.class);
         when(event5.getType()).thenReturn("event3");
         when(event5.getDocument()).thenReturn(
                 new DocumentReference("wiki3", "space3", "page3"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event5, user));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(event5, user, NotificationFormat.ALERT));
 
         Event event6 = mock(Event.class);
         when(event6.getType()).thenReturn("event3");
         when(event6.getDocument()).thenReturn(
                 new DocumentReference("wiki3", "space3", "otherPage"));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event6, user));
+        assertTrue(mocker.getComponentUnderTest().filterEvent(event6, user, NotificationFormat.ALERT));
 
         Event event7 = mock(Event.class);
         when(event7.getType()).thenReturn("eventWeDontCare");
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event7, user));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(event7, user, NotificationFormat.ALERT));
     }
 
     @Test
@@ -127,7 +128,7 @@ public class ScopeNotificationFilterTest
 
         // Test
         String result = mocker.getComponentUnderTest().queryFilterOR(
-                new DocumentReference("xwiki", "XWiki", "User")
+                new DocumentReference("xwiki", "XWiki", "User"), NotificationFormat.ALERT
         );
 
         // Verify
@@ -160,8 +161,8 @@ public class ScopeNotificationFilterTest
         );
         when(scope3.getEventType()).thenReturn("event3");
 
-        when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class))).thenReturn(
-                Arrays.asList(scope1, scope2, scope3)
+        when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
+                any(NotificationFormat.class))).thenReturn(Arrays.asList(scope1, scope2, scope3)
         );
     }
 
@@ -170,7 +171,8 @@ public class ScopeNotificationFilterTest
     {
         assertNull(
                 mocker.getComponentUnderTest().queryFilterAND(
-                        new DocumentReference("xwiki", "XWiki", "User")
+                        new DocumentReference("xwiki", "XWiki", "User"),
+                        NotificationFormat.ALERT
                 )
         );
     }
@@ -186,7 +188,8 @@ public class ScopeNotificationFilterTest
 
         // Test
         Map<String, Object> results = mocker.getComponentUnderTest().queryFilterParams(
-                new DocumentReference("xwiki", "XWiki", "User")
+                new DocumentReference("xwiki", "XWiki", "User"),
+                NotificationFormat.ALERT
         );
 
         // Verify

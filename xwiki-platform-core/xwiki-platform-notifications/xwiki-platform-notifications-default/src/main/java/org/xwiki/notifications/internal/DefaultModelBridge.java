@@ -77,6 +77,8 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String START_DATE = "startDate";
 
+    private static final String FORMAT = "format";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -104,7 +106,7 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
-                        String objFormat = obj.getStringValue("format");
+                        String objFormat = obj.getStringValue(FORMAT);
                         preferences.add(new NotificationPreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
                                 obj.getStringValue("applicationId"),
@@ -175,8 +177,8 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference)
-            throws NotificationException
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
+            NotificationFormat format) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -191,7 +193,7 @@ public class DefaultModelBridge implements ModelBridge
             List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
-                    if (obj != null) {
+                    if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT), format)) {
                         String scopeType = obj.getStringValue("scope");
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
@@ -220,6 +222,11 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    private boolean isCompatibleFormat(String format, NotificationFormat expectedFormat)
+    {
+        return format != null && NotificationFormat.valueOf(format.toUpperCase()) == expectedFormat;
     }
 
     @Override

@@ -221,7 +221,7 @@ public class DefaultNotificationManager implements NotificationManager
                     continue;
                 }
 
-                if (filterEvent(event, parameters.userReference)) {
+                if (filterEvent(event, parameters.userReference, parameters.format)) {
                     continue;
                 }
 
@@ -245,10 +245,11 @@ public class DefaultNotificationManager implements NotificationManager
         }
     }
 
-    private boolean filterEvent(Event event, DocumentReference user) throws NotificationException
+    private boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+            throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            if (filter.filterEvent(event, user)) {
+            if (filter.filterEvent(event, user, format)) {
                 return true;
             }
         }

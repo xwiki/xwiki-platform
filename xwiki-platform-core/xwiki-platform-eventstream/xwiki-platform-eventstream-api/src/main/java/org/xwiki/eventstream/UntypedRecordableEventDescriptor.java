@@ -21,7 +21,6 @@ package org.xwiki.eventstream;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.5RC1
  */
-@Role
 @Unstable
 public interface UntypedRecordableEventDescriptor extends RecordableEventDescriptor
 {

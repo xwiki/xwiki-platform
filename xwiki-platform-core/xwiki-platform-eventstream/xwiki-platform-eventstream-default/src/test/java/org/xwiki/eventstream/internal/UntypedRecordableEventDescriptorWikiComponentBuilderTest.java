@@ -29,8 +29,11 @@ import org.junit.Test;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -61,6 +64,8 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilderTest
 
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    private AuthorizationManager authorizationManager;
+
     private DocumentReference event1;
     private DocumentReference event2;
     private DocumentReference event3;
@@ -71,6 +76,7 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilderTest
         queryManager = mocker.registerMockComponent(QueryManager.class);
         modelBridge = mocker.registerMockComponent(ModelBridge.class);
         documentReferenceResolver = mocker.registerMockComponent(DocumentReferenceResolver.class);
+        authorizationManager = mocker.registerMockComponent(AuthorizationManager.class);
 
         Query query = mock(Query.class);
         when(queryManager.createQuery(any(), any())).thenReturn(query);
@@ -99,12 +105,11 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilderTest
         XWikiDocument parentDocument = mock(XWikiDocument.class);
 
         when(baseObject.getOwnerDocument()).thenReturn(parentDocument);
-        when(this.modelBridge.getEventDescriptorProperties(any())).thenReturn(mock(Map.class));
-
-        List<WikiComponent> result = this.mocker.getComponentUnderTest().buildComponents(baseObject);
 
         // Ensure that the user rights are correctly checked
-        verify(this.modelBridge, times(1)).checkRights(any(), any());
+        when(this.authorizationManager.hasAccess(any(), any(), any())).thenReturn(true);
+
+        List<WikiComponent> result = this.mocker.getComponentUnderTest().buildComponents(baseObject);
 
         assertEquals(1, result.size());
     }

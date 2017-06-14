@@ -19,7 +19,6 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +30,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -52,48 +49,12 @@ public class DefaultModelBridge implements ModelBridge
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private AuthorizationManager authorizationManager;
-
-    @Inject
     private DocumentReferenceResolver documentReferenceResolver;
-
-    @Override
-    public Map<String, Object> getEventDescriptorProperties(BaseObject untypedEventObject)
-            throws EventStreamException
-    {
-        Map<String, Object> eventDescriptorProperties = new HashMap<>();
-        eventDescriptorProperties.put(UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION,
-                untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION));
-        eventDescriptorProperties.put(UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS,
-                untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS));
-        eventDescriptorProperties.put(UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE,
-                untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE));
-        eventDescriptorProperties.put(UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION,
-                untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION));
-        eventDescriptorProperties.put(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME,
-                untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME));
-        eventDescriptorProperties.put(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON,
-                untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON));
-        eventDescriptorProperties.put(UNTYPED_EVENT_EVENT_TYPE,
-                untypedEventObject.getStringValue(UNTYPED_EVENT_EVENT_TYPE));
-
-        return eventDescriptorProperties;
-    }
 
     @Override
     public DocumentReference getAuthorReference(EntityReference entityReference) throws EventStreamException
     {
         return this.findDocument(entityReference).getAuthorReference();
-    }
-
-    @Override
-    public void checkRights(EntityReference entityReference, DocumentReference authorReference)
-            throws EventStreamException
-    {
-        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, entityReference))
-        {
-            throw new EventStreamException("Registering Untyped Events requires wiki administration rights.");
-        }
     }
 
     @Override

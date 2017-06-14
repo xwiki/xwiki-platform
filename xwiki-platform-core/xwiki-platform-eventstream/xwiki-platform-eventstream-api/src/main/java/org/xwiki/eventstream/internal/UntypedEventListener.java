@@ -130,13 +130,14 @@ public class UntypedEventListener extends AbstractEventListener
     }
 
     /**
-     * Ensure that the given the source matches what the descriptor needs.
+     * Ensure that the given source matches what the descriptor needs.
      * If the source is an instance of XWikiDocument, will check if the document contains the XObject specified in
      * the descriptor.
      *
      * @param descriptor the event descriptor
      * @param source the event source
-     * @return
+     * @return true if the source contains one of the XObjects contained in the descriptor. If no XObject is specified
+     * in the descriptor, returns true
      */
     private boolean checkXObjectCondition(UntypedRecordableEventDescriptor descriptor, Object source)
     {

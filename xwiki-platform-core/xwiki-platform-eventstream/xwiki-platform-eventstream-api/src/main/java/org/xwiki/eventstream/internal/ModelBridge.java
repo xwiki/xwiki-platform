@@ -20,14 +20,11 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-
-import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * This is an internal role that allows requests to the model without having dependencies on xwiki-platform-oldcore.
@@ -74,16 +71,6 @@ public interface ModelBridge
     String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON = "applicationIcon";
 
     /**
-     * Get a map of every properties of the given XObject.
-     *
-     * @param untypedEventObject the XObject
-     * @return a map of the descriptor properties
-     * @throws EventStreamException if the descriptor could not be found or if the properties could not be extracted
-     */
-    Map<String, Object> getEventDescriptorProperties(BaseObject untypedEventObject)
-            throws EventStreamException;
-
-    /**
      * Get the author reference of the given entity.
      *
      * @param entityReference the document
@@ -91,16 +78,6 @@ public interface ModelBridge
      * @throws EventStreamException if the author reference could not be retrieved
      */
     DocumentReference getAuthorReference(EntityReference entityReference) throws EventStreamException;
-
-    /**
-     * Ensure that the given author has the administrative rights in the current context.
-     *
-     * @param entityReference the working entity
-     * @param authorReference the author that should have its rights checked
-     * @throws EventStreamException if the author rights are not sufficient
-     */
-    void checkRights(EntityReference entityReference, DocumentReference authorReference)
-            throws EventStreamException;
 
     /**
      * Check that the given source contains one of the XObject given in xObjectTypes. If the list of

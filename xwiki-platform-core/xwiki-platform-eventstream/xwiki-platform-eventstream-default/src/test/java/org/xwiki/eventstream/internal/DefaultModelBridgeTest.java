@@ -30,16 +30,13 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.sun.star.xforms.Model;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -78,40 +75,6 @@ public class DefaultModelBridgeTest
         this.documentReferenceResolver = this.mocker.registerMockComponent(DocumentReferenceResolver.class);
     }
 
-    /**
-     * Check that {@link DefaultModelBridge#getEventDescriptorProperties(BaseObject)} returns the correct map,
-     * with the correct values.
-     */
-    @Test
-    public void testEventDescriptorProperties() throws Exception
-    {
-        BaseObject baseObject = mock(BaseObject.class);
-
-        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION)).thenReturn("description");
-        when(baseObject.getListValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS))
-                .thenReturn(Arrays.asList("trigger1", "trigger2"));
-        when(baseObject.getListValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE))
-                .thenReturn(Arrays.asList("otype1", "otype2"));
-        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION))
-                .thenReturn("validationExpression");
-        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME)).thenReturn("appName");
-        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON)).thenReturn("appIcon");
-        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_EVENT_TYPE)).thenReturn("eventType");
-
-        Map<String, Object> result = this.mocker.getComponentUnderTest().getEventDescriptorProperties(baseObject);
-
-        assertEquals("description", result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION));
-        assertEquals(2,
-                ((List<String>) result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS)).size());
-        assertEquals(2,
-                ((List<String>) result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE)).size());
-        assertEquals("validationExpression",
-                result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION));
-        assertEquals("appName", result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME));
-        assertEquals("appIcon", result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON));
-        assertEquals("eventType", result.get(ModelBridge.UNTYPED_EVENT_EVENT_TYPE));
-    }
-
     @Test
     public void testAuthorReference() throws Exception
     {
@@ -129,28 +92,6 @@ public class DefaultModelBridgeTest
         DocumentReference result = this.mocker.getComponentUnderTest().getAuthorReference(entityReference);
 
         assertEquals(authorReference, result);
-    }
-
-    @Test
-    public void testCheckRightsWithCorrectRights() throws Exception
-    {
-        EntityReference entityReference = mock(EntityReference.class);
-        DocumentReference authorReference = mock(DocumentReference.class);
-
-        when(this.authorizationManager.hasAccess(Right.ADMIN, authorReference, entityReference)).thenReturn(true);
-
-        this.mocker.getComponentUnderTest().checkRights(entityReference, authorReference);
-    }
-
-    @Test(expected = EventStreamException.class)
-    public void testCheckRightsWithIncorrectRights() throws Exception
-    {
-        EntityReference entityReference = mock(EntityReference.class);
-        DocumentReference authorReference = mock(DocumentReference.class);
-
-        when(this.authorizationManager.hasAccess(Right.ADMIN, authorReference, entityReference)).thenReturn(false);
-
-        this.mocker.getComponentUnderTest().checkRights(entityReference, authorReference);
     }
 
     @Test

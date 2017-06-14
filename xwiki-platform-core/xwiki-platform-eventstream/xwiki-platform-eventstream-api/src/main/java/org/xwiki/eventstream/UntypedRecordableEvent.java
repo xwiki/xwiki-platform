@@ -19,7 +19,6 @@
  */
 package org.xwiki.eventstream;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 9.5RC1
  */
-@Role
 @Unstable
 public interface UntypedRecordableEvent extends RecordableEvent
 {
@@ -37,7 +35,6 @@ public interface UntypedRecordableEvent extends RecordableEvent
      * Get the event type (the hint) of the current event.
      *
      * @return the event type
-     * @since 9.5RC1s
      */
     String getEventType();
 }

@@ -26,18 +26,16 @@ import org.openqa.selenium.support.FindBy;
 /**
  * Represents a confirmation page that allows the user cancel or confirm the current action (e.g. delete a page, delete
  * a space, etc.).
- * 
+ *
  * @version $Id$
  * @since 4.0M2
  */
 public class ConfirmationPage extends ViewPage
 {
-    @FindBy(xpath = "//*[(contains(@class, 'btn') or contains(@class, 'button')) "
-            + "and (contains(@value, 'Yes') or contains(text(), 'Yes'))]")
+    @FindBy(xpath = "//*[(contains(@class, 'btn') or contains(@class, 'button')) and contains(@class, 'confirm')]")
     private WebElement yesButton;
 
-    @FindBy(xpath = "//*[(contains(@class, 'btn') or contains(@class, 'button')) "
-            + "and (contains(@value, 'No') or contains(text(), 'No'))]")
+    @FindBy(xpath = "//*[(contains(@class, 'btn') or contains(@class, 'button')) and contains(@class, 'cancel')]")
     private WebElement noButton;
 
     @FindBy(id = "affectChildren")

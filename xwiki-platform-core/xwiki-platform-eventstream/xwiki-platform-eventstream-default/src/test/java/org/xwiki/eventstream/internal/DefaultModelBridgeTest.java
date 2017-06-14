@@ -1,0 +1,188 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.eventstream.internal;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Provider;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.sun.star.xforms.Model;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for {@link DefaultModelBridge}.
+ *
+ * @version $Id$
+ * @since 9.5RC1
+ */
+public class DefaultModelBridgeTest
+{
+    @Rule
+    public final MockitoComponentMockingRule<ModelBridge> mocker =
+            new MockitoComponentMockingRule<>(DefaultModelBridge.class);
+
+    private Provider<XWikiContext> contextProvider;
+
+    private AuthorizationManager authorizationManager;
+
+    private DocumentReferenceResolver documentReferenceResolver;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        this.contextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+
+        this.authorizationManager = this.mocker.registerMockComponent(AuthorizationManager.class);
+
+        this.documentReferenceResolver = this.mocker.registerMockComponent(DocumentReferenceResolver.class);
+    }
+
+    /**
+     * Check that {@link DefaultModelBridge#getEventDescriptorProperties(BaseObject)} returns the correct map,
+     * with the correct values.
+     */
+    @Test
+    public void testEventDescriptorProperties() throws Exception
+    {
+        BaseObject baseObject = mock(BaseObject.class);
+
+        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION)).thenReturn("description");
+        when(baseObject.getListValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS))
+                .thenReturn(Arrays.asList("trigger1", "trigger2"));
+        when(baseObject.getListValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE))
+                .thenReturn(Arrays.asList("otype1", "otype2"));
+        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION))
+                .thenReturn("validationExpression");
+        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME)).thenReturn("appName");
+        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON)).thenReturn("appIcon");
+        when(baseObject.getStringValue(ModelBridge.UNTYPED_EVENT_EVENT_TYPE)).thenReturn("eventType");
+
+        Map<String, Object> result = this.mocker.getComponentUnderTest().getEventDescriptorProperties(baseObject);
+
+        assertEquals("description", result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION));
+        assertEquals(2,
+                ((List<String>) result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS)).size());
+        assertEquals(2,
+                ((List<String>) result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE)).size());
+        assertEquals("validationExpression",
+                result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION));
+        assertEquals("appName", result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME));
+        assertEquals("appIcon", result.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON));
+        assertEquals("eventType", result.get(ModelBridge.UNTYPED_EVENT_EVENT_TYPE));
+    }
+
+    @Test
+    public void testAuthorReference() throws Exception
+    {
+        XWikiContext context = mock(XWikiContext.class);
+        XWiki xwiki = mock(XWiki.class);
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference authorReference = mock(DocumentReference.class);
+        EntityReference entityReference = mock(EntityReference.class);
+
+        when(this.contextProvider.get()).thenReturn(context);
+        when(context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getDocument(entityReference, context)).thenReturn(document);
+        when(document.getAuthorReference()).thenReturn(authorReference);
+
+        DocumentReference result = this.mocker.getComponentUnderTest().getAuthorReference(entityReference);
+
+        assertEquals(authorReference, result);
+    }
+
+    @Test
+    public void testCheckRightsWithCorrectRights() throws Exception
+    {
+        EntityReference entityReference = mock(EntityReference.class);
+        DocumentReference authorReference = mock(DocumentReference.class);
+
+        when(this.authorizationManager.hasAccess(Right.ADMIN, authorReference, entityReference)).thenReturn(true);
+
+        this.mocker.getComponentUnderTest().checkRights(entityReference, authorReference);
+    }
+
+    @Test(expected = EventStreamException.class)
+    public void testCheckRightsWithIncorrectRights() throws Exception
+    {
+        EntityReference entityReference = mock(EntityReference.class);
+        DocumentReference authorReference = mock(DocumentReference.class);
+
+        when(this.authorizationManager.hasAccess(Right.ADMIN, authorReference, entityReference)).thenReturn(false);
+
+        this.mocker.getComponentUnderTest().checkRights(entityReference, authorReference);
+    }
+
+    @Test
+    public void testCheckXObjectPresenceWithEmptyList() throws Exception
+    {
+        Object object = new Object();
+        List<String> xObjectTypes = Collections.EMPTY_LIST;
+
+        assertTrue(this.mocker.getComponentUnderTest().checkXObjectPresence(xObjectTypes, object));
+    }
+
+    @Test
+    public void testCheckXObjectPresenceWithPresentXObject() throws Exception
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        List<String> xObjectTypes = Arrays.asList("type1");
+
+        DocumentReference documentReferenceFromDocumentXObjects = mock(DocumentReference.class);
+        Map<DocumentReference, List<BaseObject>> documentXObjects =
+                new HashMap<DocumentReference, List<BaseObject>>() {{
+                    put(documentReferenceFromDocumentXObjects, Collections.EMPTY_LIST);
+                }};
+
+        DocumentReference resolvedType1 = mock(DocumentReference.class);
+        LocalDocumentReference localDocumentReferenceType1 = mock(LocalDocumentReference.class);
+
+        when(resolvedType1.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
+        when(this.documentReferenceResolver.resolve("type1")).thenReturn(resolvedType1);
+        when(document.getXObjects()).thenReturn(documentXObjects);
+
+        when(documentReferenceFromDocumentXObjects.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
+
+        assertTrue(this.mocker.getComponentUnderTest().checkXObjectPresence(xObjectTypes, document));
+    }
+}

@@ -156,9 +156,9 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
         } catch (ComponentLookupException e) {
             /* As we test if a component is present in the component manager before fetching it, we shouldn't get any
              * exception at this point. */
-            this.logger.warn(String.format(
+            this.logger.error(String.format(
                     "Unable to find a WikiObjectComponentBuilder associated to the helper [%s]: %s",
-                    xClassReference, e.getMessage()));
+                    xClassReference, e));
             return null;
         }
     }

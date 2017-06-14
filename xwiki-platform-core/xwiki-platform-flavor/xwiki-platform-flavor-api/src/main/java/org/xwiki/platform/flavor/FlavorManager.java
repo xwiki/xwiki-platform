@@ -67,7 +67,7 @@ public interface FlavorManager
     ExtensionId getFlavorOfWiki(String wikiId);
 
     /**
-     * Get the flavor know that the distribution.
+     * Get the flavors know to be compatible with the distribution.
      * <p>
      * Each {@link ExtensionId} always contains the flavor id but version might be null.
      * 
@@ -75,6 +75,19 @@ public interface FlavorManager
      * @since 8.1M1
      */
     default Collection<ExtensionId> getKnownFlavors()
+    {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Get the flavors know to be incompatible with the distribution.
+     * <p>
+     * Each {@link ExtensionId} always contains the flavor id but version might be null.
+     * 
+     * @return the already known flavors
+     * @since 9.5RC1
+     */
+    default Collection<String> getKnownInvalidFlavors()
     {
         return Collections.emptyList();
     }

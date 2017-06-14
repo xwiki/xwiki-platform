@@ -22,6 +22,7 @@ package org.xwiki.platform.flavor.internal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,6 +34,7 @@ import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -100,17 +102,14 @@ public class DefaultFlavorManager implements FlavorManager
         return result;
     }
 
-    @Override
-    public Collection<ExtensionId> getKnownFlavors()
+    private Collection<ExtensionId> getFlavors(String property)
     {
         Collection<ExtensionId> flavors = new LinkedHashSet<>();
 
         // Get flavors from environment extension
-        CoreExtension extension = this.coreRepository.getEnvironmentExtension();
-        if (extension != null) {
-            String flavorsString = extension.getProperty("xwiki.extension.knownFlavors");
-            flavorsString = flavorsString.replaceAll("[\r\n]", "");
-            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, flavorsString));
+        List<String> ids = getEnvironmentPropertyList(property);
+        if (!ids.isEmpty()) {
+            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, ids));
         }
 
         // TODO: Get flavors from configuration
@@ -118,6 +117,42 @@ public class DefaultFlavorManager implements FlavorManager
         // Collections.<String>emptyList()));
 
         return flavors;
+    }
+
+    private List<String> getEnvironmentPropertyList(String property)
+    {
+        // Get flavors from environment extension
+        CoreExtension extension = this.coreRepository.getEnvironmentExtension();
+        if (extension != null) {
+            String listString = extension.getProperty(property);
+            return ExtensionUtils.importPropertyStringList(listString, true);
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<ExtensionId> getKnownFlavors()
+    {
+        Collection<ExtensionId> flavors = new LinkedHashSet<>();
+
+        // Get flavors from environment extension
+        List<String> ids = getEnvironmentPropertyList("xwiki.extension.knownFlavors");
+        if (!ids.isEmpty()) {
+            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, ids));
+        }
+
+        // TODO: Get flavors from configuration
+        // flavors.addAll(configurationSource.getProperty("extension.flavor.known",
+        // Collections.<String>emptyList()));
+
+        return flavors;
+    }
+
+    @Override
+    public Collection<String> getKnownInvalidFlavors()
+    {
+        return getEnvironmentPropertyList("xwiki.extension.knownInvalidFlavors");
     }
 
     @Override

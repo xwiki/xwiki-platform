@@ -136,6 +136,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     {
         // Get known flavors
         Collection<ExtensionId> knownFlavors = this.flavorManager.getKnownFlavors();
+        Collection<String> knownInvalidFlavors = this.flavorManager.getKnownInvalidFlavors();
 
         // Get remote flavors
         IterableResult<Extension> flavors = this.flavorManager.searchFlavors(new FlavorQuery());
@@ -143,7 +144,10 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
         this.progressManager.pushLevelProgress(knownFlavors.size() + flavors.getSize(), this);
 
         try {
+            // Remember which flavors already been (in)validated
             Set<String> doneFlavors = new HashSet<>();
+            // Add the know invalid flavors to the list of already done flavors
+            doneFlavors.addAll(knownInvalidFlavors);
 
             String namespace = getRequest().getNamespaces().iterator().next();
 
@@ -151,30 +155,8 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             for (ExtensionId flavorId : knownFlavors) {
                 this.progressManager.startStep(this);
 
-                if (flavorId.getVersion() != null) {
-                    try {
-                        // Get corresponding extension
-                        Extension flavor = this.extensionManager.resolveExtension(flavorId);
-
-                        // Filter allowed flavors on namespace
-                        if (this.namespaceResolver.isAllowed(flavor.getAllowedNamespaces(), namespace)) {
-                            // Directly add the flavor without trying to validate it first (99% of the time it's valid
-                            // or it
-                            // mean
-                            // the distribution was broken and you probably want to know about it)
-                            this.foundFlavors.add(flavor);
-                        }
-                    } catch (ResolveException e) {
-                        this.logger.debug("Failed to resolve extension [{}]", flavorId, e);
-                    }
-                } else {
-                    // Find a valid version of the flavor
-                    Extension flavor = findValidVersion(flavorId.getId(), namespace);
-
-                    if (flavor != null) {
-                        this.foundFlavors.add(flavor);
-                    }
-                }
+                // Validate and add the flavor
+                validateKnownFlavor(flavorId, namespace);
 
                 // Remember we took care of this flavor
                 doneFlavors.add(flavorId.getId());
@@ -198,6 +180,35 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             }
         } finally {
             this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void validateKnownFlavor(ExtensionId flavorId, String namespace)
+    {
+        if (flavorId.getVersion() != null) {
+            try {
+                // Get corresponding extension
+                Extension flavor = this.extensionManager.resolveExtension(flavorId);
+
+                // Filter allowed flavors on namespace
+                if (this.namespaceResolver.isAllowed(flavor.getAllowedNamespaces(), namespace)) {
+                    // Directly add the flavor without trying to validate it first (99% of the time it's
+                    // valid
+                    // or it
+                    // mean
+                    // the distribution was broken and you probably want to know about it)
+                    this.foundFlavors.add(flavor);
+                }
+            } catch (ResolveException e) {
+                this.logger.debug("Failed to resolve extension [{}]", flavorId, e);
+            }
+        } else {
+            // Find a valid version of the flavor
+            Extension flavor = findValidVersion(flavorId.getId(), namespace);
+
+            if (flavor != null) {
+                this.foundFlavors.add(flavor);
+            }
         }
     }
 

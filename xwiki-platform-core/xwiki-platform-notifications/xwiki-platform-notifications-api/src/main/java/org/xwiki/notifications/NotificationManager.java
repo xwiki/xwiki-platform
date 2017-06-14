@@ -87,6 +87,8 @@ public interface NotificationManager
      * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
+     *
+     * @since 9.5RC1
      */
     List<CompositeEvent> getEvents(String userId, NotificationFormat format, boolean onlyUnread, int expectedCount,
             Date untilDate, Date fromDate, List<String> blackList) throws NotificationException;

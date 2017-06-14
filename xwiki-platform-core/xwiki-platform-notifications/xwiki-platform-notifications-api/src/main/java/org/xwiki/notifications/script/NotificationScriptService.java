@@ -210,6 +210,7 @@ public class NotificationScriptService implements ScriptService
      * Get the status of the module.
      *
      * @return true if the notification module can send emails
+     * @since 9.5RC1
      */
     public boolean areEmailsEnabled()
     {

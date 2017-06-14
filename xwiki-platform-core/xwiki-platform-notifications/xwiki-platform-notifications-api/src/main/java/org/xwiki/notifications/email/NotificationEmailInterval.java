@@ -19,12 +19,15 @@
  */
 package org.xwiki.notifications.email;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Several intervals to get notified by emails.
  *
  * @version $Id$
  * @since 9.5RC1
  */
+@Unstable
 public enum NotificationEmailInterval
 {
     /**

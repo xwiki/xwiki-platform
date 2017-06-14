@@ -126,7 +126,7 @@ public class AllDocsTest extends AbstractXWikiTestCase
         getSelenium().typeKeys("doc.location", "renamed");
         waitForTextPresent("//span[@class='xwiki-livetable-pagination-content']", "1");
         clickLinkWithLocator("//tbody/tr/td/a[text()='delete']");
-        clickLinkWithLocator("//button[contains(text(), 'Yes')]");
+        clickLinkWithLocator("//button[contains(@class, 'confirm')]");
         assertTextPresent("The page has been deleted.");
         open("Main", "AllDocs");
         getSelenium().focus("doc.location");

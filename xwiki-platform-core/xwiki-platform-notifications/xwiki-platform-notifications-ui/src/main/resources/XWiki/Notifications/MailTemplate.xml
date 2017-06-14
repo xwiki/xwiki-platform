@@ -98,7 +98,7 @@
       </text>
     </class>
     <property>
-      <html>&lt;h1&gt;Events on the wiki:&lt;/h1&gt;
+      <html>&lt;h1&gt;$escapetool.xml($services.localization.render('notifications.email.title'))&lt;/h1&gt;
 
 #foreach ($event in $htmlEvents)
   #if ($velocityCount &gt; 1)
@@ -113,10 +113,10 @@
       <language>en</language>
     </property>
     <property>
-      <subject>$events.size() events on the wiki</subject>
+      <subject>$services.localization.render('notifications.email.subject', [$events.size()])</subject>
     </property>
     <property>
-      <text>Events on the wiki:
+      <text>$services.localization.render('notifications.email.title')
 
 #foreach ($event in $plainTextEvents)
   * $event

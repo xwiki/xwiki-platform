@@ -17,30 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.email;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.stability.Unstable;
 
 /**
- * Get the configuration options concerning the Notification module.
- * 
+ * Render a notification for email sendings.
+ *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
 @Role
 @Unstable
-public interface NotificationConfiguration
+public interface NotificationEmailRenderer
 {
     /**
-     * @return true if the notification module should be enabled
+     * @param compositeEvent the event to render
+     * @return the HTML rendered version of the event
+     * @throws NotificationException of error occurs
      */
-    boolean isEnabled();
+    String renderHTML(CompositeEvent compositeEvent) throws NotificationException;
 
     /**
-     * @return true if the notification module can send emails
-     * @since 9.5RC1
+     * @param compositeEvent the event to render
+     * @return the plain text rendered version of the event
+     * @throws NotificationException of error occurs
      */
-    boolean areEmailsEnabled();
+    String renderPlainText(CompositeEvent compositeEvent) throws NotificationException;
 
+    /**
+     * @param compositeEvent the event to render
+     * @return the plain text subject for the email
+     * @throws NotificationException of error occurs
+     */
+    String generateEmailSubject(CompositeEvent compositeEvent) throws NotificationException;
 }

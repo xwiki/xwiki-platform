@@ -48,12 +48,17 @@
 (% class="profile-section highlighted-profile-section" %)
 (((
 ==$services.localization.render('notifications.settings.title')==
-{{html wiki="true"}}
+{{html}}
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th style="width: 250px;"&gt;&lt;/th&gt;
       &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.menu'))&lt;/th&gt;
+      #set ($colsCount = 2)
+      #if ($services.notification.areEmailsEnabled())
+        &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.email'))&lt;/th&gt;
+        #set ($colsCount = 3)
+      #end
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
@@ -72,28 +77,34 @@
       #if ($lastApp != $type.applicationName)
         #set ($lastApp = $type.applicationName)
         &lt;tr&gt;
-          &lt;th colspan="2"&gt;
+          &lt;th colspan="$colsCount"&gt;
             $type.applicationIcon $escapetool.xml($type.applicationName)
           &lt;/th&gt;
         &lt;/tr&gt;
       #end
-      #set ($checked = '')
-      #set ($preference = $doc.getObject('XWiki.Notifications.Code.NotificationPreferenceClass', 'eventType', $type.eventType))
-      #if ("$!preference" != '' &amp;&amp; $preference.getValue('notificationEnabled') == 1)
-        #set ($checked = 'checked="checked"')
-      #end
-      &lt;tr data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-objnumber="$!preference.number"&gt;
+      &lt;tr&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
-        &lt;td class="notificationTypeCell loading"&gt;
-          &lt;div class="hidden"&gt;
-            &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
-            #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
-              #displayScopeLivetable($type.eventType, $type.filter)
-            #elseif($type.filter == 'CUSTOM_FILTER')
-              ## TODO: handle UIX from other wikis
-              $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
-            #end
-          &lt;/div&gt;
+        #displayPreference($type, 'alert')
+        #if ($services.notification.areEmailsEnabled())
+          #displayPreference($type, 'email')
+        #end
+      &lt;/tr&gt;
+    #end
+    #if ($services.notification.areEmailsEnabled())
+      &lt;tr&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;
+          #set ($interval = 'daily')
+          #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+          #if ("$!objInterval" != '')
+            #set ($interval = $objInterval.getValue('interval'))
+          #end
+          &lt;select class="notificationEmailInterval"&gt;
+            &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
+            &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
+            &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
+          &lt;/select&gt;
         &lt;/td&gt;
       &lt;/tr&gt;
     #end
@@ -101,37 +112,89 @@
 &lt;/table&gt;
 {{/html}}
 )))
-#macro(displayScopeLivetable $eventType $filterType)
-  #set ($count = 0)
-  #foreach ($obj in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
-    #if ($obj.getValue('eventType') == $eventType)
-      #set ($count = $count + 1)
+#**
+ * Display a preference button for an event type and a given format
+ *#
+#macro(displayPreference $type $format)
+  #set ($checked = '')
+  #foreach ($pref in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceClass'))
+    #if (($pref.getValue('format') == $format || ($format == 'alert' &amp;&amp; "$!pref.getValue('format')" == '')) &amp;&amp; $pref.getValue('notificationEnabled') == 1 &amp;&amp; $pref.getValue('eventType') == $type.eventType)
+      #set ($checked = 'checked="checked"')
     #end
   #end
-  #set ($showTerminalDocuments = ($filterType == 'WIKI_SPACE_AND_DOCUMENT_FILTER'))
-  &lt;p&gt;&lt;a href="#collapse-$eventType" data-toggle="collapse"&gt;$services.localization.render('notifications.settings.filters', ["&lt;span class='notificationPreferenceScopeCount'&gt;$count&lt;/span&gt;"])&lt;/a&gt;&lt;/p&gt;
-  &lt;div class="notificationPreferenceScopeContainer collapse" id="collapse-$eventType" data-eventtype="$escapetool.xml($eventType)" data-filter="${filterType}"&gt;
-    #set($collist  = ['scope', 'location', '_actions'])
-    #set($colprops = {
-      'scope':          { 'sortable': false, 'html': true},
-      'location':       { 'sortable': false, 'html': true },
-      '_actions':       { 'sortable': false, 'actions': ['delete']}
-    })
-    #set($options  = {
-      'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceScopeLivetableResults',
-      'rowCount'          : 10,
-      'description'       : 'This table lists all watched elements.',
-      'translationPrefix' : 'notifications.preferences.scope.table.',
-      'extraParams'       : "eventType=${eventType}&amp;user=${services.model.serialize($doc.documentReference, 'default')}"
-    })
-    #livetable("notificationPreferenceScopeContainer-$eventType" $collist $colprops $options)
-    &lt;p&gt;&lt;button class="btn btn-primary btn-addfilter"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/button&gt;&lt;/p&gt;
+  &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-format="$format" data-objnumber="$!preference.number" data-filter="${type.filter}"&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
+      #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
+        #displayScopeLivetable($type.eventType, $type.filter, $format)
+      #elseif($type.filter == 'CUSTOM_FILTER')
+        ## TODO: handle UIX from other wikis
+        $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
+      #end
+    &lt;/div&gt;
+  &lt;/td&gt;
+#end
+#**
+ * Add a button to see the scope livetable in a modal box
+ *#
+#macro(displayScopeLivetable $eventType $filterType $format)
+  &lt;div class="notificationPreferenceScopeContainer"&gt;
+    #set ($count = 0)
+    #foreach ($obj in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
+      #set ($objFormat = $obj.getValue('format'))
+      #if ("$!objFormat" == '')
+        #set ($objFormat = 'alert')
+      #end
+      #if ($obj.getValue('eventType') == $eventType &amp;&amp; $format == $objFormat)
+        #set ($count = $count + 1)
+      #end
+    #end
+    #set ($showTerminalDocuments = ($filterType == 'WIKI_SPACE_AND_DOCUMENT_FILTER'))
+    &lt;p&gt;
+      &lt;button class="btn btn-xs btn-default" data-target="#modal-${eventType}-${format}" data-toggle="modal"&gt;
+        $services.localization.render('notifications.settings.filters', ["&lt;span class='notificationPreferenceScopeCount'&gt;$count&lt;/span&gt;"])
+      &lt;/button&gt;
+    &lt;/p&gt;
+    &lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-${eventType}-${format}"&gt;
+      &lt;div class="modal-dialog" role="document"&gt;
+        &lt;div class="modal-content"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+            &lt;h4 class="modal-title"&gt;Filters&lt;/h4&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body"&gt;
+            #set($collist  = ['scope', 'location', '_actions'])
+            #set($colprops = {
+              'scope':          { 'sortable': false, 'html': true},
+              'location':       { 'sortable': false, 'html': true },
+              '_actions':       { 'sortable': false, 'actions': ['delete']}
+            })
+            #set($options  = {
+              'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceScopeLivetableResults',
+              'rowCount'          : 10,
+              'description'       : 'This table lists all watched elements.',
+              'translationPrefix' : 'notifications.preferences.scope.table.',
+              'extraParams'       : "eventType=${eventType}&amp;format=${format}&amp;user=${services.model.serialize($doc.documentReference, 'default')}",
+              'outputOnlyHtml'    : true
+            })
+            #livetable("notificationPreferenceScopeContainer-${eventType}-${format}" $collist $colprops $options)
+            &lt;p&gt;&lt;button class="btn btn-primary btn-addfilter"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/button&gt;&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-footer"&gt;
+            &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+      &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+    &lt;/div&gt;&lt;!-- /.modal --&gt;
     ## TODO: handle properly the "WIKI" filter with a wiki picker instead
     ## TODO: add an option so the user can select a page without its children
-    #documentPickerModal({
-      'wiki': true,
-      'showTerminalDocuments': $showTerminalDocuments
-    })
+    ## Note: we put the picker modal here to avoid having a modal in a modal (nested modals ;))
+    &lt;div class="documentPickerModal"&gt;
+      #documentPickerModal({
+        'wiki': true,
+        'showTerminalDocuments': $showTerminalDocuments
+      })
+    &lt;/div&gt;
   &lt;/div&gt;
 #end
 {{/velocity}}
@@ -248,7 +311,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
   $('.notificationTypeCheckbox').each(function () {
     var checkBox = $(this);
     if (!checkBox.attr('checked')) {
-      enableDOMElements(checkBox.parents('td').find('.notificationPreferenceScopeContainer'), false);
+      enableDOMElements(checkBox.parents('td').find('button'), false);
     }
   });
 
@@ -268,12 +331,13 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
   $('.notificationTypeCheckbox').on('switchChange.bootstrapSwitch', function (event, state) {
     // Getting info
     var input        = $(this);
-    var tr           = input.parents('tr');
-    var eventType    = tr.attr('data-eventtype');
-    var objNumber    = tr.attr('data-objnumber');
+    var td           = input.parents('td.notificationTypeCell');
+    var eventType    = td.attr('data-eventtype');
+    var objNumber    = td.attr('data-objnumber');
+    var format       = td.attr('data-format');
 
     // Change the state of the filter container
-    enableDOMElements(input.parents('td').find('.notificationPreferenceScopeContainer'), state);
+    enableDOMElements(td.find('button'), state);
 
     // Saving
     var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
@@ -283,9 +347,10 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
       $.post(restURL, {
         'className': 'XWiki.Notifications.Code.NotificationPreferenceClass',
         'property#eventType': eventType,
+        'property#format': format,
         'property#notificationEnabled': 1
       }).done(function (data) {
-        tr.attr('data-objnumber', data.number);
+        td.attr('data-objnumber', data.number);
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
       }).fail(function () {
@@ -332,6 +397,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
         });
       }
     });
+    // Avoid conflict between bootstrap and XWiki modals
+    $('.xdialog-modal-container').css('z-index', 100000);
   };
   $(document).on('xwiki:livetable:newrow', function (event, data) {
     $(data.row).find('a.actiondelete').click(handleFilterLivetableDelete);
@@ -342,28 +409,29 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
    * Make the location picker effective
    */
   $('.notificationPreferenceScopeContainer').each(function() {
-    var scope = $(this);
-    var modal = scope.find('.modal');
+    var scope       = $(this);
+    var cell        = scope.parents('.notificationTypeCell');
+    var pickerModal = scope.find('.documentPickerModal &gt; .modal');
     // Open the location picker
     scope.find('.btn-addfilter').click(function(event) {
-      modal.modal('show');
-      scope.find('.location-tree').xtree();
-      modal.find('.modal-footer button.btn-primary').each(function() {
+      pickerModal.modal('show');
+      pickerModal.find('.location-tree').xtree();
+      pickerModal.find('.modal-footer button.btn-primary').each(function() {
         $(this).prop('disabled', 'disabled');
       });
     });
     // Enable the "select" button when a selection is made on the tree.
-    scope.find('.location-tree').on('changed.jstree', function(e, data) {
+    pickerModal.find('.location-tree').on('changed.jstree', function(e, data) {
       if (data.selected.length &gt; 0) {
-        modal.find('.modal-footer button.btn-primary').prop('disabled', '');
+        pickerModal.find('.modal-footer button.btn-primary').prop('disabled', '');
       }
     });
     // Callback called when the "select" button is clicked
-    modal.find('.modal-footer button.btn-primary').click(function() {
-      modal.modal('hide');
-      var tree = $.jstree.reference(scope.find('.location-tree'));
+    pickerModal.find('.modal-footer button.btn-primary').click(function() {
+      pickerModal.modal('hide');
+      var tree = $.jstree.reference(pickerModal.find('.location-tree'));
       var nodes = tree.get_selected(true);
-      var filterType = scope.attr('data-filter');
+      var filterType = cell.attr('data-filter');
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
         var scopeType = 'pageOnly';
@@ -383,16 +451,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
         var restURL = xm.restURL + '/objects?media=json';
         $.post(restURL, {
           'className': 'XWiki.Notifications.Code.NotificationPreferenceScopeClass',
-          'property#eventType': scope.attr('data-eventtype'),
+          'property#eventType': cell.attr('data-eventtype'),
           'property#scopeReference': node.data.id,
-          'property#scope': scopeType
+          'property#scope': scopeType,
+          'property#format': cell.attr('data-format')
         }).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
           // Reload the livetable
           window['livetable_' + scope.find('.xwiki-livetable').attr('id')].refresh();
           // Update the filter count
-          var filter = scope.parent().find('.notificationPreferenceScopeCount');
+          var filter = scope.find('.notificationPreferenceScopeCount');
           var filterValue = parseInt(filter.text());
           filter.text(filterValue + 1);
         }).fail(function () {
@@ -400,6 +469,21 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
       }
+    });
+  });
+
+  /**
+   * Handle the notification email interval
+   */
+  $('.notificationEmailInterval').change(function () {
+    var intervalSelect = $(this);
+    var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    $.post(serviceURL, {
+      'interval': intervalSelect.val()
+    }).done(function (data) {
+      notification.hide();
+      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
     });
   });
 

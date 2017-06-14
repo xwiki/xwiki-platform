@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 
 /**
  * Notification filter that handle the generic {@link NotificationPreferenceScope}.
@@ -62,7 +63,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     private Logger logger;
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user)
+    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
         // Indicate if a restriction exist concerning this type of event
         boolean hasRestriction = false;
@@ -70,7 +71,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         boolean matchRestriction = false;
 
         try {
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
                 if (scope.getEventType().equals(event.getType())) {
                     hasRestriction = true;
 
@@ -89,7 +90,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public String queryFilterOR(DocumentReference user)
+    public String queryFilterOR(DocumentReference user, NotificationFormat format)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -97,7 +98,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 
         try {
             int count = 0;
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
                 stringBuilder.append(separator);
                 stringBuilder.append("(");
                 stringBuilder.append(String.format("event.type = '%s'", scope.getEventType()));
@@ -132,19 +133,19 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public String queryFilterAND(DocumentReference user)
+    public String queryFilterAND(DocumentReference user, NotificationFormat format)
     {
         return null;
     }
 
     @Override
-    public Map<String, Object> queryFilterParams(DocumentReference user)
+    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
     {
         Map<String, Object> params = new HashedMap();
 
         try {
             int count = 0;
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
 
                 // Create a suffix to make sure our parameter has a unique name
                 final String suffix = String.format(PREFIX_FORMAT, count++);

@@ -17,30 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.email;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Get the configuration options concerning the Notification module.
- * 
+ * Several intervals to get notified by emails.
+ *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
-@Role
 @Unstable
-public interface NotificationConfiguration
+public enum NotificationEmailInterval
 {
     /**
-     * @return true if the notification module should be enabled
+     * Receive a mail every hour (if needed).
      */
-    boolean isEnabled();
+    HOURLY,
 
     /**
-     * @return true if the notification module can send emails
-     * @since 9.5RC1
+     * Receive a mail every day (if needed).
      */
-    boolean areEmailsEnabled();
+    DAILY,
 
+    /**
+     * Receive a mail every week (if needed).
+     */
+    WEEKLY
 }

@@ -31,6 +31,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -96,7 +97,8 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, null, null);
+                NotificationFormat.ALERT,
+                true, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -119,7 +121,8 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, null, null);
+                NotificationFormat.ALERT,
+                true, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -139,7 +142,8 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                false, null, null);
+                NotificationFormat.ALERT,
+                false, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -159,7 +163,8 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, untilDate, Collections.emptyList());
+                NotificationFormat.ALERT,
+                true, untilDate, null, Collections.emptyList());
 
         // Verify
         verify(queryManager).createQuery(
@@ -182,7 +187,8 @@ public class QueryGeneratorTest
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, untilDate, Arrays.asList("event1", "event2"));
+                NotificationFormat.ALERT,
+                true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
         verify(queryManager).createQuery(
@@ -205,7 +211,8 @@ public class QueryGeneratorTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, null, null);
+                NotificationFormat.ALERT,
+                true, null, null, null);
 
         // Verify
         verify(queryManager).createQuery(
@@ -233,24 +240,31 @@ public class QueryGeneratorTest
                 Arrays.asList(notificationFilter1, notificationFilter2)
         );
 
-        when(notificationFilter1.queryFilterOR(any(DocumentReference.class))).thenReturn("event.date = :someDate");
-        when(notificationFilter2.queryFilterOR(any(DocumentReference.class))).thenReturn("event.eventType = :someVal");
+        when(notificationFilter1.queryFilterOR(any(DocumentReference.class), any(NotificationFormat.class)))
+                .thenReturn("event.date = :someDate");
+        when(notificationFilter2.queryFilterOR(any(DocumentReference.class), any(NotificationFormat.class)))
+                .thenReturn("event.eventType = :someVal");
 
-        when(notificationFilter1.queryFilterAND(any(DocumentReference.class))).thenReturn("1=1");
-        when(notificationFilter2.queryFilterAND(any(DocumentReference.class))).thenReturn("2=2");
+        when(notificationFilter1.queryFilterAND(any(DocumentReference.class), any(NotificationFormat.class)))
+                .thenReturn("1=1");
+        when(notificationFilter2.queryFilterAND(any(DocumentReference.class), any(NotificationFormat.class)))
+                .thenReturn("2=2");
 
 
-        when(notificationFilter1.queryFilterParams(any(DocumentReference.class))).thenReturn(new HashedMap() {{
+        when(notificationFilter1.queryFilterParams(any(DocumentReference.class), any(NotificationFormat.class)))
+                .thenReturn(new HashedMap() {{
             put("someDate", "someValue1");
         }});
-        when(notificationFilter2.queryFilterParams(any(DocumentReference.class))).thenReturn(new HashedMap() {{
+        when(notificationFilter2.queryFilterParams(any(DocumentReference.class), any(NotificationFormat.class)))
+                .thenReturn(new HashedMap() {{
             put("someVal", "someValue2");
         }});
 
         // Test
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
-                true, untilDate, Arrays.asList("event1", "event2"));
+                NotificationFormat.ALERT,
+                true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
         verify(queryManager).createQuery(

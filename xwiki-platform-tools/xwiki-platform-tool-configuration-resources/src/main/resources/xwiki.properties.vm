@@ -802,4 +802,10 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.enabled = true
 
+#-# [Since 9.5C1]
+#-# Indicates if the notifications module can send emails.
+#-#
+#-# The default is :
+# notifications.emails.enabled = true
+
 $!xwikiPropertiesAdditionalProperties

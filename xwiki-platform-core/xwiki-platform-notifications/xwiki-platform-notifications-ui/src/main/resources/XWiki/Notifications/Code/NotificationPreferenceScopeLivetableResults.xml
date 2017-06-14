@@ -49,7 +49,11 @@
   #set ($restBaseURL = $services.rest.url($document.documentReference))
   #set ($elements = [])
   #foreach ($obj in $document.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
-    #if ($obj.getValue('eventType') == "$!request.eventType")
+    #set ($format = $obj.getValue('format'))
+    #if ("$!format" == '')
+      #set ($format = 'alert')
+    #end
+    #if ($obj.getValue('eventType') == "$!request.eventType" &amp;&amp; $format == "$!request.format")
       #if ($obj.getValue('scope') == 'pageOnly')
         #set ($reference = $services.model.resolveDocument($obj.getValue('scopeReference')))
       #elseif ($obj.getValue('scope') == 'pageAndChildren')

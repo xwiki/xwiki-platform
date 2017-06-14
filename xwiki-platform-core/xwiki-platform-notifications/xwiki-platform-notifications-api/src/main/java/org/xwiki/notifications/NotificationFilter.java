@@ -41,33 +41,37 @@ public interface NotificationFilter
      *
      * @param event an event
      * @param user the user interested in the notification
+     * @param format format of the notification
      * @return true if the event should be dismiss
      */
-    boolean filterEvent(Event event, DocumentReference user);
+    boolean filterEvent(Event event, DocumentReference user, NotificationFormat format);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "OR" statement (cannot
      * dismiss everything).
      *
      * @param user the user interested in the notifications
+     * @param format format of the notification
      * @return the HQL code to inject
      */
-    String queryFilterOR(DocumentReference user);
+    String queryFilterOR(DocumentReference user, NotificationFormat format);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "AND" statement (can
      * dismiss everything).
      *
      * @param user the user interested in the notifications
+     * @param format format of the notification
      * @return the HQL code to inject
      */
-    String queryFilterAND(DocumentReference user);
+    String queryFilterAND(DocumentReference user, NotificationFormat format);
 
     /**
      * Parameters to add to the query using bindValue().
      *
      * @param user the user interested in the notifications
+     * @param format format of the notification
      * @return the values to bind to the query, mapped by value's name
      */
-    Map<String, Object> queryFilterParams(DocumentReference user);
+    Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format);
 }

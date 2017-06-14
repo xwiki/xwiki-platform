@@ -19,28 +19,24 @@
  */
 package org.xwiki.notifications;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Get the configuration options concerning the Notification module.
- * 
+ * The different formats for notifications.
+ *
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.5RC1
  */
-@Role
 @Unstable
-public interface NotificationConfiguration
+public enum NotificationFormat
 {
     /**
-     * @return true if the notification module should be enabled
+     * Notification displayed in the UI (as an "alert").
      */
-    boolean isEnabled();
+    ALERT,
 
     /**
-     * @return true if the notification module can send emails
-     * @since 9.5RC1
+     * Notification sent by email.
      */
-    boolean areEmailsEnabled();
-
+    EMAIL
 }

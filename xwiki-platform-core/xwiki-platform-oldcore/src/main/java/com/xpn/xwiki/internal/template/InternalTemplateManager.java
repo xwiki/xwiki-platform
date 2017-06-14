@@ -340,11 +340,6 @@ public class InternalTemplateManager
                 // Should never happen
                 InternalTemplateManager.this.logger.error("Failed to populate properties of template", e);
             }
-
-            // The default is xhtml to support old templates
-            if (this.rawSyntax == null && this.sourceSyntax == null) {
-                this.rawSyntax = Syntax.XHTML_1_0;
-            }
         }
 
         @Override
@@ -562,7 +557,8 @@ public class InternalTemplateManager
             xdom = this.parser.parse(content.getContent(), content.getSourceSyntax());
         } else {
             String result = evaluateContent(template, content);
-            xdom = new XDOM(Arrays.asList(new RawBlock(result, content.getRawSyntax())));
+            xdom = new XDOM(Arrays.asList(new RawBlock(result,
+                    content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
         }
 
         return xdom;

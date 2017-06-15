@@ -21,7 +21,6 @@ package org.xwiki.eventstream.internal;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
@@ -29,6 +28,8 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * This is the default implementation of {@link UntypedRecordableEventDescriptor}.
@@ -38,6 +39,41 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordableEventDescriptor, WikiComponent
 {
+    /**
+     * The event type field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_EVENT_TYPE = "eventType";
+
+    /**
+     * The event descriptor description field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION = "eventDescription";
+
+    /**
+     * The event descriptor validation expression field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION = "validationExpression";
+
+    /**
+     * The event descriptor triggers field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS = "listenTo";
+
+    /**
+     * The event descriptor object type field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE = "objectType";
+
+    /**
+     * The event descriptor application name field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME = "applicationName";
+
+    /**
+     * The event descriptor application icon field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON = "applicationIcon";
+
     private String eventType;
 
     private String validationExpression;
@@ -57,25 +93,36 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     private DocumentReference authorReference;
 
     DefaultUntypedRecordableEventDescriptor(EntityReference reference, DocumentReference authorReference,
-            Map<String, Object> parameters) throws EventStreamException
+            BaseObject baseObject) throws EventStreamException
+    {
+        this.entityReference = reference;
+        this.authorReference = authorReference;
+        this.setProperties(baseObject);
+
+    }
+
+    /**
+     * Set the object attributes by extracting their values from the given BaseObject.
+     *
+     * @param untypedEventObject the XObject that should contain the desired values
+     * @throws EventStreamException if the properties could not be extracted
+     */
+    private void setProperties(BaseObject untypedEventObject)
+            throws EventStreamException
     {
         try {
-            this.entityReference = reference;
-            this.authorReference = authorReference;
-
-            // Cast options into private attributes
-            this.eventType = (String) parameters.get(ModelBridge.UNTYPED_EVENT_EVENT_TYPE);
+            this.eventType = untypedEventObject.getStringValue(UNTYPED_EVENT_EVENT_TYPE);
             this.validationExpression =
-                    (String) parameters.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION);
-            this.objectTypes = (List<String>) parameters.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE);
-            this.eventDescription = (String) parameters.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION);
-            this.eventTriggers = (List<String>) parameters.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS);
-            this.applicationName = (String) parameters.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME);
-            this.applicationIcon = (String) parameters.get(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON);
+                    untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION);
+            this.objectTypes = untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE);
+            this.eventDescription = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION);
+            this.eventTriggers = untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS);
+            this.applicationName = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME);
+            this.applicationIcon = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON);
         } catch (Exception e) {
             throw new EventStreamException(
-                    String.format("Unable to instanciate a DefaultUntypedRecordableEventDescriptor using [%s].",
-                            reference), e);
+                    String.format("Unable to extract the parameters of the [%s] EventClass.",
+                            untypedEventObject), e);
         }
     }
 

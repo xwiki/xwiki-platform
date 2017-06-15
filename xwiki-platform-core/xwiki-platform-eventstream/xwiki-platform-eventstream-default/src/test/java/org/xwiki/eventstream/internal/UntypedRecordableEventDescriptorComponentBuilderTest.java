@@ -21,7 +21,6 @@ package org.xwiki.eventstream.internal;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,11 +28,9 @@ import org.junit.Test;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -42,21 +39,20 @@ import com.xpn.xwiki.objects.BaseObject;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link UntypedRecordableEventDescriptorWikiComponentBuilder}.
+ * Unit tests for {@link UntypedRecordableEventDescriptorComponentBuilder}.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-public class UntypedRecordableEventDescriptorWikiComponentBuilderTest
+public class UntypedRecordableEventDescriptorComponentBuilderTest
 {
     @Rule
-    public final MockitoComponentMockingRule<UntypedRecordableEventDescriptorWikiComponentBuilder> mocker =
-            new MockitoComponentMockingRule<>(UntypedRecordableEventDescriptorWikiComponentBuilder.class);
+    public final MockitoComponentMockingRule<UntypedRecordableEventDescriptorComponentBuilder> mocker =
+            new MockitoComponentMockingRule<>(UntypedRecordableEventDescriptorComponentBuilder.class);
 
     private ModelBridge modelBridge;
 
@@ -94,7 +90,7 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilderTest
     @Test
     public void testClassReference() throws Exception
     {
-        assertEquals(UntypedRecordableEventDescriptorWikiComponentBuilder.BOUNDED_XOBJECT_CLASS,
+        assertEquals(UntypedRecordableEventDescriptorComponentBuilder.BOUNDED_XOBJECT_CLASS,
                 this.mocker.getComponentUnderTest().getClassReference().getName());
     }
 
@@ -103,8 +99,10 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilderTest
     {
         BaseObject baseObject = mock(BaseObject.class);
         XWikiDocument parentDocument = mock(XWikiDocument.class);
+        DocumentReference documentReference = mock(DocumentReference.class);
 
         when(baseObject.getOwnerDocument()).thenReturn(parentDocument);
+        when(parentDocument.getDocumentReference()).thenReturn(documentReference);
 
         // Ensure that the user rights are correctly checked
         when(this.authorizationManager.hasAccess(any(), any(), any())).thenReturn(true);

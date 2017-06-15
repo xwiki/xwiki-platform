@@ -20,9 +20,7 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,9 +48,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 9.5RC1
  */
 @Component
-@Named(UntypedRecordableEventDescriptorWikiComponentBuilder.BOUNDED_XOBJECT_CLASS)
+@Named(UntypedRecordableEventDescriptorComponentBuilder.BOUNDED_XOBJECT_CLASS)
 @Singleton
-public class UntypedRecordableEventDescriptorWikiComponentBuilder implements WikiBaseObjectComponentBuilder
+public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBaseObjectComponentBuilder
 {
     /**
      * The class name of the XObject that should be bounded to this builder.
@@ -66,7 +64,7 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilder implements Wik
     public EntityReference getClassReference()
     {
         return new EntityReference(
-                UntypedRecordableEventDescriptorWikiComponentBuilder.BOUNDED_XOBJECT_CLASS,
+                UntypedRecordableEventDescriptorComponentBuilder.BOUNDED_XOBJECT_CLASS,
                 EntityType.OBJECT);
     }
 
@@ -77,11 +75,9 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilder implements Wik
             XWikiDocument parentDocument = baseObject.getOwnerDocument();
             this.checkRights(parentDocument.getDocumentReference(), parentDocument.getAuthorReference());
 
-            // Get the parameters of the XObject we’re working
-            Map<String, Object> parameters = this.getEventDescriptorProperties(baseObject);
             return Arrays.asList(
                     new DefaultUntypedRecordableEventDescriptor(
-                            baseObject.getReference(), parentDocument.getAuthorReference(), parameters));
+                            baseObject.getReference(), parentDocument.getAuthorReference(), baseObject));
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the UntypedRecordableEvent wiki component "
@@ -90,45 +86,16 @@ public class UntypedRecordableEventDescriptorWikiComponentBuilder implements Wik
     }
 
     /**
-     * Get a map of every properties of the given XObject.
-     *
-     * @param untypedEventObject the XObject
-     * @return a map of the descriptor properties
-     * @throws EventStreamException if the descriptor could not be found or if the properties could not be extracted
-     */
-    private Map<String, Object> getEventDescriptorProperties(BaseObject untypedEventObject)
-            throws EventStreamException
-    {
-        Map<String, Object> eventDescriptorProperties = new HashMap<>();
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION,
-                untypedEventObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION));
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS,
-                untypedEventObject.getListValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS));
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE,
-                untypedEventObject.getListValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE));
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION,
-                untypedEventObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION));
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME,
-                untypedEventObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME));
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON,
-                untypedEventObject.getStringValue(ModelBridge.UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON));
-        eventDescriptorProperties.put(ModelBridge.UNTYPED_EVENT_EVENT_TYPE,
-                untypedEventObject.getStringValue(ModelBridge.UNTYPED_EVENT_EVENT_TYPE));
-
-        return eventDescriptorProperties;
-    }
-
-    /**
      * Ensure that the given author has the administrative rights in the current context.
      *
-     * @param entityReference the working entity
+     * @param documentReference the working entity
      * @param authorReference the author that should have its rights checked
      * @throws EventStreamException if the author rights are not sufficient
      */
-    private void checkRights(EntityReference entityReference, DocumentReference authorReference)
+    private void checkRights(DocumentReference documentReference, DocumentReference authorReference)
             throws EventStreamException
     {
-        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, entityReference))
+        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, documentReference.getWikiReference()))
         {
             throw new EventStreamException("Registering Untyped Events requires wiki administration rights.");
         }

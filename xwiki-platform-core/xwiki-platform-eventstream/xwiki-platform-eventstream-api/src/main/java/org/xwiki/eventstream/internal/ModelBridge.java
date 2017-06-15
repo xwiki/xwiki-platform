@@ -36,41 +36,6 @@ import org.xwiki.model.reference.EntityReference;
 public interface ModelBridge
 {
     /**
-     * The event type field name in the XObject.
-     */
-    String UNTYPED_EVENT_EVENT_TYPE = "eventType";
-
-    /**
-     * The event descriptor description field name in the XObject.
-     */
-    String UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION = "eventDescription";
-
-    /**
-     * The event descriptor validation expression field name in the XObject.
-     */
-    String UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION = "validationExpression";
-
-    /**
-     * The event descriptor triggers field name in the XObject.
-     */
-    String UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS = "listenTo";
-
-    /**
-     * The event descriptor object type field name in the XObject.
-     */
-    String UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE = "objectType";
-
-    /**
-     * The event descriptor application name field name in the XObject.
-     */
-    String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME = "applicationName";
-
-    /**
-     * The event descriptor application icon field name in the XObject.
-     */
-    String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON = "applicationIcon";
-
-    /**
      * Get the author reference of the given entity.
      *
      * @param entityReference the document

@@ -444,7 +444,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
           scopeType = 'wiki';
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
           scopeType = 'pageAndChildren';
-          // Remove the "WebHome" parent to match the space instead of the document
+          // Remove the "WebHome" part to match the space instead of the document
           reference = reference.substring(0, reference.length - '.WebHome'.length);
         }
         // Don't save a preference scope if we expect to have a wiki and the selected data is a page

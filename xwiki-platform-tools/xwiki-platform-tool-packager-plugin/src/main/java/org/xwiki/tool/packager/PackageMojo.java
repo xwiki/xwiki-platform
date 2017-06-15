@@ -659,6 +659,12 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-rendering-transformation-icon", getXWikiPlatformVersion(), null, "jar"));
 
+        // Most, if not all functional test modules have XAR dependencies and those are installed as extensions inside
+        // XWiki. Thus at XWiki initialization time, the Extension Manager initializes those extensions and need to
+        // have the AR Extension Handler available to do so.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-extension-handler-xar", getXWikiPlatformVersion(), null, "jar"));
+
         // Get the platform's pom.xml to get the versions of some needed externals dependencies, so that we do not
         // hardcode them.
         MavenProject platformPomProject = getPlatformPOMProject();

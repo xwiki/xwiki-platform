@@ -316,7 +316,7 @@
                   #if("$!classType" == 'DBList')
                     #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetabledblist.js', true))
                     <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" />
-                    <input type="text" data-type="suggest" autocomplete="off" data-xclass="$escapetool.html($propClassName)"
+                    <input type="text" data-type="suggest" autocomplete="off" data-xclass="$escapetool.html($propClassName)" data-limit="10"
                   #else
                     <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text"
                   #end

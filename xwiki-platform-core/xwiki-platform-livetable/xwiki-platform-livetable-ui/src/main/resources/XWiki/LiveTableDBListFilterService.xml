@@ -40,19 +40,18 @@
   <hidden>false</hidden>
   <content>{{velocity wiki="false"}}
 #set($reqClass = "$!request.get('class')")
-#set($reqProp = "$!request.get('prop')")
+#set($reqProperty = "$!request.get('property')")
 #set($reqInput = "$!request.get('input')")
 #set($reqLimit = "$!request.get('limit')")
-#if ($reqLimit != '')
-  #set ($limit = $numbertool.integer($reqLimit))
-#else
-  ## The limit is hardcoded here, as we are only dealing with suggestions
-  #set ($limit = 25)
+#set ($limit = $mathtool.max($mathtool.toInteger($reqLimit), 1))
+#if ("$!limit" == '')
+  ## The fallback limit is hardcoded here, as we are only dealing with suggestions
+  #set ($limit = 10)
 #end
-#if ($reqClass != '' &amp;&amp; $reqProp != '' &amp;&amp; $reqInput != '')
+#if ($reqClass != '' &amp;&amp; $reqProperty != '' &amp;&amp; $reqInput != '')
   #set ($discard = $response.setContentType('application/json'))
   #set ($classRef = $xwiki.getClass($reqClass))
-  #set ($field = $classRef.get($reqProp))
+  #set ($field = $classRef.get($reqProperty))
   #if ($field.classType == 'DBList')
     #set ($sql = $!field.getProperty('sql').value)
     #set ($results = [])
@@ -92,7 +91,7 @@
 {{/velocity}}
 
 {{velocity}}
-#if ($reqClass == '' || $reqProp == '')
+#if ($reqClass == '' || $reqProperty == '')
   {{info}}
     This service provides filtering results for the LiveTable.
   {{/info}}

@@ -62,7 +62,7 @@ public class WebJarsTest extends AbstractTest
             + "{{/velocity}}";
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), content, "WebJars Test");
 
-        assertTrue(vp.getContent().contains("installed: org.webjars:AjaxQ-0.0.2"));
+        assertTrue(vp.getContent().contains("installed: org.webjars:AjaxQ/0.0.2"));
 
         // Click the link!
         // Note: For understanding why there's a r=1 query string, see WebJarsScriptService#getResourceReference()

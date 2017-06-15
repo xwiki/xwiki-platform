@@ -436,6 +436,14 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Event Stream -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- ********************************************************************** -->
     <!-- Stuff filled with Maven hacks making them hard to install as extension right now -->
 

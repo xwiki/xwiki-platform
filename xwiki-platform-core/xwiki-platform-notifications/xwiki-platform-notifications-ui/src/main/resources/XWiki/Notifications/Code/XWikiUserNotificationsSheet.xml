@@ -117,9 +117,13 @@
  *#
 #macro(displayPreference $type $format)
   #set ($checked = '')
+  #set ($preference = '')
   #foreach ($pref in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceClass'))
-    #if (($pref.getValue('format') == $format || ($format == 'alert' &amp;&amp; "$!pref.getValue('format')" == '')) &amp;&amp; $pref.getValue('notificationEnabled') == 1 &amp;&amp; $pref.getValue('eventType') == $type.eventType)
-      #set ($checked = 'checked="checked"')
+    #if (($pref.getValue('format') == $format || ($format == 'alert' &amp;&amp; "$!pref.getValue('format')" == '')) &amp;&amp; $pref.getValue('eventType') == $type.eventType)
+      #set ($preference = $pref)
+      #if ($pref.getValue('notificationEnabled') == 1)
+        #set ($checked = 'checked="checked"')
+      #end
     #end
   #end
   &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-format="$format" data-objnumber="$!preference.number" data-filter="${type.filter}"&gt;

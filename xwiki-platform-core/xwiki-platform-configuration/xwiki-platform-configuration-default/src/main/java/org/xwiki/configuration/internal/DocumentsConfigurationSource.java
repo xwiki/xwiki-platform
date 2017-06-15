@@ -46,7 +46,7 @@ public class DocumentsConfigurationSource extends CompositeWikiConfigurationSour
     @Override
     public void initialize() throws InitializationException
     {
-        addWikiConfigurationSource("wiki");
         addWikiConfigurationSource("spaces");
+        addWikiConfigurationSource("wiki");
     }
 }

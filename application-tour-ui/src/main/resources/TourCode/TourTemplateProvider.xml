@@ -258,7 +258,9 @@
       <terminal>0</terminal>
     </property>
     <property>
-      <visibilityRestrictions/>
+      <visibilityRestrictions>
+        <value>Tour</value>
+      </visibilityRestrictions>
     </property>
   </object>
 </xwikidoc>

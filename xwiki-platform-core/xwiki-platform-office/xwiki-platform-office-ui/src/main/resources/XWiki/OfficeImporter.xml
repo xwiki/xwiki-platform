@@ -281,13 +281,9 @@
      * Enable/disable the split option depending of the value of the split document checkbox
      */
     var maybeDisableSplitOptions = function () {
-      if ($('#splitDocumentInputId').prop('checked')) {
-        $('#headingLevelsToSplitInputId').removeProp('disabled');
-        $('#childPagesNamingMethodInputId').removeProp('disabled');
-      } else {
-        $('#headingLevelsToSplitInputId').prop('disabled', 'disabled');
-        $('#childPagesNamingMethodInputId').prop('disabled', 'disabled');
-      }
+      var splitOptionsDisabled = !$('#splitDocumentInputId').prop('checked');
+      $('#headingLevelsToSplitInputId').prop('disabled', splitOptionsDisabled);
+      $('#childPagesNamingMethodInputId').prop('disabled', splitOptionsDisabled);
     }
     
     // Initalize the default state

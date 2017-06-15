@@ -80,7 +80,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * Role Types and we cannot ask the Component Manager for wiki component only (which we need to do when we need to
      * unregister them). A wiki page can hold one or several wiki components.
      */
-    private Map<DocumentReference, List<WikiComponent>> registeredComponents = new ConcurrentHashMap<>();
+    private Map<EntityReference, List<WikiComponent>> registeredComponents = new ConcurrentHashMap<>();
 
     @Override
     public void registerWikiComponent(WikiComponent component) throws WikiComponentException
@@ -97,7 +97,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
             // Set the proper information so the component manager use the proper keys to find components to register
             this.wikiComponentManagerContext.setCurrentUserReference(component.getAuthorReference());
-            this.wikiComponentManagerContext.setCurrentEntityReference(component.getDocumentReference());
+            this.wikiComponentManagerContext.setCurrentEntityReference(component.getEntityReference());
 
             // Since we are responsible to create the component instance, we also are responsible of its initialization
             if (this.isInitializable(component.getClass().getInterfaces())) {
@@ -128,10 +128,10 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
     private void cacheWikiComponent(WikiComponent component)
     {
-        List<WikiComponent> wikiComponents = this.registeredComponents.get(component.getDocumentReference());
+        List<WikiComponent> wikiComponents = this.registeredComponents.get(component.getEntityReference());
         if (wikiComponents == null) {
             wikiComponents = new ArrayList<>();
-            this.registeredComponents.put(component.getDocumentReference(), wikiComponents);
+            this.registeredComponents.put(component.getEntityReference(), wikiComponents);
         }
         if (!wikiComponents.contains(component)) {
             wikiComponents.add(component);
@@ -140,6 +140,12 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
     @Override
     public void unregisterWikiComponents(DocumentReference reference) throws WikiComponentException
+    {
+        this.unregisterWikiComponents((EntityReference) reference);
+    }
+
+    @Override
+    public void unregisterWikiComponents(EntityReference reference) throws WikiComponentException
     {
         List<WikiComponent> wikiComponents = this.registeredComponents.get(reference);
         if (wikiComponents != null) {
@@ -167,7 +173,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             // Set the proper information so the component manager use the proper keys to find components to
             // unregister
             this.wikiComponentManagerContext.setCurrentUserReference(wikiComponent.getAuthorReference());
-            this.wikiComponentManagerContext.setCurrentEntityReference(wikiComponent.getDocumentReference());
+            this.wikiComponentManagerContext.setCurrentEntityReference(wikiComponent.getEntityReference());
             // Remove from the Component Manager
             getComponentManager(wikiComponent.getScope()).unregisterComponent(wikiComponent.getRoleType(),
                 wikiComponent.getRoleHint());

@@ -31,6 +31,7 @@ import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.extension.handler.ExtensionInitializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
@@ -69,8 +70,8 @@ public class XWikiServletContextListener implements ServletContextListener
         // the Composable interface to get access to the Component Manager or better they simply
         // need to declare their components requirements using the @Inject annotation of the xwiki
         // component manager together with a private class member, for automatic injection by the CM on init.
-        servletContextEvent.getServletContext().setAttribute(
-            org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
+        servletContextEvent.getServletContext()
+            .setAttribute(org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
 
         // Use a Component Event Manager that stacks Component instance creation events till we tell it to flush them.
         // The reason is that the Observation Manager used to send the events but we need the Application Context to
@@ -113,6 +114,13 @@ public class XWikiServletContextListener implements ServletContextListener
         eventManager.setObservationManager(observationManager);
         eventManager.shouldStack(false);
         eventManager.flushEvents();
+
+        // Make sure installed extensions are initialized before sending ApplicationStartedEvent
+        try {
+            this.componentManager.getInstance(ExtensionInitializer.class);
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to initialize installed extensions", e);
+        }
 
         // Indicate to the various components that XWiki is ready
         observationManager.notify(new ApplicationStartedEvent(), this);

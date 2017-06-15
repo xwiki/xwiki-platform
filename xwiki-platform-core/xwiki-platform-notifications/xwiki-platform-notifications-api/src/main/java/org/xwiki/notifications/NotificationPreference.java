@@ -36,6 +36,8 @@ public class NotificationPreference
 
     private boolean isNotificationEnabled;
 
+    private NotificationFormat format;
+
     /**
      * Construct a NotificationPreference.
      * @param eventType type of an event
@@ -47,6 +49,25 @@ public class NotificationPreference
         this.eventType = eventType;
         this.applicationId = applicationId;
         this.isNotificationEnabled = isNotificationEnabled;
+        this.format = NotificationFormat.ALERT;
+    }
+
+    /**
+     * Construct a NotificationPreference.
+     * @param eventType type of an event
+     * @param applicationId id of an application
+     * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
+     * @param format format of the notification
+     *
+     * @since 9.5RC1
+     */
+    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled,
+            NotificationFormat format)
+    {
+        this.eventType = eventType;
+        this.applicationId = applicationId;
+        this.isNotificationEnabled = isNotificationEnabled;
+        this.format = format;
     }
 
     /**
@@ -72,5 +93,15 @@ public class NotificationPreference
     public boolean isNotificationEnabled()
     {
         return isNotificationEnabled;
+    }
+
+    /**
+     * @return format of the notification
+     *
+     * @since 9.5RC1
+     */
+    public NotificationFormat getFormat()
+    {
+        return format;
     }
 }

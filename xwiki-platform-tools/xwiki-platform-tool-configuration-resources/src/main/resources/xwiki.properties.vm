@@ -465,7 +465,7 @@ extension.oldflavors=$oldFlavor.trim()
 #end
 
 #-# [Since 8.3]
-#-# Indicate of the XWiki you try to find more informations about the core extension in the repositories.
+#-# Indicate if XWiki should try to find more informations about the core extension in the repositories.
 #-#
 #-# The default is:
 # extension.core.resolve=true
@@ -801,5 +801,11 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The default is :
 # notifications.enabled = true
+
+#-# [Since 9.5C1]
+#-# Indicates if the notifications module can send emails.
+#-#
+#-# The default is :
+# notifications.emails.enabled = true
 
 $!xwikiPropertiesAdditionalProperties

@@ -47,6 +47,12 @@
         org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
 
+    <!-- Flavors known to be incompatible with the current distribution -->
+    <xwiki.extension.knownInvalidFlavors>
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki
+    </xwiki.extension.knownInvalidFlavors>
+
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>activitystream.hbm.xml,instance.hbm.xml</xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>

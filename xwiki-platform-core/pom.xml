@@ -304,7 +304,34 @@
                      "methodName": "getAllRecordableEventDescriptorsAllWikis",
                      "elementKind": "method",
                      "justification": "Young API"
-                   }
+                   },
+                   {
+                     "code": "java.method.addedToInterface",
+                     "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                     "package": "org.xwiki.notifications",
+                     "classSimpleName": "NotificationManager",
+                     "methodName": "getEvents",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                   },
+                   {
+                     "code": "java.method.addedToInterface",
+                     "new": "method boolean org.xwiki.notifications.NotificationConfiguration::areEmailsEnabled()",
+                     "package": "org.xwiki.notifications",
+                     "classSimpleName": "NotificationConfiguration",
+                     "methodName": "areEmailsEnabled",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                    },
+                    {
+                     "code": "java.method.addedToInterface",
+                     "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, org.xwiki.notifications.NotificationFormat, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                     "package": "org.xwiki.notifications",
+                     "classSimpleName": "NotificationManager",
+                     "methodName": "getEvents",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                    }
                 ]
               }
             }
@@ -397,7 +424,6 @@
     <module>xwiki-platform-vfs</module>
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
-    <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>

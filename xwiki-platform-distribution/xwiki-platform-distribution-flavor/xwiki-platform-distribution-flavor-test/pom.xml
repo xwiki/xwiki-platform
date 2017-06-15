@@ -527,7 +527,6 @@
     <module>xwiki-platform-distribution-flavor-test-pageobjects</module>
     <module>xwiki-platform-distribution-flavor-test-ui</module>
     <module>xwiki-platform-distribution-flavor-test-selenium</module>
-    <module>xwiki-platform-distribution-flavor-test-webdav</module>
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>
     <module>xwiki-platform-distribution-flavor-test-storage</module>

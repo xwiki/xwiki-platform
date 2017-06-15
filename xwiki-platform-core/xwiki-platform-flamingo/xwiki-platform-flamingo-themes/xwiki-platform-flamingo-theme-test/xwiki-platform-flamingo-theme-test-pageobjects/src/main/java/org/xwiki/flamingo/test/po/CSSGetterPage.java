@@ -33,7 +33,7 @@ public abstract class CSSGetterPage extends ViewPage
 
     public String getPageBackgroundColor()
     {
-        return getElementCSSValue(By.xpath("//div[@class='main']"), "background-color");
+        return getElementCSSValue(By.id("mainContentArea"), "background-color");
     }
 
     public String getFontFamily()

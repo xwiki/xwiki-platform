@@ -31,5 +31,5 @@
   #end
   </ul>
 #else
-  #warning($services.localization.render('core.importer.noPackageAvailable'))
+  <span class="noitems">$services.localization.render('core.importer.noPackageAvailable')</span>
 #end

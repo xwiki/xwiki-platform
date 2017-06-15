@@ -22,6 +22,7 @@ package org.xwiki.component.wiki;
 import java.lang.reflect.Type;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Represents the definition of a wiki component implementation. A java component can extend this interface if it needs
@@ -39,6 +40,17 @@ public interface WikiComponent
      * @return the reference to the document holding this wiki component definition.
      */
     DocumentReference getDocumentReference();
+
+    /**
+     * Get the entity reference of the bounded component instance.
+     *
+     * @return the entity reference bounded to the component
+     * @since 9.5RC1
+     */
+    default EntityReference getEntityReference()
+    {
+        return this.getDocumentReference();
+    }
 
     /**
      * Get the reference to the author of the document this component instance is bound to.

@@ -41,15 +41,11 @@
              since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
              tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
 
-        <!-- Prevent JAR scanning for tlds, annotations, etc, in order to improve startup speed. Seems it makes us win
-             about 10% on startup time. -->
+        <!-- Prevent any JAR scanning for tlds, etc, in order to improve startup speed. Seems it makes us win about
+             10% on startup time. -->
         <Call name="setContextAttribute">
           <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
-          <!-- Starting with XWiki 8.0 we've removed WebDAV by default and we've made it installable through Servlet
-               3.0 annotations. In order to make the standalone distribution installation-friendly for WebDAV we're
-               configuring Jetty to parse the WebDAV JAR by default in order to find the annotations. We need to do this
-               since we've disabled JAR parsing by default to increase startup speed. -->
-          <Arg>.*xwiki-platform-webdav-server-.*\.jar</Arg>
+          <Arg>somethingnotmatching.jar</Arg>
         </Call>
 
         <Call name="addAppProvider">

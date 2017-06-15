@@ -35,13 +35,16 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Default implementation for {@link ModelBridge}.
@@ -74,6 +77,8 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String START_DATE = "startDate";
 
+    private static final String FORMAT = "format";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -101,10 +106,14 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
+                        String objFormat = obj.getStringValue(FORMAT);
                         preferences.add(new NotificationPreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
                                 obj.getStringValue("applicationId"),
-                                obj.getIntValue("notificationEnabled", 0) == 1
+                                obj.getIntValue("notificationEnabled", 0) != 0,
+                                StringUtils.isNotBlank(objFormat)
+                                        ? NotificationFormat.valueOf(objFormat.toUpperCase())
+                                        : NotificationFormat.ALERT
                         ));
                     }
                 }
@@ -168,8 +177,8 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference)
-            throws NotificationException
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
+            NotificationFormat format) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -184,7 +193,7 @@ public class DefaultModelBridge implements ModelBridge
             List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
-                    if (obj != null) {
+                    if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT), format)) {
                         String scopeType = obj.getStringValue("scope");
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
@@ -213,5 +222,29 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    private boolean isCompatibleFormat(String format, NotificationFormat expectedFormat)
+    {
+        return format != null && NotificationFormat.valueOf(format.toUpperCase()) == expectedFormat;
+    }
+
+    @Override
+    public void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
+            throws NotificationException
+    {
+        try {
+            XWikiContext xcontext = contextProvider.get();
+            DocumentReference documentReference = (DocumentReference) objectReference.getParent();
+            XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+            doc.setHidden(true);
+            BaseObject obj = doc.getXObject(objectReference.getXClassReference(), true, xcontext);
+            if (obj != null) {
+                obj.set(property, value, xcontext);
+                xcontext.getWiki().saveDocument(doc, String.format("Property [%s] set.", property), xcontext);
+            }
+        } catch (XWikiException e) {
+            throw new NotificationException(String.format("Failed to update the object [%s].", objectReference), e);
+        }
     }
 }

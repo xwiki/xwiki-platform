@@ -37,13 +37,13 @@ public class NotificationsUserProfilePage extends ViewPage
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] .bootstrap-switch")
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='create'][data-format='alert'] .bootstrap-switch")
     private WebElement pageCreatedSwitch;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] .bootstrap-switch")
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='delete'][data-format='alert'] .bootstrap-switch")
     private WebElement pageDeletedSwitch;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] .bootstrap-switch")
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='update'][data-format='alert'] .bootstrap-switch")
     private WebElement pageUpdatedSwitch;
 
     /**

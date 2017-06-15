@@ -31,7 +31,10 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
+
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
@@ -95,17 +98,27 @@ public class CachedModelBridge implements ModelBridge
     }
 
     @Override
-    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
-            throws NotificationException
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
+            NotificationFormat format) throws NotificationException
     {
+        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + "_" + format;
+
         ExecutionContext context = execution.getContext();
-        if (context.hasProperty(USER_NOTIFICATIONS_PREFERENCES_SCOPE)) {
-            return (List<NotificationPreferenceScope>) context.getProperty(USER_NOTIFICATIONS_PREFERENCES_SCOPE);
+        if (context.hasProperty(contextEntry)) {
+            return (List<NotificationPreferenceScope>) context.getProperty(contextEntry);
         }
 
-        List<NotificationPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user);
-        context.setProperty(USER_NOTIFICATIONS_PREFERENCES_SCOPE, preferences);
+        List<NotificationPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format);
+        context.setProperty(contextEntry, preferences);
 
         return preferences;
+    }
+
+    @Override
+    public void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
+            throws NotificationException
+    {
+        // Obviously there is nothing to cache
+        modelBridge.savePropertyInHiddenDocument(objectReference, property, value);
     }
 }

@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -52,6 +53,10 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 public class QueryGenerator
 {
     private static final String OR = " OR ";
+
+    private static final String LEFT_PARENTHESIS = "(";
+
+    private static final String RIGHT_PARENTHESIS = ")";
 
     @Inject
     private QueryManager queryManager;
@@ -77,16 +82,18 @@ public class QueryGenerator
      * Generate the query.
      *
      * @param user user interested in the notifications
+     * @param format only match notifications enabled for that format
      * @param onlyUnread f only unread events should be returned
      * @param endDate do not return events happened after this date
+     * @param startDate do not return events happened before this date
      * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
      * @return the query to execute
      *
      * @throws NotificationException if error happens
      * @throws QueryException if error happens
      */
-    public Query generateQuery(DocumentReference user, boolean onlyUnread, Date endDate, List<String> blackList)
-            throws NotificationException, QueryException
+    public Query generateQuery(DocumentReference user, NotificationFormat format, boolean onlyUnread, Date endDate,
+            Date startDate, List<String> blackList) throws NotificationException, QueryException
     {
         // TODO: create a role so extensions can inject their own complex query parts
         // TODO: create unit tests for all use-cases
@@ -99,8 +106,8 @@ public class QueryGenerator
         StringBuilder hql = new StringBuilder();
         hql.append("where event.date >= :startDate AND event.user <> :user AND (");
 
-        List<String> types = handleEventTypes(hql, preferences);
-        List<String> apps  = handleApplications(hql, preferences, types);
+        List<String> types = handleEventTypes(user, hql, preferences, format);
+        List<String> apps  = handleApplications(hql, preferences, types, format);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
@@ -108,10 +115,7 @@ public class QueryGenerator
             return null;
         }
 
-        hql.append(")");
-
-        handleFiltersOR(user, hql);
-        handleFiltersAND(user, hql);
+        hql.append(RIGHT_PARENTHESIS);
 
         handleBlackList(blackList, hql);
         handleEndDate(endDate, hql);
@@ -124,7 +128,7 @@ public class QueryGenerator
         Query query = queryManager.createQuery(hql.toString(), Query.HQL);
 
         // Bind values
-        query.bindValue("startDate", modelBridge.getUserStartDate(user));
+        query.bindValue("startDate", startDate != null ? startDate : modelBridge.getUserStartDate(user));
         query.bindValue("user", serializer.serialize(user));
         handleEventTypes(types, query);
         handleApplications(apps, query);
@@ -132,19 +136,21 @@ public class QueryGenerator
         handleEndDate(endDate, query);
         handleWiki(user, query);
 
-        handleFiltersParams(user, query);
+        handleFiltersParams(user, query, format);
 
         // Return the query
         return query;
     }
 
-    private void handleFiltersOR(DocumentReference user, StringBuilder hql) throws NotificationException
+    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationFormat format,
+            String type)
+            throws NotificationException
     {
         StringBuilder query = new StringBuilder();
         String separator = "";
 
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterOR(user);
+            String filterQuery = filter.queryFilterOR(user, format, type);
             if (StringUtils.isNotBlank(filterQuery)) {
                 query.append(separator);
                 query.append(filterQuery);
@@ -157,10 +163,11 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersAND(DocumentReference user, StringBuilder hql) throws NotificationException
+    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationFormat format, String type)
+            throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterAND(user);
+            String filterQuery = filter.queryFilterAND(user, format, type);
             if (StringUtils.isNotBlank(filterQuery)) {
                 hql.append(" AND ");
                 hql.append(filterQuery);
@@ -168,10 +175,11 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersParams(DocumentReference user, Query query) throws NotificationException
+    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format)
+            throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<String, Object> params = filter.queryFilterParams(user);
+            Map<String, Object> params = filter.queryFilterParams(user, format);
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 query.bindValue(entry.getKey(), entry.getValue());
             }
@@ -244,17 +252,19 @@ public class QueryGenerator
 
     private void handleEventTypes(List<String> types, Query query)
     {
-        if (!types.isEmpty()) {
-            query.bindValue("types", types);
+        int number = 0;
+        for (String type : types) {
+            query.bindValue(String.format("type_%d", number++), type);
         }
     }
 
     private List<String> handleApplications(StringBuilder hql, List<NotificationPreference> preferences,
-            List<String> types)
+            List<String> types, NotificationFormat format)
     {
         List<String> apps = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())
+                    && format.equals(preference.getFormat())) {
                 apps.add(preference.getApplicationId());
             }
         }
@@ -264,16 +274,29 @@ public class QueryGenerator
         return apps;
     }
 
-    private List<String> handleEventTypes(StringBuilder hql, List<NotificationPreference> preferences)
+    private List<String> handleEventTypes(DocumentReference user, StringBuilder hql,
+            List<NotificationPreference> preferences, NotificationFormat format) throws NotificationException
     {
         List<String> types = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())) {
+            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())
+                    && format.equals(preference.getFormat())) {
                 types.add(preference.getEventType());
             }
         }
         if (!types.isEmpty()) {
-            hql.append("event.type IN (:types)");
+            hql.append(LEFT_PARENTHESIS);
+            String separator = "";
+            int number = 0;
+            for (String type : types) {
+                hql.append(separator);
+                hql.append(String.format("(event.type = :type_%d", number++));
+                handleFiltersOR(user, hql, format, type);
+                handleFiltersAND(user, hql, format, type);
+                hql.append(RIGHT_PARENTHESIS);
+                separator = OR;
+            }
+            hql.append(RIGHT_PARENTHESIS);
         }
         return types;
     }

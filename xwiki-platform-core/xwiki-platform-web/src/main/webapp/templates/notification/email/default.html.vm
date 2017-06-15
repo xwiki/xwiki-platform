@@ -1,0 +1,15 @@
+#template('notification/macros.vm')
+#set ($app  = "$!event.events.get(0).application")
+#if ($app == 'xwiki')
+  #set ($app = $services.localization.render('core.events.appName'))
+#end
+#set ($document = $xwiki.getDocument($event.document))
+<p><strong>$escapetool.xml($app)</strong></p>
+<p><strong>[$!escapetool.xml($event.type)]</strong> <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('xhtml/1.0'))</a></p>
+<p>$services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users)"])</p>
+#set ($dates = $event.dates)
+#if ($dates.size() > 1)
+  <p><small>$services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])</small></p>
+#else
+  <p><small>$escapetool.xml($xwiki.formatDate($event.dates.get(0)))</small></p>
+#end

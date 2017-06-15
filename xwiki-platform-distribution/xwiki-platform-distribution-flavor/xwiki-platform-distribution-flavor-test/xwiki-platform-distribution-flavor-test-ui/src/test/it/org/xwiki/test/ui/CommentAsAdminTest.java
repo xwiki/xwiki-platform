@@ -138,7 +138,7 @@ public class CommentAsAdminTest extends AbstractTest
     public void testPreviewCommentOnPageWithSheet()
     {
         // We know Blog.BlogIntroduction has a sheet applied.
-        commentsTab = getUtil().gotoPage("Blog", "BlogIntroduction").openCommentsDocExtraPane();
+        commentsTab = getUtil().gotoPage("XWiki", "DefaultSkin").openCommentsDocExtraPane();
         CommentForm addCommentForm = commentsTab.getAddCommentForm();
         addCommentForm.getContentField().sendKeys("xyz");
         Assert.assertEquals("xyz", addCommentForm.clickPreview().getText());

@@ -50,7 +50,8 @@
     <!-- Flavors known to be incompatible with the current distribution -->
     <xwiki.extension.knownInvalidFlavors>
         org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
+        org.xwiki.platform:xwiki-platform-distribution-flavor
     </xwiki.extension.knownInvalidFlavors>
 
     <!-- Hibernate configuration -->

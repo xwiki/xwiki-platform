@@ -33,17 +33,14 @@
   <description>Default set of wiki pages containing both content and default applications for both main and subwiki XWiki flavors</description>
   <properties>
     <xwiki.extension.features>
+        <!-- Make sure to replace the XWiki Enterprise common flavor -->
+        org.xwiki.enterprise:xwiki-enterprise-ui-common,
+
         <!-- Replace the old XWiki Enterprise flavor -->
         com.xpn.xwiki.products:xwiki-enterprise-wiki,
         org.xwiki.platform:xwiki-enterprise-wiki,
         org.xwiki.platform:xwiki-enterprise-ui,
-        org.xwiki.platform:xwiki-enterprise-ui-all,
-
-        <!-- Replace the previous flavor that used to be common to main and sub wikis -->
-        org.xwiki.platform:xwiki-platform-distribution-flavor,
-
-        <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.platform:xwiki-enterprise-ui-common
+        org.xwiki.platform:xwiki-enterprise-ui-all
     </xwiki.extension.features>
   </properties>
   <dependencies>

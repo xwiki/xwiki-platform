@@ -331,6 +331,18 @@
                      "methodName": "getEvents",
                      "elementKind": "method",
                      "justification": "Young API"
+                    },
+                    {
+                      "code": "java.method.returnTypeTypeParametersChanged",
+                      "old": "method java.util.Enumeration<java.lang.String> javax.servlet.GenericServlet::getInitParameterNames() @ org.xwiki.resource.servlet.ResourceReferenceHandlerServlet",
+                      "new": "method java.util.Enumeration javax.servlet.GenericServlet::getInitParameterNames() @ org.xwiki.resource.servlet.ResourceReferenceHandlerServlet",
+                      "oldType": "java.util.Enumeration<java.lang.String>",
+                      "newType": "java.util.Enumeration",
+                      "package": "org.xwiki.resource.servlet",
+                      "classSimpleName": "ResourceReferenceHandlerServlet",
+                      "methodName": "getInitParameterNames",
+                      "elementKind": "method",
+                      "justification": "REVAPI bug"
                     }
                 ]
               }

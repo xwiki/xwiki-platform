@@ -439,10 +439,13 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
         var scopeType = 'pageOnly';
+        var reference = node.data.id;
         if (node.data.type == 'wiki') {
           scopeType = 'wiki';
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
           scopeType = 'pageAndChildren';
+          // Remove the "WebHome" part to match the space instead of the document
+          reference = reference.substring(0, reference.length - '.WebHome'.length);
         }
         // Don't save a preference scope if we expect to have a wiki and the selected data is a page
         if (filterType == 'WIKI_FILTER' &amp;&amp; scopeType != 'wiki') {
@@ -456,7 +459,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
         $.post(restURL, {
           'className': 'XWiki.Notifications.Code.NotificationPreferenceScopeClass',
           'property#eventType': cell.attr('data-eventtype'),
-          'property#scopeReference': node.data.id,
+          'property#scopeReference': reference,
           'property#scope': scopeType,
           'property#format': cell.attr('data-format')
         }).done(function (data) {

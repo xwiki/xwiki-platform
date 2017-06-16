@@ -137,7 +137,8 @@ public class ScopeNotificationFilterTest
         ));
 
         assertEquals(
-                String.format("(event.wiki = :wiki_scopeNotifFilter_%s AND event.space LIKE :space_scopeNotifFilter_%s)",
+                String.format("(event.wiki = :wiki_scopeNotifFilter_%s " +
+                                "AND event.space LIKE :space_scopeNotifFilter_%s ESCAPE '!')",
                     Integer.toHexString("event2".hashCode()), Integer.toHexString("event2".hashCode())),
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
@@ -198,7 +199,7 @@ public class ScopeNotificationFilterTest
         // Mocks
         createPreferenceScopeMocks();
         when(serializer.serialize(SCOPE_REFERENCE_1)).thenReturn("wiki1");
-        when(serializer.serialize(SCOPE_REFERENCE_2)).thenReturn("space2");
+        when(serializer.serialize(SCOPE_REFERENCE_2)).thenReturn("space_2");
         when(serializer.serialize(SCOPE_REFERENCE_3)).thenReturn("space3.page3");
 
         // Test
@@ -212,7 +213,7 @@ public class ScopeNotificationFilterTest
                 String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event1".hashCode()))));
         assertEquals("wiki2", results.get(
                 String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
-        assertEquals("space2.", results.get(
+        assertEquals("space!_2.%", results.get(
                 String.format("space_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
         assertEquals("wiki3", results.get(
                 String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event3".hashCode()))));

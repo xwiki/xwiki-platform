@@ -37,7 +37,7 @@ public class CompositeConfigurationSource extends AbstractCompositeConfiguration
     /**
      * The order of sources is important. Sources located before other sources take priority.
      */
-    private List<ConfigurationSource> sources = new ArrayList<ConfigurationSource>();
+    protected List<ConfigurationSource> sources = new ArrayList<ConfigurationSource>();
 
     public void addConfigurationSource(ConfigurationSource source)
     {

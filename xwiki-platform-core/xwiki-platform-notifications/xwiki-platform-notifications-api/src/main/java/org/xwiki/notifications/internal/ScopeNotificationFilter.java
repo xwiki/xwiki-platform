@@ -113,8 +113,13 @@ public class ScopeNotificationFilter implements NotificationFilter
                                 suffix, suffix));
                         break;
                     case SPACE:
-                        stringBuilder.append(String.format("event.wiki = :wiki_%s AND event.space LIKE :space_%s",
-                                suffix, suffix));
+                        stringBuilder.append(
+                                String.format(
+                                        "event.wiki = :wiki_%s AND event.space LIKE :space_%s ESCAPE '!'",
+                                        suffix,
+                                        suffix
+                                )
+                        );
                         break;
                     case WIKI:
                         stringBuilder.append(String.format("event.wiki = :wiki_%s", suffix));
@@ -163,7 +168,8 @@ public class ScopeNotificationFilter implements NotificationFilter
                         params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
                                 EntityType.WIKI).getName());
                         params.put(String.format("space_%s", suffix),
-                                String.format("%s.", serializer.serialize(scope.getScopeReference())));
+                                escape(serializer.serialize(scope.getScopeReference())) + ".%"
+                        );
                         break;
                     case WIKI:
                         params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
@@ -178,5 +184,11 @@ public class ScopeNotificationFilter implements NotificationFilter
         }
 
         return params;
+    }
+
+    private String escape(String format)
+    {
+        // See EscapeLikeParametersQuery#convertParameters()
+        return format.replaceAll("([%_!])", "!$1");
     }
 }

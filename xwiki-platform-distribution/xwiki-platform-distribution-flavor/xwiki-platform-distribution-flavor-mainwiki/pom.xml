@@ -35,19 +35,20 @@
     <xwiki.extension.category>flavor</xwiki.extension.category>
 
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>XWiki Classic Flavor</xwiki.extension.name>
+    <xwiki.extension.name>XWiki Standard Flavor</xwiki.extension.name>
 
     <!-- Should only be insalled on main wiki -->
     <xwiki.extension.namespaces>wiki:xwiki</xwiki.extension.namespaces>
 
     <xwiki.extension.features>
+        <!-- Make sure to replace the old XE flavor -->
+        org.xwiki.platform:xwiki-enterprise-ui-mainwiki,
+
+        <!-- Replace old XEM flavor -->
         com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
         org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
         org.xwiki.manager:xwiki-manager-wiki-administrator,
-        org.xwiki.manager:xwiki-manager-ui,
-
-        <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.platform:xwiki-enterprise-ui-mainwiki
+        org.xwiki.manager:xwiki-manager-ui
     </xwiki.extension.features>
   </properties>
   <dependencies>

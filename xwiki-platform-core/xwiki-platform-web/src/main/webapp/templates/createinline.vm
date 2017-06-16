@@ -69,6 +69,11 @@
 #end
 
 ## ---------------------------------------------------------------------------------------------------------
+## Determine if we need to do extra checks for a deprecated, pre-NestedSpaces request to create a space.
+## ---------------------------------------------------------------------------------------------------------
+#set ($deprecatedSpaceCreate = "$!request.tocreate" == 'space')
+
+## ---------------------------------------------------------------------------------------------------------
 ## Note: The list of available template providers is computed in the action and set on the context under
 ## the "availableTemplateProviders" binding.
 ## ---------------------------------------------------------------------------------------------------------
@@ -204,7 +209,7 @@
 #set ($discard = $xwiki.jsfx.use('js/xwiki/create.js', {'forceSkinAction': true}))
 
 ## ---------------------------------------------------------------------------------------------------------
-## Macro used to extrac a wiki's homepage reference.
+## Macro used to extract a wiki's homepage reference.
 ## ---------------------------------------------------------------------------------------------------------
 #macro (getWikiHomePageReference $wiki $return)
   #set ($_wikiHomePageReference = $services.wiki.getById($wiki).mainPageReference)
@@ -249,7 +254,7 @@
           #end
         #else
           #getWikiHomePageReference($doc.wiki $homeReference)
-          #if ($doc.documentReference.equals($homeReference))
+          #if ($doc.documentReference.equals($homeReference) || $deprecatedSpaceCreate)
             ## Encourage the user to create top level documents from the home page.
             #set ($parentReference = $doc.documentReference.wikiReference)
           #else
@@ -312,7 +317,6 @@
         ## Terminal page - Advanced users
         ## ---------------------------------------------------------------------------------------------------------
         #set ($hidden = '')
-        #set ($deprecatedSpaceCreate = "$!request.tocreate" == 'space')
         #if (!($isAdvancedUser || $isSuperAdmin) || $deprecatedSpaceCreate)
           #set ($hidden = 'hidden')
         #end

@@ -11,6 +11,7 @@
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
 ## * skipCurrentUser: don't take into account context use (XAR extension documents will keep their author for example)
+## * installJAROnRoot: force installing JAR extensions on root namespaces
 #if (!$extensionConfig)
   #set ($extensionConfig = {})
 #end

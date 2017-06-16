@@ -35,7 +35,7 @@
     <xwiki.extension.category>flavor</xwiki.extension.category>
 
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>XWiki Classic Flavor - Sub Wiki</xwiki.extension.name>
+    <xwiki.extension.name>XWiki Standard Flavor - Sub Wiki</xwiki.extension.name>
 
     <!-- Should be insalled on a wiki but not main wiki -->
     <xwiki.extension.namespaces>[wiki:(?!xwiki$).*]</xwiki.extension.namespaces>

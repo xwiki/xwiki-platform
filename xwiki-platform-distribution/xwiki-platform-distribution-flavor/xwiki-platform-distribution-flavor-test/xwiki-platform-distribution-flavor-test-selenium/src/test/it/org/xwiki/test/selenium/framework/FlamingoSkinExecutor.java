@@ -126,7 +126,7 @@ public class FlamingoSkinExecutor extends ColibriSkinExecutor
     protected void clickEditMenuItem(String menuItemId)
     {
         // Click on the arrow in the edit button
-        getTest().clickLinkWithLocator("//div[@id = 'tmEdit']/a[contains(@role, 'button')]");
+        getTest().clickLinkWithLocator("//div[@id='tmEdit']/*[contains(@class, 'dropdown-toggle')]");
         getTest().clickLinkWithLocator(menuItemId);
     }
 

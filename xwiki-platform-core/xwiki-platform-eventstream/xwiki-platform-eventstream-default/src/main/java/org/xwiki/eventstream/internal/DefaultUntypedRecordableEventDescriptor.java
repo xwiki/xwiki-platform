@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * This is the default implementation of {@link UntypedRecordableEventDescriptor}.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordableEventDescriptor, WikiComponent
 {

@@ -228,7 +228,7 @@ public interface TemplateManager
      * @param author the template author
      * @return the template
      * @throws Exception if an error occurred during template instanciation
-     * @since 9.5RC1
+     * @since 9.6RC1
      */
     default Template createStringTemplate(String content, DocumentReference author) throws Exception
     {

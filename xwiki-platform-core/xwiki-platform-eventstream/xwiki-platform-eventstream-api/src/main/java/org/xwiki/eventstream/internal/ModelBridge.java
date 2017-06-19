@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  * This is an internal role that allows requests to the model without having dependencies on xwiki-platform-oldcore.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 @Role
 public interface ModelBridge

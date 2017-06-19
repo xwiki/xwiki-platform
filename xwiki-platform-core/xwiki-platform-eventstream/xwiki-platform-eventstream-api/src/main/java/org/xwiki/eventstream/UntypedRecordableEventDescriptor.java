@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * UntypedRecordableEventDescriptors are registered
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 @Unstable
 public interface UntypedRecordableEventDescriptor extends RecordableEventDescriptor

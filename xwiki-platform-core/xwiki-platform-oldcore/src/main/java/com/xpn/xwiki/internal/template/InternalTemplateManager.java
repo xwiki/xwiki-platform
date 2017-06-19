@@ -909,7 +909,7 @@ public class InternalTemplateManager
     /**
      * Create a DefaultTemplate with the given content and the given author.
      *
-     * @since 9.5RC1
+     * @since 9.6RC1
      * @param content the template content
      * @param author the template author
      * @return the template

@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * can then be retrieved through the ComponentManager.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 @Unstable
 public interface UntypedRecordableEvent extends RecordableEvent

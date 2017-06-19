@@ -52,7 +52,7 @@ import org.xwiki.template.TemplateManager;
  * {@link UntypedRecordableEventDescriptor}) given the current context.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 @Component
 @Singleton

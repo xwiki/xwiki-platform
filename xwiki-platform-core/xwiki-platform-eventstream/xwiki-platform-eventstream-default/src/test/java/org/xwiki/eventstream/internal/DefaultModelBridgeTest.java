@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultModelBridge}.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class DefaultModelBridgeTest
 {

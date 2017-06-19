@@ -45,7 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * {@link DefaultUntypedRecordableEventDescriptor} against the Component Manager.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 @Component
 @Named(UntypedRecordableEventDescriptorComponentBuilder.BOUNDED_XOBJECT_CLASS)

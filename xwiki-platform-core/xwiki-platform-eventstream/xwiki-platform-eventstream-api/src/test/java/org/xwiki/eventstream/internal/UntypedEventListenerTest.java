@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
  * Units tests for {@link UntypedEventListener}.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class UntypedEventListenerTest
 {

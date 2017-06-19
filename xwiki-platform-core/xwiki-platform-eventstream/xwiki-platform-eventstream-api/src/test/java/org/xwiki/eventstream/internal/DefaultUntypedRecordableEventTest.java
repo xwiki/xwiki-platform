@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  * Unit tests for {@link DefaultUntypedRecordableEvent}.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class DefaultUntypedRecordableEventTest
 {

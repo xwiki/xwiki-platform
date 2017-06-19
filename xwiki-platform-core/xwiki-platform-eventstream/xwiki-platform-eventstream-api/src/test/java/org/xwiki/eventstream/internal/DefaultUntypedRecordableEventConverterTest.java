@@ -32,7 +32,7 @@ import static org.jgroups.util.Util.assertTrue;
  * Unit tests for {@link DefaultUntypedRecordableEventConverter}.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class DefaultUntypedRecordableEventConverterTest
 {

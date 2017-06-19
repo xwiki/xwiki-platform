@@ -26,7 +26,7 @@ import com.xpn.xwiki.internal.skin.AbstractInputSourceResource;
 
 /**
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class StringResource extends AbstractInputSourceResource<StringInputSource>
 {

@@ -25,7 +25,7 @@ import org.xwiki.eventstream.UntypedRecordableEvent;
  * Default implementation of the {@link UntypedRecordableEvent} interface.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 public class DefaultUntypedRecordableEvent implements UntypedRecordableEvent
 {

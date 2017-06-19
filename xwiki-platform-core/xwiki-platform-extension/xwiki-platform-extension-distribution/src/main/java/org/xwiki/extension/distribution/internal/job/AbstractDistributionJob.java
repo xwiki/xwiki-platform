@@ -97,10 +97,9 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         if (this.distributionManager.getDistributionExtension() != null) {
             DistributionJobStatus< ? > previousStatus = getPreviousStatus();
 
-            if (previousStatus != null
-                && previousStatus.getDistributionExtension() != null
-                && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
-                    this.distributionManager.getDistributionExtension())) {
+            if (previousStatus != null && previousStatus.getDistributionExtension() != null
+                && !Objects.equals(previousStatus.getDistributionExtension(),
+                    this.distributionManager.getDistributionExtension().getId())) {
                 status.setPreviousDistributionExtension(previousStatus.getDistributionExtension());
                 status.setPreviousDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
             }

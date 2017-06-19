@@ -71,6 +71,8 @@
     #set ($discard = $stepObj.set('title', $request.title))
     #set ($discard = $stepObj.set('placement', $request.placement))
     #set ($discard = $stepObj.set('targetPage', $request.targetPage))
+    #set ($discard = $stepObj.set('action', $request.targetAction))
+    #set ($discard = $stepObj.set('queryString', $request.get('queryString')))
     #set ($discard = $stepObj.set('backdrop', $request.backdrop))
     #set ($discard = $stepObj.set('content', $request.content))
     #if ($prevStepOrder != $stepOrder)

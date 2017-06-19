@@ -246,7 +246,7 @@
     &lt;li&gt;
       &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end"&gt;
         &lt;input type="text" name="text" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" /&gt;
-        &lt;button type="submit" class="btn" title="$services.localization.render('search')"&gt;$services.icon.renderHTML('search')&lt;/span&gt;&lt;/button&gt;
+        &lt;button type="submit" class="btn" title="$services.localization.render('search')"&gt;$services.icon.renderHTML('search')&lt;/button&gt;
       &lt;/form&gt;
     &lt;/li&gt;
   #end

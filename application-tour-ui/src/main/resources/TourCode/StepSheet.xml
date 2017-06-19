@@ -228,18 +228,20 @@ require(['jquery'], function ($) {
     var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
     var stepOrder = $('#stepOrderSelect').val();
     var nbSteps = $('#nbsteps').val();
-    var step = {  element   : (element? element: ''),
-                  title     : (title? title: ''), 
-                  backdrop  : (backdrop? backdrop :0), 
-                  content   : (content? content: ''), 
-                  placement : (placement? placement: ''), 
-                  targetPage: (targetPage? targetPage: ''), 
-                  stepOrder : (stepOrder? stepOrder: ''), 
-                  tourName  : (tourName? tourName: ''), 
-                  nbSteps   : nbSteps, 
-                  stepID    : stepID, 
-                  action    :'editStep', 
-                  xpage     :'plain'
+    var step = {  element     : (element? element: ''),
+                  title       : (title? title: ''),
+                  backdrop    : (backdrop? backdrop :0),
+                  content     : (content? content: ''),
+                  placement   : (placement? placement: ''),
+                  targetPage  : (targetPage? targetPage: ''),
+                  targetAction: (targetAction? targetAction: ''),
+                  queryString : (queryString? queryString: ''),
+                  stepOrder   : (stepOrder? stepOrder: ''),
+                  tourName    : (tourName? tourName: ''),
+                  nbSteps     : nbSteps,
+                  stepID      : stepID,
+                  action      : 'editStep',
+                  xpage       : 'plain'
                };
     $.ajax({
       url : "$xwiki.getURL('TourCode.AjaxActions')",

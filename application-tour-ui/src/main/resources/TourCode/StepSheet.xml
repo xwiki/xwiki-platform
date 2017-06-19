@@ -108,7 +108,7 @@
     #if ($isNewStep)
       &lt;input type="button" value="$services.localization.render('tour.steps.add_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
     #else
-      &lt;input type="button" value="$services.localization.render('tour.steps.edit_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
+      &lt;input type="button" value="$services.localization.render('tour.steps.save_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
     #end
   #end
 &lt;/div&gt;

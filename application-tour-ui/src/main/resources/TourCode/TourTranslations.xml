@@ -82,6 +82,7 @@ tour.steps=Steps
 tour.steps.new_step=New step
 tour.steps.add_step=Add step
 tour.steps.edit_step=Edit step
+tour.steps.save_step=Save
 tour.steps.delete_confirm=Are you sure you want to delete the step?
 tour.steps.delete_done=Delete step done!
 tour.steps.deleting=Deleting step...
@@ -93,7 +94,12 @@ tour.steps.delete=Delete
 # Upgrade
 tour.upgrade.title = Upgrade
 tour.upgrade.successList = Successfully converted the following pages:
-tour.upgrade.successNothing = You have nothing to upgrade!</content>
+tour.upgrade.successNothing = You have nothing to upgrade!
+
+# Template
+tour.template.name=Tour
+tour.template.description=Step by step tour
+</content>
   <object>
     <name>TourCode.TourTranslations</name>
     <number>0</number>

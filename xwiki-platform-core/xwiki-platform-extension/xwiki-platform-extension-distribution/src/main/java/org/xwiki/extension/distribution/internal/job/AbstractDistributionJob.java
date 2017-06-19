@@ -30,7 +30,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
-import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.AbstractJob;
@@ -134,7 +133,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
             if (previousStatus != null && previousStatus.getDistributionExtension() != null
                 && !Objects.equals(previousStatus.getDistributionExtension(),
-                    this.distributionManager.getDistributionExtension())) {
+                    this.distributionManager.getDistributionExtension().getId())) {
                 status.setPreviousDistributionExtension(previousStatus.getDistributionExtension());
                 status.setPreviousDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
             }

@@ -226,6 +226,8 @@ require(['jquery'], function ($) {
     var content = $("textarea[id^='" + prefix + "'][id$='_content']", parent).val();
     var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
     var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
+    var targetAction = $("input[id^='" + prefix + "'][id$='_action']", parent).val(); 
+    var queryString = $("input[id^='" + prefix + "'][id$='_queryString']", parent).val(); 
     var stepOrder = $('#stepOrderSelect').val();
     var nbSteps = $('#nbsteps').val();
     var step = {  element     : (element? element: ''),

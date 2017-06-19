@@ -54,8 +54,7 @@
     </roleHint>
   </class>
   <property>
-    <dataType>org.xwiki.rendering.syntax.SyntaxContent#wysiwyg
-    </dataType>
+    <dataType>org.xwiki.rendering.syntax.SyntaxContent#wysiwyg</dataType>
   </property>
   <property>
     <roleHint>ckeditor</roleHint>

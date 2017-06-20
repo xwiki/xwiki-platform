@@ -183,7 +183,7 @@
       <dependency>
         <groupId>org.xwiki.rendering</groupId>
         <artifactId>xwiki-rendering-macro-toc</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>${rendering.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>

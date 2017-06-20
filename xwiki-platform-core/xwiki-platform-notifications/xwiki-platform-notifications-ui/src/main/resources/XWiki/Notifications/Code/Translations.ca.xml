@@ -20,20 +20,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="Panels.Translations" locale="ca">
-  <web>Panels</web>
+<xwikidoc reference="XWiki.Notifications.Code.Translations" locale="ca">
+  <web>XWiki.Notifications.Code</web>
   <name>Translations</name>
   <language>ca</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Panels.WebHome</parent>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1393442253000</creationDate>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
+  <creationDate>1488298319000</creationDate>
+  <date>1488301583000</date>
+  <contentUpdateDate>1488301583000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <defaultTemplate/>
@@ -43,8 +43,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
-panels._actions=Accions
-panels.children.title=Pàgines Filles
-panels.siblings.title=Pàgines Germanes
+notifications.menu.header=Notificacions
+notifications.menu.header.settings=Preferències
+notifications.menu.nothing=No hi ha notificacions disponibles\!
+platform.core.profile.category.notifications=Notificacions
 </content>
 </xwikidoc>

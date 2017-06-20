@@ -76,6 +76,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Xwiki;
@@ -164,6 +166,11 @@ public class TestUtils
      * @since 7.3M1
      */
     public static final int[] STATUS_CREATED = new int[] { Status.CREATED.getStatusCode() };
+
+    /**
+     * @since 9.5RC1
+     */
+    public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
 
     private static PersistentTestContext context;
 
@@ -2443,5 +2450,25 @@ public class TestUtils
 
             return resource;
         }
+    }
+
+    /**
+     * Set the default WYSIWYG editor to GWT based one.
+     * 
+     * @since 9.5RC1
+     */
+    // FIXME: we really need to get rid of that need...
+    public void setGWTWYSIWYG() throws Exception
+    {
+        ObjectPropertyReference editorReference =
+            new ObjectPropertyReference("roleHint", new ObjectReference("XWiki.EditorBindingClass[0]",
+                new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences")));
+
+        Property property = new Property();
+        property.setValue("gwt");
+
+        TestUtils.assertStatusCodes(
+            rest().executePut(ObjectPropertyResource.class, property, rest().toElements(editorReference)), true,
+            STATUS_ACCEPTED);
     }
 }

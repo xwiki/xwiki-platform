@@ -83,11 +83,17 @@
 #**
  * Display a line with the name of all users
  * @param $users the users to display
+ * @param $link (since 9.5) either or not an HTML link to the user must be generated (default: true)
  *#
-#macro(displayNotificationEventUsers $users)##
+#macro(displayNotificationEventUsers $users $link)##
 ## The indent is bad to not introduce space charaters in the results
+#if("$!link" == '')#set ($link = true)#end
 #foreach ($user in $users)##
 #if ($velocityCount > 1 and $velocityCount == $users.size()) &amp; #elseif($velocityCount > 1), #end##
+#if ($link)
 $xwiki.getUserName($user)##
+#else
+$xwiki.getPlainUserName($user)##
+#end
 #end##
 #end##

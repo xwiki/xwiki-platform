@@ -188,7 +188,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
 
     private void updateFactoryParameters() throws NotificationException, AddressException
     {
-        handleEvents(this.currentUser);
+        handleEvents();
 
         try {
             factoryParameters.put(FROM, new InternetAddress(mailSenderConfiguration.getFromAddress()));

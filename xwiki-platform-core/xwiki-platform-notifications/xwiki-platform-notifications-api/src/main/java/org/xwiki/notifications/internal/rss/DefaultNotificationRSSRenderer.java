@@ -23,11 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -35,6 +36,12 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.notifications.rss.NotificationRSSRenderer;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.TemplateManager;
 
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
@@ -55,6 +62,11 @@ import com.rometools.rome.feed.synd.SyndPersonImpl;
 @Singleton
 public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
 {
+    /**
+     * The binding name of a composite event when the description of this composite event is rendered.
+     */
+    public static final String COMPOSITE_EVENT_BUILDING_NAME = "event";
+
     @Inject
     private Logger logger;
 
@@ -66,6 +78,16 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
+    @Inject
+    @Named("xwiki/2.1")
+    private BlockRenderer blockRenderer;
 
     @Override
     public SyndEntry renderNotification(CompositeEvent eventNotification) throws NotificationException
@@ -92,19 +114,30 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         // Define the GUID of the event
         entry.setUri(String.join("-", eventNotification.getEventIds()));
 
-        // Define the description of the RSS entry
-        // We create an HTML list containing the description of every events contained in the composite event
-        entry.setTitle(eventNotification.getType());
-        StringBuilder description = new StringBuilder();
-        for (Event event : eventNotification.getEvents()) {
-            description.append(String.format("- %s\n",
-                    this.contextualLocalizationManager.getTranslationPlain(event.getBody())));
-        }
+        // Set the entry title
+        entry.setTitle(this.contextualLocalizationManager.getTranslationPlain(eventNotification.getType()));
 
-        // Add the description to the entry
-        entryDescription.setType("text/plain");
-        entryDescription.setValue(description.toString());
-        entry.setDescription(entryDescription);
+        // Render the description (the main part) of the feed entry
+        try {
+            this.scriptContextManager.getCurrentScriptContext().setAttribute(
+                    COMPOSITE_EVENT_BUILDING_NAME, eventNotification, ScriptContext.ENGINE_SCOPE);
+
+            XDOM descriptionXDOM = this.templateManager.execute("notification/rss/default.vm");
+
+            WikiPrinter printer = new DefaultWikiPrinter();
+            blockRenderer.render(descriptionXDOM, printer);
+
+            // Add the description to the entry
+            entryDescription.setType("text/html");
+            entryDescription.setValue(printer.toString());
+            entry.setDescription(entryDescription);
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Unable to render the description of the event [%s].", eventNotification), e);
+        } finally {
+            this.scriptContextManager.getCurrentScriptContext().removeAttribute(
+                    COMPOSITE_EVENT_BUILDING_NAME, ScriptContext.ENGINE_SCOPE);
+        }
 
         // Dates are sorted in descending order in a CompositeEvent, the first date is then the most recent one
         entry.setUpdatedDate(eventNotification.getDates().get(0));
@@ -136,7 +169,8 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
             try {
                 entries.add(this.renderNotification(event));
             } catch (NotificationException e) {
-                logger.warn(String.format("Unable to render RSS entry for CompositeEvent : %s", e.getMessage()));
+                this.logger.warn(
+                        String.format("Unable to render RSS entry for CompositeEvent : %s", e.getMessage()));
             }
         }
         feed.setEntries(entries);

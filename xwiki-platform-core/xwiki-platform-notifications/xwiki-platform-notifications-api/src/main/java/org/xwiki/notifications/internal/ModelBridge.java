@@ -89,4 +89,16 @@ public interface ModelBridge
      */
     void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
             throws NotificationException;
+
+    /**
+     * Return the URL of the given {@link DocumentReference} for the given action.
+     *
+     * @param documentReference the reference
+     * @param action the request action
+     * @param parameters the request parameters
+     * @return the URL of the given reference
+     *
+     * @since 9.6RC1
+     */
+    String getDocumentURL(DocumentReference documentReference, String action, String parameters);
 }

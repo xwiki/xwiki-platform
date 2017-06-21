@@ -43,9 +43,13 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationRenderer;
 import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.rss.NotificationRSSRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
 
 /**
  * Script services for the notifications.
@@ -67,6 +71,9 @@ public class NotificationScriptService implements ScriptService
 
     @Inject
     private NotificationRenderer notificationRenderer;
+
+    @Inject
+    private NotificationRSSRenderer notificationRSSRenderer;
 
     @Inject
     private EventStatusManager eventStatusManager;
@@ -252,5 +259,41 @@ public class NotificationScriptService implements ScriptService
     public void setStartDate(String userId, Date startDate) throws NotificationException
     {
         notificationManager.setStartDate(userId, startDate);
+    }
+
+    /**
+     * Get the RSS notifications rss of the given user.
+     *
+     * @param entryNumber number of entries to get
+     * @param onlyUnread if only unread events should be returned
+     * @return the notifications RSS rss
+     * @throws NotificationException if an error occurs
+     * @since 9.6RC1
+     */
+    public String getFeed(int entryNumber, boolean onlyUnread) throws NotificationException
+    {
+        String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
+        return this.getFeed(userId, entryNumber, onlyUnread);
+    }
+
+    /**
+     * Get the RSS notifications rss of the given user.
+     *
+     * @param userId id of the user
+     * @param entryNumber number of entries to get
+     * @param onlyUnread if only unread events should be returned
+     * @return the notifications RSS rss
+     * @throws NotificationException if an error occurs
+     * @since 9.6RC1
+     */
+    public String getFeed(String userId, int entryNumber, boolean onlyUnread) throws NotificationException
+    {
+        SyndFeedOutput output = new SyndFeedOutput();
+        try {
+            return output.outputString(this.notificationRSSRenderer.renderFeed(
+                    this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
+        } catch (FeedException e) {
+            throw new NotificationException("Unable to render RSS feed : [%s]", e);
+        }
     }
 }

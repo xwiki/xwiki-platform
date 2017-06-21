@@ -247,4 +247,10 @@ public class DefaultModelBridge implements ModelBridge
             throw new NotificationException(String.format("Failed to update the object [%s].", objectReference), e);
         }
     }
+
+    @Override
+    public String getDocumentURL(DocumentReference documentReference, String action, String parameters) {
+        XWikiContext context = contextProvider.get();
+        return context.getWiki().getExternalURL(documentReference, action, parameters, null, context);
+    }
 }

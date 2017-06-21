@@ -123,7 +123,8 @@ public class UntypedEventListener extends AbstractEventListener
                 }
             }
         } catch (ComponentLookupException e) {
-            logger.error("Unable to retrieve UntypedRecordableEventDescriptor from the ComponentManager.", e);
+            logger.error("Unable to retrieve a list of registered UntypedRecordableEventDescriptor "
+                    + "from the ComponentManager.", e);
         }
     }
 

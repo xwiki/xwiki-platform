@@ -71,6 +71,7 @@ notifications.preferences.scope.table.location=Location
 notifications.preferences.scope.table._actions=Actions
 notifications.email.title=Event(s) on the wiki:
 notifications.email.subject={0} event(s) on the wiki
+notifications.email.seeChanges=Changes: {0}
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Weekly</content>

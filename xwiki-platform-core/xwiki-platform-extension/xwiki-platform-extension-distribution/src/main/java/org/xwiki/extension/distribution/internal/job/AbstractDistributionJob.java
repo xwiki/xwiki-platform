@@ -20,11 +20,11 @@
 package org.xwiki.extension.distribution.internal.job;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.Condition;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;

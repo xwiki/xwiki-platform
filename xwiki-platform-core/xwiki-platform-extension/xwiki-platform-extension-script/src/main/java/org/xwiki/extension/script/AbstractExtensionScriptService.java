@@ -161,6 +161,19 @@ public abstract class AbstractExtensionScriptService implements ScriptService
         return WIKI_NAMESPACE_PREFIX + wiki;
     }
 
+    /**
+     * Add to the job request various information about the current context.
+     * 
+     * @param request the job request
+     * @since 9.5
+     */
+    public void contextualize(AbstractRequest request)
+    {
+        // Provide informations on what started the job
+        request.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
+        request.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
+    }
+
     // Error management
 
     /**

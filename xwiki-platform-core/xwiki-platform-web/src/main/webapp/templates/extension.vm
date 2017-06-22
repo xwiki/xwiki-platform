@@ -104,13 +104,15 @@
   ${name}##
 #end
 
-#macro (displayExtensionActionButtons $extension)
+#macro (displayExtensionActionButtons $extension $readOnly)
   <div class="extension-actions">
     #displayExtensionActionButtons_detailsToggle($extension)
-    ## Group the buttons that trigger an extension job.
-    <span class="dynamic-button-group">
-      #displayExtensionActionButtons_jobTriggers($extension)
-    </span>
+    #if (!$readOnly)
+      ## Group the buttons that trigger an extension job.
+      <span class="dynamic-button-group">
+        #displayExtensionActionButtons_jobTriggers($extension)
+      </span>
+    #end
   </div>
 #end
 
@@ -926,13 +928,14 @@ $namespace##
   </div>
 #end
 
-#macro (displayExtension $extension)
+#macro (displayExtension $extension $readOnly)
   ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
   #set ($jobStatus = $NULL)
   #isShowingExtensionDetails($extension $showExtensionDetails)
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   <form action="$xwiki.relativeRequestURL" method="post" class="extension-item extension-item-${extensionStatus}">
     <div class="hidden">
+      <input name="readOnly" value="$!readOnly" type="hidden" />
       <input name="extensionId" value="$!escapetool.xml($extension.id.id)" type="hidden" />
       <input name="extensionVersion" value="$!escapetool.xml($extension.id.version.value)" type="hidden" />
       <input name="extensionNamespace" value="$!escapetool.xml($extensionNamespace)" type="hidden" />
@@ -953,7 +956,7 @@ $namespace##
       #if ($extensionStatusMessage)
         <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
       #end
-      #displayExtensionActionButtons($extension)
+      #displayExtensionActionButtons($extension, $readOnly)
       #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)
         #displayExtensionAuthors($extension)
@@ -1014,6 +1017,7 @@ $namespace##
   #else
     ## Display the extension.
     ## Create a dependency in order to support version constraints (e.g. a version range).
+    #set ($readOnly = $request.readOnly == 'true')
     #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersion))
     #if ($dependency.versionConstraint.version && $dependency.versionConstraint.ranges.isEmpty())
       ## A precise version was specified so we resolve the requested extension.
@@ -1024,7 +1028,7 @@ $namespace##
       #set ($extension = $extensionManager.resolve($dependency, $extensionNamespace))
     #end
     #if ($extension)
-      #displayExtension($extension)
+      #displayExtension($extension, $readOnly)
     #else
       <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",

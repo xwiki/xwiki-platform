@@ -360,6 +360,10 @@ public class DefaultNotificationManager implements NotificationManager
         for (CompositeEvent existingCompositeEvent : results) {
             for (Event existingEvent : existingCompositeEvent.getEvents()) {
                 int similarity = similarityCalculator.computeSimilarity(event, existingEvent);
+                if (similarity < existingCompositeEvent.getSimilarityBetweenEvents()) {
+                    // Penality
+                    similarity -= 5;
+                }
                 if (similarity > bestSimilarity.value) {
                     bestSimilarity.value = similarity;
                     bestSimilarity.event = existingEvent;

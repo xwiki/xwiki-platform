@@ -20,6 +20,7 @@
 package org.xwiki.platform.flavor.script;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -27,8 +28,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.job.Job;
@@ -246,5 +249,41 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
     public ExtensionId getFlavorOfWiki(String wikiId)
     {
         return this.flavorManager.getFlavorOfWiki(wikiId);
+    }
+
+    /**
+     * Get the flavor installed on a given namespace.
+     * 
+     * @param namespace the namespace where to search for the flavor
+     * @return the installed flavor extension
+     * @since 9.5
+     */
+    public InstalledExtension getFlavorExtension(Namespace namespace)
+    {
+        return safe(this.flavorManager.getFlavorExtension(namespace));
+    }
+
+    /**
+     * Get the flavors know to be compatible with the distribution.
+     * <p>
+     * Each {@link ExtensionId} always contains the flavor id but version might be null.
+     * 
+     * @return the already known flavors
+     * @since 9.5
+     */
+    public Collection<ExtensionId> getKnownFlavors()
+    {
+        return this.flavorManager.getKnownFlavors();
+    }
+
+    /**
+     * Get the flavors identifiers know to be incompatible with the distribution.
+     * 
+     * @return the already known flavors
+     * @since 9.5
+     */
+    public Collection<String> getKnownInvalidFlavors()
+    {
+        return this.flavorManager.getKnownInvalidFlavors();
     }
 }

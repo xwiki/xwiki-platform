@@ -274,9 +274,7 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
         request.setInteractive(true);
         request.setRecords(records);
 
-        // Provide information on what started the job.
-        request.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
-        request.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
+        contextualize(request);
 
         setRightsProperties(request);
 

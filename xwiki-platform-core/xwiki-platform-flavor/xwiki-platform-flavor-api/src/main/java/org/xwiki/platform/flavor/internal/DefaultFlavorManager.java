@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
@@ -158,15 +159,27 @@ public class DefaultFlavorManager implements FlavorManager
     @Override
     public ExtensionId getFlavorOfWiki(String wikiId)
     {
-        String namespace = "wiki:" + wikiId;
+        Namespace namespace = new Namespace("wiki", wikiId);
+
+        InstalledExtension flavor = getFlavorExtension(namespace);
+
+        if (flavor != null) {
+            return flavor.getId();
+        }
+
+        return null;
+    }
+
+    @Override
+    public InstalledExtension getFlavorExtension(Namespace namespace)
+    {
         try {
-            for (InstalledExtension extension : installedRepository.searchInstalledExtensions(namespace,
-                new FlavorQuery())) {
-                // Don't consider a dependency as the top level flavor, because a flavor can be a combination of other
-                // flavors
-                if (!extension.isDependency(namespace)) {
+            for (InstalledExtension extension : this.installedRepository
+                .searchInstalledExtensions(namespace.serialize(), new FlavorQuery())) {
+                // Assume there is only one non dependency with the tag "flavor" so return the first one found
+                if (!extension.isDependency(namespace.serialize())) {
                     // There should be only one flavor per wiki
-                    return extension.getId();
+                    return extension;
                 }
             }
         } catch (SearchException e) {
@@ -176,9 +189,10 @@ public class DefaultFlavorManager implements FlavorManager
         // If nothing has been found, look for extensions that was not tagged as flavors but that are in the list of
         // old flavors
         for (String oldFlavor : getExtensionsConsideredAsFlavors()) {
-            InstalledExtension installedExtension = installedRepository.getInstalledExtension(oldFlavor, namespace);
+            InstalledExtension installedExtension =
+                this.installedRepository.getInstalledExtension(oldFlavor, namespace.serialize());
             if (installedExtension != null) {
-                return installedExtension.getId();
+                return installedExtension;
             }
         }
 

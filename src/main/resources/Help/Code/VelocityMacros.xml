@@ -138,11 +138,11 @@
     #set ($url = $documentationURL)
   #end
   &lt;div class="well"&gt;
-    #if ($data.icon)
-      &lt;span class="icon $data.icon"&gt;&lt;/span&gt;
-    #end
     &lt;h6&gt;
       &lt;a href="$!url"&gt;
+        #if ($data.icon)
+          &lt;span class="icon $data.icon"&gt;&lt;/span&gt;
+        #end
         $escapetool.xml($data.title)
       &lt;/a&gt;
     &lt;/h6&gt;
@@ -387,7 +387,7 @@
   h6 a {
     color: @text-color;
   }
-  a:hover {
+  a:hover, a:focus {
     text-decoration: none;
   }
   ul.noitems {
@@ -399,7 +399,9 @@
   }
   .icon {
     color: @text-muted;
+    display: block;
     font-size: 300%;
+    margin-bottom: 10px;
   }
 }
 

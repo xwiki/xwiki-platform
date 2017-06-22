@@ -19,14 +19,17 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Perform tests on the notifications module.
@@ -69,7 +72,7 @@ public class NotificationsTest extends AbstractTest
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
 
-        // The user 1 creates a new page, the user 2 shouldn’t recieve any notification
+        // The user 1 creates a new page, the user 2 shouldn’t receive any notification
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         getUtil().createPage(getTestClassName(), "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
         getUtil().gotoPage(getTestClassName(), "WebHome");
@@ -129,4 +132,44 @@ public class NotificationsTest extends AbstractTest
         assertEquals(1, tray.getNotificationsCount());
         tray.clearAllNotifications();
     }
+
+    @Test
+    public void testCompositeNotifications() throws Exception
+    {
+        NotificationsUserProfilePage p;
+        NotificationsTrayPage tray;
+        // Now we enable "create", "update" and "comment" for user 2
+        getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        p.setPageCreated(false);
+        p.setPageUpdated(true);
+        p.setPageCommented(true);
+
+        // Create a page, edit it twice, and finally add a comment
+        getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        getUtil().createPage(getTestClassName(), "Linux", "Simple content", "Linux as a title");
+        ViewPage page = getUtil().gotoPage(getTestClassName(), "Linux");
+        page.edit();
+        WikiEditPage edit = new WikiEditPage();
+        edit.setContent("Linux is a part of GNU/Linux");
+        edit.clickSaveAndContinue(true);
+        edit.setContent("Linux is a part of GNU/Linux - it's the kernel");
+        edit.clickSaveAndView(true);
+        page = getUtil().gotoPage(getTestClassName(), "Linux");
+        CommentsTab commentsTab = page.openCommentsDocExtraPane();
+        commentsTab.postComment("Linux is a great OS", true);
+
+        // Check that events have been grouped together (see: https://jira.xwiki.org/browse/XWIKI-14114)
+        getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        getUtil().gotoPage(getTestClassName(), "WebHome");
+        tray = new NotificationsTrayPage();
+        assertEquals(2, tray.getNotificationsCount());
+        assertEquals("The document Linux as a title has been commented by user1.",
+                tray.getNotificationContent(0));
+        assertEquals("[update]", tray.getNotificationType(1));
+        assertEquals("[update] Linux as a title", tray.getNotificationContent(1));
+        tray.clearAllNotifications();
+
+    }
 }
+

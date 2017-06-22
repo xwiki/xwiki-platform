@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -253,6 +254,16 @@ public class InternalTemplateManager
             } else {
                 return new DefaultTemplateContent(content);
             }
+        }
+    }
+
+    private class StringTemplate extends DefaultTemplate
+    {
+        StringTemplate(String content, DocumentReference authorReference) throws Exception {
+            super(new StringResource(content));
+            // Initialize the template content
+            // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
+            ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
         }
     }
 
@@ -889,5 +900,18 @@ public class InternalTemplateManager
         }
 
         return template;
+    }
+
+    /**
+     * Create a DefaultTemplate with the given content and the given author.
+     *
+     * @since 9.6RC1
+     * @param content the template content
+     * @param author the template author
+     * @return the template
+     */
+    public Template createStringTemplate(String content, DocumentReference author) throws Exception
+    {
+        return new StringTemplate(content, author);
     }
 }

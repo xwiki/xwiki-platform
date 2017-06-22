@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package com.xpn.xwiki.internal.template;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>9.6-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-eventstream</artifactId>
-  <name>XWiki Platform - Event Stream - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Modules related to the Event Stream</description>
-  <modules>
-    <module>xwiki-platform-eventstream-api</module>
-    <module>xwiki-platform-eventstream-default</module>
-    <module>xwiki-platform-eventstream-ui</module>
-  </modules>
-</project>
+import org.apache.commons.lang.NotImplementedException;
+import org.xwiki.filter.input.StringInputSource;
+
+import com.xpn.xwiki.internal.skin.AbstractInputSourceResource;
+
+/**
+ * @version $Id$
+ * @since 9.6RC1
+ */
+public class StringResource extends AbstractInputSourceResource<StringInputSource>
+{
+    /**
+     * @param resourceContent the content of the resource
+     */
+    public StringResource(String resourceContent)
+    {
+        super(null, "StringResource", null, new StringInputSource(resourceContent));
+    }
+
+    @Override
+    public String getURL(boolean forceSkinAction) throws Exception
+    {
+        // A StringResource does not depends on a particular URL
+        throw new NotImplementedException();
+    }
+}

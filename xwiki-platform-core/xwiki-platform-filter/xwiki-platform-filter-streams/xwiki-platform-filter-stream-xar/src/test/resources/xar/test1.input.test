@@ -92,6 +92,10 @@
             <p>
               <parameters>
                 <entry>
+                  <string>name</string>
+                  <string>space.nestedspace.page</string>
+                </entry>
+                <entry>
                   <string>customclass</string>
                   <string></string>
                 </entry>
@@ -135,6 +139,10 @@
             <p>
               <parameters>
                 <entry>
+                  <string>name</string>
+                  <string>space.nestedspace.page</string>
+                </entry>
+                <entry>
                   <string>number</string>
                   <int>0</int>
                 </entry>
@@ -151,6 +159,10 @@
             <wikiClass>
               <p>
                 <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>XWiki.StyleSheetExtension</string>
+                  </entry>
                   <entry>
                     <string>customclass</string>
                     <string></string>
@@ -238,15 +250,64 @@
                 <wikiClassPropertyField name="values" value="onDemand=On demand|always=Always"></wikiClassPropertyField>
               </wikiClassProperty>
             </wikiClass>
-            <wikiObjectProperty name="cache" value="long"></wikiObjectProperty>
-            <wikiObjectProperty name="code" value="some code"></wikiObjectProperty>
-            <wikiObjectProperty name="name" value="name"></wikiObjectProperty>
-            <wikiObjectProperty name="parse" value=""></wikiObjectProperty>
-            <wikiObjectProperty name="use" value="onDemand"></wikiObjectProperty>
+            <wikiObjectProperty name="cache" value="long">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="code" value="some code">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.TextAreaClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="name" value="name">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.StringClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="parse" value="">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.BooleanClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="use" value="onDemand">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
           </wikiObject>
           <wikiObject name="space.nestedspace.page[0]">
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.nestedspace.page</string>
+                </entry>
                 <entry>
                   <string>number</string>
                   <int>0</int>
@@ -264,6 +325,10 @@
             <wikiClass>
               <p>
                 <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>space.nestedspace.page</string>
+                  </entry>
                   <entry>
                     <string>customclass</string>
                     <string></string>
@@ -304,7 +369,16 @@
                 <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
               </wikiClassProperty>
             </wikiClass>
-            <wikiObjectProperty name="property" value="12"></wikiObjectProperty>
+            <wikiObjectProperty name="property" value="12">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.NumberClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
           </wikiObject>
         </wikiDocumentRevision>
       </wikiDocumentLocale>
@@ -399,6 +473,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>customclass</string>
                 <string></string>
               </entry>
@@ -442,6 +520,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>number</string>
                 <int>0</int>
               </entry>
@@ -458,6 +540,10 @@
           <wikiClass>
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>XWiki.StyleSheetExtension</string>
+                </entry>
                 <entry>
                   <string>customclass</string>
                   <string></string>
@@ -545,15 +631,64 @@
               <wikiClassPropertyField name="values" value="onDemand=On demand|always=Always"></wikiClassPropertyField>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="cache" value="long"></wikiObjectProperty>
-          <wikiObjectProperty name="code" value="some code"></wikiObjectProperty>
-          <wikiObjectProperty name="name" value="name"></wikiObjectProperty>
-          <wikiObjectProperty name="parse" value=""></wikiObjectProperty>
-          <wikiObjectProperty name="use" value="onDemand"></wikiObjectProperty>
+          <wikiObjectProperty name="cache" value="long">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="code" value="some code">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.TextAreaClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="name" value="name">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.StringClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="parse" value="">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.BooleanClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="use" value="onDemand">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
         <wikiObject name="space.page[0]">
           <p>
             <parameters>
+              <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
               <entry>
                 <string>number</string>
                 <int>0</int>
@@ -571,6 +706,10 @@
           <wikiClass>
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.page</string>
+                </entry>
                 <entry>
                   <string>customclass</string>
                   <string></string>
@@ -611,7 +750,16 @@
               <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="property" value="12"></wikiObjectProperty>
+          <wikiObjectProperty name="property" value="12">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.NumberClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
       </wikiDocumentRevision>
     </wikiDocumentLocale>

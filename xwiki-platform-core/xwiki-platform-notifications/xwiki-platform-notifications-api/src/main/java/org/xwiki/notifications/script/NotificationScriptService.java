@@ -293,7 +293,7 @@ public class NotificationScriptService implements ScriptService
             return output.outputString(this.notificationRSSRenderer.renderFeed(
                     this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
         } catch (FeedException e) {
-            throw new NotificationException("Unable to render RSS feed : [%s]", e);
+            throw new NotificationException("Unable to render RSS feed", e);
         }
     }
 }

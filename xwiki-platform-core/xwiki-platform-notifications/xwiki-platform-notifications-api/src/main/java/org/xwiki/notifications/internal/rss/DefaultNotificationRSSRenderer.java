@@ -86,7 +86,7 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
     private ScriptContextManager scriptContextManager;
 
     @Inject
-    @Named("xwiki/2.1")
+    @Named("html/5.0")
     private BlockRenderer blockRenderer;
 
     @Override
@@ -115,7 +115,9 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         entry.setUri(String.join("-", eventNotification.getEventIds()));
 
         // Set the entry title
-        entry.setTitle(this.contextualLocalizationManager.getTranslationPlain(eventNotification.getType()));
+        entry.setTitle(this.contextualLocalizationManager.getTranslationPlain(
+                eventNotification.getEvents().get(0).getTitle(),
+                eventNotification.getEvents().get(0).getDocumentTitle()));
 
         // Render the description (the main part) of the feed entry
         try {

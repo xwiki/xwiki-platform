@@ -177,7 +177,7 @@ public class NotificationsTrayPage  extends ViewPage
         }
 
         return this.getNotifications().get(notificationNumber).findElement(
-                By.cssSelector("p:nth-child(2) a")).getText();
+                By.cssSelector("p:nth-child(2)")).getText();
     }
 
     /**

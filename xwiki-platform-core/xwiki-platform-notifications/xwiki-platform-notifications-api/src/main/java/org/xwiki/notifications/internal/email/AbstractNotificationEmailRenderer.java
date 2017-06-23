@@ -72,26 +72,47 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
     @Inject
     protected RenderingContext renderingContext;
 
+    /**
+     * Execute a template.
+     *
+     * @param event composite event to render
+     * @param templatePath path of the template to use (with a %s that the method will replace by the event type)
+     * @param syntax syntax of the template and of the output
+     * @return the rendered template
+     * @throws NotificationException if something wrong happens
+     */
     protected Block executeTemplate(CompositeEvent event, String templatePath, Syntax syntax)
             throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWikiURLFactory originalURLFactory = context.getURLFactory();
-        Syntax originalSyntax = renderingContext.getTargetSyntax();
         try {
+            // Bind the event to some variable in the velocity context
             velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, event);
+            // Use the external URL factory to generate full URLs
             context.setURLFactory(new ExternalServletURLFactory(context));
-            ((MutableRenderingContext) renderingContext).setTargetSyntax(syntax);
-
+            // Set the given syntax in the rendering context
+            if (renderingContext instanceof MutableRenderingContext) {
+                ((MutableRenderingContext) renderingContext).push(null, null, syntax, null,
+                        false, syntax);
+            }
+            // Generate the full template name
             String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
+            // Get the template
             Template template = templateManager.getTemplate(templateName);
+            // Render the template or fallback to the default one
             return template != null ? templateManager.execute(template)
                     : templateManager.execute(String.format(templatePath, "default"));
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         } finally {
-            ((MutableRenderingContext) renderingContext).setTargetSyntax(originalSyntax);
+            // Cleaning the rendering context
+            if (renderingContext instanceof MutableRenderingContext) {
+                ((MutableRenderingContext) renderingContext).pop();
+            }
+            // Cleaning the URL factory
             context.setURLFactory(originalURLFactory);
+            // Cleaning the velocity context
             velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
         }
     }

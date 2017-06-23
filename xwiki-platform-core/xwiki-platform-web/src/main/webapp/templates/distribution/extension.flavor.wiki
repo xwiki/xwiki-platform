@@ -7,40 +7,101 @@
 
 {{velocity output="false"}}
 ## Globals
-#set ($flavorId = $services.flavor.getFlavorOfWiki($services.wiki.currentWikiId))
-#set ($extensionNamespace = "wiki:${services.wiki.currentWikiId}")
-#set ($isFlavorValid = $flavorId && $services.extension.installed.getInstalledExtension($flavorId.id, $extensionNamespace).isValid($extensionNamespace))
+#set ($currentNamespace = "wiki:${services.wiki.currentWikiId}")
+#set ($currentFlavor = $services.flavor.getFlavorExtension($currentNamespace))
+#set ($isCurrentFlavorValid = $currentFlavor && $currentFlavor.isValid($extensionNamespace))
+#set ($knownFlavors = $services.flavor.knownFlavors)
+#set ($knownInvalidFlavors = $services.flavor.knownInvalidFlavors)
 
 #macro(controller)
-  #if ($flavorId && !$isFlavorValid)
-    ## TODO: propose an upgrade of the flavor
-    #set ($showCompleteStepButton = true)
-  #elseif ($request.noFlavor)
+  #if ($request.noFlavor)
     ## Let the wiki be empty
     #displayNoFlavor()
   #elseif ($request.installFlavor && $request.flavor)
     ## The user has selected a flavor, let's propose him to install it
     #displayFlavorInstallationStep()
+  #elseif ($currentFlavor && !$isCurrentFlavorValid)
+    ## The current flavor is invalid, try to fix it
+    #displayInvalidFlavor()
   #else
     ## No flavor is currently installed or even selected by the user, display the flavor picker
     #displayFlavorPickerStep()
   #end
 #end
 
-#macro(createUpdateFlavorPlan)
-  ## TODO: this code is not working, fix it
-  #set($installRequest = $services.extension.createUpgradePlanRequest($extensionNamespace))
-  #set($discard = $installRequest.addExtension($flavorId))
-  #set($job = $services.extension.createUpgradePlan($installRequest))
-    
+#macro(displayInvalidFlavor)
+  #if ($request.startUpgradePlan)
+    #set ($upgradePlanRequest = $extensionManager.createUpgradePlanRequest($currentFlavor, $extensionNamespace))
+    #set ($upgradePlanJob = $extensionManager.createUpgradePlan($upgradePlanRequest))
+    #set ($upgradePlan = $upgradePlanJob.status)
+  #else
+    #set ($upgradePlan = $extensionManager.getExtensionPlanJobStatus($currentFlavor.id.id, $extensionNamespace))
+  #end
+  #if ($isAjaxRequest)
+    #displayUpgradeInvalidFlavorStatus()
+  #else
+      == $services.localization.render('platform.extension.distributionWizard.flavorStepCurrentFlavorLabel')
+
+      {{html}}#displayExtension($currentFlavor, true){{/html}}
+
+      {{error}}$services.localization.render('platform.extension.distributionWizard.flavorStepCurrentFlavorInvalidError'){{/error}}
+
+    #if (!$knownInvalidFlavors.contains($currentFlavor.id.id))
+      == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeLabel')
+
+      #displayUpgradeInvalidFlavor()
+
+      == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewLabel')
+    #else
+      == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewLabel')
+    #end
+
+    #displayFlavorPickerStep()
+  #end
+#end
+
+#macro(displayUpgradeInvalidFlavor)
   {{html}}
-    #displayExtensionUpdaterPlan($job.status)
+    <form action="$xwiki.relativeRequestURL" method="post">
+      <input class="button" type="submit" name="startUpgradePlan" value="Check for updates"/>
+    </form>
   {{/html}}
+
+  #displayUpgradeInvalidFlavorStatus()
+#end
+
+#macro(displayUpgradeInvalidFlavorStatus)
+  (% class="extensionUpdater" %)(((
+    #if ($upgradePlan.state == 'FINISHED')
+      (% class="xHint" %)
+      $services.localization.render('platform.extension.updater.lastCheckDate',
+          [$xwiki.formatDate($upgradePlan.endDate)])
+
+      #if ($plan.error)
+        {{html}}#displayExtensionUpdaterPlanStatus($upgradePlan){{/html}}
+      #else
+        #set ($upgradePlanIterator = $upgradePlan.tree.iterator())
+        #if ($upgradePlanIterator.hasNext())
+          {{html}}#displayExtension($upgradePlanIterator.next()){{/html}}
+        #else
+          {{error}}$services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorNoUpgradeError', [$currentFlavor.id.id]){{/error}}
+        #end
+      #end
+    #elseif ($upgradePlan)
+      (% class="xHint" %)
+      {{translation key="platform.extension.updater.loading"/}}
+
+      {{html}}
+        #displayJobProgressBar($upgradePlan)
+        #displayExtensionUpdaterPlanStatus($upgradePlan)
+      {{/html}}
+    #end
+  )))
 #end
 
 #macro(displayFlavorLabel $message $backButtonMessage)
   <div>
-    <label class="xLabel">Flavor</label>
+    <label class="xLabel">$services.localization.render('platform.extension.distributionWizard.extension.flavorStepTitle')</label>
   </div>
   <div class="flavorRow">
     <div class="flavorLeft">

@@ -1,3 +1,0 @@
-org.xwiki.eventstream.internal.DefaultEventFactory
-org.xwiki.eventstream.internal.DefaultRecordableEventDescriptorManager
-org.xwiki.eventstream.script.EventStreamScriptService

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
@@ -153,5 +154,11 @@ public class DefaultTemplateManager implements TemplateManager
     public Template getTemplate(String templateName)
     {
         return this.templateManager.getTemplate(templateName);
+    }
+
+    @Override
+    public Template createStringTemplate(String content, DocumentReference author) throws Exception
+    {
+        return this.templateManager.createStringTemplate(content, author);
     }
 }

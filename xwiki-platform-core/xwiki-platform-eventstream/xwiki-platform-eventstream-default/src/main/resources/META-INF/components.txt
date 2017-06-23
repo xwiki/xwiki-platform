@@ -1,2 +1,3 @@
 org.xwiki.eventstream.internal.DefaultModelBridge
+org.xwiki.eventstream.internal.EventClassDocumentInitializer
 org.xwiki.eventstream.internal.UntypedRecordableEventDescriptorComponentBuilder

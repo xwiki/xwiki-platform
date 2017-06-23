@@ -262,11 +262,11 @@ public class NotificationScriptService implements ScriptService
     }
 
     /**
-     * Get the RSS notifications rss of the given user.
+     * Get the RSS notifications feed of the given user.
      *
      * @param entryNumber number of entries to get
      * @param onlyUnread if only unread events should be returned
-     * @return the notifications RSS rss
+     * @return the notifications RSS feed
      * @throws NotificationException if an error occurs
      * @since 9.6RC1
      */
@@ -277,12 +277,12 @@ public class NotificationScriptService implements ScriptService
     }
 
     /**
-     * Get the RSS notifications rss of the given user.
+     * Get the RSS notifications feed of the given user.
      *
      * @param userId id of the user
      * @param entryNumber number of entries to get
      * @param onlyUnread if only unread events should be returned
-     * @return the notifications RSS rss
+     * @return the notifications RSS feed
      * @throws NotificationException if an error occurs
      * @since 9.6RC1
      */

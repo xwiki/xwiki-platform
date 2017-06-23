@@ -63,7 +63,8 @@ import com.rometools.rome.feed.synd.SyndPersonImpl;
 public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
 {
     /**
-     * The binding name of a composite event when the description of this composite event is rendered.
+     * The binding name of a composite event when the description of this composite event is rendered in a feed
+     * entry.
      */
     public static final String COMPOSITE_EVENT_BUILDING_NAME = "event";
 

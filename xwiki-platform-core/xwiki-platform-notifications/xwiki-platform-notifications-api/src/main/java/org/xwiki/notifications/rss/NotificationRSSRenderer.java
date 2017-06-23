@@ -43,16 +43,16 @@ public interface NotificationRSSRenderer
      * Render a specific composite event.
      *
      * @param event the {@link CompositeEvent} that should be rendered
-     * @return the output rss entry
+     * @return the rss entry
      * @throws NotificationException if an error occurred
      */
     SyndEntry renderNotification(CompositeEvent event)  throws NotificationException;
 
     /**
-     * Render a complete RSS rss.
+     * Render a complete RSS feed.
      *
      * @param events the list of {@link CompositeEvent} that should be included in the rss
-     * @return the output rss feed
+     * @return the rss feed
      * @throws NotificationException if an error occurred
      */
     SyndFeed renderFeed(List<CompositeEvent> events) throws NotificationException;

@@ -19,14 +19,12 @@
  */
 package org.xwiki.configuration.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
 
 /**
  * Composite Configuration Source that looks in the following Document sources (configuration in wiki pages) in that
@@ -43,21 +41,12 @@ import org.xwiki.configuration.ConfigurationSource;
 @Component
 @Named("documents")
 @Singleton
-public class DocumentsConfigurationSource extends CompositeConfigurationSource implements Initializable
+public class DocumentsConfigurationSource extends CompositeWikiConfigurationSource implements Initializable
 {
-    @Inject
-    @Named("wiki")
-    private ConfigurationSource wikiPreferencesSource;
-
-    @Inject
-    @Named("spaces")
-    private ConfigurationSource spacesPreferencesSource;
-
     @Override
     public void initialize() throws InitializationException
     {
-        // First source is looked up first when a property value is requested.
-        addConfigurationSource(this.spacesPreferencesSource);
-        addConfigurationSource(this.wikiPreferencesSource);
+        addWikiConfigurationSource("spaces");
+        addWikiConfigurationSource("wiki");
     }
 }

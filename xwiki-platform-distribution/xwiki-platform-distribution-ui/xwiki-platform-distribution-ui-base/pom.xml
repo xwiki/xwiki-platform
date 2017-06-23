@@ -25,12 +25,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-ui</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-ui-base</artifactId>
   <name>XWiki Platform - Distribution - UI - Flavor Base</name>
   <packaging>xar</packaging>
   <description>Extension to be used as flavor dependency to get "core" UI extensions which make sense for any kind of flavor</description>
+  <properties>
+    <xwiki.extension.features>
+        <!-- Make sure to replace the old platform base flavor -->
+        org.xwiki.platform:xwiki-platform-distribution-flavor
+    </xwiki.extension.features>
+  </properties>
   <dependencies>
     <!-- JAR dependencies -->
     <!-- With strict versions so that XWiki XAR extension is marked as invalid when they change (upgrading the WAR) -->

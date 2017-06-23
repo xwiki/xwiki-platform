@@ -143,11 +143,11 @@ public class ApplicationNameTest extends AbstractTest
         Assert.assertFalse(appCreatePage.getContent().contains(APP_NAME_USED_WARNING_MESSAGE));
 
         // Type the name of an existing space.
-        appCreatePage.setApplicationName("Blog");
+        appCreatePage.setApplicationName("Help");
         appCreatePage.waitForApplicationNamePreview();
         Assert.assertTrue(appCreatePage.getContent().contains(APP_NAME_USED_WARNING_MESSAGE));
 
         // Proceed to the next step.
-        Assert.assertEquals("/Blog/Code/Blog Structure", appCreatePage.clickNextStep().getBreadcrumbContent());
+        Assert.assertEquals("/Help/Code/Help Structure", appCreatePage.clickNextStep().getBreadcrumbContent());
     }
 }

@@ -207,6 +207,17 @@ public class NotificationScriptService implements ScriptService
     }
 
     /**
+     * Get the status of the module.
+     *
+     * @return true if the notification module can send emails
+     * @since 9.5RC1
+     */
+    public boolean areEmailsEnabled()
+    {
+        return notificationConfiguration.areEmailsEnabled();
+    }
+
+    /**
      * Save a status for the current user.
      * @param eventId id of the event
      * @param isRead either or not the current user has read the given event

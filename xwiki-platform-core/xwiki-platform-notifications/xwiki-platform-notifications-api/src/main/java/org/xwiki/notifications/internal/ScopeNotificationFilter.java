@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 
 /**
  * Notification filter that handle the generic {@link NotificationPreferenceScope}.
@@ -48,7 +49,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 {
     private static final String ERROR = "Failed to filter the notifications.";
 
-    private static final String PREFIX_FORMAT = "scopeNotifFilter%d";
+    private static final String PREFIX_FORMAT = "scopeNotifFilter_%s";
 
     @Inject
     @Named("cached")
@@ -62,7 +63,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     private Logger logger;
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user)
+    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
         // Indicate if a restriction exist concerning this type of event
         boolean hasRestriction = false;
@@ -70,7 +71,7 @@ public class ScopeNotificationFilter implements NotificationFilter
         boolean matchRestriction = false;
 
         try {
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
                 if (scope.getEventType().equals(event.getType())) {
                     hasRestriction = true;
 
@@ -89,33 +90,39 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public String queryFilterOR(DocumentReference user)
+    public String queryFilterOR(DocumentReference user, NotificationFormat format, String type)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
         String separator = "";
 
         try {
-            int count = 0;
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
+                if (!scope.getEventType().equals(type)) {
+                    continue;
+                }
                 stringBuilder.append(separator);
                 stringBuilder.append("(");
-                stringBuilder.append(String.format("event.type = '%s'", scope.getEventType()));
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, count++);
+                final String suffix = String.format(PREFIX_FORMAT, Integer.toHexString(type.hashCode()));
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
-                        stringBuilder.append(String.format(" AND event.wiki = :wiki_%s AND event.page = :page_%s",
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s AND event.page = :page_%s",
                                 suffix, suffix));
                         break;
                     case SPACE:
-                        stringBuilder.append(String.format(" AND event.wiki = :wiki_%s AND event.space LIKE :space_%s",
-                                suffix, suffix));
+                        stringBuilder.append(
+                                String.format(
+                                        "event.wiki = :wiki_%s AND event.space LIKE :space_%s ESCAPE '!'",
+                                        suffix,
+                                        suffix
+                                )
+                        );
                         break;
                     case WIKI:
-                        stringBuilder.append(String.format(" AND event.wiki = :wiki_%s", suffix));
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s", suffix));
                         break;
                     default:
                         break;
@@ -132,22 +139,22 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public String queryFilterAND(DocumentReference user)
+    public String queryFilterAND(DocumentReference user, NotificationFormat format, String type)
     {
         return null;
     }
 
     @Override
-    public Map<String, Object> queryFilterParams(DocumentReference user)
+    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
     {
         Map<String, Object> params = new HashedMap();
 
         try {
-            int count = 0;
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, count++);
+                final String suffix = String.format(PREFIX_FORMAT,
+                        Integer.toHexString(scope.getEventType().hashCode()));
                 final String wikiParam = "wiki_%s";
 
                 switch (scope.getScopeReference().getType()) {
@@ -161,7 +168,8 @@ public class ScopeNotificationFilter implements NotificationFilter
                         params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
                                 EntityType.WIKI).getName());
                         params.put(String.format("space_%s", suffix),
-                                String.format("%s.", serializer.serialize(scope.getScopeReference())));
+                                escape(serializer.serialize(scope.getScopeReference())) + ".%"
+                        );
                         break;
                     case WIKI:
                         params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
@@ -176,5 +184,11 @@ public class ScopeNotificationFilter implements NotificationFilter
         }
 
         return params;
+    }
+
+    private String escape(String format)
+    {
+        // See EscapeLikeParametersQuery#convertParameters()
+        return format.replaceAll("([%_!])", "!$1");
     }
 }

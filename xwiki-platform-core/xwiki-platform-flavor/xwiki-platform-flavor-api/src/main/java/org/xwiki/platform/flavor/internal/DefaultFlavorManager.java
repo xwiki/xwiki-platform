@@ -22,17 +22,20 @@ package org.xwiki.platform.flavor.internal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -100,17 +103,44 @@ public class DefaultFlavorManager implements FlavorManager
         return result;
     }
 
+    private Collection<ExtensionId> getFlavors(String property)
+    {
+        Collection<ExtensionId> flavors = new LinkedHashSet<>();
+
+        // Get flavors from environment extension
+        List<String> ids = getEnvironmentPropertyList(property);
+        if (!ids.isEmpty()) {
+            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, ids));
+        }
+
+        // TODO: Get flavors from configuration
+        // flavors.addAll(configurationSource.getProperty("extension.flavor.known",
+        // Collections.<String>emptyList()));
+
+        return flavors;
+    }
+
+    private List<String> getEnvironmentPropertyList(String property)
+    {
+        // Get flavors from environment extension
+        CoreExtension extension = this.coreRepository.getEnvironmentExtension();
+        if (extension != null) {
+            String listString = extension.getProperty(property);
+            return ExtensionUtils.importPropertyStringList(listString, true);
+        }
+
+        return Collections.emptyList();
+    }
+
     @Override
     public Collection<ExtensionId> getKnownFlavors()
     {
         Collection<ExtensionId> flavors = new LinkedHashSet<>();
 
         // Get flavors from environment extension
-        CoreExtension extension = this.coreRepository.getEnvironmentExtension();
-        if (extension != null) {
-            String flavorsString = extension.getProperty("xwiki.extension.knownFlavors");
-            flavorsString = flavorsString.replaceAll("[\r\n]", "");
-            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, flavorsString));
+        List<String> ids = getEnvironmentPropertyList("xwiki.extension.knownFlavors");
+        if (!ids.isEmpty()) {
+            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, ids));
         }
 
         // TODO: Get flavors from configuration
@@ -121,17 +151,35 @@ public class DefaultFlavorManager implements FlavorManager
     }
 
     @Override
+    public Collection<String> getKnownInvalidFlavors()
+    {
+        return getEnvironmentPropertyList("xwiki.extension.knownInvalidFlavors");
+    }
+
+    @Override
     public ExtensionId getFlavorOfWiki(String wikiId)
     {
-        String namespace = "wiki:" + wikiId;
+        Namespace namespace = new Namespace("wiki", wikiId);
+
+        InstalledExtension flavor = getFlavorExtension(namespace);
+
+        if (flavor != null) {
+            return flavor.getId();
+        }
+
+        return null;
+    }
+
+    @Override
+    public InstalledExtension getFlavorExtension(Namespace namespace)
+    {
         try {
-            for (InstalledExtension extension : installedRepository.searchInstalledExtensions(namespace,
-                new FlavorQuery())) {
-                // Don't consider a dependency as the top level flavor, because a flavor can be a combination of other
-                // flavors
-                if (!extension.isDependency(namespace)) {
+            for (InstalledExtension extension : this.installedRepository
+                .searchInstalledExtensions(namespace.serialize(), new FlavorQuery())) {
+                // Assume there is only one non dependency with the tag "flavor" so return the first one found
+                if (!extension.isDependency(namespace.serialize())) {
                     // There should be only one flavor per wiki
-                    return extension.getId();
+                    return extension;
                 }
             }
         } catch (SearchException e) {
@@ -141,9 +189,10 @@ public class DefaultFlavorManager implements FlavorManager
         // If nothing has been found, look for extensions that was not tagged as flavors but that are in the list of
         // old flavors
         for (String oldFlavor : getExtensionsConsideredAsFlavors()) {
-            InstalledExtension installedExtension = installedRepository.getInstalledExtension(oldFlavor, namespace);
+            InstalledExtension installedExtension =
+                this.installedRepository.getInstalledExtension(oldFlavor, namespace.serialize());
             if (installedExtension != null) {
-                return installedExtension.getId();
+                return installedExtension;
             }
         }
 

@@ -20,6 +20,7 @@
 package org.xwiki.extension.script;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -456,9 +457,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         // Allow overwritting a few things in extensions descriptors
         installRequest.setRewriter(new ScriptExtensionRewriter());
 
-        // Provide informations on what started the job
-        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, xcontext.getWikiId());
-        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, xcontext.getAction());
+        contextualize(installRequest);
 
         setRightsProperties(installRequest);
 
@@ -620,9 +619,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         uninstallRequest.setRootModificationsAllowed(
             namespace == null || this.xcontextProvider.get().isMainWiki(toWikiId(namespace)));
 
-        // Provide informations on what started the job
-        uninstallRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
-        uninstallRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
+        contextualize(uninstallRequest);
 
         setRightsProperties(uninstallRequest);
 
@@ -689,32 +686,53 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     }
 
     /**
-     * Create the default request used when asking for the upgrade plan on a namespace.
+     * Create a request used when asking for the upgrade plan on a namespace.
      * 
      * @param namespace the namespace to upgrade
      * @return the request to pass t the job
      */
     public InstallRequest createUpgradePlanRequest(String namespace)
     {
-        InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, null, namespace));
-        installRequest.addNamespace(namespace);
-
-        // Provide informations on what started the job
-        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
-        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
-
-        return installRequest;
+        return createUpgradePlanRequest(null, namespace);
     }
 
+    /**
+     * Create a request used when asking for the upgrade plan on the whole farm.
+     * 
+     * @return the request to pass t the job
+     */
     private InstallRequest createUpgradePlanRequest()
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, null, null));
 
-        // Provide informations on what started the job
-        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
-        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
+        contextualize(installRequest);
+
+        return installRequest;
+    }
+
+    /**
+     * Create a request used when asking for the upgrade plan of an extension on a namespace.
+     * 
+     * @param extensionId the id of the extension
+     * @param namespace the namespace to upgrade
+     * @return the request to pass t the job
+     * @since 9.5
+     */
+    public InstallRequest createUpgradePlanRequest(ExtensionId extensionId, String namespace)
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addNamespace(namespace);
+        List<String> jobId;
+        if (extensionId != null) {
+            installRequest.addExtension(extensionId);
+            jobId = ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), namespace);
+        } else {
+            jobId = ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, null, namespace);
+        }
+        installRequest.setId(jobId);
+
+        contextualize(installRequest);
 
         return installRequest;
     }

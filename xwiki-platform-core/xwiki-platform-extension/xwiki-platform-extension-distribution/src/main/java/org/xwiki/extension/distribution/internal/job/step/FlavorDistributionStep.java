@@ -25,8 +25,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.platform.flavor.FlavorManager;
 
 /**
@@ -44,9 +43,6 @@ public class FlavorDistributionStep extends AbstractDistributionStep
      * ID of the distribution step.
      */
     public static final String ID = "extension.flavor";
-
-    @Inject
-    private transient InstalledExtensionRepository installedRepository;
 
     /**
      * The flavor manager.
@@ -66,9 +62,8 @@ public class FlavorDistributionStep extends AbstractDistributionStep
     public void prepare()
     {
         if (getState() == null) {
-            ExtensionId flavor = flavorManager.getFlavorOfWiki(getWiki());
-            if (flavor != null
-                && installedRepository.getInstalledExtension(flavor).isValid(getNamespace().toString())) {
+            InstalledExtension flavor = this.flavorManager.getFlavorExtension(getNamespace());
+            if (flavor != null && flavor.isValid(getNamespace().toString())) {
                 setState(State.COMPLETED);
             }
         }

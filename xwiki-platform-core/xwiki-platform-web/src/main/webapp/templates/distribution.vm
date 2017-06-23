@@ -159,7 +159,7 @@
   #set ($discard = $extensionConfig.put('skipCurrentUser', true))
 #end
 ## FIXME: refactor distribution.vm to let steps deal with all request, even extension related requests
-#if ($services.distribution.jobStatus.currentStep.id == 'extension.defaultui')
+#if ($services.distribution.jobStatus.currentStep.id == 'extension.defaultui' || $services.distribution.jobStatus.currentStep.id == 'extension.flavor')
   ## Install main wiki default UI JARS on root
   #if ($xcontext.isMainWiki())
     #set ($discard = $extensionConfig.put('installJAROnRoot', true))

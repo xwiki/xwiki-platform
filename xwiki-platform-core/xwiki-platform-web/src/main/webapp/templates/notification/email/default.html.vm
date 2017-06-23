@@ -1,0 +1,77 @@
+###
+### Include some macros
+###
+#template('notification/macros.vm')
+###
+### Compute some information about the event
+###
+#set ($app  = "$!event.events.get(0).application")
+#if ($app == 'xwiki')
+  #set ($app = $services.localization.render('core.events.appName'))
+#end
+#set ($document = $xwiki.getDocument($event.document))
+###
+### Display the event
+###
+## Unfortunately, in an HTML email, styles must be written inline each element (CSS classes do not work)
+<div style="border: solid 5px #eee; padding: 5px;">
+  <p><strong>$escapetool.xml($app)</strong></p>
+  <p><strong>[$!escapetool.xml($event.type)]</strong> <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('xhtml/1.0'))</a></p>
+  <p>$services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users)"])</p>
+  #set ($dates = $event.dates)
+  #if ($dates.size() > 1)
+    <p><small>$services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])</small></p>
+  #else
+    <p><small>$escapetool.xml($xwiki.formatDate($event.dates.get(0)))</small></p>
+  #end
+  ###
+  ### Display a diff if the event concerns a document
+  ###
+  #if ($event.document)
+    ## Fortunately, we have diff macros!
+    #template('diff_macros.vm')
+    ###
+    ### Get the 2 document versions
+    ###
+    #set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
+    #if ($event.events.size == 1)
+      #set ($origdoc = $newdoc.previousDocument)
+    #else
+      #set ($lastIndex = $event.events.size() - 1)
+      #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
+    #end
+    ###
+    ### Prepare the diff
+    ###
+    #createDocumentDiff($origdoc, $newdoc, $docDiff)
+    #createDocumentDiffSummary($docDiff, $summary)
+    ###
+    ### Macro that replace CSS classes by inline styles
+    ###
+    #macro(displayhtmldiff $html)
+      #set($result = $html.trim())
+      #set($result = $result.replaceAll('class="diff-line diff-line-added"', 'style="background-color: #ccffcc; padding: 5px; margin: 5px; border-left: solid 4px #ccc;"'))
+      #set($result = $result.replaceAll('class="diff-line diff-line-deleted"', 'style="background-color: #ffcccc; padding: 5px; margin: 5px; border-left: solid 4px #ccc;"'))
+      #set($result = $result.replaceAll('class="diff-line diff-line-context"', 'style="background-color: #fff; padding: 5px; margin: 5px; border-left: solid 4px #ccc;"'))
+      #set($result = $result.replaceAll('<ins>', '<ins style="background-color: #99ff99; text-decoration: none;">'))
+      #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
+      #set($result = $result.replaceAll('class="diff-header"', 'style="border-left: 5px solid #E8E8E8; border-right: 1px solid #E8E8E8; color: #656565; font-weight: normal; margin: 0; padding: .5em .2em;"'))
+      #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid #E8E8E8; font-family: Monospace; font-size: 12px; overflow: auto;"'))
+      #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; font-size: 0.8em; text-align: right; vertical-align: top;"'))
+      #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;"'))
+      #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
+      $result
+    #end
+    ###
+    ### Display the diff
+    ###
+    <hr style="border-top: solid 1px #eee; height: 0;" />
+    <div style="border-left: solid 5px #eee; margin: 0; padding-left: 10px;">
+      <h3>$services.localization.render('web.history.changes.details')</h3>
+      #define ($diffContent)
+        #displayDocumentDiff($docDiff)
+      #end
+      #displayhtmldiff($diffContent.toString())
+    </div>
+  #end
+</div>

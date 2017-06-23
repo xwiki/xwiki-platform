@@ -25,7 +25,10 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
+
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -44,8 +47,8 @@ public interface ModelBridge
      *
      * @throws NotificationException if an error occurs
      */
-    List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference) throws
-            NotificationException;
+    List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
+        throws NotificationException;
 
     /**
      * @param userReference the document reference of a user
@@ -65,11 +68,25 @@ public interface ModelBridge
      * Get all notification preference scope of the given user.
      *
      * @param user user interested in the notifications
+     * @param format format on which the preferences apply
      * @return the list of notification preference scopes.
      * @throws NotificationException if error happens
      *
      * @since 9.5RC1
      */
-    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user)
+    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user, NotificationFormat format)
+            throws NotificationException;
+
+    /**
+     * Save an object's property in an hidden document.
+     *
+     * @param objectReference reference of the object to save
+     * @param property the name of the property to set
+     * @param value the value of the property to set
+     * @throws NotificationException if error happens
+     *
+     * @since 9.5RC1
+     */
+    void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
             throws NotificationException;
 }

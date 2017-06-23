@@ -4675,6 +4675,28 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Get the full URL of the given {@link DocumentReference}. This also includes the server name of the wiki.
+     *
+     * @param documentReference the document that should be resolved
+     * @param action the action of the URL
+     * @param querystring the URL parameters
+     * @param anchor the anchor of the document
+     * @param context the current XWikiContext
+     * @return the full URL of the given reference
+     *
+     * @since 9.6RC1
+     */
+    public String getExternalURL(DocumentReference documentReference, String action,
+            String querystring, String anchor, XWikiContext context)
+    {
+        URL url = context.getURLFactory().createExternalURL(
+                this.getLocalStringEntityReferenceSerializer().serialize(documentReference.getLastSpaceReference()),
+                documentReference.getName(), action, querystring, anchor,
+                documentReference.getWikiReference().getName(), context);
+        return url.toString();
+    }
+
+    /**
      * @since 7.2M1
      */
     public String getAttachmentURL(AttachmentReference attachmentReference, String action, String queryString,

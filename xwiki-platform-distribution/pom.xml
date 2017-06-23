@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -46,6 +46,13 @@
         org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
         org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
+
+    <!-- Flavors known to be incompatible with the current distribution -->
+    <xwiki.extension.knownInvalidFlavors>
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
+        org.xwiki.platform:xwiki-platform-distribution-flavor
+    </xwiki.extension.knownInvalidFlavors>
 
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>activitystream.hbm.xml,instance.hbm.xml</xwiki.db.common.extraMappings>
@@ -149,80 +156,80 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.rendering</groupId>
         <artifactId>xwiki-rendering-macro-toc</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>${rendering.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-ui</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <!-- application-tour-ui -->
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>9.5-SNAPSHOT</version>
+        <version>9.6-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -477,22 +484,6 @@
                     <resources>
                       <resource>META-INF/cxf/bus-extensions.txt</resource>
                     </resources>
-                  </exception>
-                  <!-- According to https://issues.apache.org/jira/browse/TIKA-2368 this is "OK" -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>edu.usc.ir</groupId>
-                        <artifactId>sentiment-analysis-parser</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>org.apache.tika</groupId>
-                        <artifactId>tika-parsers</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.apache.tika.parser.sentiment.analysis.SentimentParser</class>
-                    </classes>
                   </exception>
                 </exceptions>
                 <ignoredResourcePatterns>

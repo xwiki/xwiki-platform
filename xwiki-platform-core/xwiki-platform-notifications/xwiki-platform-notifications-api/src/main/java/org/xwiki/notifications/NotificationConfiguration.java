@@ -37,4 +37,10 @@ public interface NotificationConfiguration
      */
     boolean isEnabled();
 
+    /**
+     * @return true if the notification module can send emails
+     * @since 9.5RC1
+     */
+    boolean areEmailsEnabled();
+
 }

@@ -24,8 +24,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -116,8 +114,8 @@ public class DeletePageTest extends AbstractTest
         // Set the current page to be any page (doesn't matter if it exists or not)
         String pageURL = getUtil().getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
         getUtil().gotoPage(SPACE_VALUE, PAGE_VALUE, DELETE_ACTION, "xredirect=" + pageURL);
-        WebElement yesButton = getDriver().findElement(By.xpath("//button[contains(text(), 'Yes')]"));
-        yesButton.click();
+        ConfirmationPage confirmation = new ConfirmationPage();
+        confirmation.clickYes();
         ViewPage vp = new ViewPage();
         // Since the page PAGE_VALUE + "Whatever" doesn't exist the View Action will redirect to the Nested Document
         // SPACE_VALUE + "." + PAGE_VALUE + "Whatever + ".WebHome".

@@ -19,12 +19,7 @@
  */
 package org.xwiki.test.selenium;
 
-import java.util.List;
-
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.runner.RunWith;
-import org.xwiki.test.integration.XWikiExecutor;
-import org.xwiki.test.integration.XWikiExecutorSuite;
 import org.xwiki.test.ui.PageObjectSuite;
 import org.xwiki.test.ui.PersistentTestContext;
 
@@ -36,16 +31,6 @@ import org.xwiki.test.ui.PersistentTestContext;
 @RunWith(PageObjectSuite.class)
 public class AllTests
 {
-    @XWikiExecutorSuite.PreStart
-    public void preStart(List<XWikiExecutor> executors) throws Exception
-    {
-        // Put back the old WYSIWYG editor in xwiki.properties
-        XWikiExecutor executor = executors.get(0);
-        PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
-        properties.setProperty("edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg", "gwt");
-        executor.saveXWikiProperties(properties);
-    }
-
     @PageObjectSuite.PostStart
     public void postStart(PersistentTestContext context) throws Exception
     {
@@ -54,5 +39,7 @@ public class AllTests
         context.getUtil().loginAsAdmin();
         context.getUtil().gotoPage("TourCode", "TourJS", "save",
             "XWiki.JavaScriptExtension_0_use=onDemand&xredirect=" + context.getUtil().getURL("Main", "WebHome"));
+
+        context.getUtil().setGWTWYSIWYG();
     }
 }

@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
@@ -78,17 +79,47 @@ public class DefaultNotificationManager implements NotificationManager
     @Inject
     private NotificationFilterManager notificationFilterManager;
 
+    /**
+     * For internal use, avoid to give more than 7 parameters to methods.
+     */
+    private class Parameters
+    {
+        public DocumentReference userReference;
+        public NotificationFormat format;
+        public boolean onlyUnread;
+        public int expectedCount;
+        public Date endDate;
+        public Date fromDate;
+        public List<String> blackList;
+
+        Parameters(DocumentReference userReference, NotificationFormat format, boolean onlyUnread,
+                int expectedCount,
+                Date endDate, Date fromDate, List<String> blackList)
+        {
+            this.userReference = userReference;
+            this.format = format;
+            this.onlyUnread = onlyUnread;
+            this.expectedCount = expectedCount;
+            this.endDate = endDate;
+            this.fromDate = fromDate;
+            this.blackList = blackList;
+        }
+    }
+
     @Override
     public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount)
             throws NotificationException
     {
-        return getEvents(
-                new ArrayList<>(),
-                documentReferenceResolver.resolve(userId),
-                onlyUnread,
-                expectedCount,
-                null,
-                new ArrayList<>()
+        return getEvents(new ArrayList<>(),
+                new Parameters(
+                    documentReferenceResolver.resolve(userId),
+                    NotificationFormat.ALERT,
+                    onlyUnread,
+                    expectedCount,
+                    null,
+                    null,
+                    new ArrayList<>()
+                )
         );
     }
 
@@ -96,8 +127,51 @@ public class DefaultNotificationManager implements NotificationManager
     public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int count, Date untilDate,
             List<String> blackList) throws NotificationException
     {
-        return getEvents(new ArrayList<>(), documentReferenceResolver.resolve(userId), onlyUnread, count, untilDate,
-                new ArrayList<>(blackList));
+        return getEvents(new ArrayList<>(),
+                new Parameters(
+                        documentReferenceResolver.resolve(userId),
+                        NotificationFormat.ALERT,
+                        onlyUnread,
+                        count,
+                        untilDate,
+                        null,
+                        new ArrayList<>(blackList)
+                )
+        );
+    }
+
+    @Override
+    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
+            Date fromDate, List<String> blackList) throws NotificationException
+    {
+        return getEvents(new ArrayList<>(),
+                new Parameters(
+                        documentReferenceResolver.resolve(userId),
+                        NotificationFormat.ALERT,
+                        onlyUnread,
+                        expectedCount,
+                        untilDate,
+                        fromDate,
+                        new ArrayList<>(blackList)
+                )
+        );
+    }
+
+    @Override
+    public List<CompositeEvent> getEvents(String userId, NotificationFormat format, boolean onlyUnread,
+            int expectedCount, Date untilDate, Date fromDate, List<String> blackList) throws NotificationException
+    {
+        return getEvents(new ArrayList<>(),
+                new Parameters(
+                        documentReferenceResolver.resolve(userId),
+                        format,
+                        onlyUnread,
+                        expectedCount,
+                        untilDate,
+                        fromDate,
+                        new ArrayList<>(blackList)
+                )
+        );
     }
 
     @Override
@@ -105,21 +179,31 @@ public class DefaultNotificationManager implements NotificationManager
     {
         DocumentReference user = documentReferenceResolver.resolve(userId);
 
-        List<CompositeEvent> events = getEvents(new ArrayList<>(), user, onlyUnread, maxCount,
-                null, new ArrayList<>());
+        List<CompositeEvent> events = getEvents(new ArrayList<>(),
+                new Parameters(
+                        user,
+                        NotificationFormat.ALERT,
+                        onlyUnread,
+                        maxCount,
+                        null,
+                        null,
+                        new ArrayList<>()
+                )
+        );
 
         return events.size();
     }
 
-    private List<CompositeEvent> getEvents(List<CompositeEvent> results, DocumentReference userReference,
-            boolean onlyUnread, int expectedCount, Date endDate, List<String> blackList) throws NotificationException
+    private List<CompositeEvent> getEvents(List<CompositeEvent> results, Parameters parameters)
+            throws NotificationException
     {
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
-        final int batchSize = expectedCount * 2;
+        final int batchSize = parameters.expectedCount * 2;
         try {
             // Create the query
-            Query query = queryGenerator.generateQuery(userReference, onlyUnread, endDate, blackList);
+            Query query = queryGenerator.generateQuery(parameters.userReference, parameters.format,
+                    parameters.onlyUnread, parameters.endDate, parameters.fromDate, parameters.blackList);
             if (query == null) {
                 return Collections.emptyList();
             }
@@ -132,27 +216,27 @@ public class DefaultNotificationManager implements NotificationManager
             for (Event event : batch) {
                 DocumentReference document = event.getDocument();
                 // Don't record events concerning a doc the user cannot see
-                if (document != null && !authorizationManager.hasAccess(Right.VIEW, userReference, document)) {
+                if (document != null && !authorizationManager.hasAccess(Right.VIEW, parameters.userReference,
+                        document)) {
                     continue;
                 }
 
-                if (filterEvent(event, userReference)) {
+                if (filterEvent(event, parameters.userReference, parameters.format)) {
                     continue;
                 }
 
                 // Record this event
                 recordEvent(results, event);
                 // If the expected count is reached, stop now
-                if (results.size() >= expectedCount) {
+                if (results.size() >= parameters.expectedCount) {
                     return results;
                 }
             }
 
             // If we haven't get the expected number of events, perform a new batch
-            if (results.size() < expectedCount && batch.size() == batchSize) {
-                blackList.addAll(getEventsIds(batch));
-                getEvents(results, userReference, onlyUnread, expectedCount - results.size(), endDate,
-                        blackList);
+            if (results.size() < parameters.expectedCount && batch.size() == batchSize) {
+                parameters.blackList.addAll(getEventsIds(batch));
+                getEvents(results, parameters);
             }
 
             return results;
@@ -161,10 +245,11 @@ public class DefaultNotificationManager implements NotificationManager
         }
     }
 
-    private boolean filterEvent(Event event, DocumentReference user) throws NotificationException
+    private boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+            throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            if (filter.filterEvent(event, user)) {
+            if (filter.filterEvent(event, user, format)) {
                 return true;
             }
         }
@@ -275,6 +360,10 @@ public class DefaultNotificationManager implements NotificationManager
         for (CompositeEvent existingCompositeEvent : results) {
             for (Event existingEvent : existingCompositeEvent.getEvents()) {
                 int similarity = similarityCalculator.computeSimilarity(event, existingEvent);
+                if (similarity < existingCompositeEvent.getSimilarityBetweenEvents()) {
+                    // Penality
+                    similarity -= 5;
+                }
                 if (similarity > bestSimilarity.value) {
                     bestSimilarity.value = similarity;
                     bestSimilarity.event = existingEvent;

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -304,7 +304,46 @@
                      "methodName": "getAllRecordableEventDescriptorsAllWikis",
                      "elementKind": "method",
                      "justification": "Young API"
-                   }
+                   },
+                   {
+                     "code": "java.method.addedToInterface",
+                     "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                     "package": "org.xwiki.notifications",
+                     "classSimpleName": "NotificationManager",
+                     "methodName": "getEvents",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                   },
+                   {
+                     "code": "java.method.addedToInterface",
+                     "new": "method boolean org.xwiki.notifications.NotificationConfiguration::areEmailsEnabled()",
+                     "package": "org.xwiki.notifications",
+                     "classSimpleName": "NotificationConfiguration",
+                     "methodName": "areEmailsEnabled",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                    },
+                    {
+                     "code": "java.method.addedToInterface",
+                     "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, org.xwiki.notifications.NotificationFormat, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
+                     "package": "org.xwiki.notifications",
+                     "classSimpleName": "NotificationManager",
+                     "methodName": "getEvents",
+                     "elementKind": "method",
+                     "justification": "Young API"
+                    },
+                    {
+                      "code": "java.method.returnTypeTypeParametersChanged",
+                      "old": "method java.util.Enumeration<java.lang.String> javax.servlet.GenericServlet::getInitParameterNames() @ org.xwiki.resource.servlet.ResourceReferenceHandlerServlet",
+                      "new": "method java.util.Enumeration javax.servlet.GenericServlet::getInitParameterNames() @ org.xwiki.resource.servlet.ResourceReferenceHandlerServlet",
+                      "oldType": "java.util.Enumeration<java.lang.String>",
+                      "newType": "java.util.Enumeration",
+                      "package": "org.xwiki.resource.servlet",
+                      "classSimpleName": "ResourceReferenceHandlerServlet",
+                      "methodName": "getInitParameterNames",
+                      "elementKind": "method",
+                      "justification": "REVAPI bug"
+                    }
                 ]
               }
             }

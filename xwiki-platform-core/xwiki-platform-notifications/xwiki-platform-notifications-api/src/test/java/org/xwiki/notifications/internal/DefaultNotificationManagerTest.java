@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -86,8 +87,9 @@ public class DefaultNotificationManagerTest
 
         when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
         query = mock(Query.class);
-        when(queryGenerator.generateQuery(any(DocumentReference.class), anyBoolean(), nullable(Date.class), nullable(List.class)))
-                .thenReturn(query);
+        when(queryGenerator.generateQuery(any(DocumentReference.class), any(NotificationFormat.class),
+                anyBoolean(), nullable(Date.class),
+                nullable(Date.class), nullable(List.class))).thenReturn(query);
 
 
         when(modelBridge.getUserStartDate(userReference)).thenReturn(startDate);
@@ -156,7 +158,8 @@ public class DefaultNotificationManagerTest
     {
         // Mocks
         NotificationException exception = new NotificationException("Error");
-        when(queryGenerator.generateQuery(eq(userReference), eq(true), isNull(), any(List.class))).thenThrow(exception);
+        when(queryGenerator.generateQuery(eq(userReference), any(NotificationFormat.class), eq(true), isNull(),
+                isNull(), any(List.class))).thenThrow(exception);
 
         // Test
         NotificationException caughtException = null;
@@ -537,5 +540,53 @@ public class DefaultNotificationManagerTest
         assertTrue(results.get(0).getEvents().contains(event1));
         assertTrue(results.get(0).getEvents().contains(event2));
         assertTrue(results.get(0).getEvents().contains(event3));
+    }
+
+    @Test
+    public void getEventsXWIKI14454() throws Exception
+    {
+        // Facts:
+        // * Then Bob updates the page "Bike"
+        // * Then Bob updates the page "Bike" again
+        // * Then bob add a comment to the "Bike" page
+
+        // Expected:
+        // * Bob has commented the page "Bike"
+        // * Bob has created the page "Bike"
+
+        // Mocks
+        Event eventUpdate1          = mock(Event.class);
+        Event eventUpdate2          = mock(Event.class);
+        Event eventAddComment       = mock(Event.class);
+        Event eventAddCommentUpdate = mock(Event.class);
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(eventUpdate1.getDocument()).thenReturn(doc); when(eventUpdate1.toString()).thenReturn("update1");
+        when(eventUpdate2.getDocument()).thenReturn(doc); when(eventUpdate2.toString()).thenReturn("update2");
+        when(eventAddComment.getDocument()).thenReturn(doc); when(eventAddComment.toString()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getDocument()).thenReturn(doc); when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+
+        when(eventUpdate1.getType()).thenReturn("update");
+        when(eventUpdate2.getType()).thenReturn("update");
+        when(eventAddComment.getType()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getType()).thenReturn("update");
+
+        when(eventUpdate1.getGroupId()).thenReturn("g1");
+        when(eventUpdate2.getGroupId()).thenReturn("g2");
+        when(eventAddComment.getGroupId()).thenReturn("g3");
+        when(eventAddCommentUpdate.getGroupId()).thenReturn("g3");
+
+        // They comes with inverse chronological order because of the query
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAddComment, eventAddCommentUpdate,
+                eventUpdate2, eventUpdate1));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+
+        // Verify
+        assertEquals(2, results.size());
     }
 }

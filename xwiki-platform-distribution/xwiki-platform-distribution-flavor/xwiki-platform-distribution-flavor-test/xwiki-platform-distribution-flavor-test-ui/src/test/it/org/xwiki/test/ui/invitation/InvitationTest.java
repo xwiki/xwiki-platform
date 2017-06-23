@@ -529,7 +529,7 @@ public class InvitationTest extends AbstractTest
     /**
      * This test proves that:
      * 1. A guest cannot register if register permission is removed from XWikiPreferences.
-     * 2. Upon recieving an email invitation the guest can register even without register premission.
+     * 2. Upon receiving an email invitation the guest can register even without register permission.
      */
     @Test
     @IgnoreBrowsers({
@@ -543,8 +543,8 @@ public class InvitationTest extends AbstractTest
             // First we ban anon from registering.
             ObjectEditPage oep = ObjectEditPage.gotoPage("XWiki", "XWikiPreferences");
 
-            oep.getObjectsOfClass("XWiki.XWikiGlobalRights").get(2)
-                .getSelectElement(By.name("XWiki.XWikiGlobalRights_2_levels")).unSelect("register");
+            oep.getObjectsOfClass("XWiki.XWikiGlobalRights").get(0)
+                .getSelectElement(By.name("XWiki.XWikiGlobalRights_0_levels")).select("register");
 
             oep.clickSaveAndContinue();
             // now prove anon cannot register
@@ -588,8 +588,8 @@ public class InvitationTest extends AbstractTest
             // Better open the wiki back up again.
             ObjectEditPage oep = ObjectEditPage.gotoPage("XWiki", "XWikiPreferences");
 
-            oep.getObjectsOfClass("XWiki.XWikiGlobalRights").get(2)
-                .getSelectElement(By.name("XWiki.XWikiGlobalRights_2_levels")).select("register");
+            oep.getObjectsOfClass("XWiki.XWikiGlobalRights").get(0)
+                .getSelectElement(By.name("XWiki.XWikiGlobalRights_0_levels")).unSelect("register");
 
             oep.clickSaveAndContinue();
         }

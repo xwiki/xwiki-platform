@@ -37,14 +37,17 @@ public class NotificationsUserProfilePage extends ViewPage
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='create'] .bootstrap-switch")
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='create'][data-format='alert'] .bootstrap-switch")
     private WebElement pageCreatedSwitch;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='delete'] .bootstrap-switch")
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='delete'][data-format='alert'] .bootstrap-switch")
     private WebElement pageDeletedSwitch;
 
-    @FindBy(css = "div#notificationsPane tr[data-eventtype='update'] .bootstrap-switch")
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='update'][data-format='alert'] .bootstrap-switch")
     private WebElement pageUpdatedSwitch;
+
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='addComment'][data-format='alert'] .bootstrap-switch")
+    private WebElement pageCommentedSwitch;
 
     /**
      * Construct a NotificationsUserProfilePage (and for the browser page to be fully loaded).
@@ -95,6 +98,18 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
+     * Check if the pageCommentedCheckbox is checked.
+     *
+     * @return true if the checkbox is checked
+     * @since 9.5
+     * @since 9.6RC1
+     */
+    public boolean isPageCommented()
+    {
+        return isSwitchOn(pageCommentedSwitch);
+    }
+
+    /**
      * Change the status of the pageCreatedCheckbox.
      * 
      * @param status New status
@@ -129,6 +144,21 @@ public class NotificationsUserProfilePage extends ViewPage
     {
         if (status != this.isPageUpdated()) {
             clickOnSwitch(this.pageUpdatedSwitch);
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
+    }
+
+    /**
+     * Change the status of the pageCommentCheckbox.
+     *
+     * @param status New status
+     * @since 9.5
+     * @since 9.6RC1
+     */
+    public void setPageCommented(boolean status)
+    {
+        if (status != this.isPageCommented()) {
+            clickOnSwitch(this.pageCommentedSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }

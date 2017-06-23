@@ -23,8 +23,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 
@@ -67,7 +69,19 @@ public interface FlavorManager
     ExtensionId getFlavorOfWiki(String wikiId);
 
     /**
-     * Get the flavor know that the distribution.
+     * Get the flavor installed on a given namespace.
+     * 
+     * @param namespace the namespace where to search for the flavor
+     * @return the found flavor
+     * @since 9.5
+     */
+    default InstalledExtension getFlavorExtension(Namespace namespace)
+    {
+        return null;
+    }
+
+    /**
+     * Get the flavors know to be compatible with the distribution.
      * <p>
      * Each {@link ExtensionId} always contains the flavor id but version might be null.
      * 
@@ -75,6 +89,17 @@ public interface FlavorManager
      * @since 8.1M1
      */
     default Collection<ExtensionId> getKnownFlavors()
+    {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Get the flavors identifiers know to be incompatible with the distribution.
+     * 
+     * @return the already known flavors
+     * @since 9.5RC1
+     */
+    default Collection<String> getKnownInvalidFlavors()
     {
         return Collections.emptyList();
     }

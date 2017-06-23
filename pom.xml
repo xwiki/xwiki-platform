@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>9.5-SNAPSHOT</version>
+  <version>9.6-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -57,7 +57,7 @@
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.9</batik.version>
 
-    <tika.version>1.15</tika.version>
+    <tika.version>1.14</tika.version>
     <pdfbox.version>2.0.6</pdfbox.version>
 
     <!-- By default check that unit tests don't output anything to the console -->

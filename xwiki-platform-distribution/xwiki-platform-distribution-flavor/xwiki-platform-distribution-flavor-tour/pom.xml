@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-tour</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Tour</name>
@@ -35,7 +35,7 @@
   <properties>
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.platform:xwiki-enterprise-ui-tour
+        org.xwiki.enterprise:xwiki-enterprise-ui-tour
     </xwiki.extension.features>
   </properties>
 

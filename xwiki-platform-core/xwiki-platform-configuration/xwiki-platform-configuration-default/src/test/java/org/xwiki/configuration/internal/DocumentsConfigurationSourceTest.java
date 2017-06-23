@@ -19,14 +19,20 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Provider;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
+
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,14 +47,25 @@ public class DocumentsConfigurationSourceTest
     public MockitoComponentMockingRule<DocumentsConfigurationSource> mocker =
         new MockitoComponentMockingRule<>(DocumentsConfigurationSource.class);
 
+    private ConfigurationSource wikiSource;
+
+    private ConfigurationSource spaceSource;
+
+    @Before
+    public void before() throws Exception
+    {
+        this.wikiSource = this.mocker.registerMockComponent(ConfigurationSource.class, "wiki");
+        this.spaceSource = this.mocker.registerMockComponent(ConfigurationSource.class, "spaces");
+
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(mock(XWikiContext.class));
+    }
+
     @Test
     public void containsKey() throws Exception
     {
-        ConfigurationSource wikiSource = this.mocker.getInstance(ConfigurationSource.class, "wiki");
-        when(wikiSource.containsKey("key")).thenReturn(true);
-
-        ConfigurationSource spaceSource = this.mocker.getInstance(ConfigurationSource.class, "spaces");
-        when(spaceSource.containsKey("key")).thenReturn(false);
+        when(this.wikiSource.containsKey("key")).thenReturn(true);
+        when(this.spaceSource.containsKey("key")).thenReturn(false);
 
         assertTrue(this.mocker.getComponentUnderTest().containsKey("key"));
 

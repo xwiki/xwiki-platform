@@ -34,9 +34,9 @@
   <properties>
     <!-- The default UI -->
     <xwiki.extension.distribution.ui>org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki</xwiki.extension.distribution.ui>
-    <xwiki.extension.distribution.ui.version>${project.version}</xwiki.extension.distribution.ui.version>
+    <xwiki.extension.distribution.ui.version>${platform.version}</xwiki.extension.distribution.ui.version>
     <xwiki.extension.distribution.wikiui>org.xwiki.platform:xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui>
-    <xwiki.extension.distribution.wikiui.version>${project.version}</xwiki.extension.distribution.wikiui.version>
+    <xwiki.extension.distribution.wikiui.version>${platform.version}</xwiki.extension.distribution.wikiui.version>
   </properties>
 
   <modules>

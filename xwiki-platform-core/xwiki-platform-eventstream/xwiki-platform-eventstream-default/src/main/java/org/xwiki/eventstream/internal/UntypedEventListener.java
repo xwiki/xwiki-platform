@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
@@ -81,7 +82,7 @@ public class UntypedEventListener extends AbstractEventListener
 
     @Inject
     @Named("wiki")
-    private ComponentManager componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private ModelBridge modelBridge;
@@ -106,7 +107,7 @@ public class UntypedEventListener extends AbstractEventListener
         try {
             // Get every UntypedEventDescriptor registered in the ComponentManager
             List<UntypedRecordableEventDescriptor> descriptors =
-                    componentManager.getInstanceList(UntypedRecordableEventDescriptor.class);
+                    this.componentManagerProvider.get().getInstanceList(UntypedRecordableEventDescriptor.class);
 
             // Filter the event descriptors concerned by the event, then create the concerned events
             for (UntypedRecordableEventDescriptor descriptor : descriptors) {

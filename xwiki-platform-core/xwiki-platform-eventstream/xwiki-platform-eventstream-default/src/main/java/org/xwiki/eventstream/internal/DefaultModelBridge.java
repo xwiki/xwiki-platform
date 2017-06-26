@@ -24,7 +24,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -43,6 +45,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 9.6RC1
  */
+@Component
+@Singleton
 public class DefaultModelBridge implements ModelBridge
 {
     @Inject

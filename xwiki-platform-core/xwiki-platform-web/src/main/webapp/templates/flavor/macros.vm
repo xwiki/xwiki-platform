@@ -8,11 +8,14 @@
 ## @param $cssClass class to add to the div (could be 'xwiki-flavor-select-small', 'xwiki-flavor-select-medium', 'xwiki-flavor-select-tall' or any other class)
 ## @param $noFlavorButton display the no flavor button
 #########################################################
-#macro(displayFlavorPicker $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $noFlavorButton)
+#macro(displayFlavorPicker $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $noFlavorButton $namespace)
+  #if (!$namespace)
+    #set ($namespace = $xcontext.database)
+  #end
   ## TODO: put this in a webjar instead
   #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/picker.css', {'forceSkinAction': true}))
   #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/picker.js' , {'forceSkinAction': true}))
-  <div class="xwiki-flavor-picker $!cssClass">
+  <div class="xwiki-flavor-picker $!cssClass" data-namespace="$escapetool.xml($namespace)">
     ## Filter
     <input type="text" id="${escapetool.xml($fieldName)}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" style="margin-bottom: 2px;"/>
     ## Results
@@ -26,7 +29,7 @@
       ###end
     </div>
     <div class="xwiki-flavor-picker-results-container">
-      #displayFlavorPicker_results($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, 0)
+      #displayFlavorPicker_results($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, 0, $namespace)
     </div>
     ## No flavor option
     #if($noFlavorButton)
@@ -36,7 +39,10 @@
   </div>
 #end
 ##
-#macro(displayFlavorPicker_results $fieldName $defaultValue $firstIsDefaultIfDefaultNull $offset)
+#macro(displayFlavorPicker_results $fieldName $defaultValue $firstIsDefaultIfDefaultNull $offset $namespace)
+  #if (!$namespace)
+    #set ($namespace = $xcontext.database)
+  #end
   #set ($resultsPerPage = 20)
   #if ("$!request.filter" != '')
     #set ($flavorQuery = $services.flavor.createFlavorQuery($request.filter))
@@ -44,9 +50,9 @@
     #set ($flavorQuery = $services.flavor.createFlavorQuery())
   #end
   ##set ($flavorQuery = $flavorQuery.setOffset($offset).setLimit($resultsPerPage))
-  #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus())
+  #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus($namespace))
   #if (!$flavorSearchJobStatus)
-    #set ($flavorSearchJob = $services.flavor.searchValidFlavors())
+    #set ($flavorSearchJob = $services.flavor.searchValidFlavors($namespace))
     #set ($flavorSearchJobStatus = $flavorSearchJob.status)
   #end
   #set ($flavors = $flavorSearchJobStatus.flavors)

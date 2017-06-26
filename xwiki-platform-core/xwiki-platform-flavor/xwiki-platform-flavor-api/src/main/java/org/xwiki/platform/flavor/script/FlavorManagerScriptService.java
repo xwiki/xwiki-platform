@@ -179,7 +179,17 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
      */
     public List<Extension> getValidExtensions()
     {
-        FlavorSearchStatus status = getSearchValidFlavorsStatus();
+        return getValidExtensions(currentNamespace());
+    }
+
+    /**
+     * @param namespace the namespace where to validate the flavors
+     * @return the valid flavors found in the currently running job status
+     * @since 9.5
+     */
+    public List<Extension> getValidExtensions(String namespace)
+    {
+        FlavorSearchStatus status = getSearchValidFlavorsStatus(namespace);
 
         return status != null ? status.getFlavors() : null;
     }

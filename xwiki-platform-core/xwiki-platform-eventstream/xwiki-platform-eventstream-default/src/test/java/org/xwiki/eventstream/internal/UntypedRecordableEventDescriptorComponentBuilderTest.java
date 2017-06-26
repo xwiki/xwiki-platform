@@ -90,7 +90,7 @@ public class UntypedRecordableEventDescriptorComponentBuilderTest
     @Test
     public void testClassReference() throws Exception
     {
-        assertEquals(UntypedRecordableEventDescriptorComponentBuilder.BOUNDED_XOBJECT_CLASS,
+        assertEquals("EventClass",
                 this.mocker.getComponentUnderTest().getClassReference().getName());
     }
 

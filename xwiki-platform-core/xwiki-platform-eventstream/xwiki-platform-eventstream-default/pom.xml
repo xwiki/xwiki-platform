@@ -31,7 +31,7 @@
   <name>XWiki Platform - Event Stream - Default bridge</name>
   <description>Default bridge to oldcore for the Event Stream API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>1</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -53,6 +53,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

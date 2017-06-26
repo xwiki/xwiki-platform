@@ -31,9 +31,9 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -63,9 +63,7 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
     @Override
     public EntityReference getClassReference()
     {
-        return new EntityReference(
-                UntypedRecordableEventDescriptorComponentBuilder.BOUNDED_XOBJECT_CLASS,
-                EntityType.OBJECT);
+        return new LocalDocumentReference(Arrays.asList("XWiki", "EventStream", "Code"), "EventClass");
     }
 
     @Override

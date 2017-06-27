@@ -18,7 +18,7 @@
       display: inline;
     }
   }
-  
+
   .navbar-nav {
     float: right;
     > li {
@@ -53,7 +53,7 @@
   @media (max-width: @screen-sm-max) {
     border: none;
   }
- 
+
   .btn {
     // When the global search is active, the button has an "hover"-kind color
     background-color: @navbar-default-link-hover-bg;
@@ -72,7 +72,7 @@
       box-shadow: none;
     }
   }
-  
+
   // The global search input
   #headerglobalsearchinput { // we need to be that specific to be applied
     border-radius: 0;
@@ -81,7 +81,7 @@
     transition: width 0.3s, padding 0.3s;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
-  
+
   // When the global search is close
   &.globalsearch-close {
     // The button is transparent
@@ -95,7 +95,7 @@
         box-shadow: none;
       }
     }
-    
+
     // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
     #headerglobalsearchinput { // we need to be that specific to be applied
       padding: 0;
@@ -119,7 +119,7 @@
 .navbar-avatar {
   > a {
     max-height: @navbar-height;
-    
+
     > img {
       @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
       border-radius: @thumbnail-border-radius;
@@ -236,12 +236,12 @@
 
 #contentmenu {
   .text-right();
-  
+
   .dropdown {
     display: inline-block;
     font-size: @font-size-large;
     width: @font-size-large * 2.5;
-    
+
     > a {
       color: @headings-color;
       padding: @font-size-large;
@@ -259,4 +259,3 @@
     border-color: darken(@btn-default-bg, 10%);
   }
 }
-

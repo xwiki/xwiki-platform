@@ -38,6 +38,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -92,11 +93,8 @@ public class DefaultNotificationRSSRendererTest
         this.blockRenderer = this.mocker.registerMockComponent(BlockRenderer.class, "html/5.0");
     }
 
-    @Test
-    public void testCompositeEventRendering() throws Exception
+    private void mockEvent(CompositeEvent testCompositeEvent) throws Exception
     {
-        CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
-
         Event testEvent1 = mock(Event.class);
         Date testEventDate = mock(Date.class);
         when(testEvent1.getTitle()).thenReturn("EventTitle");
@@ -106,26 +104,27 @@ public class DefaultNotificationRSSRendererTest
 
         DocumentReference testEventAuthor1 = new DocumentReference("xwiki", "XWiki", "AuthorName");
 
+        when(this.templateManager.getTemplate(any())).thenReturn(mock(Template.class));
+
         when(testCompositeEvent.getEvents()).thenReturn(Arrays.asList(testEvent1));
         when(testCompositeEvent.getUsers()).thenReturn(new HashSet<>(Arrays.asList(testEventAuthor1)));
         when(testCompositeEvent.getEventIds()).thenReturn(Arrays.asList("id1"));
         when(testCompositeEvent.getDates()).thenReturn(Arrays.asList(testEventDate));
+
+    }
+
+    @Test
+    public void testCompositeEventRendering() throws Exception
+    {
+        CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
+
+        this.mockEvent(testCompositeEvent);
 
         SyndEntry resultEntry = this.mocker.getComponentUnderTest().renderNotification(testCompositeEvent);
 
         assertEquals("TranslatedEventTitle", resultEntry.getTitle());
         assertEquals(1, resultEntry.getAuthors().size());
         assertEquals("id1", resultEntry.getUri());
-    }
-
-    @Test(expected = NotificationException.class)
-    public void testCompositeEventRenderingWithEmptyEvent() throws Exception
-    {
-        CompositeEvent testEvent = mock(CompositeEvent.class);
-
-        when(testEvent.getEvents()).thenReturn(Collections.emptyList());
-
-        this.mocker.getComponentUnderTest().renderNotification(testEvent);
     }
 
     @Test

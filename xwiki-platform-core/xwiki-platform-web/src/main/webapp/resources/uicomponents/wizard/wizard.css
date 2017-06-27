@@ -26,6 +26,7 @@
 .wizard-header .steps li {
   display: inline-block;
   margin-right: 1em;
+  vertical-align: middle;
 }
 
 .steps .number {
@@ -39,13 +40,12 @@
   height: 20px;
   line-height: 20px;
   text-align: center;
-  vertical-align: middle;
   width: 20px;
 }
 
 .steps .number.active {
   background-color: transparent;
-  border: 3px solid $theme.notificationSuccessColor;
+  border: 2px solid $theme.notificationSuccessColor;
   color: $theme.notificationSuccessColor;
   height: 15px;
   line-height: 15px;
@@ -54,10 +54,11 @@
 
 .steps .number.done {
   background-color: transparent;
-  border: 3px solid $theme.menuBackgroundColor;
-  color: $theme.menuBackgroundColor;
+  border: 2px solid $theme.textSecondaryColor;
+  color: $theme.textSecondaryColor;
   height: 15px;
   line-height: 15px;
+  opacity: .5;
   width: 15px;
 }
 
@@ -76,7 +77,7 @@
 }
 
 .steps .name.done {
-  color: $theme.menuBackgroundColor;
+  color: $theme.textSecondaryColor;
   opacity: .5;
 }
 

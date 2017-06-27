@@ -53,8 +53,12 @@ require(['jquery'], function($) {
   }
 
   var updateProgress = function () {
-    // Get URL
-    var url = "$escapetool.javascript($services.flavor.getSearchValidFlavorsStatusURL())";
+    // Get base URL
+    var url = "$escapetool.javascript($services.flavor.getSearchValidFlavorsStatusURL(''))";
+
+    // Add namespace to the URL if needed
+    var picker = $('.xwiki-flavor-picker');
+    url += encodeURIComponent($('.xwiki-flavor-picker').attr('data-namespace'));
 
     $.getJSON(url).done(function(data) {
       // Update progress
@@ -89,6 +93,10 @@ require(['jquery'], function($) {
   var updateFlavors = function () {
     // Get base URL
     var url = "$escapetool.javascript($doc.getURL('view', 'xpage=flavor/picker_flavors'))";
+
+    // Add namespace to the URL if needed
+    var picker = $('.xwiki-flavor-picker');
+    url += '&namespace=' + encodeURIComponent(picker.attr('data-namespace'));
 
     $.getJSON(url).done(function(data) {
       // Update the list of flavors

@@ -70,6 +70,11 @@ public class UntypedEventListener extends AbstractEventListener
      */
     public static final String EVENT_BINDING_NAME = "event";
 
+    /**
+     * The binding name of the event source when a validation expression is rendered.
+     */
+    public static final String SOURCE_BINDING_NAME = "source";
+
     @Inject
     private ObservationManager observationManager;
 
@@ -77,8 +82,8 @@ public class UntypedEventListener extends AbstractEventListener
     private TemplateManager templateManager;
 
     @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainRenderer;
+    @Named("html/5.0")
+    private BlockRenderer renderer;
 
     @Inject
     @Named("wiki")
@@ -113,9 +118,9 @@ public class UntypedEventListener extends AbstractEventListener
             for (UntypedRecordableEventDescriptor descriptor : descriptors) {
                 // If the event is expected by our descriptor
                 if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
-                        && checkXObjectCondition(descriptor, source)
+                        && this.checkXObjectCondition(descriptor, source)
                         && this.evaluateVelocityTemplate(
-                        event, descriptor.getAuthorReference(), descriptor.getValidationExpression()))
+                        event, source, descriptor.getAuthorReference(), descriptor.getValidationExpression()))
                 {
                     observationManager.notify(
                             new DefaultUntypedRecordableEvent(descriptor.getEventType()),
@@ -148,11 +153,13 @@ public class UntypedEventListener extends AbstractEventListener
      * Evaluate the given velocity template and return a boolean.
      *
      * @param event the event that should be bound to the script context
+     * @param source the source object of the event that should be bound to the template
      * @param userReference a user reference used to build context
      * @param templateContent the velocity template that should be evaluated
      * @return true if the template evaluation returned «true» or if the template is empty
      */
-    private boolean evaluateVelocityTemplate(Event event, DocumentReference userReference, String templateContent)
+    private boolean evaluateVelocityTemplate(Event event, Object source, DocumentReference userReference,
+            String templateContent)
     {
         try {
             // We don’t need to evaluate the template if it’s empty
@@ -165,14 +172,24 @@ public class UntypedEventListener extends AbstractEventListener
                     event,
                     ScriptContext.ENGINE_SCOPE);
 
+            scriptContextManager.getCurrentScriptContext().setAttribute(
+                    SOURCE_BINDING_NAME,
+                    source,
+                    ScriptContext.ENGINE_SCOPE
+            );
+
             Template customTemplate = templateManager.createStringTemplate(templateContent, userReference);
             XDOM templateXDOM = templateManager.execute(customTemplate);
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            plainRenderer.render(templateXDOM, printer);
+            renderer.render(templateXDOM, printer);
 
             scriptContextManager.getCurrentScriptContext().removeAttribute(
                     EVENT_BINDING_NAME,
+                    ScriptContext.ENGINE_SCOPE);
+
+            scriptContextManager.getCurrentScriptContext().removeAttribute(
+                    SOURCE_BINDING_NAME,
                     ScriptContext.ENGINE_SCOPE);
 
             return printer.toString().trim().equals("true");
@@ -183,6 +200,10 @@ public class UntypedEventListener extends AbstractEventListener
 
             scriptContextManager.getCurrentScriptContext().removeAttribute(
                     EVENT_BINDING_NAME,
+                    ScriptContext.ENGINE_SCOPE);
+
+            scriptContextManager.getCurrentScriptContext().removeAttribute(
+                    SOURCE_BINDING_NAME,
                     ScriptContext.ENGINE_SCOPE);
 
             return false;

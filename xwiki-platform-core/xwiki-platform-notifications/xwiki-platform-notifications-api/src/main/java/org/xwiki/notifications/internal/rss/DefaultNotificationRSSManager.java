@@ -52,13 +52,13 @@ import com.rometools.rome.feed.synd.SyndFeedImpl;
 public class DefaultNotificationRSSManager implements NotificationRSSManager
 {
     @Inject
-    protected ContextualLocalizationManager contextualLocalizationManager;
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     @Inject
-    protected ModelBridge modelBridge;
+    private ModelBridge modelBridge;
 
     @Inject
-    protected DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
     private ComponentManager componentManager;
@@ -67,7 +67,7 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
     private NotificationRSSRenderer defaultNotificationRSSRenderer;
 
     @Inject
-    protected Logger logger;
+    private Logger logger;
 
     @Override
     public SyndFeed renderFeed(List<CompositeEvent> events)

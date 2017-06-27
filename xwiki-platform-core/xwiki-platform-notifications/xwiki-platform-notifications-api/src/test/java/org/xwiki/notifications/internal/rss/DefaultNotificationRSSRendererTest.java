@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
+import javax.script.ScriptContext;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +32,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -57,12 +60,16 @@ public class DefaultNotificationRSSRendererTest
 
     private TemplateManager templateManager;
 
+    private ScriptContextManager scriptContextManager;
+
     @Before
     public void setUp() throws Exception
     {
         this.contextualLocalizationManager = this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
         this.templateManager = this.mocker.registerMockComponent(TemplateManager.class);
+
+        this.scriptContextManager = this.mocker.registerMockComponent(ScriptContextManager.class);
     }
 
     private void mockEvent(CompositeEvent testCompositeEvent) throws Exception
@@ -92,6 +99,8 @@ public class DefaultNotificationRSSRendererTest
         CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
 
         this.mockEvent(testCompositeEvent);
+
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
 
         SyndEntry resultEntry = this.mocker.getComponentUnderTest().renderNotification(testCompositeEvent);
 

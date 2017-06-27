@@ -65,10 +65,10 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
     public static final String COMPOSITE_EVENT_BUILDING_NAME = "event";
 
     @Inject
-    private TemplateManager templateManager;
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     @Inject
-    protected ContextualLocalizationManager contextualLocalizationManager;
+    private TemplateManager templateManager;
 
     @Inject
     private ScriptContextManager scriptContextManager;

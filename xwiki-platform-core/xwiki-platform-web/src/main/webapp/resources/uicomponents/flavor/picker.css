@@ -65,8 +65,10 @@
 }
 
 .xwiki-flavor-picker-option-icon > img{
-  height: 20px;
-  width: 20px;
+  height: 16px;
+  width: 16px;
+  max-width: inherit;
+  vertical-align: inherit;
 }
 
 .xwiki-flavor-picker-option:hover {

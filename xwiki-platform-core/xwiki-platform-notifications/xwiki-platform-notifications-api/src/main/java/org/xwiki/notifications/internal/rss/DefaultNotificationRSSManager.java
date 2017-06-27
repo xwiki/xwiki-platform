@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -32,6 +34,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.notifications.rss.NotificationRSSRenderer;
 
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -44,7 +47,9 @@ import com.rometools.rome.feed.synd.SyndFeedImpl;
  * @version $Id$
  * @since 9.6RC1
  */
-public abstract class AbstractNotificationRSSRenderer implements NotificationRSSRenderer
+@Component
+@Singleton
+public class DefaultNotificationRSSManager implements NotificationRSSManager
 {
     @Inject
     protected ContextualLocalizationManager contextualLocalizationManager;
@@ -57,6 +62,9 @@ public abstract class AbstractNotificationRSSRenderer implements NotificationRSS
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private NotificationRSSRenderer defaultNotificationRSSRenderer;
 
     @Inject
     protected Logger logger;
@@ -87,7 +95,7 @@ public abstract class AbstractNotificationRSSRenderer implements NotificationRSS
                 if (renderer != null) {
                     entries.add(renderer.renderNotification(event));
                 } else {
-                    entries.add(this.renderNotification(event));
+                    entries.add(defaultNotificationRSSRenderer.renderNotification(event));
                 }
             } catch (NotificationException e) {
                 this.logger.warn(

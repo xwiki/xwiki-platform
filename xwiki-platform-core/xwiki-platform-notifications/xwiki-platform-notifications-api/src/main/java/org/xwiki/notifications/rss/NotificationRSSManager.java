@@ -26,25 +26,24 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.stability.Unstable;
 
-import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
 /**
- * Display a notification in a RSS format.
+ * Allows a complete RSS feed to be properly rendered.
  *
  * @since 9.6RC1
  * @version $Id$
  */
 @Role
 @Unstable
-public interface NotificationRSSRenderer
+public interface NotificationRSSManager
 {
     /**
-     * Render a specific composite event.
+     * Render a complete RSS feed.
      *
-     * @param event the {@link CompositeEvent} that should be rendered
-     * @return the rss entry
+     * @param events the list of {@link CompositeEvent} that should be included in the rss
+     * @return the rss feed
      * @throws NotificationException if an error occurred
      */
-    SyndEntry renderNotification(CompositeEvent event)  throws NotificationException;
+    SyndFeed renderFeed(List<CompositeEvent> events) throws NotificationException;
 }

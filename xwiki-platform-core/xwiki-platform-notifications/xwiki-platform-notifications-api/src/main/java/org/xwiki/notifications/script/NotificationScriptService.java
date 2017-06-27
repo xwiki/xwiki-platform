@@ -43,7 +43,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationRenderer;
 import org.xwiki.notifications.internal.ModelBridge;
-import org.xwiki.notifications.rss.NotificationRSSRenderer;
+import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -73,7 +73,7 @@ public class NotificationScriptService implements ScriptService
     private NotificationRenderer notificationRenderer;
 
     @Inject
-    private NotificationRSSRenderer notificationRSSRenderer;
+    private NotificationRSSManager notificationRSSManager;
 
     @Inject
     private EventStatusManager eventStatusManager;
@@ -290,7 +290,7 @@ public class NotificationScriptService implements ScriptService
     {
         SyndFeedOutput output = new SyndFeedOutput();
         try {
-            return output.outputString(this.notificationRSSRenderer.renderFeed(
+            return output.outputString(this.notificationRSSManager.renderFeed(
                     this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
         } catch (FeedException e) {
             throw new NotificationException("Unable to render RSS feed", e);

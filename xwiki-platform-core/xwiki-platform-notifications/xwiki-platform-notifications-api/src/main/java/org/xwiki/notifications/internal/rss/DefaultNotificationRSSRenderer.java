@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
@@ -55,7 +56,7 @@ import com.rometools.rome.feed.synd.SyndPersonImpl;
  */
 @Component
 @Singleton
-public class DefaultNotificationRSSRenderer extends AbstractNotificationRSSRenderer
+public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
 {
     /**
      * The binding name of a composite event when the description of this composite event is rendered in a feed
@@ -65,6 +66,9 @@ public class DefaultNotificationRSSRenderer extends AbstractNotificationRSSRende
 
     @Inject
     private TemplateManager templateManager;
+
+    @Inject
+    protected ContextualLocalizationManager contextualLocalizationManager;
 
     @Inject
     private ScriptContextManager scriptContextManager;

@@ -35,7 +35,6 @@ import org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep;
 import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.WikisFlavorDistributionStep;
 import org.xwiki.text.StringUtils;
 
 /**

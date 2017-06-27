@@ -1,5 +1,3 @@
 org.xwiki.eventstream.internal.DefaultEventFactory
 org.xwiki.eventstream.internal.DefaultRecordableEventDescriptorManager
-org.xwiki.eventstream.internal.DefaultUntypedRecordableEventConverter
-org.xwiki.eventstream.internal.UntypedEventListener
 org.xwiki.eventstream.script.EventStreamScriptService

@@ -382,7 +382,6 @@
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-flavor</module>
     <module>xwiki-platform-formula</module>
-    <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>

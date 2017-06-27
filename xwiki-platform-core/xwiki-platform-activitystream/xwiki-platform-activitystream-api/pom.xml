@@ -68,7 +68,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream</artifactId>
+      <artifactId>xwiki-platform-eventstream-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

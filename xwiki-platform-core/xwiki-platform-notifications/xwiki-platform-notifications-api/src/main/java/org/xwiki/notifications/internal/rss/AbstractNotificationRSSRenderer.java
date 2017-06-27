@@ -83,7 +83,12 @@ public abstract class AbstractNotificationRSSRenderer implements NotificationRSS
         List<SyndEntry> entries = new ArrayList<>();
         for (CompositeEvent event : events) {
             try {
-                entries.add(this.renderNotification(event));
+                NotificationRSSRenderer renderer = this.getRenderer(event);
+                if (renderer != null) {
+                    entries.add(renderer.renderNotification(event));
+                } else {
+                    entries.add(this.renderNotification(event));
+                }
             } catch (NotificationException e) {
                 this.logger.warn(
                         String.format("Unable to render RSS entry for CompositeEvent : %s", e.getMessage()));

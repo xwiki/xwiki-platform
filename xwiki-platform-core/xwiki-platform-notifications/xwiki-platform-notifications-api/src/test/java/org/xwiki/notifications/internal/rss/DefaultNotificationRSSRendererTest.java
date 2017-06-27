@@ -109,6 +109,7 @@ public class DefaultNotificationRSSRendererTest
         when(testCompositeEvent.getEvents()).thenReturn(Arrays.asList(testEvent1));
         when(testCompositeEvent.getUsers()).thenReturn(new HashSet<>(Arrays.asList(testEventAuthor1)));
         when(testCompositeEvent.getEventIds()).thenReturn(Arrays.asList("id1"));
+        when(testCompositeEvent.getType()).thenReturn("eventType");
         when(testCompositeEvent.getDates()).thenReturn(Arrays.asList(testEventDate));
 
     }

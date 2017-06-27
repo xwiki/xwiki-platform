@@ -552,7 +552,7 @@ public class DefaultNotificationManagerTest
 
         // Expected:
         // * Bob has commented the page "Bike"
-        // * Bob has created the page "Bike"
+        // * Bob has updated the page "Bike"
 
         // Mocks
         Event eventUpdate1          = mock(Event.class);

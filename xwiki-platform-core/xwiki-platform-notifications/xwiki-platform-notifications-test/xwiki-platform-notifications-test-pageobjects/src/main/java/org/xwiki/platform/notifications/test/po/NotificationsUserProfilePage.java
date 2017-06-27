@@ -40,14 +40,26 @@ public class NotificationsUserProfilePage extends ViewPage
     @FindBy(css = "td.notificationTypeCell[data-eventtype='create'][data-format='alert'] .bootstrap-switch")
     private WebElement pageCreatedSwitch;
 
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='create'][data-format='email'] .bootstrap-switch")
+    private WebElement pageCreatedEmailSwitch;
+
     @FindBy(css = "td.notificationTypeCell[data-eventtype='delete'][data-format='alert'] .bootstrap-switch")
     private WebElement pageDeletedSwitch;
+
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='delete'][data-format='email'] .bootstrap-switch")
+    private WebElement pageDeletedEmailSwitch;
 
     @FindBy(css = "td.notificationTypeCell[data-eventtype='update'][data-format='alert'] .bootstrap-switch")
     private WebElement pageUpdatedSwitch;
 
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='update'][data-format='email'] .bootstrap-switch")
+    private WebElement pageUpdatedEmailSwitch;
+
     @FindBy(css = "td.notificationTypeCell[data-eventtype='addComment'][data-format='alert'] .bootstrap-switch")
     private WebElement pageCommentedSwitch;
+
+    @FindBy(css = "td.notificationTypeCell[data-eventtype='addComment'][data-format='email'] .bootstrap-switch")
+    private WebElement pageCommentedEmailSwitch;
 
     /**
      * Construct a NotificationsUserProfilePage (and for the browser page to be fully loaded).
@@ -78,6 +90,17 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
+     * Check if the pageCreatedEmailCheckbox is checked.
+     *
+     * @return true if the checkbox is checked
+     * @since 9.6RC1
+     */
+    public boolean isPageCreatedEmail()
+    {
+        return isSwitchOn(this.pageCreatedEmailSwitch);
+    }
+
+    /**
      * Check if the pageDeletedCheckbox is checked.
      * 
      * @return true if the checkbox is checked
@@ -88,6 +111,17 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
+     * Check if the pageDeletedCEmailheckbox is checked.
+     *
+     * @return true if the checkbox is checked
+     * @since 9.6RC1
+     */
+    public boolean isPageDeletedEmail()
+    {
+        return isSwitchOn(pageDeletedEmailSwitch);
+    }
+
+    /**
      * Check if the pageUpdatedCheckbox is checked.
      * 
      * @return true if the checkbox is checked
@@ -95,6 +129,17 @@ public class NotificationsUserProfilePage extends ViewPage
     public boolean isPageUpdated()
     {
         return isSwitchOn(pageUpdatedSwitch);
+    }
+
+    /**
+     * Check if the pageUpdatedEmailCheckbox is checked.
+     *
+     * @return true if the checkbox is checked
+     * @since 9.6RC1
+     */
+    public boolean isPageUpdatedEmail()
+    {
+        return isSwitchOn(pageUpdatedEmailSwitch);
     }
 
     /**
@@ -110,6 +155,17 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
+     * Check if the pageCommentedEmailCheckbox is checked.
+     *
+     * @return true if the checkbox is checked
+     * @since 9.6RC1
+     */
+    public boolean isPageCommentedEmail()
+    {
+        return isSwitchOn(pageCommentedEmailSwitch);
+    }
+
+    /**
      * Change the status of the pageCreatedCheckbox.
      * 
      * @param status New status
@@ -118,6 +174,20 @@ public class NotificationsUserProfilePage extends ViewPage
     {
         if (status != this.isPageCreated()) {
             clickOnSwitch(this.pageCreatedSwitch);
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
+    }
+
+    /**
+     * Change the status of the pageCreatedEmailCheckbox.
+     *
+     * @param status New status
+     * @since 9.6RC1
+     */
+    public void setPageCreatedEmail(boolean status)
+    {
+        if (status != this.isPageCreatedEmail()) {
+            clickOnSwitch(this.pageCreatedEmailSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -136,6 +206,20 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
+     * Change the status of the pageDeletedEmailCheckbox.
+     *
+     * @param status New status
+     * @since 9.6RC1
+     */
+    public void setPageDeletedEmail(boolean status)
+    {
+        if (status != this.isPageDeletedEmail()) {
+            clickOnSwitch(this.pageDeletedEmailSwitch);
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
+    }
+
+    /**
      * Change the status of the pageUpdatedCheckbox.
      * 
      * @param status New status
@@ -144,6 +228,20 @@ public class NotificationsUserProfilePage extends ViewPage
     {
         if (status != this.isPageUpdated()) {
             clickOnSwitch(this.pageUpdatedSwitch);
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
+    }
+
+    /**
+     * Change the status of the pageUpdatedEmailCheckbox.
+     *
+     * @param status New status
+     * @since 9.6RC1
+     */
+    public void setPageUpdatedEmail(boolean status)
+    {
+        if (status != this.isPageUpdatedEmail()) {
+            clickOnSwitch(this.pageUpdatedEmailSwitch);
             this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         }
     }
@@ -164,6 +262,20 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
+     * Change the status of the pageCommentEmailCheckbox.
+     *
+     * @param status New status
+     * @since 9.6RC1
+     */
+    public void setPageCommentedEmail(boolean status)
+    {
+        if (status != this.isPageCommentedEmail()) {
+            clickOnSwitch(this.pageCommentedEmailSwitch);
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
+    }
+
+    /**
      * Disable every notification parameters.
      */
     public void disableAllParameters()
@@ -171,6 +283,11 @@ public class NotificationsUserProfilePage extends ViewPage
         this.setPageCreated(false);
         this.setPageDeleted(false);
         this.setPageUpdated(false);
+        this.setPageCommented(false);
+        this.setPageCreatedEmail(false);
+        this.setPageDeletedEmail(false);
+        this.setPageUpdatedEmail(false);
+        this.setPageCommentedEmail(false);
     }
 
     private boolean isSwitchOn(WebElement webElement)

@@ -6927,7 +6927,9 @@ public class XWiki implements EventListener
 
             XWikiContext context = getXWikiContext();
             if (namespace == null) {
-                // Initialize in already initialized wikis (will be initialized in others when they are initialized)
+                // Initialize in main wiki
+                initializeMandatoryDocument(context.getMainXWiki(), initializer, context);
+                // Initialize in already initialized sub wikis (will be initialized in others when they are initialized)
                 for (String wiki : this.initializedWikis.keySet()) {
                     initializeMandatoryDocument(wiki, initializer, context);
                 }

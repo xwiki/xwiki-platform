@@ -4683,16 +4683,15 @@ public class XWiki implements EventListener
      * @param anchor the anchor of the document
      * @param context the current XWikiContext
      * @return the full URL of the given reference
-     *
      * @since 9.6RC1
      */
-    public String getExternalURL(DocumentReference documentReference, String action,
-            String querystring, String anchor, XWikiContext context)
+    public String getExternalURL(DocumentReference documentReference, String action, String querystring, String anchor,
+        XWikiContext context)
     {
         URL url = context.getURLFactory().createExternalURL(
-                this.getLocalStringEntityReferenceSerializer().serialize(documentReference.getLastSpaceReference()),
-                documentReference.getName(), action, querystring, anchor,
-                documentReference.getWikiReference().getName(), context);
+            this.getLocalStringEntityReferenceSerializer().serialize(documentReference.getLastSpaceReference()),
+            documentReference.getName(), action, querystring, anchor, documentReference.getWikiReference().getName(),
+            context);
         return url.toString();
     }
 
@@ -6893,7 +6892,6 @@ public class XWiki implements EventListener
             // Document modifications
 
             XWikiDocument doc = (XWikiDocument) source;
-            XWikiContext context = (XWikiContext) data;
 
             if (event instanceof XObjectPropertyEvent) {
                 EntityReference reference = ((XObjectPropertyEvent) event).getReference();

@@ -42,7 +42,7 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 
 /**
- * Abstract definition of the {@link NotificationRSSRenderer} API.
+ * This is the default implementation of {@link NotificationRSSManager}.
  *
  * @version $Id$
  * @since 9.6RC1

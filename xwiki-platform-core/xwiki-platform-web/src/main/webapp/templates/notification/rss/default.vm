@@ -1,8 +1,48 @@
+### Default plain text template for emails
+### Indention is missing because we don't want it to be displayed in the email)
 #template('notification/macros.vm')
+###
+### Get the app
+###
 #set ($app  = "$!event.events.get(0).application")
 #if ($app == 'xwiki')
-    #set ($app = $services.localization.render('core.events.appName'))
+  #set ($app = $services.localization.render('core.events.appName'))
 #end
+###
+### Get the doc
+###
 #set ($document = $xwiki.getDocument($event.document))
-$app:
-[$event.type] [$document.getRenderedTitle('plain/1.0')] $services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users, false)"])
+###
+### Display
+###
+<p>
+<b>$app: [$event.type]</b>#if ($document) <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>#end.<br/>
+  $services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users, false)"])
+</p>
+###
+### Display dates
+###
+<p>
+#set ($dates = $event.dates)
+#if ($dates.size() > 1)
+  $services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])
+#else
+  $xwiki.formatDate($event.dates.get(0))
+#end
+<br/>
+###
+### Display a link to the diff
+###
+#if ($document)
+#set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
+#if ($event.events.size == 1)
+#set ($origdoc = $newdoc.previousDocument)
+#else
+#set ($lastIndex = $event.events.size() - 1)
+#set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
+#set ($externalURL = $document.getExternalURL('view', "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}"))
+#set ($diffLink = "<a href='$externalURL'>${newdoc.version}</a>")
+#end
+$services.localization.render('notifications.email.seeChanges', 'xwiki/2.1', [$diffLink])
+#end
+</p>

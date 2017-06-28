@@ -33,7 +33,7 @@ import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.model.EntityType;
+import org.xwiki.model.namespace.DocumentNamespace;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -51,7 +51,7 @@ public class DocumentDeletedListener implements EventListener
     /**
      * The list of events observed.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent());
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentDeletedEvent());
 
     /**
      * Store and provide {@link ComponentManager} instances.
@@ -80,8 +80,7 @@ public class DocumentDeletedListener implements EventListener
         String document = ((DocumentDeletedEvent) event).getEventFilter().getFilter();
 
         ComponentManager componentManager =
-            this.componentManagerManager.getComponentManager(EntityType.DOCUMENT.toString().toLowerCase() + ':'
-                + document, false);
+            this.componentManagerManager.getComponentManager(new DocumentNamespace(document).serialize(), false);
 
         if (componentManager instanceof Disposable) {
             try {

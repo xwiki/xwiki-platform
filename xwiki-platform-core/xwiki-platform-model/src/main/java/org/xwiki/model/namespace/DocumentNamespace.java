@@ -17,30 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.internal;
+package org.xwiki.model.namespace;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.internal.multi.ComponentManagerFactory;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.namespace.SpaceNamespace;
+import org.xwiki.component.namespace.Namespace;
 
 /**
- * Implementation of {@link ComponentManagerFactory} which force parent to be {@link WikiComponentManager}.
+ * Typed {@link Namespace} for documents.
  * 
  * @version $Id$
- * @since 5.0M2
+ * @since 9.6RC1
  */
-@Component
-@Named(SpaceNamespace.TYPE)
-@Singleton
-public class SpaceComponentManagerFactory extends AbstractEnityComponentManagerFactory
+public class DocumentNamespace extends Namespace
 {
-    @Override
-    protected EntityType getEntityType()
+    /**
+     * The type used in those namespaces.
+     */
+    public static final String TYPE = "document";
+
+    /**
+     * @param documentReference the document reference
+     */
+    public DocumentNamespace(String documentReference)
     {
-        return EntityType.SPACE;
+        super(TYPE, documentReference);
     }
 }

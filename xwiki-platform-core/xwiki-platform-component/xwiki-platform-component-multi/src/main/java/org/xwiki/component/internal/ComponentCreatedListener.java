@@ -27,6 +27,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.namespace.DocumentNamespace;
+import org.xwiki.model.namespace.SpaceNamespace;
+import org.xwiki.model.namespace.UserNamespace;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -43,19 +47,19 @@ import org.xwiki.observation.event.Event;
 public class ComponentCreatedListener extends AbstractEventListener
 {
     @Inject
-    @Named(UserComponentManager.ID)
+    @Named(UserNamespace.TYPE)
     private Provider<ComponentManager> userComponentManagerProvider;
 
     @Inject
-    @Named(DocumentComponentManager.ID)
+    @Named(DocumentNamespace.TYPE)
     private Provider<ComponentManager> documentComponentManagerProvider;
 
     @Inject
-    @Named(SpaceComponentManager.ID)
+    @Named(SpaceNamespace.TYPE)
     private Provider<ComponentManager> spaceComponentManagerProvider;
 
     @Inject
-    @Named(WikiComponentManager.ID)
+    @Named(WikiNamespace.TYPE)
     private Provider<ComponentManager> wikiComponentManagerProvider;
 
     /**

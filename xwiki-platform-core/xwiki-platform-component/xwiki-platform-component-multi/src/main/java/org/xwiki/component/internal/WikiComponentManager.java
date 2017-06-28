@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -40,21 +41,16 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * @since 2.1RC1
  */
 @Component
-@Named(WikiComponentManager.ID)
+@Named(WikiNamespace.TYPE)
 @Singleton
 public class WikiComponentManager extends AbstractEntityComponentManager implements Initializable
 {
-    /**
-     * The identifier of this {@link ComponentManager}.
-     */
-    public static final String ID = "wiki";
-
     /**
      * The prefix of wiki namespace.
      * 
      * @since 8.4RC1
      */
-    public static final String NAMESPACE_PREFIX = ID + ':';
+    public static final String NAMESPACE_PREFIX = WikiNamespace.TYPE + ':';
 
     @Inject
     private WikiDescriptorManager wikis;

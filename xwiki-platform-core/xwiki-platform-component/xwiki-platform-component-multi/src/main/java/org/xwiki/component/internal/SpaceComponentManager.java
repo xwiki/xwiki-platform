@@ -28,6 +28,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.namespace.SpaceNamespace;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -40,21 +42,16 @@ import org.xwiki.model.reference.SpaceReference;
  * @since 5.0M2
  */
 @Component
-@Named(SpaceComponentManager.ID)
+@Named(SpaceNamespace.TYPE)
 @Singleton
 public class SpaceComponentManager extends AbstractEntityComponentManager implements Initializable
 {
-    /**
-     * The identifier of this {@link ComponentManager}.
-     */
-    public static final String ID = "space";
-
     /**
      * The prefix of space namespace.
      * 
      * @since 8.4RC1
      */
-    public static final String NAMESPACE_PREFIX = ID + ':';
+    public static final String NAMESPACE_PREFIX = SpaceNamespace.TYPE + ':';
 
     @Inject
     @Named("current")
@@ -64,7 +61,7 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(WikiComponentManager.ID)
+    @Named(WikiNamespace.TYPE)
     private ComponentManager wikiComponentManager;
 
     @Override

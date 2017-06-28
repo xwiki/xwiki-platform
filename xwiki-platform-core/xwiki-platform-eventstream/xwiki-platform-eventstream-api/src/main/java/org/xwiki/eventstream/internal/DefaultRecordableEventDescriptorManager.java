@@ -20,22 +20,24 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
-import org.xwiki.model.ModelContext;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -50,62 +52,53 @@ import org.xwiki.wiki.manager.WikiManagerException;
 public class DefaultRecordableEventDescriptorManager implements RecordableEventDescriptorManager
 {
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private ComponentManager contextComponentManager;
+
+    @Inject
+    private ComponentManagerManager componentManagerManager;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Inject
-    private ModelContext modelContext;
-
     @Override
-    public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
+    public List<RecordableEventDescriptor> getRecordableEventDescriptors(boolean allWikis) throws EventStreamException
     {
         try {
-            // As the wiki might change (see getAllRecordableEventDescriptorsAllWikis), we can’t use @Inject
-            // on the wikiComponentManager.
-            ComponentManager wikiComponentManager = componentManager.getInstance(ComponentManager.class, "wiki");
-
-            List<RecordableEventDescriptor> recordableEventDescriptorList =
-                    componentManager.getInstanceList(RecordableEventDescriptor.class);
-            recordableEventDescriptorList.addAll(
-                    wikiComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class));
-            return recordableEventDescriptorList;
-        } catch (ComponentLookupException e) {
-            throw new EventStreamException("Failed to retrieve the list of RecordableEventDescriptor.", e);
-        }
-    }
-
-    @Override
-    public List<RecordableEventDescriptor> getAllRecordableEventDescriptorsAllWikis() throws EventStreamException
-    {
-        if (isMainWiki()) {
             // We use an hashSet to be sure we won't store the same descriptor twice (in case the same application
             // is installed on several wikis).
             Set<RecordableEventDescriptor> recordableEventDescriptors = new HashSet<>();
 
-            try {
+            // Load the component from the context component manager (root + wiki + user component managers, etc...)
+            recordableEventDescriptors.addAll(contextComponentManager.getInstanceList(RecordableEventDescriptor.class));
+
+            // Maybe add components of the other wikis too
+            if (allWikis) {
                 for (String wikiId : wikiDescriptorManager.getAllIds()) {
-                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
-                    for (RecordableEventDescriptor recordableEventDescriptor : getAllRecordableEventDescriptors()) {
-                        recordableEventDescriptors.add(recordableEventDescriptor);
-                    }
+                    recordableEventDescriptors.addAll(getDescriptorsFromWiki(wikiId));
                 }
-            } catch (WikiManagerException e) {
-                throw new EventStreamException("Failed to get the list of all Recordable Event Descriptors.", e);
-            } finally {
-                modelContext.setCurrentEntityReference(new WikiReference(wikiDescriptorManager.getMainWikiId()));
             }
 
             return new ArrayList<>(recordableEventDescriptors);
-        }
 
-        return getAllRecordableEventDescriptors();
+        } catch (WikiManagerException | ComponentLookupException e) {
+            throw new EventStreamException("Failed to get the list of all Recordable Event Descriptors.", e);
+        }
     }
 
-    private boolean isMainWiki()
+    private List<RecordableEventDescriptor> getDescriptorsFromWiki(String wikiId)
+            throws ComponentLookupException
     {
-        return wikiDescriptorManager.getMainWikiId() != null
-                && wikiDescriptorManager.getMainWikiId().equals(wikiDescriptorManager.getCurrentWikiId());
+        Namespace namespace = new Namespace("wiki", wikiId);
+        ComponentManager wikiComponentManager =
+                componentManagerManager.getComponentManager(namespace.serialize(), false);
+        if (wikiComponentManager == null) {
+            return Collections.emptyList();
+        }
+
+        List<RecordableEventDescriptor> descriptors = new ArrayList<>();
+        descriptors.addAll(wikiComponentManager.getInstanceList(RecordableEventDescriptor.class));
+        descriptors.addAll(wikiComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class));
+        return descriptors;
     }
 }

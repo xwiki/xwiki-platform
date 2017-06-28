@@ -63,7 +63,7 @@
   &lt;/thead&gt;
   &lt;tbody&gt;
     #set ($types = [])
-    #foreach ($descriptor in $services.eventstream.allRecordableEventDescriptors)
+    #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
       #set ($discard = $types.add({
         'applicationName' : "$!services.localization.render($descriptor.applicationName)",
         'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",

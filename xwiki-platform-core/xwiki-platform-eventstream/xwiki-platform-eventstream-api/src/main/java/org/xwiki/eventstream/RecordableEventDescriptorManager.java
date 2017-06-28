@@ -35,14 +35,11 @@ import org.xwiki.stability.Unstable;
 public interface RecordableEventDescriptorManager
 {
     /**
+     * @param allWikis load the descriptors from all the wikis of the farm if true
      * @return all the available implementation of RecordableEventDescriptor
      * @throws EventStreamException if an error occurs
+     * @since 9.5.1
+     * @since 9.6RC1
      */
-    List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException;
-
-    /**
-     * @return all the available implementation of RecordableEventDescriptor
-     * @throws EventStreamException if an error occurs
-     */
-    List<RecordableEventDescriptor> getAllRecordableEventDescriptorsAllWikis() throws EventStreamException;
+    List<RecordableEventDescriptor> getRecordableEventDescriptors(boolean allWikis) throws EventStreamException;
 }

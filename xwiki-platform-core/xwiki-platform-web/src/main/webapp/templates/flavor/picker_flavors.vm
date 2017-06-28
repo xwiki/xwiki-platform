@@ -2,7 +2,7 @@
 #if ("$!request.namespace" != '')
   #set ($namespace = $request.namespace)
 #else
-  #set ($namespace = $xcontext.database)
+  #set ($namespace = "wiki:$xcontext.database")
 #end
 #set($validExtensions = $services.flavor.getValidExtensions($namespace))
 #foreach($extension in $validExtensions)

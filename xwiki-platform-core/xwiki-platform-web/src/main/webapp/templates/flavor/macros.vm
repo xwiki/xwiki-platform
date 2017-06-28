@@ -10,7 +10,7 @@
 #########################################################
 #macro(displayFlavorPicker $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $noFlavorButton $namespace)
   #if (!$namespace)
-    #set ($namespace = $xcontext.database)
+    #set ($namespace = "wiki:$xcontext.database")
   #end
   ## TODO: put this in a webjar instead
   #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/picker.css', {'forceSkinAction': true}))
@@ -41,7 +41,7 @@
 ##
 #macro(displayFlavorPicker_results $fieldName $defaultValue $firstIsDefaultIfDefaultNull $offset $namespace)
   #if (!$namespace)
-    #set ($namespace = $xcontext.database)
+    #set ($namespace = "wiki:$xcontext.database")
   #end
   #set ($resultsPerPage = 20)
   #if ("$!request.filter" != '')

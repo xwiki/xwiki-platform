@@ -38,6 +38,7 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -89,7 +90,7 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     private List<RecordableEventDescriptor> getDescriptorsFromWiki(String wikiId)
             throws ComponentLookupException
     {
-        Namespace namespace = new Namespace("wiki", wikiId);
+        Namespace namespace = new WikiNamespace(wikiId);
         ComponentManager wikiComponentManager =
                 componentManagerManager.getComponentManager(namespace.serialize(), false);
         if (wikiComponentManager == null) {

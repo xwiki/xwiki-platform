@@ -1,5 +1,4 @@
-### Default plain text template for emails
-### Indention is missing because we don't want it to be displayed in the email)
+### Default plain text template for RSS feeds
 #template('notification/macros.vm')
 ###
 ### Get the app
@@ -16,7 +15,11 @@
 ### Display
 ###
 <p>
-<b>$app: [$event.type]</b>#if ($document) <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>#end.<br/>
+  <b>$app: [$event.type]</b>
+  #if ($document)
+    <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>
+  #end
+  .<br/>
   $services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users, false)"])
 </p>
 ###
@@ -43,6 +46,6 @@
 #set ($externalURL = $document.getExternalURL('view', "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}"))
 #set ($diffLink = "<a href='$externalURL'>${newdoc.version}</a>")
 #end
-$services.localization.render('notifications.email.seeChanges', 'xwiki/2.1', [$diffLink])
+  $services.localization.render('notifications.rss.seeChanges', 'xwiki/2.1', [$diffLink])
 #end
 </p>

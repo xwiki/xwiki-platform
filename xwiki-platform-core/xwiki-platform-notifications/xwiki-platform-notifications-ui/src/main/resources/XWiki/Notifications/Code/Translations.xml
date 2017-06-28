@@ -75,6 +75,7 @@ notifications.email.seeChanges=Changes: {0}
 notifications.rss.feedLink=RSS Feed
 notifications.rss.feedTitle=Notifications RSS feed
 notifications.rss.feedDescription=This RSS feed can be customized in your profile page.
+notifications.rss.seeChanges=Changes: {0}
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Weekly</content>

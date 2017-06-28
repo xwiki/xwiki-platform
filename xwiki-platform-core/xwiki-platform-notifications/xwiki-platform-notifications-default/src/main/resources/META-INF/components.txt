@@ -1,1 +1,3 @@
 org.xwiki.notifications.internal.DefaultModelBridge
+org.xwiki.notifications.internal.NotificationDisplayerComponentBuilder
+org.xwiki.notifications.internal.NotificationDisplayerDocumentInitializer

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -43,6 +44,7 @@ import org.xwiki.text.StringUtils;
 public class DefaultNotificationRenderer implements NotificationRenderer
 {
     @Inject
+    @Named("wiki")
     private ComponentManager componentManager;
 
     @Inject

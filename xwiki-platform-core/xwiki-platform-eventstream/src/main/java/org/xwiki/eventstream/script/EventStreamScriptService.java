@@ -48,11 +48,14 @@ public class EventStreamScriptService implements ScriptService
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
 
     /**
+     * @param allWikis load the descriptors from all the wikis of the farm if true
      * @return the list of the available RecordableEventDescriptors
      * @throws EventStreamException if an error happen
+     * @since 9.5.1
+     * @since 9.6RC1
      */
-    public List<RecordableEventDescriptor> getAllRecordableEventDescriptors() throws EventStreamException
+    public List<RecordableEventDescriptor> getRecordableEventDescriptors(boolean allWikis) throws EventStreamException
     {
-        return recordableEventDescriptorManager.getAllRecordableEventDescriptorsAllWikis();
+        return recordableEventDescriptorManager.getRecordableEventDescriptors(allWikis);
     }
 }

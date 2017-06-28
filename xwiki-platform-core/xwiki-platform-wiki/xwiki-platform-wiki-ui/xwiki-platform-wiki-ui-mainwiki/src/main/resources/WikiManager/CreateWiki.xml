@@ -165,14 +165,14 @@
       #end
     &lt;/select&gt;
   #end
-  &lt;p class="xformInline"&gt;
+  &lt;div class="xformInline"&gt;
     #set ($isTemplate = '')
     #if ("$!request.set_as_template" != '')
       #set ($isTemplate = 'checked="checked"')
     #end
     &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
     &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
-  &lt;/p&gt;
+  &lt;/div&gt;
 #end
 ##################################
 ##          STEP TYPE
@@ -1414,7 +1414,9 @@ require(['jquery'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>#contentmenu, #hierarchy, #document-info, #xdocFooter {
+      <code>#template('colorThemeInit.vm')
+
+#contentmenu, #hierarchy, #document-info, #xdocFooter {
   display: none;
 }
 
@@ -1445,18 +1447,19 @@ require(['jquery'], function($) {
   width: 50%;
   text-align: center;
   padding: 1em;
-  border: 1px solid #ccc;
+  border: 1px solid $theme.borderColor;
 }
 
 .xwiki-createwiki-tabs-content {
-  border: 1px solid #ccc;
+  border: 1px solid $theme.borderColor;
   border-top: 0;
   clear: both;
   padding: 5px;
 }
 
 .xwiki-createwiki-flavor-picker .xwiki-flavor-picker-results-container{
-  height: 233px;
+  height: 220px;
+  margin-bottom: 5px;
 }
 
 #end

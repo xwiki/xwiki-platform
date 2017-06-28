@@ -6,7 +6,7 @@
 }
 
 .xwiki-flavor-picker-results-container {
-  border: 1px solid #CCC;
+  border: 1px solid $theme.borderColor;
   border-radius: 4px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
   padding: 5px;
@@ -45,7 +45,7 @@
 
 .xwiki-flavor-picker-option-selected {
   background-color: $theme.highlightColor;
-  border: 1px dotted #CCC;
+  border: 1px dotted $theme.borderColor;
 }
 
 .xwiki-flavor-picker-option, .xwiki-flavor-picker-option > label {

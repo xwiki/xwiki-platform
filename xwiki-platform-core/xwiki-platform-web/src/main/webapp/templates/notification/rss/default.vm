@@ -15,7 +15,7 @@
 ### Display
 ###
 <p>
-  <b>$app: [$event.type]</b>
+  <strong>$app: [$event.type]</strong>
   #if ($document)
     <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>
   #end

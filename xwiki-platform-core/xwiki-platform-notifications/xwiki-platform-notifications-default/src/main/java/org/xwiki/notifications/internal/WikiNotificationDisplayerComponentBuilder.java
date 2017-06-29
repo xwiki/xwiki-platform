@@ -51,9 +51,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 9.5RC1
  */
 @Component
-@Named(NotificationDisplayerDocumentInitializer.XCLASS_NAME)
+@Named(WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME)
 @Singleton
-public class NotificationDisplayerComponentBuilder implements WikiBaseObjectComponentBuilder
+public class WikiNotificationDisplayerComponentBuilder implements WikiBaseObjectComponentBuilder
 {
     @Inject
     private TemplateManager templateManager;
@@ -71,7 +71,7 @@ public class NotificationDisplayerComponentBuilder implements WikiBaseObjectComp
     public EntityReference getClassReference()
     {
         return new EntityReference(
-                NotificationDisplayerDocumentInitializer.XCLASS_NAME,
+                WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME,
                 EntityType.OBJECT);
     }
 
@@ -85,12 +85,11 @@ public class NotificationDisplayerComponentBuilder implements WikiBaseObjectComp
 
             // Instantiate the component
             return Arrays.asList(
-                    new NotificationDisplayerComponent(
-                            baseObject.getReference(), parentDocument.getAuthorReference(),
+                    new WikiNotificationDisplayer(parentDocument.getAuthorReference(),
                             this.templateManager, this.scriptContextManager, this.componentManager, baseObject));
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
-                    "Unable to build the NotificationDisplayerComponent wiki component "
+                    "Unable to build the WikiNotificationDisplayer wiki component "
                             + "for [%s].", baseObject), e);
         }
     }

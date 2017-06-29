@@ -44,13 +44,13 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * This class is meant to be instanciated and then registered to the Component Manager by the
- * {@link NotificationDisplayerComponentBuilder} component every time a document containing a
+ * {@link WikiNotificationDisplayerComponentBuilder} component every time a document containing a
  * NotificationDisplayerClass is added, updated or deleted.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-public class NotificationDisplayerComponent implements WikiComponent, NotificationDisplayer
+public class WikiNotificationDisplayer implements WikiComponent, NotificationDisplayer
 {
     private static final String EVENT_BINDING_NAME = "event";
 
@@ -64,14 +64,15 @@ public class NotificationDisplayerComponent implements WikiComponent, Notificati
 
     private DocumentReference authorReference;
 
-    private String notificationTemplate;
-
     private String eventType;
 
+    private Template notificationTemplate;
+
+    private List<String> supportedEvents;
+
     /**
-     * Constructs a new {@link NotificationDisplayerComponent}.
+     * Constructs a new {@link WikiNotificationDisplayer}.
      *
-     * @param objectReference the reference to the template XObject
      * @param authorReference the author reference of the document
      * @param templateManager the {@link TemplateManager} to use
      * @param scriptContextManager the {@link ScriptContextManager} to use
@@ -79,64 +80,76 @@ public class NotificationDisplayerComponent implements WikiComponent, Notificati
      * @param baseObject the XObject which has the required properties to instantiate the component
      * @throws NotificationException if the properties of the given BaseObject could not be loaded
      */
-    public NotificationDisplayerComponent(BaseObjectReference objectReference, DocumentReference authorReference,
-            TemplateManager templateManager, ScriptContextManager scriptContextManager,
-            ComponentManager componentManager, BaseObject baseObject) throws NotificationException
+    public WikiNotificationDisplayer(DocumentReference authorReference, TemplateManager templateManager,
+            ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
+            throws NotificationException
     {
-        this.objectReference = objectReference;
+        this.objectReference = baseObject.getReference();
         this.authorReference = authorReference;
         this.templateManager = templateManager;
         this.scriptContextManager = scriptContextManager;
         this.componentManager = componentManager;
-        this.setProperties(baseObject);
+
+        this.eventType = this.extractProperty(baseObject, WikiNotificationDisplayerDocumentInitializer.EVENT_TYPE);
+        this.supportedEvents = Arrays.asList(this.eventType);
+
+        // Create the template from the given BaseObject property
+        try {
+            this.notificationTemplate = templateManager.createStringTemplate(
+                    this.extractProperty(baseObject,
+                            WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE),
+                    this.getAuthorReference());
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Unable to render the template provided in the base object [%s]",
+                            baseObject), e);
+        }
     }
 
     /**
-     * Set the object attributes by extracting their values from the given BaseObject.
+     * Extract the the given property value from the given XObject.
      *
      * @param baseObject the XObject that should contain the parameters
-     * @throws NotificationException if an error occured while extracting the parameters from the base object
+     * @param propertyName the value of the property that should be extracted
+     * @throws NotificationException if an error occurred while extracting the parameter from the base object
      */
-    private void setProperties(BaseObject baseObject) throws NotificationException
+    private String extractProperty(BaseObject baseObject, String propertyName) throws NotificationException
     {
         try {
-            this.notificationTemplate = baseObject.getStringValue(
-                    NotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
-            this.eventType = baseObject.getStringValue(NotificationDisplayerDocumentInitializer.EVENT_TYPE);
+            return baseObject.getStringValue(propertyName);
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Unable to extract the parameters from the [%s] NotificationDisplayerClass.",
-                            baseObject), e);
+                    String.format("Unable to extract the parameter [%s] from the [%s] NotificationDisplayerClass.",
+                            propertyName, baseObject), e);
         }
     }
 
     @Override
     public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
     {
+        // Save the old value in the context that refers to EVENT_BINDING_NAME
+        Object oldContextAttribute = scriptContextManager.getCurrentScriptContext().getAttribute(EVENT_BINDING_NAME,
+                ScriptContext.ENGINE_SCOPE);
+
         try {
             // Allow the template to access the event during its execution
             scriptContextManager.getCurrentScriptContext().setAttribute(EVENT_BINDING_NAME, eventNotification,
                     ScriptContext.ENGINE_SCOPE);
 
             // If we have no template defined, fallback on the default displayer
-            if (StringUtils.isBlank(this.notificationTemplate)) {
+            if (StringUtils.isBlank(this.notificationTemplate.getContent().getContent())) {
                 return ((NotificationDisplayer) this.componentManager.getInstance(NotificationDisplayer.class))
                         .renderNotification(eventNotification);
             }
 
-            // Render the template
-            Template customTemplate = templateManager.createStringTemplate(
-                    this.notificationTemplate,
-                    this.getAuthorReference());
-
-            return templateManager.getXDOM(customTemplate);
+            return templateManager.execute(notificationTemplate);
 
         } catch (Exception e) {
             throw new NotificationException(
                     String.format("Unable to render notification template for the [%s].", this.eventType), e);
         } finally {
-            // Unbind the event from the current script context
-            scriptContextManager.getCurrentScriptContext().removeAttribute(EVENT_BINDING_NAME,
+            // Restore the old object associated with EVENT_BINDING_NAME
+            scriptContextManager.getCurrentScriptContext().setAttribute(EVENT_BINDING_NAME, oldContextAttribute,
                     ScriptContext.ENGINE_SCOPE);
         }
     }
@@ -144,7 +157,7 @@ public class NotificationDisplayerComponent implements WikiComponent, Notificati
     @Override
     public List<String> getSupportedEvents()
     {
-        return Arrays.asList(this.eventType);
+        return this.supportedEvents;
     }
 
     @Override

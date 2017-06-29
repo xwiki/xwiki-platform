@@ -44,7 +44,7 @@ import org.xwiki.text.StringUtils;
 public class DefaultNotificationRenderer implements NotificationRenderer
 {
     @Inject
-    @Named("wiki")
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject

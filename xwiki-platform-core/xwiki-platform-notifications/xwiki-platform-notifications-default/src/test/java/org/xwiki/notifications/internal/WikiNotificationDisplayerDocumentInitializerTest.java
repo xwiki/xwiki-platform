@@ -28,16 +28,16 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests for {@link NotificationDisplayerDocumentInitializer}.
+ * Tests for {@link WikiNotificationDisplayerDocumentInitializer}.
  *
  * @version $Id$
  * @since 9.6RC1
  */
-public class NotificationDisplayerDocumentInitializerTest
+public class WikiNotificationDisplayerDocumentInitializerTest
 {
     @Rule
-    public final MockitoComponentMockingRule<NotificationDisplayerDocumentInitializer> mocker =
-            new MockitoComponentMockingRule<>(NotificationDisplayerDocumentInitializer.class);
+    public final MockitoComponentMockingRule<WikiNotificationDisplayerDocumentInitializer> mocker =
+            new MockitoComponentMockingRule<>(WikiNotificationDisplayerDocumentInitializer.class);
 
     @Test
     public void testCreateClass() throws Exception

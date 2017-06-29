@@ -30,6 +30,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationDisplayer;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -43,12 +44,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link NotificationDisplayerComponent}.
+ * Unit tests for {@link WikiNotificationDisplayer}.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-public class NotificationDisplayerComponentTest
+public class WikiNotificationDisplayerTest
 {
     private BaseObjectReference objectReference;
 
@@ -56,13 +57,15 @@ public class NotificationDisplayerComponentTest
 
     private TemplateManager templateManager;
 
+    private TemplateContent mockTemplateContent;
+
     private ScriptContextManager scriptContextManager;
 
     private ComponentManager componentManager;
 
     private NotificationDisplayer defaultNotificationDisplayer;
 
-    private NotificationDisplayerComponent componentUnderTest;
+    private WikiNotificationDisplayer componentUnderTest;
 
     @Before
     public void setUp() throws Exception
@@ -70,8 +73,11 @@ public class NotificationDisplayerComponentTest
         this.objectReference = mock(BaseObjectReference.class);
         this.authorReference = mock(DocumentReference.class);
 
+        Template mockTemplate = mock(Template.class);
+        this.mockTemplateContent = mock(TemplateContent.class);
         this.templateManager = mock(TemplateManager.class);
-        when(this.templateManager.createStringTemplate(any(), any())).thenReturn(mock(Template.class));
+        when(mockTemplate.getContent()).thenReturn(this.mockTemplateContent);
+        when(this.templateManager.createStringTemplate(any(), any())).thenReturn(mockTemplate);
 
         this.scriptContextManager = mock(ScriptContextManager.class);
         ScriptContext scriptContext = mock(ScriptContext.class);
@@ -84,17 +90,18 @@ public class NotificationDisplayerComponentTest
 
     private void instantiateComponent(BaseObject baseObject) throws Exception
     {
-        componentUnderTest = new NotificationDisplayerComponent(objectReference, authorReference, templateManager,
-                scriptContextManager, componentManager, baseObject);
+        this.componentUnderTest = new WikiNotificationDisplayer(this.authorReference, this.templateManager,
+                this.scriptContextManager, this.componentManager, baseObject);
     }
 
     private BaseObject mockBaseObject(String notificationTemplate, String eventType) throws Exception
     {
         BaseObject baseObject = mock(BaseObject.class);
-        when(baseObject.getStringValue(NotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE))
+        when(baseObject.getStringValue(WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE))
                 .thenReturn(notificationTemplate);
-        when(baseObject.getStringValue(NotificationDisplayerDocumentInitializer.EVENT_TYPE))
+        when(baseObject.getStringValue(WikiNotificationDisplayerDocumentInitializer.EVENT_TYPE))
                 .thenReturn(eventType);
+        when(baseObject.getReference()).thenReturn(this.objectReference);
         return baseObject;
     }
 
@@ -127,9 +134,11 @@ public class NotificationDisplayerComponentTest
     {
         this.instantiateComponent(this.mockBaseObject("Some Template", "Event Type"));
 
+        when(this.mockTemplateContent.getContent()).thenReturn("Some Template");
+
         CompositeEvent compositeEvent = mock(CompositeEvent.class);
         this.componentUnderTest.renderNotification(compositeEvent);
 
-        verify(templateManager, times(1)).getXDOM(any(Template.class));
+        verify(templateManager, times(1)).execute(any(Template.class));
     }
 }

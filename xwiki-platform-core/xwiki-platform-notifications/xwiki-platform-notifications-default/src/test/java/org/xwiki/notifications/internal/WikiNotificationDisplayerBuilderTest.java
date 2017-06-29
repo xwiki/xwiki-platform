@@ -34,16 +34,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link NotificationDisplayerComponentBuilder}.
+ * Unit tests for {@link WikiNotificationDisplayerComponentBuilder}.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-public class NotificationDisplayerComponentBuilderTest
+public class WikiNotificationDisplayerBuilderTest
 {
     @Rule
-    public final MockitoComponentMockingRule<NotificationDisplayerComponentBuilder> mocker =
-            new MockitoComponentMockingRule<>(NotificationDisplayerComponentBuilder.class);
+    public final MockitoComponentMockingRule<WikiNotificationDisplayerComponentBuilder> mocker =
+            new MockitoComponentMockingRule<>(WikiNotificationDisplayerComponentBuilder.class);
 
     private QueryManager queryManager;
 

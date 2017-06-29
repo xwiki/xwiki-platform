@@ -39,9 +39,9 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  * @since 9.6RC1
  */
 @Component
-@Named(NotificationDisplayerDocumentInitializer.XCLASS_NAME)
+@Named(WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME)
 @Singleton
-public class NotificationDisplayerDocumentInitializer extends AbstractMandatoryClassInitializer
+public class WikiNotificationDisplayerDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The name of the XObject class that should be bound used.
@@ -66,7 +66,7 @@ public class NotificationDisplayerDocumentInitializer extends AbstractMandatoryC
     /**
      * Default constructor.
      */
-    public NotificationDisplayerDocumentInitializer()
+    public WikiNotificationDisplayerDocumentInitializer()
     {
         super(new LocalDocumentReference(SPACE_PATH, "NotificationDisplayerClass"));
     }

@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 
@@ -50,12 +51,17 @@ public class DefaultNotificationRSSManagerTest
 
     private ModelBridge modelBridge;
 
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Before
     public void setUp() throws Exception
     {
         this.contextualLocalizationManager = this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
         this.modelBridge = this.mocker.registerMockComponent(ModelBridge.class);
+
+        this.wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
     }
 
     @Test

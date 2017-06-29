@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal.rss;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,6 +38,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.notifications.rss.NotificationRSSRenderer;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -62,6 +64,9 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
     private ComponentManager componentManager;
 
     @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
     private NotificationRSSRenderer defaultNotificationRSSRenderer;
 
     @Inject
@@ -78,7 +83,8 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
 
         // Set the RSS feed link to the service generating the feed
         feed.setLink(this.modelBridge.getDocumentURL(
-                new DocumentReference("XWiki", "XWiki.Notifications.Code", "NotificationRSSService"),
+                new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
+                        Arrays.asList("XWiki", "Notifications", "Code"), "NotificationRSSService"),
                 "get", "outputSyntax=plain"));
 
         // Set the feed description

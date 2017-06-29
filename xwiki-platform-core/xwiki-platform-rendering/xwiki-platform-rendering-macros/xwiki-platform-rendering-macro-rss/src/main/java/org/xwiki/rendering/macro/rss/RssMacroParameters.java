@@ -204,7 +204,7 @@ public class RssMacroParameters
 
     /**
      * @return the encoding to use when reading the RSS Feed. If not specified then it's guessed from a variety
-     *         of places (XML header, BOM, XML Prolog, Content Type header, etc). In general this parameter shouldn't
+     *         of places (XML header, BOM, XML Prolog, etc). In general this parameter shouldn't
      *         be used.
      */
     public String getEncoding()

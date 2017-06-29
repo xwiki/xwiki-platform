@@ -20,6 +20,8 @@
 package org.xwiki.platform.notifications.test.ui;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.mail.Multipart;
@@ -27,6 +29,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +42,7 @@ import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
@@ -64,7 +68,7 @@ public class NotificationsTest extends AbstractTest
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
-    private static final String SUPERADMIN_PASSWORD = "pass";;
+    private static final String SUPERADMIN_PASSWORD = "pass";
 
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
@@ -84,10 +88,13 @@ public class NotificationsTest extends AbstractTest
         getUtil().createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
 
         NotificationsUserProfilePage p;
+        NotificationsTrayPage trayPage;
 
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
         p.disableAllParameters();
+        trayPage = new NotificationsTrayPage();
+        trayPage.clearAllNotifications();
 
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
@@ -95,6 +102,14 @@ public class NotificationsTest extends AbstractTest
         ProfileEditPage profileEditPage = ProfileUserProfilePage.gotoPage(SECOND_USER_NAME).editProfile();
         profileEditPage.setUserEmail("test@xwiki.org");
         profileEditPage.clickSaveAndView(true);
+    }
+
+    @Before
+    public void cleanPages() throws Exception
+    {
+        getUtil().login(SUPERADMIN_USER_NAME, SUPERADMIN_PASSWORD);
+        getUtil().rest().deletePage(getTestClassName(), "NotificationDisplayerClassTest");
+        getUtil().rest().deletePage(getTestClassName(), "ARandomPageThatShouldBeModified");
     }
 
     @Before
@@ -221,7 +236,7 @@ public class NotificationsTest extends AbstractTest
 
         assertEquals(1, this.mail.getReceivedMessages().length);
         MimeMessage message = this.mail.getReceivedMessages()[0];
-        assertEquals("3 event(s) on the wiki", message.getSubject());
+        assertEquals("5 event(s) on the wiki", message.getSubject());
         Multipart content = (Multipart) message.getContent();
         assertTrue(content.getContentType().startsWith("multipart/mixed;"));
         assertEquals(1, content.getCount());
@@ -305,6 +320,54 @@ public class NotificationsTest extends AbstractTest
         assertEquals("[update]", tray.getNotificationType(1));
         assertEquals("[update] Linux as a title", tray.getNotificationContent(1));
         tray.clearAllNotifications();
+    }
+
+    @Test
+    public void testNotificationDisplayerClass() throws Exception
+    {
+        // Create the pages and a custom displayer for "update" events
+        getUtil().login(SUPERADMIN_USER_NAME, SUPERADMIN_PASSWORD);
+
+        getUtil().gotoPage(getTestClassName(), "WebHome");
+        getUtil().createPage(getTestClassName(), "ARandomPageThatShouldBeModified",
+                "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page");
+
+        getUtil().createPage(getTestClassName(), "NotificationDisplayerClassTest",
+                "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page 2");
+
+        Map<String, String> notificationDisplayerParameters = new HashMap<String, String>()  {{
+            put("XWiki.Notifications.Code.NotificationDisplayerClass_0_eventType", "update");
+            put("XWiki.Notifications.Code.NotificationDisplayerClass_0_notificationTemplate",
+                    "This is a test template");
+        }};
+
+        ObjectEditPage editObjects = getUtil().editObjects(getTestClassName(), "NotificationDisplayerClassTest");
+        editObjects.addObject("XWiki.Notifications.Code.NotificationDisplayerClass");
+        editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass")
+                .get(0).fillFieldsByName(notificationDisplayerParameters);
+        editObjects.clickSaveAndContinue(true);
+
+        // Login as first user, and enable notifications on document updates
+        getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+
+        NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        p.setPageUpdated(true);
+
+        // Login as second user and modify ARandomPageThatShouldBeModified
+        getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+
+        ViewPage viewPage = getUtil().gotoPage(getTestClassName(), "ARandomPageThatShouldBeModified");
+        viewPage.edit();
+        WikiEditPage editPage = new WikiEditPage();
+        editPage.setContent("Something");
+        editPage.clickSaveAndView(true);
+
+        // Login as the first user, ensure that the notification is displayed with a custom template
+        getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        getUtil().gotoPage(getTestClassName(), "WebHome");
+
+        NotificationsTrayPage tray = new NotificationsTrayPage();
+        assertEquals("This is a test template", tray.getNotificationRawContent(0));
     }
 }
 

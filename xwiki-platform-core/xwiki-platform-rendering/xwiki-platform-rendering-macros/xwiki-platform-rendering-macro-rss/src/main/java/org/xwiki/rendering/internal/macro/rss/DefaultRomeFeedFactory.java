@@ -63,23 +63,25 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
                 HttpsURLConnection httpsURLConnection = (HttpsURLConnection) parameters.getFeedURL().openConnection();
                 httpsURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
                 httpsURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
-                feed = syndFeedInput.build(new XmlReader(httpsURLConnection.getInputStream(), true));
+                feed = syndFeedInput.build(new XmlReader(httpsURLConnection.getInputStream(), true,
+                    parameters.getEncoding()));
             } else {
                 URLConnection httpURLConnection = parameters.getFeedURL().openConnection();
                 httpURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
                 httpURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
-                feed = syndFeedInput.build(new XmlReader(httpURLConnection.getInputStream(), true));
+                feed = syndFeedInput.build(new XmlReader(httpURLConnection.getInputStream(), true,
+                    parameters.getEncoding()));
             }
         } catch (SocketTimeoutException ex) {
             throw new MacroExecutionException(MessageFormat.format("Connection timeout when trying to reach [{0}]",
-                    parameters.getFeedURL()));
+                parameters.getFeedURL()));
         } catch (Exception ex) {
-            throw new MacroExecutionException(MessageFormat.format("Error processing [{0}] : {1}", parameters
-                    .getFeedURL(), ex.getMessage()), ex);
+            throw new MacroExecutionException(MessageFormat.format("Error processing [{0}] : {1}",
+                parameters.getFeedURL(), ex.getMessage()), ex);
         }
         if (feed == null) {
             throw new MacroExecutionException(MessageFormat.format("No feed found at [{0}]",
-                    parameters.getFeedURL()));
+                parameters.getFeedURL()));
         }
 
         return feed;

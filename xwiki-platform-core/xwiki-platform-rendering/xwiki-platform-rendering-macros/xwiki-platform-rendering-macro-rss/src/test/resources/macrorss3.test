@@ -2,12 +2,12 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{testrss feed="file://feed1.xml" content="true" count="2" decoration="false"/}}
+{{testrss feed="file://feed1.xml" content="true" count="2" decoration="false" encoding="UTF-8"/}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|decoration=false]
+beginMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|decoration=false|encoding=UTF-8]
 beginGroup [[class]=[rssfeed]]
 beginParagraph [[class]=[rssitemtitle]]
 beginLink [Typed = [true] Type = [url] Reference = [http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp]] [true]
@@ -30,7 +30,7 @@ beginGroup [[class]=[rssitemdescription]]
 onRawText [Sky watchers in Europe, Asia, and parts of Alaska and Canada.] [xhtml/1.0]
 endGroup [[class]=[rssitemdescription]]
 endGroup [[class]=[rssfeed]]
-endMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|decoration=false]
+endMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|decoration=false|encoding=UTF-8]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

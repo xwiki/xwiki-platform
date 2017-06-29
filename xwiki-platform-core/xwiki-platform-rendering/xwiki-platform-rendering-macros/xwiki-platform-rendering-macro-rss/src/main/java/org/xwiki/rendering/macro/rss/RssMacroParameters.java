@@ -71,6 +71,11 @@ public class RssMacroParameters
     private URL feedURL;
 
     /**
+     * @see #getEncoding()
+     */
+    private String encoding;
+
+    /**
      * @return the RSS feed URL.
      */
     public String getFeed()
@@ -186,5 +191,24 @@ public class RssMacroParameters
     public boolean isDecoration()
     {
         return this.decoration;
+    }
+
+    /**
+     * @param encoding the encoding to use when reading the RSS Feed
+     */
+    @PropertyDescription("The encoding to use when reading the RSS Feed (guessed by default).")
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
+    }
+
+    /**
+     * @return the encoding to use when reading the RSS Feed. If not specified then it's guessed from a variety
+     *         of places (XML header, BOM, XML Prolog, Content Type header, etc). In general this parameter shouldn't
+     *         be used.
+     */
+    public String getEncoding()
+    {
+        return this.encoding;
     }
 }

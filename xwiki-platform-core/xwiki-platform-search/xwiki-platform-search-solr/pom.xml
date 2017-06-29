@@ -40,6 +40,13 @@
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
         <version>${solr.version}</version>
+        <exclusions>
+          <!-- We want a different version of Woodstox and the id changed -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
@@ -79,6 +86,11 @@
           <exclusion>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
+          </exclusion>
+          <!-- We want a different version of Woodstox and the id changed -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

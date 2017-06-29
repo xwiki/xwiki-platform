@@ -63,13 +63,12 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
                 HttpsURLConnection httpsURLConnection = (HttpsURLConnection) parameters.getFeedURL().openConnection();
                 httpsURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
                 httpsURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
-                feed = syndFeedInput.build(new XmlReader(httpsURLConnection));
-
+                feed = syndFeedInput.build(new XmlReader(httpsURLConnection.getInputStream(), true));
             } else {
                 URLConnection httpURLConnection = parameters.getFeedURL().openConnection();
                 httpURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
                 httpURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
-                feed = syndFeedInput.build(new XmlReader(httpURLConnection));
+                feed = syndFeedInput.build(new XmlReader(httpURLConnection.getInputStream(), true));
             }
         } catch (SocketTimeoutException ex) {
             throw new MacroExecutionException(MessageFormat.format("Connection timeout when trying to reach [{0}]",

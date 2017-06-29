@@ -1,7 +1,7 @@
 .#------------------------------------------------------------------------------
 .inputexpect|xwiki+xar/1.1
 .#------------------------------------------------------------------------------
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version='1.1' encoding='UTF-8'?>
 <xwikidoc version="1.3" reference="space.page" locale="">
   <web>space</web>
   <name>page</name>
@@ -85,7 +85,6 @@
     </property>
   </object>
 </xwikidoc>
-
 .#------------------------------------------------------------------------------
 .inputexpect|filter+xml
 .#------------------------------------------------------------------------------
@@ -145,25 +144,25 @@
                 </entry>
               </parameters>
             </p>
-            <wikiClassProperty name="booleanproperty1" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
-            <wikiClassProperty name="booleanproperty2" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
-            <wikiClassProperty name="booleanproperty3" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
+            <wikiClassProperty name="booleanproperty1" type="com.xpn.xwiki.objects.classes.BooleanClass"/>
+            <wikiClassProperty name="booleanproperty2" type="com.xpn.xwiki.objects.classes.BooleanClass"/>
+            <wikiClassProperty name="booleanproperty3" type="com.xpn.xwiki.objects.classes.BooleanClass"/>
             <wikiClassProperty name="listproperty1" type="com.xpn.xwiki.objects.classes.StaticListClass">
-              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="multiSelect" value="0"/>
             </wikiClassProperty>
             <wikiClassProperty name="listproperty2" type="com.xpn.xwiki.objects.classes.StaticListClass">
-              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="multiSelect" value="1"/>
             </wikiClassProperty>
             <wikiClassProperty name="listproperty3" type="StaticList">
-              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="multiSelect" value="1"/>
             </wikiClassProperty>
             <wikiClassProperty name="usersproperty1" type="com.xpn.xwiki.objects.classes.UsersClass">
-              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="multiSelect" value="0"/>
             </wikiClassProperty>
             <wikiClassProperty name="usersproperty2" type="com.xpn.xwiki.objects.classes.UsersClass">
-              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+              <wikiClassPropertyField name="multiSelect" value="1"/>
             </wikiClassProperty>
-            <wikiClassProperty name="dateproperty1" type="com.xpn.xwiki.objects.classes.DateClass"></wikiClassProperty>
+            <wikiClassProperty name="dateproperty1" type="com.xpn.xwiki.objects.classes.DateClass"/>
           </wikiClass>
           <wikiObjectProperty name="booleanproperty1" value="0">
             <p>

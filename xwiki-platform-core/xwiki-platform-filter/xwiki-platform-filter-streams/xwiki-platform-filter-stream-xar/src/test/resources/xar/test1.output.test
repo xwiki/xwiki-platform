@@ -92,6 +92,10 @@
             <p>
               <parameters>
                 <entry>
+                  <string>name</string>
+                  <string>space.nestedspace.page</string>
+                </entry>
+                <entry>
                   <string>customclass</string>
                   <string></string>
                 </entry>
@@ -122,18 +126,22 @@
               </parameters>
             </p>
             <wikiClassProperty name="property" type="com.xpn.xwiki.objects.classes.NumberClass">
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="property"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
-              <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="property"></wikiClassPropertyField>
-              <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="name" value="property"/>
+              <wikiClassPropertyField name="number" value="1"/>
+              <wikiClassPropertyField name="numberType" value="long"/>
+              <wikiClassPropertyField name="prettyName" value="property"/>
+              <wikiClassPropertyField name="size" value="30"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
             </wikiClassProperty>
           </wikiClass>
           <wikiObject name="XWiki.StyleSheetExtension[0]">
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.nestedspace.page</string>
+                </entry>
                 <entry>
                   <string>number</string>
                   <int>0</int>
@@ -151,6 +159,10 @@
             <wikiClass>
               <p>
                 <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>XWiki.StyleSheetExtension</string>
+                  </entry>
                   <entry>
                     <string>customclass</string>
                     <string></string>
@@ -182,71 +194,120 @@
                 </parameters>
               </p>
               <wikiClassProperty name="cache" type="com.xpn.xwiki.objects.classes.StaticListClass">
-                <wikiClassPropertyField name="cache" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="displayType" value="select"></wikiClassPropertyField>
-                <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="name" value="cache"></wikiClassPropertyField>
-                <wikiClassPropertyField name="number" value="5"></wikiClassPropertyField>
-                <wikiClassPropertyField name="prettyName" value="Caching policy"></wikiClassPropertyField>
-                <wikiClassPropertyField name="relationalStorage" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="separator" value=" "></wikiClassPropertyField>
-                <wikiClassPropertyField name="separators" value=" ,|"></wikiClassPropertyField>
-                <wikiClassPropertyField name="size" value="1"></wikiClassPropertyField>
-                <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="values" value="long|short|default|forbid"></wikiClassPropertyField>
+                <wikiClassPropertyField name="cache" value="0"/>
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="displayType" value="select"/>
+                <wikiClassPropertyField name="multiSelect" value="0"/>
+                <wikiClassPropertyField name="name" value="cache"/>
+                <wikiClassPropertyField name="number" value="5"/>
+                <wikiClassPropertyField name="prettyName" value="Caching policy"/>
+                <wikiClassPropertyField name="relationalStorage" value="0"/>
+                <wikiClassPropertyField name="separator" value=" "/>
+                <wikiClassPropertyField name="separators" value=" ,|"/>
+                <wikiClassPropertyField name="size" value="1"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
+                <wikiClassPropertyField name="values" value="long|short|default|forbid"/>
               </wikiClassProperty>
               <wikiClassProperty name="code" type="com.xpn.xwiki.objects.classes.TextAreaClass">
-                <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="name" value="code"></wikiClassPropertyField>
-                <wikiClassPropertyField name="number" value="2"></wikiClassPropertyField>
-                <wikiClassPropertyField name="prettyName" value="Code"></wikiClassPropertyField>
-                <wikiClassPropertyField name="rows" value="20"></wikiClassPropertyField>
-                <wikiClassPropertyField name="size" value="50"></wikiClassPropertyField>
-                <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="name" value="code"/>
+                <wikiClassPropertyField name="number" value="2"/>
+                <wikiClassPropertyField name="prettyName" value="Code"/>
+                <wikiClassPropertyField name="rows" value="20"/>
+                <wikiClassPropertyField name="size" value="50"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
               </wikiClassProperty>
               <wikiClassProperty name="name" type="com.xpn.xwiki.objects.classes.StringClass">
-                <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="name" value="name"></wikiClassPropertyField>
-                <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
-                <wikiClassPropertyField name="prettyName" value="Name"></wikiClassPropertyField>
-                <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
-                <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="name" value="name"/>
+                <wikiClassPropertyField name="number" value="1"/>
+                <wikiClassPropertyField name="prettyName" value="Name"/>
+                <wikiClassPropertyField name="size" value="30"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
               </wikiClassProperty>
               <wikiClassProperty name="parse" type="com.xpn.xwiki.objects.classes.BooleanClass">
-                <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="displayFormType" value="select"></wikiClassPropertyField>
-                <wikiClassPropertyField name="displayType" value="yesno"></wikiClassPropertyField>
-                <wikiClassPropertyField name="name" value="parse"></wikiClassPropertyField>
-                <wikiClassPropertyField name="number" value="4"></wikiClassPropertyField>
-                <wikiClassPropertyField name="prettyName" value="Parse content"></wikiClassPropertyField>
-                <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="displayFormType" value="select"/>
+                <wikiClassPropertyField name="displayType" value="yesno"/>
+                <wikiClassPropertyField name="name" value="parse"/>
+                <wikiClassPropertyField name="number" value="4"/>
+                <wikiClassPropertyField name="prettyName" value="Parse content"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
               </wikiClassProperty>
               <wikiClassProperty name="use" type="com.xpn.xwiki.objects.classes.StaticListClass">
-                <wikiClassPropertyField name="cache" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="displayType" value="select"></wikiClassPropertyField>
-                <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="name" value="use"></wikiClassPropertyField>
-                <wikiClassPropertyField name="number" value="3"></wikiClassPropertyField>
-                <wikiClassPropertyField name="prettyName" value="Use this extension"></wikiClassPropertyField>
-                <wikiClassPropertyField name="relationalStorage" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="separator" value=" "></wikiClassPropertyField>
-                <wikiClassPropertyField name="separators" value=" ,|"></wikiClassPropertyField>
-                <wikiClassPropertyField name="size" value="1"></wikiClassPropertyField>
-                <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="values" value="onDemand=On demand|always=Always"></wikiClassPropertyField>
+                <wikiClassPropertyField name="cache" value="0"/>
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="displayType" value="select"/>
+                <wikiClassPropertyField name="multiSelect" value="0"/>
+                <wikiClassPropertyField name="name" value="use"/>
+                <wikiClassPropertyField name="number" value="3"/>
+                <wikiClassPropertyField name="prettyName" value="Use this extension"/>
+                <wikiClassPropertyField name="relationalStorage" value="0"/>
+                <wikiClassPropertyField name="separator" value=" "/>
+                <wikiClassPropertyField name="separators" value=" ,|"/>
+                <wikiClassPropertyField name="size" value="1"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
+                <wikiClassPropertyField name="values" value="onDemand=On demand|always=Always"/>
               </wikiClassProperty>
             </wikiClass>
-            <wikiObjectProperty name="cache" value="long"></wikiObjectProperty>
-            <wikiObjectProperty name="code" value="some code"></wikiObjectProperty>
-            <wikiObjectProperty name="name" value="name"></wikiObjectProperty>
-            <wikiObjectProperty name="parse" value=""></wikiObjectProperty>
-            <wikiObjectProperty name="use" value="onDemand"></wikiObjectProperty>
+            <wikiObjectProperty name="cache" value="long">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="code" value="some code">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.TextAreaClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="name" value="name">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.StringClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="parse" value="">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.BooleanClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
+            <wikiObjectProperty name="use" value="onDemand">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
           </wikiObject>
           <wikiObject name="space.nestedspace.page[0]">
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.nestedspace.page</string>
+                </entry>
                 <entry>
                   <string>number</string>
                   <int>0</int>
@@ -264,6 +325,10 @@
             <wikiClass>
               <p>
                 <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>space.nestedspace.page</string>
+                  </entry>
                   <entry>
                     <string>customclass</string>
                     <string></string>
@@ -295,16 +360,25 @@
                 </parameters>
               </p>
               <wikiClassProperty name="property" type="com.xpn.xwiki.objects.classes.NumberClass">
-                <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-                <wikiClassPropertyField name="name" value="property"></wikiClassPropertyField>
-                <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
-                <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
-                <wikiClassPropertyField name="prettyName" value="property"></wikiClassPropertyField>
-                <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
-                <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="name" value="property"/>
+                <wikiClassPropertyField name="number" value="1"/>
+                <wikiClassPropertyField name="numberType" value="long"/>
+                <wikiClassPropertyField name="prettyName" value="property"/>
+                <wikiClassPropertyField name="size" value="30"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
               </wikiClassProperty>
             </wikiClass>
-            <wikiObjectProperty name="property" value="12"></wikiObjectProperty>
+            <wikiObjectProperty name="property" value="12">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>type</string>
+                    <string>com.xpn.xwiki.objects.classes.NumberClass</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiObjectProperty>
           </wikiObject>
         </wikiDocumentRevision>
       </wikiDocumentLocale>
@@ -399,6 +473,10 @@
           <p>
             <parameters>
               <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
+              <entry>
                 <string>customclass</string>
                 <string></string>
               </entry>
@@ -429,18 +507,22 @@
             </parameters>
           </p>
           <wikiClassProperty name="property" type="com.xpn.xwiki.objects.classes.NumberClass">
-            <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-            <wikiClassPropertyField name="name" value="property"></wikiClassPropertyField>
-            <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
-            <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
-            <wikiClassPropertyField name="prettyName" value="property"></wikiClassPropertyField>
-            <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
-            <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+            <wikiClassPropertyField name="disabled" value="0"/>
+            <wikiClassPropertyField name="name" value="property"/>
+            <wikiClassPropertyField name="number" value="1"/>
+            <wikiClassPropertyField name="numberType" value="long"/>
+            <wikiClassPropertyField name="prettyName" value="property"/>
+            <wikiClassPropertyField name="size" value="30"/>
+            <wikiClassPropertyField name="unmodifiable" value="0"/>
           </wikiClassProperty>
         </wikiClass>
         <wikiObject name="XWiki.StyleSheetExtension[0]">
           <p>
             <parameters>
+              <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
               <entry>
                 <string>number</string>
                 <int>0</int>
@@ -458,6 +540,10 @@
           <wikiClass>
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>XWiki.StyleSheetExtension</string>
+                </entry>
                 <entry>
                   <string>customclass</string>
                   <string></string>
@@ -489,71 +575,120 @@
               </parameters>
             </p>
             <wikiClassProperty name="cache" type="com.xpn.xwiki.objects.classes.StaticListClass">
-              <wikiClassPropertyField name="cache" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="displayType" value="select"></wikiClassPropertyField>
-              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="cache"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="5"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="Caching policy"></wikiClassPropertyField>
-              <wikiClassPropertyField name="relationalStorage" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="separator" value=" "></wikiClassPropertyField>
-              <wikiClassPropertyField name="separators" value=" ,|"></wikiClassPropertyField>
-              <wikiClassPropertyField name="size" value="1"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="values" value="long|short|default|forbid"></wikiClassPropertyField>
+              <wikiClassPropertyField name="cache" value="0"/>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="displayType" value="select"/>
+              <wikiClassPropertyField name="multiSelect" value="0"/>
+              <wikiClassPropertyField name="name" value="cache"/>
+              <wikiClassPropertyField name="number" value="5"/>
+              <wikiClassPropertyField name="prettyName" value="Caching policy"/>
+              <wikiClassPropertyField name="relationalStorage" value="0"/>
+              <wikiClassPropertyField name="separator" value=" "/>
+              <wikiClassPropertyField name="separators" value=" ,|"/>
+              <wikiClassPropertyField name="size" value="1"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
+              <wikiClassPropertyField name="values" value="long|short|default|forbid"/>
             </wikiClassProperty>
             <wikiClassProperty name="code" type="com.xpn.xwiki.objects.classes.TextAreaClass">
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="code"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="2"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="Code"></wikiClassPropertyField>
-              <wikiClassPropertyField name="rows" value="20"></wikiClassPropertyField>
-              <wikiClassPropertyField name="size" value="50"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="name" value="code"/>
+              <wikiClassPropertyField name="number" value="2"/>
+              <wikiClassPropertyField name="prettyName" value="Code"/>
+              <wikiClassPropertyField name="rows" value="20"/>
+              <wikiClassPropertyField name="size" value="50"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
             </wikiClassProperty>
             <wikiClassProperty name="name" type="com.xpn.xwiki.objects.classes.StringClass">
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="name"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="Name"></wikiClassPropertyField>
-              <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="name" value="name"/>
+              <wikiClassPropertyField name="number" value="1"/>
+              <wikiClassPropertyField name="prettyName" value="Name"/>
+              <wikiClassPropertyField name="size" value="30"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
             </wikiClassProperty>
             <wikiClassProperty name="parse" type="com.xpn.xwiki.objects.classes.BooleanClass">
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="displayFormType" value="select"></wikiClassPropertyField>
-              <wikiClassPropertyField name="displayType" value="yesno"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="parse"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="4"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="Parse content"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="displayFormType" value="select"/>
+              <wikiClassPropertyField name="displayType" value="yesno"/>
+              <wikiClassPropertyField name="name" value="parse"/>
+              <wikiClassPropertyField name="number" value="4"/>
+              <wikiClassPropertyField name="prettyName" value="Parse content"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
             </wikiClassProperty>
             <wikiClassProperty name="use" type="com.xpn.xwiki.objects.classes.StaticListClass">
-              <wikiClassPropertyField name="cache" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="displayType" value="select"></wikiClassPropertyField>
-              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="use"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="3"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="Use this extension"></wikiClassPropertyField>
-              <wikiClassPropertyField name="relationalStorage" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="separator" value=" "></wikiClassPropertyField>
-              <wikiClassPropertyField name="separators" value=" ,|"></wikiClassPropertyField>
-              <wikiClassPropertyField name="size" value="1"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="values" value="onDemand=On demand|always=Always"></wikiClassPropertyField>
+              <wikiClassPropertyField name="cache" value="0"/>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="displayType" value="select"/>
+              <wikiClassPropertyField name="multiSelect" value="0"/>
+              <wikiClassPropertyField name="name" value="use"/>
+              <wikiClassPropertyField name="number" value="3"/>
+              <wikiClassPropertyField name="prettyName" value="Use this extension"/>
+              <wikiClassPropertyField name="relationalStorage" value="0"/>
+              <wikiClassPropertyField name="separator" value=" "/>
+              <wikiClassPropertyField name="separators" value=" ,|"/>
+              <wikiClassPropertyField name="size" value="1"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
+              <wikiClassPropertyField name="values" value="onDemand=On demand|always=Always"/>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="cache" value="long"></wikiObjectProperty>
-          <wikiObjectProperty name="code" value="some code"></wikiObjectProperty>
-          <wikiObjectProperty name="name" value="name"></wikiObjectProperty>
-          <wikiObjectProperty name="parse" value=""></wikiObjectProperty>
-          <wikiObjectProperty name="use" value="onDemand"></wikiObjectProperty>
+          <wikiObjectProperty name="cache" value="long">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="code" value="some code">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.TextAreaClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="name" value="name">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.StringClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="parse" value="">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.BooleanClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="use" value="onDemand">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.StaticListClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
         <wikiObject name="space.page[0]">
           <p>
             <parameters>
+              <entry>
+                <string>name</string>
+                <string>space.page</string>
+              </entry>
               <entry>
                 <string>number</string>
                 <int>0</int>
@@ -571,6 +706,10 @@
           <wikiClass>
             <p>
               <parameters>
+                <entry>
+                  <string>name</string>
+                  <string>space.page</string>
+                </entry>
                 <entry>
                   <string>customclass</string>
                   <string></string>
@@ -602,21 +741,31 @@
               </parameters>
             </p>
             <wikiClassProperty name="property" type="com.xpn.xwiki.objects.classes.NumberClass">
-              <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
-              <wikiClassPropertyField name="name" value="property"></wikiClassPropertyField>
-              <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
-              <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
-              <wikiClassPropertyField name="prettyName" value="property"></wikiClassPropertyField>
-              <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
-              <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+              <wikiClassPropertyField name="disabled" value="0"/>
+              <wikiClassPropertyField name="name" value="property"/>
+              <wikiClassPropertyField name="number" value="1"/>
+              <wikiClassPropertyField name="numberType" value="long"/>
+              <wikiClassPropertyField name="prettyName" value="property"/>
+              <wikiClassPropertyField name="size" value="30"/>
+              <wikiClassPropertyField name="unmodifiable" value="0"/>
             </wikiClassProperty>
           </wikiClass>
-          <wikiObjectProperty name="property" value="12"></wikiObjectProperty>
+          <wikiObjectProperty name="property" value="12">
+            <p>
+              <parameters>
+                <entry>
+                  <string>type</string>
+                  <string>com.xpn.xwiki.objects.classes.NumberClass</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiObjectProperty>
         </wikiObject>
       </wikiDocumentRevision>
     </wikiDocumentLocale>
   </wikiDocument>
 </wikiSpace>
+<extension id="test" version="1.0"/>
 .#------------------------------------------------------------------------------
 .expect|xwiki+xar/1.1
 .configuration.source=${{{extension.repository}}}/test1-1.0.xar

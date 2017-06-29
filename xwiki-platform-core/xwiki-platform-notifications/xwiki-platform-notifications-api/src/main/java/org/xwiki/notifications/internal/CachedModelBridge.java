@@ -121,4 +121,11 @@ public class CachedModelBridge implements ModelBridge
         // Obviously there is nothing to cache
         modelBridge.savePropertyInHiddenDocument(objectReference, property, value);
     }
+
+    @Override
+    public String getDocumentURL(DocumentReference documentReference, String action, String parameters)
+    {
+        // We don’t need any cache on that
+        return modelBridge.getDocumentURL(documentReference, action, parameters);
+    }
 }

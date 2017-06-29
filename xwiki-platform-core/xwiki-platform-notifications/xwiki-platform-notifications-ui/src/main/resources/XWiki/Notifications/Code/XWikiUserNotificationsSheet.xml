@@ -47,8 +47,9 @@
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 (% class="profile-section highlighted-profile-section" %)
 (((
-==$services.localization.render('notifications.settings.title')==
-{{html}}
+{{html}}&#xd;
+&lt;h2>$services.localization.render('notifications.settings.title')&amp;nbsp;&lt;small>&lt;a size="6" id="notificationsRssLink" title="$services.localization.render('notifications.rss.feedLink')" target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')">$services.icon.renderHTML("rss")&lt;/a>&lt;/small>&lt;/h2>&#xd;
+&#xd;
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;

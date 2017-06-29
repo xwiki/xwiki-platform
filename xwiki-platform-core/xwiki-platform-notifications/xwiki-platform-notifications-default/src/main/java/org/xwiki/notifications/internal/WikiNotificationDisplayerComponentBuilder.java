@@ -104,8 +104,7 @@ public class WikiNotificationDisplayerComponentBuilder implements WikiBaseObject
     private void checkRights(DocumentReference documentReference, DocumentReference authorReference)
             throws NotificationException
     {
-        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, documentReference.getWikiReference()))
-        {
+        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, documentReference.getWikiReference())) {
             throw new NotificationException(
                     "Registering custom Notification Displayers requires wiki administration rights.");
         }

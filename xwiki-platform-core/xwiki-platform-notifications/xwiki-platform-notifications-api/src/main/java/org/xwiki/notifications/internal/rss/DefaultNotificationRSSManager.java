@@ -30,7 +30,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.ModelBridge;
@@ -58,9 +59,6 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
     private ModelBridge modelBridge;
 
     @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
     private ComponentManager componentManager;
 
     @Inject
@@ -80,7 +78,7 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
 
         // Set the RSS feed link to the service generating the feed
         feed.setLink(this.modelBridge.getDocumentURL(
-                this.documentReferenceResolver.resolve("XWiki.Notifications.Code.NotificationRSSService"),
+                new DocumentReference("XWiki", "XWiki.Notifications.Code", "NotificationRSSService"),
                 "get", "outputSyntax=plain"));
 
         // Set the feed description

@@ -236,7 +236,7 @@ public class NotificationsTest extends AbstractTest
 
         assertEquals(1, this.mail.getReceivedMessages().length);
         MimeMessage message = this.mail.getReceivedMessages()[0];
-        assertEquals("5 event(s) on the wiki", message.getSubject());
+        assertTrue(message.getSubject().endsWith("event(s) on the wiki"));
         Multipart content = (Multipart) message.getContent();
         assertTrue(content.getContentType().startsWith("multipart/mixed;"));
         assertEquals(1, content.getCount());

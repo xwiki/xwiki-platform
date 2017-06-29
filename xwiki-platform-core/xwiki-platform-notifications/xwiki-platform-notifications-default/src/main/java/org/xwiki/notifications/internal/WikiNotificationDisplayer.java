@@ -95,10 +95,15 @@ public class WikiNotificationDisplayer implements WikiComponent, NotificationDis
 
         // Create the template from the given BaseObject property
         try {
-            this.notificationTemplate = templateManager.createStringTemplate(
-                    this.extractProperty(baseObject,
-                            WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE),
-                    this.getAuthorReference());
+            String xObjectTemplate = this.extractProperty(baseObject,
+                    WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
+            if (!StringUtils.isBlank(xObjectTemplate)) {
+                this.notificationTemplate = templateManager.createStringTemplate(
+                        xObjectTemplate, this.getAuthorReference());
+            } else {
+                this.notificationTemplate = null;
+            }
+
         } catch (Exception e) {
             throw new NotificationException(
                     String.format("Unable to render the template provided in the base object [%s]",
@@ -137,7 +142,7 @@ public class WikiNotificationDisplayer implements WikiComponent, NotificationDis
                     ScriptContext.ENGINE_SCOPE);
 
             // If we have no template defined, fallback on the default displayer
-            if (StringUtils.isBlank(this.notificationTemplate.getContent().getContent())) {
+            if (this.notificationTemplate == null) {
                 return ((NotificationDisplayer) this.componentManager.getInstance(NotificationDisplayer.class))
                         .renderNotification(eventNotification);
             }

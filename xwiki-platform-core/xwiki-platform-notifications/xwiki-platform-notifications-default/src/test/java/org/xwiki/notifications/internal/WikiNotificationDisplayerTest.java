@@ -57,8 +57,6 @@ public class WikiNotificationDisplayerTest
 
     private TemplateManager templateManager;
 
-    private TemplateContent mockTemplateContent;
-
     private ScriptContextManager scriptContextManager;
 
     private ComponentManager componentManager;
@@ -73,11 +71,8 @@ public class WikiNotificationDisplayerTest
         this.objectReference = mock(BaseObjectReference.class);
         this.authorReference = mock(DocumentReference.class);
 
-        Template mockTemplate = mock(Template.class);
-        this.mockTemplateContent = mock(TemplateContent.class);
         this.templateManager = mock(TemplateManager.class);
-        when(mockTemplate.getContent()).thenReturn(this.mockTemplateContent);
-        when(this.templateManager.createStringTemplate(any(), any())).thenReturn(mockTemplate);
+        when(this.templateManager.createStringTemplate(any(), any())).thenReturn(mock(Template.class));
 
         this.scriptContextManager = mock(ScriptContextManager.class);
         ScriptContext scriptContext = mock(ScriptContext.class);
@@ -133,8 +128,6 @@ public class WikiNotificationDisplayerTest
     public void renderNotificationWithTemplate() throws Exception
     {
         this.instantiateComponent(this.mockBaseObject("Some Template", "Event Type"));
-
-        when(this.mockTemplateContent.getContent()).thenReturn("Some Template");
 
         CompositeEvent compositeEvent = mock(CompositeEvent.class);
         this.componentUnderTest.renderNotification(compositeEvent);

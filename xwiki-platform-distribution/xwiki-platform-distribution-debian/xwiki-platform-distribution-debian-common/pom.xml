@@ -229,6 +229,18 @@
               <linkName>/usr/lib/xwiki/WEB-INF/web.xml</linkName>
               <linkTarget>/etc/xwiki/web.xml</linkTarget>
             </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/xwiki.cfg</linkName>
+              <linkTarget>/etc/xwiki/xwiki.cfg</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/xwiki.properties</linkName>
+              <linkTarget>/etc/xwiki/xwiki.properties</linkTarget>
+            </data>
           </dataSet>
         </configuration>
       </plugin>

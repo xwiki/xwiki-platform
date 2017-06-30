@@ -55,12 +55,12 @@
   }
 
   .btn {
-    // When the global search is active, the button has an "hover"-kind color
-    background-color: @navbar-default-link-hover-bg;
+    // When the global search is active, the button has an "active"-kind color
+    background-color: @navbar-default-link-active-bg;
+    color: @navbar-default-link-active-color;
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    color: @navbar-default-link-color;
     margin: 0;
     padding: 10px @navbar-padding-horizontal;
     @media (min-width: @grid-float-breakpoint) {
@@ -69,7 +69,12 @@
     &:hover,
     &:focus {
       background-color: @navbar-default-link-hover-bg;
+      color: @navbar-default-link-hover-color;
       box-shadow: none;
+    }
+    &:active {
+      background-color: @navbar-default-link-active-bg;
+      color: @navbar-default-link-active-color;
     }
   }
 
@@ -84,15 +89,21 @@
 
   // When the global search is close
   &.globalsearch-close {
-    // The button is transparent
+    // The button is taking the normal values
     .btn {
-      background-color: transparent;
+      background-color: @navbar-default-bg;
+      color: @navbar-default-link-color;
       border: 0;
-      // Except when it is hovering!
+      // Except when it is hovering
       &:hover,
       &:focus {
         background-color: @navbar-default-link-hover-bg;
+        color: @navbar-default-link-hover-color;
         box-shadow: none;
+      }
+      &:active {
+        background-color: @navbar-default-link-active-bg;
+        color: @navbar-default-link-active-color;
       }
     }
 

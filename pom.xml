@@ -414,6 +414,38 @@
         <artifactId>jsqlparser</artifactId>
         <version>1.0</version>
       </dependency>
+
+      <!-- JNR -->
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jffi</artifactId>
+        <version>1.2.16</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jnr-constants</artifactId>
+        <version>0.9.9</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jnr-ffi</artifactId>
+        <version>2.1.6</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jnr-netdb</artifactId>
+        <version>1.1.6</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jnr-posix</artifactId>
+        <version>3.0.41</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jnr-x86asm</artifactId>
+        <version>1.0.2</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -512,17 +544,9 @@
                   org.slf4j:slf4j-log4j12
                 </features>
               </extensionOverride>
-              <!-- For Jython 2.7.0 (don't forget to refresh it when Jython version id changed !) -->
               <extensionOverride>
                 <id>org.python:jython-standalone</id>
-                <features>
-                  org.python:jython,
-                  com.github.jnr:jffi/1.2.7,
-                  com.github.jnr:jnr-constants/0.8.6,
-                  com.github.jnr:jnr-ffi/2.0.1,
-                  com.github.jnr:jnr-netdb/1.1.4,
-                  com.github.jnr:jnr-posix/3.0.9
-                </features>
+                <features>org.python:jython</features>
               </extensionOverride>
               <!-- We've moved to Dom4J 2.0.0+ which has a new groupId (dom4j -> org.dom4j) and thus extensions of XWiki
                    may depend on dom4j:dom4j:1.6 and without this they would install dom4j instead of using the version

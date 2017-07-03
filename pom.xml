@@ -528,8 +528,8 @@
                    may depend on dom4j:dom4j:1.6 and without this they would install dom4j instead of using the version
                    provided by the platform -->
               <extensionOverride>
-                <id>dom4j:dom4j</id>
-                <features>org.dom4j:dom4j</features>
+                <id>org.dom4j:dom4j</id>
+                <features>dom4j:dom4j</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

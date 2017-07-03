@@ -301,13 +301,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-chart-macro</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-dashboard-macro</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -319,7 +319,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-formula-macro</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency> 
     <dependency>

@@ -154,14 +154,7 @@
               <!-- For Jython 2.7.0 (don't forget to refresh it when Jython version id changed !) -->
               <extensionOverride>
                 <id>org.python:jython-standalone</id>
-                <features>
-                  org.python:jython,
-                  com.github.jnr:jffi/1.2.7,
-                  com.github.jnr:jnr-constants/0.8.6,
-                  com.github.jnr:jnr-ffi/2.0.1,
-                  com.github.jnr:jnr-netdb/1.1.4,
-                  com.github.jnr:jnr-posix/3.0.9
-                </features>
+                <features>org.python:jython</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

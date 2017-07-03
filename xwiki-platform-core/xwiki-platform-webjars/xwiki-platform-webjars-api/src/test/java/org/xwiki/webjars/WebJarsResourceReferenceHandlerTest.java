@@ -134,6 +134,9 @@ public class WebJarsResourceReferenceHandlerTest
         Long now = new Date().getTime();
         this.handler.handle(reference, this.chain);
 
+        assertEquals(1, this.handler.getSupportedResourceReferences().size());
+        assertEquals(WebJarsResourceReference.TYPE, this.handler.getSupportedResourceReferences().get(0));
+
         // Verify that the resource content has been copied to the Response output stream.
         assertEquals("content", this.response.getOutputStream().toString());
         // Verify that the correct Content Type has been set.

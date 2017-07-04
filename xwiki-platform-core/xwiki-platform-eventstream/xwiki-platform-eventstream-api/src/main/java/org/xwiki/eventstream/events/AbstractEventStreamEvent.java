@@ -22,7 +22,7 @@ package org.xwiki.eventstream.events;
 import org.xwiki.eventstream.Event;
 
 /**
- * Groups every event regarding the {@link org.xwiki.eventstream.EventStream}.
+ * Abstract method for every event that is related to the {@link org.xwiki.eventstream.EventStream}.
  * When an event that extends an {@link AbstractEventStreamEvent} is triggered, it should also be triggered
  * with the corresponding event stream event as the source object.
  *

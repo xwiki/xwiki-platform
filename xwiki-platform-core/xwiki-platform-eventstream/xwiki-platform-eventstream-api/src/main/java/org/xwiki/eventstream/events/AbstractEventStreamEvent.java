@@ -22,12 +22,7 @@ package org.xwiki.eventstream.events;
 import org.xwiki.eventstream.Event;
 
 /**
- * Abstract method for every event that is related to the {@link org.xwiki.eventstream.EventStream}.
- * When an event that extends an {@link AbstractEventStreamEvent} is triggered, it should also be triggered
- * with the corresponding event stream event as the source object.
- *
- * Here, we require a reference to an event stream event in order to correctly implement
- * {@link org.xwiki.observation.event.Event#matches(Object)}.
+ * Abstract class for every event that is related to the {@link org.xwiki.eventstream.EventStream}.
  *
  * @since 9.6RC1
  * @version $Id$

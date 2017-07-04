@@ -58,7 +58,7 @@ public class BridgeEventStream implements EventStream
      * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
      * triggering new events.
      */
-    private static final String EVENT_CONTEXT_LOCK_PROPERTY = "eventContextProperty";
+    private static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
 
     /** Needed for accessing the current request context. */
     @Inject
@@ -105,8 +105,8 @@ public class BridgeEventStream implements EventStream
         // In order to avoid infinite loop caused by observation events triggering event stream events that are
         // themselves triggering new observation events …, we add a new property to the execution context. Therefore,
         // an observation event declared out of an event stream event can only be triggered once.
-        if (!this.execution.getContext().hasProperty(EVENT_CONTEXT_LOCK_PROPERTY)) {
-            this.execution.getContext().newProperty(EVENT_CONTEXT_LOCK_PROPERTY).declare();
+        if (!this.execution.getContext().hasProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            this.execution.getContext().newProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY).declare();
             this.observationManager.notify(eventStreamEvent, eventStreamEvent.getEvent());
         }
     }

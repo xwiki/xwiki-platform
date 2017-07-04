@@ -30,8 +30,8 @@
   <creationDate>1496336171000</creationDate>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1497000123000</date>
-  <contentUpdateDate>1496999359000</contentUpdateDate>
+  <date>1499180169000</date>
+  <contentUpdateDate>1499180164000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -52,22 +52,26 @@
   #set ($discard = $response.setContentType('application/json'))
   #set ($classRef = $xwiki.getClass($reqClass))
   #set ($field = $classRef.get($reqProperty))
+  #set ($results = [])
   #if ($field.classType == 'DBList')
     #set ($sql = $!field.getProperty('sql').value)
-    #set ($results = [])
-    #if ($sql == '')
+    #if ($sql != '')
       ## Use SOLR
       #set ($dbId = "$!field.getProperty('idField').value")
       #set ($dbValue = "$!field.getProperty('valueField').value")
-      #set ($dbClass = $services.model.serialize("$!field.getProperty('classname').value", 'solr'))
-      #set ($solr = "property.${dbClass}.${dbValue}:$reqInput")
+      #set ($dbClassName = "$!field.getProperty('classname').value")
+      #set ($dbClass = $xwiki.getClass($dbClassName))
+      #set ($solrId = $services.model.serialize($dbClass.get($dbId).reference, 'solr'))
+      #set ($solrValue = $services.model.serialize($dbClass.get($dbValue).reference, 'solr'))
+      #set ($solr = "${reqInput}")
       #set ($query = $services.query.createQuery($solr, 'solr'))
-      #set ($discard = $query.bindValue('fq', "type:DOCUMENT class:$dbClass"))
+      #set ($discard = $query.bindValue('fq', ["type:DOCUMENT", "class:$dbClassName"]))
+      ## set ($discard = $query.bindValue('qf', "property.${solrValue}"))
       #set ($discard = $query.setLimit($limit))
       #foreach ($obj in $query.execute()[0].results)
         #set ($res = {
-          'id': $obj.getFieldValue("property.${dbClass}.${dbId}_string"),
-          'name': $obj.getFieldValue("property.${dbClass}.${dbValue}_string")
+          'id': $obj.getFieldValue("property.${solrId}"),
+          'name': $obj.getFieldValue("property.${solrValue}")
         })
         #set($discard = $results.add($res))
       #end

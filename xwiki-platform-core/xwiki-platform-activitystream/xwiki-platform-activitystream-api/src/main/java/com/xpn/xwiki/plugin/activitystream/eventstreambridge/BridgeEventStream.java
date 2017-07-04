@@ -31,6 +31,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventGroup;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
+import org.xwiki.eventstream.events.EventStreamDeletedEvent;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -61,6 +64,9 @@ public class BridgeEventStream implements EventStream
     @Inject
     private EventConverter eventConverter;
 
+    @Inject
+    private ObservationManager observationManager;
+
     @Override
     public void addEvent(Event e)
     {
@@ -68,6 +74,7 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
+            this.observationManager.notify(new EventStreamAddedEvent(e), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
@@ -80,6 +87,7 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
+            this.observationManager.notify(new EventStreamDeletedEvent(e), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }

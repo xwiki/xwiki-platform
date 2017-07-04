@@ -53,4 +53,10 @@ public abstract class AbstractEventStreamEvent implements org.xwiki.observation.
     {
         return this.event;
     }
+
+    @Override
+    public boolean matches(Object o)
+    {
+        return (this.getClass().isInstance(o) && ((AbstractEventStreamEvent) o).getEvent().equals(this.event));
+    }
 }

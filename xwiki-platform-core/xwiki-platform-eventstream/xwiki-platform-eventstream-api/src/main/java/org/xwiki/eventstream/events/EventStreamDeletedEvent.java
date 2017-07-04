@@ -46,10 +46,4 @@ public class EventStreamDeletedEvent extends AbstractEventStreamEvent
     {
         super(event);
     }
-
-    @Override
-    public boolean matches(Object o)
-    {
-        return (o instanceof EventStreamDeletedEvent && ((EventStreamDeletedEvent) o).getEvent().equals(this.event));
-    }
 }

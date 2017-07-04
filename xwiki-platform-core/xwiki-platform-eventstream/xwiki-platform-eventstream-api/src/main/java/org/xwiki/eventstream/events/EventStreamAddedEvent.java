@@ -47,10 +47,4 @@ public class EventStreamAddedEvent extends AbstractEventStreamEvent
     {
         super(event);
     }
-
-    @Override
-    public boolean matches(Object o)
-    {
-        return (o instanceof EventStreamAddedEvent && ((EventStreamAddedEvent) o).getEvent().equals(this.event));
-    }
 }

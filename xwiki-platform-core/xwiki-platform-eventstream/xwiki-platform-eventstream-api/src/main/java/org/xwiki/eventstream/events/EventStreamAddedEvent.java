@@ -32,6 +32,14 @@ public class EventStreamAddedEvent extends AbstractEventStreamEvent
 {
     /**
      * Constructs a new {@link EventStreamAddedEvent}.
+     */
+    public EventStreamAddedEvent()
+    {
+        super(null);
+    }
+
+    /**
+     * Constructs a new {@link EventStreamAddedEvent}.
      *
      * @param event the event stream event related to this particular event
      */

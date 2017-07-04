@@ -31,6 +31,14 @@ public class EventStreamDeletedEvent extends AbstractEventStreamEvent
 {
     /**
      * Constructs a new {@link EventStreamDeletedEvent}.
+     */
+    public EventStreamDeletedEvent()
+    {
+        super(null);
+    }
+
+    /**
+     * Constructs a new {@link EventStreamDeletedEvent}.
      *
      * @param event the event stream event related to this particular event
      */

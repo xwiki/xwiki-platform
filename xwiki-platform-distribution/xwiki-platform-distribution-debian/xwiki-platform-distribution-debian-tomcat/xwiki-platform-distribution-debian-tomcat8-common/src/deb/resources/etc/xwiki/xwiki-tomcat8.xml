@@ -24,8 +24,7 @@
 
 <!-- Context configuration file for the XWiki Web App -->
 
-<Context path="/xwiki" docBase="/usr/lib/xwiki" privileged="true"
-  allowLinking="true" crossContext="true">
+<Context path="/xwiki" docBase="/usr/lib/xwiki" privileged="true" crossContext="true">
   <!-- make symlinks work in Tomcat -->
   <Resources allowLinking="true" />
 </Context>

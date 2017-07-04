@@ -515,7 +515,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     
     // Function that change the logo in the iframe
     var setLogo = function(event) {
-      var value = $("#var-logo input").val();
+      var value = $("[name$='_logo']").val();
       var iFrameLogo = iframe.contents().find("#companylogo &gt; a &gt; img");
       if (value == "") {
         var url = "$xwiki.getSkinFile('logo.svg')";

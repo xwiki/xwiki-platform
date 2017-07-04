@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.namespace.SpaceNamespace;
 
 /**
  * Implementation of {@link ComponentManagerFactory} which force parent to be {@link WikiComponentManager}.
@@ -33,7 +34,7 @@ import org.xwiki.model.EntityType;
  * @since 5.0M2
  */
 @Component
-@Named(SpaceComponentManager.ID)
+@Named(SpaceNamespace.TYPE)
 @Singleton
 public class SpaceComponentManagerFactory extends AbstractEnityComponentManagerFactory
 {

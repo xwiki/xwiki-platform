@@ -30,6 +30,7 @@ import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.context.Execution;
+import org.xwiki.model.namespace.UserNamespace;
 
 /**
  * Chains Component Managers to perform lookups based on the current execution context (current user, current wiki,
@@ -47,7 +48,7 @@ public class ContextComponentManager extends DelegateComponentManager
      * The first Component Manager in the chain.
      */
     @Inject
-    @Named("user")
+    @Named(UserNamespace.TYPE)
     private ComponentManager userComponentManager;
 
     @Inject

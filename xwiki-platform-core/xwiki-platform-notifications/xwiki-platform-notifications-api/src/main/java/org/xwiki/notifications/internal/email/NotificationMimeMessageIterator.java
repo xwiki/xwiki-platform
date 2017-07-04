@@ -188,7 +188,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
 
     private void updateFactoryParameters() throws NotificationException, AddressException
     {
-        handleEvents(this.currentUser);
+        handleEvents();
 
         try {
             factoryParameters.put(FROM, new InternetAddress(mailSenderConfiguration.getFromAddress()));
@@ -199,7 +199,7 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
         factoryParameters.put(TO, this.currentUserEmail);
     }
 
-    private void handleEvents(DocumentReference user) throws NotificationException
+    private void handleEvents() throws NotificationException
     {
         // Render all the events both in HTML and Plain Text
         List<String> htmlEvents = new ArrayList<>();

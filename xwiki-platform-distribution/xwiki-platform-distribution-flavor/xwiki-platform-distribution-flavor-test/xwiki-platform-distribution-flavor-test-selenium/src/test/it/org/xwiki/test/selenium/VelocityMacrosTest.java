@@ -40,8 +40,7 @@ public class VelocityMacrosTest extends AbstractXWikiTestCase
         // tests in a single junit test) and modify thet assert so that it checks for exact content
         setFieldValue("content", "{{velocity}}{{html}}#mimetypeimg('image/jpeg' 'photo.jpeg'){{/html}}{{/velocity}}");
         clickEditSaveAndView();
-        assertGeneratedHTML("p/img[@src='/xwiki/resources/icons/silk/picture.png' "
-            + "and @alt='Image' and @title='Image']");
+        assertGeneratedHTML("p/span[@title = 'Image']/span[@class = 'fa fa-image']");
     }
 
     /**

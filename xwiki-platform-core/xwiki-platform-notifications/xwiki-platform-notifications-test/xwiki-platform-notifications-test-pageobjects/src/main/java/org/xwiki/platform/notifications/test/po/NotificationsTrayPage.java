@@ -177,7 +177,22 @@ public class NotificationsTrayPage  extends ViewPage
         }
 
         return this.getNotifications().get(notificationNumber).findElement(
-                By.cssSelector("p:nth-child(2) a")).getText();
+                By.cssSelector("p:nth-child(2)")).getText();
+    }
+
+    /**
+     * Get the raw content of a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return the notification raw content
+     */
+    public String getNotificationRawContent(int notificationNumber)
+    {
+        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return this.getNotifications().get(notificationNumber).getText();
     }
 
     /**

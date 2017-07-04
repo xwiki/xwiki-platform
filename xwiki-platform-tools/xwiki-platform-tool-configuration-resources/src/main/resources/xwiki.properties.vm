@@ -159,6 +159,11 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-# [Since 2.4M1]
+#-# Change the Pygments style used in the code macro (see http://pygments.org/docs/styles/)
+#-# If not set "default" style is used.
+# rendering.macro.code.pygments.style=vs
+
 #-------------------------------------------------------------------------------------
 # Rendering Transformations
 #-------------------------------------------------------------------------------------

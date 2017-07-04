@@ -75,7 +75,7 @@ public class HTTPPerformanceTest
     private static void addXarFiles(List<HTTPSampler> samplers) throws UnsupportedEncodingException, XarException,
         IOException
     {
-        String path = System.getProperty("localRepository") + "/" + System.getProperty("pathToXWikiXar");
+        String path = System.getProperty("pathToDocuments");
         String patternFilter = System.getProperty("documentsToTest");
 
         Pattern pattern = patternFilter == null ? null : Pattern.compile(patternFilter);

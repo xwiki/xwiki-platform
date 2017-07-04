@@ -35,7 +35,6 @@ import org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep;
 import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.WikisFlavorDistributionStep;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -84,13 +83,7 @@ public class DefaultDistributionJob extends AbstractDistributionJob<Distribution
                     this.logger.error("Failed to get all in one default UI step instance", e);
                 }
             } else {
-                // Display the wikis flavor step
-                try {
-                    steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
-                        WikisFlavorDistributionStep.ID));
-                } catch (ComponentLookupException e) {
-                    this.logger.error("Failed to get all in one flavor step instance", e);
-                }
+                // TODO: Display the wikis flavor step
             }
         }
 

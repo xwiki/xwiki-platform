@@ -1,5 +1,6 @@
 .#------------------------------------------------------------------------------
 .expect|filter+xml
+.configuration.generateRootElement=true
 .#------------------------------------------------------------------------------
 <wikiSpace name="space1">
   <wikiDocument name="page1">

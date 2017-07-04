@@ -4675,6 +4675,27 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Get the full URL of the given {@link DocumentReference}. This also includes the server name of the wiki.
+     *
+     * @param documentReference the document that should be resolved
+     * @param action the action of the URL
+     * @param querystring the URL parameters
+     * @param anchor the anchor of the document
+     * @param context the current XWikiContext
+     * @return the full URL of the given reference
+     * @since 9.6RC1
+     */
+    public String getExternalURL(DocumentReference documentReference, String action, String querystring, String anchor,
+        XWikiContext context)
+    {
+        URL url = context.getURLFactory().createExternalURL(
+            this.getLocalStringEntityReferenceSerializer().serialize(documentReference.getLastSpaceReference()),
+            documentReference.getName(), action, querystring, anchor, documentReference.getWikiReference().getName(),
+            context);
+        return url.toString();
+    }
+
+    /**
      * @since 7.2M1
      */
     public String getAttachmentURL(AttachmentReference attachmentReference, String action, String queryString,
@@ -6871,7 +6892,6 @@ public class XWiki implements EventListener
             // Document modifications
 
             XWikiDocument doc = (XWikiDocument) source;
-            XWikiContext context = (XWikiContext) data;
 
             if (event instanceof XObjectPropertyEvent) {
                 EntityReference reference = ((XObjectPropertyEvent) event).getReference();
@@ -6905,7 +6925,9 @@ public class XWiki implements EventListener
 
             XWikiContext context = getXWikiContext();
             if (namespace == null) {
-                // Initialize in already initialized wikis (will be initialized in others when they are initialized)
+                // Initialize in main wiki
+                initializeMandatoryDocument(context.getMainXWiki(), initializer, context);
+                // Initialize in already initialized sub wikis (will be initialized in others when they are initialized)
                 for (String wiki : this.initializedWikis.keySet()) {
                     initializeMandatoryDocument(wiki, initializer, context);
                 }

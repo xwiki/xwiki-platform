@@ -28,6 +28,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.namespace.DocumentNamespace;
+import org.xwiki.model.namespace.SpaceNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
@@ -40,21 +42,16 @@ import org.xwiki.model.reference.EntityReference;
  * @since 5.0M2
  */
 @Component
-@Named(DocumentComponentManager.ID)
+@Named(DocumentNamespace.TYPE)
 @Singleton
 public class DocumentComponentManager extends AbstractEntityComponentManager implements Initializable
 {
-    /**
-     * The identifier of this {@link ComponentManager}.
-     */
-    public static final String ID = "document";
-
     /**
      * The prefix of document namespace.
      * 
      * @since 8.4RC1
      */
-    public static final String NAMESPACE_PREFIX = ID + ':';
+    public static final String NAMESPACE_PREFIX = DocumentNamespace.TYPE + ':';
 
     @Inject
     @Named("current")
@@ -64,7 +61,7 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(SpaceComponentManager.ID)
+    @Named(SpaceNamespace.TYPE)
     private ComponentManager spaceComponentManager;
 
     @Override

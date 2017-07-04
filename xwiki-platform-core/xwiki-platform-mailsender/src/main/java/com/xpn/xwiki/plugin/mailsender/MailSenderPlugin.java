@@ -60,7 +60,6 @@ import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -71,8 +70,6 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.util.Util;
@@ -136,26 +133,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     @Override
-    public void init(XWikiContext context)
-    {
-        try {
-            initMailClass(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void virtualInit(XWikiContext context)
-    {
-        try {
-            initMailClass(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public String getName()
     {
         return ID;
@@ -204,67 +181,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             address[i] = new InternetAddress(mails[i]);
         }
         return address;
-    }
-
-    /**
-     * Creates the Mail XWiki Class
-     * 
-     * @param context Context of the request
-     * @return the Mail XWiki Class
-     */
-    protected BaseClass initMailClass(XWikiContext context) throws XWikiException
-    {
-        XWikiDocument doc;
-        XWiki xwiki = context.getWiki();
-        boolean needsUpdate = false;
-
-        try {
-            doc = xwiki.getDocument(EMAIL_XWIKI_CLASS_NAME, context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            String[] spaceAndName = EMAIL_XWIKI_CLASS_NAME.split(".");
-            doc.setSpace(spaceAndName[0]);
-            doc.setName(spaceAndName[1]);
-            needsUpdate = true;
-        }
-
-        BaseClass bclass = doc.getXClass();
-        bclass.setName(EMAIL_XWIKI_CLASS_NAME);
-        needsUpdate |= bclass.addTextField("subject", "Subject", 40);
-        needsUpdate |= bclass.addTextField("language", "Language", 5);
-        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
-        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator("superadmin");
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle("XWiki Mail Class");
-        }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;
-            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        if (needsUpdate) {
-            xwiki.saveDocument(doc, context);
-        }
-        return bclass;
     }
 
     /**

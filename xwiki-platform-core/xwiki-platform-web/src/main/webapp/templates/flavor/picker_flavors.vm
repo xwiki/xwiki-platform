@@ -1,5 +1,11 @@
 #set($flavors = [])
-#foreach($extension in $services.flavor.validExtensions)
+#if ("$!request.namespace" != '')
+  #set ($namespace = $request.namespace)
+#else
+  #set ($namespace = "wiki:$xcontext.database")
+#end
+#set($validExtensions = $services.flavor.getValidExtensions($namespace))
+#foreach($extension in $validExtensions)
 #set($flavor = {})
 #set($void = $flavor.put('id', $extension.id))
 #set($void = $flavor.put('website', $extension.website))

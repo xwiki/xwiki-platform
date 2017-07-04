@@ -26,6 +26,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.namespace.DocumentNamespace;
+import org.xwiki.model.namespace.UserNamespace;
 
 /**
  * Implementation of {@link ComponentManagerFactory} which force parent to be {@link DocumentComponentManager}.
@@ -34,7 +36,7 @@ import org.xwiki.component.manager.ComponentManager;
  * @since 3.3M2
  */
 @Component
-@Named(UserComponentManager.ID)
+@Named(UserNamespace.TYPE)
 @Singleton
 public class UserComponentManagerFactory extends AbstractComponentManagerFactory
 {
@@ -42,7 +44,7 @@ public class UserComponentManagerFactory extends AbstractComponentManagerFactory
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(DocumentComponentManager.ID)
+    @Named(DocumentNamespace.TYPE)
     private ComponentManager documentComponentManager;
 
     @Override

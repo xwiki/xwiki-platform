@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerFactory;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.namespace.DocumentNamespace;
 
 /**
  * Implementation of {@link ComponentManagerFactory} which force parent to be {@link SpaceComponentManager}.
@@ -33,7 +34,7 @@ import org.xwiki.model.EntityType;
  * @since 5.0M2
  */
 @Component
-@Named(DocumentComponentManager.ID)
+@Named(DocumentNamespace.TYPE)
 @Singleton
 public class DocumentComponentManagerFactory extends AbstractEnityComponentManagerFactory
 {

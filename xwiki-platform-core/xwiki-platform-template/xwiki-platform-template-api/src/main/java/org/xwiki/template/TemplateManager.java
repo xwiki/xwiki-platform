@@ -22,6 +22,7 @@ package org.xwiki.template;
 import java.io.Writer;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
 
@@ -219,4 +220,20 @@ public interface TemplateManager
      * @return the template
      */
     Template getTemplate(String templateName);
+
+    /**
+     * Create a new template using a given content and a specific author.
+     *
+     * @param content the template content
+     * @param author the template author
+     * @return the template
+     * @throws Exception if an error occurred during template instanciation
+     * @since 9.6RC1
+     */
+    default Template createStringTemplate(String content, DocumentReference author) throws Exception
+    {
+        throw new UnsupportedOperationException(
+                "org.xwiki.template.TemplateManager#createStringTemplate() "
+                        + "has been called without being reimplemented.");
+    }
 }

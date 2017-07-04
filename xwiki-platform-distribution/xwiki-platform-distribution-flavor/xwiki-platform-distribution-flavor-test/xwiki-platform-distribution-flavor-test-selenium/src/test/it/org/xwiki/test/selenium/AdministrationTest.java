@@ -68,29 +68,6 @@ public class AdministrationTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Test adding a new category in Blog Categories
-     */
-    /* Disabled until the new blog can insert its own administration page.
-    @Test
-    public void testBlogAdmin()
-    {
-        open("XWiki", "XWikiPreferences", "admin");
-       
-        // select global administration
-        clickLinkWithLocator("//span[text()='General']", true);
-        getSelenium().select("//select[@id='XWiki.XWikiPreferences_0_editor']", "label=Text");
-        clickLinkWithLocator("//input[@value='Save']");
-        assertElementPresent("//span[@id='showsectionswrapper']");
-        clickLinkWithXPath("//a[@id='showsections']", false);
-        assertElementPresent("//span[@id='hidesectionswrapper']");
-        clickLinkWithLocator("//span[text()='Blog categories']");
-        setFieldValue("name", "New Category");
-        setFieldValue("description", "New Category Content");              
-        clickLinkWithLocator("//input[@value='Add']", true);
-        assertTextPresent("New Category");               
-    }*/
-
-    /**
      * Test Panel Wizard
      */
     @Test
@@ -106,14 +83,14 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='rightcolumn']", false);
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@class='panel expanded CategoriesPanel']//h1"), By.id("rightPanels"));
-        assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'CategoriesPanel')]");
+        dragAndDrop(By.xpath("//div[@class='panel expanded QuickLinks']//h1"), By.id("rightPanels"));
+        assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'QuickLinks')]");
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
         open("Main", "WebHome");
         assertElementNotPresent("leftPanels");
         assertElementPresent("rightPanels");
-        assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'CategoriesPanel')]");
+        assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'QuickLinks')]");
 
         // Revert changes
         open("XWiki", "XWikiPreferences", "admin");
@@ -124,15 +101,15 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='bothcolumns']", false);
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@id='rightPanels']//div[contains(@class, 'CategoriesPanel')]//h1"),
+        dragAndDrop(By.xpath("//div[@id='rightPanels']//div[contains(@class, 'QuickLinks')]//h1"),
             By.xpath("//div[@id='allviewpanels']//div[@class='accordionTabContentBox']"));
-        assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'CategoriesPanel')]");
+        assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'QuickLinks')]");
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
         open("Main", "WebHome");
         assertElementPresent("leftPanels");
         assertElementPresent("rightPanels");
-        assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'CategoriesPanel')]");
+        assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'QuickLinks')]");
 
         // test panel wizard at space level
         open("TestPanelsAdmin", "WebHome", "edit", "editor=wiki");
@@ -146,15 +123,15 @@ public class AdministrationTest extends AbstractXWikiTestCase
         clickLinkWithXPath("//div[@id='leftcolumn']", false);
         waitForBodyContains("Panel List");
         clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.xpath("//div[@class='panel expanded CategoriesPanel']//h1"), By.id("leftPanels"));
+        dragAndDrop(By.xpath("//div[@class='panel expanded QuickLinks']//h1"), By.id("leftPanels"));
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
         open("TestPanelsAdmin", "WebHome");
         assertElementPresent("leftPanels");
-        assertElementPresent("//div[@id = 'leftPanels']//div[contains(@class, 'CategoriesPanel')]");
+        assertElementPresent("//div[@id = 'leftPanels']//div[contains(@class, 'QuickLinks')]");
         open("XWiki", "WebHome");
         assertElementPresent("rightPanels");
-        assertElementNotPresent("//div[@id = 'leftPanels']//div[contains(@class, 'CategoriesPanel')]");
+        assertElementNotPresent("//div[@id = 'leftPanels']//div[contains(@class, 'QuickLinks')]");
     }
 
     /**

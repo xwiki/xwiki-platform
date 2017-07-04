@@ -82,7 +82,7 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.renderPlainText(event);
+            return renderer.generateEmailSubject(event);
         }
 
         return renderPlainText(executeTemplate(event, "notification/email/%s.subject.vm",

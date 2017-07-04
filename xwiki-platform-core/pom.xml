@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -190,160 +190,41 @@
                 },
                 "ignore" : [
                   {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationDisplayer::renderNotification(===org.xwiki.eventstream.Event===) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationDisplayer::renderNotification(===org.xwiki.notifications.CompositeEvent===) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "org.xwiki.eventstream.Event",
-                    "newType": "org.xwiki.notifications.CompositeEvent",
-                    "package": "org.xwiki.notifications",
-                    "classSimpleName": "NotificationDisplayer",
-                    "methodName": "renderNotification",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "NotificationDisplayer must handle a composite event instead of a raw event"
-                  },
-                  {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
-                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
-                    "package": "org.xwiki.notifications",
-                    "classSimpleName": "NotificationManager",
-                    "methodName": "getEvents",
+                    "code": "java.method.removed",
+                    "old": "method java.util.List<org.xwiki.eventstream.RecordableEventDescriptor> org.xwiki.eventstream.RecordableEventDescriptorManager::getAllRecordableEventDescriptors() throws org.xwiki.eventstream.EventStreamException",
+                    "package": "org.xwiki.eventstream",
+                    "classSimpleName": "RecordableEventDescriptorManager",
+                    "methodName": "getAllRecordableEventDescriptors",
                     "elementKind": "method",
-                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                    "justification": "Young API"
                   },
                   {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
-                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
-                    "package": "org.xwiki.notifications",
-                    "classSimpleName": "NotificationManager",
-                    "methodName": "getEvents",
+                    "code": "java.method.removed",
+                    "old": "method java.util.List<org.xwiki.eventstream.RecordableEventDescriptor> org.xwiki.eventstream.RecordableEventDescriptorManager::getAllRecordableEventDescriptorsAllWikis() throws org.xwiki.eventstream.EventStreamException",
+                    "package": "org.xwiki.eventstream",
+                    "classSimpleName": "RecordableEventDescriptorManager",
+                    "methodName": "getAllRecordableEventDescriptorsAllWikis",
                     "elementKind": "method",
-                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                    "justification": "Young API"
                   },
                   {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationRenderer::render(===org.xwiki.eventstream.Event===) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.NotificationRenderer::render(===org.xwiki.notifications.CompositeEvent===) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "org.xwiki.eventstream.Event",
-                    "newType": "org.xwiki.notifications.CompositeEvent",
-                    "package": "org.xwiki.notifications",
-                    "classSimpleName": "NotificationRenderer",
-                    "methodName": "render",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "NotificationRenderer must handle a composite event instead of a raw event"
-                  },
-                  {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
-                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
-                    "package": "org.xwiki.notifications.script",
-                    "classSimpleName": "NotificationScriptService",
-                    "methodName": "getEvents",
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.xwiki.eventstream.RecordableEventDescriptor> org.xwiki.eventstream.RecordableEventDescriptorManager::getRecordableEventDescriptors(boolean) throws org.xwiki.eventstream.EventStreamException",
+                    "package": "org.xwiki.eventstream",
+                    "classSimpleName": "RecordableEventDescriptorManager",
+                    "methodName": "getRecordableEventDescriptors",
                     "elementKind": "method",
-                    "justification": "NotificationManager must return composite events instead of a raw events now"
+                    "justification": "Young API"
                   },
                   {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.lang.String[]) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.lang.String[]) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
-                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
-                    "package": "org.xwiki.notifications.script",
-                    "classSimpleName": "NotificationScriptService",
-                    "methodName": "getEvents",
+                    "code": "java.method.removed",
+                    "old": "method java.util.List<org.xwiki.eventstream.RecordableEventDescriptor> org.xwiki.eventstream.script.EventStreamScriptService::getAllRecordableEventDescriptors() throws org.xwiki.eventstream.EventStreamException",
+                    "package": "org.xwiki.eventstream.script",
+                    "classSimpleName": "EventStreamScriptService",
+                    "methodName": "getAllRecordableEventDescriptors",
                     "elementKind": "method",
-                    "justification": "NotificationManager must return composite events instead of a raw events now"
-                  },
-                  {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.List<org.xwiki.eventstream.Event> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.script.NotificationScriptService::getEvents(boolean, int, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "java.util.List<org.xwiki.eventstream.Event>",
-                    "newType": "java.util.List<org.xwiki.notifications.CompositeEvent>",
-                    "package": "org.xwiki.notifications.script",
-                    "classSimpleName": "NotificationScriptService",
-                    "methodName": "getEvents",
-                    "elementKind": "method",
-                    "justification": "NotificationManager must return composite events instead of a raw events now"
-                  },
-                  {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.script.NotificationScriptService::render(===org.xwiki.eventstream.Event===) throws org.xwiki.notifications.NotificationException",
-                    "new": "parameter org.xwiki.rendering.block.Block org.xwiki.notifications.script.NotificationScriptService::render(===org.xwiki.notifications.CompositeEvent===) throws org.xwiki.notifications.NotificationException",
-                    "oldType": "org.xwiki.eventstream.Event",
-                    "newType": "org.xwiki.notifications.CompositeEvent",
-                    "package": "org.xwiki.notifications.script",
-                    "classSimpleName": "NotificationScriptService",
-                    "methodName": "render",
-                    "parameterIndex": "0",
-                    "elementKind": "parameter",
-                    "justification": "NotificationManager must return composite events instead of a raw events now"
-                  },
-                  {
-                    "code": "java.annotation.added",
-                    "old": "field org.xwiki.rest.model.jaxb.JobRequest.verbose",
-                    "new": "field org.xwiki.rest.model.jaxb.JobRequest.verbose",
-                    "annotationType": "javax.xml.bind.annotation.XmlElement",
-                    "elementKind": "annotation",
-                    "justification": "Align with Java API"
-                  },
-                  {
-                     "code": "java.method.addedToInterface",
-                     "new": "method java.util.List<org.xwiki.eventstream.RecordableEventDescriptor> org.xwiki.eventstream.RecordableEventDescriptorManager::getAllRecordableEventDescriptorsAllWikis() throws org.xwiki.eventstream.EventStreamException",
-                     "package": "org.xwiki.eventstream",
-                     "classSimpleName": "RecordableEventDescriptorManager",
-                     "methodName": "getAllRecordableEventDescriptorsAllWikis",
-                     "elementKind": "method",
-                     "justification": "Young API"
-                   },
-                   {
-                     "code": "java.method.addedToInterface",
-                     "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
-                     "package": "org.xwiki.notifications",
-                     "classSimpleName": "NotificationManager",
-                     "methodName": "getEvents",
-                     "elementKind": "method",
-                     "justification": "Young API"
-                   },
-                   {
-                     "code": "java.method.addedToInterface",
-                     "new": "method boolean org.xwiki.notifications.NotificationConfiguration::areEmailsEnabled()",
-                     "package": "org.xwiki.notifications",
-                     "classSimpleName": "NotificationConfiguration",
-                     "methodName": "areEmailsEnabled",
-                     "elementKind": "method",
-                     "justification": "Young API"
-                    },
-                    {
-                     "code": "java.method.addedToInterface",
-                     "new": "method java.util.List<org.xwiki.notifications.CompositeEvent> org.xwiki.notifications.NotificationManager::getEvents(java.lang.String, org.xwiki.notifications.NotificationFormat, boolean, int, java.util.Date, java.util.Date, java.util.List<java.lang.String>) throws org.xwiki.notifications.NotificationException",
-                     "package": "org.xwiki.notifications",
-                     "classSimpleName": "NotificationManager",
-                     "methodName": "getEvents",
-                     "elementKind": "method",
-                     "justification": "Young API"
-                    },
-                    {
-                      "code": "java.method.returnTypeTypeParametersChanged",
-                      "old": "method java.util.Enumeration<java.lang.String> javax.servlet.GenericServlet::getInitParameterNames() @ org.xwiki.resource.servlet.ResourceReferenceHandlerServlet",
-                      "new": "method java.util.Enumeration javax.servlet.GenericServlet::getInitParameterNames() @ org.xwiki.resource.servlet.ResourceReferenceHandlerServlet",
-                      "oldType": "java.util.Enumeration<java.lang.String>",
-                      "newType": "java.util.Enumeration",
-                      "package": "org.xwiki.resource.servlet",
-                      "classSimpleName": "ResourceReferenceHandlerServlet",
-                      "methodName": "getInitParameterNames",
-                      "elementKind": "method",
-                      "justification": "REVAPI bug"
-                    }
+                    "justification": "Young API"
+                  }
                 ]
               }
             }
@@ -382,7 +263,6 @@
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-flavor</module>
     <module>xwiki-platform-formula</module>
-    <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>

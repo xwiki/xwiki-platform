@@ -5923,12 +5923,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             try {
                 tdoc = context.getWiki().getDocument(new DocumentReference(getDocumentReference(), locale), context);
 
-                if (tdoc.isNew()) {
-                    tdoc = this;
+                if (!tdoc.isNew()) {
+                    return tdoc;
                 }
             } catch (Exception e) {
-                tdoc = this;
+                LOGGER.error("Error when loading document {} for locale {}", getDocumentReference(), locale, e);
             }
+
+            tdoc = getTranslatedDocument(LocaleUtils.getParentLocale(locale), context);
         }
 
         return tdoc;

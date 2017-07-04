@@ -37,7 +37,7 @@ import org.xwiki.filter.test.integration.FilterTestSuite.Scope;
  */
 @RunWith(FilterTestSuite.class)
 @AllComponents
-@Scope(value = "xar", pattern = "legacymixed1.input.test")
+@Scope(value = "xar"/*, pattern = "test1.output.test"*/)
 public class XARIntegrationTests
 {
     @BeforeClass

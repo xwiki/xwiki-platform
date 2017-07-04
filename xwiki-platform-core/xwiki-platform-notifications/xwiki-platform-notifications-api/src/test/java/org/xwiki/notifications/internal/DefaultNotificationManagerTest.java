@@ -541,4 +541,52 @@ public class DefaultNotificationManagerTest
         assertTrue(results.get(0).getEvents().contains(event2));
         assertTrue(results.get(0).getEvents().contains(event3));
     }
+
+    @Test
+    public void getEventsXWIKI14454() throws Exception
+    {
+        // Facts:
+        // * Then Bob updates the page "Bike"
+        // * Then Bob updates the page "Bike" again
+        // * Then bob add a comment to the "Bike" page
+
+        // Expected:
+        // * Bob has commented the page "Bike"
+        // * Bob has updated the page "Bike"
+
+        // Mocks
+        Event eventUpdate1          = mock(Event.class);
+        Event eventUpdate2          = mock(Event.class);
+        Event eventAddComment       = mock(Event.class);
+        Event eventAddCommentUpdate = mock(Event.class);
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(eventUpdate1.getDocument()).thenReturn(doc); when(eventUpdate1.toString()).thenReturn("update1");
+        when(eventUpdate2.getDocument()).thenReturn(doc); when(eventUpdate2.toString()).thenReturn("update2");
+        when(eventAddComment.getDocument()).thenReturn(doc); when(eventAddComment.toString()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getDocument()).thenReturn(doc); when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+
+        when(eventUpdate1.getType()).thenReturn("update");
+        when(eventUpdate2.getType()).thenReturn("update");
+        when(eventAddComment.getType()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getType()).thenReturn("update");
+
+        when(eventUpdate1.getGroupId()).thenReturn("g1");
+        when(eventUpdate2.getGroupId()).thenReturn("g2");
+        when(eventAddComment.getGroupId()).thenReturn("g3");
+        when(eventAddCommentUpdate.getGroupId()).thenReturn("g3");
+
+        // They comes with inverse chronological order because of the query
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAddComment, eventAddCommentUpdate,
+                eventUpdate2, eventUpdate1));
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+
+        // Verify
+        assertEquals(2, results.size());
+    }
 }

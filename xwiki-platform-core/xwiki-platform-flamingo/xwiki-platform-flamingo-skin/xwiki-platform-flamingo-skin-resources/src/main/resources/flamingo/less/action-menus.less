@@ -18,7 +18,7 @@
       display: inline;
     }
   }
-  
+
   .navbar-nav {
     float: right;
     > li {
@@ -53,14 +53,14 @@
   @media (max-width: @screen-sm-max) {
     border: none;
   }
- 
+
   .btn {
-    // When the global search is active, the button has an "hover"-kind color
-    background-color: @navbar-default-link-hover-bg;
+    // When the global search is active, the button has an "active"-kind color
+    background-color: @navbar-default-link-active-bg;
+    color: @navbar-default-link-active-color;
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    color: @navbar-default-link-color;
     margin: 0;
     padding: 10px @navbar-padding-horizontal;
     @media (min-width: @grid-float-breakpoint) {
@@ -69,10 +69,15 @@
     &:hover,
     &:focus {
       background-color: @navbar-default-link-hover-bg;
+      color: @navbar-default-link-hover-color;
       box-shadow: none;
     }
+    &:active {
+      background-color: @navbar-default-link-active-bg;
+      color: @navbar-default-link-active-color;
+    }
   }
-  
+
   // The global search input
   #headerglobalsearchinput { // we need to be that specific to be applied
     border-radius: 0;
@@ -81,21 +86,27 @@
     transition: width 0.3s, padding 0.3s;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
-  
+
   // When the global search is close
   &.globalsearch-close {
-    // The button is transparent
+    // The button is taking the normal values
     .btn {
-      background-color: transparent;
+      background-color: @navbar-default-bg;
+      color: @navbar-default-link-color;
       border: 0;
-      // Except when it is hovering!
+      // Except when it is hovering
       &:hover,
       &:focus {
         background-color: @navbar-default-link-hover-bg;
+        color: @navbar-default-link-hover-color;
         box-shadow: none;
       }
+      &:active {
+        background-color: @navbar-default-link-active-bg;
+        color: @navbar-default-link-active-color;
+      }
     }
-    
+
     // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
     #headerglobalsearchinput { // we need to be that specific to be applied
       padding: 0;
@@ -119,7 +130,7 @@
 .navbar-avatar {
   > a {
     max-height: @navbar-height;
-    
+
     > img {
       @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
       border-radius: @thumbnail-border-radius;
@@ -236,27 +247,31 @@
 
 #contentmenu {
   .text-right();
-  
+
   .dropdown {
     display: inline-block;
     font-size: @font-size-large;
     width: @font-size-large * 2.5;
-    
+
     > a {
       color: @headings-color;
       padding: @font-size-large;
     }
   }
 
+  // Used a mix of LESS variables in order to assure the content buttons
+  // have a styling more similar to breadcrumbs than buttons, while looking
+  // decent across the bundled color themes
   .btn-default {
-    box-shadow: none;
-    background-image: none;
     background-color: @breadcrumb-bg;
-    border: 1px solid @btn-default-bg;
+    background-image: none;
+    border-color: @dropdown-divider-bg;
+    box-shadow: none;
+    color: @dropdown-link-color;
+    text-shadow: none;
   }
 
-  .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
-    border-color: darken(@btn-default-bg, 10%);
+ .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
+    border-color: darken(@dropdown-divider-bg, 10%);
   }
 }
-

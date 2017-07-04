@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-api</artifactId>
   <name>XWiki Platform - Notifications - API</name>
   <description>Handle notifications</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.56</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications API</xwiki.extension.name>
   </properties>
@@ -53,7 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream</artifactId>
+      <artifactId>xwiki-platform-eventstream-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -71,7 +71,16 @@
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-wiki</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

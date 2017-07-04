@@ -28,6 +28,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.namespace.DocumentNamespace;
+import org.xwiki.model.namespace.UserNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -40,21 +42,16 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.1RC1
  */
 @Component
-@Named(UserComponentManager.ID)
+@Named(UserNamespace.TYPE)
 @Singleton
 public class UserComponentManager extends AbstractEntityComponentManager implements Initializable
 {
-    /**
-     * The identifier of this {@link ComponentManager}.
-     */
-    public static final String ID = "user";
-
     /**
      * The prefix of user namespace.
      * 
      * @since 8.4RC1
      */
-    public static final String NAMESPACE_PREFIX = ID + ':';
+    public static final String NAMESPACE_PREFIX = UserNamespace.TYPE + ':';
 
     /**
      * Used to access the current user in the Execution Context.
@@ -72,7 +69,7 @@ public class UserComponentManager extends AbstractEntityComponentManager impleme
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
-    @Named(DocumentComponentManager.ID)
+    @Named(DocumentNamespace.TYPE)
     private ComponentManager documentComponentManager;
 
     @Override

@@ -274,7 +274,7 @@
     </wikiDocumentLocale>
   </wikiDocument>
 </wikiSpace>
-<extension id="test" version="1.0"></extension>
+<extension id="test" version="1.0"/>
 .#------------------------------------------------------------------------------
 .input|xwiki+xar/1.1
 .configuration.source=${{{extension.repository}}}/nested1-1.0.xar

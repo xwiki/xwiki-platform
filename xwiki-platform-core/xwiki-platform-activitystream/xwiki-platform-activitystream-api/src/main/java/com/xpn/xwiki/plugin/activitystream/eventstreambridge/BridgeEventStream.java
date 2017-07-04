@@ -31,6 +31,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventGroup;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.observation.ObservationManager;
@@ -53,6 +54,12 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 @Singleton
 public class BridgeEventStream implements EventStream
 {
+    /**
+     * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
+     * triggering new events.
+     */
+    private static final String EVENT_CONTEXT_LOCK_PROPERTY = "eventContextProperty";
+
     /** Needed for accessing the current request context. */
     @Inject
     private Execution execution;
@@ -74,7 +81,7 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.observationManager.notify(new EventStreamAddedEvent(e), e);
+            this.sendEventStreamEvent(new EventStreamAddedEvent(e));
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
@@ -87,9 +94,20 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.observationManager.notify(new EventStreamDeletedEvent(e), e);
+            this.sendEventStreamEvent(new EventStreamDeletedEvent(e));
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
+        }
+    }
+
+    private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent)
+    {
+        // In order to avoid infinite loop caused by observation events triggering event stream events that are
+        // themselves triggering new observation events …, we add a new property to the execution context. Therefore,
+        // an observation event declared out of an event stream event can only be triggered once.
+        if (!this.execution.getContext().hasProperty(EVENT_CONTEXT_LOCK_PROPERTY)) {
+            this.execution.getContext().newProperty(EVENT_CONTEXT_LOCK_PROPERTY).declare();
+            this.observationManager.notify(eventStreamEvent, eventStreamEvent.getEvent());
         }
     }
 

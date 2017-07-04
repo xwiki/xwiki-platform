@@ -43,4 +43,8 @@ public interface NotificationConfiguration
      */
     boolean areEmailsEnabled();
 
+    /**
+     * @return the number of minutes that should last before sending a live notification mail
+     */
+    int liveNotificationsGraceTime();
 }

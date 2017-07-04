@@ -813,4 +813,16 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.emails.enabled = true
 
+#-# [Since 9.6RC1]
+#-# Indicate the grace time used when sending live email notifications.
+#-# When an event is triggered in the wiki (for example, a document update), the platform will wait X minutes
+#-# before sending live notifications emails. During this time, if events of the same kind are recieved, they will
+#-# be grouped in the same email.
+#-#
+#-# The grace time define the period (in minutes) for which the platform should wait before sending a notification
+#-# mail after an event.
+#-#
+#-# The default is :
+# notifications.emails.live.graceTime = 10
+
 $!xwikiPropertiesAdditionalProperties

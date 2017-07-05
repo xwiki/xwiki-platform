@@ -100,9 +100,16 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         // full URLs).
         XWikiContext xcontext = this.xwikiContextProvider.get();
         XWikiURLFactory originalURLFactory = xcontext.getURLFactory();
+        Locale originalLocale = xcontext.getLocale();
 
         try {
+            // Generate full URLs (instead of relative URLs)
             xcontext.setURLFactory(new ExternalServletURLFactory(xcontext));
+
+            // Set the current locale to be the passed locale so that the template content is evaluated in that
+            // language (in case there are translations used).
+            xcontext.setLocale(locale);
+
             StringWriter writer = new StringWriter();
             velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
             return writer.toString();
@@ -112,6 +119,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
                     property, templateReference, localeValue), e);
         } finally {
             xcontext.setURLFactory(originalURLFactory);
+            xcontext.setLocale(originalLocale);
         }
     }
 

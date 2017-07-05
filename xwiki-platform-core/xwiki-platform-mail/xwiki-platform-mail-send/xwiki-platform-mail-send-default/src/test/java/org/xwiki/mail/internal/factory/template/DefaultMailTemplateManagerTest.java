@@ -73,19 +73,21 @@ public class DefaultMailTemplateManagerTest
 
     private XWiki xwiki;
 
+    private XWikiContext xwikiContext;
+
     @Before
     public void setUp() throws Exception
     {
-        XWikiContext xwikiContext = mock(XWikiContext.class);
+        this.xwikiContext = mock(XWikiContext.class);
         Provider<XWikiContext> contextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(contextProvider.get()).thenReturn(xwikiContext);
+        when(contextProvider.get()).thenReturn(this.xwikiContext);
 
         this.xwiki = mock(XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(this.xwiki);
-        when(this.xwiki.getDefaultLocale(xwikiContext)).thenReturn(Locale.ENGLISH);
+        when(this.xwiki.getDefaultLocale(this.xwikiContext)).thenReturn(Locale.ENGLISH);
 
         XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument(any(DocumentReference.class), eq(xwikiContext))).thenReturn(document);
+        when(this.xwiki.getDocument(any(DocumentReference.class), eq(this.xwikiContext))).thenReturn(document);
 
         BaseObject object = mock(BaseObject.class);
 
@@ -93,8 +95,8 @@ public class DefaultMailTemplateManagerTest
 
         // Needed so that xcontext.setURLFactory(new ExternalServletURLFactory(xcontext)); will not fail even
         // though we don't want this line to have any behavior.
-        when(xwikiContext.getURL()).thenReturn(new URL("http://localhost:8080/dummy"));
-        when(xwikiContext.getRequest()).thenReturn(mock(XWikiRequest.class));
+        when(this.xwikiContext.getURL()).thenReturn(new URL("http://localhost:8080/dummy"));
+        when(this.xwikiContext.getRequest()).thenReturn(mock(XWikiRequest.class));
     }
 
     @Test
@@ -154,10 +156,17 @@ public class DefaultMailTemplateManagerTest
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
             any(), eq("Salut <b>${name}</b> <br />${email}"));
 
+        // Set the default Locale to be different from the locale we pass to verify we restore it properly
+        when(this.xwikiContext.getLocale()).thenReturn(Locale.ITALIAN);
+
         String result = this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
             Locale.FRENCH);
 
         verify(documentBridge).getObjectNumber(any(), any(), eq("language"), eq("fr"));
+
+        // Make sure we set the right locale in the XWiki Context
+        verify(this.xwikiContext).setLocale(Locale.FRENCH);
+        verify(this.xwikiContext).setLocale(Locale.ITALIAN);
 
         assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }

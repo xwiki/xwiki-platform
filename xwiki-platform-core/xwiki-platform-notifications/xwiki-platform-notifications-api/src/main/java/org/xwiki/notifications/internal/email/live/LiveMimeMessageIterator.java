@@ -20,25 +20,47 @@
 package org.xwiki.notifications.internal.email.live;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.internal.NotificationFilterManager;
 import org.xwiki.notifications.internal.email.AbstractMimeMessageIterator;
 import org.xwiki.notifications.internal.email.NotificationUserIterator;
 
 /**
  * MimeMessageIterator for sending live mail notifications.
+ *
+ * @since 9.6RC1
+ * @version $Id$
  */
 @Component(roles = LiveMimeMessageIterator.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
 {
-    private List<CompositeEvent> compositeEvents;
+    private CompositeEvent compositeEvent;
+
+    @Inject
+    private NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    private ModelBridge modelBridge;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Initialize the iterator.
@@ -50,12 +72,59 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
     public void initialize(NotificationUserIterator userIterator, CompositeEvent event,
             DocumentReference templateReference)
     {
-        this.compositeEvents = Arrays.asList(event);
+        this.compositeEvent = event;
         super.initialize(userIterator, templateReference);
     }
 
+    /**
+     * For the given user, we will have to check that the composite event that we have to send matches the user
+     * preferences.
+     *
+     * If, for any reason, one of the events of the original composite event is not meant for the user, we clone
+     * the original composite event and remove the incriminated event.
+     */
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        return this.compositeEvents;
+        CompositeEvent resultCompositeEvent = this.compositeEvent.clone();
+
+        if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
+            // Apply the filters that the user has defined in its notification preferences
+            // If one of the events present in the composite event does not match a user filter, remove the event
+            for (NotificationFilter filter : this.notificationFilterManager.getAllNotificationFilters(user)) {
+                for (Event event: resultCompositeEvent.getEvents()) {
+                    if (!filter.filterEvent(event, user, NotificationFormat.EMAIL)) {
+                        resultCompositeEvent.remove(event);
+                    }
+                }
+            }
+
+            return Collections.singletonList(resultCompositeEvent);
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Test if the given user has enabled the notification preference corresponding to the given composite event.
+     *
+     * @param user
+     * @param compositeEvent
+     * @return
+     */
+    private boolean hasCorrespondingNotificationPreference(DocumentReference user,
+            CompositeEvent compositeEvent)
+    {
+        try {
+            for (NotificationPreference notificationPreference: this.modelBridge.getNotificationsPreferences(user)) {
+                if (notificationPreference.getEventType().equals(compositeEvent.getType())) {
+                    return notificationPreference.isNotificationEnabled();
+                }
+            }
+        } catch (NotificationException e) {
+            this.logger.warn(
+                    String.format("Unable to retrieve the notifications preferences of [%s]: [%s]", user, e));
+        }
+
+        return false;
     }
 }

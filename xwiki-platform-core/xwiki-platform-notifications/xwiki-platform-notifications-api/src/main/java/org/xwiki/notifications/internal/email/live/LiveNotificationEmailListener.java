@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -113,7 +114,7 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     public void onEvent(Event event, Object o, Object o1)
     {
         try {
-            EventStreamAddedEvent eventStreamEvent = (EventStreamAddedEvent) event;
+            org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
 
             // We can’t directly store a list of RecordableEventDescriptors as some of them can be
             // dynamically defined at runtime.
@@ -125,11 +126,11 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                 // Find a descriptor that corresponds to the given event
                 // We also check if the notifications are enabled in the wiki and if the mail option for the
                 // notifications is enabled.
-                if (descriptor.getEventType().equals(eventStreamEvent.getEvent().getType())
+                if (descriptor.getEventType().equals(eventStreamEvent.getType())
                         && this.notificationConfiguration.isEnabled()
                         && this.notificationConfiguration.areEmailsEnabled()) {
                     // Add the event to the live notification email queue
-                    this.liveNotificationEmailManager.addEvent(eventStreamEvent.getEvent());
+                    this.liveNotificationEmailManager.addEvent(eventStreamEvent);
 
                     // If the notification grace time thread is not running, start it
                     if (!this.notificationGraceTimeThread.isAlive()) {

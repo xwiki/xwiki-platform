@@ -38,7 +38,7 @@ import org.xwiki.text.StringUtils;
  * @since 9.4RC1
  */
 @Unstable
-public class CompositeEvent
+public class CompositeEvent implements Cloneable
 {
     private List<Event> events = new ArrayList<>();
 
@@ -162,5 +162,20 @@ public class CompositeEvent
     public void remove(Event event)
     {
         events.remove(event);
+    }
+
+    /**
+     * Clone the current composite event.
+     * Note that we are implementing shallow copy (and not deep copy).
+     *
+     * @return a clone of the current composite event
+     */
+    public CompositeEvent clone() {
+        try {
+            return (CompositeEvent) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // This should not happen as we are implementing the Cloneable interface.
+            return null;
+        }
     }
 }

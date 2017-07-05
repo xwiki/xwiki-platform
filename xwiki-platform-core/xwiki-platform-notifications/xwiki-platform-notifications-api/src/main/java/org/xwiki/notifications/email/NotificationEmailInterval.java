@@ -31,6 +31,10 @@ import org.xwiki.stability.Unstable;
 public enum NotificationEmailInterval
 {
     /**
+     * Receive an e-mail when a notification is triggered in the wiki.
+     */
+    LIVE,
+    /**
      * Receive a mail every hour (if needed).
      */
     HOURLY,

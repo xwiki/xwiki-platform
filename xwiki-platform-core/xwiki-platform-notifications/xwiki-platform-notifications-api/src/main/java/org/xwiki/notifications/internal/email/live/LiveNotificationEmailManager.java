@@ -50,6 +50,9 @@ public class LiveNotificationEmailManager implements Initializable
     @Inject
     private NotificationConfiguration notificationConfiguration;
 
+    @Inject
+    private LiveNotificationEmailSender liveNotificationEmailSender;
+
     /**
      * Number of minutes during which a composite event can stay in the event map before being sent.
      */
@@ -110,7 +113,7 @@ public class LiveNotificationEmailManager implements Initializable
 
             if (element.date.isBeforeNow()) {
                 // Send the mail
-                // TODO
+                this.liveNotificationEmailSender.sendEmails(element.event);
                 it.remove();
             } else {
                 // As soon as we hit an element which has its date older than now, we know that every other element

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.email;
+package org.xwiki.notifications.internal.email.live;
 
 import java.util.List;
 
@@ -27,14 +27,11 @@ import javax.inject.Singleton;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
-import org.xwiki.eventstream.events.EventStreamAddedEvent;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
-import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -45,7 +42,7 @@ import org.xwiki.observation.event.Event;
  */
 @Singleton
 @Named(LiveNotificationEmailListener.NAME)
-public class LiveNotificationEmailListener extends AbstractEventListener implements Initializable
+public class LiveNotificationEmailListener extends AbstractEventListener
 {
     /**
      * The name of the listener.
@@ -57,6 +54,9 @@ public class LiveNotificationEmailListener extends AbstractEventListener impleme
 
     @Inject
     private LiveNotificationEmailManager liveNotificationEmailManager;
+
+    @Inject
+    private NotificationConfiguration notificationConfiguration;
 
     @Inject
     private Logger logger;
@@ -104,6 +104,9 @@ public class LiveNotificationEmailListener extends AbstractEventListener impleme
     public LiveNotificationEmailListener()
     {
         super(NAME, new EventStreamAddedEvent());
+
+        // Initialize the local instance of NotificationGraceTimeThread
+        this.notificationGraceTimeThread = new NotificationGraceTimeThread(this.liveNotificationEmailManager);
     }
 
     @Override
@@ -120,7 +123,11 @@ public class LiveNotificationEmailListener extends AbstractEventListener impleme
             // Try to match one of the given descriptors with the current event.
             for (RecordableEventDescriptor descriptor : descriptorList) {
                 // Find a descriptor that corresponds to the given event
-                if (descriptor.getEventType().equals(eventStreamEvent.getEvent().getType())) {
+                // We also check if the notifications are enabled in the wiki and if the mail option for the
+                // notifications is enabled.
+                if (descriptor.getEventType().equals(eventStreamEvent.getEvent().getType())
+                        && this.notificationConfiguration.isEnabled()
+                        && this.notificationConfiguration.areEmailsEnabled()) {
                     // Add the event to the live notification email queue
                     this.liveNotificationEmailManager.addEvent(eventStreamEvent.getEvent());
 
@@ -133,12 +140,5 @@ public class LiveNotificationEmailListener extends AbstractEventListener impleme
         } catch (EventStreamException e) {
             logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
         }
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        // Initialize the local instance of NotificationGraceTimeThread
-        this.notificationGraceTimeThread = new NotificationGraceTimeThread(this.liveNotificationEmailManager);
     }
 }

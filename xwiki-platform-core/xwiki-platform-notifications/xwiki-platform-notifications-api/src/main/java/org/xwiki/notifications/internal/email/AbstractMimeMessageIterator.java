@@ -35,29 +35,18 @@ import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.email.NotificationEmailRenderer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Iterator used to generate emails for notifications. Generate MimeMessages.
- *
- * @version $Id$
- * @since 9.5RC1
+ * Created by caubin on 7/5/17.
  */
-@Component(roles = NotificationMimeMessageIterator.class)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
+public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {
     private static final String EVENTS = "events";
 
@@ -74,9 +63,6 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
     private static final String VELOCITY_VARIABLES = "velocityVariables";
 
     private static final String ERROR_MESSAGE = "Failed to generate an email for the user [{}].";
-
-    @Inject
-    private NotificationManager notificationManager;
 
     @Inject
     @Named("template")
@@ -97,14 +83,9 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
     @Inject
     private MailSenderConfiguration mailSenderConfiguration;
 
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
     private NotificationUserIterator userIterator;
 
-    private Map<String, Object> factoryParameters;
-
-    private Date lastTrigger;
+    private Map<String, Object> factoryParameters = new HashMap<>();
 
     private DocumentReference templateReference;
 
@@ -118,24 +99,26 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
 
     /**
      * Initialize the iterator.
+     * A class extending {@link AbstractMimeMessageIterator} should implement a same initialize method that calls
+     * this one at the end of its execution.
      *
      * @param userIterator iterator that returns all users
-     * @param factoryParameters parameters for the email factory
-     * @param lastTrigger time of the last email sent
      * @param templateReference reference to the mail template
      */
-    public void initialize(NotificationUserIterator userIterator,
-            Map<String, Object> factoryParameters, Date lastTrigger, DocumentReference templateReference)
+    protected void initialize(NotificationUserIterator userIterator, DocumentReference templateReference)
     {
         this.userIterator = userIterator;
-        this.factoryParameters = factoryParameters;
-        this.lastTrigger = lastTrigger;
         this.templateReference = templateReference;
-
         this.computeNext();
     }
 
-    private void computeNext()
+    protected abstract List<CompositeEvent> retrieveCompositeEventList(DocumentReference user)
+            throws NotificationException;
+
+    /**
+     * Compute the message that will be sent to the next user in the iterator.
+     */
+    protected void computeNext()
     {
         this.currentEvents = Collections.emptyList();
         this.currentUserEmail = null;
@@ -151,39 +134,13 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
             try {
                 // TODO: in a next version, it will be import to paginate these results and to send several emails
                 // if there is too much content
-                this.currentEvents = notificationManager.getEvents(serializer.serialize(currentUser),
-                        NotificationFormat.EMAIL, false, Integer.MAX_VALUE / 4, null,
-                        lastTrigger, Collections.emptyList());
+                this.currentEvents = retrieveCompositeEventList(currentUser);
             } catch (NotificationException e) {
                 logger.error(ERROR_MESSAGE, this.currentUser, e);
             }
         }
 
         this.hasNext = currentUserEmail != null && !this.currentEvents.isEmpty();
-    }
-
-    @Override
-    public boolean hasNext()
-    {
-        return hasNext;
-    }
-
-    @Override
-    public MimeMessage next()
-    {
-        MimeMessage message = null;
-        try {
-            updateFactoryParameters();
-            message = this.factory.createMessage(templateReference, factoryParameters);
-        } catch (Exception e) {
-            logger.error(ERROR_MESSAGE, this.currentUser, e);
-        }
-
-        // Look for the next email to send
-        this.computeNext();
-
-        // But return the current email
-        return message;
     }
 
     private void updateFactoryParameters() throws NotificationException, AddressException
@@ -233,6 +190,30 @@ public class NotificationMimeMessageIterator implements Iterator<MimeMessage>, I
                 new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), "XWiki", "XWikiUsers"),
                 0,
                 EMAIL_PROPERTY);
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+        return hasNext;
+    }
+
+    @Override
+    public MimeMessage next()
+    {
+        MimeMessage message = null;
+        try {
+            updateFactoryParameters();
+            message = this.factory.createMessage(templateReference, factoryParameters);
+        } catch (Exception e) {
+            logger.error(ERROR_MESSAGE, this.currentUser, e);
+        }
+
+        // Look for the next email to send
+        this.computeNext();
+
+        // But return the current email
+        return message;
     }
 
     @Override

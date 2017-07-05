@@ -1,6 +1,6 @@
 org.xwiki.notifications.internal.email.DefaultNotificationEmailRenderer
 org.xwiki.notifications.internal.email.NotificationEmailSender
-org.xwiki.notifications.internal.email.NotificationMimeMessageIterator
+org.xwiki.notifications.internal.email.PeriodicMimeMessageIterator
 org.xwiki.notifications.internal.email.NotificationUserIterator
 org.xwiki.notifications.internal.rss.DefaultNotificationRSSManager
 org.xwiki.notifications.internal.rss.DefaultNotificationRSSRenderer

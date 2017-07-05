@@ -42,7 +42,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionScmConnection;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.RemoteExtension;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.ExtensionFactory;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
@@ -81,6 +80,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.NumberProperty;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
@@ -275,7 +275,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return getExtensionObject(getExistingExtensionDocumentById(extensionId));
     }
 
-
     protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
     {
         BaseObject extensionObject = getExtensionObject(extensionDocument);
@@ -408,6 +407,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                                 .setId((String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID));
                             dependency.setConstraint(
                                 (String) getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
+                            dependency.setOptional(getBooleanValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
                             List<String> repositories = (List<String>) getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
                             dependency.withRepositories(toExtensionRepositories(repositories));
@@ -821,6 +822,17 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
 
         return property != null ? (T) property.getValue() : def;
+    }
+
+    protected boolean getBooleanValue(BaseObject object, String field, boolean def)
+    {
+        BaseProperty<?> property = (BaseProperty<?>) object.safeget(field);
+
+        if (property instanceof NumberProperty) {
+            return ((Number) property.getValue()).intValue() == 1;
+        }
+
+        return def;
     }
 
     protected ResponseBuilder getAttachmentResponse(XWikiAttachment xwikiAttachment) throws XWikiException

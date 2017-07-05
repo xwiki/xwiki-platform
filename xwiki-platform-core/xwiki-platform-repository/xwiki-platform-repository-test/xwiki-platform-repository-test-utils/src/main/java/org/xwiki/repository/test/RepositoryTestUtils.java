@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
@@ -166,6 +165,9 @@ public class RepositoryTestUtils
 
         dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId()));
 
+        dependencyObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0));
+
         return dependencyObject;
     }
 
@@ -300,6 +302,7 @@ public class RepositoryTestUtils
         this.testUtils.addObject(getExtensionPageReference(extension),
             XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
             dependency.getVersionConstraint(), XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(),
+            XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional(),
             XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version);
     }
 

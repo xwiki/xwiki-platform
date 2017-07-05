@@ -934,10 +934,25 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public ExtensionDependency createExtensionDependency(String id, String versionConstraint)
     {
+        return createExtensionDependency(id, versionConstraint, false);
+    }
+
+    /**
+     * Creates an extension dependency object.
+     * 
+     * @param id the dependency identifier
+     * @param versionConstraint the dependency version constraint
+     * @param optional true if the dependency is optional
+     * @return the extension dependency object
+     * @since 9.6RC1
+     */
+    public ExtensionDependency createExtensionDependency(String id, String versionConstraint, boolean optional)
+    {
         setError(null);
 
         try {
-            return this.factory.getExtensionDependency(id, this.factory.getVersionConstraint(versionConstraint), null);
+            return this.factory.getExtensionDependency(id, this.factory.getVersionConstraint(versionConstraint),
+                optional, null);
         } catch (Exception e) {
             setError(e);
         }

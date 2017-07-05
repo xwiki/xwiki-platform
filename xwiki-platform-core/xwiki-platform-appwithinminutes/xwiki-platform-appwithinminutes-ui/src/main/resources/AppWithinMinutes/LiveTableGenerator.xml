@@ -68,6 +68,8 @@ $string.replace("'", "''")##
         #set ($discard = $properties.put('type', 'list'))
       #elseif ($field.classType == 'Number')
         #set ($discard = $properties.put('type', 'number'))
+      #elseif ($field.classType == 'Date')
+        #set ($discard = $properties.put('type', 'date'))
       #end
       ## Sortable/Filterable columns.
       #if ($unsortableFieldTypes.contains($field.classType))
@@ -96,6 +98,8 @@ $string.replace("'", "''")##
         #set ($discard = $properties.put('html', true))
       #elseif ($column == 'doc.creator' || $column == 'doc.author')
         #set ($discard = $properties.put('link', 'author'))
+      #elseif ($column == 'doc.date' || $column == 'doc.creationDate')
+        #set ($discard = $properties.put('type', 'date'))
       #elseif ($column != 'doc.date' &amp;&amp; $column != 'doc.creationDate')
         #set ($discard = $properties.put('link', 'view'))
       #end

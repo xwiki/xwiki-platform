@@ -81,7 +81,7 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.sendEventStreamEvent(new EventStreamAddedEvent(e));
+            this.sendEventStreamEvent(new EventStreamAddedEvent(), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
@@ -94,20 +94,20 @@ public class BridgeEventStream implements EventStream
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.sendEventStreamEvent(new EventStreamDeletedEvent(e));
+            this.sendEventStreamEvent(new EventStreamDeletedEvent(), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
     }
 
-    private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent)
+    private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent, Event event)
     {
         // In order to avoid infinite loop caused by observation events triggering event stream events that are
         // themselves triggering new observation events …, we add a new property to the execution context. Therefore,
         // an observation event declared out of an event stream event can only be triggered once.
         if (!this.execution.getContext().hasProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
             this.execution.getContext().newProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY).declare();
-            this.observationManager.notify(eventStreamEvent, eventStreamEvent.getEvent());
+            this.observationManager.notify(eventStreamEvent, event);
         }
     }
 

@@ -19,31 +19,15 @@
  */
 package org.xwiki.eventstream.events;
 
-import org.xwiki.eventstream.Event;
-
 /**
  * Event triggered when an event is deleted from the {@link org.xwiki.eventstream.EventStream}.
+ *
+ * This event also send the following parameters:
+ * source: the event removed from the event stream that triggered this event
  *
  * @since 9.6RC1
  * @version $Id$
  */
 public class EventStreamDeletedEvent extends AbstractEventStreamEvent
 {
-    /**
-     * Constructs a new {@link EventStreamDeletedEvent}.
-     */
-    public EventStreamDeletedEvent()
-    {
-        super(null);
-    }
-
-    /**
-     * Constructs a new {@link EventStreamDeletedEvent}.
-     *
-     * @param event the event stream event related to this particular event
-     */
-    public EventStreamDeletedEvent(Event event)
-    {
-        super(event);
-    }
 }

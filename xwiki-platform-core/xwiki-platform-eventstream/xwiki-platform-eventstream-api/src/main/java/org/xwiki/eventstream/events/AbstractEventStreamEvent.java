@@ -19,8 +19,6 @@
  */
 package org.xwiki.eventstream.events;
 
-import org.xwiki.eventstream.Event;
-
 /**
  * Abstract class for every event that is related to the {@link org.xwiki.eventstream.EventStream}.
  *
@@ -29,29 +27,9 @@ import org.xwiki.eventstream.Event;
  */
 public abstract class AbstractEventStreamEvent implements org.xwiki.observation.event.Event
 {
-    protected Event event;
-
-    /**
-     * Constructs a new {@link AbstractEventStreamEvent}.
-     *
-     * @param event the event stream event that is related to this particular event.
-     */
-    public AbstractEventStreamEvent(Event event)
-    {
-        this.event = event;
-    }
-
-    /**
-     * @return the event related to the event stream.
-     */
-    public Event getEvent()
-    {
-        return this.event;
-    }
-
     @Override
     public boolean matches(Object o)
     {
-        return (this.getClass().isInstance(o) && ((AbstractEventStreamEvent) o).getEvent().equals(this.event));
+        return (this.getClass().isInstance(o));
     }
 }

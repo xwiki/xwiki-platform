@@ -19,32 +19,16 @@
  */
 package org.xwiki.eventstream.events;
 
-import org.xwiki.eventstream.Event;
-
 /**
  * Event triggered when a new event is registered inside of the {@link org.xwiki.eventstream.EventStream}. This event
  * contains a reference to the actual event that has been registered in the event stream.
+ *
+ * This event also send the following parameters:
+ * source: the event inserted in the event stream that triggered this event
  *
  * @since 9.6RC1
  * @version $Id$
  */
 public class EventStreamAddedEvent extends AbstractEventStreamEvent
 {
-    /**
-     * Constructs a new {@link EventStreamAddedEvent}.
-     */
-    public EventStreamAddedEvent()
-    {
-        super(null);
-    }
-
-    /**
-     * Constructs a new {@link EventStreamAddedEvent}.
-     *
-     * @param event the event stream event related to this particular event
-     */
-    public EventStreamAddedEvent(Event event)
-    {
-        super(event);
-    }
 }

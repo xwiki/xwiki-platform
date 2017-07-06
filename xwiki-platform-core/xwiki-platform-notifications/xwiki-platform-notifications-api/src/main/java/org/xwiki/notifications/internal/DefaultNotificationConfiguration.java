@@ -50,12 +50,12 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     @Override
     public boolean areEmailsEnabled()
     {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "email.enabled", true);
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "emails.enabled", true);
     }
 
     @Override
     public int liveNotificationsGraceTime()
     {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "email.live.graceTime", 10);
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "emails.live.graceTime", 10);
     }
 }

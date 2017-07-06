@@ -47,10 +47,19 @@
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 (% class="profile-section highlighted-profile-section" %)
 (((
-{{html}}
+{{html clean="false"}}
 &lt;h2&gt;$services.localization.render('notifications.settings.title')&amp;nbsp;&lt;small&gt;&lt;a id="notificationsRssLink" title="$services.localization.render('notifications.rss.feedLink')" target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;$services.icon.renderHTML("rss")&lt;/a&gt;&lt;/small&gt;&lt;/h2&gt;
-
-&lt;table&gt;
+&lt;style&gt;
+.notifPreferences tbody {
+  margin-top: 2em;
+}
+.notifPreferences tbody:nth-child(odd) { background: #fafafa; }
+.notifPreferences tbody:nth-child(even) { background: #e5e5e5; }
+.notifPreferences .rowApp td, .notifPreferences .rowApp th{
+  height: 3em;
+}
+&lt;/style&gt;
+&lt;table class="notifPreferences"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th style="width: 250px;"&gt;&lt;/th&gt;
@@ -62,7 +71,6 @@
       #end
     &lt;/tr&gt;
   &lt;/thead&gt;
-  &lt;tbody&gt;
     #set ($types = [])
     #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
       #set ($discard = $types.add({
@@ -70,17 +78,26 @@
         'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
         'description'     : "$!services.localization.render($descriptor.description)",
         'eventType'       : "$!descriptor.eventType",
-        'filter'          : "$!descriptor.filter"
+        'filter'          : "$!descriptor.filter",
+        'applicationId'   : "$!descriptor.applicationId"
       }))
     #end
     #set ($lastApp = '')
     #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
       #if ($lastApp != $type.applicationName)
+        #if ($velocityCount &gt; 1)
+        &lt;/tbody&gt;
+        #end
         #set ($lastApp = $type.applicationName)
-        &lt;tr&gt;
-          &lt;th colspan="$colsCount"&gt;
+        &lt;tbody  id="app${lastApp}"&gt;
+        &lt;tr class="rowApp"&gt;
+          &lt;th style="vertical-align: top;"&gt;
             $type.applicationIcon $escapetool.xml($type.applicationName)
           &lt;/th&gt;
+            #displayPreferenceForApp($type.applicationId, 'alert')
+            #if ($services.notification.areEmailsEnabled())
+              #displayPreferenceForApp($type.applicationId, 'email')
+            #end
         &lt;/tr&gt;
       #end
       &lt;tr&gt;
@@ -91,7 +108,9 @@
         #end
       &lt;/tr&gt;
     #end
+    &lt;/tbody&gt;
     #if ($services.notification.areEmailsEnabled())
+    &lt;tfoot&gt;
       &lt;tr&gt;
         &lt;td&gt;&lt;/td&gt;
         &lt;td&gt;&lt;/td&gt;
@@ -108,11 +127,33 @@
           &lt;/select&gt;
         &lt;/td&gt;
       &lt;/tr&gt;
+    &lt;/tfoot&gt;
     #end
   &lt;/tbody&gt;
 &lt;/table&gt;
 {{/html}}
 )))
+#**
+ * Display a preference button for an event type and a given format
+ *#
+#macro(displayPreferenceForApp $app $format)
+  #set ($checked = '')
+  #set ($preference = '')
+  #foreach ($pref in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceClass'))
+    #if (($pref.getValue('format') == $format || ($format == 'alert' &amp;&amp; "$!pref.getValue('format')" == '')) &amp;&amp; $pref.getValue('applicationId') == $app)
+      #set ($preference = $pref)
+      #if ($pref.getValue('notificationEnabled') == 1)
+        #set ($checked = 'checked="checked"')
+      #end
+    #end
+  #end
+  &lt;td class="notificationAppCell loading" data-applicationid="$!escapetool.xml($type.applicationId)" data-format="$format" data-objnumber="$!preference.number"&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type="checkbox" class="notificationAppCheckbox" $checked/&gt;
+      ##displayScopeLivetable($app, "", $format)
+    &lt;/div&gt;
+  &lt;/td&gt;
+#end
 #**
  * Display a preference button for an event type and a given format
  *#
@@ -329,14 +370,20 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
     offColor: 'danger',
     labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
   });
+  $('.notificationAppCheckbox').bootstrapSwitch({
+    size: 'mini',
+    onColor: 'default'
+  });
 
   /**
    * Called when the user enable or disable an event type.
    */
-  $('.notificationTypeCheckbox').on('switchChange.bootstrapSwitch', function (event, state) {
+  $('.notificationTypeCheckbox, .notificationAppCheckbox').on('switchChange.bootstrapSwitch', function (event, state) {
     // Getting info
     var input        = $(this);
-    var td           = input.parents('td.notificationTypeCell');
+    var inputIsApp   = input.hasClass('notificationAppCheckbox');
+    var td           = input.parents('td.notificationTypeCell, td.notificationAppCell');
+    var appId        = td.attr('data-applicationid');
     var eventType    = td.attr('data-eventtype');
     var objNumber    = td.attr('data-objnumber');
     var format       = td.attr('data-format');
@@ -349,12 +396,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
     if (objNumber == '' &amp;&amp; state) {
       // If the object does not exist yet, create it
       var restURL = xm.restURL + '/objects?media=json';
-      $.post(restURL, {
+      var params = {
         'className': 'XWiki.Notifications.Code.NotificationPreferenceClass',
-        'property#eventType': eventType,
         'property#format': format,
         'property#notificationEnabled': 1
-      }).done(function (data) {
+      };
+      if (inputIsApp) {
+        params['property#applicationId'] = appId;
+      } else {
+        params['property#eventType'] = eventType;
+      }
+      $.post(restURL, params).done(function (data) {
         td.attr('data-objnumber', data.number);
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
@@ -496,9 +548,27 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
   });
 
   /**
+   * Disable all checkboxes where the application is enabled
+   */
+  var synchronizeTypeCheckboxWithAppCheckbox = function () {
+    var checkbox = $(this);
+    var td = checkbox.parents('td.notificationAppCell');
+    var appId = td.attr('data-applicationid');
+    var format = td.attr('data-format');
+    checkbox.parents('tbody').find('.notificationTypeCell').each(function() {
+      var cell = $(this);
+      if (cell.attr('data-applicationid') == appId &amp;&amp; cell.attr('data-format') == format) {
+        cell.find('input').bootstrapSwitch('disabled', checkbox.bootstrapSwitch('state'));
+      }
+    })
+  };
+  $('.notificationAppCheckbox').each(synchronizeTypeCheckboxWithAppCheckbox);
+  $('.notificationAppCheckbox').on('switchChange.bootstrapSwitch', synchronizeTypeCheckboxWithAppCheckbox);
+
+  /**
    * Disable the "loading" screens
    */
-  $('td.notificationTypeCell').each(function(){
+  $('td.notificationTypeCell, td.notificationAppCell').each(function(){
     $(this).find('&gt; div.hidden').removeClass('hidden');
     $(this).removeClass('loading');
   });

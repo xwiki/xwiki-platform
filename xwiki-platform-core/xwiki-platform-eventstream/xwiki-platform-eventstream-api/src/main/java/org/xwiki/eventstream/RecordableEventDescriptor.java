@@ -56,6 +56,15 @@ public interface RecordableEventDescriptor
     String getEventType();
 
     /**
+     * @return the id of the application that provide this event
+     * @since 9.6RC1
+     */
+    default String getApplicationId() {
+        // Should be reimplemented
+        return getApplicationName();
+    }
+
+    /**
      * @return the name of the application that provide this event
      */
     String getApplicationName();

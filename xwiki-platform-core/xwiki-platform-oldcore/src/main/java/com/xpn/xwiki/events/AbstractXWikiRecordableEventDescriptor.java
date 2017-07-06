@@ -19,45 +19,38 @@
  */
 package com.xpn.xwiki.events;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.AbstractRecordableEventDescriptor;
+import org.xwiki.eventstream.RecordableEventDescriptor;
 
 /**
- * Descriptor for the {@link org.xwiki.bridge.event.DocumentCreatedEvent}.
+ * Abstract implementation of {@link RecordableEventDescriptor} for all events sent by oldcore.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 9.6RC1
  */
-@Component
-@Singleton
-@Named(DocumentCreatedEventDescriptor.EVENT_TYPE)
-public class DocumentCreatedEventDescriptor extends AbstractXWikiRecordableEventDescriptor
+public abstract class AbstractXWikiRecordableEventDescriptor extends AbstractRecordableEventDescriptor
 {
     /**
-     * Name of the supported type (as it is stored in Activity Stream).
+     * Construct an AbstractRecordableEventDescriptor.
+     *
+     * @param descriptionTranslationKey the name of the translation key that describe the event
+     * @param applicationTranslationKey the translation key of the name of the application that send this event
      */
-    public static final String EVENT_TYPE = "create";
-
-    /**
-     * Construct a DocumentCreatedEventDescriptor.
-     */
-    public DocumentCreatedEventDescriptor()
+    public AbstractXWikiRecordableEventDescriptor(String descriptionTranslationKey, String applicationTranslationKey)
     {
-        super("core.events.create.description",
-                "core.events.appName");
+        super(descriptionTranslationKey, applicationTranslationKey);
     }
 
     @Override
-    public String getEventType()
+    public String getApplicationId()
     {
-        // Match the name used by Activity Stream.
-        return EVENT_TYPE;
+        // A bit generic but I don't want to declare "oldcore".
+        return "org.xwiki.platform";
     }
 
     @Override
-    public EventFilter getFilter() {
-        return EventFilter.WIKI_SPACE_AND_DOCUMENT_FILTER;
+    public String getApplicationIcon()
+    {
+        return "page";
     }
 }

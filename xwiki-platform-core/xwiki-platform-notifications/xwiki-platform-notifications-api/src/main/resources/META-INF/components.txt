@@ -1,5 +1,4 @@
 org.xwiki.notifications.internal.email.DefaultNotificationEmailRenderer
-org.xwiki.notifications.internal.email.live.LiveNotificationEmailListener
 org.xwiki.notifications.internal.email.live.LiveNotificationEmailManager
 org.xwiki.notifications.internal.email.live.LiveNotificationEmailSender
 org.xwiki.notifications.internal.email.live.LiveMimeMessageIterator

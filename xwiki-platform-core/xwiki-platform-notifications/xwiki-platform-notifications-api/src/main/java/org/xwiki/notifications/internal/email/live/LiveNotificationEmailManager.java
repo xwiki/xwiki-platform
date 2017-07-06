@@ -36,8 +36,6 @@ import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.SimilarityCalculator;
 
-import com.xpn.xwiki.web.Utils;
-
 /**
  * This manager contains a queue of events that just happened in a wiki and that are waiting to be sent to the users
  * that subscribed to those events.
@@ -51,6 +49,9 @@ public class LiveNotificationEmailManager implements Initializable
 {
     @Inject
     private SimilarityCalculator similarityCalculator;
+
+    @Inject
+    private LiveNotificationEmailSender liveNotificationEmailSender;
 
     @Inject
     private NotificationConfiguration notificationConfiguration;
@@ -95,7 +96,8 @@ public class LiveNotificationEmailManager implements Initializable
             int similarity = similarityCalculator.computeSimilarity(event, element.event.getEvents().get(0));
 
             // If we can merge the event in the composite event
-            if (element.event.getSimilarityBetweenEvents() <= similarity) {
+            if (similarity > SimilarityCalculator.SAME_DOCUMENT_AND_TYPE
+                && element.event.getSimilarityBetweenEvents() <= similarity) {
                 try {
                     element.event.add(event, similarity);
                     return;
@@ -122,7 +124,7 @@ public class LiveNotificationEmailManager implements Initializable
 
             if (element.date.isBeforeNow()) {
                 // Send the mail
-                Utils.getComponent(LiveNotificationEmailSender.class).sendEmails(element.event);
+                this.liveNotificationEmailSender.sendEmails(element.event);
                 it.remove();
             } else {
                 // As soon as we hit an element which has its date older than now, we know that every other element

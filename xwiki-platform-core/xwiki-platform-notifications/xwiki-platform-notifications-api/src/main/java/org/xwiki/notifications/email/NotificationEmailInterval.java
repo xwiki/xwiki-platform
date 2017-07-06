@@ -22,7 +22,7 @@ package org.xwiki.notifications.email;
 import org.xwiki.stability.Unstable;
 
 /**
- * Several intervals to get notified by emails.
+ * Several intervals to get notified by email.
  *
  * @version $Id$
  * @since 9.5RC1

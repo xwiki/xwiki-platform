@@ -81,8 +81,6 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
 
     private int offset;
 
-    private String wikiId;
-
     private DocumentReference nextUser;
 
     /**
@@ -91,24 +89,13 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
      */
     public void initialize(NotificationEmailInterval interval)
     {
-        this.initialize(interval, this.wikiDescriptorManager.getCurrentWikiId());
-    }
-
-    /**
-     * Initialize the user iterator.
-     * @param interval the interval that users must have configured
-     * @param wikiId the ID of the wiki to run on (apart from the main wiki)
-     */
-    public void initialize(NotificationEmailInterval interval, String wikiId)
-    {
         this.interval = interval;
-        this.wikiId = wikiId;
         getNext();
     }
 
     private void getNext()
     {
-        DocumentReference classReference = new DocumentReference(wikiId,
+        DocumentReference classReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
                 Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
 
         try {
@@ -122,7 +109,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
                 }
                 while (!hasNext() && !users.isEmpty()) {
                     DocumentReference user = resolver.resolve(users.poll(),
-                            new WikiReference(wikiId));
+                            new WikiReference(wikiDescriptorManager.getCurrentWikiId()));
                     Object userInterval
                             = documentAccessBridge.getProperty(user, classReference, "interval");
                     if (isDefaultInterval(userInterval) || isSameInterval(userInterval)) {
@@ -140,7 +127,6 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
         Query query = queryManager.createQuery(XWQL_QUERY, Query.XWQL);
         query.setLimit(BATCH_SIZE);
         query.setOffset(offset);
-        query.setWiki(wikiId);
         users.addAll(query.execute());
         offset += BATCH_SIZE;
     }

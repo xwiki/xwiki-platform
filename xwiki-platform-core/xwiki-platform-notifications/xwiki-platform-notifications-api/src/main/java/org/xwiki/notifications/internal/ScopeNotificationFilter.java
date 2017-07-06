@@ -20,12 +20,12 @@
 package org.xwiki.notifications.internal;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -147,7 +147,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Override
     public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
     {
-        Map<String, Object> params = new HashedMap();
+        Map<String, Object> params = new ConcurrentHashMap<>();
 
         try {
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {

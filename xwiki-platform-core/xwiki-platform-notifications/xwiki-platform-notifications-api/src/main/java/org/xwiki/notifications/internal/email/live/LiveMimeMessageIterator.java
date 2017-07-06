@@ -22,8 +22,10 @@ package org.xwiki.notifications.internal.email.live;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -57,6 +59,7 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
     private NotificationFilterManager notificationFilterManager;
 
     @Inject
+    @Named("cached")
     private ModelBridge modelBridge;
 
     @Inject
@@ -92,9 +95,13 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
             for (NotificationFilter filter : this.notificationFilterManager.getAllNotificationFilters(user)) {
-                for (Event event: resultCompositeEvent.getEvents()) {
-                    if (!filter.filterEvent(event, user, NotificationFormat.EMAIL)) {
+                CopyOnWriteArrayList<Event> events = new CopyOnWriteArrayList<>(resultCompositeEvent.getEvents());
+                for (Event event : events) {
+                    if (filter.filterEvent(event, user, NotificationFormat.EMAIL)) {
                         resultCompositeEvent.remove(event);
+                        if (resultCompositeEvent.getEvents().size() == 0) {
+                            return Collections.emptyList();
+                        }
                     }
                 }
             }
@@ -112,8 +119,7 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
      * @param compositeEvent
      * @return
      */
-    private boolean hasCorrespondingNotificationPreference(DocumentReference user,
-            CompositeEvent compositeEvent)
+    private boolean hasCorrespondingNotificationPreference(DocumentReference user, CompositeEvent compositeEvent)
     {
         try {
             for (NotificationPreference notificationPreference: this.modelBridge.getNotificationsPreferences(user)) {

@@ -35,10 +35,10 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.email.NotificationEmailInterval;
 import org.xwiki.notifications.internal.email.NotificationUserIterator;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Sends live email notifications regarding a given composite event against every user that have set their preferences
@@ -68,7 +68,7 @@ public class LiveNotificationEmailSender
     private Provider<LiveMimeMessageIterator> liveMimeMessageIteratorProvider;
 
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * Send live notification e-mails regarding the given event for the users that are concerned by this event and that
@@ -77,19 +77,14 @@ public class LiveNotificationEmailSender
      */
     public void sendEmails(CompositeEvent event)
     {
-        // Extract the wikiId from the composite event that we have
-        String wikiId = this.entityReferenceSerializer.serialize(event.getEvents().get(0).getWiki());
-
-        // TODO: Change wikiDescriptorManager.getMainWikiId() to wikiDescriptorManager.getCurrentWikiId()
-        DocumentReference templateReference = new DocumentReference(wikiId,
+        DocumentReference templateReference = new DocumentReference(this.wikiDescriptorManager.getCurrentWikiId(),
                 Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
         // Get a list of users that have enabled the live e-mail notifications.
         NotificationUserIterator notificationUserIterator = this.notificationUserIteratorProvider.get();
-        notificationUserIterator.initialize(NotificationEmailInterval.LIVE, wikiId);
+        notificationUserIterator.initialize(NotificationEmailInterval.LIVE);
 
-        LiveMimeMessageIterator liveNotificationMessageIterator =
-                this.liveMimeMessageIteratorProvider.get();
+        LiveMimeMessageIterator liveNotificationMessageIterator = this.liveMimeMessageIteratorProvider.get();
         liveNotificationMessageIterator.initialize(notificationUserIterator, new HashMap<>(), event, templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());

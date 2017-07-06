@@ -36,6 +36,8 @@ import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
+
 /**
  * This listener is responsible of starting triggers when specific events occurs in the wiki.
  *
@@ -64,24 +66,16 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
-    private NotificationGraceTimeThread notificationGraceTimeThread;
+    private Thread notificationGraceTimeThread;
 
     /**
      * Thread used for triggering {@link LiveNotificationEmailManager#run()} when needed (ie : when an event
      * grace time has ended).
      */
-    private class NotificationGraceTimeThread extends Thread
+    private class NotificationGraceTimeRunnable extends AbstractXWikiRunnable
     {
-        private LiveNotificationEmailManager emailManager;
-
-        NotificationGraceTimeThread(LiveNotificationEmailManager emailManager)
-        {
-            this.emailManager = emailManager;
-            this.setDaemon(true);
-            this.setPriority(NORM_PRIORITY);
-        }
-
-        public void run()
+        @Override
+        public void runInternal()
         {
             DateTime nextWakeUpTime = DateTime.now();
 
@@ -98,9 +92,9 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                     }
                 }
 
-                this.emailManager.run();
+                liveNotificationEmailManager.run();
 
-                nextWakeUpTime = this.emailManager.getNextExecutionDate();
+                nextWakeUpTime = liveNotificationEmailManager.getNextExecutionDate();
             }
         }
     }
@@ -152,7 +146,10 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                 || (!this.notificationGraceTimeThread.isAlive()
                         && this.notificationGraceTimeThread.getState() != Thread.State.NEW)) {
             // ... initialize it
-            this.notificationGraceTimeThread = new NotificationGraceTimeThread(this.liveNotificationEmailManager);
+            this.notificationGraceTimeThread = new Thread(new NotificationGraceTimeRunnable());
+            this.notificationGraceTimeThread.setName("Live E-Mail notifications thread");
+            this.notificationGraceTimeThread.setDaemon(true);
+            this.notificationGraceTimeThread.setPriority(Thread.NORM_PRIORITY);
         }
 
         if (!this.notificationGraceTimeThread.isAlive()) {

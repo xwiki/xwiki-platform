@@ -1041,7 +1041,8 @@ public class RepositoryManager implements Initializable, Disposable
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(), xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
                     dependency.getVersionConstraint().getValue(), xcontext);
-                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional(), xcontext);
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0,
+                    xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES,
                     XWikiRepositoryModel.toStringList(dependency.getRepositories()), xcontext);
 

@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
@@ -41,6 +42,7 @@ import org.xwiki.observation.event.Event;
  * @since 9.6-RC1
  * @version $Id$
  */
+@Component
 @Singleton
 @Named(LiveNotificationEmailListener.NAME)
 public class LiveNotificationEmailListener extends AbstractEventListener
@@ -64,11 +66,15 @@ public class LiveNotificationEmailListener extends AbstractEventListener
 
     private NotificationGraceTimeThread notificationGraceTimeThread;
 
+    /**
+     * Thread used for triggering {@link LiveNotificationEmailManager#run()} when needed (ie : when an event
+     * grace time has ended).
+     */
     private class NotificationGraceTimeThread extends Thread
     {
         private LiveNotificationEmailManager emailManager;
 
-        public NotificationGraceTimeThread(LiveNotificationEmailManager emailManager)
+        NotificationGraceTimeThread(LiveNotificationEmailManager emailManager)
         {
             this.emailManager = emailManager;
             this.setDaemon(true);
@@ -105,9 +111,6 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     public LiveNotificationEmailListener()
     {
         super(NAME, new EventStreamAddedEvent());
-
-        // Initialize the local instance of NotificationGraceTimeThread
-        this.notificationGraceTimeThread = new NotificationGraceTimeThread(this.liveNotificationEmailManager);
     }
 
     @Override
@@ -132,14 +135,28 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                     // Add the event to the live notification email queue
                     this.liveNotificationEmailManager.addEvent(eventStreamEvent);
 
-                    // If the notification grace time thread is not running, start it
-                    if (!this.notificationGraceTimeThread.isAlive()) {
-                        this.notificationGraceTimeThread.start();
-                    }
+                    this.startNotificationThread();
                 }
             }
         } catch (EventStreamException e) {
             logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
+        }
+    }
+
+    /**
+     * If the notification grace time thread is not running, start it.
+     */
+    private synchronized void startNotificationThread() {
+        // If the notification thread is not defined or is dead ...
+        if (this.notificationGraceTimeThread == null
+                || (!this.notificationGraceTimeThread.isAlive()
+                        && this.notificationGraceTimeThread.getState() != Thread.State.NEW)) {
+            // ... initialize it
+            this.notificationGraceTimeThread = new NotificationGraceTimeThread(this.liveNotificationEmailManager);
+        }
+
+        if (!this.notificationGraceTimeThread.isAlive()) {
+            this.notificationGraceTimeThread.start();
         }
     }
 }

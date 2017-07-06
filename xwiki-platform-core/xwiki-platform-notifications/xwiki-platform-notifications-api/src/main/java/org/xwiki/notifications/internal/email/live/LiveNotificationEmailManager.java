@@ -21,8 +21,10 @@ package org.xwiki.notifications.internal.email.live;
 
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.joda.time.DateTime;
 import org.xwiki.component.annotation.Component;
@@ -34,6 +36,8 @@ import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.internal.SimilarityCalculator;
 
+import com.xpn.xwiki.web.Utils;
+
 /**
  * This manager contains a queue of events that just happened in a wiki and that are waiting to be sent to the users
  * that subscribed to those events.
@@ -41,7 +45,8 @@ import org.xwiki.notifications.internal.SimilarityCalculator;
  * @since 9.6RC1
  * @version $Id$
  */
-@Component(roles=LiveNotificationEmailManager.class)
+@Component(roles = LiveNotificationEmailManager.class)
+@Singleton
 public class LiveNotificationEmailManager implements Initializable
 {
     @Inject
@@ -50,16 +55,13 @@ public class LiveNotificationEmailManager implements Initializable
     @Inject
     private NotificationConfiguration notificationConfiguration;
 
-    @Inject
-    private LiveNotificationEmailSender liveNotificationEmailSender;
-
     /**
      * Number of minutes during which a composite event can stay in the event map before being sent.
      */
     private int graceTime = 10;
 
     /**
-     * Represents an element of the queue
+     * Represents an element of the queue.
      */
     private class QueueElement
     {
@@ -67,15 +69,22 @@ public class LiveNotificationEmailManager implements Initializable
 
         private DateTime date;
 
-        public QueueElement(CompositeEvent event, DateTime date)
+        QueueElement(CompositeEvent event, DateTime date)
         {
             this.event = event;
             this.date = date;
         }
     }
 
-    private Queue<QueueElement> queue;
+    private Queue<QueueElement> queue = new ConcurrentLinkedDeque<>();
 
+    /**
+     * Add an event that has to be sent to the queue.
+     * If a composite event exists in the queue matching the event, the two will merge. Else, a new composite event
+     * is created.
+     *
+     * @param event the event that has to be sent in X minutes
+     */
     public void addEvent(Event event)
     {
         Iterator<QueueElement> it = queue.iterator();
@@ -113,7 +122,7 @@ public class LiveNotificationEmailManager implements Initializable
 
             if (element.date.isBeforeNow()) {
                 // Send the mail
-                this.liveNotificationEmailSender.sendEmails(element.event);
+                Utils.getComponent(LiveNotificationEmailSender.class).sendEmails(element.event);
                 it.remove();
             } else {
                 // As soon as we hit an element which has its date older than now, we know that every other element

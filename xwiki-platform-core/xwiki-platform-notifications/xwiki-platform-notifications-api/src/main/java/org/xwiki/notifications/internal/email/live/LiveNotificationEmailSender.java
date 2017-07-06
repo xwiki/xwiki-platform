@@ -21,6 +21,7 @@ package org.xwiki.notifications.internal.email.live;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,14 +29,16 @@ import javax.inject.Provider;
 import javax.mail.Session;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.email.NotificationEmailInterval;
 import org.xwiki.notifications.internal.email.NotificationUserIterator;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Sends live email notifications regarding a given composite event against every user that have set their preferences
@@ -45,6 +48,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * @version $Id$
  */
 @Component(roles = LiveNotificationEmailSender.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class LiveNotificationEmailSender
 {
     @Inject
@@ -58,10 +62,13 @@ public class LiveNotificationEmailSender
     private Provider<MailListener> mailListenerProvider;
 
     @Inject
+    private Provider<NotificationUserIterator> notificationUserIteratorProvider;
+
+    @Inject
     private Provider<LiveMimeMessageIterator> liveMimeMessageIteratorProvider;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Send live notification e-mails regarding the given event for the users that are concerned by this event and that
@@ -70,15 +77,20 @@ public class LiveNotificationEmailSender
      */
     public void sendEmails(CompositeEvent event)
     {
-        DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
+        // Extract the wikiId from the composite event that we have
+        String wikiId = this.entityReferenceSerializer.serialize(event.getEvents().get(0).getWiki());
+
+        // TODO: Change wikiDescriptorManager.getMainWikiId() to wikiDescriptorManager.getCurrentWikiId()
+        DocumentReference templateReference = new DocumentReference(wikiId,
                 Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
         // Get a list of users that have enabled the live e-mail notifications.
-        NotificationUserIterator notificationUserIterator = new NotificationUserIterator();
-        notificationUserIterator.initialize(NotificationEmailInterval.LIVE);
+        NotificationUserIterator notificationUserIterator = this.notificationUserIteratorProvider.get();
+        notificationUserIterator.initialize(NotificationEmailInterval.LIVE, wikiId);
 
-        LiveMimeMessageIterator liveNotificationMessageIterator = liveMimeMessageIteratorProvider.get();
-        liveNotificationMessageIterator.initialize(notificationUserIterator, event, templateReference);
+        LiveMimeMessageIterator liveNotificationMessageIterator =
+                this.liveMimeMessageIteratorProvider.get();
+        liveNotificationMessageIterator.initialize(notificationUserIterator, new HashMap<>(), event, templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
         MailListener mailListener = mailListenerProvider.get();

@@ -19,9 +19,9 @@
  */
 package org.xwiki.notifications.internal.email.live;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -66,14 +66,15 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
      * Initialize the iterator.
      *
      * @param userIterator iterator that returns all users
+     * @param factoryParameters parameters for the email factory
      * @param event the event that has to be sent to every user
      * @param templateReference reference to the mail template
      */
-    public void initialize(NotificationUserIterator userIterator, CompositeEvent event,
-            DocumentReference templateReference)
+    public void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
+            CompositeEvent event, DocumentReference templateReference)
     {
         this.compositeEvent = event;
-        super.initialize(userIterator, templateReference);
+        super.initialize(userIterator, factoryParameters, templateReference);
     }
 
     /**
@@ -85,7 +86,7 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
      */
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        CompositeEvent resultCompositeEvent = this.compositeEvent.clone();
+        CompositeEvent resultCompositeEvent = new CompositeEvent(this.compositeEvent);
 
         if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
             // Apply the filters that the user has defined in its notification preferences
@@ -107,7 +108,7 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
     /**
      * Test if the given user has enabled the notification preference corresponding to the given composite event.
      *
-     * @param user
+     * @param user the user from which we have to extract
      * @param compositeEvent
      * @return
      */

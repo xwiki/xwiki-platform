@@ -21,7 +21,6 @@ package org.xwiki.notifications.internal.email;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,10 @@ import org.xwiki.notifications.email.NotificationEmailRenderer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Created by caubin on 7/5/17.
+ * Abstract iterator for sending MIME notification messages (usually emails).
+ *
+ * @since 9.6RC1
+ * @version $Id$
  */
 public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {
@@ -103,11 +105,14 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
      * this one at the end of its execution.
      *
      * @param userIterator iterator that returns all users
+     * @param factoryParameters parameters for the email factory
      * @param templateReference reference to the mail template
      */
-    protected void initialize(NotificationUserIterator userIterator, DocumentReference templateReference)
+    protected void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
+            DocumentReference templateReference)
     {
         this.userIterator = userIterator;
+        this.factoryParameters = factoryParameters;
         this.templateReference = templateReference;
         this.computeNext();
     }

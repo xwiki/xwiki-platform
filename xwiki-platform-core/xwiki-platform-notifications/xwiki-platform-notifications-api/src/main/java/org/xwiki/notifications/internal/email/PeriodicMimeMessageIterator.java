@@ -59,13 +59,15 @@ public class PeriodicMimeMessageIterator extends AbstractMimeMessageIterator
      * Initialize the iterator.
      *
      * @param userIterator iterator that returns all users
+     * @param factoryParameters parameters for the email factory
      * @param lastTrigger time of the last email sent
      * @param templateReference reference to the mail template
      */
-    public void initialize(NotificationUserIterator userIterator, Date lastTrigger, DocumentReference templateReference)
+    public void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
+            Date lastTrigger, DocumentReference templateReference)
     {
         this.lastTrigger = lastTrigger;
-        super.initialize(userIterator, templateReference);
+        super.initialize(userIterator, factoryParameters, templateReference);
     }
 
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException

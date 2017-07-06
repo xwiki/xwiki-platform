@@ -75,11 +75,14 @@ public class NotificationEmailSender
     public void sendEmails(Date fromDate, NotificationUserIterator notificationUserIterator)
             throws JobExecutionException
     {
+        Map<String, Object> emailFactoryParameters = new HashMap<>();
+
         DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
                 Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
         PeriodicMimeMessageIterator periodicMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
-        periodicMimeMessageIterator.initialize(notificationUserIterator, fromDate, templateReference);
+        periodicMimeMessageIterator.initialize(notificationUserIterator, emailFactoryParameters, fromDate,
+                templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
         MailListener mailListener = mailListenerProvider.get();

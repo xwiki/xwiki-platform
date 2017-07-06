@@ -1001,9 +1001,11 @@ public class RepositoryManager implements Initializable, Disposable
                                 getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT);
                             List<String> xobjectRepositories = (List<String>) getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
+                            boolean xobjectOptional =
+                                getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, 0) == 1;
 
                             DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
-                                new DefaultVersionConstraint(xobjectConstraint));
+                                new DefaultVersionConstraint(xobjectConstraint), xobjectOptional);
                             xobjectDependency.setRepositories(XWikiRepositoryModel
                                 .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
 

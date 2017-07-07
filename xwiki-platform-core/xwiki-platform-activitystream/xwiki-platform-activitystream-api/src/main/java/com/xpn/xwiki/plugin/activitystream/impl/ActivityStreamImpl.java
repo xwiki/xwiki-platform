@@ -40,8 +40,6 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
@@ -74,7 +72,6 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
-import com.xpn.xwiki.plugin.activitystream.eventstreambridge.BridgeEventStream;
 import com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.Utils;
@@ -301,10 +298,6 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public void addActivityEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
         throws ActivityStreamException
     {
-        if (this.isLoopLockActive()) {
-            return;
-        }
-
         prepareEvent(event, doc, context);
 
         if (useLocalStore()) {
@@ -493,10 +486,6 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     @Override
     public void deleteActivityEvent(ActivityEvent event, XWikiContext context) throws ActivityStreamException
     {
-        if (this.isLoopLockActive()) {
-            return;
-        }
-
         boolean bTransaction = true;
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
         String oriDatabase = context.getWikiId();
@@ -1061,32 +1050,13 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * Check if the {@link BridgeEventStream#EVENT_LOOP_CONTEXT_LOCK_PROPERTY} lock is declared in the current
-     * execution context.
-     *
-     * @return true if the lock is declared, else false
-     */
-    private boolean isLoopLockActive() {
-        Execution executionContext = Utils.getComponent(Execution.class);
-
-        return executionContext.getContext().hasProperty(BridgeEventStream.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
-    }
-
-    /**
      * Send a new {@link AbstractEventStreamEvent} to the observation manager.
-     *
-     * In order to check if no loop is created, we use the lock property
-     * {@link BridgeEventStream#EVENT_LOOP_CONTEXT_LOCK_PROPERTY}.
      *
      * @param eventStreamEvent the event that should be sent
      * @param event the related event stream event
      */
     private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent, ActivityEvent event)
     {
-        Execution executionContext = Utils.getComponent(Execution.class);
-
-        executionContext.getContext().newProperty(BridgeEventStream.EVENT_LOOP_CONTEXT_LOCK_PROPERTY).declare();
-
         org.xwiki.eventstream.Event convertedEvent =
                 Utils.getComponent(EventConverter.class).convertActivityToEvent(event);
         Utils.getComponent(ObservationManager.class).notify(eventStreamEvent, convertedEvent);

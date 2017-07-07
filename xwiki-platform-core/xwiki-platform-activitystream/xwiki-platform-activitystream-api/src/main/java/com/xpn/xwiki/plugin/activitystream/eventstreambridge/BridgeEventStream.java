@@ -31,7 +31,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventGroup;
 import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.observation.ObservationManager;
@@ -54,12 +53,6 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 @Singleton
 public class BridgeEventStream implements EventStream
 {
-    /**
-     * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
-     * triggering new events.
-     */
-    public static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
-
     /** Needed for accessing the current request context. */
     @Inject
     private Execution execution;
@@ -78,15 +71,10 @@ public class BridgeEventStream implements EventStream
     public void addEvent(Event e)
     {
         try {
-            // If we are in a loop, don’t add the event
-            if (this.execution.getContext().hasProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
-                return;
-            }
-
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.sendEventStreamEvent(new EventStreamAddedEvent(), e);
+            this.observationManager.notify(new EventStreamAddedEvent(), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
@@ -96,28 +84,13 @@ public class BridgeEventStream implements EventStream
     public void deleteEvent(Event e)
     {
         try {
-            // Same as addEvent(Event)
-            if (this.execution.getContext().hasProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
-                return;
-            }
-
             XWikiContext context = getXWikiContext();
             ActivityStreamPlugin plugin = getPlugin(context);
             plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.sendEventStreamEvent(new EventStreamDeletedEvent(), e);
+            this.observationManager.notify(new EventStreamDeletedEvent(), e);
         } catch (ActivityStreamException ex) {
             // Unlikely; nothing we can do
         }
-    }
-
-    private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent, Event event)
-    {
-        // In order to avoid infinite loop caused by observation events triggering event stream events that are
-        // themselves triggering new observation events …, the EVENT_LOOP_CONTEXT_LOCK_PROPERTY should be checked
-        // if it is defined in the current execution context before registering an event and sending notifications.
-        // Therefore, an observation event declared out of an event stream event can only be triggered once.
-        this.execution.getContext().newProperty(EVENT_LOOP_CONTEXT_LOCK_PROPERTY).declare();
-        this.observationManager.notify(eventStreamEvent, event);
     }
 
     @Override

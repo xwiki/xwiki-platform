@@ -40,6 +40,9 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.eventstream.events.AbstractEventStreamEvent;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
+import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
@@ -69,6 +72,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
+import com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.Utils;
 
@@ -325,6 +329,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 context.setWikiId(oriDatabase);
             }
         }
+
+        this.sendEventStreamEvent(new EventStreamAddedEvent(), event);
     }
 
     @Override
@@ -556,6 +562,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 }
             }
         }
+
+        this.sendEventStreamEvent(new EventStreamDeletedEvent(), event);
     }
 
     @Override
@@ -1039,5 +1047,18 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         String stringSerialization = serializer.serialize(documentReference);
 
         return stringSerialization;
+    }
+
+    /**
+     * Send a new {@link AbstractEventStreamEvent} to the observation manager.
+     *
+     * @param eventStreamEvent the event that should be sent
+     * @param event the related event stream event
+     */
+    private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent, ActivityEvent event)
+    {
+        org.xwiki.eventstream.Event convertedEvent =
+                Utils.getComponent(EventConverter.class).convertActivityToEvent(event);
+        Utils.getComponent(ObservationManager.class).notify(eventStreamEvent, convertedEvent);
     }
 }

@@ -679,20 +679,20 @@
   &lt;li&gt;
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    &lt;div class="notifications-header clearfix">&#xd;
-    &lt;div class="col-xs-4">&#xd;
-    &lt;p>&lt;strong>$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong>&lt;/p>&#xd;
-    &lt;/div>&#xd;
-    &lt;div class="col-xs-8 text-right">&#xd;
-    &lt;p>&#xd;
-    &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')">&#xd;
-    $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a>&#xd;
-    &amp;nbsp;&#xd;
-    &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings">&#xd;
-    $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))&lt;/a>&lt;/p>&#xd;
-    &lt;/div>&#xd;
-    &lt;div class="notifications-header-uix col-xs-12">&lt;/div>&#xd;
-    &lt;/div>&#xd;
+    &lt;div class="notifications-header clearfix"&gt;
+    &lt;div class="col-xs-4"&gt;
+    &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="col-xs-8 text-right"&gt;
+    &lt;p&gt;
+    &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;
+    $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;
+    &amp;nbsp;
+    &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
+    $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))&lt;/a&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="notifications-header-uix col-xs-12"&gt;&lt;/div&gt;
+    &lt;/div&gt;
     &lt;div class="notifications-area loading clearfix"&gt;
     &lt;/div&gt;
   &lt;/li&gt;

@@ -1,3 +1,4 @@
+## Make sure the browser won't keep the same version of the resource in cache from one version of XWiki to another
 #set($environmentVersion = $services.extension.core.repository.environmentExtension.id.version)
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', {'forceSkinAction': true, 'version': $environmentVersion}))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', {'forceSkinAction': true, 'version': $environmentVersion}))
@@ -1728,6 +1729,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   #end
   #if (!$isAjaxRequest)
     ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
+    ## Make sure the browser won't keep the same version of the resource in cache from one version of XWiki to another
     #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', {'forceSkinAction': true, 'version': $environmentVersion}))
     <p class="noitems">
       $escapetool.xml($services.localization.render('extension.updater.hint'))

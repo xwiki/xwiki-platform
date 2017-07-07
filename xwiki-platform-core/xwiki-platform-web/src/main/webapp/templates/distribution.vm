@@ -32,6 +32,7 @@
 #macro(displayStep)
   #template('xwikivars.vm')
   #template('htmlheader.vm')
+  ## Make sure the browser won't keep the same version of the resource in cache from one version of XWiki to another
   #set($environmentVersion = $services.distribution.distributionExtension.id.version)
   $xwiki.ssfx.use('uicomponents/wizard/wizard.css', {'forceSkinAction': true, 'version': $environmentVersion})
   $xwiki.ssfx.use('uicomponents/extension/distribution.css', {'forceSkinAction': true, 'version': $environmentVersion})

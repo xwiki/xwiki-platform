@@ -29,10 +29,12 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
@@ -66,6 +68,9 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     @Inject
     @Named("context")
     private ComponentManager componentManager;
+
+    @Inject
+    private Execution execution;
 
     @Inject
     private Logger logger;
@@ -125,30 +130,40 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object o, Object o1)
     {
-        try {
-            org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
+        // Ensure that we’re not in an event loop
+        if (!this.execution.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY))
+        {
+            try {
 
-            // We can’t directly store a list of RecordableEventDescriptors as some of them can be
-            // dynamically defined at runtime.
-            List<RecordableEventDescriptor> descriptorList =
-                    this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
+                org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
 
-            // Try to match one of the given descriptors with the current event.
-            for (RecordableEventDescriptor descriptor : descriptorList) {
-                // Find a descriptor that corresponds to the given event
-                // We also check if the notifications are enabled in the wiki and if the mail option for the
-                // notifications is enabled.
-                if (descriptor.getEventType().equals(eventStreamEvent.getType())
-                        && this.notificationConfiguration.isEnabled()
-                        && this.notificationConfiguration.areEmailsEnabled()) {
-                    // Add the event to the live notification email queue
-                    this.liveNotificationEmailManager.addEvent(eventStreamEvent);
+                // We can’t directly store a list of RecordableEventDescriptors as some of them can be
+                // dynamically defined at runtime.
+                List<RecordableEventDescriptor> descriptorList =
+                        this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
 
-                    this.startNotificationThread();
+                // Try to match one of the given descriptors with the current event.
+                for (RecordableEventDescriptor descriptor : descriptorList) {
+                    // Find a descriptor that corresponds to the given event
+                    // We also check if the notifications are enabled in the wiki and if the mail option for the
+                    // notifications is enabled.
+                    if (descriptor.getEventType().equals(eventStreamEvent.getType())
+                            && this.notificationConfiguration.isEnabled()
+                            && this.notificationConfiguration.areEmailsEnabled())
+                    {
+                        // Add the event to the live notification email queue
+                        this.liveNotificationEmailManager.addEvent(eventStreamEvent);
+
+                        this.startNotificationThread();
+                    }
                 }
+
+                // Define EVENT_LOOP_CONTEXT_LOCK_PROPERTY in the current execution context in order to avoid loops.
+                this.execution.getContext()
+                        .setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+            } catch (EventStreamException e) {
+                logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
             }
-        } catch (EventStreamException e) {
-            logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
         }
     }
 

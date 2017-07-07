@@ -27,12 +27,6 @@ package org.xwiki.eventstream.events;
  */
 public abstract class AbstractEventStreamEvent implements org.xwiki.observation.event.Event
 {
-    /**
-     * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
-     * triggering new events.
-     */
-    public static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
-
     @Override
     public boolean matches(Object o)
     {

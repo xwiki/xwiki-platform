@@ -23,21 +23,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
-import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -67,8 +60,6 @@ public class LiveNotificationEmailListenerTest
 
     private ComponentManager componentManager;
 
-    private Execution execution;
-
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
@@ -83,11 +74,6 @@ public class LiveNotificationEmailListenerTest
         this.notificationConfiguration = this.mocker.registerMockComponent(NotificationConfiguration.class);
 
         this.componentManager = this.mocker.registerMockComponent(ComponentManager.class, "context");
-
-        this.execution = this.mocker.registerMockComponent(Execution.class);
-        ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(this.execution.getContext()).thenReturn(executionContext);
-        when(executionContext.hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)).thenReturn(false);
 
         // Override the default output streams in order for the tests to pass even if the thread raised by the test
         // crashes and log its crash to console.

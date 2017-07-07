@@ -130,40 +130,33 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object o, Object o1)
     {
-        // Ensure that we’re not in an event loop
-        if (!this.execution.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY))
-        {
-            try {
+        try {
 
-                org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
+            org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
 
-                // We can’t directly store a list of RecordableEventDescriptors as some of them can be
-                // dynamically defined at runtime.
-                List<RecordableEventDescriptor> descriptorList =
-                        this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
+            // We can’t directly store a list of RecordableEventDescriptors as some of them can be
+            // dynamically defined at runtime.
+            List<RecordableEventDescriptor> descriptorList =
+                    this.recordableEventDescriptorManager.getRecordableEventDescriptors(true);
 
-                // Try to match one of the given descriptors with the current event.
-                for (RecordableEventDescriptor descriptor : descriptorList) {
-                    // Find a descriptor that corresponds to the given event
-                    // We also check if the notifications are enabled in the wiki and if the mail option for the
-                    // notifications is enabled.
-                    if (descriptor.getEventType().equals(eventStreamEvent.getType())
-                            && this.notificationConfiguration.isEnabled()
-                            && this.notificationConfiguration.areEmailsEnabled())
-                    {
-                        // Add the event to the live notification email queue
-                        this.liveNotificationEmailManager.addEvent(eventStreamEvent);
+            // Try to match one of the given descriptors with the current event.
+            for (RecordableEventDescriptor descriptor : descriptorList) {
+                // Find a descriptor that corresponds to the given event
+                // We also check if the notifications are enabled in the wiki and if the mail option for the
+                // notifications is enabled.
+                if (descriptor.getEventType().equals(eventStreamEvent.getType())
+                        && this.notificationConfiguration.isEnabled()
+                        && this.notificationConfiguration.areEmailsEnabled())
+                {
+                    // Add the event to the live notification email queue
+                    this.liveNotificationEmailManager.addEvent(eventStreamEvent);
 
-                        this.startNotificationThread();
-                    }
+                    this.startNotificationThread();
                 }
-
-                // Define EVENT_LOOP_CONTEXT_LOCK_PROPERTY in the current execution context in order to avoid loops.
-                this.execution.getContext()
-                        .setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
-            } catch (EventStreamException e) {
-                logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
             }
+
+        } catch (EventStreamException e) {
+            logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
         }
     }
 

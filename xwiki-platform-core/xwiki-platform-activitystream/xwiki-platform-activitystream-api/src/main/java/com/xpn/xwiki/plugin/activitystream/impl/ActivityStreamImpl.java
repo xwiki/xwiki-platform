@@ -339,6 +339,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             this.sendEventStreamEvent(new EventStreamAddedEvent(), event);
             executionContext.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
+
+        this.sendEventStreamEvent(new EventStreamAddedEvent(), event);
     }
 
     @Override
@@ -580,6 +582,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
             executionContext.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
+
+        this.sendEventStreamEvent(new EventStreamDeletedEvent(), event);
     }
 
     @Override

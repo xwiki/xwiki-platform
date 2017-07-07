@@ -50,7 +50,7 @@ $services.localization.render('platform.appwithinminutes.description')
 #set($columnsProperties = {
   'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
   'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},
-  'doc.date': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true},
+  'doc.date': {'type': 'date', 'size': 10, 'filterable': true, 'sortable': true},
   '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
 })
 #set($options = {

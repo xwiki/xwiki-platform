@@ -58,7 +58,7 @@ public class BridgeEventStream implements EventStream
      * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
      * triggering new events.
      */
-    private static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
+    public static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
 
     /** Needed for accessing the current request context. */
     @Inject

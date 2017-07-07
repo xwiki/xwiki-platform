@@ -31,6 +31,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventGroup;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.observation.ObservationManager;
@@ -70,26 +71,38 @@ public class BridgeEventStream implements EventStream
     @Override
     public void addEvent(Event e)
     {
-        try {
-            XWikiContext context = getXWikiContext();
-            ActivityStreamPlugin plugin = getPlugin(context);
-            plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.observationManager.notify(new EventStreamAddedEvent(), e);
-        } catch (ActivityStreamException ex) {
-            // Unlikely; nothing we can do
+        if (this.execution.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            this.execution.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+
+            try {
+                XWikiContext context = getXWikiContext();
+                ActivityStreamPlugin plugin = getPlugin(context);
+                plugin.getActivityStream().addActivityEvent(eventConverter.convertEventToActivity(e), context);
+                this.observationManager.notify(new EventStreamAddedEvent(), e);
+            } catch (ActivityStreamException ex) {
+                // Unlikely; nothing we can do
+            }
+
+            this.execution.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
     }
 
     @Override
     public void deleteEvent(Event e)
     {
-        try {
-            XWikiContext context = getXWikiContext();
-            ActivityStreamPlugin plugin = getPlugin(context);
-            plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
-            this.observationManager.notify(new EventStreamDeletedEvent(), e);
-        } catch (ActivityStreamException ex) {
-            // Unlikely; nothing we can do
+        if (this.execution.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            this.execution.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+
+            try {
+                XWikiContext context = getXWikiContext();
+                ActivityStreamPlugin plugin = getPlugin(context);
+                plugin.getActivityStream().deleteActivityEvent(eventConverter.convertEventToActivity(e), context);
+                this.observationManager.notify(new EventStreamDeletedEvent(), e);
+            } catch (ActivityStreamException ex) {
+                // Unlikely; nothing we can do
+            }
+
+            this.execution.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
     }
 

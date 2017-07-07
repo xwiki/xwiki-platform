@@ -40,6 +40,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
 import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
@@ -298,39 +299,46 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public void addActivityEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
         throws ActivityStreamException
     {
-        prepareEvent(event, doc, context);
+        Execution executionContext = Utils.getComponent(Execution.class);
 
-        if (useLocalStore()) {
-            // store event in the local database
-            XWikiHibernateStore localHibernateStore = context.getWiki().getHibernateStore();
-            try {
-                localHibernateStore.beginTransaction(context);
-                Session session = localHibernateStore.getSession(context);
-                session.save(event);
-                localHibernateStore.endTransaction(context, true);
-            } catch (XWikiException e) {
-                localHibernateStore.endTransaction(context, false);
+        if (executionContext.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            executionContext.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+
+            prepareEvent(event, doc, context);
+
+            if (useLocalStore()) {
+                // store event in the local database
+                XWikiHibernateStore localHibernateStore = context.getWiki().getHibernateStore();
+                try {
+                    localHibernateStore.beginTransaction(context);
+                    Session session = localHibernateStore.getSession(context);
+                    session.save(event);
+                    localHibernateStore.endTransaction(context, true);
+                } catch (XWikiException e) {
+                    localHibernateStore.endTransaction(context, false);
+                }
             }
-        }
 
-        if (useMainStore()) {
-            // store event in the main database
-            String oriDatabase = context.getWikiId();
-            context.setWikiId(context.getMainXWiki());
-            XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
-            try {
-                mainHibernateStore.beginTransaction(context);
-                Session session = mainHibernateStore.getSession(context);
-                session.save(event);
-                mainHibernateStore.endTransaction(context, true);
-            } catch (XWikiException e) {
-                mainHibernateStore.endTransaction(context, false);
-            } finally {
-                context.setWikiId(oriDatabase);
+            if (useMainStore()) {
+                // store event in the main database
+                String oriDatabase = context.getWikiId();
+                context.setWikiId(context.getMainXWiki());
+                XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
+                try {
+                    mainHibernateStore.beginTransaction(context);
+                    Session session = mainHibernateStore.getSession(context);
+                    session.save(event);
+                    mainHibernateStore.endTransaction(context, true);
+                } catch (XWikiException e) {
+                    mainHibernateStore.endTransaction(context, false);
+                } finally {
+                    context.setWikiId(oriDatabase);
+                }
             }
-        }
 
-        this.sendEventStreamEvent(new EventStreamAddedEvent(), event);
+            this.sendEventStreamEvent(new EventStreamAddedEvent(), event);
+            executionContext.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
+        }
     }
 
     @Override
@@ -486,84 +494,92 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     @Override
     public void deleteActivityEvent(ActivityEvent event, XWikiContext context) throws ActivityStreamException
     {
-        boolean bTransaction = true;
-        ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
-        String oriDatabase = context.getWikiId();
+        Execution executionContext = Utils.getComponent(Execution.class);
 
-        if (useLocalStore()) {
-            XWikiHibernateStore hibstore;
+        if (executionContext.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            executionContext.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
 
-            // delete event from the local database
-            if (context.getWikiId().equals(event.getWiki())) {
-                hibstore = context.getWiki().getHibernateStore();
-            } else {
-                context.setWikiId(event.getWiki());
-                hibstore = context.getWiki().getHibernateStore();
-            }
+            boolean bTransaction = true;
+            ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
+            String oriDatabase = context.getWikiId();
 
-            try {
-                if (bTransaction) {
-                    hibstore.checkHibernate(context);
-                    bTransaction = hibstore.beginTransaction(context);
+            if (useLocalStore()) {
+                XWikiHibernateStore hibstore;
+
+                // delete event from the local database
+                if (context.getWikiId().equals(event.getWiki())) {
+                    hibstore = context.getWiki().getHibernateStore();
+                } else {
+                    context.setWikiId(event.getWiki());
+                    hibstore = context.getWiki().getHibernateStore();
                 }
 
-                Session session = hibstore.getSession(context);
-
-                session.delete(evImpl);
-
-                if (bTransaction) {
-                    hibstore.endTransaction(context, true);
-                }
-
-            } catch (XWikiException e) {
-                throw new ActivityStreamException();
-            } finally {
                 try {
                     if (bTransaction) {
-                        hibstore.endTransaction(context, false);
+                        hibstore.checkHibernate(context);
+                        bTransaction = hibstore.beginTransaction(context);
                     }
-                    if (context.getWikiId().equals(oriDatabase)) {
+
+                    Session session = hibstore.getSession(context);
+
+                    session.delete(evImpl);
+
+                    if (bTransaction) {
+                        hibstore.endTransaction(context, true);
+                    }
+
+                } catch (XWikiException e) {
+                    throw new ActivityStreamException();
+                } finally {
+                    try {
+                        if (bTransaction) {
+                            hibstore.endTransaction(context, false);
+                        }
+                        if (context.getWikiId().equals(oriDatabase)) {
+                            context.setWikiId(oriDatabase);
+                        }
+                    } catch (Exception e) {
+                        // Do nothing.
+                    }
+                }
+            }
+
+            if (useMainStore()) {
+                // delete event from the main database
+                context.setWikiId(context.getMainXWiki());
+                XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
+                try {
+                    if (bTransaction) {
+                        hibstore.checkHibernate(context);
+                        bTransaction = hibstore.beginTransaction(context);
+                    }
+
+                    Session session = hibstore.getSession(context);
+
+                    session.delete(evImpl);
+
+                    if (bTransaction) {
+                        hibstore.endTransaction(context, true);
+                    }
+
+                } catch (XWikiException e) {
+                    throw new ActivityStreamException();
+                } finally {
+                    try {
+                        if (bTransaction) {
+                            hibstore.endTransaction(context, false);
+                        }
                         context.setWikiId(oriDatabase);
+                    } catch (Exception e) {
+                        // Do nothing
                     }
-                } catch (Exception e) {
-                    // Do nothing.
                 }
             }
+
+            this.sendEventStreamEvent(new EventStreamDeletedEvent(), event);
+
+            executionContext.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
-
-        if (useMainStore()) {
-            // delete event from the main database
-            context.setWikiId(context.getMainXWiki());
-            XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
-            try {
-                if (bTransaction) {
-                    hibstore.checkHibernate(context);
-                    bTransaction = hibstore.beginTransaction(context);
-                }
-
-                Session session = hibstore.getSession(context);
-
-                session.delete(evImpl);
-
-                if (bTransaction) {
-                    hibstore.endTransaction(context, true);
-                }
-
-            } catch (XWikiException e) {
-                throw new ActivityStreamException();
-            } finally {
-                try {
-                    if (bTransaction) {
-                        hibstore.endTransaction(context, false);
-                    }
-                    context.setWikiId(oriDatabase);
-                } catch (Exception e) {
-                    // Do nothing
-                }
-            }
-        }
-
-        this.sendEventStreamEvent(new EventStreamDeletedEvent(), event);
     }
 
     @Override

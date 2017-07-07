@@ -301,6 +301,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public void addActivityEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
         throws ActivityStreamException
     {
+        if (this.isLoopLockActive()) {
+            return;
+        }
+
         prepareEvent(event, doc, context);
 
         if (useLocalStore()) {
@@ -489,6 +493,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     @Override
     public void deleteActivityEvent(ActivityEvent event, XWikiContext context) throws ActivityStreamException
     {
+        if (this.isLoopLockActive()) {
+            return;
+        }
+
         boolean bTransaction = true;
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
         String oriDatabase = context.getWikiId();
@@ -1053,8 +1061,19 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * Send a new {@link AbstractEventStreamEvent} to the observation manager while ensuring that no event loop
-     * is created.
+     * Check if the {@link BridgeEventStream#EVENT_LOOP_CONTEXT_LOCK_PROPERTY} lock is declared in the current
+     * execution context.
+     *
+     * @return true if the lock is declared, else false
+     */
+    private boolean isLoopLockActive() {
+        Execution executionContext = Utils.getComponent(Execution.class);
+
+        return executionContext.getContext().hasProperty(BridgeEventStream.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
+    }
+
+    /**
+     * Send a new {@link AbstractEventStreamEvent} to the observation manager.
      *
      * In order to check if no loop is created, we use the lock property
      * {@link BridgeEventStream#EVENT_LOOP_CONTEXT_LOCK_PROPERTY}.
@@ -1066,13 +1085,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         Execution executionContext = Utils.getComponent(Execution.class);
 
-        if (!executionContext.getContext()
-                .hasProperty(BridgeEventStream.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
-            executionContext.getContext().newProperty(BridgeEventStream.EVENT_LOOP_CONTEXT_LOCK_PROPERTY).declare();
+        executionContext.getContext().newProperty(BridgeEventStream.EVENT_LOOP_CONTEXT_LOCK_PROPERTY).declare();
 
-            org.xwiki.eventstream.Event convertedEvent =
-                    Utils.getComponent(EventConverter.class).convertActivityToEvent(event);
-            Utils.getComponent(ObservationManager.class).notify(eventStreamEvent, convertedEvent);
-        }
+        org.xwiki.eventstream.Event convertedEvent =
+                Utils.getComponent(EventConverter.class).convertActivityToEvent(event);
+        Utils.getComponent(ObservationManager.class).notify(eventStreamEvent, convertedEvent);
     }
 }

@@ -889,7 +889,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         // Take events into account only once in a cluster
         if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()
-                && executionContext.getContext().hasProperty(
+                && !executionContext.getContext().hasProperty(
                         AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
             executionContext.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
 

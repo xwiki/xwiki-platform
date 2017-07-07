@@ -1,9 +1,10 @@
-#set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
-#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
+#set($environmentVersion = $services.extension.core.repository.environmentExtension.id.version)
+#set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', {'forceSkinAction': true, 'version': $environmentVersion}))
+#set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', {'forceSkinAction': true, 'version': $environmentVersion}))
+#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', {'forceSkinAction': true, 'version': $environmentVersion}))
+#set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js', {'forceSkinAction': true, 'version': $environmentVersion}))
+#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', {'forceSkinAction': true, 'version': $environmentVersion}))
+#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js', {'forceSkinAction': true, 'version': $environmentVersion}))
 
 #set($discard = $services.template.execute('job_macros.vm'))
 #set($discard = $services.template.execute('rating_macros.vm'))
@@ -1727,7 +1728,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   #end
   #if (!$isAjaxRequest)
     ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
-    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
+    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', {'forceSkinAction': true, 'version': $environmentVersion}))
     <p class="noitems">
       $escapetool.xml($services.localization.render('extension.updater.hint'))
     </p>

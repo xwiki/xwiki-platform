@@ -32,9 +32,10 @@
 #macro(displayStep)
   #template('xwikivars.vm')
   #template('htmlheader.vm')
-  $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true)
-  $xwiki.ssfx.use('uicomponents/extension/distribution.css', true)
-  $xwiki.jsfx.use('uicomponents/extension/distribution.js', true)
+  #set($environmentVersion = $services.distribution.distributionExtension.id.version)
+  $xwiki.ssfx.use('uicomponents/wizard/wizard.css', {'forceSkinAction': true, 'version': $environmentVersion})
+  $xwiki.ssfx.use('uicomponents/extension/distribution.css', {'forceSkinAction': true, 'version': $environmentVersion})
+  $xwiki.jsfx.use('uicomponents/extension/distribution.js', {'forceSkinAction': true, 'version': $environmentVersion})
   <div id="distributionWizard">
     <div class="xdialog-screen"></div>
     <div class="xdialog-box">
@@ -175,11 +176,7 @@
   #end
   $response.sendRedirect($redirectURL)
 #else
-  ## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which
-  ## makes them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly"
-  ## fails to register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with
-  ## #include but unfortunately this doesn't allow the template to be overridden from the skin.
-  #evaluate("#include('extension.vm')")
+  #template('extension.vm')
   #if ("$!request.action" != '')
     #handleStepAction($request.action)
   #elseif ($isAjaxRequest)

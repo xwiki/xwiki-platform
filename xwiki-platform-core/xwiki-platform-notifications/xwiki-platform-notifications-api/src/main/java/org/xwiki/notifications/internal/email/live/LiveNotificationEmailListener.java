@@ -28,6 +28,8 @@ import javax.inject.Singleton;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
@@ -35,8 +37,6 @@ import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-
-import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
  * This listener is responsible of starting triggers when specific events occurs in the wiki.
@@ -64,6 +64,10 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     private NotificationConfiguration notificationConfiguration;
 
     @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
+    @Inject
     private Logger logger;
 
     private Thread notificationGraceTimeThread;
@@ -72,10 +76,10 @@ public class LiveNotificationEmailListener extends AbstractEventListener
      * Thread used for triggering {@link LiveNotificationEmailManager#run()} when needed (ie : when an event
      * grace time has ended).
      */
-    private class NotificationGraceTimeRunnable extends AbstractXWikiRunnable
+    private class NotificationGraceTimeRunnable implements Runnable
     {
         @Override
-        public void runInternal()
+        public void run()
         {
             DateTime nextWakeUpTime = DateTime.now();
 
@@ -96,6 +100,17 @@ public class LiveNotificationEmailListener extends AbstractEventListener
 
                 nextWakeUpTime = liveNotificationEmailManager.getNextExecutionDate();
             }
+        }
+    }
+
+    /**
+     * Handles the execution context of the {@link NotificationGraceTimeRunnable}.
+     */
+    private class NotificationGraceTimeExecutionContext extends ExecutionContextRunnable
+    {
+        NotificationGraceTimeExecutionContext(ComponentManager componentManager)
+        {
+            super(new NotificationGraceTimeRunnable(), componentManager);
         }
     }
 
@@ -146,7 +161,8 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                 || (!this.notificationGraceTimeThread.isAlive()
                         && this.notificationGraceTimeThread.getState() != Thread.State.NEW)) {
             // ... initialize it
-            this.notificationGraceTimeThread = new Thread(new NotificationGraceTimeRunnable());
+            this.notificationGraceTimeThread = new Thread(
+                    new NotificationGraceTimeExecutionContext(this.componentManager));
             this.notificationGraceTimeThread.setName("Live E-Mail notifications thread");
             this.notificationGraceTimeThread.setDaemon(true);
             this.notificationGraceTimeThread.setPriority(Thread.NORM_PRIORITY);

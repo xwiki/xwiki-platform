@@ -96,7 +96,7 @@ public class LiveNotificationEmailManager implements Initializable
             int similarity = similarityCalculator.computeSimilarity(event, element.event.getEvents().get(0));
 
             // If we can merge the event in the composite event
-            if (similarity > SimilarityCalculator.SAME_DOCUMENT_AND_TYPE
+            if (similarity > SimilarityCalculator.NO_SIMILARITY
                 && element.event.getSimilarityBetweenEvents() <= similarity) {
                 try {
                     element.event.add(event, similarity);

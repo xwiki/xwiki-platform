@@ -1,4 +1,3 @@
-org.xwiki.notifications.internal.email.live.LiveNotificationEmailListener
 org.xwiki.notifications.internal.DefaultModelBridge
 org.xwiki.notifications.internal.WikiNotificationDisplayerComponentBuilder
 org.xwiki.notifications.internal.WikiNotificationDisplayerDocumentInitializer

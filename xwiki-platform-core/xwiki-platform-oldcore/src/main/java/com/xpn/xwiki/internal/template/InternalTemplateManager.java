@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -259,7 +258,8 @@ public class InternalTemplateManager
 
     private class StringTemplate extends DefaultTemplate
     {
-        StringTemplate(String content, DocumentReference authorReference) throws Exception {
+        StringTemplate(String content, DocumentReference authorReference) throws Exception
+        {
             super(new StringResource(content));
             // Initialize the template content
             // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
@@ -569,7 +569,7 @@ public class InternalTemplateManager
         } else {
             String result = evaluateContent(template, content);
             xdom = new XDOM(Arrays.asList(new RawBlock(result,
-                    content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
+                content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
         }
 
         return xdom;
@@ -799,6 +799,9 @@ public class InternalTemplateManager
             }
         }
 
+        this.progress.startStep(template, "template.evaluateContent.message",
+            "Evaluate content of template with id [{}]", template.getId());
+
         try {
             this.velocityManager.evaluate(writer, namespace, new StringReader(content.getContent()));
         } finally {
@@ -806,6 +809,8 @@ public class InternalTemplateManager
             if (renderingContextPushed) {
                 ((MutableRenderingContext) this.renderingContext).pop();
             }
+
+            this.progress.endStep(template);
         }
     }
 

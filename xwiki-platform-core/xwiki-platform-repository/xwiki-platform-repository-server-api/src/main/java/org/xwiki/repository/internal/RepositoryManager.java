@@ -1004,13 +1004,14 @@ public class RepositoryManager implements Initializable, Disposable
                             boolean xobjectOptional =
                                 getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, 0) == 1;
 
-                            DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
-                                new DefaultVersionConstraint(xobjectConstraint), xobjectOptional);
-                            xobjectDependency.setRepositories(XWikiRepositoryModel
-                                .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
-
                             if (dependencies.size() > dependencyIndex) {
                                 ExtensionDependency dependency = dependencies.get(dependencyIndex);
+
+                                DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
+                                    new DefaultVersionConstraint(xobjectConstraint), xobjectOptional,
+                                    dependency.getProperties());
+                                xobjectDependency.setRepositories(XWikiRepositoryModel
+                                    .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
 
                                 if (dependency.equals(xobjectDependency)) {
                                     ++dependencyIndex;

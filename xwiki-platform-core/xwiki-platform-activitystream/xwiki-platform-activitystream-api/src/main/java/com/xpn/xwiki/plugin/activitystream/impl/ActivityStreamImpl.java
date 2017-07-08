@@ -40,6 +40,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
 import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
@@ -884,8 +885,14 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             return;
         }
 
+        Execution executionContext = Utils.getComponent(Execution.class);
+
         // Take events into account only once in a cluster
-        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
+        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()
+                && !executionContext.getContext().hasProperty(
+                        AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            executionContext.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+
             String eventType;
             String displayTitle;
             String additionalIdentifier = null;
@@ -948,11 +955,14 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
 
             try {
+
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
                 LOGGER.error("Exception while trying to add a document activity event, updated document: [" + wiki
                     + ":" + currentDoc + "]");
             }
+
+            executionContext.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
     }
 

@@ -37,7 +37,8 @@ public class ExtendedTocMacroParameters extends TocMacroParameters
      * @param reference the reference to the document for which to generate the table of content. If not defined, then
      *                  the current document is used
      */
-    @PropertyDescription("the reference to the document from which to generate the table of content")
+    @PropertyDescription("the reference to the document from which to generate the table of content. "
+        + "Leave empty for the current page")
     public void setReference(EntityReference reference)
     {
         this.reference = reference;

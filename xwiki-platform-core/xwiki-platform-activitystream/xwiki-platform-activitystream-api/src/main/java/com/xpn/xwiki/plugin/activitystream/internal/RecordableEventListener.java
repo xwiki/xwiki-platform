@@ -26,9 +26,11 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventConverter;
+import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
@@ -63,6 +65,9 @@ public class RecordableEventListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
+    @Inject
+    private Execution execution;
+
     /**
      * Construct a NotificationEventListener.
      */
@@ -86,8 +91,16 @@ public class RecordableEventListener extends AbstractEventListener
         }
 
         try {
-            // Save the event in the event stream
-            eventStream.addEvent(convertEvent(event, source, data));
+            if (!this.execution.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+                this.execution.getContext()
+                        .setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+
+                // Save the event in the event stream
+                eventStream.addEvent(convertEvent(event, source, data));
+
+                this.execution.getContext()
+                        .removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
+            }
         } catch (Exception e) {
             logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), e);
         }

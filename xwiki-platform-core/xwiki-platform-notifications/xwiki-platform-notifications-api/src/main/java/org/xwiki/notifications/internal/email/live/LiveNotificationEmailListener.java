@@ -29,12 +29,10 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
-import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
@@ -70,9 +68,6 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     private ComponentManager componentManager;
 
     @Inject
-    private Execution execution;
-
-    @Inject
     private Logger logger;
 
     private Thread notificationGraceTimeThread;
@@ -105,17 +100,6 @@ public class LiveNotificationEmailListener extends AbstractEventListener
 
                 nextWakeUpTime = liveNotificationEmailManager.getNextExecutionDate();
             }
-        }
-    }
-
-    /**
-     * Handles the execution context of the {@link NotificationGraceTimeRunnable}.
-     */
-    private class NotificationGraceTimeExecutionContext extends ExecutionContextRunnable
-    {
-        NotificationGraceTimeExecutionContext(ComponentManager componentManager)
-        {
-            super(new NotificationGraceTimeRunnable(), componentManager);
         }
     }
 
@@ -170,7 +154,7 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                         && this.notificationGraceTimeThread.getState() != Thread.State.NEW)) {
             // ... initialize it
             this.notificationGraceTimeThread = new Thread(
-                    new NotificationGraceTimeExecutionContext(this.componentManager));
+                    new ExecutionContextRunnable(new NotificationGraceTimeRunnable(), this.componentManager));
             this.notificationGraceTimeThread.setName("Live E-Mail notifications thread");
             this.notificationGraceTimeThread.setDaemon(true);
             this.notificationGraceTimeThread.setPriority(Thread.NORM_PRIORITY);

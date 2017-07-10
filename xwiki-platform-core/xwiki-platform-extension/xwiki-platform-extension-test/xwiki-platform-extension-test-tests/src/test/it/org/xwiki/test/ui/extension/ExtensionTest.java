@@ -191,7 +191,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Check that the result matches the search query.
         ExtensionPane extension = searchResults.getExtension(RandomUtils.nextInt(20));
-        assertTrue(extension.getId().getId().contains("commons"));
+        assertTrue(extension.getSummary().toLowerCase().contains("commons"));
         assertEquals("core", extension.getStatus());
 
         // Test search query with no results.
@@ -210,7 +210,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
-        assertTrue(extension.getId().getId().contains("restlet"));
+        assertTrue(extension.getName().toLowerCase().contains("restlet"));
     }
 
     /**
@@ -229,7 +229,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertNull(searchResults.getNoResultsMessage());
         ExtensionPane extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
-        assertTrue(extension.getId().getId().contains("restlet"));
+        assertTrue(extension.getName().toLowerCase().contains("restlet"));
         assertEquals(version, extension.getVersion());
 
         searchResults = new SimpleSearchPane().clickAdvancedSearch().search("foo", "bar");

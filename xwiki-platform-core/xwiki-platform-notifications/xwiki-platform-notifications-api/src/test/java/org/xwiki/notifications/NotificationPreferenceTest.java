@@ -17,36 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.email;
+package org.xwiki.notifications;
 
-import org.xwiki.stability.Unstable;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Several intervals to get notified by emails.
+ * Unit tests for {@link NotificationPreference}.
  *
+ * @since 9.6RC1
  * @version $Id$
- * @since 9.5RC1
  */
-@Unstable
-public enum NotificationEmailInterval
+public class NotificationPreferenceTest
 {
-    /**
-     * Receive a mail every hour (if needed).
-     */
-    HOURLY,
+    @Test
+    public void testPublicGetters() throws Exception
+    {
+        NotificationPreference testPreference = new NotificationPreference("eventType", "appId", true);
 
-    /**
-     * Receive a mail every day (if needed).
-     */
-    DAILY,
+        assertEquals("eventType", testPreference.getEventType());
+        assertEquals("appId", testPreference.getApplicationId());
+        assertTrue(testPreference.isNotificationEnabled());
 
-    /**
-     * Receive a mail every week (if needed).
-     */
-    WEEKLY,
-    /**
-     * Receive an e-mail when a notification is triggered in the wiki.
-     * @since 9.6RC1
-     */
-    LIVE
+        NotificationPreference testPreference2 = new NotificationPreference("eventType", "appId",
+                true, NotificationFormat.EMAIL);
+
+        assertEquals(NotificationFormat.EMAIL, testPreference2.getFormat());
+    }
 }

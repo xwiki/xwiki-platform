@@ -52,4 +52,12 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "emails.enabled", true);
     }
+
+    @Override
+    public int liveNotificationsGraceTime()
+    {
+        int graceTime = configurationSource.getProperty(CONFIGURATION_PREFIX + "emails.live.graceTime", 10);
+
+        return (graceTime < 0) ? 0 : graceTime;
+    }
 }

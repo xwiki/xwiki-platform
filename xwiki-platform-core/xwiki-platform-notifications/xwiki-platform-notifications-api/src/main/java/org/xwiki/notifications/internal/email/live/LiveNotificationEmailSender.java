@@ -17,20 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.email;
+package org.xwiki.notifications.internal.email.live;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.Session;
 
-import org.quartz.JobExecutionException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -38,17 +35,21 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.email.NotificationEmailInterval;
+import org.xwiki.notifications.internal.email.NotificationUserIterator;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Send notifications emails for specified users.
+ * Sends live email notifications regarding a given composite event against every user that have set their preferences
+ * to receive live email notifications for this kind of events.
  *
+ * @since 9.6RC1
  * @version $Id$
- * @since 9.5RC1
  */
-@Component(roles = NotificationEmailSender.class)
+@Component(roles = LiveNotificationEmailSender.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class NotificationEmailSender
+public class LiveNotificationEmailSender
 {
     @Inject
     private MailSender mailSender;
@@ -61,33 +62,35 @@ public class NotificationEmailSender
     private Provider<MailListener> mailListenerProvider;
 
     @Inject
-    private Provider<PeriodicMimeMessageIterator> notificationMimeMessageIteratorProvider;
+    private Provider<NotificationUserIterator> notificationUserIteratorProvider;
+
+    @Inject
+    private Provider<LiveMimeMessageIterator> liveMimeMessageIteratorProvider;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     /**
-     * Send notifications emails for specified users.
-     * @param fromDate only send notifications about events that happened after this date
-     * @param notificationUserIterator iterator for users interested in the notifications emails
-     * @throws JobExecutionException if error happens
+     * Send live notification e-mails regarding the given event for the users that are concerned by this event and that
+     * have enabled live notifications.
+     * @param event the event that should be sent to the users
      */
-    public void sendEmails(Date fromDate, NotificationUserIterator notificationUserIterator)
-            throws JobExecutionException
+    public void sendEmails(CompositeEvent event)
     {
-        Map<String, Object> emailFactoryParameters = new HashMap<>();
-
-        DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
+        DocumentReference templateReference = new DocumentReference(this.wikiDescriptorManager.getCurrentWikiId(),
                 Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
-        PeriodicMimeMessageIterator periodicMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
-        periodicMimeMessageIterator.initialize(notificationUserIterator, emailFactoryParameters, fromDate,
-                templateReference);
+        // Get a list of users that have enabled the live e-mail notifications.
+        NotificationUserIterator notificationUserIterator = this.notificationUserIteratorProvider.get();
+        notificationUserIterator.initialize(NotificationEmailInterval.LIVE);
+
+        LiveMimeMessageIterator liveNotificationMessageIterator = this.liveMimeMessageIteratorProvider.get();
+        liveNotificationMessageIterator.initialize(notificationUserIterator, new HashMap<>(), event, templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
         MailListener mailListener = mailListenerProvider.get();
 
         // Pass it to the message sender to send it asynchronously.
-        mailSender.sendAsynchronously(periodicMimeMessageIterator, session, mailListener);
+        mailSender.sendAsynchronously(liveNotificationMessageIterator, session, mailListener);
     }
 }

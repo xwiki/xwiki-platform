@@ -43,4 +43,12 @@ public interface NotificationConfiguration
      */
     boolean areEmailsEnabled();
 
+    /**
+     * Get the number of minutes for the notification emails grace time. If the value is 0, then the email will be
+     * instantly sent.
+     *
+     * @return the number of minutes that should last before sending a live notification mail
+     * @since 9.6RC1
+     */
+    int liveNotificationsGraceTime();
 }

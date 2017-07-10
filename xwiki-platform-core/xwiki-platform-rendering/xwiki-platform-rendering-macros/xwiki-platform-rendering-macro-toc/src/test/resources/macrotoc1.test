@@ -1,0 +1,19 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# TOC for another document
+.#-----------------------------------------------------
+{{toc reference="Space.Page" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [toc] [reference=Space.Page]
+beginList [BULLETED]
+beginListItem
+beginLink [Typed = [true] Type = [doc] Reference = [Space.Page]] [false]
+endLink [Typed = [true] Type = [doc] Reference = [Space.Page]] [false]
+endListItem
+endList [BULLETED]
+endMacroMarkerStandalone [toc] [reference=Space.Page]
+endDocument

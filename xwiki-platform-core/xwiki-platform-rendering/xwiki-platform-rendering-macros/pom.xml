@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>4.3.0.Final</version>
+      <version>4.3.2.Final</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -98,17 +98,19 @@ Thus it is forbidden to depend on the HTML Macro.
     </plugins>
   </build>
   <modules>
-    <module>xwiki-platform-rendering-macro-include</module>
-    <module>xwiki-platform-rendering-macro-script</module>
-    <module>xwiki-platform-rendering-macro-velocity</module>
-    <module>xwiki-platform-rendering-macro-groovy</module>
+    <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-rendering-macro-cache</module>
     <module>xwiki-platform-rendering-macro-code</module>
-    <module>xwiki-platform-rendering-macro-rss</module>
-    <module>xwiki-platform-rendering-macro-useravatar</module>
-    <module>xwiki-platform-rendering-macro-python</module>
     <module>xwiki-platform-rendering-macro-container</module>
     <module>xwiki-platform-rendering-macro-context</module>
-    <module>xwiki-platform-rendering-macro-cache</module>
     <module>xwiki-platform-rendering-macro-gallery</module>
+    <module>xwiki-platform-rendering-macro-groovy</module>
+    <module>xwiki-platform-rendering-macro-include</module>
+    <module>xwiki-platform-rendering-macro-python</module>
+    <module>xwiki-platform-rendering-macro-script</module>
+    <module>xwiki-platform-rendering-macro-velocity</module>
+    <module>xwiki-platform-rendering-macro-rss</module>
+    <module>xwiki-platform-rendering-macro-toc</module>
+    <module>xwiki-platform-rendering-macro-useravatar</module>
   </modules>
 </project>

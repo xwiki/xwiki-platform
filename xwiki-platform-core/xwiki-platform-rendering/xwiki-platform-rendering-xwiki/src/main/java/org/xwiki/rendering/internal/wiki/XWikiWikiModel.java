@@ -48,12 +48,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.wiki.WikiModel;
+import org.xwiki.rendering.wiki.WikiModelException;
 
 import com.steadystate.css.parser.CSSOMParser;
 import com.steadystate.css.parser.SACParserCSS21;
@@ -144,7 +146,7 @@ public class XWikiWikiModel implements WikiModel
     {
         // Note that we don't ask for a full URL because links should be relative as much as possible
         EntityReference attachmentReference =
-            resourceReferenceEntityReferenceResolver.resolve(linkReference, EntityType.ATTACHMENT);
+            this.resourceReferenceEntityReferenceResolver.resolve(linkReference, EntityType.ATTACHMENT);
 
         if (attachmentReference == null) {
             throw new IllegalArgumentException(String.valueOf(attachmentReference));
@@ -200,7 +202,7 @@ public class XWikiWikiModel implements WikiModel
     public String getDocumentViewURL(ResourceReference resourceReference)
     {
         EntityReference documentReference =
-            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+            this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
@@ -243,7 +245,7 @@ public class XWikiWikiModel implements WikiModel
         }
 
         EntityReference documentReference =
-            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+            this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
@@ -251,6 +253,24 @@ public class XWikiWikiModel implements WikiModel
 
         return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "create",
             modifiedQueryString, resourceReference.getParameter(DocumentResourceReference.ANCHOR));
+    }
+
+    @Override
+    public XDOM getXDOM(ResourceReference resourceReference) throws WikiModelException
+    {
+        // Currently we only support getting the XDOM for a document
+        EntityReference entityReference =
+            this.resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+
+        if (entityReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
+        }
+
+        try {
+            return this.documentAccessBridge.getDocument(new DocumentReference(entityReference)).getXDOM();
+        } catch (Exception e) {
+            throw new WikiModelException(String.format("Failed to get XDOM for [%s]", resourceReference), e);
+        }
     }
 
     /**

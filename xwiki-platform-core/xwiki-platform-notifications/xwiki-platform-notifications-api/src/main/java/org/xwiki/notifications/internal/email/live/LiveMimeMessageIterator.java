@@ -20,9 +20,9 @@
 package org.xwiki.notifications.internal.email.live;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -95,10 +95,11 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
             for (NotificationFilter filter : this.notificationFilterManager.getAllNotificationFilters(user)) {
-                CopyOnWriteArrayList<Event> events = new CopyOnWriteArrayList<>(resultCompositeEvent.getEvents());
-                for (Event event : events) {
+                Iterator<Event> it = resultCompositeEvent.getEvents().iterator();
+                while (it.hasNext()) {
+                    Event event = it.next();
                     if (filter.filterEvent(event, user, NotificationFormat.EMAIL)) {
-                        resultCompositeEvent.remove(event);
+                        it.remove();
                         if (resultCompositeEvent.getEvents().size() == 0) {
                             return Collections.emptyList();
                         }
@@ -123,7 +124,8 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
     {
         try {
             for (NotificationPreference notificationPreference: this.modelBridge.getNotificationsPreferences(user)) {
-                if (notificationPreference.getEventType().equals(compositeEvent.getType())) {
+                if (notificationPreference.getFormat().equals(NotificationFormat.EMAIL)
+                        && notificationPreference.getEventType().equals(compositeEvent.getType())) {
                     return notificationPreference.isNotificationEnabled();
                 }
             }

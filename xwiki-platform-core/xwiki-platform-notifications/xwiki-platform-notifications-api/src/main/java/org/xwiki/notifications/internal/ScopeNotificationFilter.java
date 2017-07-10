@@ -19,8 +19,8 @@
  */
 package org.xwiki.notifications.internal;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -147,7 +147,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Override
     public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
     {
-        Map<String, Object> params = new ConcurrentHashMap<>();
+        Map<String, Object> params = new HashMap<>();
 
         try {
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {

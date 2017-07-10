@@ -46,6 +46,7 @@ public enum NotificationEmailInterval
     WEEKLY,
     /**
      * Receive an e-mail when a notification is triggered in the wiki.
+     * @since 9.6RC1
      */
     LIVE
 }

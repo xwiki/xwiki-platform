@@ -60,7 +60,7 @@ public class CompositeEvent
      */
     public CompositeEvent(CompositeEvent compositeEvent)
     {
-        this.events = compositeEvent.events;
+        this.events = new ArrayList<>(compositeEvent.events);
         this.similarityBetweenEvents = compositeEvent.similarityBetweenEvents;
     }
 

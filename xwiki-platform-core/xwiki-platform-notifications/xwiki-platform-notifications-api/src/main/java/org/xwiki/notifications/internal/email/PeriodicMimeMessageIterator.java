@@ -40,7 +40,7 @@ import org.xwiki.notifications.NotificationManager;
  * Iterator used to generate emails for notifications. Generate MimeMessages.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.6RC1
  */
 @Component(roles = PeriodicMimeMessageIterator.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

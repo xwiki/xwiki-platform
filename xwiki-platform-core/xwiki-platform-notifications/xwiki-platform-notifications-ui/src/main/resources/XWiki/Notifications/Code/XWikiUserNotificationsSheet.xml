@@ -53,8 +53,13 @@
 .notifPreferences tbody {
   margin-top: 2em;
 }
-.notifPreferences tbody:nth-child(odd) { background: #fafafa; }
-.notifPreferences tbody:nth-child(even) { background: #e5e5e5; }
+.notifPreferences .appOdd {
+  background: #e5e5e5;
+}
+.notifPreferences .appEven {
+  background: #fafafa;
+}
+
 .notifPreferences .rowApp td, .notifPreferences .rowApp th{
   height: 3em;
 }
@@ -83,13 +88,14 @@
       }))
     #end
     #set ($lastApp = '')
+    #set ($appClass = "appOdd")
     #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
       #if ($lastApp != $type.applicationName)
         #if ($velocityCount &gt; 1)
         &lt;/tbody&gt;
         #end
         #set ($lastApp = $type.applicationName)
-        &lt;tbody  id="app${lastApp}"&gt;
+        &lt;thead id="app${lastApp}head" class="$appClass"&gt;
         &lt;tr class="rowApp"&gt;
           &lt;th style="vertical-align: top;"&gt;
             $type.applicationIcon $escapetool.xml($type.applicationName)
@@ -98,7 +104,17 @@
             #if ($services.notification.areEmailsEnabled())
               #displayPreferenceForApp($type.applicationId, 'email')
             #end
+          &lt;td&gt;
+            &lt;button class="btn btn-default btn-sm" data-toggle="collapse" data-target="#app${lastApp}"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
+          &lt;/td&gt;
         &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody id="app${lastApp}" class="collapse $appClass"&gt;
+        #if ($appClass == 'appOdd')
+          #set ($appClass = 'appEven')
+        #else
+          #set ($appClass = 'appOdd')
+        #end
       #end
       &lt;tr&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
@@ -106,6 +122,7 @@
         #if ($services.notification.areEmailsEnabled())
           #displayPreference($type, 'email')
         #end
+        &lt;td&gt;&lt;/td&gt;
       &lt;/tr&gt;
     #end
     &lt;/tbody&gt;
@@ -125,6 +142,8 @@
             &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
             &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
           &lt;/select&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
         &lt;/td&gt;
       &lt;/tr&gt;
     &lt;/tfoot&gt;
@@ -366,13 +385,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
    */
   $('.notificationTypeCheckbox').bootstrapSwitch({
     size: 'mini',
-    onColor: 'success',
-    offColor: 'danger',
     labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
   });
   $('.notificationAppCheckbox').bootstrapSwitch({
-    size: 'mini',
-    onColor: 'default'
+    size: 'small',
+    labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
   });
 
   /**
@@ -555,7 +572,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
     var td = checkbox.parents('td.notificationAppCell');
     var appId = td.attr('data-applicationid');
     var format = td.attr('data-format');
-    checkbox.parents('tbody').find('.notificationTypeCell').each(function() {
+    $('.notificationTypeCell').each(function() {
       var cell = $(this);
       if (cell.attr('data-applicationid') == appId &amp;&amp; cell.attr('data-format') == format) {
         cell.find('input').bootstrapSwitch('disabled', checkbox.bootstrapSwitch('state'));

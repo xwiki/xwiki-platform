@@ -261,16 +261,16 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       $('usersandgroupstable-filters-scope').addClassName('hidden');
       // Default to global.
       $('wiki').options[1].selected=true;
-      
+
       return true;
-    } 
-    
+    }
+
     return false;
   }
-  
+
   function startup() {
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-    
+
     #if ($isWorkspace)
       window.groupScopeIndex = 0;
       hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
@@ -279,9 +279,9 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
       window.saveUrl = "$saveUrl";
       window.saveUrl.replace(/&amp;/g, "&");
-      
+
       var targetDocument = new XWiki.Document(XWiki.Model.resolve("$escapetool.javascript($services.model.serialize($targetDocument.documentReference, 'default'))", XWiki.EntityType.DOCUMENT));
-      
+
       window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
       window.unregUser = "XWiki.XWikiGuest";
       // the callback function is called from LiveTable with 3 arguments
@@ -297,11 +297,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           $('unregistered').removeClassName('hidden');
         }
       });
-    #if("$!editor" == 'globaladmin')
+    #if("$!editor" == 'globaladmin' && $request.section != 'wikis.rights')
       Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
       Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
-    #if($guest_comment_captcha_prop)
+    #if($guest_comment_captcha_prop && $request.section != 'wikis.rights')
       Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
       return true;

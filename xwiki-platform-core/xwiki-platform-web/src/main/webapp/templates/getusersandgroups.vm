@@ -131,7 +131,7 @@ $response.setContentType("application/json")
           #else
             #if($rightsWithAllowPrecedence.contains($right))
               ## If the same right is specified both as allow and deny, allow is stronger.
-              #if(!$allows.containsKey($right)) #set($discard = $deny.put($right, "1")) #end
+              #if(!$allows.containsKey($right)) #set($discard = $denys.put($right, "1")) #end
             #else
               #set($discard = $denys.put($right, "1"))
               ## If the same right is specified both as allow and deny, deny is stronger.

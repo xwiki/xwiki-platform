@@ -1031,22 +1031,42 @@ public class XWikiDocumentMockitoTest
         template.setSyntax(Syntax.XWIKI_2_0);
         template.setContent("Enter content here");
 
-        XWikiAttachment templateAttachment = new XWikiAttachment(template, "test.txt");
-        String testContent = "test content";
-        templateAttachment.setContent(IOUtils.toInputStream(testContent));
-        template.addAttachment(templateAttachment);
+        XWikiAttachment aliceAttachment = new XWikiAttachment(template, "alice.png");
+        aliceAttachment.setContent(new ByteArrayInputStream("alice content".getBytes()));
+        template.addAttachment(aliceAttachment);
 
-        this.oldcore.getSpyXWiki().saveDocument(template, this.oldcore.getXWikiContext());
+        XWikiAttachment bobAttachment = new XWikiAttachment(template, "bob.png");
+        bobAttachment.setContent(new ByteArrayInputStream("bob content".getBytes()));
+        template.addAttachment(bobAttachment);
+
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        this.oldcore.getSpyXWiki().saveDocument(template, xcontext);
 
         XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
-        target.readFromTemplate(template.getDocumentReference(), this.oldcore.getXWikiContext());
+
+        XWikiAttachment aliceModifiedAttachment = new XWikiAttachment(target, "alice.png");
+        aliceModifiedAttachment.setContent(new ByteArrayInputStream("alice modified content".getBytes()));
+        target.addAttachment(aliceModifiedAttachment);
+
+        XWikiAttachment carolAttachment = new XWikiAttachment(target, "carol.png");
+        carolAttachment.setContent(new ByteArrayInputStream("carol content".getBytes()));
+        target.addAttachment(carolAttachment);
+
+        target.readFromTemplate(template.getDocumentReference(), xcontext);
 
         Assert.assertEquals(template.getDocumentReference(), target.getTemplateDocumentReference());
         Assert.assertEquals(template.getParentReference(), target.getParentReference());
         Assert.assertEquals(template.getTitle(), target.getTitle());
         Assert.assertEquals(template.getSyntax(), target.getSyntax());
         Assert.assertEquals(template.getContent(), target.getContent());
-        assertThat(target.getAttachmentList(), Matchers.containsInAnyOrder(target.getAttachmentList().toArray()));
+
+        assertEquals(3, target.getAttachmentList().size());
+        assertTrue(IOUtils.contentEquals(target.getAttachment("alice.png").getContentInputStream(xcontext),
+            aliceModifiedAttachment.getContentInputStream(xcontext)));
+        assertTrue(IOUtils.contentEquals(target.getAttachment("bob.png").getContentInputStream(xcontext),
+            bobAttachment.getContentInputStream(xcontext)));
+        assertTrue(IOUtils.contentEquals(target.getAttachment("carol.png").getContentInputStream(xcontext),
+            carolAttachment.getContentInputStream(xcontext)));
     }
 
     @Test

@@ -193,7 +193,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     @Override
-    public Object clone()
+    public XWikiAttachment clone()
     {
         XWikiAttachment attachment = null;
         try {

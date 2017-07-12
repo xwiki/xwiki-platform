@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications;
 
+import java.util.Date;
+
 import org.xwiki.stability.Unstable;
 
 /**
@@ -37,6 +39,8 @@ public class NotificationPreference
     private boolean isNotificationEnabled;
 
     private NotificationFormat format;
+
+    private Date startDate;
 
     /**
      * Construct a NotificationPreference.
@@ -68,6 +72,23 @@ public class NotificationPreference
         this.applicationId = applicationId;
         this.isNotificationEnabled = isNotificationEnabled;
         this.format = format;
+    }
+
+    /**
+     * Construct a new NotificationPreference.
+     * @param eventType type of an event
+     * @param applicationId id of an application
+     * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
+     * @param format format of the notification
+     * @param startDate the date from which notifications that match this preference should be retrieved
+     *
+     * @since 9.7RC1
+     */
+    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled,
+            NotificationFormat format, Date startDate)
+    {
+        this(eventType, applicationId, isNotificationEnabled, format);
+        this.startDate = startDate;
     }
 
     /**
@@ -103,5 +124,15 @@ public class NotificationPreference
     public NotificationFormat getFormat()
     {
         return format;
+    }
+
+    /**
+     * @return the date from which notifications that match this preference should be retrieved
+     *
+     * @since 9.7RC1
+     */
+    public Date getStartDate()
+    {
+        return this.startDate;
     }
 }

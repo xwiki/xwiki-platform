@@ -233,6 +233,15 @@
                     "methodName": "liveNotificationsGraceTime",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.NotificationManager::setStartDateForPreference(java.lang.String, org.xwiki.notifications.NotificationPreference, java.util.Date) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationManager",
+                    "methodName": "setStartDateForPreference",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

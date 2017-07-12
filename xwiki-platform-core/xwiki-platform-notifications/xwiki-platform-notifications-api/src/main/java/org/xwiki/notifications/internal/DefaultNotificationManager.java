@@ -392,4 +392,11 @@ public class DefaultNotificationManager implements NotificationManager
     {
         modelBridge.setStartDateForUser(documentReferenceResolver.resolve(userId), startDate);
     }
+
+    @Override
+    public void setStartDateForPreference(String userId, NotificationPreference preference, Date startDate)
+            throws NotificationException
+    {
+        modelBridge.setStartDateForUser(documentReferenceResolver.resolve(userId), preference, startDate);
+    }
 }

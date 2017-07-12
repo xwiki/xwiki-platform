@@ -21,8 +21,10 @@ package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -85,7 +87,9 @@ public class QueryGenerator
      * @param format only match notifications enabled for that format
      * @param onlyUnread f only unread events should be returned
      * @param endDate do not return events happened after this date
-     * @param startDate do not return events happened before this date
+     * @param startDate do not return events happened before this date. Note that since 9.7RC1, this start date is
+     * completely optional, {@link NotificationPreference#startDate} should be used for more granular control on
+     * notifications
      * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
      * @return the query to execute
      *
@@ -104,14 +108,18 @@ public class QueryGenerator
 
         // Then: generate the HQL query
         StringBuilder hql = new StringBuilder();
-        hql.append("where event.date >= :startDate AND event.user <> :user AND (");
+        hql.append("where event.user <> :user AND ");
+        if (startDate != null) {
+            hql.append("event.date >= :startDate AND ");
+        }
+        hql.append(LEFT_PARENTHESIS);
 
-        List<String> types = handleEventTypes(user, hql, preferences, format);
-        List<String> apps  = handleApplications(hql, preferences, types, format);
+        Map<String, Date> preferencesMap = handleEventPreferences(user, hql, preferences, format);
+        List<String> apps  = handleApplications(hql, preferences, preferencesMap.keySet(), format);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
-        if (preferences.isEmpty() || (types.isEmpty() && apps.isEmpty())) {
+        if (preferences.isEmpty() || (preferencesMap.isEmpty() && apps.isEmpty())) {
             return null;
         }
 
@@ -128,9 +136,11 @@ public class QueryGenerator
         Query query = queryManager.createQuery(hql.toString(), Query.HQL);
 
         // Bind values
-        query.bindValue("startDate", startDate != null ? startDate : modelBridge.getUserStartDate(user));
+        if (startDate != null) {
+            query.bindValue("startDate", startDate);
+        }
         query.bindValue("user", serializer.serialize(user));
-        handleEventTypes(types, query);
+        handleEventPreferences(preferencesMap, query);
         handleApplications(apps, query);
         handleBlackList(blackList, query);
         handleEndDate(endDate, query);
@@ -250,16 +260,25 @@ public class QueryGenerator
         }
     }
 
-    private void handleEventTypes(List<String> types, Query query)
+    /**
+     * Bind the event preferences parameters to the query. Those parameters are usually declared in
+     * {@link #handleEventPreferences(Map, Query)}.
+     *
+     * @param preferencesMap A map containing an event type as a key, and the start date of this event type as value
+     * @param query the query
+     */
+    private void handleEventPreferences(Map<String, Date> preferencesMap, Query query)
     {
         int number = 0;
-        for (String type : types) {
-            query.bindValue(String.format("type_%d", number++), type);
+        for (String type : preferencesMap.keySet()) {
+            query.bindValue(String.format("type_%d", number), type);
+            query.bindValue(String.format("date_%d", number), preferencesMap.get(type));
+            number++;
         }
     }
 
     private List<String> handleApplications(StringBuilder hql, List<NotificationPreference> preferences,
-            List<String> types, NotificationFormat format)
+            Set<String> types, NotificationFormat format)
     {
         List<String> apps = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
@@ -274,23 +293,37 @@ public class QueryGenerator
         return apps;
     }
 
-    private List<String> handleEventTypes(DocumentReference user, StringBuilder hql,
+    /**
+     * For each notification preference of the given user, add a constraint on the events to
+     * - have one of the notification types that have been subscribed by the user;
+     * - have a date superior to the start date corresponding to this type;
+     * - match the custom defined user filters.
+     *
+     * @param user the current user
+     * @param hql the query
+     * @param preferences a list of the user preferences
+     * @param format the format of event that we want to retrieve
+     * @return a Map containing the event types in keys and their corresponding start dates as values
+     * @throws NotificationException if an error occurred
+     */
+    private Map<String, Date> handleEventPreferences(DocumentReference user, StringBuilder hql,
             List<NotificationPreference> preferences, NotificationFormat format) throws NotificationException
     {
-        List<String> types = new ArrayList<>();
+        Map<String, Date> preferencesMap = new HashMap<>();
         for (NotificationPreference preference : preferences) {
             if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())
                     && format.equals(preference.getFormat())) {
-                types.add(preference.getEventType());
+                preferencesMap.put(preference.getEventType(), preference.getStartDate());
             }
         }
-        if (!types.isEmpty()) {
+        if (!preferencesMap.isEmpty()) {
             hql.append(LEFT_PARENTHESIS);
             String separator = "";
             int number = 0;
-            for (String type : types) {
+            for (String type : preferencesMap.keySet()) {
                 hql.append(separator);
-                hql.append(String.format("(event.type = :type_%d", number++));
+                hql.append(String.format("((event.type = :type_%d AND event.date >= :date_%d)", number, number));
+                number++;
                 handleFiltersOR(user, hql, format, type);
                 handleFiltersAND(user, hql, format, type);
                 hql.append(RIGHT_PARENTHESIS);
@@ -298,7 +331,7 @@ public class QueryGenerator
             }
             hql.append(RIGHT_PARENTHESIS);
         }
-        return types;
+        return preferencesMap;
     }
 
     private void handleWiki(DocumentReference user, Query query)

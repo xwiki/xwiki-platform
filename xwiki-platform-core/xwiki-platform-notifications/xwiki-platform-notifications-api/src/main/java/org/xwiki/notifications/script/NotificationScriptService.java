@@ -34,13 +34,16 @@ import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationManager;
+import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.notifications.NotificationRenderer;
 import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.notifications.rss.NotificationRSSManager;
@@ -80,6 +83,9 @@ public class NotificationScriptService implements ScriptService
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -250,7 +256,7 @@ public class NotificationScriptService implements ScriptService
     }
 
     /**
-     * Set the start date for the given user.
+     * Set the start date for every notification preference of the given user.
      *
      * @param userId id of the user
      * @param startDate the date before which we ignore notifications
@@ -294,6 +300,68 @@ public class NotificationScriptService implements ScriptService
                     this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
         } catch (FeedException e) {
             throw new NotificationException("Unable to render RSS feed", e);
+        }
+    }
+
+    /**
+     * Update a notification preference of the given user that matches the given eventType and notificationType to
+     * the given notificationStatus and the given startDate.
+     *
+     * @param eventType the type of the event
+     * @param applicationId the ID of the application concerned
+     * @param notificationFormat the format of the notification (see {@link NotificationFormat}
+     * @param notificationStatus the status (enabled / disabled) of the notification
+     * @param startDate the date from which the user should receive notifications of this type
+     * @throws NotificationException if an error occurs
+     *
+     * @since 9.7RC1
+     */
+    public void setNotificationPreferenceStatus(String eventType, String applicationId,
+            String notificationFormat, boolean notificationStatus,
+            Date startDate) throws NotificationException
+    {
+        NotificationFormat format = NotificationFormat.valueOf(notificationFormat.toUpperCase());
+
+        // Build the corresponding NotificationPreference object
+        NotificationPreference preference = new NotificationPreference(eventType, applicationId, notificationStatus,
+                format, startDate);
+
+        try {
+            this.modelBridge.saveNotificationPreference(documentAccessBridge.getCurrentUserReference(), preference);
+        } catch (NotificationException e) {
+            throw new NotificationException(String.format(
+                    "Unable to save the notification preferences for [%s] in [%s]", eventType, applicationId));
+        }
+    }
+
+    /**
+     * As {@link #setNotificationPreferenceStatus(String, String, String, boolean, Date)}, update the notification
+     * preference of a given user.
+     *
+     * @param userId the id of the user to edit
+     * @param eventType the type of the event
+     * @param applicationId the ID of the application concerned
+     * @param notificationFormat the format of the notification (see {@link NotificationFormat}
+     * @param notificationStatus the status (enabled / disabled) of the notification
+     * @param startDate the date from which the user should receive notifications of this type
+     * @throws NotificationException if an error occurs
+     *
+     * @since 9.7RC1
+     */
+    public void setNotificationPreferenceStatus(String userId, String eventType, String applicationId,
+            String notificationFormat, boolean notificationStatus, Date startDate) throws NotificationException
+    {
+        NotificationFormat format = NotificationFormat.valueOf(notificationFormat.toUpperCase());
+
+        NotificationPreference preference = new NotificationPreference(eventType, applicationId, notificationStatus,
+                format, startDate);
+
+        try {
+            this.modelBridge.saveNotificationPreference(this.documentReferenceResolver.resolve(userId), preference);
+        } catch (NotificationException e) {
+            throw new NotificationException(String.format(
+                    "Unable to save the notification preferences [%s] in [%s] for the user [%s]",
+                    eventType, applicationId, userId));
         }
     }
 }

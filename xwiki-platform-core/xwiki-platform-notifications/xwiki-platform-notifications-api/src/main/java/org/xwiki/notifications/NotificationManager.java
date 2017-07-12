@@ -105,13 +105,26 @@ public interface NotificationManager
     long getEventsCount(String userId, boolean onlyUnread, int maxCount) throws NotificationException;
 
     /**
-     * Set the start date for the given user.
+     * Set the start date for every notification preference of the given user.
      *
      * @param userId the id of the user
      * @param startDate the date before which we ignore notifications
      * @throws NotificationException if an error happens
      */
     void setStartDate(String userId, Date startDate) throws NotificationException;
+
+    /**
+     * Set the start date for a notification preference of the given user.
+     *
+     * @param userId the id of the user
+     * @param preference the concerned {@link NotificationPreference}
+     * @param startDate the date before which we ignore notifications
+     * @throws NotificationException if an error happens
+     *
+     * @since 9.7RC1
+     */
+    void setStartDateForPreference(String userId, NotificationPreference preference, Date startDate)
+            throws NotificationException;
 
     /**
      * @return the list of notifications preferences for the current user

@@ -160,26 +160,6 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void setStartDateForUser(DocumentReference userReference, NotificationPreference notificationPreference,
-            Date startDate) throws NotificationException
-    {
-        try {
-            XWikiContext context = contextProvider.get();
-            XWiki xwiki = context.getWiki();
-            XWikiDocument document =  xwiki.getDocument(userReference, context);
-
-            BaseObject object = this.findNotificationPreference(document, notificationPreference);
-            object.setDateValue(START_DATE_FIELD, startDate);
-
-            xwiki.saveDocument(document, NOTIFICATION_START_DATE_UPDATE_COMMENT, context);
-
-        } catch (Exception e) {
-            throw new NotificationException(
-                    String.format(SET_USER_START_DATE_ERROR_MESSAGE, userReference), e);
-        }
-    }
-
-    @Override
     public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
             NotificationFormat format) throws NotificationException
     {

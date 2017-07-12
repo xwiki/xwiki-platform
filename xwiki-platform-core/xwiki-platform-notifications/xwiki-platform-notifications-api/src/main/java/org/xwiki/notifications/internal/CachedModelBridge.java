@@ -82,14 +82,6 @@ public class CachedModelBridge implements ModelBridge
     }
 
     @Override
-    public void setStartDateForUser(DocumentReference userReference, NotificationPreference notificationPreference,
-            Date startDate) throws NotificationException
-    {
-        // Obviously, there is no possible cache here
-        modelBridge.setStartDateForUser(userReference, notificationPreference, startDate);
-    }
-
-    @Override
     public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
             NotificationFormat format) throws NotificationException
     {

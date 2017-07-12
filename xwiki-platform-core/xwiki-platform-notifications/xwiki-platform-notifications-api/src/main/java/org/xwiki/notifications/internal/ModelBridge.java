@@ -60,17 +60,6 @@ public interface ModelBridge
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
 
     /**
-     * Set the start date of the given NotificationPreference of the given user to the given startDate.
-     *
-     * @param userReference the document reference of a user
-     * @param notificationPreference the notification preference to edit
-     * @param startDate the date before which we ignore notifications
-     * @throws NotificationException if error happens
-     */
-    void setStartDateForUser(DocumentReference userReference, NotificationPreference notificationPreference,
-            Date startDate) throws NotificationException;
-
-    /**
      * Get all notification preference scope of the given user.
      *
      * @param user user interested in the notifications

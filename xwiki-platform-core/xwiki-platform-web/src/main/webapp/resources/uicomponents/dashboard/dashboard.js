@@ -501,6 +501,15 @@ XWiki.Dashboard = Class.create( {
       'id' : newId});
     // update the other containers - this is now the last column
     lastContainer.removeClassName('last-column');
+
+    // Update the columns container to display the columns in the right way.
+    // Compute the previous class name regarding the number of columns that we have currently and the new class name
+    var oldColumnsContainerClass = 'container-columns-' + (newIdNumber - 1);
+    var newColumnsContainerClass = 'container-columns-' + newIdNumber;
+    var containersContainer = lastContainer.parentNode;
+    containersContainer.addClassName(newColumnsContainerClass);
+    containersContainer.removeClassName(oldColumnsContainerClass);
+
     // add it in the DOM and in the containers list
     lastContainer.insert({'after' : newContainer});
     this.containers.push(newContainer);

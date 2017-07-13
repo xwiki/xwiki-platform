@@ -228,7 +228,9 @@ public class DefaultModelBridge implements ModelBridge
                 // Ensure that we’re dealing with the correct event type
                 BaseObject object = it.next();
                 if (object != null
-                        && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))) {
+                        && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))
+                        && notificationPreference.getApplicationId().equals(
+                                object.getStringValue(APPLICATION_ID_FIELD))) {
                     String format = object.getStringValue(FORMAT_FIELD);
 
                     // Ensure that we have the correct notification format
@@ -285,7 +287,7 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            // Try to find the corresponding XObject for the notfication preference
+            // Try to find the corresponding XObject for the notification preference
             BaseObject preferenceObject = this.findNotificationPreference(document, notificationPreference);
 
             // If the object exists, update it

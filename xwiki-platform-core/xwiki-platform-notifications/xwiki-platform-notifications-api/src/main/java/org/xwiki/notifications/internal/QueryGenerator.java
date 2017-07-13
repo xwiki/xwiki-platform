@@ -21,7 +21,7 @@ package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +81,30 @@ public class QueryGenerator
     private NotificationFilterManager notificationFilterManager;
 
     /**
+     * Class used to store the property of an event used in the query.
+     *
+     * @since 9.7RC1
+     */
+    private class EventProperty
+    {
+        private String eventType;
+
+        private Date startDate;
+
+        /**
+         * Constructs a new {@link EventProperty}.
+         *
+         * @param eventType the type of the event
+         * @param startDate the start date of the event
+         */
+        EventProperty(String eventType, Date startDate)
+        {
+            this.eventType = eventType;
+            this.startDate = startDate;
+        }
+    }
+
+    /**
      * Generate the query.
      *
      * @param user user interested in the notifications
@@ -114,12 +138,18 @@ public class QueryGenerator
         }
         hql.append(LEFT_PARENTHESIS);
 
-        Map<String, Date> preferencesMap = handleEventPreferences(user, hql, preferences, format);
-        List<String> apps  = handleApplications(hql, preferences, preferencesMap.keySet(), format);
+        List<EventProperty> propertyList = handleEventPreferences(user, hql, preferences, format);
+        Set<String> eventTypes = new HashSet<>();
+        for (EventProperty property : propertyList)
+        {
+            eventTypes.add(property.eventType);
+        }
+
+        List<String> apps  = handleApplications(hql, preferences, eventTypes, format);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
-        if (preferences.isEmpty() || (preferencesMap.isEmpty() && apps.isEmpty())) {
+        if (preferences.isEmpty() || (propertyList.isEmpty() && apps.isEmpty())) {
             return null;
         }
 
@@ -140,7 +170,7 @@ public class QueryGenerator
             query.bindValue("startDate", startDate);
         }
         query.bindValue("user", serializer.serialize(user));
-        handleEventPreferences(preferencesMap, query);
+        handleEventPreferences(propertyList, query);
         handleApplications(apps, query);
         handleBlackList(blackList, query);
         handleEndDate(endDate, query);
@@ -262,17 +292,17 @@ public class QueryGenerator
 
     /**
      * Bind the event preferences parameters to the query. Those parameters are usually declared in
-     * {@link #handleEventPreferences(Map, Query)}.
+     * {@link #handleEventPreferences(DocumentReference, StringBuilder, List, NotificationFormat)}..
      *
-     * @param preferencesMap A map containing an event type as a key, and the start date of this event type as value
+     * @param propertyList A list of {@link EventProperty}
      * @param query the query
      */
-    private void handleEventPreferences(Map<String, Date> preferencesMap, Query query)
+    private void handleEventPreferences(List<EventProperty> propertyList, Query query)
     {
         int number = 0;
-        for (String type : preferencesMap.keySet()) {
-            query.bindValue(String.format("type_%d", number), type);
-            query.bindValue(String.format("date_%d", number), preferencesMap.get(type));
+        for (EventProperty property : propertyList) {
+            query.bindValue(String.format("type_%d", number), property.eventType);
+            query.bindValue(String.format("date_%d", number), property.startDate);
             number++;
         }
     }
@@ -306,32 +336,32 @@ public class QueryGenerator
      * @return a Map containing the event types in keys and their corresponding start dates as values
      * @throws NotificationException if an error occurred
      */
-    private Map<String, Date> handleEventPreferences(DocumentReference user, StringBuilder hql,
+    private List<EventProperty> handleEventPreferences(DocumentReference user, StringBuilder hql,
             List<NotificationPreference> preferences, NotificationFormat format) throws NotificationException
     {
-        Map<String, Date> preferencesMap = new HashMap<>();
+        List<EventProperty> propertyList = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
             if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())
                     && format.equals(preference.getFormat())) {
-                preferencesMap.put(preference.getEventType(), preference.getStartDate());
+                propertyList.add(new EventProperty(preference.getEventType(), preference.getStartDate()));
             }
         }
-        if (!preferencesMap.isEmpty()) {
+        if (!propertyList.isEmpty()) {
             hql.append(LEFT_PARENTHESIS);
             String separator = "";
             int number = 0;
-            for (String type : preferencesMap.keySet()) {
+            for (EventProperty property : propertyList) {
                 hql.append(separator);
                 hql.append(String.format("((event.type = :type_%d AND event.date >= :date_%d)", number, number));
                 number++;
-                handleFiltersOR(user, hql, format, type);
-                handleFiltersAND(user, hql, format, type);
+                handleFiltersOR(user, hql, format, property.eventType);
+                handleFiltersAND(user, hql, format, property.eventType);
                 hql.append(RIGHT_PARENTHESIS);
                 separator = OR;
             }
             hql.append(RIGHT_PARENTHESIS);
         }
-        return preferencesMap;
+        return propertyList;
     }
 
     private void handleWiki(DocumentReference user, Query query)

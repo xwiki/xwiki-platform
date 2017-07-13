@@ -223,10 +223,7 @@ public class DefaultModelBridge implements ModelBridge
         List<BaseObject> objects = xWikiDocument.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
 
         if (objects != null) {
-            Iterator<BaseObject> it = objects.iterator();
-            while (it.hasNext()) {
-                // Ensure that we’re dealing with the correct event type
-                BaseObject object = it.next();
+            for (BaseObject object : objects)
                 if (object != null
                         && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))
                         && notificationPreference.getApplicationId().equals(

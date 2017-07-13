@@ -74,105 +74,107 @@
         &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.email'))&lt;/th&gt;
         #set ($colsCount = 3)
       #end
+      &lt;td&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
-    #set ($types = [])
-    #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-      #set ($discard = $types.add({
-        'applicationName' : "$!services.localization.render($descriptor.applicationName)",
-        'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
-        'description'     : "$!services.localization.render($descriptor.description)",
-        'eventType'       : "$!descriptor.eventType",
-        'filter'          : "$!descriptor.filter",
-        'applicationId'   : "$!descriptor.applicationId"
-      }))
+  ##
+  ## Get all event types and group them by applications
+  ##
+  #set ($types = [])
+  #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+    #set ($discard = $types.add({
+      'applicationName' : "$!services.localization.render($descriptor.applicationName)",
+      'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
+      'description'     : "$!services.localization.render($descriptor.description)",
+      'eventType'       : "$!descriptor.eventType",
+      'filter'          : "$!descriptor.filter",
+      'applicationId'   : "$!descriptor.applicationId"
+    }))
+  #end
+  #set ($apps = [])
+  #set ($lastAppId = '')
+  #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
+    #if ($lastAppId != $type.applicationId)
+      #set ($lastAppId = $type.applicationId)
+      #set ($lastApp = [])
+      #set ($discard = $apps.add($lastApp))
     #end
-    #set ($lastApp = '')
-    #set ($appClass = "appOdd")
-    #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
-      #if ($lastApp != $type.applicationName)
-        #if ($velocityCount &gt; 1)
-        &lt;/tbody&gt;
-        #end
-        #set ($lastApp = $type.applicationName)
-        &lt;thead id="app${lastApp}head" class="$appClass"&gt;
-        &lt;tr class="rowApp"&gt;
-          &lt;th style="vertical-align: top;"&gt;
-            $type.applicationIcon $escapetool.xml($type.applicationName)
-          &lt;/th&gt;
-            #displayPreferenceForApp($type.applicationId, 'alert')
-            #if ($services.notification.areEmailsEnabled())
-              #displayPreferenceForApp($type.applicationId, 'email')
-            #end
-          &lt;td&gt;
-            &lt;button class="btn btn-default btn-sm" data-toggle="collapse" data-target="#app${lastApp}"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
-          &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody id="app${lastApp}" class="collapse $appClass"&gt;
-        #if ($appClass == 'appOdd')
-          #set ($appClass = 'appEven')
-        #else
-          #set ($appClass = 'appOdd')
-        #end
-      #end
+    #set ($discard = $lastApp.add($type))
+  #end
+  ##
+  ## Display all applications
+  ##
+  #set ($appClass = "appOdd")
+  #foreach ($app in $apps)
+    #set ($type = $app[0])
+    &lt;tbody class="applicationElem $appClass" data-applicationid="$escapetool.xml($type.applicationId)"&gt;
+      ##
+      ## Display the application row
+      ##
       &lt;tr&gt;
-        &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
-        #displayPreference($type, 'alert')
+        ## Application Name and Icon
+        &lt;th style="vertical-align: top;"&gt;
+          $type.applicationIcon $escapetool.xml($type.applicationName)
+        &lt;/th&gt;
+        ## Alert switch
+        &lt;td class="notificationAppCell loading" data-format="alert"&gt;
+          &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
+        &lt;/td&gt;
+        ## Email switch
         #if ($services.notification.areEmailsEnabled())
-          #displayPreference($type, 'email')
+          &lt;td class="notificationAppCell loading" data-format="email"&gt;
+            &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
+          &lt;/td&gt;
         #end
-        &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-    #end
-    &lt;/tbody&gt;
-    #if ($services.notification.areEmailsEnabled())
-    &lt;tfoot&gt;
-      &lt;tr&gt;
-        &lt;td&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;/td&gt;
+        ## Collapse button
         &lt;td&gt;
-          #set ($interval = 'daily')
-          #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
-          #if ("$!objInterval" != '')
-            #set ($interval = $objInterval.getValue('interval'))
+          &lt;button class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      ##
+      ## Display all events of this application
+      ##
+      #foreach($type in $app)
+        &lt;tr class="rowEventType hidden" data-eventtype="$type.eventType"&gt;
+          &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
+          #displayPreference($type, 'alert')
+          #if ($services.notification.areEmailsEnabled())
+            #displayPreference($type, 'email')
           #end
-          &lt;select class="notificationEmailInterval"&gt;
-            &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
-            &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
-            &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
-          &lt;/select&gt;
-        &lt;/td&gt;
-        &lt;td&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    &lt;/tfoot&gt;
+          &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+      #end
+    &lt;/tbody&gt;
+    #if ($appClass == 'appOdd')
+      #set ($appClass = 'appEven')
+    #else
+      #set ($appClass = 'appOdd')
     #end
-  &lt;/tbody&gt;
+  #end
+  #if ($services.notification.areEmailsEnabled())
+  &lt;tfoot&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;/td&gt;
+      &lt;td&gt;
+        #set ($interval = 'daily')
+        #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+        #if ("$!objInterval" != '')
+          #set ($interval = $objInterval.getValue('interval'))
+        #end
+        &lt;select class="notificationEmailInterval"&gt;
+          &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
+          &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
+          &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/td&gt;
+      &lt;td&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tfoot&gt;
+  #end
 &lt;/table&gt;
 {{/html}}
 )))
-#**
- * Display a preference button for an event type and a given format
- *#
-#macro(displayPreferenceForApp $app $format)
-  #set ($checked = '')
-  #set ($preference = '')
-  #foreach ($pref in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceClass'))
-    #if (($pref.getValue('format') == $format || ($format == 'alert' &amp;&amp; "$!pref.getValue('format')" == '')) &amp;&amp; $pref.getValue('applicationId') == $app)
-      #set ($preference = $pref)
-      #if ($pref.getValue('notificationEnabled') == 1)
-        #set ($checked = 'checked="checked"')
-      #end
-    #end
-  #end
-  &lt;td class="notificationAppCell loading" data-applicationid="$!escapetool.xml($type.applicationId)" data-format="$format" data-objnumber="$!preference.number"&gt;
-    &lt;div class="hidden"&gt;
-      &lt;input type="checkbox" class="notificationAppCheckbox" $checked/&gt;
-      ##displayScopeLivetable($app, "", $format)
-    &lt;/div&gt;
-  &lt;/td&gt;
-#end
 #**
  * Display a preference button for an event type and a given format
  *#
@@ -187,7 +189,7 @@
       #end
     #end
   #end
-  &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-applicationid="$!escapetool.xml($type.applicationId)" data-format="$format" data-objnumber="$!preference.number" data-filter="${type.filter}"&gt;
+    &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-objnumber="$!preference.number" data-filter="${type.filter}"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
       #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
@@ -216,7 +218,7 @@
     #end
     #set ($showTerminalDocuments = ($filterType == 'WIKI_SPACE_AND_DOCUMENT_FILTER'))
     &lt;p&gt;
-      &lt;button class="btn btn-xs btn-default" data-target="#modal-${eventType}-${format}" data-toggle="modal"&gt;
+      &lt;button class="btn btn-xs btn-default filterButton" data-target="#modal-${eventType}-${format}" data-toggle="modal"&gt;
         $services.localization.render('notifications.settings.filters', ["&lt;span class='notificationPreferenceScopeCount'&gt;$count&lt;/span&gt;"])
       &lt;/button&gt;
     &lt;/p&gt;
@@ -346,7 +348,8 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/**
+      <code>'use strict';
+/**
  * Start the requirejs config.
  */
 require.config({
@@ -360,152 +363,670 @@ require.config({
 /**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm) {
-  'use strict';
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
 
   /**
-   * Enable or disable some DOM elemnts.
+   * Page initialization
    */
-  var enableDOMElements = function (elements, enable) {
-    elements.css('pointer-events', enable ? 'auto' : 'none').css('opacity', enable ? 1.0 : 0.4);
-  };
+  $(document).ready(function() {
 
-  /**
-   * Disable all filters where the event type is not enabled
-   */
-  $('.notificationTypeCheckbox').each(function () {
-    var checkBox = $(this);
-    if (!checkBox.attr('checked')) {
-      enableDOMElements(checkBox.parents('td').find('button'), false);
-    }
-  });
+    var applications = [];
 
-  /**
-   * Enable bootstrap switch.
-   */
-  $('.notificationTypeCheckbox').bootstrapSwitch({
-    size: 'mini',
-    labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
-  });
-  $('.notificationAppCheckbox').bootstrapSwitch({
-    size: 'small',
-    labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
-  });
+    // Create application widgets
+    $('.applicationElem').each(function() {
+      applications.push(new ApplicationWidget($(this)));
+    });
 
-  /**
-   * Called when the user enable or disable an event type.
-   */
-  $('.notificationTypeCheckbox, .notificationAppCheckbox').on('switchChange.bootstrapSwitch', function (event, state) {
-    // Getting info
-    var input        = $(this);
-    var inputIsApp   = input.hasClass('notificationAppCheckbox');
-    var td           = input.parents('td.notificationTypeCell, td.notificationAppCell');
-    var appId        = td.attr('data-applicationid');
-    var eventType    = td.attr('data-eventtype');
-    var objNumber    = td.attr('data-objnumber');
-    var format       = td.attr('data-format');
-
-    // Change the state of the filter container
-    enableDOMElements(td.find('button'), state);
-
-    // Saving
-    var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-    if (objNumber == '' &amp;&amp; state) {
-      // If the object does not exist yet, create it
-      var restURL = xm.restURL + '/objects?media=json';
-      var params = {
-        'className': 'XWiki.Notifications.Code.NotificationPreferenceClass',
-        'property#format': format,
-        'property#notificationEnabled': 1
-      };
-      if (inputIsApp) {
-        params['property#applicationId'] = appId;
-      } else {
-        params['property#eventType'] = eventType;
+    /**
+     * Save the current settings
+     */
+    var save = function() {
+      var data = [];
+      for (var i = 0; i &lt; applications.length; ++i) {
+        for (var j = 0; j &lt; applications[i].eventTypes.length; j++) {
+          data.push({
+            eventType: applications[i].eventTypes[j].eventType,
+            format: 'alert',
+            enabled: applications[i].eventTypes[j].getAlertState()
+          });
+          data.push({
+            eventType: applications[i].eventTypes[j].eventType,
+            format: 'email',
+            enabled: applications[i].eventTypes[j].getEmailState()
+          });
+        }
       }
-      $.post(restURL, params).done(function (data) {
-        td.attr('data-objnumber', data.number);
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function () {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+      var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
+      $.post(url, {
+        action: 'savePreferences',
+        json: JSON.stringify(data)
+      }).done(function(data){
+        console.log(data);
       });
-    } else if (objNumber != '') {
-      // If the object already exist, just update its value
-      var restURL = xm.restURL + '/objects/XWiki.Notifications.Code.NotificationPreferenceClass/' + objNumber
-        + '/properties/notificationEnabled?media=json';
-      $.ajax(restURL, {
-        method: 'PUT',
-        contentType: 'text/plain',
-        data: state ? '1' : '0'
+    };
+
+    /**
+     * Several changes can be received very closely (for example, when several switches are updated in the same time),
+     * so we save only the last received event.
+     * For that we postpone the save action (300ms is clone enought for the user) and we cancel it if an other event
+     * happens in the meantime.
+     */
+    var nextSave = 0;
+    $(document).on('switchChange.bootstrapSwitch', function(event, state) {
+      if (nextSave != 0) {
+        clearTimeout(nextSave);
+      }
+      nextSave = setTimeout(save, 300);
+    });
+
+    // Disable the "loading" screens
+    $('td.notificationTypeCell, td.notificationAppCell').each(function(){
+      $(this).find('.hidden').removeClass('hidden');
+      $(this).removeClass('loading');
+    });
+
+    /**
+     * Handle the livetable 'delete' action
+     */
+    var handleFilterLivetableDelete = function (event) {
+      event.preventDefault();
+      var link = $(this);
+      var livetable = window['livetable_' + link.parents('.xwiki-livetable').attr('id')];
+      var filter = $(this).parents('.notificationPreferenceScopeContainer').parent().find('.notificationPreferenceScopeCount');
+      // Ask a confirmation
+      new XWiki.widgets.ConfirmationBox({
+        onYes: function() {
+          // Delete on confirmation
+          // This is done thanks to a REST URL with the "delete" action
+          $.ajax(link.attr('href'), {
+            type: 'DELETE'
+          }).done(function() {
+            // Reload the livetable
+            livetable.refresh();
+            filter.text(parseInt(filter.text()) - 1);
+          });
+        }
+      });
+      // Avoid conflict between bootstrap and XWiki modals
+      $('.xdialog-modal-container').css('z-index', 100000);
+    };
+    $(document).on('xwiki:livetable:newrow', function (event, data) {
+      $(data.row).find('a.actiondelete').click(handleFilterLivetableDelete);
+    });
+    $('.notificationPreferenceScopeContainer .xwiki-livetable a.actiondelete').click(handleFilterLivetableDelete);
+
+    /**
+     * Handle the notification email interval
+     */
+    $('.notificationEmailInterval').change(function () {
+      var intervalSelect = $(this);
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      $.post(serviceURL, {
+        'interval': intervalSelect.val()
       }).done(function (data) {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function () {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
-    }
-  });
+    });
 
+    /**
+     * Disable the "loading" screens
+     */
+    $('td.notificationTypeCell').each(function(){
+      $(this).find('&gt; div.hidden').removeClass('hidden');
+      $(this).removeClass('loading');
+    });
+
+  });
+});
+</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>a0f40a59-e61d-46b0-9c37-bea6331cec7a</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('EventTypeWidget', ['jquery', 'EventTypeFilter', 'xwiki-meta', 'bootstrap-switch'], function($, EventTypeFilter, xm) {
   /**
-   * Handle the livetable 'delete' action
-   */
-  var handleFilterLivetableDelete = function (event) {
-    event.preventDefault();
-    var link = $(this);
-    var livetable = window['livetable_' + link.parents('.xwiki-livetable').attr('id')];
-    var filter = $(this).parents('.notificationPreferenceScopeContainer').parent().find('.notificationPreferenceScopeCount');
-    // Ask a confirmation
-    new XWiki.widgets.ConfirmationBox({
-      onYes: function() {
-        // Delete on confirmation
-        // This is done thanks to a REST URL with the "delete" action
-        $.ajax(link.attr('href'), {
-          type: 'DELETE'
-        }).done(function() {
-          // Reload the livetable
-          livetable.refresh();
-          filter.text(parseInt(filter.text()) - 1);
+  * Construct an EventTypeWidget.
+  */
+  return function(domElement, application) {
+    var self               = this;
+    self.domElement        = domElement;
+    self.application       = application;
+    self.eventType         = domElement.attr('data-eventtype');
+    self.cellAlert         = domElement.find('.notificationTypeCell[data-format="alert"]');
+    self.cellEmail         = domElement.find('.notificationTypeCell[data-format="email"]');
+    self.switchAlert       = self.cellAlert.find('.notificationTypeCheckbox');
+    self.switchEmail       = self.cellEmail.find('.notificationTypeCheckbox');
+    self.alertObjectNumber = self.cellAlert.attr('data-objnumber');
+    self.emailObjectNumber = self.cellEmail.attr('data-objnumber');
+    self.filterAlert       = new EventTypeFilter(self, 'alert');
+    self.filterEmail       = new EventTypeFilter(self, 'email');
+
+    /**
+     * Initialization
+     */
+    self.init = function () {
+      // Replace the 'hidden' class by a call to jQuery.hide();
+      self.domElement.removeClass('hidden').hide();
+      // Enable bootstrap switches
+      $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
+        size: 'mini',
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
+      });
+      // On change
+      $(self.switchAlert).on('switchChange.bootstrapSwitch', function(event, state) {
+        self.application.updateSwitches();
+        self.filterAlert.setState(state);
+        setTimeout(function() { self.save('alert', state); }, 1);
+      });
+      $(self.switchEmail).on('switchChange.bootstrapSwitch', function(event, state) {
+        self.application.updateSwitches();
+        self.filterEmail.setState(state);
+        setTimeout(function() { self.save('email', state); }, 1);
+      });
+      // Set event filter widget state
+      self.filterAlert.setState(self.getAlertState());
+      self.filterEmail.setState(self.getEmailState());
+    };
+
+    /**
+     * Get the state of the alert switch
+     */
+    self.getAlertState = function() {
+      return self.switchAlert.bootstrapSwitch('state');
+    };
+
+    /**
+     * Get the state of the email switch
+     */
+    self.getEmailState = function() {
+      return self.switchEmail.bootstrapSwitch('state');
+    };
+
+    /**
+     * Set the state of the alert switch
+     */
+    self.setAlertState = function (state) {
+      self.switchAlert.bootstrapSwitch('state', state);
+    };
+
+    /**
+     * Set the state of the email switch
+     */
+    self.setEmailState = function (state) {
+      self.switchEmail.bootstrapSwitch('state', state);
+    };
+
+    /**
+     * Hide/Show the event type widget
+     */
+    self.toggleVisibility = function () {
+      self.domElement.toggle();
+    };
+
+    /**
+     * Save the preference
+     */
+    self.save = function(format, state) {
+      return;
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+      var cell = format == 'alert' ? self.cellAlert : self.cellEmail;
+      var objNumber = cell.attr('data-objnumber');
+      if (objNumber == '' &amp;&amp; state) {
+        // If the object does not exist yet, create it
+        var restURL = xm.restURL + '/objects?media=json';
+        var params = {
+          'className': 'XWiki.Notifications.Code.NotificationPreferenceClass',
+          'property#format': format,
+          'property#notificationEnabled': 1
+        };
+        params['property#eventType'] = self.eventType;
+        $.post(restURL, params).done(function (data) {
+          cell.attr('data-objnumber', data.number);
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        });
+      } else if (objNumber != '') {
+        // If the object already exist, just update its value
+        var restURL = xm.restURL + '/objects/XWiki.Notifications.Code.NotificationPreferenceClass/' + objNumber
+          + '/properties/notificationEnabled?media=json';
+        $.ajax(restURL, {
+          method: 'PUT',
+          contentType: 'text/plain',
+          data: state ? '1' : '0'
+        }).done(function (data) {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
       }
-    });
-    // Avoid conflict between bootstrap and XWiki modals
-    $('.xdialog-modal-container').css('z-index', 100000);
-  };
-  $(document).on('xwiki:livetable:newrow', function (event, data) {
-    $(data.row).find('a.actiondelete').click(handleFilterLivetableDelete);
-  });
-  $('.notificationPreferenceScopeContainer .xwiki-livetable a.actiondelete').click(handleFilterLivetableDelete);
+    };
 
+    // Call init
+    self.init();
+  };
+});
+</code>
+    </property>
+    <property>
+      <name>Event Type Widget</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>d0c80940-3537-47c3-9aa8-090e7bd74b57</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'bootstrap-switch'], function($, EventTypeWidget) {
   /**
-   * Make the location picker effective
+   * Construct an application widget.
    */
-  $('.notificationPreferenceScopeContainer').each(function() {
-    var scope       = $(this);
-    var cell        = scope.parents('.notificationTypeCell');
-    var pickerModal = scope.find('.documentPickerModal &gt; .modal');
-    // Open the location picker
-    scope.find('.btn-addfilter').click(function(event) {
-      pickerModal.modal('show');
-      pickerModal.find('.location-tree').xtree();
-      pickerModal.find('.modal-footer button.btn-primary').each(function() {
-        $(this).prop('disabled', 'disabled');
+  return function(domElement) {
+
+    var self             = this;
+    self.domElement      = domElement;
+    self.applicationId   = domElement.attr('data-applicationid');
+    self.cellAlert       = domElement.find('.notificationAppCell[data-format="alert"]');
+    self.cellEmail       = domElement.find('.notificationAppCell[data-format="email"]');
+    self.switchAlert     = self.cellAlert.find('.notificationAppCheckbox');
+    self.switchEmail     = self.cellEmail.find('.notificationAppCheckbox');
+    self.collapseButton  = domElement.find('.collapseButton');
+    self.eventTypes      = [];
+
+    /**
+     * Initialization
+     */
+    self.init = function () {
+      // Creates event type widgets for this application
+      self.domElement.find('.rowEventType').each(function() {
+        self.eventTypes.push(new EventTypeWidget($(this), self));
       });
-    });
-    // Enable the "select" button when a selection is made on the tree.
-    pickerModal.find('.location-tree').on('changed.jstree', function(e, data) {
-      if (data.selected.length &gt; 0) {
-        pickerModal.find('.modal-footer button.btn-primary').prop('disabled', '');
+      // Enable bootstrap switch.
+      $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
+        size: 'small',
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
+      });
+      // Set initial state for the switches
+      self.updateSwitches();
+      self.updateTypesOnChange = true;
+      // Handle collapsing
+      self.collapseButton.click(function() {
+        for (var i = 0; i &lt; self.eventTypes.length; ++i) {
+          self.eventTypes[i].toggleVisibility();
+        }
+      });
+      // Handle switch change
+      self.switchAlert.on('switchChange.bootstrapSwitch', function(event, state) {
+        for (var i = 0; i &lt; self.eventTypes.length; ++i) {
+          self.eventTypes[i].setAlertState(state);
+        }
+      });
+      self.switchEmail.on('switchChange.bootstrapSwitch', function(event, state) {
+        for (var i = 0; i &lt; self.eventTypes.length; ++i) {
+          self.eventTypes[i].setEmailState(state);
+        }
+      });
+    };
+
+    /**
+     * Set the switch states according to their event type
+     */
+    self.updateSwitches = function() {
+      var allAlertsOn = true;
+      var allAlertsOff = true;
+      var allEmailsOn = true;
+      var allEmailsOff = true;
+      for (var i = 0; i &lt; self.eventTypes.length; ++i) {
+        var eventType = self.eventTypes[i];
+        allAlertsOn  &amp;=  eventType.getAlertState();
+        allAlertsOff &amp;= !eventType.getAlertState();
+        allEmailsOn  &amp;=  eventType.getEmailState();
+        allEmailsOff &amp;= !eventType.getEmailState();
       }
-    });
-    // Callback called when the "select" button is clicked
-    pickerModal.find('.modal-footer button.btn-primary').click(function() {
-      pickerModal.modal('hide');
-      var tree = $.jstree.reference(pickerModal.find('.location-tree'));
+      if (allAlertsOn) {
+        self.switchAlert.bootstrapSwitch('state', true);
+      } else if (allAlertsOff) {
+        self.switchAlert.bootstrapSwitch('state', false);
+      } else {
+        self.switchAlert.bootstrapSwitch('indeterminate', true);
+      }
+      if (allEmailsOn) {
+        self.switchEmail.bootstrapSwitch('state', true);
+      } else if (allEmailsOff) {
+        self.switchEmail.bootstrapSwitch('state', false);
+      } else {
+        self.switchEmail.bootstrapSwitch('indeterminate', true);
+      }
+    };
+
+    // Call to init()
+    self.init();
+  };
+});
+</code>
+    </property>
+    <property>
+      <name>Application Widget</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>3</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>6a8f036c-8c5d-4307-8a17-fc9d732f0b79</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('EventTypeFilter', ['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, xm) {
+  /**
+   * Construct an event type filter
+   */
+  return function(eventTypeWidget, format) {
+    var self              = this;
+    self.eventTypeWidget  = eventTypeWidget;
+    self.format           = format;
+    self.cell             = self.eventTypeWidget.domElement.find('.notificationTypeCell[data-format="'+format+'"]');
+    self.filterType       = self.cell.attr('data-filter');
+    self.container        = self.cell.find('.notificationPreferenceScopeContainer');
+    self.button           = self.container.find('.filterButton');
+    self.buttonAddFilter  = self.container.find('.btn-addfilter');
+    self.livetableModal   = self.container.find('&gt; .modal');
+    self.pickerModal      = self.container.find('.documentPickerModal &gt; .modal');
+
+    /**
+     * Initialization
+     */
+    self.init = function () {
+      // Open the location picker
+      self.buttonAddFilter.click(function() {
+        self.pickerModal.modal('show');
+        self.pickerModal.find('.location-tree').xtree();
+        self.pickerModal.find('.modal-footer button.btn-primary').each(function() {
+          $(this).prop('disabled', 'disabled');
+        });
+      });
+      // Enable the "select" button when a selection is made on the tree.
+      self.pickerModal.find('.location-tree').on('changed.jstree', function(e, data) {
+        if (data.selected.length &gt; 0) {
+          self.pickerModal.find('.modal-footer button.btn-primary').prop('disabled', '');
+        }
+      });
+      // Callback called when the "select" button is clicked
+      self.pickerModal.find('.modal-footer button.btn-primary').click(self.onSelectButtonClicked);
+    };
+
+    /**
+     * Set the button is clickable or not
+     */
+    self.setState = function (state) {
+      self.button.css('pointer-events', state ? 'auto' : 'none').css('opacity', state ? 1.0 : 0.4);
+    };
+
+    /**
+     * On "select" button clicked
+     */
+    self.onSelectButtonClicked = function() {
+      self.pickerModal.modal('hide');
+      var tree = $.jstree.reference(self.pickerModal.find('.location-tree'));
       var nodes = tree.get_selected(true);
-      var filterType = cell.attr('data-filter');
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
         var scopeType = 'pageOnly';
@@ -518,7 +1039,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
           reference = reference.substring(0, reference.length - '.WebHome'.length);
         }
         // Don't save a preference scope if we expect to have a wiki and the selected data is a page
-        if (filterType == 'WIKI_FILTER' &amp;&amp; scopeType != 'wiki') {
+        if (self.filterType == 'WIKI_FILTER' &amp;&amp; scopeType != 'wiki') {
           // TODO: would be even better if the picker was not suggesting pages...
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.errorFilterWiki'))", 'error');
           continue;
@@ -528,17 +1049,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
         var restURL = xm.restURL + '/objects?media=json';
         $.post(restURL, {
           'className': 'XWiki.Notifications.Code.NotificationPreferenceScopeClass',
-          'property#eventType': cell.attr('data-eventtype'),
+          'property#eventType': self.eventTypeWidget.eventType,
           'property#scopeReference': reference,
           'property#scope': scopeType,
-          'property#format': cell.attr('data-format')
+          'property#format': self.format
         }).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
           // Reload the livetable
-          window['livetable_' + scope.find('.xwiki-livetable').attr('id')].refresh();
+          window['livetable_' + self.container.find('.xwiki-livetable').attr('id')].refresh();
           // Update the filter count
-          var filter = scope.find('.notificationPreferenceScopeCount');
+          var filter = self.container.find('.notificationPreferenceScopeCount');
           var filterValue = parseInt(filter.text());
           filter.text(filterValue + 1);
         }).fail(function () {
@@ -546,54 +1067,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
       }
-    });
-  });
+    };
 
-  /**
-   * Handle the notification email interval
-   */
-  $('.notificationEmailInterval').change(function () {
-    var intervalSelect = $(this);
-    var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-    var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-    $.post(serviceURL, {
-      'interval': intervalSelect.val()
-    }).done(function (data) {
-      notification.hide();
-      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-    });
-  });
-
-  /**
-   * Disable all checkboxes where the application is enabled
-   */
-  var synchronizeTypeCheckboxWithAppCheckbox = function () {
-    var checkbox = $(this);
-    var td = checkbox.parents('td.notificationAppCell');
-    var appId = td.attr('data-applicationid');
-    var format = td.attr('data-format');
-    $('.notificationTypeCell').each(function() {
-      var cell = $(this);
-      if (cell.attr('data-applicationid') == appId &amp;&amp; cell.attr('data-format') == format) {
-        cell.find('input').bootstrapSwitch('disabled', checkbox.bootstrapSwitch('state'));
-      }
-    })
+    // Call init()
+    self.init();
   };
-  $('.notificationAppCheckbox').each(synchronizeTypeCheckboxWithAppCheckbox);
-  $('.notificationAppCheckbox').on('switchChange.bootstrapSwitch', synchronizeTypeCheckboxWithAppCheckbox);
 
-  /**
-   * Disable the "loading" screens
-   */
-  $('td.notificationTypeCell, td.notificationAppCell').each(function(){
-    $(this).find('&gt; div.hidden').removeClass('hidden');
-    $(this).removeClass('loading');
-  });
 });
 </code>
     </property>
     <property>
-      <name>JS</name>
+      <name>Event Type Filter</name>
     </property>
     <property>
       <parse>1</parse>

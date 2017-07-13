@@ -502,17 +502,18 @@ XWiki.Dashboard = Class.create( {
     // update the other containers - this is now the last column
     lastContainer.removeClassName('last-column');
 
+    // add it in the DOM and in the containers list
+    lastContainer.insert({'after' : newContainer});
+    this.containers.push(newContainer);
+
     // Update the columns container to display the columns in the right way.
     // Compute the previous class name regarding the number of columns that we have currently and the new class name
-    var oldColumnsContainerClass = 'container-columns-' + (newIdNumber - 1);
-    var newColumnsContainerClass = 'container-columns-' + newIdNumber;
+    var oldColumnsContainerClass = 'container-columns-' + (this.containers.length - 1);
+    var newColumnsContainerClass = 'container-columns-' + this.containers.length;
     var containersContainer = lastContainer.parentNode;
     containersContainer.addClassName(newColumnsContainerClass);
     containersContainer.removeClassName(oldColumnsContainerClass);
 
-    // add it in the DOM and in the containers list
-    lastContainer.insert({'after' : newContainer});
-    this.containers.push(newContainer);
     // make it draggable
     var containerIds = new Array();
     this.containers.each(function(container) {
@@ -521,12 +522,6 @@ XWiki.Dashboard = Class.create( {
     // recreate the drag & drops, to take into account the new added container as well. Re-create all because they all
     // need to take into account the new one
     this.createDragAndDrops();
-    // insert the css element in the head of this document, to update the columns css to one more column
-    var linkElement = new Element('link',
-        {'href' : '$xwiki.getSkinFile("uicomponents/container/columns.css", true)' + '?columns=' + this.containers.length,
-         'type' : 'text/css',
-         'rel' : 'stylesheet'}
-    );
     // get the head element and insert the new css link element at the end
     var headElt = $(document.getElementsByTagName('head')[0]);
     headElt.insert(linkElement);

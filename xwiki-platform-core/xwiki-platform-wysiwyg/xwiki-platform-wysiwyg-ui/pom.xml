@@ -37,14 +37,6 @@
   </properties>
   <dependencies>
     <dependency>
-      <!-- For document and class sheet binding -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-sheet-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <!-- The administration section is defined using ConfigurableClass -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>

@@ -22,8 +22,6 @@ var XWiki = (function(XWiki) {
 var widgets = XWiki.widgets = XWiki.widgets || {};
 /**
  * Full screen editing for textareas or maximizable elements.
- *
- * TODO Revisit once the new WYSIWYG supports inline editing.
  */
 widgets.FullScreen = Class.create({
   // Some layout settings, to be customized for other skins
@@ -71,12 +69,6 @@ widgets.FullScreen = Class.create({
         }.bind(this));
       }.bind(this));
     }.bind(this));
-    // The GWT editor removes the textarea from the document, thus should be treated separately
-    $$('.xRichTextEditor').each(function(item) {
-      this.addBehavior(item);
-    }.bind(this));
-    // WYSIWYGR sends events when a new editor is created.
-    this.addWysiwygListeners();
     // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
     // that full screen
     this.maximizedReference = $(document.body).down("input[name='x-maximized']");
@@ -92,12 +84,8 @@ widgets.FullScreen = Class.create({
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
-    if (this.isWysiwyg20Content(item)) {
-      this.addWysiwyg20ContentButton(item);
-    } else if (this.isWikiContent(item)) {
+    if (this.isWikiContent(item)) {
       this.addWikiContentButton(item);
-    } else if (this.isWysiwyg20Field(item)) {
-      this.addWysiwyg20FieldButton(item);
     } else if (this.isWikiField(item)) {
       this.addWikiFieldButton(item);
     } else {
@@ -105,40 +93,14 @@ widgets.FullScreen = Class.create({
       this.addElementButton(item);
     }
   },
-  addWysiwygListeners : function () {
-    document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
-  },
-  wysiwyg20Created : function(event) {
-    var item = $(event.memo.instance.getRichTextArea()).up(".xRichTextEditor");
-    this.removeTextareaLink(item);
-    this.addBehavior(item);
-  },
-  /* Remove the old maximize link inserted for the plain textarea before the WYSIWYG was loaded. */
-  removeTextareaLink : function(item) {
-    while (true) {
-      if (!item) {
-        return;
-      } else if (item.previous(".fullScreenEditLinkContainer")) {
-        item.previous(".fullScreenEditLinkContainer").remove();
-        return;
-      }
-      item = item.up();
-    }
-  },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {
     // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.name == 'content' && textarea.visible();
   },
-  isWysiwyg20Content : function (item) {
-    return item.hasClassName("xRichTextEditor") && item.up("div[id^=content_container]");
-  },
   isWikiField : function (textarea) {
     // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.visible();
-  },
-  isWysiwyg20Field : function (item) {
-    return item.hasClassName("xRichTextEditor") && !item.up("div[id^=content_container]");
   },
   /** Adds the fullscreen button in the Wiki editor toolbar. */
   addWikiContentButton : function (textarea) {
@@ -150,43 +112,11 @@ widgets.FullScreen = Class.create({
       this.addWikiFieldButton(textarea);
     }
   },
-  /** Adds the fullscreen button in the GWT WYSIWYGR editor menu. */
-  addWysiwyg20ContentButton : function (item) {
-    var toolbar = item.down(".gwt-MenuBar");
-    // Sometimes the toolbar isn't loaded when this method executes (in IE). Schedule a periodical reatempt.
-    if (!toolbar) {
-      // Only schedule once
-      if (!item._x_fullScreenLoader) {
-        item._x_fullScreenLoader_iterations = 0;
-        item._x_fullScreenLoader = new PeriodicalExecuter(function(item) {
-          // Give up after 20 seconds
-          if (item._x_fullScreenLoader_iteration > 100) {
-            item._x_fullScreenLoader.stop();
-            item._x_fullScreenLoader = false;
-            return;
-          }
-          item._x_fullScreenLoader_iteration++;
-          this.addWysiwyg20ContentButton(item);
-        }.bind(this, item), 0.2);
-      }
-      return false;
-    }
-    toolbar.insert({"top" : this.createOpenButton(item)});
-    item._toolbar = toolbar;
-    if (item._x_fullScreenLoader) {
-      item._x_fullScreenLoader.stop();
-      item._x_fullScreenLoader = false;
-    }
-    return true;
-  },
   addElementButton: function(element) {
     Element.insert(element, {before: this.createOpenLink(element)});
   },
   addWikiFieldButton : function (textarea) {
     Element.insert(textarea, {before: this.createOpenLink(textarea)});
-  },
-  addWysiwyg20FieldButton : function (textarea) {
-    this.addWysiwyg20ContentButton(textarea);
   },
   /** Creates a full screen activator button for the given element. */
   createOpenButton : function (targetElement) {
@@ -280,7 +210,7 @@ widgets.FullScreen = Class.create({
       } else if (targetElement.name) {
         this.maximizedReference.value = targetElement.tagName + "[name='" + targetElement.name + "']" ;
       } else if (targetElement.className) {
-        // No id, no name. This must be the GWT editor...
+        // No id, no name. This must be the WYSIWYG editor...
         this.maximizedReference.value = targetElement.tagName + "." + targetElement.className ;
       }
     }
@@ -297,18 +227,6 @@ widgets.FullScreen = Class.create({
       'width' : targetElement.style['width'],
       'height' : targetElement.style['height']
     };
-    if (targetElement.hasClassName("xRichTextEditor")) {
-      var iframe = targetElement.down(".gwt-RichTextArea");
-      // We store the original style of the rich text area on the editor element because the in-line frame used to
-      // implement the rich text area is renewed each time the rich text area is reloaded (e.g. when adding or editing a
-      // macro) to prevent the browser from adding a new history entry. The WYSIWYG editor could copy the JavaScript
-      // object properties whenever the in-line frame is cloned but it would have to filter some internal properties
-      // specific to GWT. Let's keep the hack here, for the moment. The code is not generic anyway.
-      targetElement._richTextAreaOriginalStyle = {
-        'width' : iframe.style['width'],
-        'height' : iframe.style['height']
-      };
-    }
     // All the elements between the targetElement and the root element are set to position: static, so that the offset
     // parent of the targetElement will be the window. Remember the previous settings in order to be able to restore the
     // layout when exiting fullscreen.
@@ -399,11 +317,6 @@ widgets.FullScreen = Class.create({
     Event.stopObserving(window, 'resize', this.resizeListener);
     // Restore the parent element (the wrapper)
     targetElement.up().removeClassName("fullScreenWrapper");
-    // Restore the WYSIWYGs
-    if (targetElement.hasClassName("xRichTextEditor")) {
-      var iframe = targetElement.down(".gwt-RichTextArea");
-      iframe.setStyle(targetElement._richTextAreaOriginalStyle);
-    }
 
     // Restore the previous layout
     // NOTE: We restore the previous layout in reverse order (from the document body down to the target element) to
@@ -478,10 +391,6 @@ widgets.FullScreen = Class.create({
     // Window height - margin (for the toolbar) - styling padding - buttons
     newHeight = newHeight - targetElement.positionedOffset().top - this.margin - this.buttons.getHeight();
     targetElement.setStyle({'width' :  newWidth + 'px', 'height' :  newHeight + 'px'});
-    // Resize the WYSIWYGs
-    if (targetElement.hasClassName("xRichTextEditor")) {
-      targetElement.down(".gwt-RichTextArea").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement.down(".xToolbar").getHeight() - targetElement.down(".gwt-MenuBar").getHeight() + 'px'});
-    }
     document.fire("xwiki:fullscreen:resized", { "target" : targetElement });
   },
   /** onMouseDown handler that prevents dragging the button. */

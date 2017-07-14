@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
+import org.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 

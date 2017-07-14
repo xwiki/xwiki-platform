@@ -35,7 +35,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
-import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
+import org.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**

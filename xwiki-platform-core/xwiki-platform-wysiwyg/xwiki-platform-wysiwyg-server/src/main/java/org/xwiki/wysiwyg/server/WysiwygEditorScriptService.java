@@ -78,9 +78,4 @@ public interface WysiwygEditorScriptService extends ScriptService
      * @return the annotated XHTML result of the conversion
      */
     String toAnnotatedXHTML(String source, String syntaxId);
-
-    /**
-     * @return the WYSIWYG editor configuration object
-     */
-    WysiwygEditorConfiguration getConfig();
 }

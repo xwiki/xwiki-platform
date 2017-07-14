@@ -35,10 +35,6 @@
   margin: 2px;
   float: right;
 }
-.gwt-MenuBar .fullScreenEditButton, .gwt-MenuBar .fullScreenCloseButton {
-  float: right;
-  margin: 5px;
-}
 
 #body .fullScreenWrapper {
   z-index: 5;
@@ -61,10 +57,6 @@
 
 * html .fullScreenWrapper {
   position: absolute !important;
-}
-/* Make sure gwt popup menus are visible in full screen: */
-.gwt-MenuBarPopup {
-  z-index: 12;
 }
 /* This overrides the pre behavior when the buttons end up as children of such a field */
 #body .fullScreenWrapper {

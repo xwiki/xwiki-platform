@@ -32,11 +32,8 @@
   <packaging>pom</packaging>
   <description>Parent POM for the WYSIWYG editor modules</description>
   <modules>
-    <module>xwiki-platform-wysiwyg-client</module>
-    <module>xwiki-platform-wysiwyg-plugin-api</module>
     <module>xwiki-platform-wysiwyg-server</module>
     <module>xwiki-platform-wysiwyg-ui</module>
-    <module>xwiki-platform-wysiwyg-war</module>
   </modules>
   <profiles>
     <profile>

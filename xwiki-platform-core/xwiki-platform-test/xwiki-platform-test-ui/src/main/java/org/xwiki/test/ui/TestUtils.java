@@ -2451,24 +2451,4 @@ public class TestUtils
             return resource;
         }
     }
-
-    /**
-     * Set the default WYSIWYG editor to GWT based one.
-     * 
-     * @since 9.5RC1
-     */
-    // FIXME: we really need to get rid of that need...
-    public void setGWTWYSIWYG() throws Exception
-    {
-        ObjectPropertyReference editorReference =
-            new ObjectPropertyReference("roleHint", new ObjectReference("XWiki.EditorBindingClass[0]",
-                new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences")));
-
-        Property property = new Property();
-        property.setValue("gwt");
-
-        TestUtils.assertStatusCodes(
-            rest().executePut(ObjectPropertyResource.class, property, rest().toElements(editorReference)), true,
-            STATUS_ACCEPTED);
-    }
 }

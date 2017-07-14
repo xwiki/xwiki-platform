@@ -50,48 +50,9 @@
           </configuration>
         </plugin>
         <plugin>
-          <!-- Default configuration for the GWT maven plugin -->
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>gwt-maven-plugin</artifactId>
-          <version>${gwt.maven.plugin.version}</version>
-          <!-- We declare these dependencies here in case we use different value for ${gwt.version} and
-               ${gwt.maven.plugin.version} variables.
-               See http://mojo.codehaus.org/gwt-maven-plugin/user-guide/using-different-gwt-sdk-version.html -->
-          <dependencies>
-            <dependency>
-              <groupId>com.google.gwt</groupId>
-              <artifactId>gwt-user</artifactId>
-              <version>${gwt.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>com.google.gwt</groupId>
-              <artifactId>gwt-dev</artifactId>
-              <version>${gwt.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <mode>htmlunit</mode>
-            <testTimeOut>600</testTimeOut>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>test</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <!--
-              We exclude the GWT client tests because of http://jira.codehaus.org/browse/SUREFIRE-508 (Cannot run
-              GWTTestCases with Surefire). GWT client tests are currently run by gwt-maven-plugin.
-            -->
-            <excludes>
-              <exclude>**/gwt/**/client/**/*.java</exclude>
-            </excludes>
             <systemProperties combine.children="append">
               <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
               <property>
@@ -114,19 +75,6 @@
               <version>${commons.version}</version>
             </dependency>
           </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>com.atlassian.maven.plugins</groupId>
-          <artifactId>clover-maven-plugin</artifactId>
-          <configuration>
-            <!--
-              Exclude GWT client code since otherwise it would mean they would get instrumented by Clover and GWT would
-              complain that it doesn't find the sources for Clover at runtime.
-            -->
-            <excludes>
-              <exclude>**/gwt/**/client/**/*.java</exclude>
-            </excludes>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>net.alchim31.maven</groupId>
@@ -273,7 +221,6 @@
     <module>xwiki-platform-flavor</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-groovy</module>
-    <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>
     <module>xwiki-platform-icon</module>
     <module>xwiki-platform-index</module>
@@ -340,25 +287,6 @@
       <modules>
         <module>xwiki-platform-legacy</module>
       </modules>
-    </profile>
-    <profile>
-      <!-- Allows running GWT tests manually -->
-      <id>gwt-test-manual</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>gwt-maven-plugin</artifactId>
-            <configuration>
-              <mode>manual</mode>
-              <productionMode>true</productionMode>
-              <style>DETAILED</style>
-              <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
-              <out>target/www-test -port 54321 -codeServerPort 12345</out>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>

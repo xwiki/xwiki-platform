@@ -27,14 +27,13 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
+import org.xwiki.wysiwyg.server.converter.HTMLConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 import org.xwiki.wysiwyg.server.WysiwygEditorScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -77,12 +76,6 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      */
     @Inject
     private HTMLConverter htmlConverter;
-
-    /**
-     * The component used to access the WYSIWYG editor configuration properties.
-     */
-    @Inject
-    private WysiwygEditorConfiguration editorConfiguration;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -184,12 +177,6 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
 
             setSecurityDocument(originalSecurityDocument);
         }
-    }
-
-    @Override
-    public WysiwygEditorConfiguration getConfig()
-    {
-        return this.editorConfiguration;
     }
 
     /**

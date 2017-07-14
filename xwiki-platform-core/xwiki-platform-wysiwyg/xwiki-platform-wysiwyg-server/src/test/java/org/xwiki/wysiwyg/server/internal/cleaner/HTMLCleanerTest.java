@@ -21,7 +21,7 @@ package org.xwiki.wysiwyg.server.internal.cleaner;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
+import org.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 
 /**
  * A generic JUnit test used by {@link HTMLCleanerTestSuite} to clean some passed HTML content and verify it matches

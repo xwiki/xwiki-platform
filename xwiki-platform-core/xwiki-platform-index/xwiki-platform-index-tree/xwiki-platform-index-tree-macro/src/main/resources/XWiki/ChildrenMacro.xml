@@ -171,7 +171,7 @@
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>navigation</defaultCategory>
+      <defaultCategory>Navigation</defaultCategory>
     </property>
     <property>
       <description>Displays a tree of children page of the current page</description>

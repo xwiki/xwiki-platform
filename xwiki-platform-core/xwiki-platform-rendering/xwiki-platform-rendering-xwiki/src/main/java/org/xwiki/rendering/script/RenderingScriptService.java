@@ -36,6 +36,10 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -45,6 +49,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -78,6 +83,9 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private ExtendedRenderingConfiguration extendedConfiguration;
+
+    @Inject
+    private MacroManager macroManager;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -248,6 +256,22 @@ public class RenderingScriptService implements ScriptService
     public List<Syntax> getDisabledSyntaxes()
     {
         return this.extendedConfiguration.getDisabledSyntaxes();
+    }
+
+    /**
+     * @param syntax the syntax for which to return the list of Macro descriptors
+     * @return the macro descriptors for the macros registered and available to the passed syntax
+     * @throws MacroLookupException if a macro component descriptor cannot be loaded
+     * @since 9.7RC1
+     */
+    @Unstable
+    public List<MacroDescriptor> getMacroDescriptors(Syntax syntax) throws MacroLookupException
+    {
+        List<MacroDescriptor> macroDescriptors = new ArrayList<>();
+        for (MacroId id : this.macroManager.getMacroIds(syntax)) {
+            macroDescriptors.add(this.macroManager.getMacro(id).getDescriptor());
+        }
+        return macroDescriptors;
     }
 
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException

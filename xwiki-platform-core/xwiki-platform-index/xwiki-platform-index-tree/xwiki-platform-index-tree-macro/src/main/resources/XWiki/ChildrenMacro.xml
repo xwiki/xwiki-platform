@@ -174,7 +174,7 @@
       <defaultCategory>Navigation</defaultCategory>
     </property>
     <property>
-      <description>Displays a tree of children page of the current page</description>
+      <description>Displays a tree of children pages of the current page</description>
     </property>
     <property>
       <id>children</id>

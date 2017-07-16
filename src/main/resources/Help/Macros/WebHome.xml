@@ -66,7 +66,7 @@
 }, {
   'title': 'Browse Macros',
   'description': 'Choose from community contributed macros and install them inside your wiki.',
-  'tip': "The &lt;a href=""$xwiki.getURL('XWiki.WikiMacros')""&gt;Macro Index&lt;/a&gt; lists the macros that are already installed and ready to be used inside your pages.",
+  'tip': "The &lt;a href=""#if($xwiki.exists('XWiki.XWikiSyntaxMacrosList'))$xwiki.getURL('XWiki.XWikiSyntaxMacrosList')#{else}$xwiki.getURL('XWiki.WikiMacros')#end""&gt;Macro Index&lt;/a&gt; lists the macros that are already installed and ready to be used inside your pages.",
   'thumbnail': 'EM',
   'actions': [{
     'label': 'Browse',

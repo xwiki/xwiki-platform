@@ -87,6 +87,10 @@ public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTe
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());
+
+        // Verify that the wiki macro descriptor has a macro id without a syntax since wiki macros are registered for
+        // all syntaxes.
+        assertNull(macro.getDescriptor().getId().getSyntax());
     }
 
     public void testCreateWikiMacroWithoutName() throws Exception

@@ -210,12 +210,6 @@
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-rendering-wikimacro-ui</artifactId>
-        <version>9.7-SNAPSHOT</version>
-        <type>xar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
         <version>9.7-SNAPSHOT</version>
         <type>xar</type>

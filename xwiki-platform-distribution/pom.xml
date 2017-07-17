@@ -150,7 +150,8 @@
     <war.dependencies.artifactId.legacy>xwiki-platform-distribution-war-legacydependencies</war.dependencies.artifactId.legacy>
   </properties>
 
-  <!-- Avoid enforce-upper-bounds rule complains (it's actually false positive since Extension Manager is not affected by that) -->
+  <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not
+       affected by that) -->
   <dependencyManagement>
     <dependencies>
       <!-- application-help-center -->

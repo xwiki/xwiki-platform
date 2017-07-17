@@ -33,17 +33,13 @@
   <description>Default set of wiki pages containing both content and default applications for XWiki Flavor Main Wiki</description>
   <properties>
     <xwiki.extension.category>flavor</xwiki.extension.category>
-
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>XWiki Standard Flavor</xwiki.extension.name>
-
-    <!-- Should only be insalled on main wiki -->
+    <!-- Should only be installed on main wiki -->
     <xwiki.extension.namespaces>wiki:xwiki</xwiki.extension.namespaces>
-
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
         org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
-
         <!-- Replace old XEM flavor -->
         com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
         org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
@@ -58,7 +54,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>

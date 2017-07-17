@@ -140,8 +140,7 @@ public class QueryGenerator
 
         List<EventProperty> propertyList = handleEventPreferences(user, hql, preferences, format);
         Set<String> eventTypes = new HashSet<>();
-        for (EventProperty property : propertyList)
-        {
+        for (EventProperty property : propertyList) {
             eventTypes.add(property.eventType);
         }
 

@@ -31,14 +31,11 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
-import org.xwiki.eventstream.internal.DefaultEvent;
-import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
-import org.xwiki.notifications.CompositeEventStatusManager;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -49,9 +46,10 @@ import org.xwiki.notifications.internal.ModelBridge;
 import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
-import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
 
 /**
@@ -79,10 +77,10 @@ public class NotificationScriptService implements ScriptService
     private NotificationRSSManager notificationRSSManager;
 
     @Inject
-    private EventStatusManager eventStatusManager;
+    private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager authorizationManager;
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
@@ -91,10 +89,10 @@ public class NotificationScriptService implements ScriptService
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private CompositeEventStatusManager compositeEventStatusManager;
+    private ModelBridge modelBridge;
 
     @Inject
-    private ModelBridge modelBridge;
+    private NotificationScriptEventHelper notificationScriptEventHelper;
 
     /**
      * @param onyUnread either or not to return only unread events
@@ -190,8 +188,7 @@ public class NotificationScriptService implements ScriptService
      */
     public List<EventStatus> getEventStatuses(List<Event> events) throws Exception
     {
-        return eventStatusManager.getEventStatus(events,
-                Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+        return notificationScriptEventHelper.getEventStatuses(events);
     }
 
     /**
@@ -205,8 +202,7 @@ public class NotificationScriptService implements ScriptService
      */
     public List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents) throws Exception
     {
-        return compositeEventStatusManager.getCompositeEventStatuses(compositeEvents,
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()));
+        return notificationScriptEventHelper.getCompositeEventStatuses(compositeEvents);
     }
 
     /**
@@ -238,10 +234,7 @@ public class NotificationScriptService implements ScriptService
      */
     public void saveEventStatus(String eventId, boolean isRead) throws Exception
     {
-        DefaultEvent event = new DefaultEvent();
-        event.setId(eventId);
-        String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
-        eventStatusManager.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
+        notificationScriptEventHelper.saveEventStatus(eventId, isRead);
     }
 
     /**
@@ -298,7 +291,7 @@ public class NotificationScriptService implements ScriptService
         try {
             return output.outputString(this.notificationRSSManager.renderFeed(
                     this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
-        } catch (FeedException e) {
+        } catch (Exception e) {
             throw new NotificationException("Unable to render RSS feed", e);
         }
     }
@@ -351,14 +344,16 @@ public class NotificationScriptService implements ScriptService
     public void setNotificationPreferenceStatus(String userId, String eventType, String applicationId,
             String notificationFormat, boolean notificationStatus, Date startDate) throws NotificationException
     {
-        NotificationFormat format = NotificationFormat.valueOf(notificationFormat.toUpperCase());
-
         NotificationPreference preference = new NotificationPreference(eventType, applicationId, notificationStatus,
-                format, startDate);
+                notificationFormat, startDate);
+
+        DocumentReference userReference = this.documentReferenceResolver.resolve(userId);
 
         try {
-            this.modelBridge.saveNotificationPreference(this.documentReferenceResolver.resolve(userId), preference);
-        } catch (NotificationException e) {
+            this.authorizationManager.checkAccess(Right.EDIT, userReference);
+
+            this.modelBridge.saveNotificationPreference(userReference, preference);
+        } catch (Exception e) {
             throw new NotificationException(String.format(
                     "Unable to save the notification preferences [%s] in [%s] for the user [%s]",
                     eventType, applicationId, userId));

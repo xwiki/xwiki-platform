@@ -92,6 +92,24 @@ public class NotificationPreference
     }
 
     /**
+     * Construct a new NotificationPreference.
+     *
+     * @param eventType type of an event
+     * @param applicationId id of an application
+     * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
+     * @param format format of the notification
+     * @param startDate the date from which notifications that match this preference should be retrieved
+     *
+     * @since 9.7RC1
+     */
+    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled,
+            String format, Date startDate)
+    {
+        this(eventType, applicationId, isNotificationEnabled, NotificationFormat.valueOf(format.toUpperCase()),
+                startDate);
+    }
+
+    /**
      * @return the type of the event concerned by the preference
      */
     public String getEventType()

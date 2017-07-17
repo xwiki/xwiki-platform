@@ -19,3 +19,4 @@ org.xwiki.notifications.internal.QueryGenerator
 org.xwiki.notifications.internal.ScopeNotificationFilter
 org.xwiki.notifications.internal.SimilarityCalculator
 org.xwiki.notifications.script.NotificationScriptService
+org.xwiki.notifications.script.NotificationScriptEventHelper

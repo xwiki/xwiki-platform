@@ -1441,7 +1441,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory/>
+      <defaultCategory>Development</defaultCategory>
     </property>
     <property>
       <description>A control to be used for object properties of the current document that are supposed to contain the name of an attachment from the current (or target) document. Allows uploading new attachments, and deleting attachments from the target document.  If no target document is specified, the current document will be used. Object properties are only saved to the current document.</description>

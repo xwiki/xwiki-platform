@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
+import org.xwiki.stability.Unstable;
 
 /**
  * Helper for event related operations on the {@link NotificationScriptService}.
@@ -46,6 +47,7 @@ import org.xwiki.notifications.CompositeEventStatusManager;
  */
 @Component(roles = NotificationScriptEventHelper.class)
 @Singleton
+@Unstable
 public class NotificationScriptEventHelper
 {
     @Inject

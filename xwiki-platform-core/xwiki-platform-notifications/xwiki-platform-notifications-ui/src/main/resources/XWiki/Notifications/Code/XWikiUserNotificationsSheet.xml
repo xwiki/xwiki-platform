@@ -353,7 +353,6 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
     $.post(url, {
       'action': 'toggleNotificationPreference',
       'eventType': eventType,
-      'applicationId': appId,
       'notificationFormat': format,
       'notificationState': state,
     }).done(function () {

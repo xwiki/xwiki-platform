@@ -21,6 +21,7 @@ package org.xwiki.rendering.script;
 
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -30,6 +31,10 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -40,6 +45,8 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.test.mockito.StringReaderMatcher;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -76,7 +83,7 @@ public class RenderingScriptServiceTest
         }).when(blockRenderer).render(any(XDOM.class), any());
 
         XDOM xdom = this.mocker.getComponentUnderTest().parse("some [[TODO]] stuff", "plain/1.0");
-        Assert.assertEquals("some ~[~[TODO]] stuff", this.mocker.getComponentUnderTest().render(xdom, "xwiki/2.0"));
+        assertEquals("some ~[~[TODO]] stuff", this.mocker.getComponentUnderTest().render(xdom, "xwiki/2.0"));
     }
 
     @Test
@@ -105,7 +112,7 @@ public class RenderingScriptServiceTest
         SyntaxFactory syntaxFactory = this.mocker.getInstance(SyntaxFactory.class);
         when(syntaxFactory.createSyntaxFromIdString("xwiki/2.1")).thenReturn(Syntax.XWIKI_2_1);
 
-        Assert.assertEquals(Syntax.XWIKI_2_1, this.mocker.getComponentUnderTest().resolveSyntax("xwiki/2.1"));
+        assertEquals(Syntax.XWIKI_2_1, this.mocker.getComponentUnderTest().resolveSyntax("xwiki/2.1"));
     }
 
     @Test
@@ -123,14 +130,14 @@ public class RenderingScriptServiceTest
         // Since the logic is pretty simple (prepend every character with an escape character), the below tests are
         // mostly for exemplification.
         // Note: Java escaped string "\\" == "\" (real string).
-        Assert.assertEquals("\\\\", this.mocker.getComponentUnderTest().escape("\\", Syntax.XWIKI_1_0));
-        Assert.assertEquals("\\*\\t\\e\\s\\t\\*", this.mocker.getComponentUnderTest()
+        assertEquals("\\\\", this.mocker.getComponentUnderTest().escape("\\", Syntax.XWIKI_1_0));
+        assertEquals("\\*\\t\\e\\s\\t\\*", this.mocker.getComponentUnderTest()
             .escape("*test*", Syntax.XWIKI_1_0));
-        Assert.assertEquals("\\a\\\\\\\\\\[\\l\\i\\n\\k\\>\\X\\.\\Y\\]",
+        assertEquals("\\a\\\\\\\\\\[\\l\\i\\n\\k\\>\\X\\.\\Y\\]",
             this.mocker.getComponentUnderTest().escape("a\\\\[link>X.Y]", Syntax.XWIKI_1_0));
-        Assert.assertEquals("\\{\\p\\r\\e\\}\\v\\e\\r\\b\\a\\t\\i\\m\\{\\/\\p\\r\\e\\}", this.mocker
+        assertEquals("\\{\\p\\r\\e\\}\\v\\e\\r\\b\\a\\t\\i\\m\\{\\/\\p\\r\\e\\}", this.mocker
             .getComponentUnderTest().escape("{pre}verbatim{/pre}", Syntax.XWIKI_1_0));
-        Assert.assertEquals("\\{\\m\\a\\c\\r\\o\\:\\s\\o\\m\\e\\=\\p\\a\\r\\a\\m\\e\\t\\e\\r\\}"
+        assertEquals("\\{\\m\\a\\c\\r\\o\\:\\s\\o\\m\\e\\=\\p\\a\\r\\a\\m\\e\\t\\e\\r\\}"
             + "\\c\\o\\n\\t\\e\\n\\t" + "\\{\\m\\a\\c\\r\\o\\}",
             this.mocker.getComponentUnderTest().escape("{macro:some=parameter}content{macro}", Syntax.XWIKI_1_0));
     }
@@ -140,16 +147,15 @@ public class RenderingScriptServiceTest
     {
         // Since the logic is pretty simple (prepend every character with an escape character), the below tests are
         // mostly for exemplification.
-        Assert.assertEquals("~~", this.mocker.getComponentUnderTest().escape("~", Syntax.XWIKI_2_0));
-        Assert.assertEquals("~*~*~t~e~s~t~*~*", this.mocker.getComponentUnderTest()
+        assertEquals("~~", this.mocker.getComponentUnderTest().escape("~", Syntax.XWIKI_2_0));
+        assertEquals("~*~*~t~e~s~t~*~*", this.mocker.getComponentUnderTest()
             .escape("**test**", Syntax.XWIKI_2_0));
         // Note: Java escaped string "\\" == "\" (real string).
-        Assert.assertEquals("~a~\\~\\~[~[~l~i~n~k~>~>~X~.~Y~]~]",
+        assertEquals("~a~\\~\\~[~[~l~i~n~k~>~>~X~.~Y~]~]",
             this.mocker.getComponentUnderTest().escape("a\\\\[[link>>X.Y]]", Syntax.XWIKI_2_0));
-        Assert.assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}",
+        assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}",
             this.mocker.getComponentUnderTest().escape("{{{verbatim}}}", Syntax.XWIKI_2_0));
-        Assert
-            .assertEquals(
+        assertEquals(
                 "~{~{~m~a~c~r~o~ ~s~o~m~e~=~'~p~a~r~a~m~e~t~e~r~'~}~}~c~o~n~t~e~n~t~{~{~/~m~a~c~r~o~}~}",
                 this.mocker.getComponentUnderTest().escape("{{macro some='parameter'}}content{{/macro}}",
                     Syntax.XWIKI_2_0));
@@ -160,16 +166,15 @@ public class RenderingScriptServiceTest
     {
         // Since the logic is pretty simple (prepend every character with an escape character), the below tests are
         // mostly for exemplification.
-        Assert.assertEquals("~~", this.mocker.getComponentUnderTest().escape("~", Syntax.XWIKI_2_1));
-        Assert.assertEquals("~*~*~t~e~s~t~*~*", this.mocker.getComponentUnderTest()
+        assertEquals("~~", this.mocker.getComponentUnderTest().escape("~", Syntax.XWIKI_2_1));
+        assertEquals("~*~*~t~e~s~t~*~*", this.mocker.getComponentUnderTest()
             .escape("**test**", Syntax.XWIKI_2_1));
         // Note: Java escaped string "\\" == "\" (real string).
-        Assert.assertEquals("~a~\\~\\~[~[~l~i~n~k~>~>~X~.~Y~]~]",
+        assertEquals("~a~\\~\\~[~[~l~i~n~k~>~>~X~.~Y~]~]",
             this.mocker.getComponentUnderTest().escape("a\\\\[[link>>X.Y]]", Syntax.XWIKI_2_1));
-        Assert.assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}",
+        assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}",
             this.mocker.getComponentUnderTest().escape("{{{verbatim}}}", Syntax.XWIKI_2_1));
-        Assert
-            .assertEquals(
+        assertEquals(
                 "~{~{~m~a~c~r~o~ ~s~o~m~e~=~'~p~a~r~a~m~e~t~e~r~'~}~}~c~o~n~t~e~n~t~{~{~/~m~a~c~r~o~}~}",
                 this.mocker.getComponentUnderTest().escape("{{macro some='parameter'}}content{{/macro}}",
                     Syntax.XWIKI_2_1));
@@ -178,20 +183,20 @@ public class RenderingScriptServiceTest
     @Test
     public void escapeSpaces() throws Exception
     {
-        Assert.assertEquals("\\a\\ \\*\\t\\e\\s\\t\\*",
+        assertEquals("\\a\\ \\*\\t\\e\\s\\t\\*",
             this.mocker.getComponentUnderTest().escape("a *test*", Syntax.XWIKI_1_0));
-        Assert.assertEquals("~a~ ~*~*~t~e~s~t~*~*",
+        assertEquals("~a~ ~*~*~t~e~s~t~*~*",
             this.mocker.getComponentUnderTest().escape("a **test**", Syntax.XWIKI_2_0));
-        Assert.assertEquals("~a~ ~*~*~t~e~s~t~*~*",
+        assertEquals("~a~ ~*~*~t~e~s~t~*~*",
             this.mocker.getComponentUnderTest().escape("a **test**", Syntax.XWIKI_2_1));
     }
 
     @Test
     public void escapeNewLines() throws Exception
     {
-        Assert.assertEquals("\\a\\\n\\b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_1_0));
-        Assert.assertEquals("~a~\n~b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_2_0));
-        Assert.assertEquals("~a~\n~b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_2_1));
+        assertEquals("\\a\\\n\\b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_1_0));
+        assertEquals("~a~\n~b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_2_0));
+        assertEquals("~a~\n~b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_2_1));
     }
 
     @Test
@@ -204,7 +209,7 @@ public class RenderingScriptServiceTest
     @Test
     public void escapeWithEmptyInput() throws Exception
     {
-        Assert.assertEquals("", this.mocker.getComponentUnderTest().escape("", Syntax.XWIKI_2_1));
+        assertEquals("", this.mocker.getComponentUnderTest().escape("", Syntax.XWIKI_2_1));
     }
 
     @Test
@@ -226,5 +231,21 @@ public class RenderingScriptServiceTest
     {
         Assert.assertNull("Unexpected non-null output for unsupported syntax", this.mocker.getComponentUnderTest()
             .escape("unsupported", Syntax.XHTML_1_0));
+    }
+
+    @Test
+    public void getMacroDescriptors() throws Exception
+    {
+        MacroManager macroManager = this.mocker.registerMockComponent(MacroManager.class);
+        MacroId macroId = new MacroId("macroid");
+        when(macroManager.getMacroIds(Syntax.XWIKI_2_1)).thenReturn(Collections.singleton(macroId));
+        Macro macro = mock(Macro.class);
+        when(macroManager.getMacro(macroId)).thenReturn(macro);
+        MacroDescriptor descriptor = mock(MacroDescriptor.class);
+        when(macro.getDescriptor()).thenReturn(descriptor);
+
+        List<MacroDescriptor> descriptors = this.mocker.getComponentUnderTest().getMacroDescriptors(Syntax.XWIKI_2_1);
+        assertEquals(1, descriptors.size());
+        assertSame(descriptor, descriptors.get(0));
     }
 }

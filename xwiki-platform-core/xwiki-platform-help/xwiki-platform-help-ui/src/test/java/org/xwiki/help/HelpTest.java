@@ -74,8 +74,7 @@ public class HelpTest extends PageTest
 
         String result = renderPage(new DocumentReference("xwiki", "XWiki", "XWikiSyntax"));
         assertTrue("$subHeading should have been evaluated and replaced by '==='", result.contains(
-            "<h3 id=\"HXWikiSyntax2.1LinkSpecification\" class=\"wikigeneratedheader\">"
-                + "<span>XWiki Syntax 2.1 Link Specification</span></h3>"));
+            "<h3 id=\"HXWikiSyntax2.1LinkSpecification\""));
         assertTrue("$subHeading should have been evaluated and replaced by '==='", !result.contains("$subHeading"));
     }
 }

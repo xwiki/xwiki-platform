@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.script;
+package org.xwiki.notifications.internal.script;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
-import org.xwiki.stability.Unstable;
+import org.xwiki.notifications.script.NotificationScriptService;
 
 /**
  * Helper for event related operations on the {@link NotificationScriptService}.
@@ -47,7 +47,6 @@ import org.xwiki.stability.Unstable;
  */
 @Component(roles = NotificationScriptEventHelper.class)
 @Singleton
-@Unstable
 public class NotificationScriptEventHelper
 {
     @Inject

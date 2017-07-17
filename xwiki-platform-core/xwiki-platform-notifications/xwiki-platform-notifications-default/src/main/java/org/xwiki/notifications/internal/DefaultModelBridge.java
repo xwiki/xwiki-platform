@@ -21,7 +21,6 @@ package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -223,7 +222,7 @@ public class DefaultModelBridge implements ModelBridge
         List<BaseObject> objects = xWikiDocument.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
 
         if (objects != null) {
-            for (BaseObject object : objects)
+            for (BaseObject object : objects) {
                 if (object != null
                         && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))
                         && notificationPreference.getApplicationId().equals(

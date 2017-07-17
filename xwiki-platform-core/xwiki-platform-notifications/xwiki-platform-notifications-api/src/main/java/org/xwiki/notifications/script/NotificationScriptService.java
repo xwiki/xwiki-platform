@@ -43,6 +43,7 @@ import org.xwiki.notifications.NotificationManager;
 import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.notifications.NotificationRenderer;
 import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.internal.script.NotificationScriptEventHelper;
 import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;

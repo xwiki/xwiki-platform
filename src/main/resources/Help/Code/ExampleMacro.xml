@@ -205,7 +205,7 @@
       <contentType>Mandatory</contentType>
     </property>
     <property>
-      <defaultCategory/>
+      <defaultCategory>Formatting</defaultCategory>
     </property>
     <property>
       <description>Shows an example and its source code.</description>

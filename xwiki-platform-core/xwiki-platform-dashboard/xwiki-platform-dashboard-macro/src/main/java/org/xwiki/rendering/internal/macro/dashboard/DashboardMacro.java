@@ -158,6 +158,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
     public DashboardMacro()
     {
         super("Dashboard", DESCRIPTION, DashboardMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
     }
 
     @Override

@@ -367,7 +367,7 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory/>
+      <defaultCategory>Content</defaultCategory>
     </property>
     <property>
       <description>Show the content of your current watchlist.</description>

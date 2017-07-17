@@ -42,7 +42,7 @@
 
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.platform:xwiki-enterprise-ui-mainwiki
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki
     </xwiki.extension.features>
   </properties>
   <dependencies>

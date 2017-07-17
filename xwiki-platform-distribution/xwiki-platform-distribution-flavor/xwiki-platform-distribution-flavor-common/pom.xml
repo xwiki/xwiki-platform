@@ -142,26 +142,4 @@
       <type>xar</type>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <configuration>
-          <!-- Perform some transformations specific to (sub) wikis -->
-          <transformations>
-            <!-- Set CKEditor as default WYSIWYG editor -->
-            <transformation>
-              <artifact>org.xwiki.platform:xwiki-platform-distribution-ui-base</artifact>
-              <file>XWiki/XWikiPreferences.xml</file>
-              <xpath>xwikidoc</xpath>
-              <action>INSERT_CHILD</action>
-              <xml>src/xar/transformations/ckeditor.xml</xml>
-            </transformation>
-          </transformations>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

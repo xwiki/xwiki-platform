@@ -137,61 +137,6 @@ public class ManualTemplateTest extends AbstractManualTest
     }
 
     @Test
-    public void testBrowseWysiwygSQL() throws IOException
-    {
-        skipIfIgnored("templates/browsewysiwyg.vm");
-        // TODO check for SQL escaping (i.e. additionally put \ and ;)
-        String url = createUrl("view", "Sandbox", "WebHome", params(kv("xpage", "browsewysiwyg"), test("text")));
-        checkUnderEscaping(url, "XWIKI-5193 sql");
-        checkForErrorTrace(url);
-    }
-
-    @Test
-    public void testBrowseWysiwygPage()
-    {
-        // also covers former testBrowseWysiwygPageLink()
-        skipIfIgnored("templates/browsewysiwyg.vm");
-        // need an existing page with name = title = test string
-        createPage("Main", XMLEscapingValidator.getTestString(), XMLEscapingValidator.getTestString(), "Bla bla");
-        checkUnderEscaping(createUrl("view", "Main", "Test", params(template("browsewysiwyg"))),
-            "XWIKI-5193 page");
-    }
-
-    @Test
-    public void testWysiwygRecentViewsPage()
-    {
-        skipIfIgnored("templates/recentdocwysiwyg.vm");
-        // need an existing page with name = title = test string
-        createPage("Main", XMLEscapingValidator.getTestString(), XMLEscapingValidator.getTestString(), "Bla bla");
-        checkUnderEscaping(createUrl("view", "Main", "Test", params(template("recentdocwysiwyg"))),
-            "XWIKI-5193 recent docs");
-    }
-
-    @Test
-    public void testSearchWysiwygSQL() throws IOException
-    {
-        skipIfIgnored("templates/searchwysiwyg.vm");
-        // TODO check for SQL escaping (i.e. additionally put \ and ;)
-        String spaceUrl = createUrl("view", "Main", "Test", params(kv("xpage", "searchwysiwyg"), test("space")));
-        checkUnderEscaping(spaceUrl, "XWIKI-5344 sql space");
-        checkForErrorTrace(spaceUrl);
-
-        String pageUrl = createUrl("view", "Main", "Test", params(kv("xpage", "searchwysiwyg"), test("page")));
-        checkUnderEscaping(pageUrl, "XWIKI-5344 sql page");
-        checkForErrorTrace(pageUrl);
-    }
-
-    @Test
-    public void testSearchWysiwygPageLink()
-    {
-        skipIfIgnored("templates/searchwysiwyg.vm");
-        // need an existing page with name = title = test string
-        createPage("Main", XMLEscapingValidator.getTestString(), XMLEscapingValidator.getTestString(), "Bla bla");
-        checkUnderEscaping(createUrl("view", "Main", "Test", params(template("searchwysiwyg"))),
-            "XWIKI-5344 page link");
-    }
-
-    @Test
     public void testLoginRedirect()
     {
         skipIfIgnored("templates/login.vm");

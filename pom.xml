@@ -65,6 +65,14 @@
 
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.outputDirectory>
+
+    <!-- The recommended version of known extensions to use -->
+    <xwiki.extension.recommendedVersion.platform>
+      ${xwiki.extension.recommendedVersion.commons},
+      org.xwiki.rendering:.*/[${rendering.version}],
+      org.xwiki.platform:.*/[${platform.version}]
+    </xwiki.extension.recommendedVersion.platform>
+    <xwiki.extension.recommendedVersion>${xwiki.extension.recommendedVersion.platform}</xwiki.extension.recommendedVersion>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

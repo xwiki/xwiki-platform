@@ -59,18 +59,21 @@
       <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-menu-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-help-center</artifactId>
       <version>1.2-SNAPSHOT</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

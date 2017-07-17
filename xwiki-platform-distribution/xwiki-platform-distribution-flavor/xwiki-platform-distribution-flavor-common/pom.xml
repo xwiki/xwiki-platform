@@ -52,39 +52,80 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-logging-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-directory-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-help-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-theme-bootswatch</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-office-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-invitation-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-linkchecker-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -115,24 +156,28 @@
       <artifactId>xwiki-platform-sandbox</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-sharepage-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-flavor-tour</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.templates</groupId>
       <artifactId>application-templates-ui</artifactId>
       <version>1.0.1</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
@@ -145,6 +190,7 @@
       <artifactId>editor-tool-highlighting-ui</artifactId>
       <version>3.4</version>
       <type>xar</type>
+      <optional>true</optional>
       <exclusions>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>

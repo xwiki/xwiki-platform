@@ -31,24 +31,21 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationManager;
-import org.xwiki.notifications.NotificationPreference;
 import org.xwiki.notifications.NotificationRenderer;
 import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.internal.script.NotificationPreferencesSaver;
 import org.xwiki.notifications.internal.script.NotificationScriptEventHelper;
 import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 import com.rometools.rome.io.SyndFeedOutput;
@@ -94,6 +91,9 @@ public class NotificationScriptService implements ScriptService
 
     @Inject
     private NotificationScriptEventHelper notificationScriptEventHelper;
+
+    @Inject
+    private NotificationPreferencesSaver notificationPreferencesSaver;
 
     /**
      * @param onyUnread either or not to return only unread events
@@ -298,66 +298,15 @@ public class NotificationScriptService implements ScriptService
     }
 
     /**
-     * Update a notification preference of the given user that matches the given eventType and notificationType to
-     * the given notificationStatus and the given startDate.
+     * Update notification preferences of the given user.
      *
-     * @param eventType the type of the event
-     * @param applicationId the ID of the application concerned
-     * @param notificationFormat the format of the notification (see {@link NotificationFormat}
-     * @param notificationStatus the status (enabled / disabled) of the notification
-     * @param startDate the date from which the user should receive notifications of this type
+     * @param json a list of notification preferences represented as JSON
      * @throws NotificationException if an error occurs
      *
      * @since 9.7RC1
      */
-    public void setNotificationPreferenceStatus(String eventType, String applicationId,
-            String notificationFormat, boolean notificationStatus,
-            Date startDate) throws NotificationException
+    public void saveNotificationsPreferences(String json) throws NotificationException
     {
-        NotificationFormat format = NotificationFormat.valueOf(notificationFormat.toUpperCase());
-
-        // Build the corresponding NotificationPreference object
-        NotificationPreference preference = new NotificationPreference(eventType, applicationId, notificationStatus,
-                format, startDate);
-
-        try {
-            this.modelBridge.saveNotificationPreference(documentAccessBridge.getCurrentUserReference(), preference);
-        } catch (NotificationException e) {
-            throw new NotificationException(String.format(
-                    "Unable to save the notification preferences for [%s] in [%s]", eventType, applicationId));
-        }
-    }
-
-    /**
-     * As {@link #setNotificationPreferenceStatus(String, String, String, boolean, Date)}, update the notification
-     * preference of a given user.
-     *
-     * @param userId the id of the user to edit
-     * @param eventType the type of the event
-     * @param applicationId the ID of the application concerned
-     * @param notificationFormat the format of the notification (see {@link NotificationFormat}
-     * @param notificationStatus the status (enabled / disabled) of the notification
-     * @param startDate the date from which the user should receive notifications of this type
-     * @throws NotificationException if an error occurs
-     *
-     * @since 9.7RC1
-     */
-    public void setNotificationPreferenceStatus(String userId, String eventType, String applicationId,
-            String notificationFormat, boolean notificationStatus, Date startDate) throws NotificationException
-    {
-        NotificationPreference preference = new NotificationPreference(eventType, applicationId, notificationStatus,
-                notificationFormat, startDate);
-
-        DocumentReference userReference = this.documentReferenceResolver.resolve(userId);
-
-        try {
-            this.authorizationManager.checkAccess(Right.EDIT, userReference);
-
-            this.modelBridge.saveNotificationPreference(userReference, preference);
-        } catch (Exception e) {
-            throw new NotificationException(String.format(
-                    "Unable to save the notification preferences [%s] in [%s] for the user [%s]",
-                    eventType, applicationId, userId));
-        }
+        notificationPreferencesSaver.saveNotificationPreferences(json, documentAccessBridge.getCurrentUserReference());
     }
 }

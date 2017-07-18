@@ -19,9 +19,9 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
-import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
  * Represents the actions possible in WYSIWYG edit mode.
@@ -32,9 +32,13 @@ import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 public class WYSIWYGEditPage extends PreviewableEditPage
 {
     /**
-     * The WYSIWYG content editor.
+     * The content text area.
+     * <p>
+     * TODO: We need a common interface for WYSIWYG editors and a way to load the current implementation without
+     * hard-coding it (similar to a component).
      */
-    private final EditorElement editor = new EditorElement("content");
+    @FindBy(id = "content")
+    private WebElement contentTextArea;
 
     /**
      * Go to the passed page in WYSIWYG edit mode.
@@ -50,25 +54,25 @@ public class WYSIWYGEditPage extends PreviewableEditPage
      */
     public String getContent()
     {
-        return editor.getRichTextArea().getText();
+        return this.contentTextArea.getText();
     }
 
     /**
-     * Sets the content of the editor (rich text area).
+     * Sets the content of the page.
      * 
      * @param content the content to be set
      */
     public void setContent(String content)
     {
-        RichTextAreaElement textArea = editor.getRichTextArea();
-        textArea.clear();
-        textArea.sendKeys(content);
+        this.contentTextArea.clear();
+        this.contentTextArea.sendKeys(content);
     }
 
     @Override
     public WYSIWYGEditPage waitUntilPageIsLoaded()
     {
-        editor.waitToLoad();
+        // Nothing at the moment but we'll have to wait for the actual WYSIWYG editor when we implement the common
+        // editor interface.
         return this;
     }
 

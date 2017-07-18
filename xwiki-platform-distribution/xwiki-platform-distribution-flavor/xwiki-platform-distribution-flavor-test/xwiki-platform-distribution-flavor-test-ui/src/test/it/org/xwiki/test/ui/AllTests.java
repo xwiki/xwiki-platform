@@ -38,5 +38,9 @@ public class AllTests
     public void postStart(PersistentTestContext context) throws Exception
     {
         context.getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
+
+        // Use the text editor by default to speed up and simplify the tests. We tests the WYSIWYG editor separately.
+        LOGGER.info("Use the text editor for the tests");
+        context.getUtil().setWikiPreference("editor", "Text");
     }
 }

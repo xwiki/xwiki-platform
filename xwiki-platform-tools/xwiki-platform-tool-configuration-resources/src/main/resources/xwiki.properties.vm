@@ -475,6 +475,16 @@ extension.oldflavors=$oldFlavor.trim()
 #-# The default is:
 # extension.core.resolve=true
 
+#-# [Since 9.6]
+#-# Indicate a list of pattern extension ids and the corresponding recommended version.
+#-# This version will be used for dependencies matching the pattern and fallback on the version declared by the extension in case of failure.
+#-#
+#-# Here is an example:
+# extension.recommendedVersions=org.xwiki.commons:.*/[9.6]
+# extension.recommendedVersions=org.xwiki.rendering:.*/[9.6]
+# extension.recommendedVersions=org.xwiki.platform:.*/[9.6]
+# extension.recommendedVersions=com.mygroupid:.*/[1.9]
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

@@ -67,12 +67,12 @@
     <webjar.outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.outputDirectory>
 
     <!-- The recommended version of known extensions to use -->
-    <xwiki.extension.recommendedVersion.platform>
-      ${xwiki.extension.recommendedVersion.commons},
+    <xwiki.extension.recommendedVersions.platform>
+      ${xwiki.extension.recommendedVersions.commons},
       org.xwiki.rendering:.*/[${rendering.version}],
       org.xwiki.platform:.*/[${platform.version}]
-    </xwiki.extension.recommendedVersion.platform>
-    <xwiki.extension.recommendedVersion>${xwiki.extension.recommendedVersion.platform}</xwiki.extension.recommendedVersion>
+    </xwiki.extension.recommendedVersions.platform>
+    <xwiki.extension.recommendedVersions>${xwiki.extension.recommendedVersions.platform}</xwiki.extension.recommendedVersions>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

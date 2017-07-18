@@ -28,7 +28,7 @@ import org.xwiki.test.ui.AuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.CreatePagePage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Test page creation using the NewPage Panel.
@@ -55,7 +55,7 @@ public class NewPagePanelTest extends AbstractTest
 
         CreatePagePage createPagePage = newPagePanel.createPage(getTestClassName(), getTestMethodName());
         createPagePage.clickCreate();
-        WYSIWYGEditPage editPage = new WYSIWYGEditPage();
+        WikiEditPage editPage = new WikiEditPage();
 
         Assert.assertEquals(getTestMethodName(), editPage.getDocumentTitle());
         Assert.assertEquals("WebHome", editPage.getMetaDataValue("page"));

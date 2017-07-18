@@ -258,7 +258,6 @@
                     templates/rename\.vm <!-- step=1 renders renameStep1.vm, otherwise needs correct form_token and renames the document -->
                     templates/rendercontent\.vm <!-- page must exist, otherwise empty -->
                     templates/rightpanels\.vm <!-- empty response if parameter "forceRightPanels" is not set -->
-                    templates/textarea_wysiwyg\.vm <!-- probably need to set default editor to wysiwyg -->
                     templates/getdocuments\.vm <!-- generates JSON and our Test currently only supports validating XML -->
                     skins/flamingo/leftpanels\.vm <!-- empty response if parameter "forceLeftPanels" is not set -->
                     skins/flamingo/rightpanels\.vm <!-- empty response if parameter "forceRightPanels" is not set -->
@@ -281,7 +280,6 @@
                     templates/titlevars\.vm <!-- needs defined $renderedContent, already tested with editinline.vm and contentview.vm -->
                     templates/uploadfailure\.vm <!-- returns a 500 error and shows an error message -->
                     templates/watch\.vm <!-- expects xredirect to be a valid URL, does not display anything -->
-                    templates/wysiwyg\.vm <!-- redirects to editwysiwyg.vm, recursive redirection error with some parameters -->
                     templates/xpart\.vm <!-- avoid recursive include -->
                     templates/init\.vm <!-- escaping does not like it but it does not take any parameter anyway -->
                     templates/xml\.vm <!-- it's not escaping test job to validate XML format -->
@@ -530,7 +528,6 @@
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>
     <module>xwiki-platform-distribution-flavor-test-storage</module>
-    <module>xwiki-platform-distribution-flavor-test-wysiwyg</module>
     <module>xwiki-platform-distribution-flavor-test-jmeter</module>
   </modules>
 </project>

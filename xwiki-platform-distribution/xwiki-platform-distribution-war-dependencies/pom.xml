@@ -558,18 +558,10 @@
     </dependency>
 
     <!-- Wysiwyg -->
-    <!-- Add the GWT JAR so that the XWiki GWT Servlet can be activated by default in web.xml -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-gwt-api</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-api</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-war</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
       <scope>runtime</scope>
     </dependency>
 

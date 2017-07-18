@@ -27,7 +27,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 
 /**
  * Represents the actions possible when editing an application entry.
@@ -92,10 +91,20 @@ public class EntryEditPage extends InlinePage
     }
 
     /**
-     * @return the content editor
+     * Sets the entry content, if the application class has a Content field.
+     * 
+     * @param content the entry content
      */
-    public EditorElement getContentEditor()
+    public void setContent(String content)
     {
-        return new EditorElement("content");
+        new FormElement(getForm()).setFieldValue(By.name("content"), content);
+    }
+
+    /**
+     * @return the entry content
+     */
+    public String getContent()
+    {
+        return getForm().findElement(By.name("content")).getAttribute("value");
     }
 }

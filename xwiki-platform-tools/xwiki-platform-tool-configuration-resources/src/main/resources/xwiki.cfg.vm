@@ -385,20 +385,6 @@ xwiki.editcomment.mandatory=$xwikiCfgEditCommentMandatory
 # xwiki.editcomment.suggested=0
 
 #---------------------------------------
-# WYSIWYG Editor configuration
-#
-
-#-# You can configure the toolbars you wish to see in the WYSIWYG editor by defining the
-#-# xwiki.wysiwyg.toolbars property.
-#-# When not defined it defaults to:
-#   xwiki.wysiwyg.toolbars=texttoolbar, listtoolbar, indenttoolbar, undotoolbar, titletoolbar, \
-#                          styletoolbar, horizontaltoolbar, attachmenttoolbar, macrostoolbar, \
-#                          tabletoolbar, tablerowtoolbar, tablecoltoolbar, linktoolbar
-#-# The full list of toolbars includes the one defined above and the following ones:
-#-#   subtoolbar, findtoolbar, symboltoolbar
-
-
-#---------------------------------------
 # Skins & Templates configuration
 #
 

@@ -27,7 +27,7 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -55,10 +55,10 @@ public class SpacesTest extends AbstractTest
         // Make sure the new space's WebHome page doesn't exist.
         getUtil().deletePage(spaceName, "WebHome");
 
-        // Create the new space using the UI and verify it leads to the page being edited in WYSIWYG mode
+        // Create the new space using the UI and verify it leads to the space home page being edited.
         SpacesMacroPage macroPage = SpacesMacroPage.gotoPage();
         macroPage.getSpacesMacroPane().createSpace(spaceName).clickCreate();
-        WYSIWYGEditPage editPage = new WYSIWYGEditPage();
+        WikiEditPage editPage = new WikiEditPage();
 
         // Verify that space creation uses the space name as the space home page's title
         assertEquals(spaceName, editPage.getDocumentTitle());

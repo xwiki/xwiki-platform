@@ -792,9 +792,6 @@ extension.oldflavors=$oldFlavor.trim()
 #if ($xwikiPropertiesDefaultWysiwygEditor)
 edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
 edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
-#else
-# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=gwt
-# edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=gwt
 #end
 
 #-------------------------------------------------------------------------------------

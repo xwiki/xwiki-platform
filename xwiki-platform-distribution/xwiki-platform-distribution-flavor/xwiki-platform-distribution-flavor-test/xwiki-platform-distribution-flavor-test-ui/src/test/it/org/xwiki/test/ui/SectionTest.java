@@ -31,7 +31,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
@@ -97,14 +96,8 @@ public class SectionTest extends AbstractTest
     {
         ViewPage vp = createTestPages(syntaxId);
 
-        // Edit the second section in the wysiwyg editor
-        WYSIWYGEditPage wysiwygEditPage = vp.editSection(2);
-        wysiwygEditPage.waitUntilPageIsLoaded();
-        Assert.assertEquals("Section2\nContent2\nSection3\nContent3\nSection4\nContent4\nSection5\nContent5\n"
-            + "Section6\nContent6", wysiwygEditPage.getContent());
-
         // Edit the second section in the wiki editor
-        WikiEditPage wikiEditPage = wysiwygEditPage.editWiki();
+        WikiEditPage wikiEditPage = vp.editSection(2).editWiki();
         Assert.assertEquals("= Section2 = Content2 == Section3 == Content3 "
             + "{{include document=\"Test.SectionEditingIncluded\"/}}", wikiEditPage.getContent());
         vp = wikiEditPage.clickCancel();

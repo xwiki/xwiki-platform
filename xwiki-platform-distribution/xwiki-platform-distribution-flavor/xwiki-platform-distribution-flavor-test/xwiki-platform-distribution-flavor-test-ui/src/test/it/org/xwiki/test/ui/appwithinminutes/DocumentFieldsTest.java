@@ -38,7 +38,6 @@ import org.xwiki.test.ui.AdminAuthenticationRule;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
  * Tests the special document fields available in the class editor, such as Title and Content.
@@ -90,14 +89,13 @@ public class DocumentFieldsTest extends AbstractTest
         EntryNamePane entryNamePane = homeEditPage.clickFinish().clickAddNewEntry();
         entryNamePane.setName("Test");
         EntryEditPage entryEditPage = entryNamePane.clickAdd();
-        RichTextAreaElement contentTextArea = entryEditPage.getContentEditor().waitToLoad().getRichTextArea();
         Assert.assertEquals("13", entryEditPage.getValue("number1"));
         // The page name is used as the default value for the title field.
         Assert.assertEquals("Test", entryEditPage.getDocumentTitle());
         Assert.assertEquals("Test", entryEditPage.getTitle());
         entryEditPage.setTitle("Foo");
-        Assert.assertEquals(defaultContent, contentTextArea.getText());
-        contentTextArea.setContent("Bar");
+        Assert.assertEquals(defaultContent, entryEditPage.getContent());
+        entryEditPage.setContent("Bar");
 
         // Check that the title and the content of the entry have been updated.
         ViewPage entryViewPage = entryEditPage.clickSaveAndView();

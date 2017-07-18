@@ -37,9 +37,11 @@ public class AllTests
     @PageObjectSuite.PostStart
     public void postStart(PersistentTestContext context) throws Exception
     {
-        LOGGER.info("Put back the old WYSIWYG editor in preferences");
         context.getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
-        context.getUtil().setGWTWYSIWYG();
+
+        // Use the text editor by default to speed up and simplify the tests. We test the WYSIWYG editor separately.
+        LOGGER.info("Use the text editor for the tests");
+        context.getUtil().setWikiPreference("editor", "Text");
 
         // We need to disable syntax highlighting so that tests using the wiki editor can set and get content.
         LOGGER.info("Disable Syntax Highlighting for the tests");

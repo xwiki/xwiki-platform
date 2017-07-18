@@ -1547,6 +1547,27 @@ public class TestUtils
     }
 
     /**
+     * Sets the value of an existing property of XWiki.XWikiPreferences.
+     *
+     * @param propertyName name of the property to set
+     * @param value value to set to the property
+     * @since 9.7RC1
+     */
+    public void setWikiPreference(String propertyName, String value) throws Exception
+    {
+        ObjectPropertyReference propertyReference =
+            new ObjectPropertyReference(propertyName, new ObjectReference("XWiki.XWikiPreferences[0]",
+                new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences")));
+
+        Property property = new Property();
+        property.setValue(value);
+
+        TestUtils.assertStatusCodes(
+            rest().executePut(ObjectPropertyResource.class, property, rest().toElements(propertyReference)), true,
+            STATUS_ACCEPTED);
+    }
+
+    /**
      * @since 7.3M1
      */
     public static void assertStatuses(int actualCode, int... expectedCodes)
@@ -2450,26 +2471,6 @@ public class TestUtils
 
             return resource;
         }
-    }
-
-    /**
-     * Set the default WYSIWYG editor to GWT based one.
-     * 
-     * @since 9.5RC1
-     */
-    // FIXME: we really need to get rid of that need...
-    public void setGWTWYSIWYG() throws Exception
-    {
-        ObjectPropertyReference editorReference =
-            new ObjectPropertyReference("roleHint", new ObjectReference("XWiki.EditorBindingClass[0]",
-                new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences")));
-
-        Property property = new Property();
-        property.setValue("gwt");
-
-        TestUtils.assertStatusCodes(
-            rest().executePut(ObjectPropertyResource.class, property, rest().toElements(editorReference)), true,
-            STATUS_ACCEPTED);
     }
 
     /**

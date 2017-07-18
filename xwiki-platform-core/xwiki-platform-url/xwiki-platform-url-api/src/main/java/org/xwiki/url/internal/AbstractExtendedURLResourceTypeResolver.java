@@ -66,10 +66,7 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
     {
         ResourceType resourceType;
 
-        // Find the Resource Type, which is the first segment in the ExtendedURL, except for GTW resources which
-        // use a ".gwtrpc" suffix.
-        // TODO: Right now we don't have any specific Resolver for GWT resources and we just consider them as Entity
-        // Resources.
+        // Find the Resource Type, which is the first segment in the ExtendedURL.
         //
         // Note that we need to remove the type from the ExtendedURL instance since it's passed to the specific
         // resolvers and they shouldn't be aware of where it was located since they need to be able to resolve the
@@ -87,12 +84,6 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
         // if a Resource type has been identified (see below) and if not, we assume the URL is pointing to an Entity
         // Resource.
         List<String> segments = extendedURL.getSegments();
-
-        // Special handling for GWT resources
-        if (segments.size() > 0 && segments.get(segments.size() - 1).endsWith(".gwtrpc"))
-        {
-            return EntityResourceReference.TYPE;
-        }
 
         resourceType = this.defaultStringResourceTypeResolver.resolve(segments.get(0), Collections
             .<String, Object>emptyMap());

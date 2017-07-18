@@ -145,24 +145,6 @@
   }
 }
 
-// FIX: WYSIWYG
-.gwt-MenuBar-horizontal { // PROBLEM: General styling reset
-  table {
-    width: auto;
-  }
-}
-
-.gwt-MenuBarPopup, // PROBLEM: General styling reset
-.gwt-PopupPanel {
-  & table {
-    margin-bottom: 0;
-    td {
-      padding: 0;
-      border-top: 0;
-    }
-  }
-}
-
 // FIX: History Table
 .xwikidatatable .row:after, .xwikidatatable .row:before { // PROBLEM: Usage of a class with meaning inside Bootstrap
   display: none;

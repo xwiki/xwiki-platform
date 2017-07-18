@@ -248,44 +248,6 @@ tbody.xwiki-livetable-display-body td._avatar img {
   max-width: 50px;
 }
 /* </ Live Table Body> */
-/* <Dialog Box> */
-div.dialog-loading {
-  border: 1px solid $theme.borderColor;
-}
-div.dialog-loading tr.dialogTop td.dialogTopCenter div.Caption {
-  background-color: $theme.backgroundSecondaryColor;
-}
-div.dialog-loading tr.dialogMiddle td.dialogMiddleCenter div.gwt-ModalDialog-Content {
-  padding: 20px;
-}
-div.xwikigwt-editfield {
-  background-color: $theme.pageContentBackgroundColor;
-  border: 1px solid $theme.borderColor;
-}
-div.xwikigwt-editfield-main {
-  padding: 20px;
-}
-div.xwikigwt-editfield  tr.dialogTop td.dialogTopCenter div.Caption {
-  background-color: $theme.backgroundSecondaryColor;
-  color: $theme.textColor;
-  padding: 9px 4px 4px;
-}
-div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfield-actions {
-  margin-top: 10px;
-  width: 75%;
-}
-div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfield-actions .xwikigwt-cancel {
-  background-color: $theme.pageContentBackgroundColor;
-  color: $theme.linkColor;
-  padding: 0;
-  border: 0;
-  float: right;
-}
-div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfield-actions .xwikigwt-next {
-  background-color: $theme.backgroundSecondaryColor;
-  color: $theme.textColor;
-}
-/* </Dialog Box> */
 /* <Tag Cloud & Top Filters>  */
 .xwiki-livetable-topfilters-container,
 .xwiki-livetable-tagcloud-container {

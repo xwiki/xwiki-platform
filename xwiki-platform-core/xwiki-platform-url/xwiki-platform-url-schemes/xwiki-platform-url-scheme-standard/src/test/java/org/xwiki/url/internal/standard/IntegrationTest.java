@@ -150,12 +150,6 @@ public class IntegrationTest
         assertURL("http://localhost:8080/xwiki/resources/js/prototype/prototype.js", ResourcesResourceReference.TYPE,
             new ResourcesResourceReference());
 
-        // GWT Resource References
-        assertURL("http://localhost:8080/xwiki/resources/js/xwiki/wysiwyg/xwe/MacroService.gwtrpc",
-            EntityResourceReference.TYPE, new EntityResourceReference(new DocumentReference("xwiki",
-                Arrays.asList("js", "xwiki", "wysiwyg", "xwe"), "MacroService.gwtrpc"),
-                new EntityResourceAction("resources")));
-
         // Skins Resource References
         assertURL("http://localhost:8080/xwiki/skins/flamingo/logo.png", SkinsResourceReference.TYPE,
             new SkinsResourceReference());

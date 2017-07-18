@@ -28,8 +28,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
-import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
  * Represents the actions available when editing the application home page. This is also the forth step of the App
@@ -50,9 +48,10 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     private WebElement applicationIconInput;
 
     /**
-     * The WYSIWYG editor used to input the application description.
+     * The text area used to input the application description.
      */
-    private final EditorElement descriptionEditor = new EditorElement("AppWithinMinutes.LiveTableClass_0_description");
+    @FindBy(id = "AppWithinMinutes.LiveTableClass_0_description")
+    private WebElement descriptionTextArea;
 
     /**
      * Clicks on the Previous Step button.
@@ -90,8 +89,6 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
      */
     public void setDescription(String description)
     {
-        descriptionEditor.waitToLoad();
-        RichTextAreaElement descriptionTextArea = descriptionEditor.getRichTextArea();
         descriptionTextArea.clear();
         descriptionTextArea.sendKeys(description);
     }
@@ -212,7 +209,6 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     @Override
     public ApplicationHomeEditPage waitUntilPageIsLoaded()
     {
-        descriptionEditor.waitToLoad();
         return this;
     }
 }

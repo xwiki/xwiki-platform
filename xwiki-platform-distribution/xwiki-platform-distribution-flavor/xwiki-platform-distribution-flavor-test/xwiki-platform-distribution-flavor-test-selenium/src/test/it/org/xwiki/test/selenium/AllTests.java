@@ -39,7 +39,5 @@ public class AllTests
         context.getUtil().loginAsAdmin();
         context.getUtil().gotoPage("TourCode", "TourJS", "save",
             "XWiki.JavaScriptExtension_0_use=onDemand&xredirect=" + context.getUtil().getURL("Main", "WebHome"));
-
-        context.getUtil().setGWTWYSIWYG();
     }
 }

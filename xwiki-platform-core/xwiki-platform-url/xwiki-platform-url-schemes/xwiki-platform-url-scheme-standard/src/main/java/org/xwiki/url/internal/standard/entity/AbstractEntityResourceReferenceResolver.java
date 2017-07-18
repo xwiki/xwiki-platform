@@ -155,23 +155,10 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         // - If the first segment is an action name then always consider that it represents an action
         //   (whether isViewActionHidden is true or false), e.g. if the first space is called "view" then "view/view"
         //   will need to be used to produce a view URL for it.
-        //
-        // In addition we need to handle the special case of GWT resources, see AbstractExtendedURLResourceTypeResolver
-        // e.g. if we have "resources/js/xwiki/wysiwyg/xwe/MacroService.gwtrpc" as input then we need to return an
-        // action of "resources" and a document reference of "js.xwiki.wysiwyg.xwe.MacroService.gwtrpc"
-        // Note that "resources" is not a real action name which is why we ned a special handling.
-        // TODO: Remove this GWT handling and move it sto some more generic place
 
         if (!this.entityResourceActionLister.listActions().contains(firstSegment)) {
-            if (pathSegments.size() > 0 && firstSegment.equals("resources")
-                && pathSegments.get(pathSegments.size() - 1).endsWith(".gwtrpc"))
-            {
-                action = firstSegment;
-                startPosition = 1;
-            } else {
-                action = VIEW_ACTION;
-                startPosition = 0;
-            }
+            action = VIEW_ACTION;
+            startPosition = 0;
         } else {
             action = firstSegment;
             startPosition = 1;

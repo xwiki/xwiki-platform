@@ -174,7 +174,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-server</artifactId>
+      <artifactId>xwiki-platform-wysiwyg-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

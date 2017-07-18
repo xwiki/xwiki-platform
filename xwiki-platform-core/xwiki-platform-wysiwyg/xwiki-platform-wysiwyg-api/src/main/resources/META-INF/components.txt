@@ -1,0 +1,9 @@
+org.xwiki.wysiwyg.internal.cleaner.DefaultHTMLCleaner
+org.xwiki.wysiwyg.internal.cleaner.EmptyAttributeFilter
+org.xwiki.wysiwyg.internal.cleaner.EmptyLineFilter
+org.xwiki.wysiwyg.internal.cleaner.LineBreakFilter
+org.xwiki.wysiwyg.internal.cleaner.NestedAnchorsFilter
+org.xwiki.wysiwyg.internal.cleaner.StandAloneMacroFilter
+org.xwiki.wysiwyg.internal.converter.DefaultHTMLConverter
+org.xwiki.wysiwyg.internal.filter.http.MutableHttpServletRequestFactory
+org.xwiki.wysiwyg.script.WysiwygEditorScriptService

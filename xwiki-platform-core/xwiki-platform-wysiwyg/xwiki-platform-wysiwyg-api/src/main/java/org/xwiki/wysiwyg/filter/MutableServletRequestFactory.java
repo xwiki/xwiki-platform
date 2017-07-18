@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,21 +16,28 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.wysiwyg.filter;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>9.7-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-wysiwyg</artifactId>
-  <name>XWiki Platform - WYSIWYG Editor - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Parent POM for the WYSIWYG editor modules</description>
-  <modules>
-    <module>xwiki-platform-wysiwyg-api</module>
-    <module>xwiki-platform-wysiwyg-ui</module>
-  </modules>
-</project>
+import javax.servlet.ServletRequest;
+
+import org.xwiki.component.annotation.Role;
+
+/**
+ * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
+ * default constructor and I couldn't make the component manager (Plexus) inject the current servlet request when
+ * instantiating mutable servlet requets.
+ * 
+ * @version $Id$
+ */
+@Role
+public interface MutableServletRequestFactory
+{
+    /**
+     * Creates a new mutable servlet request.
+     * 
+     * @param request The original servlet request to wrap.
+     * @return a new mutable servlet request.
+     */
+    MutableServletRequest newInstance(ServletRequest request);
+}

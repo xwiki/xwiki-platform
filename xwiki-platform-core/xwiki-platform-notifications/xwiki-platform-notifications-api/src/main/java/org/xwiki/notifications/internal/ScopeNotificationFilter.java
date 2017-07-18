@@ -168,7 +168,7 @@ public class ScopeNotificationFilter implements NotificationFilter
                         params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
                                 EntityType.WIKI).getName());
                         params.put(String.format("space_%s", suffix),
-                                escape(serializer.serialize(scope.getScopeReference())) + ".%"
+                                escape(serializer.serialize(scope.getScopeReference())) + "%"
                         );
                         break;
                     case WIKI:

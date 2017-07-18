@@ -213,7 +213,7 @@ public class ScopeNotificationFilterTest
                 String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event1".hashCode()))));
         assertEquals("wiki2", results.get(
                 String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
-        assertEquals("space!_2.%", results.get(
+        assertEquals("space!_2%", results.get(
                 String.format("space_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
         assertEquals("wiki3", results.get(
                 String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event3".hashCode()))));

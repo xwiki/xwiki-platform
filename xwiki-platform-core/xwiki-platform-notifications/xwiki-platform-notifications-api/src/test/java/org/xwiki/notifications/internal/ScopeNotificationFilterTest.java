@@ -128,8 +128,7 @@ public class ScopeNotificationFilterTest
 
         // Verify
         assertEquals(
-                String.format("(event.wiki = :wiki_scopeNotifFilter_%s)",
-                    Integer.toHexString("event1".hashCode())),
+                "(event.wiki = :wiki_scopeNotifFilter_1)",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
                     NotificationFormat.ALERT,
@@ -137,9 +136,8 @@ public class ScopeNotificationFilterTest
         ));
 
         assertEquals(
-                String.format("(event.wiki = :wiki_scopeNotifFilter_%s " +
-                                "AND event.space LIKE :space_scopeNotifFilter_%s ESCAPE '!')",
-                    Integer.toHexString("event2".hashCode()), Integer.toHexString("event2".hashCode())),
+                "(event.wiki = :wiki_scopeNotifFilter_2 " +
+                                "AND event.space LIKE :space_scopeNotifFilter_2 ESCAPE '!')",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
                     NotificationFormat.ALERT,
@@ -147,8 +145,7 @@ public class ScopeNotificationFilterTest
         ));
 
         assertEquals(
-                String.format("(event.wiki = :wiki_scopeNotifFilter_%s AND event.page = :page_scopeNotifFilter_%s)",
-                    Integer.toHexString("event3".hashCode()), Integer.toHexString("event3".hashCode())),
+                "(event.wiki = :wiki_scopeNotifFilter_3 AND event.page = :page_scopeNotifFilter_3)",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
                     NotificationFormat.ALERT,
@@ -209,16 +206,11 @@ public class ScopeNotificationFilterTest
         );
 
         // Verify
-        assertEquals("wiki1", results.get(
-                String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event1".hashCode()))));
-        assertEquals("wiki2", results.get(
-                String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
-        assertEquals("space!_2%", results.get(
-                String.format("space_scopeNotifFilter_%s", Integer.toHexString("event2".hashCode()))));
-        assertEquals("wiki3", results.get(
-                String.format("wiki_scopeNotifFilter_%s", Integer.toHexString("event3".hashCode()))));
-        assertEquals("space3.page3", results.get(
-                String.format("page_scopeNotifFilter_%s", Integer.toHexString("event3".hashCode()))));
+        assertEquals("wiki1", results.get("wiki_scopeNotifFilter_1"));
+        assertEquals("wiki2", results.get("wiki_scopeNotifFilter_2"));
+        assertEquals("space!_2%", results.get("space_scopeNotifFilter_2"));
+        assertEquals("wiki3", results.get("wiki_scopeNotifFilter_3"));
+        assertEquals("space3.page3", results.get("page_scopeNotifFilter_3"));
         assertEquals(5, results.size());
     }
 }

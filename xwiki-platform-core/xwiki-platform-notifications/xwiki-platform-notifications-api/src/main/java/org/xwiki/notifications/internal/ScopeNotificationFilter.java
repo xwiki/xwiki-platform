@@ -49,7 +49,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 {
     private static final String ERROR = "Failed to filter the notifications.";
 
-    private static final String PREFIX_FORMAT = "scopeNotifFilter_%s";
+    private static final String PREFIX_FORMAT = "scopeNotifFilter_%d";
 
     @Inject
     @Named("cached")
@@ -97,7 +97,9 @@ public class ScopeNotificationFilter implements NotificationFilter
         String separator = "";
 
         try {
+            int number = 0;
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
+                number++;
                 if (!scope.getEventType().equals(type)) {
                     continue;
                 }
@@ -105,7 +107,7 @@ public class ScopeNotificationFilter implements NotificationFilter
                 stringBuilder.append("(");
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, Integer.toHexString(type.hashCode()));
+                final String suffix = String.format(PREFIX_FORMAT, number);
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
@@ -150,11 +152,11 @@ public class ScopeNotificationFilter implements NotificationFilter
         Map<String, Object> params = new HashMap<>();
 
         try {
+            int number = 0;
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT,
-                        Integer.toHexString(scope.getEventType().hashCode()));
+                final String suffix = String.format(PREFIX_FORMAT, ++number);
                 final String wikiParam = "wiki_%s";
 
                 switch (scope.getScopeReference().getType()) {

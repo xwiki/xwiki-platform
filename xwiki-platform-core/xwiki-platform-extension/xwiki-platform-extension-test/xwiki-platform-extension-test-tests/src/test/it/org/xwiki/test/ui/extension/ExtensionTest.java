@@ -1,4 +1,3 @@
-/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -105,7 +104,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Double check that the XWiki Extension Repository is empty.
         ExtensionsSearchResult searchResult =
-            getUtil().rest().getResource("repository/search", Collections.singletonMap("number", new Object[] {1}));
+            getUtil().rest().getResource("repository/search", Collections.singletonMap("number", new Object[] { 1 }));
         assertEquals(0, searchResult.getTotalHits());
     }
 
@@ -190,7 +189,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Check that the result matches the search query.
         ExtensionPane extension = searchResults.getExtension(RandomUtils.nextInt(20));
-        assertTrue(extension.getSummary().toLowerCase().contains("commons"));
+        assertTrue("Can't find [commons] in the summary of extension [" + extension.getId() + "] ("
+            + extension.getSummary() + ")", extension.getSummary().toLowerCase().contains("commons"));
         assertEquals("core", extension.getStatus());
 
         // Test search query with no results.
@@ -209,7 +209,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
-        assertTrue(extension.getName().toLowerCase().contains("restlet"));
+        assertTrue("Can't find [restlet] in the name of the extension [" + extension.getId() + "] ("
+            + extension.getName() + ")", extension.getName().toLowerCase().contains("restlet"));
     }
 
     /**

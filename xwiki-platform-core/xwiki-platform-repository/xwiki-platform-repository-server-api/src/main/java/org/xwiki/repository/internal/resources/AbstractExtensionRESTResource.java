@@ -376,7 +376,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             features = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES);
         }
         if (features != null && !features.isEmpty()) {
-            extension.withFeatures(features);
             for (String feature : features) {
                 org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
                 ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
@@ -385,6 +384,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                     extensionFeature.setVersion(extensionId.getVersion().getValue());
                 }
                 extension.getExtensionFeatures().add(extensionFeature);
+                extension.getFeatures().add(extensionFeature.getId());
             }
         }
 
@@ -615,7 +615,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         List<String> features = ListClass.getListFromString(
             this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_FEATURES), "|", false);
         if (features != null && !features.isEmpty()) {
-            extension.withFeatures(features);
             for (String feature : features) {
                 org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
                 ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
@@ -624,6 +623,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                     extensionFeature.setVersion(extensionId.getVersion().getValue());
                 }
                 extension.getExtensionFeatures().add(extensionFeature);
+                extension.getFeatures().add(extensionFeature.getId());
             }
         }
 
@@ -717,7 +717,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Features
         Collection<String> features = this.<String>getSolrValues(document, Extension.FIELD_FEATURES);
         if (features != null && !features.isEmpty()) {
-            extension.withFeatures(features);
             for (String feature : features) {
                 org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
                 ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
@@ -726,6 +725,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                     extensionFeature.setVersion(extensionId.getVersion().getValue());
                 }
                 extension.getExtensionFeatures().add(extensionFeature);
+                extension.getFeatures().add(extensionFeature.getId());
             }
         }
 

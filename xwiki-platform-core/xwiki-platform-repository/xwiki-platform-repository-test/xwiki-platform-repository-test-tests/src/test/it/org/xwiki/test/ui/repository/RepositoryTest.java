@@ -59,8 +59,8 @@ import org.xwiki.test.ui.po.editor.ObjectEditPane;
  */
 public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 {
-    public static final UsernamePasswordCredentials USER_CREDENTIALS = new UsernamePasswordCredentials("Author",
-        "password");
+    public static final UsernamePasswordCredentials USER_CREDENTIALS =
+        new UsernamePasswordCredentials("Author", "password");
 
     private static final String IDPREFIX = "prefix-";
 
@@ -94,10 +94,10 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
             new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", USER_CREDENTIALS.getUserName())));
         this.baseExtension.addAuthor(this.baseAuthor);
 
-        this.baseExtension.addDependency(new DefaultExtensionDependency("dependencyid1", new DefaultVersionConstraint(
-            "1.0")));
-        this.baseExtension.addDependency(new DefaultExtensionDependency("dependencyid2", new DefaultVersionConstraint(
-            "2.0")));
+        this.baseExtension
+            .addDependency(new DefaultExtensionDependency("dependencyid1", new DefaultVersionConstraint("1.0")));
+        this.baseExtension
+            .addDependency(new DefaultExtensionDependency("dependencyid2", new DefaultVersionConstraint("2.0")));
 
         this.sizeOfFile = FileUtils.sizeOf(this.baseExtension.getFile().getFile());
     }
@@ -112,7 +112,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         validateRecommendations();
     }
 
-    private void setUpXWiki() {
+    private void setUpXWiki()
+    {
         // Set id prefix
 
         RepositoryAdminPage repositoryAdminPage = RepositoryAdminPage.gotoPage();
@@ -121,7 +122,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         repositoryAdminPage.clickUpdateButton();
 
         getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), "first_name",
-                "User", "last_name", "Name");
+            "User", "last_name", "Name");
 
     }
 
@@ -152,11 +153,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Add versions
         // TODO: add XR UI to manipulate versions
         getRepositoryTestUtils().addVersionObject(this.baseExtension);
-        getRepositoryTestUtils().addVersionObject(
-            this.baseExtension,
-            "10.0",
-            getUtil().getAttachmentURL("Extension", this.baseExtension.getName(),
-                this.baseExtension.getFile().getName()));
+        getRepositoryTestUtils().addVersionObject(this.baseExtension, "10.0", getUtil().getAttachmentURL("Extension",
+            this.baseExtension.getName(), this.baseExtension.getFile().getName()));
         getRepositoryTestUtils().addVersionObject(this.baseExtension, "2.0",
             "attach:" + this.baseExtension.getFile().getName());
 
@@ -211,10 +209,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // File
 
-        Assert.assertEquals(
-            this.sizeOfFile,
-            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
-                "1.0").length);
+        Assert.assertEquals(this.sizeOfFile, getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
+            this.baseExtension.getId().getId(), "1.0").length);
 
         // //////////////////////////////////////////
         // 2.0
@@ -239,10 +235,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // File
 
-        Assert.assertEquals(
-            this.sizeOfFile,
-            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
-                "2.0").length);
+        Assert.assertEquals(this.sizeOfFile, getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
+            this.baseExtension.getId().getId(), "2.0").length);
 
         // //////////////////////////////////////////
         // 10.0
@@ -273,10 +267,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // File
 
-        Assert.assertEquals(
-            this.sizeOfFile,
-            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
-                this.baseExtension.getId().getVersion().getValue()).length);
+        Assert.assertEquals(this.sizeOfFile, getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null,
+            this.baseExtension.getId().getId(), this.baseExtension.getId().getVersion().getValue()).length);
 
         // //////////////////////////////////////////
         // Search
@@ -302,7 +294,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Search pattern
 
         Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
-        queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"macro"});
+        queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] { "macro" });
 
         ExtensionsSearchResult result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
@@ -321,7 +313,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Wrong search pattern
 
         queryParams.clear();
-        queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"notexisting"});
+        queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] { "notexisting" });
 
         result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
@@ -332,7 +324,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Search limit offset
 
         queryParams.clear();
-        queryParams.put(Resources.QPARAM_LIST_START, new Object[] {1});
+        queryParams.put(Resources.QPARAM_LIST_START, new Object[] { 1 });
 
         result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
@@ -342,7 +334,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Search limit nb
 
         queryParams.clear();
-        queryParams.put(Resources.QPARAM_LIST_NUMBER, new Object[] {0});
+        queryParams.put(Resources.QPARAM_LIST_NUMBER, new Object[] { 0 });
 
         result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
@@ -396,7 +388,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         return extensionPage;
     }
 
-    private void testRestAccessToImportedExtension() throws Exception {
+    private void testRestAccessToImportedExtension() throws Exception
+    {
         // 2.0
 
         TestExtension emptyExtension =
@@ -415,7 +408,12 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("summary2\n      some more details", extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
-        Assert.assertEquals(Arrays.asList("maven:oldextension/2.0"), extension.getFeatures());
+        Assert.assertEquals(Arrays.asList("maven:oldextension", "maven:oldversionnedextension"),
+            extension.getFeatures());
+        Assert.assertEquals("maven:oldextension", extension.getExtensionFeatures().get(0).getId());
+        Assert.assertEquals("2.0", extension.getExtensionFeatures().get(0).getVersion());
+        Assert.assertEquals("maven:oldversionnedextension", extension.getExtensionFeatures().get(1).getId());
+        Assert.assertEquals("10.0", extension.getExtensionFeatures().get(1).getVersion());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(fileSize,
@@ -433,7 +431,12 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("summary2\n      some more details", extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
-        Assert.assertEquals(Arrays.asList("maven:oldextension/1.0"), extension.getFeatures());
+        Assert.assertEquals(Arrays.asList("maven:oldextension", "maven:oldversionnedextension"),
+            extension.getFeatures());
+        Assert.assertEquals("maven:oldextension", extension.getExtensionFeatures().get(0).getId());
+        Assert.assertEquals("1.0", extension.getExtensionFeatures().get(0).getVersion());
+        Assert.assertEquals("maven:oldversionnedextension", extension.getExtensionFeatures().get(1).getId());
+        Assert.assertEquals("10.0", extension.getExtensionFeatures().get(1).getVersion());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(FileUtils.sizeOf(emptyExtension.getFile().getFile()),
@@ -452,6 +455,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals(Arrays.asList(), extension.getFeatures());
+        Assert.assertEquals(Arrays.asList(), extension.getExtensionFeatures());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(fileSize,
@@ -459,16 +463,17 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
     }
 
-    private void enableProxying(ExtensionPage extensionPage) throws Exception {
+    private void enableProxying(ExtensionPage extensionPage) throws Exception
+    {
 
         String IMPORTED_EXTENSION_NAME = "name";
-        //assert that this test is going to make sense at all
+        // assert that this test is going to make sense at all
         Assert.assertTrue(getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME) > 1);
         Assert.assertTrue(getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME) > 1);
 
-        //set higher proxy level: "version" - in previously imported extension
+        // set higher proxy level: "version" - in previously imported extension
         getUtil().updateObject(Arrays.asList("Extension", IMPORTED_EXTENSION_NAME), "WebHome",
-                XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel", "history");
+            XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel", "history");
 
         // refresh extension
         extensionPage.updateExtension();
@@ -481,19 +486,24 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         testRestAccessToImportedExtension();
     }
 
-    private int getNumberOfExtensionVersionsObjects(String extensionName) {
+    private int getNumberOfExtensionVersionsObjects(String extensionName)
+    {
         ObjectEditPage objectEditPage = goToObjectEditPage(extensionName);
-        List<ObjectEditPane> versionObjects = objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
+        List<ObjectEditPane> versionObjects =
+            objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
         return versionObjects.size();
     }
 
-    private int getNumberOfExtensionVersionsDependenciesObjects(String extensionName) {
+    private int getNumberOfExtensionVersionsDependenciesObjects(String extensionName)
+    {
         ObjectEditPage objectEditPage = goToObjectEditPage(extensionName);
-        List<ObjectEditPane> dependenciesObjects = objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
+        List<ObjectEditPane> dependenciesObjects =
+            objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
         return dependenciesObjects.size();
     }
 
-    private ObjectEditPage goToObjectEditPage(String extensionName) {
+    private ObjectEditPage goToObjectEditPage(String extensionName)
+    {
         return getRepositoryTestUtils().gotoExtensionObjectsEditPage(extensionName);
     }
 

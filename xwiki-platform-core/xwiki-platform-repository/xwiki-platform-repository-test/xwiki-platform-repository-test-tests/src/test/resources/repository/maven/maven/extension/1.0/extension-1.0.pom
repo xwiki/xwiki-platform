@@ -40,7 +40,10 @@
       </developer>
     </developers>
     <properties>
-      <xwiki.extension.features>maven:oldextension</xwiki.extension.features>
+      <xwiki.extension.features>
+        maven:oldextension,
+        maven:oldversionnedextension/10.0
+      </xwiki.extension.features>
     </properties>
     <licenses>
       <license>

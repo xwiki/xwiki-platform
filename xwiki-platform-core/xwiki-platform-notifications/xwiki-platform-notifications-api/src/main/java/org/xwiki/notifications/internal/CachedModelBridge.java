@@ -52,8 +52,6 @@ public class CachedModelBridge implements ModelBridge
 
     private static final String USER_NOTIFICATIONS_PREFERENCES_SCOPE = "userNotificationsPreferencesScope";
 
-    private static final String USER_NOTIFICATIONS_START_DATE = "userNotificationsStartDate";
-
     @Inject
     private ModelBridge modelBridge;
 
@@ -73,20 +71,6 @@ public class CachedModelBridge implements ModelBridge
         context.setProperty(USER_NOTIFICATIONS_PREFERENCES, preferences);
 
         return preferences;
-    }
-
-    @Override
-    public Date getUserStartDate(DocumentReference userReference) throws NotificationException
-    {
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(USER_NOTIFICATIONS_START_DATE)) {
-            return (Date) context.getProperty(USER_NOTIFICATIONS_START_DATE);
-        }
-
-        Date date = modelBridge.getUserStartDate(userReference);
-        context.setProperty(USER_NOTIFICATIONS_START_DATE, date);
-
-        return date;
     }
 
     @Override
@@ -127,5 +111,13 @@ public class CachedModelBridge implements ModelBridge
     {
         // We don’t need any cache on that
         return modelBridge.getDocumentURL(documentReference, action, parameters);
+    }
+
+    @Override
+    public void saveNotificationPreference(DocumentReference userReference,
+            NotificationPreference notificationPreference) throws NotificationException
+    {
+        // We can’t cache that
+        modelBridge.saveNotificationPreference(userReference, notificationPreference);
     }
 }

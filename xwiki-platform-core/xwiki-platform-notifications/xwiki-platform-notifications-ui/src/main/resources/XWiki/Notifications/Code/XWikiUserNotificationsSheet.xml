@@ -339,6 +339,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
     var input        = $(this);
     var td           = input.parents('td.notificationTypeCell');
     var eventType    = td.attr('data-eventtype');
+    var appId        = td.attr('data-applicationid');
     var objNumber    = td.attr('data-objnumber');
     var format       = td.attr('data-format');
 
@@ -347,38 +348,20 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch', 'xwiki-events-
 
     // Saving
     var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-    if (objNumber == '' &amp;&amp; state) {
-      // If the object does not exist yet, create it
-      var restURL = xm.restURL + '/objects?media=json';
-      $.post(restURL, {
-        'className': 'XWiki.Notifications.Code.NotificationPreferenceClass',
-        'property#eventType': eventType,
-        'property#format': format,
-        'property#notificationEnabled': 1
-      }).done(function (data) {
-        td.attr('data-objnumber', data.number);
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function () {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      });
-    } else if (objNumber != '') {
-      // If the object already exist, just update its value
-      var restURL = xm.restURL + '/objects/XWiki.Notifications.Code.NotificationPreferenceClass/' + objNumber
-        + '/properties/notificationEnabled?media=json';
-      $.ajax(restURL, {
-        method: 'PUT',
-        contentType: 'text/plain',
-        data: state ? '1' : '0'
-      }).done(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).fail(function () {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      });
-    }
+    var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
+      XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    $.post(url, {
+      'action': 'toggleNotificationPreference',
+      'eventType': eventType,
+      'notificationFormat': format,
+      'notificationState': state,
+    }).done(function () {
+      notification.hide();
+      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+    }).fail(function () {
+      notification.hide();
+      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+    });
   });
 
   /**

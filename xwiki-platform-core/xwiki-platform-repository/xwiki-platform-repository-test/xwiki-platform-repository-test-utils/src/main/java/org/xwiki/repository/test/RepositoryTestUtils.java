@@ -302,7 +302,7 @@ public class RepositoryTestUtils
         this.testUtils.addObject(getExtensionPageReference(extension),
             XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
             dependency.getVersionConstraint(), XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(),
-            XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional(),
+            XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0,
             XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version);
     }
 

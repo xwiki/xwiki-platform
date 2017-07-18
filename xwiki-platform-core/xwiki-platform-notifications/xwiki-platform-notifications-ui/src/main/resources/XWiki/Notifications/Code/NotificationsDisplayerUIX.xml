@@ -96,6 +96,11 @@
     #set ($startDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.date).longValue()).toDate())
   #end
   #set ($discard = $services.notification.setStartDate($datetool.date))
+#********************************************************
+     Toggle the given notification preference state
+********************************************************#
+#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'toggleNotificationPreference' == $request.action)
+  #set ($discard = $services.notification.setNotificationPreferenceStatus($request.eventType, $request.applicationId, $request.notificationFormat, $request.notificationState, $datetool.date))
 #end
 {{/velocity}}
 </content>

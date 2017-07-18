@@ -241,7 +241,9 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
 
         // Create macro descriptor.
-        MacroId id = new MacroId(macroId, doc.getSyntax());
+        // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
+        // macro for a given syntax only.
+        MacroId id = new MacroId(macroId);
         MacroDescriptor macroDescriptor =
             new WikiMacroDescriptor(id, macroName, macroDescription, macroDefaultCategory, macroVisibility,
                 contentDescriptor, parameterDescriptors);

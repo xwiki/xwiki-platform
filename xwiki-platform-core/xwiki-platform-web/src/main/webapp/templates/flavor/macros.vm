@@ -13,8 +13,9 @@
     #set ($namespace = "wiki:$xcontext.database")
   #end
   ## TODO: put this in a webjar instead
-  #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/picker.css', {'forceSkinAction': true}))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/picker.js' , {'forceSkinAction': true}))
+  #set($environmentVersion = $services.extension.core.repository.environmentExtension.id.version)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/picker.css', {'forceSkinAction': true, 'version': $environmentVersion}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/picker.js' , {'forceSkinAction': true, 'version': $environmentVersion}))
   <div class="xwiki-flavor-picker $!cssClass" data-namespace="$escapetool.xml($namespace)">
     ## Filter
     <input type="text" id="${escapetool.xml($fieldName)}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" style="margin-bottom: 2px;"/>

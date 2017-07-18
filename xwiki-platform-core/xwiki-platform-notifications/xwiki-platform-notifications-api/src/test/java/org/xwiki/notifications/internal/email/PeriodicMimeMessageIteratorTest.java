@@ -57,11 +57,11 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class NotificationMimeMessageIteratorTest
+public class PeriodicMimeMessageIteratorTest
 {
     @Rule
-    public final MockitoComponentMockingRule<NotificationMimeMessageIterator> mocker =
-            new MockitoComponentMockingRule<>(NotificationMimeMessageIterator.class);
+    public final MockitoComponentMockingRule<PeriodicMimeMessageIterator> mocker =
+            new MockitoComponentMockingRule<>(PeriodicMimeMessageIterator.class);
 
     private NotificationManager notificationManager;
     private MimeMessageFactory<MimeMessage> factory;
@@ -129,7 +129,7 @@ public class NotificationMimeMessageIteratorTest
         when(defaultNotificationEmailRenderer.renderPlainText(event2)).thenReturn("event2");
 
         // Test
-        NotificationMimeMessageIterator iterator = mocker.getComponentUnderTest();
+        PeriodicMimeMessageIterator iterator = mocker.getComponentUnderTest();
 
         iterator.initialize(userIterator, factoryParameters, new Date(0L), templateReference);
 

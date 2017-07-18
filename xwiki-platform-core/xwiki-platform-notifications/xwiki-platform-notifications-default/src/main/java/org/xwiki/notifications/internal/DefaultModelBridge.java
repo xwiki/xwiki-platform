@@ -57,9 +57,17 @@ public class DefaultModelBridge implements ModelBridge
 {
     private static final String EVENT_TYPE_FIELD = "eventType";
 
+    private static final String START_DATE_FIELD = "startDate";
+
+    private static final String NOTIFICATION_ENABLED_FIELD = "notificationEnabled";
+
+    private static final String APPLICATION_ID_FIELD = "applicationId";
+
+    private static final String FORMAT_FIELD = "format";
+
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
         new SpaceReference("Notifications",
-            new SpaceReference("XWiki", new WikiReference("toChange"))
+            new SpaceReference("XWiki", new WikiReference("xwiki"))
         )
     );
 
@@ -71,13 +79,9 @@ public class DefaultModelBridge implements ModelBridge
             "NotificationPreferenceScopeClass", NOTIFICATION_CODE_SPACE
     );
 
-    private static final DocumentReference NOTIFICATION_START_DATE_CLASS = new DocumentReference(
-            "NotificationsStartDateClass", NOTIFICATION_CODE_SPACE
-    );
+    private static final String NOTIFICATION_START_DATE_UPDATE_COMMENT = "Update start date for the notifications.";
 
-    private static final String START_DATE = "startDate";
-
-    private static final String FORMAT = "format";
+    private static final String SET_USER_START_DATE_ERROR_MESSAGE = "Failed to set the user start date for [%s].";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -106,14 +110,16 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
-                        String objFormat = obj.getStringValue(FORMAT);
+                        String objFormat = obj.getStringValue(FORMAT_FIELD);
+                        Date objStartDate = obj.getDateValue(START_DATE_FIELD);
                         preferences.add(new NotificationPreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
-                                obj.getStringValue("applicationId"),
-                                obj.getIntValue("notificationEnabled", 0) != 0,
+                                obj.getStringValue(APPLICATION_ID_FIELD),
+                                obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0,
                                 StringUtils.isNotBlank(objFormat)
                                         ? NotificationFormat.valueOf(objFormat.toUpperCase())
-                                        : NotificationFormat.ALERT
+                                        : NotificationFormat.ALERT,
+                                (objStartDate != null) ? objStartDate : doc.getCreationDate()
                         ));
                     }
                 }
@@ -127,33 +133,6 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public Date getUserStartDate(DocumentReference userReference) throws NotificationException
-    {
-        try {
-            XWikiContext context = contextProvider.get();
-            XWiki xwiki = context.getWiki();
-            XWikiDocument document =  xwiki.getDocument(userReference, context);
-
-            final DocumentReference notificationStartDateClass
-                    = NOTIFICATION_START_DATE_CLASS.setWikiReference(userReference.getWikiReference());
-
-            BaseObject obj = document.getXObject(notificationStartDateClass);
-            if (obj != null) {
-                Date date = obj.getDateValue(START_DATE);
-                if (date != null) {
-                    return date;
-                }
-            }
-
-            // Fallback to the creation date of the user
-            return document.getCreationDate();
-        } catch (XWikiException e) {
-            throw new NotificationException(
-                    String.format("Failed to get the document [%s].", userReference), e);
-        }
-    }
-
-    @Override
     public void setStartDateForUser(DocumentReference userReference, Date startDate)
             throws NotificationException
     {
@@ -162,17 +141,20 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            final DocumentReference notificationStartDateClass
-                    = NOTIFICATION_START_DATE_CLASS.setWikiReference(userReference.getWikiReference());
+            List<BaseObject> objects = document.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
+            if (objects != null) {
+                for (BaseObject object : objects) {
+                    if (object != null) {
+                        object.setDateValue(START_DATE_FIELD, startDate);
+                    }
+                }
+            }
 
-            BaseObject obj = document.getXObject(notificationStartDateClass, true, context);
-            obj.setDateValue(START_DATE, startDate);
-
-            xwiki.saveDocument(document, "Update start date for the notifications.", context);
+            xwiki.saveDocument(document, NOTIFICATION_START_DATE_UPDATE_COMMENT, context);
 
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to set the user start date for [%s].", userReference), e);
+                    String.format(SET_USER_START_DATE_ERROR_MESSAGE, userReference), e);
         }
     }
 
@@ -193,7 +175,7 @@ public class DefaultModelBridge implements ModelBridge
             List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
-                    if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT), format)) {
+                    if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT_FIELD), format)) {
                         String scopeType = obj.getStringValue("scope");
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
@@ -224,6 +206,44 @@ public class DefaultModelBridge implements ModelBridge
         return preferences;
     }
 
+    /**
+     * Search for the XObject corresponding to the given notification preference in the given document. If no object
+     * is found, returns null.
+     *
+     * @param xWikiDocument the document to search in
+     * @param notificationPreference the notification preference
+     * @return the corresponding NotificationPreferences XObject
+     * @throws NotificationException if the base object could not be found
+     * @since 9.7RC1
+     */
+    private BaseObject findNotificationPreference(XWikiDocument xWikiDocument,
+            NotificationPreference notificationPreference) throws NotificationException
+    {
+        List<BaseObject> objects = xWikiDocument.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
+
+        if (objects != null) {
+            for (BaseObject object : objects) {
+                if (object != null
+                        && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))
+                        && notificationPreference.getApplicationId().equals(
+                                object.getStringValue(APPLICATION_ID_FIELD))) {
+                    String format = object.getStringValue(FORMAT_FIELD);
+
+                    // Ensure that we have the correct notification format
+                    if ((StringUtils.isBlank(format) && notificationPreference.getFormat().equals(
+                            NotificationFormat.ALERT))
+                            || notificationPreference.getFormat().equals(NotificationFormat.valueOf(
+                                    format.toUpperCase())))
+                    {
+                        return object;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     private boolean isCompatibleFormat(String format, NotificationFormat expectedFormat)
     {
         return format != null && NotificationFormat.valueOf(format.toUpperCase()) == expectedFormat;
@@ -252,5 +272,44 @@ public class DefaultModelBridge implements ModelBridge
     public String getDocumentURL(DocumentReference documentReference, String action, String parameters) {
         XWikiContext context = contextProvider.get();
         return context.getWiki().getExternalURL(documentReference, action, parameters, null, context);
+    }
+
+    @Override
+    public void saveNotificationPreference(DocumentReference userReference,
+            NotificationPreference notificationPreference) throws NotificationException
+    {
+        try {
+            XWikiContext context = contextProvider.get();
+            XWiki xwiki = context.getWiki();
+            XWikiDocument document =  xwiki.getDocument(userReference, context);
+
+            // Try to find the corresponding XObject for the notification preference
+            BaseObject preferenceObject = this.findNotificationPreference(document, notificationPreference);
+
+            // If the object exists, update it
+            if (preferenceObject != null) {
+                preferenceObject.set(NOTIFICATION_ENABLED_FIELD,
+                        (notificationPreference.isNotificationEnabled() ? 1 : 0), context);
+                preferenceObject.set(START_DATE_FIELD, notificationPreference.getStartDate(), context);
+            } else {
+                // If no preference exist, then create one
+                preferenceObject = new BaseObject();
+                preferenceObject.setXClassReference(NOTIFICATION_PREFERENCE_CLASS);
+                document.addXObject(preferenceObject);
+
+                preferenceObject.set(EVENT_TYPE_FIELD, notificationPreference.getEventType(), context);
+                preferenceObject.set(APPLICATION_ID_FIELD, notificationPreference.getApplicationId(), context);
+                preferenceObject.set(FORMAT_FIELD, notificationPreference.getFormat().name().toLowerCase(),
+                        context);
+                preferenceObject.set(NOTIFICATION_ENABLED_FIELD,
+                        (notificationPreference.isNotificationEnabled() ? 1 : 0), context);
+                preferenceObject.set(START_DATE_FIELD, notificationPreference.getStartDate(), context);
+            }
+
+        } catch (XWikiException e) {
+            throw new NotificationException(String.format(
+                    "Failed to save the notification preference [%s] for [%s]",
+                    notificationPreference, userReference));
+        }
     }
 }

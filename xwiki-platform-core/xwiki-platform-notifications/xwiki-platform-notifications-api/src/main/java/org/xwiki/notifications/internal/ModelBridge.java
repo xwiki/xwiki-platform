@@ -51,13 +51,8 @@ public interface ModelBridge
         throws NotificationException;
 
     /**
-     * @param userReference the document reference of a user
-     * @return the date before which we ignore notifications
-     * @throws NotificationException if an error occurs
-     */
-    Date getUserStartDate(DocumentReference userReference) throws NotificationException;
-
-    /**
+     * Set the start date of every NotificationPreference of the given user to the given startDate.
+     *
      * @param userReference the document reference of a user
      * @param startDate the date before which we ignore notifications
      * @throws NotificationException if an error occurs
@@ -101,4 +96,17 @@ public interface ModelBridge
      * @since 9.6RC1
      */
     String getDocumentURL(DocumentReference documentReference, String action, String parameters);
+
+    /**
+     * Save the given {@link NotificationPreference} for the given user. If such notification already exists, it will
+     * be updated.
+     *
+     * @param userReference the user we want to work on
+     * @param notificationPreference the notification preference to save
+     * @throws NotificationException if error happens
+     *
+     * @since 9.7RC1
+     */
+    void saveNotificationPreference(DocumentReference userReference, NotificationPreference notificationPreference)
+        throws NotificationException;
 }

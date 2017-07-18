@@ -3867,12 +3867,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         setXObjects(new TreeMap<DocumentReference, List<BaseObject>>());
                     }
                     // Merge the external objects.
-                    // Currently the choice is not to merge the base class and object because it is not the prefered way
-                    // of using external classes and objects.
+                    // Currently the choice is not to merge the base class and object because it is not the preferred
+                    // way of using external classes and objects.
                     mergeXObjects(templatedoc);
 
-                    // Copy the attachments from the template document.
-                    copyAttachments(templatedoc);
+                    // Copy the attachments from the template document, but don't overwrite existing attachments because
+                    // the user can add attachments from the WYSIWYG editor before the save button is clicked (and thus
+                    // before the template is applied).
+                    copyAttachments(templatedoc, false);
                 }
             }
         }
@@ -4048,30 +4050,46 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Copy attachments from one document to another. This implementation expects that you are copying the attachment
-     * from one document to another and thus it should be saved seperately from the original in the database.
+     * from one document to another and thus it should be saved separately from the original in the database.
      *
      * @param sourceDocument an XWikiDocument to copy attachments from
      */
     public void copyAttachments(XWikiDocument sourceDocument)
     {
-        // Note: when clearing the attachment list, we automatically mark the document's metadata as dirty.
-        getAttachmentList().clear();
+        copyAttachments(sourceDocument, true);
+    }
 
-        Iterator<XWikiAttachment> attit = sourceDocument.getAttachmentList().iterator();
-        while (attit.hasNext()) {
-            XWikiAttachment attachment = attit.next();
-            XWikiAttachment newattachment = (XWikiAttachment) attachment.clone();
-            newattachment.setDoc(this);
+    /**
+     * Copy attachments from one document to another. This implementation expects that you are copying the attachment
+     * from one document to another and thus it should be saved separately from the original in the database.
+     *
+     * @param sourceDocument an XWikiDocument to copy attachments from
+     * @param overwrite whether to overwrite the existing attachments or not
+     * @since 8.4.6
+     * @since 9.6RC1
+     */
+    private void copyAttachments(XWikiDocument sourceDocument, boolean overwrite)
+    {
+        if (overwrite) {
+            // Note: when clearing the attachment list, we automatically mark the document's metadata as dirty.
+            getAttachmentList().clear();
+        }
 
-            // We need to set the content of the attachment to be dirty because the dirty bit
-            // is used to signal that there is a reason to save the copied attachment, otherwise
-            // the copied attachment will be empty since the original attachment content is not
-            // modified in this operation.
-            if (newattachment.getAttachment_content() != null) {
-                newattachment.getAttachment_content().setContentDirty(true);
+        for (XWikiAttachment attachment : sourceDocument.getAttachmentList()) {
+            if (overwrite || this.getAttachment(attachment.getFilename()) == null) {
+                XWikiAttachment newAttachment = attachment.clone();
+                newAttachment.setDoc(this);
+
+                // We need to set the content of the attachment to be dirty because the dirty bit
+                // is used to signal that there is a reason to save the copied attachment, otherwise
+                // the copied attachment will be empty since the original attachment content is not
+                // modified in this operation.
+                if (newAttachment.getAttachment_content() != null) {
+                    newAttachment.getAttachment_content().setContentDirty(true);
+                }
+
+                getAttachmentList().add(newAttachment);
             }
-
-            getAttachmentList().add(newattachment);
         }
     }
 

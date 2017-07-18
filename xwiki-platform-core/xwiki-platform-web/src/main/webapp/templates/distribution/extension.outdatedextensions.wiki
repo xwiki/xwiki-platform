@@ -7,7 +7,8 @@
   #set ($discard = "#getExtensionUpdaterPlan($plan)")
   #if (!$isAjaxRequest)
     ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
-    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
+    ## Make sure the browser won't keep the same version of the resource in cache from one version of XWiki to another
+    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', {'forceSkinAction': true, 'version': $environmentVersion}))
     $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
       '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application]]',

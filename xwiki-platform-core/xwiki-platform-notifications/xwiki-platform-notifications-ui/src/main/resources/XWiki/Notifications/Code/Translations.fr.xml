@@ -43,16 +43,34 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Journalier
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Horaire
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Hebdomadaire
+notifications.email.seeChanges=Changements \: 
+notifications.email.subject={0} évènement(s) sur le wiki
+notifications.email.title=Évènements sur le wiki \:
 notifications.eventTypes.create=Une page est créée
 notifications.eventTypes.delete=Une page est supprimée
 notifications.eventTypes.update=Une page est modifiée
+notifications.events.addComment.description=Le document {0} a été commenté par {1}.
+notifications.events.by=Par {0}.
+notifications.events.lastChange=Dernière modification \: {0}.
+notifications.events.lastComment=Dernier commentaire \: {0}.
 notifications.menu.clear=Effacer tout
 notifications.menu.cleared=Les notifications ont été effacées
 notifications.menu.clearing=Les notifications sont en train d'être effacées
+notifications.menu.details=Détails ({0})
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Préférences
 notifications.menu.more=Charger des notifications plus anciennes
 notifications.menu.nothing=Pas de notification \!
+notifications.preferences.scope.table._actions=Actions
+notifications.preferences.scope.table.location=Emplacement
+notifications.preferences.scope.table.scope=Portée
+notifications.settings.addFilter=Ajouter un filtre
+notifications.settings.email=E-Mail
+notifications.settings.errorFilterWiki=Erreur \: vous devez sélectionner un wiki et non une page
+notifications.settings.filters=Filtres ({0})
 notifications.settings.menu=Menu des notifications
 notifications.settings.saved=Enregistrées \!
 notifications.settings.saving=Vos préférences sont en train d'être enregistrées...

@@ -43,6 +43,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+appWithinMinutes.classEditor.title={0} Structure
 appWithinMinutes.codeSpace.description=L'emplacement où le code de l'application est situé.
 appWithinMinutes.codeSpace.hiddenPagesInfo=Les pages cachées sont également listées ici. Cela va à l'encontre de vos préférences utilisateur, mais sans cela aucune page de code ne serait visible puisqu'elles sont toutes cachées par défaut.
 appWithinMinutes.codeSpace.title=Code
@@ -51,8 +52,20 @@ appWithinMinutes.createApp.location.label=Emplacement
 appWithinMinutes.createApp.parent.hint=La page parente de la nouvelle application. Laisser vide si vous souhaitez créer une application de premier niveau.
 appWithinMinutes.createApp.parent.label=Page parente
 appWithinMinutes.createApp.parent.placeholder=Emplacent.Du.Parent
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Si aucun emplacement n’est sélectionné, les éléments peuvent être créées partout dans le wiki.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Emplacement de création des entrées
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Permet de n’utiliser les emplacements précisés précédemment que comme des suggestions. L’utilisateur pourra donc modifier l’emplacement d’un élément lors de sa création.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Désactiver les restrictions d’emplacement des éléments
+appWithinMinutes.templateProviderEditor.description.hint=Courte description d’un élément de l’application.
+appWithinMinutes.templateProviderEditor.hint=Les éléments d’une application sont des pages wiki contenant des données structurées.
+appWithinMinutes.templateProviderEditor.icon.hint=Icône associée à chaque élément de l’application.
+appWithinMinutes.templateProviderEditor.terminal.hint=Détermine si les éléments de l’application doivent être contenus dans des pages terminales.
 appWithinMinutes.templateProviderEditor.title={0} éléments
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Si aucun emplacement n’est sélectionné, les entrées peuvent être créées depuis n’importe quelle page.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Espace à partir duquel des entrées peuvent être créées
+appWithinMinutes.wizardStep.entries.description=Choisissez où stocker les éléments de votre application
 appWithinMinutes.wizardStep.entries.name=Eléments
+appWithinMinutes.wizardStep.entries.title=Localisez vos entrées
 appWithinMinutes.wizardStep.name.description=Choisissez un nom pour l'application
 appWithinMinutes.wizardStep.name.name=Nom
 appWithinMinutes.wizardStep.name.title=Donnez un nom à votre application
@@ -164,6 +177,7 @@ platform.appwithinminutes.liveTableEditorDocDateColumnDescription=La date à laq
 platform.appwithinminutes.liveTableEditorDocDateColumnName=Date de dernière mise à jour
 platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Le nom de la page qui contient l'entrée, préfixée par le nom de l'espace.
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nom complet de la page
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Emplacement de la page contenant les données de l’application
 platform.appwithinminutes.liveTableEditorDocLocationColumnName=Emplacement
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Le nom de la page qui contient l'entrée de l'application
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Nom de la page

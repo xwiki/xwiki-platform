@@ -167,5 +167,9 @@ Radeox macros cannot be used in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocit
 
 {{info}}
 For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
-{{/info}}</content>
+{{/info}}
+
+==== Macros in this wiki ====
+
+{{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
 </xwikidoc>

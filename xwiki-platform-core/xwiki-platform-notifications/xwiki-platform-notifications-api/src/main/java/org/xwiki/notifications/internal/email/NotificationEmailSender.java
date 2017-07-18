@@ -61,7 +61,7 @@ public class NotificationEmailSender
     private Provider<MailListener> mailListenerProvider;
 
     @Inject
-    private Provider<NotificationMimeMessageIterator> notificationMimeMessageIteratorProvider;
+    private Provider<PeriodicMimeMessageIterator> notificationMimeMessageIteratorProvider;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -80,14 +80,14 @@ public class NotificationEmailSender
         DocumentReference templateReference = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
                 Arrays.asList("XWiki", "Notifications"), "MailTemplate");
 
-        NotificationMimeMessageIterator notificationMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
-        notificationMimeMessageIterator.initialize(notificationUserIterator, emailFactoryParameters,
-                fromDate, templateReference);
+        PeriodicMimeMessageIterator periodicMimeMessageIterator = notificationMimeMessageIteratorProvider.get();
+        periodicMimeMessageIterator.initialize(notificationUserIterator, emailFactoryParameters, fromDate,
+                templateReference);
 
         Session session = this.sessionFactory.create(Collections.emptyMap());
         MailListener mailListener = mailListenerProvider.get();
 
         // Pass it to the message sender to send it asynchronously.
-        mailSender.sendAsynchronously(notificationMimeMessageIterator, session, mailListener);
+        mailSender.sendAsynchronously(periodicMimeMessageIterator, session, mailListener);
     }
 }

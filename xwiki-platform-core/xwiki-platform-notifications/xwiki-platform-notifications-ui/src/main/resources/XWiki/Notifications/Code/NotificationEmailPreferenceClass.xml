@@ -67,7 +67,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>hourly=Hourly|daily=Daily|weekly=Weekly</values>
+      <values>hourly=Hourly|daily=Daily|weekly=Weekly|live=Live</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </interval>
   </class>

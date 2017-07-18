@@ -191,7 +191,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Check that the result matches the search query.
         ExtensionPane extension = searchResults.getExtension(RandomUtils.nextInt(20));
-        assertTrue(extension.getName().toLowerCase().contains("commons"));
+        assertTrue(extension.getSummary().toLowerCase().contains("commons"));
         assertEquals("core", extension.getStatus());
 
         // Test search query with no results.

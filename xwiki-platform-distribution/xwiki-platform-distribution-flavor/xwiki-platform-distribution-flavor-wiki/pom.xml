@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>9.6-SNAPSHOT</version>
+    <version>9.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-wiki</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Wiki</name>
@@ -42,7 +42,7 @@
 
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.platform:xwiki-enterprise-ui-mainwiki
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki
     </xwiki.extension.features>
   </properties>
   <dependencies>
@@ -58,6 +58,7 @@
       <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

@@ -54,6 +54,17 @@ public class CompositeEvent
     }
 
     /**
+     * Copy constructor of {@link CompositeEvent}.
+     *
+     * @param compositeEvent the composite event to copy
+     */
+    public CompositeEvent(CompositeEvent compositeEvent)
+    {
+        this.events = new ArrayList<>(compositeEvent.events);
+        this.similarityBetweenEvents = compositeEvent.similarityBetweenEvents;
+    }
+
+    /**
      * @return the list of the ids of the events
      */
     public List<String> getEventIds()

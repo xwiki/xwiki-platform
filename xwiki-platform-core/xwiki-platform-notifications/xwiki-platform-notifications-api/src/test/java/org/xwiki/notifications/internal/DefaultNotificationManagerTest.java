@@ -91,9 +91,6 @@ public class DefaultNotificationManagerTest
                 anyBoolean(), nullable(Date.class),
                 nullable(Date.class), nullable(List.class))).thenReturn(query);
 
-
-        when(modelBridge.getUserStartDate(userReference)).thenReturn(startDate);
-
         NotificationPreference pref1 = new NotificationPreference("create", null, true);
         when(modelBridge.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
     }

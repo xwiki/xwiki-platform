@@ -1001,14 +1001,17 @@ public class RepositoryManager implements Initializable, Disposable
                                 getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT);
                             List<String> xobjectRepositories = (List<String>) getValue(dependencyObject,
                                 XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
-
-                            DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
-                                new DefaultVersionConstraint(xobjectConstraint));
-                            xobjectDependency.setRepositories(XWikiRepositoryModel
-                                .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
+                            boolean xobjectOptional =
+                                getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, 0) == 1;
 
                             if (dependencies.size() > dependencyIndex) {
                                 ExtensionDependency dependency = dependencies.get(dependencyIndex);
+
+                                DefaultExtensionDependency xobjectDependency = new DefaultExtensionDependency(xobjectId,
+                                    new DefaultVersionConstraint(xobjectConstraint), xobjectOptional,
+                                    dependency.getProperties());
+                                xobjectDependency.setRepositories(XWikiRepositoryModel
+                                    .toRepositoryDescriptors(xobjectRepositories, this.extensionFactory));
 
                                 if (dependency.equals(xobjectDependency)) {
                                     ++dependencyIndex;
@@ -1041,7 +1044,8 @@ public class RepositoryManager implements Initializable, Disposable
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(), xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
                     dependency.getVersionConstraint().getValue(), xcontext);
-                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional(), xcontext);
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, dependency.isOptional() ? 1 : 0,
+                    xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES,
                     XWikiRepositoryModel.toStringList(dependency.getRepositories()), xcontext);
 

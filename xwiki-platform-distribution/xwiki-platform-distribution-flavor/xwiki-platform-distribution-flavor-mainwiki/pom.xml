@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>9.6-SNAPSHOT</version>
+    <version>9.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Main Wiki</name>
@@ -33,17 +33,13 @@
   <description>Default set of wiki pages containing both content and default applications for XWiki Flavor Main Wiki</description>
   <properties>
     <xwiki.extension.category>flavor</xwiki.extension.category>
-
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>XWiki Standard Flavor</xwiki.extension.name>
-
-    <!-- Should only be insalled on main wiki -->
+    <!-- Should only be installed on main wiki -->
     <xwiki.extension.namespaces>wiki:xwiki</xwiki.extension.namespaces>
-
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.platform:xwiki-enterprise-ui-mainwiki,
-
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
         <!-- Replace old XEM flavor -->
         com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
         org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
@@ -58,24 +54,26 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-menu-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-help-center</artifactId>
-      <version>1.1</version>
+      <version>1.2-SNAPSHOT</version>
       <type>xar</type>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

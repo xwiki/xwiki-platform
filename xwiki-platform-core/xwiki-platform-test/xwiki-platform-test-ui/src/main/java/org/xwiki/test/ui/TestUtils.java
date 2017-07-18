@@ -2471,4 +2471,23 @@ public class TestUtils
             rest().executePut(ObjectPropertyResource.class, property, rest().toElements(editorReference)), true,
             STATUS_ACCEPTED);
     }
+
+    /**
+     * Disable Syntax Highlighting.
+     *
+     * @since 9.7RC1
+     */
+    public void disableSyntaxHighlighting() throws Exception
+    {
+        ObjectPropertyReference enabledPropertyReference =
+            new ObjectPropertyReference("enabled", new ObjectReference("SyntaxHighlighting.ConfigurationClass[0]",
+                new DocumentReference(getCurrentWiki(), "SyntaxHighlighting", "Configuration")));
+
+        Property property = new Property();
+        property.setValue("0");
+
+        TestUtils.assertStatusCodes(
+            rest().executePut(ObjectPropertyResource.class, property, rest().toElements(enabledPropertyReference)),
+            true, STATUS_ACCEPTED);
+    }
 }

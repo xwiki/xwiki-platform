@@ -19,13 +19,13 @@
  */
 package org.xwiki.notifications.internal;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -49,7 +49,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 {
     private static final String ERROR = "Failed to filter the notifications.";
 
-    private static final String PREFIX_FORMAT = "scopeNotifFilter_%s";
+    private static final String PREFIX_FORMAT = "scopeNotifFilter_%d";
 
     @Inject
     @Named("cached")
@@ -97,7 +97,9 @@ public class ScopeNotificationFilter implements NotificationFilter
         String separator = "";
 
         try {
+            int number = 0;
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
+                number++;
                 if (!scope.getEventType().equals(type)) {
                     continue;
                 }
@@ -105,7 +107,7 @@ public class ScopeNotificationFilter implements NotificationFilter
                 stringBuilder.append("(");
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, Integer.toHexString(type.hashCode()));
+                final String suffix = String.format(PREFIX_FORMAT, number);
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
@@ -147,14 +149,14 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Override
     public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
     {
-        Map<String, Object> params = new HashedMap();
+        Map<String, Object> params = new HashMap<>();
 
         try {
+            int number = 0;
             for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT,
-                        Integer.toHexString(scope.getEventType().hashCode()));
+                final String suffix = String.format(PREFIX_FORMAT, ++number);
                 final String wikiParam = "wiki_%s";
 
                 switch (scope.getScopeReference().getType()) {
@@ -168,7 +170,7 @@ public class ScopeNotificationFilter implements NotificationFilter
                         params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
                                 EntityType.WIKI).getName());
                         params.put(String.format("space_%s", suffix),
-                                escape(serializer.serialize(scope.getScopeReference())) + ".%"
+                                escape(serializer.serialize(scope.getScopeReference())) + "%"
                         );
                         break;
                     case WIKI:

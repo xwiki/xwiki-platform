@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications;
 
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
@@ -73,7 +74,13 @@ public interface NotificationFilter
      *
      * @param user the user interested in the notifications
      * @param format format of the notification
+     * @param enabledEventTypes list of the event types the user has registered
      * @return the values to bind to the query, mapped by value's name
+     *
+     * @since 9.5.2
+     * @since 9.6
+     * @since 9.7RC1
      */
-    Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format);
+    Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
+            List<String> enabledEventTypes);
 }

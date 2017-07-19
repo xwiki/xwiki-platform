@@ -255,6 +255,16 @@
                     "methodName": "getApplicationId",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.util.Map<java.lang.String, java.lang.Object> org.xwiki.notifications.NotificationFilter::queryFilterParams(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
+                    "new": "method java.util.Map<java.lang.String, java.lang.Object> org.xwiki.notifications.NotificationFilter::queryFilterParams(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat, java.util.List<java.lang.String>)",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "queryFilterParams",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

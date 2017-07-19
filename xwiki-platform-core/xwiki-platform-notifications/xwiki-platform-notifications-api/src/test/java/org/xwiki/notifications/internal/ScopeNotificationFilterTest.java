@@ -202,7 +202,7 @@ public class ScopeNotificationFilterTest
         // Test
         Map<String, Object> results = mocker.getComponentUnderTest().queryFilterParams(
                 new DocumentReference("xwiki", "XWiki", "User"),
-                NotificationFormat.ALERT
+                NotificationFormat.ALERT, Arrays.asList("event1", "event2", "event3")
         );
 
         // Verify

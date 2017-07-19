@@ -172,7 +172,7 @@ public class QueryGenerator
         handleEndDate(endDate, query);
         handleWiki(user, query);
 
-        handleFiltersParams(user, query, format);
+        handleFiltersParams(user, query, format, propertyList);
 
         // Return the query
         return query;
@@ -211,11 +211,15 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format)
-            throws NotificationException
+    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format,
+            List<EventProperty> propertyList) throws NotificationException
     {
+        ArrayList<String> eventTypes = new ArrayList<>();
+        for (EventProperty property : propertyList) {
+            eventTypes.add(property.eventType);
+        }
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<String, Object> params = filter.queryFilterParams(user, format);
+            Map<String, Object> params = filter.queryFilterParams(user, format, eventTypes);
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 query.bindValue(entry.getKey(), entry.getValue());
             }

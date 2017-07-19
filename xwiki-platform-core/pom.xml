@@ -228,7 +228,7 @@
                   {
                     "code": "java.method.addedToInterface",
                     "new": "method int org.xwiki.notifications.NotificationConfiguration::liveNotificationsGraceTime()",
-                    "packagquerye": "org.xwiki.notifications",
+                    "package": "org.xwiki.notifications",
                     "classSimpleName": "NotificationConfiguration",
                     "methodName": "liveNotificationsGraceTime",
                     "elementKind": "method",

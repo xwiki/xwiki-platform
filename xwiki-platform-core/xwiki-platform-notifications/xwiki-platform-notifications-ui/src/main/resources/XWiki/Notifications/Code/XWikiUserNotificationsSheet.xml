@@ -382,6 +382,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
      * Save the current settings
      */
     var save = function() {
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       var data = [];
       for (var i = 0; i &lt; applications.length; ++i) {
         for (var j = 0; j &lt; applications[i].eventTypes.length; j++) {
@@ -401,8 +402,12 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       $.post(url, {
         action: 'savePreferences',
         json: JSON.stringify(data)
-      }).done(function(data){
-        console.log(data);
+      }).done(function() {
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+      }).error(function() {
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
     };
 

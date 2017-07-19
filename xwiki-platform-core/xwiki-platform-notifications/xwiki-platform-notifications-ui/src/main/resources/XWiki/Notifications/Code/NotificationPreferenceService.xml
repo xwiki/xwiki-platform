@@ -46,7 +46,12 @@
   #set ($discard = $prefObj.set('interval', $request.interval))
   #set ($discard = $userDoc.save('Update Notification Email Interval'))
 #elseif ("$!request.action" == 'savePreferences')
-  $services.notification.saveNotificationsPreferences($request.json)
+  #try()
+    $services.notification.saveNotificationsPreferences($request.json)
+  #end
+  #if ("$!exception" != '')
+    $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")
+  #end
 #end
 {{/velocity}}
 </content>

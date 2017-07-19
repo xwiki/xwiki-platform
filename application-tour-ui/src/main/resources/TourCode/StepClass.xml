@@ -149,6 +149,20 @@
       <unmodifiable>0</unmodifiable>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </queryString>
+    <reflex>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>reflex</name>
+      <number>10</number>
+      <prettyName>Reflex</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </reflex>
     <targetPage>
       <customDisplay/>
       <disabled>0</disabled>

@@ -227,17 +227,19 @@ require(['jquery'], function ($) {
     var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
     var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
     var targetAction = $("input[id^='" + prefix + "'][id$='_action']", parent).val(); 
-    var queryString = $("input[id^='" + prefix + "'][id$='_queryString']", parent).val(); 
+    var queryString = $("input[id^='" + prefix + "'][id$='_queryString']", parent).val();
+    var reflex = $("input[id^='" + prefix + "'][id$='_reflex']", parent).is(':checked');
     var stepOrder = $('#stepOrderSelect').val();
     var nbSteps = $('#nbsteps').val();
     var step = {  element     : (element? element: ''),
                   title       : (title? title: ''),
-                  backdrop    : (backdrop? backdrop :0),
+                  backdrop    : backdrop,
                   content     : (content? content: ''),
                   placement   : (placement? placement: ''),
                   targetPage  : (targetPage? targetPage: ''),
                   targetAction: (targetAction? targetAction: ''),
                   queryString : (queryString? queryString: ''),
+                  reflex      : reflex,
                   stepOrder   : (stepOrder? stepOrder: ''),
                   tourName    : (tourName? tourName: ''),
                   nbSteps     : nbSteps,

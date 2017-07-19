@@ -69,6 +69,7 @@
             &lt;th&gt;$services.localization.render("TourCode.StepClass_backdrop")&lt;/th&gt;
             &lt;th&gt;$services.localization.render("TourCode.StepClass_placement")&lt;/th&gt;
             &lt;th&gt;$services.localization.render("TourCode.StepClass_targetPage")&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_reflex")&lt;/th&gt;
             #if ($xcontext.action == 'edit' || $pageMode == "edit")
                &lt;th style="text-align:right"&gt;Actions&lt;/th&gt;
             #end
@@ -84,6 +85,7 @@
                #set($targetPage  = $step.getValue('targetPage'))
                #set($action      = $step.getValue('action'))
                #set($queryString = $step.getValue('queryString'))
+               #set($reflex      = $step.getValue('reflex'))
                #set($stepID      = $step.getNumber())
                &lt;tr&gt;
                   &lt;td&gt;$!mathtool.add($order, 1)&lt;/td&gt;
@@ -103,7 +105,14 @@
                      $!targetPage &lt;br&gt;
                      $!action &lt;br&gt;
                      $!queryString
-                  &lt;/td&gt; 
+                  &lt;/td&gt;
+                  &lt;td&gt;
+                  #if($reflex == 1)
+                     $services.localization.render('tour.steps.yes')
+                  #else
+                     $services.localization.render('tour.steps.no')
+                  #end
+                  &lt;/td&gt;
                   #if ($xcontext.action == 'edit' || $pageMode == 'edit')
                      &lt;td&gt;
                         &lt;a href="#" class="actionBtn editStep" data-step-id="$!stepID"&gt;

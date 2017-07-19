@@ -75,6 +75,7 @@
     #set ($discard = $stepObj.set('queryString', $request.get('queryString')))
     #set ($discard = $stepObj.set('backdrop', $request.backdrop))
     #set ($discard = $stepObj.set('content', $request.content))
+    #set ($discard = $stepObj.set('reflex', $request.reflex))
     #if ($prevStepOrder != $stepOrder)
       ## Update the step objects
       #set ($stepObj2 = $tourDoc.getObject('TourCode.StepClass', 'order', "$stepOrder"))

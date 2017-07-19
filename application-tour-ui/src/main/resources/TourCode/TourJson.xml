@@ -85,6 +85,7 @@
         ## -------------------------
         #foreach($stepObj in $tourDoc.getObjects('TourCode.StepClass'))
           #set ($backdrop = $tourDoc.getValue('backdrop', $stepObj) == 1)
+          #set ($reflex = $tourDoc.getValue('reflex', $stepObj) == 1)
           ## If the 'targetPage' value of a step is empty, the path is inherited from the previous step.
           ## For the first step, the path is inherited from the tour configuration.
           ## This way the tour stays in the same wiki page.
@@ -124,7 +125,8 @@
                           'order'    : $tourDoc.getValue('order', $stepObj),
                           'backdrop' : $backdrop,
                           'path'     : $path, 
-                          'orphan'   : $orphan})
+                          'orphan'   : $orphan,
+                          'reflex'   : $reflex })
           #set ($discard = $tour.steps.add($step))
         #end
         ##--------------------------------------------------------

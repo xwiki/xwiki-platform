@@ -148,6 +148,10 @@
     <!-- The module triggering all WAR dependencies. Put in a property to be changed when legacy profile is enabled. -->
     <war.dependencies.artifactId>xwiki-platform-distribution-war-dependencies</war.dependencies.artifactId>
     <war.dependencies.artifactId.legacy>xwiki-platform-distribution-war-legacydependencies</war.dependencies.artifactId.legacy>
+
+    <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
+      backward compatibility breakages. -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not

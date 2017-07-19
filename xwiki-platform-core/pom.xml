@@ -228,9 +228,19 @@
                   {
                     "code": "java.method.addedToInterface",
                     "new": "method int org.xwiki.notifications.NotificationConfiguration::liveNotificationsGraceTime()",
-                    "package": "org.xwiki.notifications",
+                    "packagquerye": "org.xwiki.notifications",
                     "classSimpleName": "NotificationConfiguration",
                     "methodName": "liveNotificationsGraceTime",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.util.Map<java.lang.String, java.lang.Object> org.xwiki.notifications.NotificationFilter::queryFilterParams(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
+                    "new": "method java.util.Map<java.lang.String, java.lang.Object> org.xwiki.notifications.NotificationFilter::queryFilterParams(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat, java.util.List<java.lang.String>)",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "queryFilterParams",
                     "elementKind": "method",
                     "justification": "Young API"
                   }

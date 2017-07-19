@@ -22,6 +22,7 @@ package org.xwiki.notifications.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
@@ -251,12 +252,12 @@ public class QueryGeneratorTest
                 .thenReturn("2=2");
 
 
-        when(notificationFilter1.queryFilterParams(any(DocumentReference.class), any(NotificationFormat.class)))
-                .thenReturn(new HashedMap() {{
+        when(notificationFilter1.queryFilterParams(any(DocumentReference.class), any(NotificationFormat.class),
+                any(List.class))).thenReturn(new HashedMap() {{
             put("someDate", "someValue1");
         }});
-        when(notificationFilter2.queryFilterParams(any(DocumentReference.class), any(NotificationFormat.class)))
-                .thenReturn(new HashedMap() {{
+        when(notificationFilter2.queryFilterParams(any(DocumentReference.class), any(NotificationFormat.class),
+                any(List.class))).thenReturn(new HashedMap() {{
             put("someVal", "someValue2");
         }});
 

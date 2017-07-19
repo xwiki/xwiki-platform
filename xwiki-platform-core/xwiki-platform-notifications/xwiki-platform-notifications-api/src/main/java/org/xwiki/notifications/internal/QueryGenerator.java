@@ -136,7 +136,7 @@ public class QueryGenerator
         handleEndDate(endDate, query);
         handleWiki(user, query);
 
-        handleFiltersParams(user, query, format);
+        handleFiltersParams(user, query, format, types);
 
         // Return the query
         return query;
@@ -175,11 +175,11 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format)
-            throws NotificationException
+    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format,
+            List<String> types) throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<String, Object> params = filter.queryFilterParams(user, format);
+            Map<String, Object> params = filter.queryFilterParams(user, format, types);
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 query.bindValue(entry.getKey(), entry.getValue());
             }

@@ -51,7 +51,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  *
  * @version $Id$
  */
-@Component
+@Component(roles = ModelBridge.class)
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {
@@ -174,6 +174,15 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT_FIELD), format)) {
                         String scopeType = obj.getStringValue("scope");
+
+                        // Get the type of the filter associated with this scope.
+                        // If no type is specified, the scope is INCLUSIVE by default
+                        String rawScopeFilterType = obj.getStringValue("scopeFilterType");
+                        NotificationPreferenceScopeFilterType scopeFilterType =
+                                (StringUtils.isNotBlank(rawScopeFilterType))
+                                        ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType)
+                                        : NotificationPreferenceScopeFilterType.INCLUSIVE;
+
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
                             type = EntityType.DOCUMENT;
@@ -189,7 +198,8 @@ public class DefaultModelBridge implements ModelBridge
 
                         preferences.add(new NotificationPreferenceScope(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
-                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type)
+                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type),
+                                scopeFilterType
                         ));
                     }
                 }
@@ -198,6 +208,23 @@ public class DefaultModelBridge implements ModelBridge
             throw new NotificationException(
                     String.format("Failed to get the notification preferences scope for the user [%s].", userReference),
                     e);
+        }
+
+        return preferences;
+    }
+
+    @Override
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
+            NotificationFormat format, NotificationPreferenceScopeFilterType scopeFilterType)
+            throws NotificationException
+    {
+        List<NotificationPreferenceScope> preferences = new ArrayList<>();
+
+        for (NotificationPreferenceScope preference
+                : this.getNotificationPreferenceScopes(userReference, format)) {
+            if (preference.getScopeFilterType().equals(scopeFilterType)) {
+                preferences.add(preference);
+            }
         }
 
         return preferences;

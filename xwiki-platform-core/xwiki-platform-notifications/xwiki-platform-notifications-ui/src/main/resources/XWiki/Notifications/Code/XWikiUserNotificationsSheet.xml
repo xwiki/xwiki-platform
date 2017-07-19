@@ -1035,17 +1035,17 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       var nodes = tree.get_selected(true);
       for (var i = 0; i &lt; nodes.length; ++i) {
         var node = nodes[i];
-        var scopeType = 'pageOnly';
+        var scopeFilterType = 'pageOnly';
         var reference = node.data.id;
         if (node.data.type == 'wiki') {
-          scopeType = 'wiki';
+          scopeFilterType = 'wiki';
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
-          scopeType = 'pageAndChildren';
+          scopeFilterType = 'pageAndChildren';
           // Remove the "WebHome" part to match the space instead of the document
           reference = reference.substring(0, reference.length - '.WebHome'.length);
         }
         // Don't save a preference scope if we expect to have a wiki and the selected data is a page
-        if (self.filterType == 'WIKI_FILTER' &amp;&amp; scopeType != 'wiki') {
+        if (filterType == 'WIKI_FILTER' &amp;&amp; scopeFilterType != 'wiki') {
           // TODO: would be even better if the picker was not suggesting pages...
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.errorFilterWiki'))", 'error');
           continue;
@@ -1057,8 +1057,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
           'className': 'XWiki.Notifications.Code.NotificationPreferenceScopeClass',
           'property#eventType': self.eventTypeWidget.eventType,
           'property#scopeReference': reference,
-          'property#scope': scopeType,
-          'property#format': self.format
+          'property#scope': scopeFilterType,
+          'property#format': cell.attr('data-format')
         }).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');

@@ -50,7 +50,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 {
     private static final String ERROR = "Failed to filter the notifications.";
 
-    private static final String PREFIX_FORMAT = "scopeNotifFilter_%d";
+    private static final String PREFIX_FORMAT = "scopeNotifFilter_%s_%d";
 
     @Inject
     @Named("cached")
@@ -66,18 +66,32 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
+        return this.filterEventByFilterType(event, user, format, NotificationPreferenceScopeFilterType.EXCLUSIVE)
+                || this.filterEventByFilterType(event, user, format, NotificationPreferenceScopeFilterType.INCLUSIVE);
+    }
+
+    private boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
+            NotificationPreferenceScopeFilterType scopeFilterType)
+    {
         // Indicate if a restriction exist concerning this type of event
         boolean hasRestriction = false;
         // Indicate if a restriction matches the document of the event
         boolean matchRestriction = false;
 
         try {
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
+                    scopeFilterType)) {
                 if (scope.getEventType().equals(event.getType())) {
                     hasRestriction = true;
 
                     if (event.getDocument().equals(scope.getScopeReference())
                             || event.getDocument().hasParent(scope.getScopeReference())) {
+
+                        // If we have a match on an EXCLUSIVE filter, we don’t need to go any further
+                        if (scopeFilterType.equals(NotificationPreferenceScopeFilterType.EXCLUSIVE)) {
+                            return true;
+                        }
+
                         matchRestriction = true;
                         break;
                     }
@@ -93,79 +107,43 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Override
     public String queryFilterOR(DocumentReference user, NotificationFormat format, String type)
     {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String separator = "";
-
-        try {
-            int number = 0;
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
-                number++;
-                if (!scope.getEventType().equals(type)) {
-                    continue;
-                }
-                stringBuilder.append(separator);
-                stringBuilder.append("(");
-
-                // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, number);
-
-                switch (scope.getScopeReference().getType()) {
-                    case DOCUMENT:
-                        stringBuilder.append(String.format("event.wiki = :wiki_%s AND event.page = :page_%s",
-                                suffix, suffix));
-                        break;
-                    case SPACE:
-                        stringBuilder.append(
-                                String.format(
-                                        "event.wiki = :wiki_%s AND event.space LIKE :space_%s ESCAPE '!'",
-                                        suffix,
-                                        suffix
-                                )
-                        );
-                        break;
-                    case WIKI:
-                        stringBuilder.append(String.format("event.wiki = :wiki_%s", suffix));
-                        break;
-                    default:
-                        break;
-                }
-
-                stringBuilder.append(")");
-                separator = " OR ";
-            }
-        } catch (NotificationException e) {
-            logger.warn(ERROR, e);
-        }
-
-        return stringBuilder.toString();
+        return this.generateQueryString(user, format, type, NotificationPreferenceScopeFilterType.INCLUSIVE);
     }
 
     @Override
     public String queryFilterAND(DocumentReference user, NotificationFormat format, String type)
     {
-        return null;
+        return this.generateQueryString(user, format, type, NotificationPreferenceScopeFilterType.EXCLUSIVE);
     }
 
     @Override
-    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<String> enabledEventTypes)
+    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
+    {
+        Map<String, Object> params =
+                this.generateQueryFilterParams(user, format, NotificationPreferenceScopeFilterType.INCLUSIVE);
+        params.putAll(this.generateQueryFilterParams(user, format, NotificationPreferenceScopeFilterType.EXCLUSIVE));
+
+        return params;
+    }
+
+    /**
+     * Generate a map of parameters that should be used with the query made from
+     * {@link #queryFilterAND(DocumentReference, NotificationFormat, String)}
+     * and {@link #queryFilterOR(DocumentReference, NotificationFormat, String)}.
+     */
+    private Map<String, Object> generateQueryFilterParams(DocumentReference user, NotificationFormat format,
+            NotificationPreferenceScopeFilterType filterType)
     {
         Map<String, Object> params = new HashMap<>();
 
         try {
             int number = 0;
-            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format)) {
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
+                    filterType)) {
 
                 // Create a suffix to make sure our parameter has a unique name
-                final String suffix = String.format(PREFIX_FORMAT, ++number);
+                final String suffix = String.format(PREFIX_FORMAT, filterType, ++number);
                 final String wikiParam = "wiki_%s";
-
-                // Don't try to add parameters to the query if the event type is not enabled, the parameters will not
-                // be found in the query and it will be broken
-                if (!enabledEventTypes.contains(scope.getEventType())) {
-                    continue;
-                }
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
@@ -194,6 +172,69 @@ public class ScopeNotificationFilter implements NotificationFilter
         }
 
         return params;
+    }
+
+    private String generateQueryString(DocumentReference user, NotificationFormat format, String type,
+            NotificationPreferenceScopeFilterType filterType)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String separator = "";
+
+        try {
+            int number = 0;
+            for (NotificationPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
+                    filterType)) {
+                number++;
+                if (!scope.getEventType().equals(type)) {
+                    continue;
+                }
+
+                stringBuilder.append(separator);
+
+                // If we have an EXCLUSIVE filter, negate the filter block
+                stringBuilder.append(
+                        (filterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) ? "(" : " NOT (");
+
+                // Create a suffix to make sure our parameter has a unique name
+                final String suffix = String.format(PREFIX_FORMAT, filterType.name(), number);
+
+                // Don't try to add parameters to the query if the event type is not enabled, the parameters will not
+                // be found in the query and it will be broken
+                if (!enabledEventTypes.contains(scope.getEventType())) {
+                    continue;
+                }
+
+                switch (scope.getScopeReference().getType()) {
+                    case DOCUMENT:
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s AND event.page = :page_%s",
+                                suffix, suffix));
+                        break;
+                    case SPACE:
+                        stringBuilder.append(
+                                String.format(
+                                        "event.wiki = :wiki_%s AND event.space LIKE :space_%s ESCAPE '!'",
+                                        suffix,
+                                        suffix
+                                )
+                        );
+                        break;
+                    case WIKI:
+                        stringBuilder.append(String.format("event.wiki = :wiki_%s", suffix));
+                        break;
+                    default:
+                        break;
+                }
+
+                stringBuilder.append(")");
+
+                separator = (filterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) ? " OR " : " AND ";
+            }
+        } catch (NotificationException e) {
+            logger.warn(ERROR, e);
+        }
+
+        return stringBuilder.toString();
     }
 
     private String escape(String format)

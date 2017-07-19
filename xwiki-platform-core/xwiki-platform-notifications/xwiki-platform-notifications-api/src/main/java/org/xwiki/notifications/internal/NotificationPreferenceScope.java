@@ -23,6 +23,7 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Represent a preferences that filter some event type to given scope (a wiki, a space, a page...).
+ * This preference can be either incusive or exclusive compared to other filters.
  *
  * Example: only get "update" events when it concern pages inside the space "xwiki:Space1".
  *
@@ -35,16 +36,21 @@ public class NotificationPreferenceScope
 
     private EntityReference scopeReference;
 
+    private NotificationPreferenceScopeFilterType scopeFilterType;
+
     /**
      * Construct a NotificationPreferenceScope.
      *
      * @param eventType name of the event type to refine
      * @param scopeReference reference of the scope
+     * @param scopeFilterType the type of filter associated with the scope
      */
-    public NotificationPreferenceScope(String eventType, EntityReference scopeReference)
+    public NotificationPreferenceScope(String eventType, EntityReference scopeReference,
+            NotificationPreferenceScopeFilterType scopeFilterType)
     {
         this.eventType = eventType;
         this.scopeReference = scopeReference;
+        this.scopeFilterType = scopeFilterType;
     }
 
     /**
@@ -61,5 +67,13 @@ public class NotificationPreferenceScope
     public EntityReference getScopeReference()
     {
         return scopeReference;
+    }
+
+    /**
+     * @return the type of the scope
+     */
+    public NotificationPreferenceScopeFilterType getScopeFilterType()
+    {
+        return this.scopeFilterType;
     }
 }

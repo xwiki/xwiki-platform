@@ -104,6 +104,27 @@
       <values>pageOnly=Page|pageAndChildren=Page &amp; Children|wiki=Wiki</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </scope>
+    <scopeFilterType>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>scopeFilterType</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>scopeFilterType</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>inclusive=Inclusive|exclusive=Exclusive</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </scopeFilterType>
     <scopeReference>
       <customDisplay/>
       <disabled>0</disabled>

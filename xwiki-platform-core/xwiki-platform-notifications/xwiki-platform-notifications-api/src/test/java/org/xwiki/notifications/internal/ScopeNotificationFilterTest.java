@@ -33,12 +33,14 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.text.StringUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -128,7 +130,7 @@ public class ScopeNotificationFilterTest
 
         // Verify
         assertEquals(
-                "(event.wiki = :wiki_scopeNotifFilter_1)",
+                "(event.wiki = :wiki_scopeNotifFilter_INCLUSIVE_1)",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
                     NotificationFormat.ALERT,
@@ -136,8 +138,8 @@ public class ScopeNotificationFilterTest
         ));
 
         assertEquals(
-                "(event.wiki = :wiki_scopeNotifFilter_2 " +
-                                "AND event.space LIKE :space_scopeNotifFilter_2 ESCAPE '!')",
+                "(event.wiki = :wiki_scopeNotifFilter_INCLUSIVE_2 " +
+                                "AND event.space LIKE :space_scopeNotifFilter_INCLUSIVE_2 ESCAPE '!')",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
                     NotificationFormat.ALERT,
@@ -145,7 +147,8 @@ public class ScopeNotificationFilterTest
         ));
 
         assertEquals(
-                "(event.wiki = :wiki_scopeNotifFilter_3 AND event.page = :page_scopeNotifFilter_3)",
+                "(event.wiki = :wiki_scopeNotifFilter_INCLUSIVE_3 "
+                        + "AND event.page = :page_scopeNotifFilter_INCLUSIVE_3)",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
                     NotificationFormat.ALERT,
@@ -174,14 +177,16 @@ public class ScopeNotificationFilterTest
         when(scope3.getEventType()).thenReturn("event3");
 
         when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
-                any(NotificationFormat.class))).thenReturn(Arrays.asList(scope1, scope2, scope3)
+                any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.INCLUSIVE))).thenReturn(
+                        Arrays.asList(scope1, scope2, scope3)
         );
     }
 
     @Test
     public void queryFilterAND() throws Exception
     {
-        assertNull(
+        assertEquals(
+                StringUtils.EMPTY,
                 mocker.getComponentUnderTest().queryFilterAND(
                         new DocumentReference("xwiki", "XWiki", "User"),
                         NotificationFormat.ALERT,
@@ -206,11 +211,11 @@ public class ScopeNotificationFilterTest
         );
 
         // Verify
-        assertEquals("wiki1", results.get("wiki_scopeNotifFilter_1"));
-        assertEquals("wiki2", results.get("wiki_scopeNotifFilter_2"));
-        assertEquals("space!_2%", results.get("space_scopeNotifFilter_2"));
-        assertEquals("wiki3", results.get("wiki_scopeNotifFilter_3"));
-        assertEquals("space3.page3", results.get("page_scopeNotifFilter_3"));
+        assertEquals("wiki1", results.get("wiki_scopeNotifFilter_INCLUSIVE_1"));
+        assertEquals("wiki2", results.get("wiki_scopeNotifFilter_INCLUSIVE_2"));
+        assertEquals("space!_2%", results.get("space_scopeNotifFilter_INCLUSIVE_2"));
+        assertEquals("wiki3", results.get("wiki_scopeNotifFilter_INCLUSIVE_3"));
+        assertEquals("space3.page3", results.get("page_scopeNotifFilter_INCLUSIVE_3"));
         assertEquals(5, results.size());
     }
 }

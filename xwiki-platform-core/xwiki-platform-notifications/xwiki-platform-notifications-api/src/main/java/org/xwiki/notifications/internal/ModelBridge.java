@@ -73,6 +73,20 @@ public interface ModelBridge
             throws NotificationException;
 
     /**
+     * Get all notification preference scope of the given user.
+     *
+     * @param user user interested in the notifications
+     * @param format format on which the preferences apply
+     * @param type the filter type of the scope we want to retrieve, see {@link NotificationPreferenceScopeFilterType}
+     * @return the list of notification preference scopes.
+     * @throws NotificationException if error happens
+     *
+     * @since 9.7RC1
+     */
+    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user, NotificationFormat format,
+            NotificationPreferenceScopeFilterType type) throws NotificationException;
+
+    /**
      * Save an object's property in an hidden document.
      *
      * @param objectReference reference of the object to save

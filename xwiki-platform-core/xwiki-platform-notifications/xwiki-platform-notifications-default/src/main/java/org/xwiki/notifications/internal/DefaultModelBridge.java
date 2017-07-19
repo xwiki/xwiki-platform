@@ -61,8 +61,6 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String NOTIFICATION_ENABLED_FIELD = "notificationEnabled";
 
-    private static final String APPLICATION_ID_FIELD = "applicationId";
-
     private static final String FORMAT_FIELD = "format";
 
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
@@ -114,7 +112,6 @@ public class DefaultModelBridge implements ModelBridge
                         Date objStartDate = obj.getDateValue(START_DATE_FIELD);
                         preferences.add(new NotificationPreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
-                                obj.getStringValue(APPLICATION_ID_FIELD),
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0,
                                 StringUtils.isNotBlank(objFormat)
                                         ? NotificationFormat.valueOf(objFormat.toUpperCase())

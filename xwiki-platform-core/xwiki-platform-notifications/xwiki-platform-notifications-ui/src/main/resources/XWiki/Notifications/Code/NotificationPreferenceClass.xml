@@ -49,15 +49,6 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <applicationId>
-      <disabled>0</disabled>
-      <name>applicationId</name>
-      <number>2</number>
-      <prettyName>applicationId</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </applicationId>
     <eventType>
       <disabled>0</disabled>
       <name>eventType</name>

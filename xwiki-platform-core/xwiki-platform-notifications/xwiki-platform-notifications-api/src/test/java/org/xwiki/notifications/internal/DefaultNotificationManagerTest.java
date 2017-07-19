@@ -91,7 +91,7 @@ public class DefaultNotificationManagerTest
                 anyBoolean(), nullable(Date.class),
                 nullable(Date.class), nullable(List.class))).thenReturn(query);
 
-        NotificationPreference pref1 = new NotificationPreference("create", null, true);
+        NotificationPreference pref1 = new NotificationPreference("create", true);
         when(modelBridge.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
     }
 
@@ -139,7 +139,7 @@ public class DefaultNotificationManagerTest
     @Test
     public void getEventsWhenNoPreferences() throws Exception
     {
-        NotificationPreference pref1 = new NotificationPreference("create", null, false);
+        NotificationPreference pref1 = new NotificationPreference("create", false);
         when(modelBridge.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
         // Test

@@ -34,8 +34,6 @@ public class NotificationPreference
 {
     private String eventType;
 
-    private String applicationId;
-
     private boolean isNotificationEnabled;
 
     private NotificationFormat format;
@@ -45,13 +43,11 @@ public class NotificationPreference
     /**
      * Construct a NotificationPreference.
      * @param eventType type of an event
-     * @param applicationId id of an application
      * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
      */
-    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled)
+    public NotificationPreference(String eventType, boolean isNotificationEnabled)
     {
         this.eventType = eventType;
-        this.applicationId = applicationId;
         this.isNotificationEnabled = isNotificationEnabled;
         this.format = NotificationFormat.ALERT;
     }
@@ -59,17 +55,14 @@ public class NotificationPreference
     /**
      * Construct a NotificationPreference.
      * @param eventType type of an event
-     * @param applicationId id of an application
      * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
      * @param format format of the notification
      *
      * @since 9.5RC1
      */
-    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled,
-            NotificationFormat format)
+    public NotificationPreference(String eventType, boolean isNotificationEnabled, NotificationFormat format)
     {
         this.eventType = eventType;
-        this.applicationId = applicationId;
         this.isNotificationEnabled = isNotificationEnabled;
         this.format = format;
     }
@@ -77,17 +70,16 @@ public class NotificationPreference
     /**
      * Construct a new NotificationPreference.
      * @param eventType type of an event
-     * @param applicationId id of an application
      * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
      * @param format format of the notification
      * @param startDate the date from which notifications that match this preference should be retrieved
      *
      * @since 9.7RC1
      */
-    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled,
-            NotificationFormat format, Date startDate)
+    public NotificationPreference(String eventType, boolean isNotificationEnabled, NotificationFormat format,
+            Date startDate)
     {
-        this(eventType, applicationId, isNotificationEnabled, format);
+        this(eventType, isNotificationEnabled, format);
         this.startDate = startDate;
     }
 
@@ -95,18 +87,15 @@ public class NotificationPreference
      * Construct a new NotificationPreference.
      *
      * @param eventType type of an event
-     * @param applicationId id of an application
      * @param isNotificationEnabled either or not the notification is enabled for the event type or the application
      * @param format format of the notification
      * @param startDate the date from which notifications that match this preference should be retrieved
      *
      * @since 9.7RC1
      */
-    public NotificationPreference(String eventType, String applicationId, boolean isNotificationEnabled,
-            String format, Date startDate)
+    public NotificationPreference(String eventType, boolean isNotificationEnabled, String format, Date startDate)
     {
-        this(eventType, applicationId, isNotificationEnabled, NotificationFormat.valueOf(format.toUpperCase()),
-                startDate);
+        this(eventType, isNotificationEnabled, NotificationFormat.valueOf(format.toUpperCase()), startDate);
     }
 
     /**
@@ -115,15 +104,6 @@ public class NotificationPreference
     public String getEventType()
     {
         return eventType;
-    }
-
-    /**
-     * @return the if of the application concerned by the preference
-     */
-    public String getApplicationId()
-    {
-        // Note: this field might be removed a further versions
-        return applicationId;
     }
 
     /**

@@ -64,7 +64,7 @@ public class NotificationPreferencesSaver
                 String eventType = (String) item.get("eventType");
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
-                toSave.add(new NotificationPreference(eventType, null, enabled, format));
+                toSave.add(new NotificationPreference(eventType, enabled, format));
             }
 
             modelBridge.saveNotificationsPreferences(userReference, toSave);

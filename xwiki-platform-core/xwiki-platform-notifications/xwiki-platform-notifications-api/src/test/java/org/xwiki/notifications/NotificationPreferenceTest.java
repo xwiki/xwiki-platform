@@ -22,7 +22,6 @@ package org.xwiki.notifications;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link NotificationPreference}.
@@ -35,14 +34,11 @@ public class NotificationPreferenceTest
     @Test
     public void testPublicGetters() throws Exception
     {
-        NotificationPreference testPreference = new NotificationPreference("eventType", "appId", true);
+        NotificationPreference testPreference = new NotificationPreference("eventType", true);
 
         assertEquals("eventType", testPreference.getEventType());
-        assertEquals("appId", testPreference.getApplicationId());
-        assertTrue(testPreference.isNotificationEnabled());
 
-        NotificationPreference testPreference2 = new NotificationPreference("eventType", "appId",
-                true, NotificationFormat.EMAIL);
+        NotificationPreference testPreference2 = new NotificationPreference("eventType", true, NotificationFormat.EMAIL);
 
         assertEquals(NotificationFormat.EMAIL, testPreference2.getFormat());
     }

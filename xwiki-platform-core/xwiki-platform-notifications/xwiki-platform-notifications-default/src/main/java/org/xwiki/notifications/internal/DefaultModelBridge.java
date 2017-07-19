@@ -61,8 +61,6 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String NOTIFICATION_ENABLED_FIELD = "notificationEnabled";
 
-    private static final String APPLICATION_ID_FIELD = "applicationId";
-
     private static final String FORMAT_FIELD = "format";
 
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
@@ -114,7 +112,6 @@ public class DefaultModelBridge implements ModelBridge
                         Date objStartDate = obj.getDateValue(START_DATE_FIELD);
                         preferences.add(new NotificationPreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
-                                obj.getStringValue(APPLICATION_ID_FIELD),
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0,
                                 StringUtils.isNotBlank(objFormat)
                                         ? NotificationFormat.valueOf(objFormat.toUpperCase())
@@ -224,17 +221,14 @@ public class DefaultModelBridge implements ModelBridge
         if (objects != null) {
             for (BaseObject object : objects) {
                 if (object != null
-                        && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))
-                        && notificationPreference.getApplicationId().equals(
-                                object.getStringValue(APPLICATION_ID_FIELD))) {
+                        && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))) {
                     String format = object.getStringValue(FORMAT_FIELD);
 
                     // Ensure that we have the correct notification format
                     if ((StringUtils.isBlank(format) && notificationPreference.getFormat().equals(
                             NotificationFormat.ALERT))
                             || notificationPreference.getFormat().equals(NotificationFormat.valueOf(
-                                    format.toUpperCase())))
-                    {
+                                    format.toUpperCase()))) {
                         return object;
                     }
                 }
@@ -275,41 +269,52 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void saveNotificationPreference(DocumentReference userReference,
-            NotificationPreference notificationPreference) throws NotificationException
+    public void saveNotificationsPreferences(DocumentReference userReference,
+            List<NotificationPreference> notificationPreferences) throws NotificationException
     {
         try {
             XWikiContext context = contextProvider.get();
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            // Try to find the corresponding XObject for the notification preference
-            BaseObject preferenceObject = this.findNotificationPreference(document, notificationPreference);
+            for (NotificationPreference notificationPreference : notificationPreferences) {
 
-            // If the object exists, update it
-            if (preferenceObject != null) {
-                preferenceObject.set(NOTIFICATION_ENABLED_FIELD,
-                        (notificationPreference.isNotificationEnabled() ? 1 : 0), context);
-                preferenceObject.set(START_DATE_FIELD, notificationPreference.getStartDate(), context);
-            } else {
+                // Try to find the corresponding XObject for the notification preference
+                BaseObject preferenceObject = this.findNotificationPreference(document, notificationPreference);
+
                 // If no preference exist, then create one
-                preferenceObject = new BaseObject();
-                preferenceObject.setXClassReference(NOTIFICATION_PREFERENCE_CLASS);
-                document.addXObject(preferenceObject);
+                if (preferenceObject == null) {
+                    preferenceObject = new BaseObject();
+                    preferenceObject.setXClassReference(NOTIFICATION_PREFERENCE_CLASS);
+                    document.addXObject(preferenceObject);
+                }
 
                 preferenceObject.set(EVENT_TYPE_FIELD, notificationPreference.getEventType(), context);
-                preferenceObject.set(APPLICATION_ID_FIELD, notificationPreference.getApplicationId(), context);
                 preferenceObject.set(FORMAT_FIELD, notificationPreference.getFormat().name().toLowerCase(),
                         context);
                 preferenceObject.set(NOTIFICATION_ENABLED_FIELD,
                         (notificationPreference.isNotificationEnabled() ? 1 : 0), context);
-                preferenceObject.set(START_DATE_FIELD, notificationPreference.getStartDate(), context);
+
+                Date startDate = null;
+                if (notificationPreference.isNotificationEnabled()) {
+                    startDate = notificationPreference.getStartDate();
+                    if (startDate == null) {
+                        // Fallback to the previous value if date is empty
+                        startDate = preferenceObject.getDateValue(START_DATE_FIELD);
+                        if (startDate == null) {
+                            // Fallback to now
+                            startDate = new Date();
+                        }
+                    }
+                }
+                preferenceObject.set(START_DATE_FIELD, startDate, context);
             }
+
+            xwiki.saveDocument(document, "Update notification preferences.", context);
 
         } catch (XWikiException e) {
             throw new NotificationException(String.format(
-                    "Failed to save the notification preference [%s] for [%s]",
-                    notificationPreference, userReference));
+                    "Failed to save the notification preference for [%s]", userReference));
         }
     }
 }

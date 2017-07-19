@@ -102,11 +102,11 @@ public interface ModelBridge
      * be updated.
      *
      * @param userReference the user we want to work on
-     * @param notificationPreference the notification preference to save
+     * @param notificationPreferences the list of notification preference to save
      * @throws NotificationException if error happens
      *
      * @since 9.7RC1
      */
-    void saveNotificationPreference(DocumentReference userReference, NotificationPreference notificationPreference)
-        throws NotificationException;
+    void saveNotificationsPreferences(DocumentReference userReference,
+            List<NotificationPreference> notificationPreferences) throws NotificationException;
 }

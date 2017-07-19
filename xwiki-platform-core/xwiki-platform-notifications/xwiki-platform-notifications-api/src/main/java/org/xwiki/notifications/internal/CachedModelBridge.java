@@ -114,10 +114,10 @@ public class CachedModelBridge implements ModelBridge
     }
 
     @Override
-    public void saveNotificationPreference(DocumentReference userReference,
-            NotificationPreference notificationPreference) throws NotificationException
+    public void saveNotificationsPreferences(DocumentReference userReference,
+            List<NotificationPreference> notificationPreferences) throws NotificationException
     {
-        // We can’t cache that
-        modelBridge.saveNotificationPreference(userReference, notificationPreference);
+        // Obviously there is nothing to cache
+        modelBridge.saveNotificationsPreferences(userReference, notificationPreferences);
     }
 }

@@ -33,12 +33,12 @@ import org.xwiki.localization.ContextualLocalizationManager;
  */
 public abstract class AbstractRecordableEventDescriptor implements RecordableEventDescriptor
 {
+    @Inject
+    protected ContextualLocalizationManager contextualLocalizationManager;
+
     private String descriptionTranslationKey;
 
     private String applicationTranslationKey;
-
-    @Inject
-    private ContextualLocalizationManager contextualLocalizationManager;
 
     /**
      * Construct an AbstractRecordableEventDescriptor.
@@ -67,7 +67,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder().append(getApplicationName()).append(getEventType()).toHashCode();
+        return new HashCodeBuilder().append(getApplicationId()).append(getEventType()).toHashCode();
     }
 
     @Override
@@ -82,6 +82,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
             EqualsBuilder equalsBuilder = new EqualsBuilder();
             equalsBuilder.append(other.getApplicationName(), this.getApplicationName());
             equalsBuilder.append(other.getEventType(), this.getEventType());
+            equalsBuilder.append(other.getApplicationId(), this.getApplicationId());
 
             return equalsBuilder.isEquals();
         }

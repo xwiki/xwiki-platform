@@ -85,7 +85,7 @@ public class QueryGeneratorTest
         when(serializer.serialize(userReference)).thenReturn("xwiki:XWiki.UserA");
 
         pref1StartDate = new Date(100);
-        NotificationPreference pref1 = new NotificationPreference("create", null, true,
+        NotificationPreference pref1 = new NotificationPreference("create", true,
                 NotificationFormat.ALERT, pref1StartDate);
         when(modelBridge.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 

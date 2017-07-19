@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.AbstractRecordableEventDescriptor;
 
 import com.xpn.xwiki.internal.event.CommentAddedEvent;
 
@@ -36,7 +35,7 @@ import com.xpn.xwiki.internal.event.CommentAddedEvent;
 @Component
 @Singleton
 @Named(DocumentCommentedEventDescriptor.EVENT_TYPE)
-public class DocumentCommentedEventDescriptor extends AbstractRecordableEventDescriptor
+public class DocumentCommentedEventDescriptor extends AbstractXWikiRecordableEventDescriptor
 {
     /**
      * Name of the supported type (as it is stored in Activity Stream).
@@ -57,12 +56,6 @@ public class DocumentCommentedEventDescriptor extends AbstractRecordableEventDes
     {
         // Match the name used by Activity Stream.
         return EVENT_TYPE;
-    }
-
-    @Override
-    public String getApplicationIcon()
-    {
-        return "page";
     }
 
     @Override

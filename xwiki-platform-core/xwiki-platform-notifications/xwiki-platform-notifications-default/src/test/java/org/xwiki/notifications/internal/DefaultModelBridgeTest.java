@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -70,7 +69,6 @@ public class DefaultModelBridgeTest
     {
         this.fakeNotificationPreference = mock(BaseObject.class);
         when(fakeNotificationPreference.getStringValue("eventType")).thenReturn("fakeEventType");
-        when(fakeNotificationPreference.getStringValue("applicationId")).thenReturn("fakeApplicationId");
         when(fakeNotificationPreference.getDateValue("startDate")).thenReturn(new Date(10));
         when(fakeNotificationPreference.getStringValue("format")).thenReturn("email");
         when(fakeNotificationPreference.getIntValue("notificationEnabled", 0)).thenReturn(1);
@@ -99,7 +97,6 @@ public class DefaultModelBridgeTest
 
         assertEquals(1, preferences.size());
         assertEquals("fakeEventType", preferences.get(0).getEventType());
-        assertEquals("fakeApplicationId", preferences.get(0).getApplicationId());
         assertEquals(new Date(10), preferences.get(0).getStartDate());
         assertEquals(NotificationFormat.EMAIL, preferences.get(0).getFormat());
         assertTrue(preferences.get(0).isNotificationEnabled());

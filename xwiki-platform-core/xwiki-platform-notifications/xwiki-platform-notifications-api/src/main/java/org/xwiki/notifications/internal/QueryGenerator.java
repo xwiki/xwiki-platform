@@ -144,11 +144,9 @@ public class QueryGenerator
             eventTypes.add(property.eventType);
         }
 
-        List<String> apps  = handleApplications(hql, preferences, eventTypes, format);
-
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
-        if (preferences.isEmpty() || (propertyList.isEmpty() && apps.isEmpty())) {
+        if (preferences.isEmpty() || propertyList.isEmpty()) {
             return null;
         }
 
@@ -170,7 +168,6 @@ public class QueryGenerator
         }
         query.bindValue("user", serializer.serialize(user));
         handleEventPreferences(propertyList, query);
-        handleApplications(apps, query);
         handleBlackList(blackList, query);
         handleEndDate(endDate, query);
         handleWiki(user, query);
@@ -282,13 +279,6 @@ public class QueryGenerator
         }
     }
 
-    private void handleApplications(List<String> apps, Query query)
-    {
-        if (!apps.isEmpty()) {
-            query.bindValue("apps", apps);
-        }
-    }
-
     /**
      * Bind the event preferences parameters to the query. Those parameters are usually declared in
      * {@link #handleEventPreferences(DocumentReference, StringBuilder, List, NotificationFormat)}..
@@ -304,22 +294,6 @@ public class QueryGenerator
             query.bindValue(String.format("date_%d", number), property.startDate);
             number++;
         }
-    }
-
-    private List<String> handleApplications(StringBuilder hql, List<NotificationPreference> preferences,
-            Set<String> types, NotificationFormat format)
-    {
-        List<String> apps = new ArrayList<>();
-        for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getApplicationId())
-                    && format.equals(preference.getFormat())) {
-                apps.add(preference.getApplicationId());
-            }
-        }
-        if (!apps.isEmpty()) {
-            hql.append((types.isEmpty() ? "" : OR) + "event.application IN (:apps)");
-        }
-        return apps;
     }
 
     /**

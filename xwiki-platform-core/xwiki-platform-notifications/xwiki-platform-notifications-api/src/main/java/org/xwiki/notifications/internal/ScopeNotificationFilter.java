@@ -117,11 +117,14 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format)
+    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
+            List<String> enabledEventTypes)
     {
         Map<String, Object> params =
-                this.generateQueryFilterParams(user, format, NotificationPreferenceScopeFilterType.INCLUSIVE);
-        params.putAll(this.generateQueryFilterParams(user, format, NotificationPreferenceScopeFilterType.EXCLUSIVE));
+                this.generateQueryFilterParams(user, format, enabledEventTypes,
+                        NotificationPreferenceScopeFilterType.INCLUSIVE);
+        params.putAll(this.generateQueryFilterParams(user, format, enabledEventTypes,
+                NotificationPreferenceScopeFilterType.EXCLUSIVE));
 
         return params;
     }
@@ -132,7 +135,7 @@ public class ScopeNotificationFilter implements NotificationFilter
      * and {@link #queryFilterOR(DocumentReference, NotificationFormat, String)}.
      */
     private Map<String, Object> generateQueryFilterParams(DocumentReference user, NotificationFormat format,
-            NotificationPreferenceScopeFilterType filterType)
+            List<String> enabledEventTypes, NotificationPreferenceScopeFilterType filterType)
     {
         Map<String, Object> params = new HashMap<>();
 
@@ -144,6 +147,12 @@ public class ScopeNotificationFilter implements NotificationFilter
                 // Create a suffix to make sure our parameter has a unique name
                 final String suffix = String.format(PREFIX_FORMAT, filterType, ++number);
                 final String wikiParam = "wiki_%s";
+
+                // Don't try to add parameters to the query if the event type is not enabled, the parameters will not
+                // be found in the query and it will be broken
+                if (!enabledEventTypes.contains(scope.getEventType())) {
+                    continue;
+                }
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
@@ -198,12 +207,6 @@ public class ScopeNotificationFilter implements NotificationFilter
 
                 // Create a suffix to make sure our parameter has a unique name
                 final String suffix = String.format(PREFIX_FORMAT, filterType.name(), number);
-
-                // Don't try to add parameters to the query if the event type is not enabled, the parameters will not
-                // be found in the query and it will be broken
-                if (!enabledEventTypes.contains(scope.getEventType())) {
-                    continue;
-                }
 
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:

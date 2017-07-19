@@ -219,7 +219,7 @@ public class DefaultModelBridge implements ModelBridge
     {
         String rawScopeFilterType = object.getStringValue("scopeFilterType");
         return (rawScopeFilterType != null && StringUtils.isNotBlank(rawScopeFilterType))
-                ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType)
+                ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType.toUpperCase())
                 : NotificationPreferenceScopeFilterType.INCLUSIVE;
     }
 

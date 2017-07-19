@@ -66,7 +66,6 @@
         <Set name="idleTimeout"><Property name="https.timeout" default="30000"/></Set>
         <Set name="soLingerTime"><Property name="https.soLingerTime" default="-1"/></Set>
         <Set name="acceptorPriorityDelta"><Property name="ssl.acceptorPriorityDelta" default="0"/></Set>
-        <Set name="selectorPriorityDelta"><Property name="ssl.selectorPriorityDelta" default="0"/></Set>
       </New>
     </Arg>
   </Call>

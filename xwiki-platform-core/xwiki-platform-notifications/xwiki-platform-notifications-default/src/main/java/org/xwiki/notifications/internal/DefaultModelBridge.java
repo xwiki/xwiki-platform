@@ -174,15 +174,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT_FIELD), format)) {
                         String scopeType = obj.getStringValue("scope");
-
-                        // Get the type of the filter associated with this scope.
-                        // If no type is specified, the scope is INCLUSIVE by default
-                        String rawScopeFilterType = obj.getStringValue("scopeFilterType");
-                        NotificationPreferenceScopeFilterType scopeFilterType =
-                                (StringUtils.isNotBlank(rawScopeFilterType))
-                                        ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType)
-                                        : NotificationPreferenceScopeFilterType.INCLUSIVE;
-
+                        NotificationPreferenceScopeFilterType scopeFilterType = this.extractScopeFilterType(obj);
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
                             type = EntityType.DOCUMENT;
@@ -211,6 +203,24 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    /**
+     * Extract the scopeFilterType parameter in the given {@link BaseObject}.
+     * This is done in order to eliminate too much cyclomatic complexity in
+     * {@link #getNotificationPreferenceScopes(DocumentReference, NotificationFormat)}.
+     * If no scopeFilterType is defined, the default is {@link NotificationPreferenceScopeFilterType#INCLUSIVE}.
+     *
+     * @param object the related base object
+     * @return the corresponding {@link NotificationPreferenceScopeFilterType}
+     * @since 9.7RC1
+     */
+    private NotificationPreferenceScopeFilterType extractScopeFilterType(BaseObject object)
+    {
+        String rawScopeFilterType = object.getStringValue("scopeFilterType");
+        return (rawScopeFilterType != null && StringUtils.isNotBlank(rawScopeFilterType))
+                ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType)
+                : NotificationPreferenceScopeFilterType.INCLUSIVE;
     }
 
     @Override

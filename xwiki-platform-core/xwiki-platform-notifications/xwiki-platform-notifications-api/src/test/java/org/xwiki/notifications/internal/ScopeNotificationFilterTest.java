@@ -49,11 +49,19 @@ import static org.mockito.Mockito.when;
  */
 public class ScopeNotificationFilterTest
 {
-    public static final WikiReference SCOPE_REFERENCE_1 = new WikiReference("wiki1");
+    public static final WikiReference SCOPE_INCLUSIVE_REFERENCE_1 = new WikiReference("wiki1");
 
-    public static final SpaceReference SCOPE_REFERENCE_2 = new SpaceReference("space2", new WikiReference("wiki2"));
+    public static final SpaceReference SCOPE_INCLUSIVE_REFERENCE_2 =
+            new SpaceReference("space2", new WikiReference("wiki2"));
 
-    public static final DocumentReference SCOPE_REFERENCE_3 = new DocumentReference("wiki3", "space3", "page3");
+    public static final DocumentReference SCOPE_INCLUSIVE_REFERENCE_3 =
+            new DocumentReference("wiki3", "space3", "page3");
+
+    public static final SpaceReference SCOPE_EXCLUSIVE_REFERENCE_1 =
+            new SpaceReference("excludedWiki", "space1");
+
+    public static final DocumentReference SCOPE_EXCLUSIVE_REFERENCE_2 =
+            new DocumentReference("excludedWiki", "space2", "page2");
 
     @Rule
     public final MockitoComponentMockingRule<ScopeNotificationFilter> mocker =
@@ -160,37 +168,74 @@ public class ScopeNotificationFilterTest
     {
         NotificationPreferenceScope scope1 = mock(NotificationPreferenceScope.class);
         when(scope1.getScopeReference()).thenReturn(
-                SCOPE_REFERENCE_1
+                SCOPE_INCLUSIVE_REFERENCE_1
         );
         when(scope1.getEventType()).thenReturn("event1");
 
         NotificationPreferenceScope scope2 = mock(NotificationPreferenceScope.class);
         when(scope2.getScopeReference()).thenReturn(
-                SCOPE_REFERENCE_2
+                SCOPE_INCLUSIVE_REFERENCE_2
         );
         when(scope2.getEventType()).thenReturn("event2");
 
         NotificationPreferenceScope scope3 = mock(NotificationPreferenceScope.class);
         when(scope3.getScopeReference()).thenReturn(
-                SCOPE_REFERENCE_3
+                SCOPE_INCLUSIVE_REFERENCE_3
         );
         when(scope3.getEventType()).thenReturn("event3");
+
+        NotificationPreferenceScope exclusiveScope1 = mock(NotificationPreferenceScope.class);
+        when(exclusiveScope1.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_1);
+        when(exclusiveScope1.getScopeFilterType()).thenReturn(NotificationPreferenceScopeFilterType.EXCLUSIVE);
+        when(exclusiveScope1.getEventType()).thenReturn("exclusiveEvent1");
+
+        NotificationPreferenceScope exclusiveScope2 = mock(NotificationPreferenceScope.class);
+        when(exclusiveScope2.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_2);
+        when(exclusiveScope2.getScopeFilterType()).thenReturn(NotificationPreferenceScopeFilterType.EXCLUSIVE);
+        when(exclusiveScope2.getEventType()).thenReturn("exclusiveEvent2");
 
         when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
                 any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.INCLUSIVE))).thenReturn(
                         Arrays.asList(scope1, scope2, scope3)
+        );
+
+        when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
+                any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.EXCLUSIVE))).thenReturn(
+                        Arrays.asList(exclusiveScope1, exclusiveScope2)
         );
     }
 
     @Test
     public void queryFilterAND() throws Exception
     {
+        createPreferenceScopeMocks();
+
         assertEquals(
                 StringUtils.EMPTY,
                 mocker.getComponentUnderTest().queryFilterAND(
                         new DocumentReference("xwiki", "XWiki", "User"),
                         NotificationFormat.ALERT,
                         "type1"
+                )
+        );
+
+        assertEquals(
+                " NOT (event.wiki = :wiki_scopeNotifFilter_EXCLUSIVE_1 "
+                        + "AND event.space LIKE :space_scopeNotifFilter_EXCLUSIVE_1 ESCAPE '!')",
+                mocker.getComponentUnderTest().queryFilterAND(
+                        new DocumentReference("xwiki", "XWiki", "User"),
+                        NotificationFormat.ALERT,
+                        "exclusiveEvent1"
+                )
+        );
+
+        assertEquals(
+                " NOT (event.wiki = :wiki_scopeNotifFilter_EXCLUSIVE_1 "
+                        + "AND event.space LIKE :space_scopeNotifFilter_EXCLUSIVE_1 ESCAPE '!')",
+                mocker.getComponentUnderTest().queryFilterAND(
+                        new DocumentReference("xwiki", "XWiki", "User"),
+                        NotificationFormat.ALERT,
+                        "exclusiveEvent1"
                 )
         );
     }
@@ -200,9 +245,11 @@ public class ScopeNotificationFilterTest
     {
         // Mocks
         createPreferenceScopeMocks();
-        when(serializer.serialize(SCOPE_REFERENCE_1)).thenReturn("wiki1");
-        when(serializer.serialize(SCOPE_REFERENCE_2)).thenReturn("space_2");
-        when(serializer.serialize(SCOPE_REFERENCE_3)).thenReturn("space3.page3");
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_1)).thenReturn("wiki1");
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_2)).thenReturn("space_2");
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_3)).thenReturn("space3.page3");
+        when(serializer.serialize(SCOPE_EXCLUSIVE_REFERENCE_1)).thenReturn("space1");
+        when(serializer.serialize(SCOPE_EXCLUSIVE_REFERENCE_2)).thenReturn("space2.page2");
 
         // Test
         Map<String, Object> results = mocker.getComponentUnderTest().queryFilterParams(
@@ -216,6 +263,10 @@ public class ScopeNotificationFilterTest
         assertEquals("space!_2%", results.get("space_scopeNotifFilter_INCLUSIVE_2"));
         assertEquals("wiki3", results.get("wiki_scopeNotifFilter_INCLUSIVE_3"));
         assertEquals("space3.page3", results.get("page_scopeNotifFilter_INCLUSIVE_3"));
-        assertEquals(5, results.size());
+        assertEquals("excludedWiki", results.get("wiki_scopeNotifFilter_EXCLUSIVE_1"));
+        assertEquals("space1%", results.get("space_scopeNotifFilter_EXCLUSIVE_1"));
+        assertEquals("excludedWiki", results.get("wiki_scopeNotifFilter_EXCLUSIVE_2"));
+        assertEquals("space2.page2", results.get("page_scopeNotifFilter_EXCLUSIVE_2"));
+        assertEquals(9, results.size());
     }
 }

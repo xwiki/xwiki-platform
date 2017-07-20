@@ -21,6 +21,7 @@ package org.xwiki.platform.notifications.test.po.preferences;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.stability.Unstable;
 
@@ -31,26 +32,19 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Unstable
-public class EventTypePreferences
+public class EventTypePreferences extends AbstractNotificationPreferences
 {
-    private WebElement webElement;
-
     private String eventType;
-
-    private BootstrapSwitch alertSwitch;
-
-    private BootstrapSwitch emailSwitch;
 
     /**
      * Construct an EventTypePreferences.
      * @param webElement table row of the event type
+     * @param driver the xwiki web driver
      */
-    public EventTypePreferences(WebElement webElement)
+    public EventTypePreferences(WebElement webElement, XWikiWebDriver driver)
     {
-        this.webElement           = webElement;
-        this.eventType            = webElement.getAttribute("data-eventtype");
-        this.alertSwitch          = getSwitch("alert");
-        this.emailSwitch          = getSwitch("email");
+        super(webElement, driver);
+        this.eventType   = webElement.getAttribute("data-eventtype");
     }
 
     /**
@@ -74,43 +68,8 @@ public class EventTypePreferences
         return webElement.findElement(By.cssSelector("td:first-child")).getText();
     }
 
-    /**
-     * Set the state of the alert switch.
-     * @param state the expected state
-     * @throws Exception if the state is not valid
-     */
-    public void setAlertState(BootstrapSwitch.State state) throws Exception
-    {
-        this.alertSwitch.setState(state);
-    }
-
-    /**
-     * Set the state of the email switch.
-     * @param state the expected state
-     * @throws Exception if the state is not valid
-     */
-    public void setEmailState(BootstrapSwitch.State state) throws Exception
-    {
-        this.emailSwitch.setState(state);
-    }
-
-    /**
-     * @return the state of the alert switch
-     */
-    public BootstrapSwitch.State getAlertState()
-    {
-        return alertSwitch.getState();
-    }
-
-    /**
-     * @return the state of the email switch
-     */
-    public BootstrapSwitch.State getEmail()
-    {
-        return emailSwitch.getState();
-    }
-
-    private BootstrapSwitch getSwitch(String format)
+    @Override
+    protected BootstrapSwitch getSwitch(String format)
     {
         return new BootstrapSwitch(
                 webElement.findElement(
@@ -120,7 +79,8 @@ public class EventTypePreferences
                                         format
                                 )
                         )
-                )
+                ),
+                driver
         );
     }
 }

@@ -25,11 +25,12 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.platform.notifications.test.po.preferences.AbstractNotificationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
 import org.xwiki.stability.Unstable;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.BootstrapSwitch;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the user profile's Notifications tab.
@@ -148,7 +149,7 @@ public class NotificationsUserProfilePage extends ViewPage
         if (ALERT_FORMAT.equals(format)) {
             return pref.getAlertState();
         } else {
-            return pref.getEmail();
+            return pref.getEmailState();
         }
     }
 
@@ -162,13 +163,8 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public void setApplicationState(String applicationId, String format, BootstrapSwitch.State state) throws Exception
     {
-        ApplicationPreferences pref = getApplication(applicationId);
-        if (ALERT_FORMAT.equals(format)) {
-            pref.setAlertState(state);
-        } else {
-            pref.setEmailState(state);
-        }
-        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        AbstractNotificationPreferences pref = getApplication(applicationId);
+        setState(format, state, pref);
     }
 
     /**
@@ -184,12 +180,27 @@ public class NotificationsUserProfilePage extends ViewPage
             throws Exception
     {
         EventTypePreferences pref = getEventType(applicationId, eventType);
+        setState(format, state, pref);
+    }
+
+    private void setState(String format, BootstrapSwitch.State state, AbstractNotificationPreferences pref)
+            throws Exception
+    {
+        boolean wait = false;
         if (ALERT_FORMAT.equals(format)) {
-            pref.setAlertState(state);
+            if (pref.getAlertState() != state) {
+                pref.setAlertState(state);
+                wait = true;
+            }
         } else {
-            pref.setEmailState(state);
+            if (pref.getEmailState() != state) {
+                pref.setEmailState(state);
+                wait = true;
+            }
         }
-        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        if (wait) {
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
     }
 
     /**

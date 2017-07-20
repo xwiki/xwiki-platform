@@ -93,23 +93,15 @@ public class NotificationsTest extends AbstractTest
     @Before
     public void setUpUsers() throws Exception
     {
-        if (getUtil().rest().exists(new DocumentReference("xwiki", "XWiki", FIRST_USER_NAME))) {
-            // Already done
-            return;
-        }
-
         // Create the two users we will be using
         getUtil().createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
         getUtil().createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
 
         NotificationsUserProfilePage p;
-        NotificationsTrayPage trayPage;
 
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
         p.disableAllParameters();
-        trayPage = new NotificationsTrayPage();
-        trayPage.clearAllNotifications();
 
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);

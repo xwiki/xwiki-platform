@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
+import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
  * Wrap a bootstrap switch widget (http://bootstrapswitch.com/).
@@ -55,13 +56,17 @@ public class BootstrapSwitch
 
     private WebElement webElement;
 
+    private XWikiWebDriver driver;
+
     /**
      * Construct a bootstrap switch.
      * @param webElement the element the the wrapper will handle
+     * @param driver the xwiki web driver
      */
-    public BootstrapSwitch(WebElement webElement)
+    public BootstrapSwitch(WebElement webElement, XWikiWebDriver driver)
     {
         this.webElement = webElement;
+        this.driver = driver;
     }
 
     /**
@@ -95,7 +100,9 @@ public class BootstrapSwitch
      */
     public void click()
     {
+        State originalState = getState();
         this.webElement.findElement(By.className("bootstrap-switch-label")).click();
+        driver.waitUntilCondition(webDriver -> getState() != originalState);
     }
 
     /**

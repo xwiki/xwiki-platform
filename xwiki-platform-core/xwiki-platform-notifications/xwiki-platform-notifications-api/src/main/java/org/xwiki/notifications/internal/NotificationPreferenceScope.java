@@ -70,7 +70,7 @@ public class NotificationPreferenceScope
     }
 
     /**
-     * @return the type of the scope
+     * @return the type of filter associated to the scope
      */
     public NotificationPreferenceScopeFilterType getScopeFilterType()
     {

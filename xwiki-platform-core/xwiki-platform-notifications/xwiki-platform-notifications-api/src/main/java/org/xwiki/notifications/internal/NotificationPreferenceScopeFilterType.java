@@ -20,7 +20,7 @@
 package org.xwiki.notifications.internal;
 
 /**
- * Determine the type of a {@link NotificationPreferenceScope}.
+ * Determine the filter type of a {@link NotificationPreferenceScope}.
  * This type can be either inclusive or exclusive. This will affect the comportment of the related
  * {@link NotificationPreferenceScope} when used in {@link ScopeNotificationFilter}.
  *

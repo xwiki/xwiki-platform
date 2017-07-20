@@ -997,14 +997,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     self.buttonAddFilter  = self.container.find('.btn-addfilter');
     self.livetableModal   = self.container.find('&gt; .modal');
     self.pickerModal      = self.container.find('.documentPickerModal &gt; .modal');
-    self.filterTypeSelector = $('&lt;hr/>'
-      + '&lt;p>'
-      +   '&lt;label for="notificationFilterTypeSelector">$escapetool.javascript($services.localization.render('notifications.filters.type.label'))&lt;/label>'
-      +   '&lt;select class="notificationFilterTypeSelector">'
-      +     '&lt;option value="inclusive" selected>$escapetool.javascript($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option>'
-      +     '&lt;option value="exclusive">$escapetool.javascript($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive'))&lt;/option>'
-      +   '&lt;/select>'
-      + '&lt;/p>');
+    self.filterTypeSelector = $('&lt;hr/&gt;'
+      + '&lt;p&gt;'
+      +   '&lt;label for="notificationFilterTypeSelector"&gt;$escapetool.javascript($services.localization.render('notifications.filters.type.label'))&lt;/label&gt;'
+      +   '&lt;select class="notificationFilterTypeSelector"&gt;'
+      +     '&lt;option value="inclusive" selected&gt;$escapetool.javascript($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option&gt;'
+      +     '&lt;option value="exclusive"&gt;$escapetool.javascript($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive'))&lt;/option&gt;'
+      +   '&lt;/select&gt;'
+      + '&lt;/p&gt;');
 
     /**
      * Initialization

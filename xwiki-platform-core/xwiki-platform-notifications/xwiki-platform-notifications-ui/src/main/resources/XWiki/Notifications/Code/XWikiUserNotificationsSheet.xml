@@ -231,10 +231,11 @@
             &lt;h4 class="modal-title"&gt;Filters&lt;/h4&gt;
           &lt;/div&gt;
           &lt;div class="modal-body"&gt;
-            #set($collist  = ['scope', 'location', '_actions'])
+            #set($collist  = ['scope', 'location', 'scopeFilterType', '_actions'])
             #set($colprops = {
               'scope':          { 'sortable': false, 'html': true},
               'location':       { 'sortable': false, 'html': true },
+              'scopeFilterType':{ 'sortable': true},
               '_actions':       { 'sortable': false, 'actions': ['delete']}
             })
             #set($options  = {
@@ -996,6 +997,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     self.buttonAddFilter  = self.container.find('.btn-addfilter');
     self.livetableModal   = self.container.find('&gt; .modal');
     self.pickerModal      = self.container.find('.documentPickerModal &gt; .modal');
+    self.filterTypeSelector = $('&lt;hr/>'
+      + '&lt;p>'
+      +   '&lt;label for="notificationFilterTypeSelector">$escapetool.javascript($services.localization.render('notifications.filters.type.label'))&lt;/label>'
+      +   '&lt;select class="notificationFilterTypeSelector">'
+      +     '&lt;option value="inclusive" selected>$escapetool.javascript($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option>'
+      +     '&lt;option value="exclusive">$escapetool.javascript($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive'))&lt;/option>'
+      +   '&lt;/select>'
+      + '&lt;/p>');
 
     /**
      * Initialization
@@ -1005,6 +1014,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       self.buttonAddFilter.click(function() {
         self.pickerModal.modal('show');
         self.pickerModal.find('.location-tree').xtree();
+        self.pickerModal.find('.modal-body').append(self.filterTypeSelector);
         self.pickerModal.find('.modal-footer button.btn-primary').each(function() {
           $(this).prop('disabled', 'disabled');
         });
@@ -1037,6 +1047,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         var node = nodes[i];
         var scopeType = 'pageOnly';
         var reference = node.data.id;
+        var scopeFilterType = self.filterTypeSelector.find('option:selected').val();
         if (node.data.type == 'wiki') {
           scopeType = 'wiki';
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
@@ -1058,7 +1069,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
           'property#eventType': self.eventTypeWidget.eventType,
           'property#scopeReference': reference,
           'property#scope': scopeType,
-          'property#format': self.format
+          'property#format': self.format,
+          'property#scopeFilterType': scopeFilterType
         }).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');

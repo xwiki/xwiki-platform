@@ -70,6 +70,38 @@ public class ScopeNotificationFilter implements NotificationFilter
                 || this.filterEventByFilterType(event, user, format, NotificationPreferenceScopeFilterType.INCLUSIVE);
     }
 
+    @Override
+    public String queryFilterOR(DocumentReference user, NotificationFormat format, String type)
+    {
+        return this.generateQueryString(user, format, type, NotificationPreferenceScopeFilterType.INCLUSIVE);
+    }
+
+    @Override
+    public String queryFilterAND(DocumentReference user, NotificationFormat format, String type)
+    {
+        return this.generateQueryString(user, format, type, NotificationPreferenceScopeFilterType.EXCLUSIVE);
+    }
+
+    @Override
+    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
+            List<String> enabledEventTypes)
+    {
+        Map<String, Object> params =
+                this.generateQueryFilterParams(user, format, enabledEventTypes,
+                        NotificationPreferenceScopeFilterType.INCLUSIVE);
+        params.putAll(this.generateQueryFilterParams(user, format, enabledEventTypes,
+                NotificationPreferenceScopeFilterType.EXCLUSIVE));
+
+        return params;
+    }
+
+    /**
+     * Just as {@link #filterEvent(Event, DocumentReference, NotificationFormat)}, use the given user, the event, the
+     * format of the wanted notification and the type of filter we want to apply (see
+     * {@link NotificationPreferenceScopeFilterType}.
+     *
+     * @since 9.7RC1
+     */
     private boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
             NotificationPreferenceScopeFilterType scopeFilterType)
     {
@@ -101,38 +133,24 @@ public class ScopeNotificationFilter implements NotificationFilter
             logger.warn(ERROR, e);
         }
 
-        return hasRestriction && !matchRestriction;
-    }
-
-    @Override
-    public String queryFilterOR(DocumentReference user, NotificationFormat format, String type)
-    {
-        return this.generateQueryString(user, format, type, NotificationPreferenceScopeFilterType.INCLUSIVE);
-    }
-
-    @Override
-    public String queryFilterAND(DocumentReference user, NotificationFormat format, String type)
-    {
-        return this.generateQueryString(user, format, type, NotificationPreferenceScopeFilterType.EXCLUSIVE);
-    }
-
-    @Override
-    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<String> enabledEventTypes)
-    {
-        Map<String, Object> params =
-                this.generateQueryFilterParams(user, format, enabledEventTypes,
-                        NotificationPreferenceScopeFilterType.INCLUSIVE);
-        params.putAll(this.generateQueryFilterParams(user, format, enabledEventTypes,
-                NotificationPreferenceScopeFilterType.EXCLUSIVE));
-
-        return params;
+        /**
+         * In case we have an INCLUSIVE filter, we check if we had a restriction that was not satisfied.
+         * In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
+         * returned true.
+         */
+        if (scopeFilterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) {
+            return hasRestriction && !matchRestriction;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Generate a map of parameters that should be used with the query made from
      * {@link #queryFilterAND(DocumentReference, NotificationFormat, String)}
      * and {@link #queryFilterOR(DocumentReference, NotificationFormat, String)}.
+     *
+     * @since 9.7RC1
      */
     private Map<String, Object> generateQueryFilterParams(DocumentReference user, NotificationFormat format,
             List<String> enabledEventTypes, NotificationPreferenceScopeFilterType filterType)
@@ -183,6 +201,19 @@ public class ScopeNotificationFilter implements NotificationFilter
         return params;
     }
 
+    /**
+     * Generate parts of a query used to retrieve events from a given user.
+     * Depending on the {@link NotificationPreferenceScopeFilterType} given, the generated query will have a different
+     * content.
+     *
+     * Generated syntax for INCLUSIVE filters:
+     * (--filter1--) OR (--filter2--) OR (--filter3--) ...
+     *
+     * Generated syntax for EXCLUSIVE filters:
+     * NOT (--filter1--) AND NOT (--filter2--) AND NOT (--filter3--) ...
+     *
+     * @since 9.7RC1
+     */
     private String generateQueryString(DocumentReference user, NotificationFormat format, String type,
             NotificationPreferenceScopeFilterType filterType)
     {

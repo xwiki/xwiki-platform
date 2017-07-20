@@ -69,9 +69,11 @@
       #else
         #set ($scopeIcon = 'wiki')
       #end
+      #set ($scopeFilterTypeValue = $obj.getValue('scopeFilterType'))
       #set ($element = {
         'scope'          : $services.icon.renderHTML($scopeIcon),
         'scopeReference' : $obj.getValue('scopeReference'),
+        'scopeFilterType': $services.localization.render("XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_$scopeFilterTypeValue"),
         'doc_viewable'   : true,
         'location'       : "#hierarchy($reference, {'limit': 5, 'plain': false, 'local': false, 'displayTitle': false})",
         'doc_delete_url' : "${restBaseURL}/objects/XWiki.Notifications.Code.NotificationPreferenceScopeClass/${obj.reference.objectNumber}"

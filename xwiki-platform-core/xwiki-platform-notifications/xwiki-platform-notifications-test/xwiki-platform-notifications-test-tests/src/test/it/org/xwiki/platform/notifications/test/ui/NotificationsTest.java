@@ -342,6 +342,10 @@ public class NotificationsTest extends AbstractTest
         DocumentReference page1 = new DocumentReference("xwiki", getTestClassName(), "Page1");
         DocumentReference page2 = new DocumentReference("xwiki", getTestClassName(), "Page2");
 
+        // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
+        // changed.
+        Thread.sleep(1000);
+
         getUtil().createPage(getTestClassName(), "Page1", "Content 1", "Title 1");
         getUtil().createPage(getTestClassName(), "Page2", "Content 2", "Title 2");
 
@@ -365,18 +369,15 @@ public class NotificationsTest extends AbstractTest
 
         // Events inside an email comes in random order, so we just verify that all the expected content is there
         String email = prepareMail(multipart1.getBodyPart(0).getContent().toString());
-        assertTrue(email.contains(
-                prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail1.txt")))
-            )
-        );
-        assertTrue(email.contains(
-                prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail2.txt")))
-                )
-        );
-        assertTrue(email.contains(
-                prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail3.txt")))
-                )
-        );
+        String expectedContent;
+        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail1.txt")));
+        assertTrue(String.format("Email is supposed to contain: [\n%s\n], but all we have is [\n%s\n].",
+                expectedContent, email),
+                email.contains(expectedContent));
+        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail2.txt")));
+        assertTrue(String.format("Email is supposed to contain: [\n%s\n], but all we we have is [\n%s\n].",
+                expectedContent, email),
+                email.contains(expectedContent));
 
         getUtil().rest().delete(page1);
         getUtil().rest().delete(page2);

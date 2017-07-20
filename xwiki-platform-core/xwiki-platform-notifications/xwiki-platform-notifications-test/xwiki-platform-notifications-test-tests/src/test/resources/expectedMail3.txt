@@ -1,5 +1,0 @@
-System:
-  [create] [Profile of user1](http://localhost:8080/xwiki/bin/view/XWiki/user1).
-  By user1.
-  2017/06/27 15:49
-  Changes: http://localhost:8080/xwiki/bin/view/XWiki/user1?viewer=changes&rev1=1.1&rev2=1.1

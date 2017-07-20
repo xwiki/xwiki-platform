@@ -28,6 +28,7 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -70,6 +71,11 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     private static final String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME = "applicationName";
 
     /**
+     * The event descriptor application identifier field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ID = "applicationId";
+
+    /**
      * The event descriptor application icon field name in the XObject.
      */
     private static final String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON = "applicationIcon";
@@ -83,6 +89,8 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     private String eventDescription;
 
     private String applicationName;
+
+    private String applicationId;
 
     private String applicationIcon;
 
@@ -118,6 +126,13 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
             this.eventDescription = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION);
             this.eventTriggers = untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS);
             this.applicationName = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_NAME);
+
+            // If the applicationId property is not defined, fallback on the applicationName
+            String rawApplicationIdProperty =
+                    untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ID);
+            this.applicationId = (rawApplicationIdProperty != null && StringUtils.isNotBlank(rawApplicationIdProperty))
+                    ? rawApplicationIdProperty : this.applicationName;
+
             this.applicationIcon = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON);
         } catch (Exception e) {
             throw new EventStreamException(
@@ -190,6 +205,12 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     public String getApplicationName()
     {
         return this.applicationName;
+    }
+
+    @Override
+    public String getApplicationId()
+    {
+        return this.applicationId;
     }
 
     @Override

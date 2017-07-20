@@ -63,7 +63,8 @@ public class EventClassDocumentInitializer extends AbstractMandatoryClassInitial
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("applicationName", "Application", 64);
+        xclass.addTextField("applicationName", "Application Name", 64);
+        xclass.addTextField("applicationId", "Application Identifier", 64);
         xclass.addTextField("eventType", "Event type", 64);
         xclass.addTextField("applicationIcon", "Event icon", 64);
         xclass.addTextField("eventDescription", "Event description", 64);

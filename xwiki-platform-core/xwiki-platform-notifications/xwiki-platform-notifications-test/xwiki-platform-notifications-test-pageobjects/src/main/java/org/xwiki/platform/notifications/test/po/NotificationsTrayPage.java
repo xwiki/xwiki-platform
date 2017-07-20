@@ -25,6 +25,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -33,7 +34,8 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 9.4RC1
  */
-public class NotificationsTrayPage  extends ViewPage
+@Unstable
+public class NotificationsTrayPage extends ViewPage
 {
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;

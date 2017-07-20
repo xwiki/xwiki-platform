@@ -29,15 +29,16 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
+import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.CommentsTab;
@@ -72,6 +73,20 @@ public class NotificationsTest extends AbstractTest
 
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
+
+    private static final String SYSTEM = "org.xwiki.platform";
+
+    private static final String ALERT_FORMAT = "alert";
+
+    private static final String EMAIL_FORMAT = "email";
+
+    private static final String ADD_COMMENT = "addComment";
+
+    private static final String CREATE = "create";
+
+    private static final String DELETE = "delete";
+
+    private static final String UPDATE = "update";
 
     private static GreenMail mail;
 
@@ -146,6 +161,106 @@ public class NotificationsTest extends AbstractTest
     }
 
     @Test
+    public void testNotificationsSwitches() throws Exception
+    {
+        getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+
+        assertEquals(1, p.getApplicationPreferences().size());
+
+        // Open system
+        ApplicationPreferences system = p.getApplication(SYSTEM);
+        assertTrue(system.isCollapsed());
+        system.setCollapsed(false);
+        assertFalse(system.isCollapsed());
+        assertEquals("System", system.getApplicationName());
+        assertEquals("A comment is posted", p.getEventType(SYSTEM, ADD_COMMENT).getEventTypeDescription());
+        assertEquals("A new page is created", p.getEventType(SYSTEM, CREATE).getEventTypeDescription());
+        assertEquals("A page is deleted", p.getEventType(SYSTEM, DELETE).getEventTypeDescription());
+        assertEquals("A page is updated", p.getEventType(SYSTEM, UPDATE).getEventTypeDescription());
+
+        // Check default
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // Enable alert on system
+        p.setApplicationState(SYSTEM, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        assertEquals(BootstrapSwitch.State.ON , p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // Enable email on system
+        p.setApplicationState(SYSTEM, EMAIL_FORMAT, BootstrapSwitch.State.ON);
+        assertEquals(BootstrapSwitch.State.ON, p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // Disable email on system
+        p.setApplicationState(SYSTEM, EMAIL_FORMAT, BootstrapSwitch.State.OFF);
+        assertEquals(BootstrapSwitch.State.ON , p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // Disable alert on "update"
+        p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
+        assertEquals(BootstrapSwitch.State.UNDETERMINED , p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // Enable email on "delete"
+        p.setEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT, BootstrapSwitch.State.ON);
+        assertEquals(BootstrapSwitch.State.UNDETERMINED , p.getApplicationState(SYSTEM, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.UNDETERMINED, p.getApplicationState(SYSTEM, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, ADD_COMMENT, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, CREATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, DELETE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.ON , p.getEventTypeState(SYSTEM, DELETE, EMAIL_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT));
+        assertEquals(BootstrapSwitch.State.OFF, p.getEventTypeState(SYSTEM, UPDATE, EMAIL_FORMAT));
+
+        // Forget it
+        p.disableAllParameters();
+    }
+
+    @Test
     public void testNotifications() throws Exception
     {
         NotificationsUserProfilePage p;
@@ -165,8 +280,8 @@ public class NotificationsTest extends AbstractTest
         // The user 2 will now enable his notifications for new pages
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
-        p.setPageCreated(true);
-        p.setPageCreated(true);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         // We create a lot of pages in order to test the notification badge
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -199,8 +314,9 @@ public class NotificationsTest extends AbstractTest
 
         // The user 2 will get notifications only for pages deletions
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
-        p.setPageCreated(false);
-        p.setPageDeleted(true);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
+        p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         // Delete the "Deletion test page" and test the notification
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -219,7 +335,8 @@ public class NotificationsTest extends AbstractTest
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         NotificationsUserProfilePage p;
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
-        p.setPageCreatedEmail(true);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT, BootstrapSwitch.State.ON);
 
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         DocumentReference page1 = new DocumentReference("xwiki", getTestClassName(), "Page1");
@@ -289,9 +406,10 @@ public class NotificationsTest extends AbstractTest
         // Now we enable "create", "update" and "comment" for user 2
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
-        p.setPageCreated(false);
-        p.setPageUpdated(true);
-        p.setPageCommented(true);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
+        p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        p.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, BootstrapSwitch.State.ON);
         getUtil().gotoPage("Main", "WebHome");
         tray = new NotificationsTrayPage();
         tray.clearAllNotifications();
@@ -351,7 +469,8 @@ public class NotificationsTest extends AbstractTest
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
         NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        p.setPageUpdated(true);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         // Login as second user and modify ARandomPageThatShouldBeModified
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
@@ -370,4 +489,3 @@ public class NotificationsTest extends AbstractTest
         assertEquals("This is a test template", tray.getNotificationRawContent(0));
     }
 }
-

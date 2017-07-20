@@ -19,10 +19,17 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
+import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.BootstrapSwitch;
 
 /**
  * Represents the user profile's Notifications tab.
@@ -30,36 +37,19 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 9.4RC1
  */
+@Unstable
 public class NotificationsUserProfilePage extends ViewPage
 {
     private static final String SAVED_NOTIFICATION_TEXT = "Saved!";
 
+    private static final String ALERT_FORMAT = "alert";
+
+    private static final String EMAIL_FORMAT = "email";
+
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
 
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='create'][data-format='alert'] .bootstrap-switch")
-    private WebElement pageCreatedSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='create'][data-format='email'] .bootstrap-switch")
-    private WebElement pageCreatedEmailSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='delete'][data-format='alert'] .bootstrap-switch")
-    private WebElement pageDeletedSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='delete'][data-format='email'] .bootstrap-switch")
-    private WebElement pageDeletedEmailSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='update'][data-format='alert'] .bootstrap-switch")
-    private WebElement pageUpdatedSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='update'][data-format='email'] .bootstrap-switch")
-    private WebElement pageUpdatedEmailSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='addComment'][data-format='alert'] .bootstrap-switch")
-    private WebElement pageCommentedSwitch;
-
-    @FindBy(css = "td.notificationTypeCell[data-eventtype='addComment'][data-format='email'] .bootstrap-switch")
-    private WebElement pageCommentedEmailSwitch;
+    private Map<String, ApplicationPreferences> applicationPreferences = new HashMap<>();
 
     /**
      * Construct a NotificationsUserProfilePage (and for the browser page to be fully loaded).
@@ -67,11 +57,26 @@ public class NotificationsUserProfilePage extends ViewPage
     public NotificationsUserProfilePage()
     {
         getDriver().waitUntilElementIsVisible(notificationsPane, By.className("bootstrap-switch"));
+
+        for (WebElement element : getDriver().findElements(By.cssSelector("tbody.applicationElem"))) {
+            ApplicationPreferences pref = new ApplicationPreferences(element, getDriver());
+            applicationPreferences.put(pref.getApplicationId(), pref);
+        }
+    }
+
+    /**
+     * @return a map of the preferences for each application
+     * @since 9.7RC1
+     */
+    public Map<String, ApplicationPreferences> getApplicationPreferences()
+    {
+        return applicationPreferences;
     }
 
     /**
      * @param username the user profile document name
      * @return the notifications profile tab page object
+     * @since 9.7RC1
      */
     public static NotificationsUserProfilePage gotoPage(String username)
     {
@@ -80,199 +85,111 @@ public class NotificationsUserProfilePage extends ViewPage
     }
 
     /**
-     * Check if the pageCreatedCheckbox is checked.
-     * 
-     * @return true if the checkbox is checked
+     * @param applicationId id of the application
+     * @return the preferences for the given application
+     * @throws Exception if the application cannot be found
+     * @since 9.7RC1
      */
-    public boolean isPageCreated()
+    public ApplicationPreferences getApplication(String applicationId) throws Exception
     {
-        return isSwitchOn(this.pageCreatedSwitch);
+        ApplicationPreferences pref = applicationPreferences.get(applicationId);
+        if (pref == null) {
+            throw new Exception(String.format("Application [%s] is not present.", applicationId));
+        }
+        return pref;
     }
 
     /**
-     * Check if the pageCreatedEmailCheckbox is checked.
-     *
-     * @return true if the checkbox is checked
-     * @since 9.6RC1
+     * @param applicationId id of the application
+     * @param eventType name of the event type
+     * @return the preferences for the given event type of the given application
+     * @throws Exception if the event type cannot be found
+     * @since 9.7RC1
      */
-    public boolean isPageCreatedEmail()
+    public EventTypePreferences getEventType(String applicationId, String eventType) throws Exception
     {
-        return isSwitchOn(this.pageCreatedEmailSwitch);
+        EventTypePreferences pref = getApplication(applicationId).getEventTypePreferences().get(eventType);
+        if (pref == null) {
+            throw new Exception(
+                    String.format("Event Type [%s] is not present in the application [%s].", eventType, applicationId));
+        }
+        return pref;
     }
 
     /**
-     * Check if the pageDeletedCheckbox is checked.
-     * 
-     * @return true if the checkbox is checked
+     * @param applicationId id of the application
+     * @param format the format of the notification
+     * @return the state of the switch related to given application and format
+     * @throws Exception if the application cannot be found
+     * @since 9.7RC1
      */
-    public boolean isPageDeleted()
+    public BootstrapSwitch.State getApplicationState(String applicationId, String format) throws Exception
     {
-        return isSwitchOn(pageDeletedSwitch);
-    }
-
-    /**
-     * Check if the pageDeletedCEmailheckbox is checked.
-     *
-     * @return true if the checkbox is checked
-     * @since 9.6RC1
-     */
-    public boolean isPageDeletedEmail()
-    {
-        return isSwitchOn(pageDeletedEmailSwitch);
-    }
-
-    /**
-     * Check if the pageUpdatedCheckbox is checked.
-     * 
-     * @return true if the checkbox is checked
-     */
-    public boolean isPageUpdated()
-    {
-        return isSwitchOn(pageUpdatedSwitch);
-    }
-
-    /**
-     * Check if the pageUpdatedEmailCheckbox is checked.
-     *
-     * @return true if the checkbox is checked
-     * @since 9.6RC1
-     */
-    public boolean isPageUpdatedEmail()
-    {
-        return isSwitchOn(pageUpdatedEmailSwitch);
-    }
-
-    /**
-     * Check if the pageCommentedCheckbox is checked.
-     *
-     * @return true if the checkbox is checked
-     * @since 9.5
-     * @since 9.6RC1
-     */
-    public boolean isPageCommented()
-    {
-        return isSwitchOn(pageCommentedSwitch);
-    }
-
-    /**
-     * Check if the pageCommentedEmailCheckbox is checked.
-     *
-     * @return true if the checkbox is checked
-     * @since 9.6RC1
-     */
-    public boolean isPageCommentedEmail()
-    {
-        return isSwitchOn(pageCommentedEmailSwitch);
-    }
-
-    /**
-     * Change the status of the pageCreatedCheckbox.
-     * 
-     * @param status New status
-     */
-    public void setPageCreated(boolean status)
-    {
-        if (status != this.isPageCreated()) {
-            clickOnSwitch(this.pageCreatedSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        ApplicationPreferences pref = getApplication(applicationId);
+        if (ALERT_FORMAT.equals(format)) {
+            return pref.getAlertState();
+        } else {
+            return pref.getEmailState();
         }
     }
 
     /**
-     * Change the status of the pageCreatedEmailCheckbox.
-     *
-     * @param status New status
-     * @since 9.6RC1
+     * @param applicationId id of the application
+     * @param eventType name of the event type
+     * @param format the format of the notification
+     * @return the state of the switch related to given event type and format
+     * @throws Exception if the event type cannot be found
+     * @since 9.7RC1
      */
-    public void setPageCreatedEmail(boolean status)
+    public BootstrapSwitch.State getEventTypeState(String applicationId, String eventType, String format)
+            throws Exception
     {
-        if (status != this.isPageCreatedEmail()) {
-            clickOnSwitch(this.pageCreatedEmailSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        EventTypePreferences pref = getEventType(applicationId, eventType);
+        if (ALERT_FORMAT.equals(format)) {
+            return pref.getAlertState();
+        } else {
+            return pref.getEmail();
         }
     }
 
     /**
-     * Change the status of the pageDeletedCheckbox.
-     * 
-     * @param status New status
+     * Set the state of the given application for the given format.
+     * @param applicationId id of the application
+     * @param format the format of the notification
+     * @param state the state to set
+     * @throws Exception if the application is not found
+     * @since 9.7RC1
      */
-    public void setPageDeleted(boolean status)
+    public void setApplicationState(String applicationId, String format, BootstrapSwitch.State state) throws Exception
     {
-        if (status != this.isPageDeleted()) {
-            clickOnSwitch(this.pageDeletedSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        ApplicationPreferences pref = getApplication(applicationId);
+        if (ALERT_FORMAT.equals(format)) {
+            pref.setAlertState(state);
+        } else {
+            pref.setEmailState(state);
         }
+        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
     }
 
     /**
-     * Change the status of the pageDeletedEmailCheckbox.
-     *
-     * @param status New status
-     * @since 9.6RC1
+     * Set the state of the event type for the given format.
+     * @param applicationId id of the application
+     * @param eventType name of the event type
+     * @param format the format of the notification
+     * @param state the state to set
+     * @throws Exception if the event type cannot be found
+     * @since 9.7RC1
      */
-    public void setPageDeletedEmail(boolean status)
+    public void setEventTypeState(String applicationId, String eventType, String format, BootstrapSwitch.State state)
+            throws Exception
     {
-        if (status != this.isPageDeletedEmail()) {
-            clickOnSwitch(this.pageDeletedEmailSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        EventTypePreferences pref = getEventType(applicationId, eventType);
+        if (ALERT_FORMAT.equals(format)) {
+            pref.setAlertState(state);
+        } else {
+            pref.setEmailState(state);
         }
-    }
-
-    /**
-     * Change the status of the pageUpdatedCheckbox.
-     * 
-     * @param status New status
-     */
-    public void setPageUpdated(boolean status)
-    {
-        if (status != this.isPageUpdated()) {
-            clickOnSwitch(this.pageUpdatedSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
-        }
-    }
-
-    /**
-     * Change the status of the pageUpdatedEmailCheckbox.
-     *
-     * @param status New status
-     * @since 9.6RC1
-     */
-    public void setPageUpdatedEmail(boolean status)
-    {
-        if (status != this.isPageUpdatedEmail()) {
-            clickOnSwitch(this.pageUpdatedEmailSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
-        }
-    }
-
-    /**
-     * Change the status of the pageCommentCheckbox.
-     *
-     * @param status New status
-     * @since 9.5
-     * @since 9.6RC1
-     */
-    public void setPageCommented(boolean status)
-    {
-        if (status != this.isPageCommented()) {
-            clickOnSwitch(this.pageCommentedSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
-        }
-    }
-
-    /**
-     * Change the status of the pageCommentEmailCheckbox.
-     *
-     * @param status New status
-     * @since 9.6RC1
-     */
-    public void setPageCommentedEmail(boolean status)
-    {
-        if (status != this.isPageCommentedEmail()) {
-            clickOnSwitch(this.pageCommentedEmailSwitch);
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
-        }
+        this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
     }
 
     /**
@@ -280,25 +197,14 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public void disableAllParameters()
     {
-        this.setPageCreated(false);
-        this.setPageDeleted(false);
-        this.setPageUpdated(false);
-        this.setPageCommented(false);
-        this.setPageCreatedEmail(false);
-        this.setPageDeletedEmail(false);
-        this.setPageUpdatedEmail(false);
-        this.setPageCommentedEmail(false);
-    }
-
-    private boolean isSwitchOn(WebElement webElement)
-    {
-        // TODO: create a generic widget object
-        return webElement.getAttribute("class").contains("bootstrap-switch-on");
-    }
-
-    private void clickOnSwitch(WebElement webElement)
-    {
-        // TODO: create a generic widget object
-        webElement.findElement(By.className("bootstrap-switch-label")).click();
+        try {
+            for (ApplicationPreferences app : applicationPreferences.values()) {
+                app.setAlertState(BootstrapSwitch.State.OFF);
+                app.setEmailState(BootstrapSwitch.State.OFF);
+            }
+            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        } catch (Exception e) {
+            // Nothing, the exception is only triggered if we try to use an invalid state
+        }
     }
 }

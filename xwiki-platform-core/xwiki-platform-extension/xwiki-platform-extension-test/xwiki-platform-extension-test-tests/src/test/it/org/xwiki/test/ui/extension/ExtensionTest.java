@@ -189,11 +189,16 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         assertNull(searchResults.getNoResultsMessage());
 
-        // Check that the result matches the search query.
-        ExtensionPane extension = searchResults.getExtension(RandomUtils.nextInt(20));
-        assertTrue("Can't find [commons] in the summary of extension [" + extension.getId() + "] ("
-            + extension.getSummary() + ")", extension.getSummary().toLowerCase().contains("commons"));
-        assertEquals("core", extension.getStatus());
+        // Check that the results match the search query.
+        for (int i = 0; i < searchResults.getPagination().getPageCount(); i++) {
+            ExtensionPane extension = searchResults.getExtension(i);
+            assertTrue("Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
+                + extension.getSummary() + ")",
+                extension.getSummary().toLowerCase().contains("commons")
+                    || extension.getId().getId().toLowerCase().contains("commons")
+                    || extension.getName().toLowerCase().contains("commons"));
+            assertEquals("core", extension.getStatus());
+        }
 
         // Test search query with no results.
         searchResults = new SimpleSearchPane().search("blahblah");
@@ -209,7 +214,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertNull(searchResults.getPagination());
         assertTrue(searchResults.getDisplayedResultsCount() > 1);
 
-        extension = searchResults.getExtension(0);
+        ExtensionPane extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
         assertTrue("Can't find [restlet] in the name of the extension [" + extension.getId() + "] ("
             + extension.getName() + ")", extension.getName().toLowerCase().contains("restlet"));

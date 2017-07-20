@@ -223,7 +223,7 @@
       <dependency>
         <groupId>org.xwiki.rendering</groupId>
         <artifactId>xwiki-rendering-macro-velocity</artifactId>
-        <version>9.6-SNAPSHOT</version>
+        <version>${rendering.version}</version>
       </dependency>
       <!-- application-tour-ui -->
       <dependency>
@@ -241,7 +241,7 @@
       <dependency>
         <groupId>org.xwiki.rendering</groupId>
         <artifactId>xwiki-rendering-macro-html</artifactId>
-        <version>9.6-SNAPSHOT</version>
+        <version>${rendering.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

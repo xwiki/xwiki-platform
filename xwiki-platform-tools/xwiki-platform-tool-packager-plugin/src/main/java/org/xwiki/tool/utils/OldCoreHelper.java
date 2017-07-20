@@ -67,9 +67,6 @@ public class OldCoreHelper implements AutoCloseable
     @Inject
     private ExecutionContextManager ecim;
 
-    @Inject
-    private org.xwiki.environment.Environment environment;
-
     private boolean disposeComponentManager;
 
     private String wikiId;

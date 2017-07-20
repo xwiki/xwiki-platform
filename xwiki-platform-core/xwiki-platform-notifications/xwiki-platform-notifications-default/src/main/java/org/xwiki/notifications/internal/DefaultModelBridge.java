@@ -51,7 +51,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  *
  * @version $Id$
  */
-@Component(roles = ModelBridge.class)
+@Component
 @Singleton
 public class DefaultModelBridge implements ModelBridge
 {

@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -61,9 +60,6 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
     @Inject
     @Named("cached")
     private ModelBridge modelBridge;
-
-    @Inject
-    private Logger logger;
 
     /**
      * Initialize the iterator.

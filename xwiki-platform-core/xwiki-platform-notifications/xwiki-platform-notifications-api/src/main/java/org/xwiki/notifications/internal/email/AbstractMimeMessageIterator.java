@@ -67,11 +67,11 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private static final String ERROR_MESSAGE = "Failed to generate an email for the user [{}].";
 
     @Inject
-    @Named("template")
-    private MimeMessageFactory<MimeMessage> factory;
+    protected Logger logger;
 
     @Inject
-    private Logger logger;
+    @Named("template")
+    private MimeMessageFactory<MimeMessage> factory;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;

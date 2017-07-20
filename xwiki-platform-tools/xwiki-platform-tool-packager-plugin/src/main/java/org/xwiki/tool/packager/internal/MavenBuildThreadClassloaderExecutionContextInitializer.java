@@ -26,6 +26,7 @@ import org.xwiki.classloader.xwiki.internal.ThreadClassloaderExecutionContextIni
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextInitializer;
 
 /**
  * Cancel {@link ThreadClassloaderExecutionContextInitializer} to not mess with the Maven classloader.
@@ -36,7 +37,7 @@ import org.xwiki.context.ExecutionContextException;
 @Component
 @Singleton
 @Named("threadclassloader")
-public class MavenBuildThreadClassloaderExecutionContextInitializer extends ThreadClassloaderExecutionContextInitializer
+public class MavenBuildThreadClassloaderExecutionContextInitializer implements ExecutionContextInitializer
 {
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException

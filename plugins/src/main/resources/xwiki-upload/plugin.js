@@ -41,6 +41,20 @@
         var stopMarker = '<!--stopimage-->';
         return startMarker + html + stopMarker;
       });
+
+      // Chrome uses 'image.png' as file name when pasting images, instead of leaving the file name empty, and this
+      // prevents us from using the configured default file name.
+      // See CKEDITOR-169: Image upload by copy & paste overwrites previous ones
+      // See https://github.com/ckeditor/ckeditor-dev/issues/664
+      var oldCreate = editor.uploadRepository.create;
+      editor.uploadRepository.create = function(file, name) {
+        // jshint camelcase:false
+        var defaultFileName = editor.config.fileTools_defaultFileName;
+        if (!name && file && file.type === 'image/png' && file.name === 'image.png' && defaultFileName) {
+          name = defaultFileName + '.png';
+        }
+        return oldCreate.call(this, file, name);
+      };
     },
 
     /**

@@ -41,7 +41,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @since 9.0RC1
  * @since 8.4.2
  */
-@Mojo(name = "data", defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true)
+@Mojo(name = "data", defaultPhase = LifecyclePhase.PREPARE_PACKAGE, requiresProject = true)
 public class DataMojo extends AbstractOldCoreMojo
 {
     /**

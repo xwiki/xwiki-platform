@@ -414,7 +414,7 @@ $xwiki.ssx.use('Main.Spaces')##
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Navigation</defaultCategory>
+      <defaultCategory>Deprecated</defaultCategory>
     </property>
     <property>
       <description>Displays all the spaces in this wiki.</description>

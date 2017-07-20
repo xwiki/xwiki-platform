@@ -229,7 +229,7 @@ $services.localization.render('platform.index.spaceIndexDescription', [$space])
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Navigation</defaultCategory>
+      <defaultCategory>Deprecated</defaultCategory>
     </property>
     <property>
       <description>Lists documents in a space.</description>

@@ -603,15 +603,15 @@
                 <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
-                    <allowedVersionRegex>\$\{commons.version\}|[^$].*</allowedVersionRegex>
+                    <allowedVersionRegex>\$\{commons.version\}</allowedVersionRegex>
                   </versionCheck>
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.rendering</groupIdPrefix>
-                    <allowedVersionRegex>\$\{rendering.version\}|[^$].*</allowedVersionRegex>
+                    <allowedVersionRegex>\$\{rendering.version\}</allowedVersionRegex>
                   </versionCheck>
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.platform</groupIdPrefix>
-                    <allowedVersionRegex>\$\{project.version\}|[^$].*</allowedVersionRegex>
+                    <allowedVersionRegex>\$\{project.version\}|${platform.version}</allowedVersionRegex>
                   </versionCheck>
                 </validateDependencyVersion>
               </rules>

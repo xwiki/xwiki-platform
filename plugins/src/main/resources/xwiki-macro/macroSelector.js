@@ -141,8 +141,11 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       var name = $(this).find('.macro-name').text().toLowerCase();
       var description = $(this).find('.macro-description').text().toLowerCase();
       var category = $(this).attr('data-macroCategory');
+      // By default we hide Macros located in the special Internal and Deprecated categories so that they
+      // are less visible to users.
       var hide = (text && name.indexOf(text) < 0 && description.indexOf(text) < 0) ||
-        (typeof selectedCategory === 'string' && category !== selectedCategory);
+        (typeof selectedCategory === 'string' && category !== selectedCategory) ||
+          (typeof selectedCategory !== 'string' && (category === 'Internal' || category === 'Deprecated'));
       $(this).removeClass('selected').toggleClass('hidden', hide);
     }).not('.hidden').first().addClass('selected');
     macroSelector.trigger('change');

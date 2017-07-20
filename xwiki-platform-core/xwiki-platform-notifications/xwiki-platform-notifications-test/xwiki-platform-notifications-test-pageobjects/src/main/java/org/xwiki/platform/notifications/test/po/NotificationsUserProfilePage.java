@@ -199,12 +199,17 @@ public class NotificationsUserProfilePage extends ViewPage
     {
         try {
             for (ApplicationPreferences app : applicationPreferences.values()) {
-                app.setAlertState(BootstrapSwitch.State.OFF);
-                app.setEmailState(BootstrapSwitch.State.OFF);
+                if (app.getAlertState() != BootstrapSwitch.State.OFF) {
+                    app.setAlertState(BootstrapSwitch.State.OFF);
+                    this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+                }
+                if (app.getEmailState() != BootstrapSwitch.State.OFF) {
+                    app.setEmailState(BootstrapSwitch.State.OFF);
+                    this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+                }
             }
-            this.waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
         } catch (Exception e) {
-            // Nothing, the exception is only triggered if we try to use an invalid state
+            // Do nothing, the exception is only triggered if we try to use an invalid state
         }
     }
 }

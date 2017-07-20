@@ -164,7 +164,7 @@
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Navigation</defaultCategory>
+      <defaultCategory>Deprecated</defaultCategory>
     </property>
     <property>
       <description>Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.</description>
@@ -173,7 +173,7 @@
       <id>workspaces</id>
     </property>
     <property>
-      <name>Workspaces (Legacy)</name>
+      <name>Workspaces</name>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>

@@ -81,8 +81,9 @@ public class DeletePageTest extends AbstractTest
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilIsTerminated();
-        assertTrue(deletingPage.isTerminated());
-        assertTrue(deletingPage.isSuccess());
+        // Note: it's better to wait instead of using isSuccess() since there could be some timeframe between
+        // the hiding of the progress UI and the display of the success message.
+        deletingPage.waitUntilSuccessMessage();
         assertEquals(CONFIRMATION, deletingPage.getSuccessMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());

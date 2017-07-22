@@ -22,14 +22,13 @@ package org.xwiki.tool.packager.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.classloader.xwiki.internal.ThreadClassloaderExecutionContextInitializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
 
 /**
- * Cancel {@link ThreadClassloaderExecutionContextInitializer} to not mess with the Maven classloader.
+ * Cancel ThreadClassloaderExecutionContextInitializer to not mess with the Maven classloader.
  * 
  * @version $Id$
  * @since 9.7RC1

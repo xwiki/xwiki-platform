@@ -138,11 +138,8 @@ public class ScopeNotificationFilter implements NotificationFilter
          * In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
          * returned true.
          */
-        if (scopeFilterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) {
-            return hasRestriction && !matchRestriction;
-        } else {
-            return false;
-        }
+        return (scopeFilterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)
+                && hasRestriction && !matchRestriction);
     }
 
     /**

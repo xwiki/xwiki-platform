@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -126,8 +127,8 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
                 }
             }
         } catch (NotificationException e) {
-            this.logger.warn(
-                    String.format("Unable to retrieve the notifications preferences of [%s]: [%s]", user, e));
+            this.logger.warn("Unable to retrieve the notifications preferences of [{}]: [{}]", user,
+                    ExceptionUtils.getRootCauseMessage(e));
         }
 
         return false;

@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -102,8 +103,8 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
                     entries.add(defaultNotificationRSSRenderer.renderNotification(event));
                 }
             } catch (NotificationException e) {
-                this.logger.warn(
-                        String.format("Unable to render RSS entry for CompositeEvent : %s", e.getMessage()));
+                this.logger.warn("Unable to render RSS entry for CompositeEvent [{}] : [{}]",
+                                event, ExceptionUtils.getRootCauseMessage(e));
             }
         }
         feed.setEntries(entries);
@@ -124,9 +125,8 @@ public class DefaultNotificationRSSManager implements NotificationRSSManager
             } catch (ComponentLookupException e) {
                     /* If we get this exception, then it means that the component manager is broken as we’ve already
                        checked if an instance of a component with the given hint is available. */
-                this.logger.error(String.format(
-                        "Unable to fetch NotificationRSSRenderer component with hint [%s]",
-                        event.getType()), e);
+                this.logger.error("Unable to fetch NotificationRSSRenderer component with hint [{}]",
+                        event.getType(), e);
             }
         }
         return null;

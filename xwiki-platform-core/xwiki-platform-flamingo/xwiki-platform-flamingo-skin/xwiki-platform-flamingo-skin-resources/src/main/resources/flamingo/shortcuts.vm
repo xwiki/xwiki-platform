@@ -75,6 +75,33 @@
     shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
       location.href = $('tmViewSource').href;
     }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+
+    var developerShortcutsRestCall = function(restUrl) {
+        const req = new XMLHttpRequest();
+
+        req.onreadystatechange = function(event) {
+            if (this.readyState === XMLHttpRequest.DONE) {
+                if (this.status === 200) {
+                    // Reload the page to apply the user modifications
+                    location.reload()
+                } else {
+                    new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.shortcuts.developper.user.ajax.error'))", 'error');
+                }
+            }
+        };
+
+        req.open('PUT', restUrl, true);
+        req.send(null);
+    };
+
+    // Append developper shortcuts for toggeling userType and hiddenDocuments in the current user profile
+    shortcut.add("$services.localization.render('core.shortcuts.developer.user.type')", function() {
+        developerShortcutsRestCall('/rest/currentuser/properties/usertype/next');
+    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+
+    shortcut.add("$services.localization.render('core.shortcuts.developer.user.displayHiddenDocs')", function () {
+        developerShortcutsRestCall('/rest/currentuser/properties/displayHiddenDocuments/next');
+    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
   //]]>
   </script>
 #end

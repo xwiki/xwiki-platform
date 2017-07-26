@@ -49,6 +49,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
+ * Implementation for the REST resource {@link CurrentUserPropertyResource}.
+ *
  * @version $Id$
  * @since 9.7RC1
  */
@@ -69,7 +71,7 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
     private ModelFactory factory;
 
     @Override
-    public Response updateObjectProperty(String propertyName) throws XWikiRestException
+    public Response setNextPropertyValue(String propertyName) throws XWikiRestException
     {
         XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty(
             XWikiContext.EXECUTIONCONTEXT_KEY);
@@ -96,28 +98,7 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
             // Find the value to replace:
             // - for a boolean type, if true then the new value is false, if false then then new value is true
             // - for a static list type, find the next value in the list. Note that multiselect lists are not handled
-            java.lang.Object newValue = null;
-            PropertyClass propertyClass = (PropertyClass) object.getXClass(xcontext).get(propertyName);
-            if (propertyClass.getClassType().equals("Boolean")) {
-                if (object.getIntValue(propertyName) == 0) {
-                    newValue = 1;
-                } else {
-                    newValue = 0;
-                }
-            } else if (propertyClass.getClassType().equals("StaticList")) {
-                StaticListClass listClass = (StaticListClass) propertyClass;
-                if (listClass.isMultiSelect()) {
-                    List<String> items = listClass.getList(xcontext);
-                    int pos = items.indexOf(listClass.getValues());
-                    if (pos != -1) {
-                        if (pos == items.size() - 1) {
-                            newValue = items.get(0);
-                        } else {
-                            newValue = items.get(pos + 1);
-                        }
-                    }
-                }
-            }
+            java.lang.Object newValue = computeNewValue(object, propertyName, xcontext);
 
             if (newValue != null) {
                 object.set(propertyName, newValue, xcontext);
@@ -130,6 +111,41 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
             throw new XWikiRestException(String.format("Failed to change property [%s] for user [%s]", propertyName,
                 xcontext.getUserReference()), e);
         }
+    }
+
+    private java.lang.Object computeNewValue(BaseObject object, String propertyName, XWikiContext xcontext)
+    {
+        java.lang.Object newValue = null;
+        PropertyClass propertyClass = (PropertyClass) object.getXClass(xcontext).get(propertyName);
+        if (propertyClass.getClassType().equals("Boolean")) {
+            // Note: if not defined, then set it to true
+            if (object.getIntValue(propertyName) == 1) {
+                newValue = 0;
+            } else  {
+                newValue = 1;
+            }
+        } else if (propertyClass.getClassType().equals("StaticList")) {
+            newValue = computeNewStaticListValue((StaticListClass) propertyClass, object, propertyName, xcontext);
+        }
+        return newValue;
+    }
+
+    private java.lang.Object computeNewStaticListValue(StaticListClass listClass, BaseObject object, String
+        propertyName, XWikiContext xcontext)
+    {
+        java.lang.Object newValue = null;
+        if (!listClass.isMultiSelect()) {
+            List<String> items = listClass.getList(xcontext);
+            int pos = items.indexOf(object.getStringValue(propertyName));
+            if (pos != -1) {
+                if (pos == items.size() - 1) {
+                    newValue = items.get(0);
+                } else {
+                    newValue = items.get(pos + 1);
+                }
+            }
+        }
+        return newValue;
     }
 
     private Response buildResponse(XWikiDocument document, String propertyName, XWikiContext xcontext)

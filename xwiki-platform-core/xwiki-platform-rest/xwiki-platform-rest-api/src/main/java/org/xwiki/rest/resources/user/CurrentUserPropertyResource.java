@@ -19,18 +19,17 @@
  */
 package org.xwiki.rest.resources.user;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
 /**
- * Get or update a property of the current user.
+ * Update a boolean or static kilst property of the current user to its next value (for a Boolean this means set it
+ * to true if it was false and vice versa).
  *
  * @version $Id$
  * @since 9.7RC1
@@ -39,7 +38,12 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface CurrentUserPropertyResource
 {
-    @PUT Response updateObjectProperty(
+    /**
+     * @param propertyName the xproperty name to modify
+     * @return the REST response object with the Code and the content
+     * @throws XWikiRestException if an error occurred while setting the next value
+     */
+    @PUT Response setNextPropertyValue(
         @PathParam("propertyName") String propertyName
     ) throws XWikiRestException;
 }

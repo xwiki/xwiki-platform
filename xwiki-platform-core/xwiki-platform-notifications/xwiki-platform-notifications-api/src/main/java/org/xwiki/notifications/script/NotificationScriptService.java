@@ -45,7 +45,9 @@ import org.xwiki.notifications.internal.script.NotificationScriptEventHelper;
 import org.xwiki.notifications.rss.NotificationRSSManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 import com.rometools.rome.io.SyndFeedOutput;
@@ -258,7 +260,14 @@ public class NotificationScriptService implements ScriptService
      */
     public void setStartDate(String userId, Date startDate) throws NotificationException
     {
-        notificationManager.setStartDate(userId, startDate);
+        try {
+            this.authorizationManager.checkAccess(Right.EDIT, documentReferenceResolver.resolve(userId));
+            notificationManager.setStartDate(userId, startDate);
+        } catch (AccessDeniedException e) {
+            throw new NotificationException(
+                    String.format("Unable to save the start date of the notifications for the user [%s]", userId),
+                    e);
+        }
     }
 
     /**

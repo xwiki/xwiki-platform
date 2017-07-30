@@ -75,34 +75,52 @@
 ##        ADD KEYBOARD SHORTCUTS
 ###########################################
 #if ($keyboardShortcutsEnabled)
-  <script type="text/javascript">
-  //<![CDATA[
-    var developerShortcutsRestCall = function(restUrl) {
+<script type="text/javascript">
+    //<![CDATA[
+    shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
+        location.href = $('tmViewSource').href;
+    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+
+    /**
+     * Perform a PUT on the given REST API. If the request is successful, reload the page.
+     *
+     * We use this function in order to quickly edit the user properties for developer shortcuts.
+     * Also note that JQuery is not supported here, so we use a starndard XMLHttpRequest.
+     *
+     * @param restUrl the URL to use
+     * @param errorMessage the message to display if an error ocurred in the request
+     */
+    var developerShortcutsRestCall = function(restUrl, errorMessage) {
         const req = new XMLHttpRequest();
 
         req.onreadystatechange = function(event) {
             if (this.readyState === XMLHttpRequest.DONE) {
-                if (this.status === 200) {
+                if (this.status >= 200 && this.status < 300) {
                     // Reload the page to apply the user modifications
+                    new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.ajax.success'))", 'success');
                     location.reload()
                 } else {
-                    new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.shortcuts.developper.user.ajax.error'))", 'error');
+                    new XWiki.widgets.Notification(errorMessage, 'error');
                 }
             }
         };
 
         req.open('PUT', restUrl, true);
         req.send(null);
+
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.ajax.inprogress'))", 'inprogress');
     };
 
-    // Append developper shortcuts for toggeling userType and hiddenDocuments in the current user profile
+    // Append developer shortcuts for toggeling userType and hiddenDocuments in the current user profile
     shortcut.add("$services.localization.render('core.shortcuts.developer.user.type')", function() {
-        developerShortcutsRestCall('/rest/currentuser/properties/usertype/next');
+        developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
+                "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");
     }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
 
     shortcut.add("$services.localization.render('core.shortcuts.developer.user.displayHiddenDocs')", function () {
-        developerShortcutsRestCall('/rest/currentuser/properties/displayHiddenDocuments/next');
+        developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/displayHiddenDocuments/next",
+                "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
     }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
-  //]]>
-  </script>
+    //]]>
+</script>
 #end

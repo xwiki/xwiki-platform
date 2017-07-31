@@ -45,6 +45,12 @@ platform.core.profile.category.notifications=Notifications
 notifications.eventTypes.create=A page is created
 notifications.eventTypes.update=A page is updated
 notifications.eventTypes.delete=A page is deleted
+notifications.filters.cancel=Cancel
+notifications.filters.submit=Save
+notifications.filters.type.label=Filter type:
+notifications.filters.type.hint=How the filter should act towards an event in the given location
+notifications.filters.location.label=Filter scope:
+notifications.filters.location.hint=What part of the wiki should be concerned by the filter?
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings
 notifications.menu.clear=Clear All
@@ -68,6 +74,7 @@ notifications.events.lastComment=Last comment: {0}.
 notifications.events.addComment.description=The document {0} has been commented by {1}.
 notifications.preferences.scope.table.scope=Scope
 notifications.preferences.scope.table.location=Location
+notifications.preferences.scope.table.scopeFilterType=Filter Type
 notifications.preferences.scope.table._actions=Actions
 notifications.email.title=Event(s) on the wiki:
 notifications.email.subject={0} event(s) on the wiki
@@ -79,7 +86,9 @@ notifications.rss.seeChanges=Changes: {0}
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Weekly
-XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live</content>
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inclusive
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Exclusive</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

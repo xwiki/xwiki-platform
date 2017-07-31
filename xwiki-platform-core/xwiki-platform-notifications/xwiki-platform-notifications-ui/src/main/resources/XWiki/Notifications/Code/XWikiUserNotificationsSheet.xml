@@ -231,10 +231,11 @@
             &lt;h4 class="modal-title"&gt;Filters&lt;/h4&gt;
           &lt;/div&gt;
           &lt;div class="modal-body"&gt;
-            #set($collist  = ['scope', 'location', '_actions'])
+            #set($collist  = ['scope', 'location', 'scopeFilterType', '_actions'])
             #set($colprops = {
               'scope':          { 'sortable': false, 'html': true},
               'location':       { 'sortable': false, 'html': true },
+              'scopeFilterType':{ 'sortable': true},
               '_actions':       { 'sortable': false, 'actions': ['delete']}
             })
             #set($options  = {
@@ -257,12 +258,51 @@
     ## TODO: handle properly the "WIKI" filter with a wiki picker instead
     ## TODO: add an option so the user can select a page without its children
     ## Note: we put the picker modal here to avoid having a modal in a modal (nested modals ;))
-    &lt;div class="documentPickerModal"&gt;
-      #documentPickerModal({
-        'wiki': true,
-        'showTerminalDocuments': $showTerminalDocuments
-      })
-    &lt;/div&gt;
+    &lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-scope"&gt;
+      &lt;div class="modal-dialog" role="document"&gt;
+        &lt;div class="modal-content"&gt;
+          &lt;div class="modal-header"&gt;
+            &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+            &lt;h4 class="modal-title"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/h4&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-body"&gt;
+            &lt;form class="xform"&gt;
+              &lt;dl class="location-picker"&gt;
+                &lt;dt&gt;
+                  &lt;label for="notificationFilterTypeSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.label'))&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.hint'))&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;select id="notificationFilterTypeSelector" name="notificationFilterTypeSelector" size="1"&gt;
+                    &lt;option value="inclusive" selected&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option&gt;
+                    &lt;option value="exclusive"&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive'))&lt;/option&gt;
+                  &lt;/select&gt;
+                &lt;/dd&gt;
+                &lt;dt&gt;
+                  &lt;label for="notificationFilterScopeLocationSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.location.label'))&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.location.hint'))&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd class="document-tree"&gt;
+                  #documentTree({
+                    'class': 'location-tree',
+                    'finder': true,
+                    'showAttachments': false,
+                    'showRoot': false,
+                    'showTerminalDocuments': true,
+                    'showTranslations': false,
+                    'showWikis': true
+                  })
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/form&gt;
+          &lt;/div&gt;
+          &lt;div class="modal-footer"&gt;
+            &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$services.localization.render('notifications.filters.cancel')&lt;/button&gt;
+            &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;$services.localization.render('notifications.filters.submit')&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+      &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+    &lt;/div&gt;&lt;!-- /.modal --&gt;
   &lt;/div&gt;
 #end
 {{/velocity}}
@@ -994,8 +1034,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     self.container        = self.cell.find('.notificationPreferenceScopeContainer');
     self.button           = self.container.find('.filterButton');
     self.buttonAddFilter  = self.container.find('.btn-addfilter');
-    self.livetableModal   = self.container.find('&gt; .modal');
-    self.pickerModal      = self.container.find('.documentPickerModal &gt; .modal');
+    self.livetableModal   = self.container.find('&gt; #modal-' + self.eventTypeWidget.eventType + '-' + self.format);
+    self.pickerModal      = self.container.find('&gt; #modal-add-filter-scope');
+    self.filterTypeSelector = self.container.find('#notificationFilterTypeSelector');
 
     /**
      * Initialization
@@ -1037,6 +1078,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         var node = nodes[i];
         var scopeType = 'pageOnly';
         var reference = node.data.id;
+        var scopeFilterType = self.filterTypeSelector.find('option:selected').val();
         if (node.data.type == 'wiki') {
           scopeType = 'wiki';
         } else if (node.data.type == 'document' &amp;&amp; node.data.id.match('WebHome$')) {
@@ -1058,7 +1100,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
           'property#eventType': self.eventTypeWidget.eventType,
           'property#scopeReference': reference,
           'property#scope': scopeType,
-          'property#format': self.format
+          'property#format': self.format,
+          'property#scopeFilterType': scopeFilterType
         }).done(function (data) {
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');

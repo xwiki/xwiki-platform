@@ -52,6 +52,8 @@ public class CachedModelBridge implements ModelBridge
 
     private static final String USER_NOTIFICATIONS_PREFERENCES_SCOPE = "userNotificationsPreferencesScope";
 
+    private static final String UNDERSCORE = "_";
+
     @Inject
     private ModelBridge modelBridge;
 
@@ -85,7 +87,7 @@ public class CachedModelBridge implements ModelBridge
     public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
             NotificationFormat format) throws NotificationException
     {
-        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + "_" + format;
+        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format;
 
         ExecutionContext context = execution.getContext();
         if (context.hasProperty(contextEntry)) {
@@ -93,6 +95,24 @@ public class CachedModelBridge implements ModelBridge
         }
 
         List<NotificationPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format);
+        context.setProperty(contextEntry, preferences);
+
+        return preferences;
+    }
+
+    @Override
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
+            NotificationFormat format, NotificationPreferenceScopeFilterType type) throws NotificationException
+    {
+        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format + UNDERSCORE
+                + type.name();
+
+        ExecutionContext context = execution.getContext();
+        if (context.hasProperty(contextEntry)) {
+            return (List<NotificationPreferenceScope>) context.getProperty(contextEntry);
+        }
+
+        List<NotificationPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format, type);
         context.setProperty(contextEntry, preferences);
 
         return preferences;

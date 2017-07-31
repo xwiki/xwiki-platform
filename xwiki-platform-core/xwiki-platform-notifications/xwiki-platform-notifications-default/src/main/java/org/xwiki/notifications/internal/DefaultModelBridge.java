@@ -174,6 +174,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null && isCompatibleFormat(obj.getStringValue(FORMAT_FIELD), format)) {
                         String scopeType = obj.getStringValue("scope");
+                        NotificationPreferenceScopeFilterType scopeFilterType = this.extractScopeFilterType(obj);
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
                             type = EntityType.DOCUMENT;
@@ -189,7 +190,8 @@ public class DefaultModelBridge implements ModelBridge
 
                         preferences.add(new NotificationPreferenceScope(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
-                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type)
+                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type),
+                                scopeFilterType
                         ));
                     }
                 }
@@ -198,6 +200,41 @@ public class DefaultModelBridge implements ModelBridge
             throw new NotificationException(
                     String.format("Failed to get the notification preferences scope for the user [%s].", userReference),
                     e);
+        }
+
+        return preferences;
+    }
+
+    /**
+     * Extract the scopeFilterType parameter in the given {@link BaseObject}.
+     * This is done in order to eliminate too much cyclomatic complexity in
+     * {@link #getNotificationPreferenceScopes(DocumentReference, NotificationFormat)}.
+     * If no scopeFilterType is defined, the default is {@link NotificationPreferenceScopeFilterType#INCLUSIVE}.
+     *
+     * @param object the related base object
+     * @return the corresponding {@link NotificationPreferenceScopeFilterType}
+     * @since 9.7RC1
+     */
+    private NotificationPreferenceScopeFilterType extractScopeFilterType(BaseObject object)
+    {
+        String rawScopeFilterType = object.getStringValue("scopeFilterType");
+        return (rawScopeFilterType != null && StringUtils.isNotBlank(rawScopeFilterType))
+                ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType.toUpperCase())
+                : NotificationPreferenceScopeFilterType.INCLUSIVE;
+    }
+
+    @Override
+    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
+            NotificationFormat format, NotificationPreferenceScopeFilterType scopeFilterType)
+            throws NotificationException
+    {
+        List<NotificationPreferenceScope> preferences = new ArrayList<>();
+
+        for (NotificationPreferenceScope preference
+                : this.getNotificationPreferenceScopes(userReference, format)) {
+            if (preference.getScopeFilterType().equals(scopeFilterType)) {
+                preferences.add(preference);
+            }
         }
 
         return preferences;

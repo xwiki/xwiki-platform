@@ -9,7 +9,16 @@
     <div id="document-title"><h1>$titleToDisplay</h1></div>
     #if (!$doc.isNew())
       <div class="xdocLastModification">
-        $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+        #if (!$doc.isMostRecent())
+          $services.localization.render(
+            'platform.document.modificationWithVersion',
+            ["<a href='$tdoc.getURL('view', ""rev=$tdoc.version"")'>$tdoc.version</a>",
+            $xwiki.getUserName($tdoc.author),
+            $xwiki.formatDate($tdoc.date)
+          ])
+        #else
+          $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+        #end
       </div>
     #end
   </div>

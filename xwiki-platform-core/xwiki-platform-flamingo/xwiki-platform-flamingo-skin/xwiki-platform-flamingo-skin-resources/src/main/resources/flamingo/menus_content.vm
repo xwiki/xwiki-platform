@@ -296,7 +296,10 @@
     ## VIEW SOURCE
     ##
     #define ($viewSource)
-      #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search')
+      #if ("$!request.rev" != '')
+        #set ($revisionParameter = "&rev=$request.rev")
+      #end
+      #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search')
     #end
     #set ($discard = $staticExtensions.add( { 'content': $viewSource, 'order': 100000}))
     ##

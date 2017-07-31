@@ -335,6 +335,10 @@ public class XWikiDocumentArchive
             doc.setAuthor(nodeInfo.getAuthor());
             doc.setMinorEdit(nodeInfo.isMinorEdit());
             doc.setMostRecent(version.equals(getLatestVersion()));
+
+            // A document coming from the archive should never be considered new.
+            doc.setNew(false);
+
             return doc;
         } catch (Exception e) {
             Object[] args = { version.toString(), Long.valueOf(getId()) };

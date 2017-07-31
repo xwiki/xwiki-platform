@@ -5,17 +5,25 @@
 <div id="changes-info">
   <div id="changes-info-boxes">
     <div id="changes-info-box-from" class="changes-info-box">
-      <div class="changes-info-title">$services.localization.render('core.viewers.diff.from', [$rev1])</div>
-      <div class="changes-info-content">
-      #if($origdoc)
-        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
-        <br />
-        $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($origdoc.date)])
+      #if ("$!rev1" == '')
+        <div class="changes-info-title">$services.localization.render('core.viewers.diff.fromNew')</div>
+      #else
+        #set ($fromVersionURL = $origdoc.getURL('view', "rev=$rev1"))
+        #set ($fromVersionLink = "<a href='$fromVersionURL'>$rev1</a>")
+        <div class="changes-info-title">$services.localization.render('core.viewers.diff.from', [$fromVersionLink])</div>
+        <div class="changes-info-content">
+        #if($origdoc)
+          $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
+          <br />
+          $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($origdoc.date)])
+        #end
+        </div> ## changes-info-content
       #end
-      </div> ## changes-info-content
     </div> ## changes-info-box-from
     <div id="changes-info-box-to" class="changes-info-box">
-      <div class="changes-info-title">$services.localization.render('core.viewers.diff.to', [$rev2])</div>
+      #set ($toVersionURL = $newdoc.getURL('view', "rev=$rev2"))
+      #set ($toVersionLink = "<a href='$toVersionURL'>$rev2</a>")
+      <div class="changes-info-title">$services.localization.render('core.viewers.diff.to', [$toVersionLink])</div>
       <div class="changes-info-content">
       #if($newdoc)
         $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($newdoc.author)])

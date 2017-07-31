@@ -9,6 +9,10 @@
   ## Search for the revision
   #set($origdoc = $xwiki.getDocument($tdoc.documentReferenceWithLocale, $rev1))
 #end
+#if ($rev2 == '')
+  #set ($newdoc = $tdoc)
+  #set ($rev2 = $tdoc.version)
+#end
 #if ($tdoc.version == $rev2)
   #set($newdoc = $tdoc)
 #else

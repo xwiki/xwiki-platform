@@ -1,7 +1,7 @@
 ###
 ### Code page in the "view" mode
 ###
-$xwiki.jsfx.use('uicomponents/viewers/code.js', true)##
+$xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
 $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', true)##
 $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($titleToDisplay = $services.localization.render('core.viewers.code.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()]))
@@ -9,27 +9,101 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## ----------------------------
 ## Display the code
 ## ----------------------------
-#set($escapedcontent = $escapetool.html($tdoc.translatedContent))
-#set($ln = "$!request.getParameter('showlinenumbers')")
-<div>
-#if($ln != '0')
-  <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=0&amp;$!docvariant")" id="toggleLineNumbers">$services.localization.render('core.viewers.code.hideLineNumbers')</a>
-  #set($contentLines = $escapedcontent.split($util.newline))
-  #set($lineCount = $contentLines.size())
-  #set($p = 1)
-  #foreach($i in [0..5])
-    #if($p > $lineCount)
-      #set($positions = $i)
-      #break
-    #end
-    #set($p = $p * 10)
-  #end
-  <textarea readonly="readonly" class="wiki-code" rows="25" cols="80">
-#foreach($line in $contentLines)
-$doc.name.format("%${positions}d:", $velocityCount) $line
-#end</textarea>
-#else
-  <a href="$doc.getURL('view', "viewer=code&amp;showlinenumbers=1&amp;$!docvariant")" id="toggleLineNumbers">$services.localization.render('core.viewers.code.showLineNumbers')</a>
-  <textarea readonly="readonly" class="wiki-code" rows="25" cols="80">$escapedcontent</textarea>
+#set ($content = $tdoc.translatedContent)
+## Determine if we are viewing a revision other than the most recent one for the current document.
+#set ($latestDocument = $xwiki.getDocument($doc.documentReference))
+#if ($doc.version != $latestDocument.version)
+  #set ($optionalRevisionInfo = "rev=${doc.version}&")
 #end
+## Show the button to display the last authors / blame view.
+#set ($showLastAuthors = $request.showLastAuthors)
+#if ($showLastAuthors)
+  <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code")">Hide last authors</a>
+#else
+  <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code&showLastAuthors=true")">Show last authors</a>
+#end
+<div class="revision-container">
+  <table class="revision">
+    <tbody class="group">
+#if ($showLastAuthors)
+  ## Initialiaze the annotated content with the latest content of the document
+  #set ($annotatedContent = $services.blame.blame(null, $doc.getRevisionInfo($doc.version), $content))
+  ## Retrieve the previous version of the document
+  #set ($previous = $doc.previousVersion)
+  ## While ($previous && !$annotatedContent.isEntirelyAnnotated())
+  #set ($numberOfRevisions = ${doc.revisions.size()})
+  #foreach($i in [0..$numberOfRevisions])
+    #if (!$previous || $annotatedContent.isEntirelyAnnotated())
+      #break($foreach)
+    #end
+    ## Retrieve previous content
+    #set ($prevDoc = $doc.getDocumentRevision($previous))
+    #set ($prevInfo = $doc.getRevisionInfo($previous))
+    ## Blame previous revision
+    #set ($annotatedContent = $services.blame.blame($annotatedContent, $prevInfo, $prevDoc.content))
+    ## Retrieve the previous revision of that previous document
+    #set ($previous = $prevDoc.previousVersion)
+  #end## While
+  ## If the last revision is reached
+  #if (!$previous)
+    ## Call again to resolve all remaining lines
+    #set ($annotatedContent = $services.blame.blame($annotatedContent, null, ""))
+  #end
+
+  #set ($lastVersion = "")
+  #foreach($el in $annotatedContent)
+    #set ($sourceRev = $el.revision)
+    #set ($previousVersion = $NULL)
+    #if ($sourceRev)
+      #set ($sourceVersion = $sourceRev.version)
+      #set ($sourceDate = $sourceRev.date)
+      #set ($sourceAuthor = $sourceRev.author)
+      #set ($revisionDoc = $doc.getDocumentRevision($sourceRev.version))
+      #set ($previousVersion = $revisionDoc.previousVersion)
+    #else
+      #set ($sourceVersion = "?.?")
+      #set ($sourceDate = "?/?/?")
+      #set ($sourceAuthor = "Unknown")
+    #end
+
+    #set ($changesQueryString = "viewer=changes")
+    #if ("$!previousVersion" != '')
+      #set ($changesQueryString = "${changesQueryString}&rev1=${previousVersion}")
+    #end
+    #set ($changesQueryString = "${changesQueryString}&rev2=${sourceVersion}")
+    #if ($sourceVersion != $lastVersion)
+      #set ($lastVersion = $sourceVersion)
+      #set ($startNewGroup = true)
+    #else
+      #set ($startNewGroup = false)
+    #end
+
+    #set ($lineNumber = $velocityCount)
+
+    #if ($startNewGroup)
+      </tbody>
+      <tbody class="group">
+    #end
+    <tr class="line" id="$lineNumber">
+      <td class="author avatar_16">#if ($startNewGroup)<a href="$xwiki.getURL($sourceAuthor)">#resizedUserAvatar($sourceAuthor, 16)</a>#end</td>
+      <td class="version">#if ($startNewGroup)<a href="$doc.getURL('view', $changesQueryString)" title="$xwiki.formatDate($sourceDate)">$sourceVersion</a>#end</td>
+      <td class="line-number unselectable"><a href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code&showLastAuthors=true#${lineNumber}")">$lineNumber</a></td>
+      ##<td class="date">#if ($startNewGroup)$sourceRev.date#end</td>
+      <td class="content">$escapetool.xml($el.element)</td>
+    </tr>
+  #end
+#else
+  #if ($content.length() > 0)
+    #set ($lines = $content.split('\n'))
+    #foreach ($line in $lines)
+      #set ($lineNumber = $velocityCount)
+      <tr class="line" id="$lineNumber">
+        <td class="line-number unselectable"><a href="$doc.getURL('view', "viewer=code#${lineNumber}")">$lineNumber</a></td>
+        <td class="content">$escapetool.xml($line)</td>
+      </tr>
+    #end
+  #end
+#end
+    </tbody>
+  </table>
 </div>

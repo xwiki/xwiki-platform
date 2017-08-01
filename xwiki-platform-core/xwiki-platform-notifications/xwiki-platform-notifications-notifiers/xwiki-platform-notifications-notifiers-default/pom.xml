@@ -24,28 +24,46 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-notifications</artifactId>
+    <artifactId>xwiki-platform-notifications-notifiers</artifactId>
     <version>9.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-api</artifactId>
-  <name>XWiki Platform - Notifications - API</name>
-  <description>Handle notifications</description>
+  <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+  <name>XWiki Platform - Notifications - Notifiers - Default bridge</name>
+  <description>Default bridge to oldcore for the notifications notifiers API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Notifications API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-api</artifactId>
+      <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-wiki</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

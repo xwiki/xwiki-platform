@@ -33,7 +33,11 @@
   <description>Modules related to the notifications</description>
   <modules>
     <module>xwiki-platform-notifications-api</module>
-    <module>xwiki-platform-notifications-default</module>
+    <module>xwiki-platform-notifications-filters</module>
+    <module>xwiki-platform-notifications-notifiers</module>
+    <module>xwiki-platform-notifications-preferences</module>
+    <module>xwiki-platform-notifications-script</module>
+    <module>xwiki-platform-notifications-sources</module>
     <module>xwiki-platform-notifications-ui</module>
   </modules>
   <profiles>

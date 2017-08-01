@@ -1,0 +1,12 @@
+org.xwiki.notifications.notifiers.internal.DefaultNotificationDisplayer
+org.xwiki.notifications.notifiers.internal.DefaultNotificationRenderer
+org.xwiki.notifications.notifiers.internal.email.DefaultNotificationEmailRenderer
+org.xwiki.notifications.notifiers.internal.email.live.LiveMimeMessageIterator
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailListener
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailManager
+org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailSender
+org.xwiki.notifications.notifiers.internal.email.NotificationEmailSender
+org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator
+org.xwiki.notifications.notifiers.internal.email.PeriodicMimeMessageIterator
+org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSManager
+org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSRenderer

@@ -1,0 +1,2 @@
+org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerComponentBuilder
+org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerDocumentInitializer

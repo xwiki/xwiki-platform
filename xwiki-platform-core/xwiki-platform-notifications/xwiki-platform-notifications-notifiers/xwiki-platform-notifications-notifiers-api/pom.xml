@@ -24,21 +24,44 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-notifications</artifactId>
+    <artifactId>xwiki-platform-notifications-notifiers</artifactId>
     <version>9.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-api</artifactId>
-  <name>XWiki Platform - Notifications - API</name>
-  <description>Handle notifications</description>
+  <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
+  <name>XWiki Platform - Notifications - Notifiers - API</name>
+  <description>Handle how notifications are transmitted to a user</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Notifications API</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.51</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-eventstream-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-preferences-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-sources</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->

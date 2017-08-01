@@ -27,26 +27,12 @@
     <artifactId>xwiki-platform-notifications</artifactId>
     <version>9.7-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-api</artifactId>
-  <name>XWiki Platform - Notifications - API</name>
-  <description>Handle notifications</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Notifications API</xwiki.extension.name>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-notifications-notifiers</artifactId>
+  <name>XWiki Platform - Notifications - Notifiers - Parent POM</name>
+  <description>Handle how notifications are transmitted to a user</description>
+  <packaging>pom</packaging>
+  <modules>
+    <module>xwiki-platform-notifications-notifiers-api</module>
+    <module>xwiki-platform-notifications-notifiers-default</module>
+  </modules>
 </project>

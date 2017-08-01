@@ -38,15 +38,26 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-api</artifactId>
+      <artifactId>xwiki-platform-notifications-script</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Add the dependency to the oldcore bridge that we need for sure -->
+    <!-- Add the dependency to the oldcore bridges that we need for sure -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-default</artifactId>
+      <artifactId>xwiki-platform-notifications-filters-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Needed to have a nice toggle buttons on watchlist notifications area. -->
     <dependency>
       <groupId>org.webjars</groupId>

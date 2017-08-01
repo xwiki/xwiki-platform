@@ -265,7 +265,72 @@
                     "methodName": "queryFilterParams",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.NotificationDisplayer",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationDisplayer",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.notifiers.NotificationDisplayer"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.NotificationFilter",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationFilter",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.filters.NotificationFilter"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.NotificationManager",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationManager",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.sources.NotificationManager"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.notifications.NotificationPreference",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationPreference",
+                    "elementKind": "class",
+                    "justification": "Young API, moved to org.xwiki.notifications.preferences.NotificationPreference"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.NotificationRenderer",
+                    "package": "org.xwiki.notifications",
+                    "classSimpleName": "NotificationRenderer",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.notifiers.NotificationRenderer"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "enum org.xwiki.notifications.email.NotificationEmailInterval",
+                    "package": "org.xwiki.notifications.email",
+                    "classSimpleName": "NotificationEmailInterval",
+                    "elementKind": "enum",
+                    "justification": "Young API, moved to org.xwiki.notifications.notifiers.email.NotificationEmailInterval"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.email.NotificationEmailRenderer",
+                    "package": "org.xwiki.notifications.email",
+                    "classSimpleName": "NotificationEmailRenderer",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.notifiers.email.NotificationEmailRenderer"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.notifications.script.NotificationScriptService",
+                    "package": "org.xwiki.notifications.script",
+                    "classSimpleName": "NotificationScriptService",
+                    "elementKind": "class",
+                    "justification": "Young API, moved to org.xwiki.notifications.script.NotificationScriptService"
                   }
+
                 ]
               }
             }

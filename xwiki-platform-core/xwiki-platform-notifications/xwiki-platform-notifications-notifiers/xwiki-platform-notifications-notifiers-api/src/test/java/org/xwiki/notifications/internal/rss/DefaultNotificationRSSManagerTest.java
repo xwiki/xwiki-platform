@@ -21,12 +21,9 @@ package org.xwiki.notifications.internal.rss;
 
 import java.util.Collections;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.notifiers.internal.ModelBridge;
 import org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSManager;
@@ -34,6 +31,10 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.feed.synd.SyndFeed;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultNotificationRSSManager}.
@@ -61,24 +62,24 @@ public class DefaultNotificationRSSManagerTest
         this.modelBridge = this.mocker.registerMockComponent(ModelBridge.class);
 
         this.wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
-        Mockito.when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
     }
 
     @Test
     public void renderFeed() throws Exception
     {
-        Mockito.when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.feedTitle"))
+        when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.feedTitle"))
                 .thenReturn("FeedTitle");
-        Mockito.when(this.modelBridge.getDocumentURL(
-                ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn("url");
-        Mockito.when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.feedDescription"))
+        when(this.modelBridge.getDocumentURL(
+                any(), any(), any())).thenReturn("url");
+        when(this.contextualLocalizationManager.getTranslationPlain("notifications.rss.feedDescription"))
                 .thenReturn("FeedDescription");
 
         SyndFeed feed = this.mocker.getComponentUnderTest().renderFeed(Collections.EMPTY_LIST);
 
-        Assert.assertEquals("FeedTitle", feed.getTitle());
-        Assert.assertEquals("FeedDescription", feed.getDescription());
-        Assert.assertEquals("url", feed.getLink());
-        Assert.assertEquals(0, feed.getEntries().size());
+        assertEquals("FeedTitle", feed.getTitle());
+        assertEquals("FeedDescription", feed.getDescription());
+        assertEquals("url", feed.getLink());
+        assertEquals(0, feed.getEntries().size());
     }
 }

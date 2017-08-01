@@ -25,7 +25,6 @@ import java.util.HashSet;
 
 import javax.script.ScriptContext;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +43,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.rometools.rome.feed.synd.SyndEntry;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -78,38 +76,38 @@ public class DefaultNotificationRSSRendererTest
 
     private void mockEvent(CompositeEvent testCompositeEvent) throws Exception
     {
-        Event testEvent1 = Mockito.mock(Event.class);
-        Date testEventDate = Mockito.mock(Date.class);
-        Mockito.when(testEvent1.getTitle()).thenReturn("EventTitle");
-        Mockito.when(testEvent1.getDocumentTitle()).thenReturn("EventDocumentTitle");
-        Mockito.when(this.contextualLocalizationManager.getTranslationPlain("EventTitle", "EventDocumentTitle"))
+        Event testEvent1 = mock(Event.class);
+        Date testEventDate = mock(Date.class);
+        when(testEvent1.getTitle()).thenReturn("EventTitle");
+        when(testEvent1.getDocumentTitle()).thenReturn("EventDocumentTitle");
+        when(this.contextualLocalizationManager.getTranslationPlain("EventTitle", "EventDocumentTitle"))
                 .thenReturn("TranslatedEventTitle");
 
         DocumentReference testEventAuthor1 = new DocumentReference("xwiki", "XWiki", "AuthorName");
 
-        Mockito.when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
+        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
 
-        Mockito.when(testCompositeEvent.getEvents()).thenReturn(Arrays.asList(testEvent1));
-        Mockito.when(testCompositeEvent.getUsers()).thenReturn(new HashSet<>(Arrays.asList(testEventAuthor1)));
-        Mockito.when(testCompositeEvent.getEventIds()).thenReturn(Arrays.asList("id1"));
-        Mockito.when(testCompositeEvent.getType()).thenReturn("eventType");
-        Mockito.when(testCompositeEvent.getDates()).thenReturn(Arrays.asList(testEventDate));
+        when(testCompositeEvent.getEvents()).thenReturn(Arrays.asList(testEvent1));
+        when(testCompositeEvent.getUsers()).thenReturn(new HashSet<>(Arrays.asList(testEventAuthor1)));
+        when(testCompositeEvent.getEventIds()).thenReturn(Arrays.asList("id1"));
+        when(testCompositeEvent.getType()).thenReturn("eventType");
+        when(testCompositeEvent.getDates()).thenReturn(Arrays.asList(testEventDate));
 
     }
 
     @Test
     public void testCompositeEventRendering() throws Exception
     {
-        CompositeEvent testCompositeEvent = Mockito.mock(CompositeEvent.class);
+        CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
 
         this.mockEvent(testCompositeEvent);
 
-        Mockito.when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
 
         SyndEntry resultEntry = this.mocker.getComponentUnderTest().renderNotification(testCompositeEvent);
 
-        Assert.assertEquals("TranslatedEventTitle", resultEntry.getTitle());
-        Assert.assertEquals(1, resultEntry.getAuthors().size());
-        Assert.assertEquals("id1", resultEntry.getUri());
+        assertEquals("TranslatedEventTitle", resultEntry.getTitle());
+        assertEquals(1, resultEntry.getAuthors().size());
+        assertEquals("id1", resultEntry.getUri());
     }
 }

@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -42,6 +41,14 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
@@ -76,19 +83,19 @@ public class QueryGeneratorTest
 
         startDate = new Date(10);
 
-        query = Mockito.mock(Query.class);
-        Mockito.when(queryManager.createQuery(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenReturn(query);
+        query = mock(Query.class);
+        when(queryManager.createQuery(anyString(), anyString())).thenReturn(query);
 
-        Mockito.when(serializer.serialize(userReference)).thenReturn("xwiki:XWiki.UserA");
+        when(serializer.serialize(userReference)).thenReturn("xwiki:XWiki.UserA");
 
         pref1StartDate = new Date(100);
         NotificationPreference pref1 = new NotificationPreference("create", true,
                 NotificationFormat.ALERT, pref1StartDate);
-        Mockito.when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
+        when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
-        Mockito.when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
+        when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
 
-        Mockito.when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
     @Test
@@ -101,24 +108,24 @@ public class QueryGeneratorTest
                 true, null, startDate, null);
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND (((("
                         + "event.type = :type_0 AND event.date >= :date_0))))" +
                         " AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue("startDate", startDate);
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
     }
 
     @Test
     public void generateQueryWhenHiddenDocsAreEnabled() throws Exception
     {
         // Mock
-        Mockito.when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(1);
+        when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(1);
 
         // Test
         mocker.getComponentUnderTest().generateQuery(
@@ -127,17 +134,17 @@ public class QueryGeneratorTest
                 true, null, startDate, null);
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND (((("
                         + "event.type = :type_0 AND event.date >= :date_0))))" +
                         " AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
-        Mockito.verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query).bindValue("startDate", startDate);
     }
 
     @Test
@@ -150,15 +157,15 @@ public class QueryGeneratorTest
                 false, null, startDate, null);
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND (((("
                         + "event.type = :type_0 AND event.date >= :date_0))))" +
                         " AND event.hidden <> true " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
-        Mockito.verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query).bindValue("startDate", startDate);
     }
 
     @Test
@@ -173,18 +180,18 @@ public class QueryGeneratorTest
                 true, untilDate, startDate, Collections.emptyList());
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND (((("
                         + "event.type = :type_0 AND event.date >= :date_0))))" +
                         " AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
-        Mockito.verify(query).bindValue("startDate", startDate);
-        Mockito.verify(query).bindValue("endDate", untilDate);
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("endDate", untilDate);
     }
 
     @Test
@@ -199,33 +206,33 @@ public class QueryGeneratorTest
                 true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND (((("
                         + "event.type = :type_0 AND event.date >= :date_0))))" +
                         " AND event.id NOT IN (:blackList) AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
-        Mockito.verify(query, Mockito.never()).bindValue(ArgumentMatchers.eq("startDate"), ArgumentMatchers.any(Date.class));
-        Mockito.verify(query).bindValue("endDate", untilDate);
-        Mockito.verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query, never()).bindValue(ArgumentMatchers.eq("startDate"), any(Date.class));
+        verify(query).bindValue("endDate", untilDate);
+        verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
     }
 
     @Test
     public void generateQueryWithLocalUser() throws Exception
     {
         // Test
-        Mockito.when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         mocker.getComponentUnderTest().generateQuery(
                 new DocumentReference("xwiki", "XWiki", "UserA"),
                 NotificationFormat.ALERT,
                 true, null, startDate, null);
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND (((("
                         + "event.type = :type_0 AND event.date >= :date_0))))" +
                         " AND event.hidden <> true AND " +
@@ -233,11 +240,11 @@ public class QueryGeneratorTest
                         "where status.activityEvent = event and status.entityId = :user and status.read = true))" +
                         " AND event.wiki = :userWiki " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
-        Mockito.verify(query).bindValue("startDate", startDate);
-        Mockito.verify(query).bindValue("userWiki", "xwiki");
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("userWiki", "xwiki");
     }
 
     @Test
@@ -246,39 +253,39 @@ public class QueryGeneratorTest
         Date untilDate = new Date();
 
         // Mocks
-        NotificationFilter notificationFilter1 = Mockito.mock(NotificationFilter.class);
-        NotificationFilter notificationFilter2 = Mockito.mock(NotificationFilter.class);
-        Mockito.when(notificationFilterManager.getAllNotificationFilters(ArgumentMatchers.any(DocumentReference.class))).thenReturn(
+        NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
+        NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
+        when(notificationFilterManager.getAllNotificationFilters(any(DocumentReference.class))).thenReturn(
                 Arrays.asList(notificationFilter1, notificationFilter2)
         );
 
-        Mockito.when(notificationFilter1.queryFilterOR(
-                ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers.any(NotificationFormat.class), ArgumentMatchers
+        when(notificationFilter1.queryFilterOR(
+                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
                         .anyMap()))
                 .thenReturn("event.date = :someDate");
-        Mockito.when(notificationFilter2.queryFilterOR(
-                ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers.any(NotificationFormat.class), ArgumentMatchers
+        when(notificationFilter2.queryFilterOR(
+                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
                         .anyMap()))
                 .thenReturn("event.eventType = :someVal");
 
-        Mockito.when(notificationFilter1.queryFilterAND(
-                ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers.any(NotificationFormat.class), ArgumentMatchers
+        when(notificationFilter1.queryFilterAND(
+                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
                         .anyMap()))
                 .thenReturn("1=1");
-        Mockito.when(notificationFilter2.queryFilterAND(
-                ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers.any(NotificationFormat.class), ArgumentMatchers
+        when(notificationFilter2.queryFilterAND(
+                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
                         .anyMap()))
                 .thenReturn("2=2");
 
 
-        Mockito.when(notificationFilter1.queryFilterParams(ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers
-                        .any(NotificationFormat.class),
-                ArgumentMatchers.any(List.class))).thenReturn(new HashedMap() {{
+        when(notificationFilter1.queryFilterParams(any(DocumentReference.class),
+                any(NotificationFormat.class),
+                any(List.class))).thenReturn(new HashedMap() {{
             put("someDate", "someValue1");
         }});
-        Mockito.when(notificationFilter2.queryFilterParams(ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers
-                        .any(NotificationFormat.class),
-                ArgumentMatchers.any(List.class))).thenReturn(new HashedMap() {{
+        when(notificationFilter2.queryFilterParams(any(DocumentReference.class),
+                any(NotificationFormat.class),
+                any(List.class))).thenReturn(new HashedMap() {{
             put("someVal", "someValue2");
         }});
 
@@ -289,7 +296,7 @@ public class QueryGeneratorTest
                 true, untilDate, startDate, Arrays.asList("event1", "event2"));
 
         // Verify
-        Mockito.verify(queryManager).createQuery(
+        verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND " +
                         "((((event.type = :type_0 AND event.date >= :date_0)"
                         + " AND (event.date = :someDate OR event.eventType = :someVal) AND 1=1 AND 2=2)))" +
@@ -297,14 +304,14 @@ public class QueryGeneratorTest
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
                         "order by event.date DESC", Query.HQL);
-        Mockito.verify(query).bindValue("user", "xwiki:XWiki.UserA");
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("type_0"), ArgumentMatchers.eq("create"));
-        Mockito.verify(query).bindValue(ArgumentMatchers.eq("date_0"), ArgumentMatchers.eq(pref1StartDate));
-        Mockito.verify(query).bindValue("startDate", startDate);
-        Mockito.verify(query).bindValue("endDate", untilDate);
-        Mockito.verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
-        Mockito.verify(query).bindValue("someDate", "someValue1");
-        Mockito.verify(query).bindValue("someVal", "someValue2");
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("endDate", untilDate);
+        verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
+        verify(query).bindValue("someDate", "someValue1");
+        verify(query).bindValue("someVal", "someValue2");
     }
 
 }

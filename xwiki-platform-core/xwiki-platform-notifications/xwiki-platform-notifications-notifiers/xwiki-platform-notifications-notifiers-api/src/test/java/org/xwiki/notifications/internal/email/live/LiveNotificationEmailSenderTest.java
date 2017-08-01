@@ -76,12 +76,12 @@ public class LiveNotificationEmailSenderTest
 
         this.mailListenerProvider = this.mocker.registerMockComponent(Provider.class, "database");
 
-        this.notificationUserIteratorProvider = Mockito.mock(Provider.class);
+        this.notificationUserIteratorProvider = mock(Provider.class);
         this.mocker.registerComponent(
                 new DefaultParameterizedType(null, Provider.class, NotificationUserIterator.class),
                 this.notificationUserIteratorProvider);
 
-        this.liveMimeMessageIteratorProvider = Mockito.mock(Provider.class);
+        this.liveMimeMessageIteratorProvider = mock(Provider.class);
         this.mocker.registerComponent(
                 new DefaultParameterizedType(null, Provider.class, LiveMimeMessageIterator.class),
                 this.liveMimeMessageIteratorProvider);
@@ -92,21 +92,21 @@ public class LiveNotificationEmailSenderTest
     @Test
     public void testSendMail() throws Exception
     {
-        CompositeEvent event1 = Mockito.mock(CompositeEvent.class);
+        CompositeEvent event1 = mock(CompositeEvent.class);
 
-        Mockito.when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 
-        Mockito.when(this.notificationUserIteratorProvider.get()).thenReturn(Mockito.mock(NotificationUserIterator.class));
+        when(this.notificationUserIteratorProvider.get()).thenReturn(Mockito.mock(NotificationUserIterator.class));
 
-        Mockito.when(this.liveMimeMessageIteratorProvider.get()).thenReturn(Mockito.mock(LiveMimeMessageIterator.class));
+        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(Mockito.mock(LiveMimeMessageIterator.class));
 
-        Mockito.when(this.sessionFactory.create(ArgumentMatchers.any())).thenReturn(null);
+        when(this.sessionFactory.create(ArgumentMatchers.any())).thenReturn(null);
 
-        Mockito.when(this.mailListenerProvider.get()).thenReturn(Mockito.mock(MailListener.class));
+        when(this.mailListenerProvider.get()).thenReturn(Mockito.mock(MailListener.class));
 
         this.mocker.getComponentUnderTest().sendEmails(event1);
 
-        Mockito.verify(this.mailSender, Mockito.times(1)).sendAsynchronously(
-                ArgumentMatchers.any(LiveMimeMessageIterator.class), ArgumentMatchers.any(), ArgumentMatchers.any(MailListener.class));
+        verify(this.mailSender, times(1)).sendAsynchronously(
+                any(LiveMimeMessageIterator.class), any(), any(MailListener.class));
     }
 }

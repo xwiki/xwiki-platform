@@ -23,12 +23,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
@@ -45,6 +43,17 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
@@ -78,45 +87,45 @@ public class DefaultNotificationManagerTest
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         startDate = new Date(10);
 
-        Mockito.when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
-        query = Mockito.mock(Query.class);
-        Mockito.when(queryGenerator.generateQuery(ArgumentMatchers.any(DocumentReference.class), ArgumentMatchers.any(NotificationFormat.class),
-                ArgumentMatchers.anyBoolean(), ArgumentMatchers.nullable(Date.class),
-                ArgumentMatchers.nullable(Date.class), ArgumentMatchers.nullable(List.class))).thenReturn(query);
+        when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
+        query = mock(Query.class);
+        when(queryGenerator.generateQuery(any(DocumentReference.class), any(NotificationFormat.class),
+                anyBoolean(), nullable(Date.class),
+                nullable(Date.class), nullable(List.class))).thenReturn(query);
 
         NotificationPreference pref1 = new NotificationPreference("create", true);
-        Mockito.when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
+        when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
     }
 
     @Test
     public void getEventsWith2Queries() throws Exception
     {
         // Mocks
-        Event event1 = Mockito.mock(Event.class);
-        Event event2 = Mockito.mock(Event.class);
-        Event event3 = Mockito.mock(Event.class);
-        Event event4 = Mockito.mock(Event.class);
-        Event event5 = Mockito.mock(Event.class);
-        Event event6 = Mockito.mock(Event.class);
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+        Event event3 = mock(Event.class);
+        Event event4 = mock(Event.class);
+        Event event5 = mock(Event.class);
+        Event event6 = mock(Event.class);
 
         DocumentReference doc1 = new DocumentReference("xwiki", "Main", "WebHome");
-        Mockito.when(event1.getDocument()).thenReturn(doc1);
+        when(event1.getDocument()).thenReturn(doc1);
         DocumentReference doc2 = new DocumentReference("xwiki", "PrivateSpace", "WebHome");
-        Mockito.when(event2.getDocument()).thenReturn(doc2);
-        Mockito.when(event3.getDocument()).thenReturn(doc2);
-        Mockito.when(event4.getDocument()).thenReturn(doc2);
+        when(event2.getDocument()).thenReturn(doc2);
+        when(event3.getDocument()).thenReturn(doc2);
+        when(event4.getDocument()).thenReturn(doc2);
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(false);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(false);
 
-        Mockito.when(event1.getType()).thenReturn("type1");
-        Mockito.when(event2.getType()).thenReturn("type2");
-        Mockito.when(event3.getType()).thenReturn("type3");
-        Mockito.when(event4.getType()).thenReturn("type4");
-        Mockito.when(event5.getType()).thenReturn("type5");
-        Mockito.when(event6.getType()).thenReturn("type6");
+        when(event1.getType()).thenReturn("type1");
+        when(event2.getType()).thenReturn("type2");
+        when(event3.getType()).thenReturn("type3");
+        when(event4.getType()).thenReturn("type4");
+        when(event5.getType()).thenReturn("type5");
+        when(event6.getType()).thenReturn("type6");
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4),
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4),
                 Arrays.asList(event5, event6));
 
         // Test
@@ -124,23 +133,23 @@ public class DefaultNotificationManagerTest
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
 
         // Verify
-        Assert.assertEquals(2, results.size());
-        Assert.assertEquals(event1, results.get(0).getEvents().get(0));
-        Assert.assertEquals(event5, results.get(1).getEvents().get(0));
+        assertEquals(2, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event5, results.get(1).getEvents().get(0));
     }
 
     @Test
     public void getEventsWhenNoPreferences() throws Exception
     {
         NotificationPreference pref1 = new NotificationPreference("create", false);
-        Mockito.when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
+        when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
         // Test
         List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
 
         // Verify
-        Assert.assertEquals(0, results.size());
+        assertEquals(0, results.size());
     }
 
     @Test
@@ -148,9 +157,9 @@ public class DefaultNotificationManagerTest
     {
         // Mocks
         NotificationException exception = new NotificationException("Error");
-        Mockito.when(queryGenerator.generateQuery(ArgumentMatchers.eq(userReference), ArgumentMatchers.any(NotificationFormat.class), ArgumentMatchers
-                        .eq(true), ArgumentMatchers.isNull(),
-                ArgumentMatchers.isNull(), ArgumentMatchers.any(List.class))).thenThrow(exception);
+        when(queryGenerator.generateQuery(ArgumentMatchers.eq(userReference), any(NotificationFormat.class), ArgumentMatchers
+                        .eq(true), isNull(),
+                isNull(), any(List.class))).thenThrow(exception);
 
         // Test
         NotificationException caughtException = null;
@@ -161,20 +170,20 @@ public class DefaultNotificationManagerTest
         }
 
         // Verify
-        Assert.assertNotNull(caughtException);
-        Assert.assertEquals("Fail to get the list of notifications.", caughtException.getMessage());
-        Assert.assertEquals(exception, caughtException.getCause());
+        assertNotNull(caughtException);
+        assertEquals("Fail to get the list of notifications.", caughtException.getMessage());
+        assertEquals(exception, caughtException.getCause());
     }
 
     @Test
     public void getEventsCount() throws Exception
     {
         // Mocks
-        Event event1 = Mockito.mock(Event.class);
-        Event event2 = Mockito.mock(Event.class);
-        Event event3 = Mockito.mock(Event.class);
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+        Event event3 = mock(Event.class);
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(
+        when(eventStream.searchEvents(query)).thenReturn(
                 Arrays.asList(event1, event2, event1, event2, event2, event2, event1, event2, event2, event2),
                 Arrays.asList(event1, event2, event2, event1, event3));
 
@@ -182,8 +191,8 @@ public class DefaultNotificationManagerTest
         long result = mocker.getComponentUnderTest().getEventsCount("xwiki:XWiki.UserA", true, 5);
 
         // Verify
-        Assert.assertEquals(5, result);
-        Mockito.verifyZeroInteractions(event3);
+        assertEquals(5, result);
+        verifyZeroInteractions(event3);
     }
 
     @Test
@@ -200,30 +209,30 @@ public class DefaultNotificationManagerTest
         // Note: the 2 events have been combined
 
         // Mocks
-        Event eventAlice = Mockito.mock(Event.class);
-        Event eventBob = Mockito.mock(Event.class);
+        Event eventAlice = mock(Event.class);
+        Event eventBob = mock(Event.class);
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        Mockito.when(eventAlice.getDocument()).thenReturn(doc);
-        Mockito.when(eventBob.getDocument()).thenReturn(doc);
+        when(eventAlice.getDocument()).thenReturn(doc);
+        when(eventBob.getDocument()).thenReturn(doc);
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
-
-
-        Mockito.when(eventAlice.getType()).thenReturn("update");
-        Mockito.when(eventBob.getType()).thenReturn("update");
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
 
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAlice, eventBob));
+        when(eventAlice.getType()).thenReturn("update");
+        when(eventBob.getType()).thenReturn("update");
+
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAlice, eventBob));
 
         // Test
         List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
 
         // Verify
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals(eventAlice, results.get(0).getEvents().get(0));
-        Assert.assertEquals(eventBob, results.get(0).getEvents().get(1));
+        assertEquals(1, results.size());
+        assertEquals(eventAlice, results.get(0).getEvents().get(0));
+        assertEquals(eventBob, results.get(0).getEvents().get(1));
     }
 
     @Test
@@ -239,31 +248,31 @@ public class DefaultNotificationManagerTest
         // implementation of the "comment" feature.
 
         // Mocks
-        Event eventComment = Mockito.mock(Event.class);
-        Event eventUpdate = Mockito.mock(Event.class);
+        Event eventComment = mock(Event.class);
+        Event eventUpdate = mock(Event.class);
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        Mockito.when(eventComment.getDocument()).thenReturn(doc);
-        Mockito.when(eventUpdate.getDocument()).thenReturn(doc);
+        when(eventComment.getDocument()).thenReturn(doc);
+        when(eventUpdate.getDocument()).thenReturn(doc);
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
 
-        Mockito.when(eventComment.getType()).thenReturn("addComment");
-        Mockito.when(eventUpdate.getType()).thenReturn("update");
+        when(eventComment.getType()).thenReturn("addComment");
+        when(eventUpdate.getType()).thenReturn("update");
 
-        Mockito.when(eventComment.getGroupId()).thenReturn("g1");
-        Mockito.when(eventUpdate.getGroupId()).thenReturn("g1");
+        when(eventComment.getGroupId()).thenReturn("g1");
+        when(eventUpdate.getGroupId()).thenReturn("g1");
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventComment, eventUpdate));
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventComment, eventUpdate));
 
         // Test
         List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
 
         // Verify
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals(eventComment, results.get(0).getEvents().get(0));
-        Assert.assertEquals(eventUpdate, results.get(0).getEvents().get(1));
+        assertEquals(1, results.size());
+        assertEquals(eventComment, results.get(0).getEvents().get(0));
+        assertEquals(eventUpdate, results.get(0).getEvents().get(1));
     }
 
     @Test
@@ -283,36 +292,36 @@ public class DefaultNotificationManagerTest
         // because we don't care of the event' user in our tests.
 
         // Mocks
-        Event event1 = Mockito.mock(Event.class);
-        Event event2 = Mockito.mock(Event.class);
-        Event event3 = Mockito.mock(Event.class);
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+        Event event3 = mock(Event.class);
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        Mockito.when(event1.getDocument()).thenReturn(doc);
-        Mockito.when(event2.getDocument()).thenReturn(doc);
-        Mockito.when(event3.getDocument()).thenReturn(doc);
+        when(event1.getDocument()).thenReturn(doc);
+        when(event2.getDocument()).thenReturn(doc);
+        when(event3.getDocument()).thenReturn(doc);
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
 
-        Mockito.when(event1.getType()).thenReturn("update");
-        Mockito.when(event2.getType()).thenReturn("addComment");
-        Mockito.when(event3.getType()).thenReturn("update");
+        when(event1.getType()).thenReturn("update");
+        when(event2.getType()).thenReturn("addComment");
+        when(event3.getType()).thenReturn("update");
 
-        Mockito.when(event1.getGroupId()).thenReturn("g1");
-        Mockito.when(event2.getGroupId()).thenReturn("g2");
-        Mockito.when(event3.getGroupId()).thenReturn("g2");
+        when(event1.getGroupId()).thenReturn("g1");
+        when(event2.getGroupId()).thenReturn("g2");
+        when(event3.getGroupId()).thenReturn("g2");
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3));
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3));
 
         // Test
         List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
 
         // Verify
-        Assert.assertEquals(2, results.size());
-        Assert.assertEquals(event1, results.get(0).getEvents().get(0));
-        Assert.assertEquals(event2, results.get(1).getEvents().get(0));
-        Assert.assertEquals(event3, results.get(1).getEvents().get(1));
+        assertEquals(2, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event2, results.get(1).getEvents().get(0));
+        assertEquals(event3, results.get(1).getEvents().get(1));
     }
 
     @Test
@@ -328,31 +337,31 @@ public class DefaultNotificationManagerTest
         // Comment: we don't show 2 events, only one is interesting
 
         // Mocks
-        Event event1 = Mockito.mock(Event.class);
-        Event event2 = Mockito.mock(Event.class);
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        Mockito.when(event1.getDocument()).thenReturn(doc);
-        Mockito.when(event2.getDocument()).thenReturn(doc);
+        when(event1.getDocument()).thenReturn(doc);
+        when(event2.getDocument()).thenReturn(doc);
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
 
-        Mockito.when(event1.getType()).thenReturn("update");
-        Mockito.when(event2.getType()).thenReturn("update");
+        when(event1.getType()).thenReturn("update");
+        when(event2.getType()).thenReturn("update");
 
-        Mockito.when(event1.getGroupId()).thenReturn("g1");
-        Mockito.when(event2.getGroupId()).thenReturn("g2");
+        when(event1.getGroupId()).thenReturn("g1");
+        when(event2.getGroupId()).thenReturn("g2");
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2));
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2));
 
         // Test
         List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
 
         // Verify
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals(event1, results.get(0).getEvents().get(0));
-        Assert.assertEquals(event2, results.get(0).getEvents().get(1));
+        assertEquals(1, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
+        assertEquals(event2, results.get(0).getEvents().get(1));
     }
 
     @Test
@@ -380,84 +389,84 @@ public class DefaultNotificationManagerTest
         // Mocks
         DocumentReference doc1 = new DocumentReference("xwiki", "Main", "Bike");
         DocumentReference doc2 = new DocumentReference("xwiki", "Main", "Guitar");
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(true);
 
         // * Bob updates the page "Bike" (E1)
-        Event event1 = Mockito.mock(Event.class); Mockito.when(event1.toString()).thenReturn("event1");
-        Mockito.when(event1.getDocument()).thenReturn(doc1);
-        Mockito.when(event1.getType()).thenReturn("update");
-        Mockito.when(event1.getGroupId()).thenReturn("g1");
+        Event event1 = mock(Event.class); when(event1.toString()).thenReturn("event1");
+        when(event1.getDocument()).thenReturn(doc1);
+        when(event1.getType()).thenReturn("update");
+        when(event1.getGroupId()).thenReturn("g1");
 
         // * Alice updates the page "Bike" (E2)
-        Event event2 = Mockito.mock(Event.class); Mockito.when(event2.toString()).thenReturn("event2");
-        Mockito.when(event2.getDocument()).thenReturn(doc1);
-        Mockito.when(event2.getType()).thenReturn("update");
-        Mockito.when(event2.getGroupId()).thenReturn("g2");
+        Event event2 = mock(Event.class); when(event2.toString()).thenReturn("event2");
+        when(event2.getDocument()).thenReturn(doc1);
+        when(event2.getType()).thenReturn("update");
+        when(event2.getGroupId()).thenReturn("g2");
 
         // * Bob comments the page "Bike" (E3 & E4)
-        Event event3 = Mockito.mock(Event.class); Mockito.when(event3.toString()).thenReturn("event3");
-        Mockito.when(event3.getDocument()).thenReturn(doc1);
-        Mockito.when(event3.getType()).thenReturn("addComment");
-        Mockito.when(event3.getGroupId()).thenReturn("g3");
-        Event event4 = Mockito.mock(Event.class); Mockito.when(event4.toString()).thenReturn("event4");
-        Mockito.when(event4.getDocument()).thenReturn(doc1);
-        Mockito.when(event4.getType()).thenReturn("update");
-        Mockito.when(event4.getGroupId()).thenReturn("g3");
+        Event event3 = mock(Event.class); when(event3.toString()).thenReturn("event3");
+        when(event3.getDocument()).thenReturn(doc1);
+        when(event3.getType()).thenReturn("addComment");
+        when(event3.getGroupId()).thenReturn("g3");
+        Event event4 = mock(Event.class); when(event4.toString()).thenReturn("event4");
+        when(event4.getDocument()).thenReturn(doc1);
+        when(event4.getType()).thenReturn("update");
+        when(event4.getGroupId()).thenReturn("g3");
 
         // * Carol comments the page "Bike" (E5 & E6)
         // (note: we put the "update" event before the "addComment", because we can not guarantee the order so
         // it's good to test both)
-        Event event5 = Mockito.mock(Event.class); Mockito.when(event5.toString()).thenReturn("event5");
-        Mockito.when(event5.getDocument()).thenReturn(doc1);
-        Mockito.when(event5.getType()).thenReturn("update");
-        Mockito.when(event5.getGroupId()).thenReturn("g5");
-        Event event6 = Mockito.mock(Event.class); Mockito.when(event6.toString()).thenReturn("event6");
-        Mockito.when(event6.getDocument()).thenReturn(doc1);
-        Mockito.when(event6.getType()).thenReturn("addComment");
-        Mockito.when(event6.getGroupId()).thenReturn("g5");
+        Event event5 = mock(Event.class); when(event5.toString()).thenReturn("event5");
+        when(event5.getDocument()).thenReturn(doc1);
+        when(event5.getType()).thenReturn("update");
+        when(event5.getGroupId()).thenReturn("g5");
+        Event event6 = mock(Event.class); when(event6.toString()).thenReturn("event6");
+        when(event6.getDocument()).thenReturn(doc1);
+        when(event6.getType()).thenReturn("addComment");
+        when(event6.getGroupId()).thenReturn("g5");
 
         // * Dave comments the page "Guitar" (E7 & E8)
-        Event event7 = Mockito.mock(Event.class); Mockito.when(event7.toString()).thenReturn("event7");
-        Mockito.when(event7.getDocument()).thenReturn(doc2);
-        Mockito.when(event7.getType()).thenReturn("update");
-        Mockito.when(event7.getGroupId()).thenReturn("g7");
-        Event event8 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event8");
-        Mockito.when(event8.getDocument()).thenReturn(doc2);
-        Mockito.when(event8.getType()).thenReturn("addComment");
-        Mockito.when(event8.getGroupId()).thenReturn("g7");
+        Event event7 = mock(Event.class); when(event7.toString()).thenReturn("event7");
+        when(event7.getDocument()).thenReturn(doc2);
+        when(event7.getType()).thenReturn("update");
+        when(event7.getGroupId()).thenReturn("g7");
+        Event event8 = mock(Event.class); when(event8.toString()).thenReturn("event8");
+        when(event8.getDocument()).thenReturn(doc2);
+        when(event8.getType()).thenReturn("addComment");
+        when(event8.getGroupId()).thenReturn("g7");
 
         // * Bob adds an annotation on page "Bike" (E9 & E10)
-        Event event9 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event9");
-        Mockito.when(event9.getDocument()).thenReturn(doc1);
-        Mockito.when(event9.getType()).thenReturn("update");
-        Mockito.when(event9.getGroupId()).thenReturn("g9");
-        Event event10 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event10");
-        Mockito.when(event10.getDocument()).thenReturn(doc1);
-        Mockito.when(event10.getType()).thenReturn("addAnnotation");
-        Mockito.when(event10.getGroupId()).thenReturn("g9");
+        Event event9 = mock(Event.class); when(event8.toString()).thenReturn("event9");
+        when(event9.getDocument()).thenReturn(doc1);
+        when(event9.getType()).thenReturn("update");
+        when(event9.getGroupId()).thenReturn("g9");
+        Event event10 = mock(Event.class); when(event8.toString()).thenReturn("event10");
+        when(event10.getDocument()).thenReturn(doc1);
+        when(event10.getType()).thenReturn("addAnnotation");
+        when(event10.getGroupId()).thenReturn("g9");
 
         // * Alice adds an annotation on page "Bike" (E11 & E12)
-        Event event11 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event11");
-        Mockito.when(event11.getDocument()).thenReturn(doc1);
-        Mockito.when(event11.getType()).thenReturn("update");
-        Mockito.when(event11.getGroupId()).thenReturn("g11");
-        Event event12 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event12");
-        Mockito.when(event12.getDocument()).thenReturn(doc1);
-        Mockito.when(event12.getType()).thenReturn("addAnnotation");
-        Mockito.when(event12.getGroupId()).thenReturn("g11");
+        Event event11 = mock(Event.class); when(event8.toString()).thenReturn("event11");
+        when(event11.getDocument()).thenReturn(doc1);
+        when(event11.getType()).thenReturn("update");
+        when(event11.getGroupId()).thenReturn("g11");
+        Event event12 = mock(Event.class); when(event8.toString()).thenReturn("event12");
+        when(event12.getDocument()).thenReturn(doc1);
+        when(event12.getType()).thenReturn("addAnnotation");
+        when(event12.getGroupId()).thenReturn("g11");
 
         // * Alice adds an other annotation on page "Bike" (E12 & E13)
-        Event event13 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event11");
-        Mockito.when(event13.getDocument()).thenReturn(doc1);
-        Mockito.when(event13.getType()).thenReturn("addAnnotation");
-        Mockito.when(event13.getGroupId()).thenReturn("g13");
-        Event event14 = Mockito.mock(Event.class); Mockito.when(event8.toString()).thenReturn("event12");
-        Mockito.when(event14.getDocument()).thenReturn(doc1);
-        Mockito.when(event14.getType()).thenReturn("update");
-        Mockito.when(event14.getGroupId()).thenReturn("g13");
+        Event event13 = mock(Event.class); when(event8.toString()).thenReturn("event11");
+        when(event13.getDocument()).thenReturn(doc1);
+        when(event13.getType()).thenReturn("addAnnotation");
+        when(event13.getGroupId()).thenReturn("g13");
+        Event event14 = mock(Event.class); when(event8.toString()).thenReturn("event12");
+        when(event14.getDocument()).thenReturn(doc1);
+        when(event14.getType()).thenReturn("update");
+        when(event14.getGroupId()).thenReturn("g13");
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4, event5, event6,
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3, event4, event5, event6,
                 event7, event8, event9, event10, event11, event12, event13, event14));
 
         // Test
@@ -465,29 +474,29 @@ public class DefaultNotificationManagerTest
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 50);
 
         // Verify
-        Assert.assertEquals(4, results.size());
+        assertEquals(4, results.size());
 
         // * Bob and Alice have updated the page "Bike"
-        Assert.assertTrue(results.get(0).getEvents().contains(event1));
-        Assert.assertTrue(results.get(0).getEvents().contains(event2));
+        assertTrue(results.get(0).getEvents().contains(event1));
+        assertTrue(results.get(0).getEvents().contains(event2));
 
         // * Bob and Carol have commented the page "Bike"
-        Assert.assertTrue(results.get(1).getEvents().contains(event3));
-        Assert.assertTrue(results.get(1).getEvents().contains(event4));
-        Assert.assertTrue(results.get(1).getEvents().contains(event5));
-        Assert.assertTrue(results.get(1).getEvents().contains(event6));
+        assertTrue(results.get(1).getEvents().contains(event3));
+        assertTrue(results.get(1).getEvents().contains(event4));
+        assertTrue(results.get(1).getEvents().contains(event5));
+        assertTrue(results.get(1).getEvents().contains(event6));
 
         // * Dave has commented the page "Guitar"
-        Assert.assertTrue(results.get(2).getEvents().contains(event7));
-        Assert.assertTrue(results.get(2).getEvents().contains(event8));
+        assertTrue(results.get(2).getEvents().contains(event7));
+        assertTrue(results.get(2).getEvents().contains(event8));
 
         // * Bob and Alice have annotated the page "Bike"
-        Assert.assertTrue(results.get(3).getEvents().contains(event9));
-        Assert.assertTrue(results.get(3).getEvents().contains(event10));
-        Assert.assertTrue(results.get(3).getEvents().contains(event11));
-        Assert.assertTrue(results.get(3).getEvents().contains(event12));
-        Assert.assertTrue(results.get(3).getEvents().contains(event13));
-        Assert.assertTrue(results.get(3).getEvents().contains(event14));
+        assertTrue(results.get(3).getEvents().contains(event9));
+        assertTrue(results.get(3).getEvents().contains(event10));
+        assertTrue(results.get(3).getEvents().contains(event11));
+        assertTrue(results.get(3).getEvents().contains(event12));
+        assertTrue(results.get(3).getEvents().contains(event13));
+        assertTrue(results.get(3).getEvents().contains(event14));
     }
 
     @Test
@@ -501,36 +510,36 @@ public class DefaultNotificationManagerTest
         // * Bob has annotated the page "Bike"
 
         // Mocks
-        Event event1 = Mockito.mock(Event.class); Mockito.when(event1.toString()).thenReturn("event1");
-        Event event2 = Mockito.mock(Event.class); Mockito.when(event1.toString()).thenReturn("event2");
-        Event event3 = Mockito.mock(Event.class); Mockito.when(event1.toString()).thenReturn("event3");
+        Event event1 = mock(Event.class); when(event1.toString()).thenReturn("event1");
+        Event event2 = mock(Event.class); when(event1.toString()).thenReturn("event2");
+        Event event3 = mock(Event.class); when(event1.toString()).thenReturn("event3");
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        Mockito.when(event1.getDocument()).thenReturn(doc);
-        Mockito.when(event2.getDocument()).thenReturn(doc);
-        Mockito.when(event3.getDocument()).thenReturn(doc);
+        when(event1.getDocument()).thenReturn(doc);
+        when(event2.getDocument()).thenReturn(doc);
+        when(event3.getDocument()).thenReturn(doc);
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
 
-        Mockito.when(event1.getType()).thenReturn("update");
-        Mockito.when(event2.getType()).thenReturn("addComment");
-        Mockito.when(event3.getType()).thenReturn("addAnnotation");
+        when(event1.getType()).thenReturn("update");
+        when(event2.getType()).thenReturn("addComment");
+        when(event3.getType()).thenReturn("addAnnotation");
 
-        Mockito.when(event1.getGroupId()).thenReturn("g1");
-        Mockito.when(event2.getGroupId()).thenReturn("g1");
-        Mockito.when(event3.getGroupId()).thenReturn("g1");
+        when(event1.getGroupId()).thenReturn("g1");
+        when(event2.getGroupId()).thenReturn("g1");
+        when(event3.getGroupId()).thenReturn("g1");
 
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3));
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2, event3));
 
         // Test
         List<CompositeEvent> results
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 50);
 
         // Verify
-        Assert.assertEquals(1, results.size());
-        Assert.assertTrue(results.get(0).getEvents().contains(event1));
-        Assert.assertTrue(results.get(0).getEvents().contains(event2));
-        Assert.assertTrue(results.get(0).getEvents().contains(event3));
+        assertEquals(1, results.size());
+        assertTrue(results.get(0).getEvents().contains(event1));
+        assertTrue(results.get(0).getEvents().contains(event2));
+        assertTrue(results.get(0).getEvents().contains(event3));
     }
 
     @Test
@@ -546,31 +555,31 @@ public class DefaultNotificationManagerTest
         // * Bob has updated the page "Bike"
 
         // Mocks
-        Event eventUpdate1          = Mockito.mock(Event.class);
-        Event eventUpdate2          = Mockito.mock(Event.class);
-        Event eventAddComment       = Mockito.mock(Event.class);
-        Event eventAddCommentUpdate = Mockito.mock(Event.class);
+        Event eventUpdate1          = mock(Event.class);
+        Event eventUpdate2          = mock(Event.class);
+        Event eventAddComment       = mock(Event.class);
+        Event eventAddCommentUpdate = mock(Event.class);
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
-        Mockito.when(eventUpdate1.getDocument()).thenReturn(doc); Mockito.when(eventUpdate1.toString()).thenReturn("update1");
-        Mockito.when(eventUpdate2.getDocument()).thenReturn(doc); Mockito.when(eventUpdate2.toString()).thenReturn("update2");
-        Mockito.when(eventAddComment.getDocument()).thenReturn(doc); Mockito.when(eventAddComment.toString()).thenReturn("addComment");
-        Mockito.when(eventAddCommentUpdate.getDocument()).thenReturn(doc); Mockito.when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
+        when(eventUpdate1.getDocument()).thenReturn(doc); when(eventUpdate1.toString()).thenReturn("update1");
+        when(eventUpdate2.getDocument()).thenReturn(doc); when(eventUpdate2.toString()).thenReturn("update2");
+        when(eventAddComment.getDocument()).thenReturn(doc); when(eventAddComment.toString()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getDocument()).thenReturn(doc); when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
 
-        Mockito.when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
 
-        Mockito.when(eventUpdate1.getType()).thenReturn("update");
-        Mockito.when(eventUpdate2.getType()).thenReturn("update");
-        Mockito.when(eventAddComment.getType()).thenReturn("addComment");
-        Mockito.when(eventAddCommentUpdate.getType()).thenReturn("update");
+        when(eventUpdate1.getType()).thenReturn("update");
+        when(eventUpdate2.getType()).thenReturn("update");
+        when(eventAddComment.getType()).thenReturn("addComment");
+        when(eventAddCommentUpdate.getType()).thenReturn("update");
 
-        Mockito.when(eventUpdate1.getGroupId()).thenReturn("g1");
-        Mockito.when(eventUpdate2.getGroupId()).thenReturn("g2");
-        Mockito.when(eventAddComment.getGroupId()).thenReturn("g3");
-        Mockito.when(eventAddCommentUpdate.getGroupId()).thenReturn("g3");
+        when(eventUpdate1.getGroupId()).thenReturn("g1");
+        when(eventUpdate2.getGroupId()).thenReturn("g2");
+        when(eventAddComment.getGroupId()).thenReturn("g3");
+        when(eventAddCommentUpdate.getGroupId()).thenReturn("g3");
 
         // They comes with inverse chronological order because of the query
-        Mockito.when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAddComment, eventAddCommentUpdate,
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAddComment, eventAddCommentUpdate,
                 eventUpdate2, eventUpdate1));
 
         // Test
@@ -578,6 +587,6 @@ public class DefaultNotificationManagerTest
                 = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
 
         // Verify
-        Assert.assertEquals(2, results.size());
+        assertEquals(2, results.size());
     }
 }

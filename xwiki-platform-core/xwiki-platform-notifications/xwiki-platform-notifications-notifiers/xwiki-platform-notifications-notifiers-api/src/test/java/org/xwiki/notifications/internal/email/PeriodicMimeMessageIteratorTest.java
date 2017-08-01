@@ -29,11 +29,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.collections.map.HashedMap;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -49,7 +47,14 @@ import org.xwiki.notifications.notifiers.internal.email.PeriodicMimeMessageItera
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.jgroups.util.Util.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
@@ -82,8 +87,8 @@ public class PeriodicMimeMessageIteratorTest
         mailSenderConfiguration = mocker.getInstance(MailSenderConfiguration.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
 
-        Mockito.when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
-        Mockito.when(mailSenderConfiguration.getFromAddress()).thenReturn("xwiki@xwiki.org");
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
+        when(mailSenderConfiguration.getFromAddress()).thenReturn("xwiki@xwiki.org");
     }
 
     @Test
@@ -93,37 +98,37 @@ public class PeriodicMimeMessageIteratorTest
         Map<String, Object> factoryParameters = new HashedMap();
 
         // Mocks
-        NotificationUserIterator userIterator = Mockito.mock(NotificationUserIterator.class);
+        NotificationUserIterator userIterator = mock(NotificationUserIterator.class);
         DocumentReference userA = new DocumentReference("xwiki", "XWiki", "UserA");
         DocumentReference userB = new DocumentReference("xwiki", "XWiki", "UserB");
         DocumentReference userC = new DocumentReference("xwiki", "XWiki", "UserC");
-        Mockito.when(userIterator.hasNext()).thenReturn(true, true, true, false);
-        Mockito.when(userIterator.next()).thenReturn(userA, userB, userC);
+        when(userIterator.hasNext()).thenReturn(true, true, true, false);
+        when(userIterator.next()).thenReturn(userA, userB, userC);
         DocumentReference userClass = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
-        Mockito.when(documentAccessBridge.getProperty(userA, userClass, 0, "email")).thenReturn("userA@xwiki.org");
-        Mockito.when(documentAccessBridge.getProperty(userB, userClass, 0, "email")).thenReturn("bad email");
-        Mockito.when(documentAccessBridge.getProperty(userC, userClass, 0, "email")).thenReturn("userC@xwiki.org");
-        Mockito.when(serializer.serialize(userA)).thenReturn("xwiki:XWiki.UserA");
-        Mockito.when(serializer.serialize(userB)).thenReturn("xwiki:XWiki.UserA");
-        Mockito.when(serializer.serialize(userC)).thenReturn("xwiki:XWiki.UserC");
+        when(documentAccessBridge.getProperty(userA, userClass, 0, "email")).thenReturn("userA@xwiki.org");
+        when(documentAccessBridge.getProperty(userB, userClass, 0, "email")).thenReturn("bad email");
+        when(documentAccessBridge.getProperty(userC, userClass, 0, "email")).thenReturn("userC@xwiki.org");
+        when(serializer.serialize(userA)).thenReturn("xwiki:XWiki.UserA");
+        when(serializer.serialize(userB)).thenReturn("xwiki:XWiki.UserA");
+        when(serializer.serialize(userC)).thenReturn("xwiki:XWiki.UserC");
 
-        CompositeEvent event1 = Mockito.mock(CompositeEvent.class);
-        CompositeEvent event2 = Mockito.mock(CompositeEvent.class);
+        CompositeEvent event1 = mock(CompositeEvent.class);
+        CompositeEvent event2 = mock(CompositeEvent.class);
 
-        Mockito.when(notificationManager.getEvents("xwiki:XWiki.UserA", NotificationFormat.EMAIL, false,
+        when(notificationManager.getEvents("xwiki:XWiki.UserA", NotificationFormat.EMAIL, false,
                 Integer.MAX_VALUE / 4, null, new Date(0L), Collections.emptyList()))
                 .thenReturn(Arrays.asList(event1));
-        Mockito.when(notificationManager.getEvents("xwiki:XWiki.UserC", NotificationFormat.EMAIL, false,
+        when(notificationManager.getEvents("xwiki:XWiki.UserC", NotificationFormat.EMAIL, false,
                 Integer.MAX_VALUE / 4, null, new Date(0L), Collections.emptyList()))
                 .thenReturn(Arrays.asList(event2));
 
-        MimeMessage message = Mockito.mock(MimeMessage.class);
-        Mockito.when(factory.createMessage(templateReference, factoryParameters)).thenReturn(message, message);
+        MimeMessage message = mock(MimeMessage.class);
+        when(factory.createMessage(templateReference, factoryParameters)).thenReturn(message, message);
 
-        Mockito.when(defaultNotificationEmailRenderer.renderHTML(event1)).thenReturn("eventHTML1");
-        Mockito.when(defaultNotificationEmailRenderer.renderPlainText(event1)).thenReturn("event1");
-        Mockito.when(defaultNotificationEmailRenderer.renderHTML(event2)).thenReturn("eventHTML2");
-        Mockito.when(defaultNotificationEmailRenderer.renderPlainText(event2)).thenReturn("event2");
+        when(defaultNotificationEmailRenderer.renderHTML(event1)).thenReturn("eventHTML1");
+        when(defaultNotificationEmailRenderer.renderPlainText(event1)).thenReturn("event1");
+        when(defaultNotificationEmailRenderer.renderHTML(event2)).thenReturn("eventHTML2");
+        when(defaultNotificationEmailRenderer.renderPlainText(event2)).thenReturn("event2");
 
         // Test
         PeriodicMimeMessageIterator iterator = mocker.getComponentUnderTest();
@@ -131,32 +136,32 @@ public class PeriodicMimeMessageIteratorTest
         iterator.initialize(userIterator, factoryParameters, new Date(0L), templateReference);
 
         // First iteration
-        Assert.assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
         assertEquals(message, iterator.next());
-        Assert.assertEquals(new InternetAddress("xwiki@xwiki.org"), factoryParameters.get("from"));
-        Assert.assertEquals(new InternetAddress("userA@xwiki.org"), factoryParameters.get("to"));
+        assertEquals(new InternetAddress("xwiki@xwiki.org"), factoryParameters.get("from"));
+        assertEquals(new InternetAddress("userA@xwiki.org"), factoryParameters.get("to"));
         Map<String, Object> velocityVariables = (Map<String, Object>) factoryParameters.get("velocityVariables");
-        Assert.assertNotNull(velocityVariables);
-        Assert.assertEquals(Arrays.asList(event1), velocityVariables.get("events"));
-        Assert.assertEquals(Arrays.asList("eventHTML1"), velocityVariables.get("htmlEvents"));
-        Assert.assertEquals(Arrays.asList("event1"), velocityVariables.get("plainTextEvents"));
+        assertNotNull(velocityVariables);
+        assertEquals(Arrays.asList(event1), velocityVariables.get("events"));
+        assertEquals(Arrays.asList("eventHTML1"), velocityVariables.get("htmlEvents"));
+        assertEquals(Arrays.asList("event1"), velocityVariables.get("plainTextEvents"));
 
         // Second iteration
-        Assert.assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
         assertEquals(message, iterator.next());
-        Assert.assertEquals(new InternetAddress("xwiki@xwiki.org"), factoryParameters.get("from"));
-        Assert.assertEquals(new InternetAddress("userC@xwiki.org"), factoryParameters.get("to"));
+        assertEquals(new InternetAddress("xwiki@xwiki.org"), factoryParameters.get("from"));
+        assertEquals(new InternetAddress("userC@xwiki.org"), factoryParameters.get("to"));
         velocityVariables = (Map<String, Object>) factoryParameters.get("velocityVariables");
-        Assert.assertNotNull(velocityVariables);
-        Assert.assertEquals(Arrays.asList(event2), velocityVariables.get("events"));
-        Assert.assertEquals(Arrays.asList("eventHTML2"), velocityVariables.get("htmlEvents"));
-        Assert.assertEquals(Arrays.asList("event2"), velocityVariables.get("plainTextEvents"));
+        assertNotNull(velocityVariables);
+        assertEquals(Arrays.asList(event2), velocityVariables.get("events"));
+        assertEquals(Arrays.asList("eventHTML2"), velocityVariables.get("htmlEvents"));
+        assertEquals(Arrays.asList("event2"), velocityVariables.get("plainTextEvents"));
 
         // End
-        Assert.assertFalse(iterator.hasNext());
+        assertFalse(iterator.hasNext());
 
         // Verify
-        Mockito.verify(serializer, Mockito.never()).serialize(userB);
+        verify(serializer, never()).serialize(userB);
 
         assertEquals(iterator, iterator.iterator());
     }

@@ -20,11 +20,9 @@
 package org.xwiki.notifications.internal.email.live;
 
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.internal.SimilarityCalculator;
@@ -59,7 +57,7 @@ public class LiveNotificationEmailManagerTest
     public void setUp() throws Exception
     {
         this.notificationConfiguration = this.mocker.registerMockComponent(NotificationConfiguration.class);
-        Mockito.when(this.notificationConfiguration.liveNotificationsGraceTime()).thenReturn(1);
+        when(this.notificationConfiguration.liveNotificationsGraceTime()).thenReturn(1);
 
         this.liveNotificationEmailSender = this.mocker.registerMockComponent(LiveNotificationEmailSender.class);
 
@@ -76,13 +74,13 @@ public class LiveNotificationEmailManagerTest
     public void testAddNewEvent() throws Exception
     {
         // No event is currently defined
-        Event event1 = Mockito.mock(Event.class);
-        Event event2 = Mockito.mock(Event.class);
-        Event event3 = Mockito.mock(Event.class);
+        Event event1 = mock(Event.class);
+        Event event2 = mock(Event.class);
+        Event event3 = mock(Event.class);
 
-        Mockito.when(this.similarityCalculator.computeSimilarity(event1, event2))
+        when(this.similarityCalculator.computeSimilarity(event1, event2))
                 .thenReturn(SimilarityCalculator.NO_SIMILARITY);
-        Mockito.when(this.similarityCalculator.computeSimilarity(event2, event3))
+        when(this.similarityCalculator.computeSimilarity(event2, event3))
                 .thenReturn(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE);
 
         this.mocker.getComponentUnderTest().initialize();
@@ -91,9 +89,9 @@ public class LiveNotificationEmailManagerTest
         this.mocker.getComponentUnderTest().addEvent(event3);
 
         // We assume that this test will take no more than 15 seconds to execute
-        Assert.assertTrue(this.mocker.getComponentUnderTest().getNextExecutionDate().isAfter(
+        assertTrue(this.mocker.getComponentUnderTest().getNextExecutionDate().isAfter(
                 DateTime.now().plusSeconds(45).getMillis()));
-        Assert.assertTrue(this.mocker.getComponentUnderTest().getNextExecutionDate().isBefore(
+        assertTrue(this.mocker.getComponentUnderTest().getNextExecutionDate().isBefore(
                 DateTime.now().plusMinutes(1).getMillis()));
     }
 }

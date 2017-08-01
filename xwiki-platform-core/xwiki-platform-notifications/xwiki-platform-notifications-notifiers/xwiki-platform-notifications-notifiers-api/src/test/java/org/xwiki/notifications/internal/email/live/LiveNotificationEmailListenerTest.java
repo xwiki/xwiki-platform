@@ -27,7 +27,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEventDescriptor;
@@ -93,20 +92,20 @@ public class LiveNotificationEmailListenerTest
     @Test
     public void testOnEvent() throws Exception
     {
-        Event eventStreamEvent = Mockito.mock(Event.class);
-        EventStreamAddedEvent event = Mockito.mock(EventStreamAddedEvent.class);
+        Event eventStreamEvent = mock(Event.class);
+        EventStreamAddedEvent event = mock(EventStreamAddedEvent.class);
 
-        RecordableEventDescriptor eventDescriptor = Mockito.mock(RecordableEventDescriptor.class);
-        Mockito.when(eventDescriptor.getEventType()).thenReturn("eventType");
-        Mockito.when(this.recordableEventDescriptorManager.getRecordableEventDescriptors(true))
+        RecordableEventDescriptor eventDescriptor = mock(RecordableEventDescriptor.class);
+        when(eventDescriptor.getEventType()).thenReturn("eventType");
+        when(this.recordableEventDescriptorManager.getRecordableEventDescriptors(true))
                 .thenReturn(Arrays.asList(eventDescriptor));
-        Mockito.when(eventStreamEvent.getType()).thenReturn("eventType");
+        when(eventStreamEvent.getType()).thenReturn("eventType");
 
-        Mockito.when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
-        Mockito.when(this.notificationConfiguration.isEnabled()).thenReturn(true);
+        when(this.notificationConfiguration.areEmailsEnabled()).thenReturn(true);
+        when(this.notificationConfiguration.isEnabled()).thenReturn(true);
 
         this.mocker.getComponentUnderTest().onEvent(event, eventStreamEvent, null);
 
-        Mockito.verify(this.liveNotificationEmailManager, Mockito.times(1)).addEvent(eventStreamEvent);
+        verify(this.liveNotificationEmailManager, times(1)).addEvent(eventStreamEvent);
     }
 }

@@ -37,12 +37,12 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationManager;
-import org.xwiki.notifications.NotificationRenderer;
-import org.xwiki.notifications.internal.ModelBridge;
-import org.xwiki.notifications.internal.script.NotificationPreferencesSaver;
-import org.xwiki.notifications.internal.script.NotificationScriptEventHelper;
-import org.xwiki.notifications.rss.NotificationRSSManager;
+import org.xwiki.notifications.preferences.NotificationPreferenceManager;
+import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.notifiers.NotificationRenderer;
+import org.xwiki.notifications.script.internal.NotificationPreferencesSaver;
+import org.xwiki.notifications.script.internal.NotificationScriptEventHelper;
+import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -77,6 +77,9 @@ public class NotificationScriptService implements ScriptService
     private NotificationRSSManager notificationRSSManager;
 
     @Inject
+    private NotificationPreferenceManager notificationPreferenceManager;
+
+    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
@@ -87,9 +90,6 @@ public class NotificationScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @Inject
-    private ModelBridge modelBridge;
 
     @Inject
     private NotificationScriptEventHelper notificationScriptEventHelper;
@@ -248,7 +248,7 @@ public class NotificationScriptService implements ScriptService
      */
     public void setStartDate(Date startDate) throws NotificationException
     {
-        modelBridge.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
+        notificationPreferenceManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
     }
 
     /**

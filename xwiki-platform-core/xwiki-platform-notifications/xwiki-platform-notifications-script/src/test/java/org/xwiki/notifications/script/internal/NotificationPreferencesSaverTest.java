@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.script;
+package org.xwiki.notifications.script.internal;
 
 import java.util.List;
 
@@ -26,11 +26,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -42,12 +43,12 @@ public class NotificationPreferencesSaverTest
     public final MockitoComponentMockingRule<NotificationPreferencesSaver> mocker =
             new MockitoComponentMockingRule<>(NotificationPreferencesSaver.class);
 
-    private ModelBridge modelBridge;
+    private NotificationPreferenceManager notificationPreferenceManager;
 
     @Before
     public void setUp() throws Exception
     {
-        modelBridge = mocker.getInstance(ModelBridge.class);
+        notificationPreferenceManager = mocker.getInstance(NotificationPreferenceManager.class);
     }
 
     @Test
@@ -57,6 +58,6 @@ public class NotificationPreferencesSaverTest
         mocker.getComponentUnderTest().saveNotificationPreferences(
                 IOUtils.toString(getClass().getResourceAsStream("/preferences.json")), userRef);
 
-        verify(modelBridge).saveNotificationsPreferences(eq(userRef), any(List.class));
+        verify(notificationPreferenceManager, times(1)).saveNotificationsPreferences(eq(userRef), any(List.class));
     }
 }

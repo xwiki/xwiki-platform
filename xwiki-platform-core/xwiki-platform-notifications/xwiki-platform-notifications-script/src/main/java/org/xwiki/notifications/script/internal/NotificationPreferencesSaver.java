@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.script;
+package org.xwiki.notifications.script.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationPreference;
-import org.xwiki.notifications.internal.ModelBridge;
+import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,8 +45,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Singleton
 public class NotificationPreferencesSaver
 {
+
     @Inject
-    private ModelBridge modelBridge;
+    private NotificationPreferenceManager notificationPreferenceManager;
 
     /**
      * Save preferences given as JSON.
@@ -67,7 +68,7 @@ public class NotificationPreferencesSaver
                 toSave.add(new NotificationPreference(eventType, enabled, format));
             }
 
-            modelBridge.saveNotificationsPreferences(userReference, toSave);
+            notificationPreferenceManager.saveNotificationsPreferences(userReference, toSave);
 
         } catch (Exception e) {
             throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);

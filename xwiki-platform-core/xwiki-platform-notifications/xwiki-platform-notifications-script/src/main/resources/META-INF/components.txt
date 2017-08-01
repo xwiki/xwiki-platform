@@ -1,0 +1,3 @@
+org.xwiki.notifications.script.internal.NotificationPreferencesSaver
+org.xwiki.notifications.script.internal.NotificationScriptEventHelper
+org.xwiki.notifications.script.NotificationScriptService

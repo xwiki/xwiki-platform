@@ -21,7 +21,9 @@ package org.xwiki.notifications.notifiers.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
@@ -38,6 +40,8 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @version $Id$
  * @since 9.7RC1
  */
+@Component
+@Singleton
 public class DefaultModelBridge implements ModelBridge
 {
     @Inject

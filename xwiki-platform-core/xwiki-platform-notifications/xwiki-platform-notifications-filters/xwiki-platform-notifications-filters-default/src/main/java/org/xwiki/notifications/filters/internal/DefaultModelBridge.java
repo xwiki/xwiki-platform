@@ -24,8 +24,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -46,6 +48,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 9.7RC1
  */
+@Component
+@Singleton
 public class DefaultModelBridge implements ModelBridge
 {
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",

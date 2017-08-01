@@ -1,0 +1,1 @@
+org.xwiki.notifications.filters.internal.DefaultModelBridge

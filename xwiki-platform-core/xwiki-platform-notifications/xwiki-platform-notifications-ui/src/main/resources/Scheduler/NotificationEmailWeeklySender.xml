@@ -187,7 +187,7 @@
       <cron>0 0 0 ? * MON</cron>
     </property>
     <property>
-      <jobClass>org.xwiki.notifications.internal.email.NotificationEmailJob</jobClass>
+      <jobClass>org.xwiki.notifications.notifiers.internal.email.NotificationEmailJob</jobClass>
     </property>
     <property>
       <jobDescription/>

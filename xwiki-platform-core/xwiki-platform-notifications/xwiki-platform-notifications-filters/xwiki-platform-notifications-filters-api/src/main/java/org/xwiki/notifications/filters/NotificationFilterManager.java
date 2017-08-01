@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters;
 
 import java.util.Collection;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 
@@ -30,6 +31,7 @@ import org.xwiki.notifications.NotificationException;
  * @version $Id$
  * @since 9.7RC1
  */
+@Role
 public interface NotificationFilterManager
 {
     /**

@@ -17,25 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.filters;
+
+import java.util.Collection;
+
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationException;
 
 /**
- * Determine the filter type of a {@link NotificationPreferenceScope}.
- * This type can be either inclusive or exclusive. This will affect the comportment of the related
- * {@link NotificationPreferenceScope} when used in {@link ScopeNotificationFilter}.
+ * Provide an interface for interacting with user notification filters.
  *
  * @version $Id$
  * @since 9.7RC1
  */
-public enum NotificationPreferenceScopeFilterType
+public interface NotificationFilterManager
 {
     /**
-     * This is the default scope type, the filter associated with this scope will be inclusive.
+     * Get all notifications filters, from all wikis if the user is global.
+     *
+     * @param user the user interested in notifications
+     * @return a collection of notification filters
+     * @throws NotificationException if error happens
      */
-    INCLUSIVE,
-
-    /**
-     * The filter associated with this scope will be exclusive.
-     */
-    EXCLUSIVE
+    Collection<NotificationFilter> getAllNotificationFilters(DocumentReference user) throws NotificationException;
 }

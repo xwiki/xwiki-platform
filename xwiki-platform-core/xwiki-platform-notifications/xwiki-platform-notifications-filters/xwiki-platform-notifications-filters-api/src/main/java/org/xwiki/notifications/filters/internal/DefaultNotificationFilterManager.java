@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,18 +32,19 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Retrieve all notification filters.
+ * Default implementation of {@link NotificationFilterManager}.
  *
  * @version $Id$
  * @since 9.5RC1
  */
-@Component(roles = NotificationFilterManager.class)
+@Component
 @Singleton
-public class NotificationFilterManager
+public class DefaultNotificationFilterManager implements NotificationFilterManager
 {
     private static final String ERROR_MESSAGE = "Failed to get all the notification filters.";
 
@@ -56,13 +57,7 @@ public class NotificationFilterManager
     @Inject
     private ModelContext modelContext;
 
-    /**
-     * Get all notifications filters, from all wikis if the user is global.
-     *
-     * @param user the user interested in notifications
-     * @return a collection of notification filters
-     * @throws NotificationException if error happens
-     */
+    @Override
     public Collection<NotificationFilter> getAllNotificationFilters(DocumentReference user)
             throws NotificationException
     {

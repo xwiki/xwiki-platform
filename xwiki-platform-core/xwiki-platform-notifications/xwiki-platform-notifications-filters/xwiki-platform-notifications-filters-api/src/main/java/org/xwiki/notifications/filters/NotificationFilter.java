@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.filters;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +25,7 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -53,10 +54,11 @@ public interface NotificationFilter
      *
      * @param user the user interested in the notifications
      * @param format format of the notification
-     * @param type event type to filter
+     * @param properties the properties of the notification to filter
      * @return the HQL code to inject
      */
-    String queryFilterOR(DocumentReference user, NotificationFormat format, String type);
+    String queryFilterOR(DocumentReference user, NotificationFormat format,
+            Map<NotificationProperty, String> properties);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "AND" statement (can
@@ -64,23 +66,20 @@ public interface NotificationFilter
      *
      * @param user the user interested in the notifications
      * @param format format of the notification
-     * @param type event type to filter
+     * @param properties the properties of the notification to filter
      * @return the HQL code to inject
      */
-    String queryFilterAND(DocumentReference user, NotificationFormat format, String type);
+    String queryFilterAND(DocumentReference user, NotificationFormat format,
+            Map<NotificationProperty, String> properties);
 
     /**
      * Parameters to add to the query using bindValue().
      *
      * @param user the user interested in the notifications
      * @param format format of the notification
-     * @param enabledEventTypes list of the event types the user has registered
+     * @param propertiesList a list of the properties to filter
      * @return the values to bind to the query, mapped by value's name
-     *
-     * @since 9.5.2
-     * @since 9.6
-     * @since 9.7RC1
      */
     Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<String> enabledEventTypes);
+            List<Map<NotificationProperty, String>> propertiesList);
 }

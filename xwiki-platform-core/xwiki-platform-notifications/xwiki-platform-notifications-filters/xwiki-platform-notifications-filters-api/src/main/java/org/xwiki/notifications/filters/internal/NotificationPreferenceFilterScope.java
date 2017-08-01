@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.filters.internal;
 
 import org.xwiki.model.reference.EntityReference;
 
@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 9.5RC1
  */
-public class NotificationPreferenceScope
+public class NotificationPreferenceFilterScope
 {
     private String eventType;
 
@@ -39,13 +39,13 @@ public class NotificationPreferenceScope
     private NotificationPreferenceScopeFilterType scopeFilterType;
 
     /**
-     * Construct a NotificationPreferenceScope.
+     * Construct a NotificationPreferenceFilterScope.
      *
      * @param eventType name of the event type to refine
      * @param scopeReference reference of the scope
      * @param scopeFilterType the type of filter associated with the scope
      */
-    public NotificationPreferenceScope(String eventType, EntityReference scopeReference,
+    public NotificationPreferenceFilterScope(String eventType, EntityReference scopeReference,
             NotificationPreferenceScopeFilterType scopeFilterType)
     {
         this.eventType = eventType;

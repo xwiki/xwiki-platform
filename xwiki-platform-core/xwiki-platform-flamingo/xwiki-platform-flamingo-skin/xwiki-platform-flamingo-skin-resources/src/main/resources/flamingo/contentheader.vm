@@ -11,7 +11,7 @@
       <div class="xdocLastModification">
         #if (!$doc.isMostRecent())
           $services.localization.render(
-            'platform.document.modificationWithVersion',
+            'core.document.modificationWithVersion',
             ["<a href='$tdoc.getURL('view', ""rev=$tdoc.version"")'>$tdoc.version</a>",
             $xwiki.getUserName($tdoc.author),
             $xwiki.formatDate($tdoc.date)

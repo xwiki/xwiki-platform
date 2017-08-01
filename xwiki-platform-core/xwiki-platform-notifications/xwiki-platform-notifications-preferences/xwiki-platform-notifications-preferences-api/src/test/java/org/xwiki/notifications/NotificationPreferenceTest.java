@@ -20,6 +20,7 @@
 package org.xwiki.notifications;
 
 import org.junit.Test;
+import org.xwiki.notifications.preferences.NotificationPreference;
 
 import static org.junit.Assert.assertEquals;
 

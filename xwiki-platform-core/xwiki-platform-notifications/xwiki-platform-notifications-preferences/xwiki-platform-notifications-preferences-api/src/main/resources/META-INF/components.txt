@@ -1,0 +1,2 @@
+org.xwiki.notifications.preferences.internal.CachedModelBridge
+org.xwiki.notifications.preferences.internal.DefaultNotificationPreferenceManager

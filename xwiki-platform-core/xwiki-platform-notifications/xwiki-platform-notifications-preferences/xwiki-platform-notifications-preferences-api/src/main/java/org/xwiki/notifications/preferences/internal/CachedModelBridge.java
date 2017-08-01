@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.preferences.internal;
 
 import java.util.Date;
 import java.util.List;
@@ -31,10 +31,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationPreference;
-
-import com.xpn.xwiki.objects.BaseObjectReference;
+import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
@@ -49,10 +46,6 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 public class CachedModelBridge implements ModelBridge
 {
     private static final String USER_NOTIFICATIONS_PREFERENCES = "userNotificationsPreferences";
-
-    private static final String USER_NOTIFICATIONS_PREFERENCES_SCOPE = "userNotificationsPreferencesScope";
-
-    private static final String UNDERSCORE = "_";
 
     @Inject
     private ModelBridge modelBridge;
@@ -81,56 +74,6 @@ public class CachedModelBridge implements ModelBridge
     {
         // Obviously, there is no possible cache here
         modelBridge.setStartDateForUser(userReference, startDate);
-    }
-
-    @Override
-    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format) throws NotificationException
-    {
-        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format;
-
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(contextEntry)) {
-            return (List<NotificationPreferenceScope>) context.getProperty(contextEntry);
-        }
-
-        List<NotificationPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format);
-        context.setProperty(contextEntry, preferences);
-
-        return preferences;
-    }
-
-    @Override
-    public List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format, NotificationPreferenceScopeFilterType type) throws NotificationException
-    {
-        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format + UNDERSCORE
-                + type.name();
-
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(contextEntry)) {
-            return (List<NotificationPreferenceScope>) context.getProperty(contextEntry);
-        }
-
-        List<NotificationPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format, type);
-        context.setProperty(contextEntry, preferences);
-
-        return preferences;
-    }
-
-    @Override
-    public void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
-            throws NotificationException
-    {
-        // Obviously there is nothing to cache
-        modelBridge.savePropertyInHiddenDocument(objectReference, property, value);
-    }
-
-    @Override
-    public String getDocumentURL(DocumentReference documentReference, String action, String parameters)
-    {
-        // We don’t need any cache on that
-        return modelBridge.getDocumentURL(documentReference, action, parameters);
     }
 
     @Override

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.preferences.internal;
 
 import java.util.Date;
 import java.util.List;
@@ -25,10 +25,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationPreference;
-
-import com.xpn.xwiki.objects.BaseObjectReference;
+import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -58,58 +55,6 @@ public interface ModelBridge
      * @throws NotificationException if an error occurs
      */
     void setStartDateForUser(DocumentReference userReference, Date startDate) throws NotificationException;
-
-    /**
-     * Get all notification preference scope of the given user.
-     *
-     * @param user user interested in the notifications
-     * @param format format on which the preferences apply
-     * @return the list of notification preference scopes.
-     * @throws NotificationException if error happens
-     *
-     * @since 9.5RC1
-     */
-    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user, NotificationFormat format)
-            throws NotificationException;
-
-    /**
-     * Get all notification preference scope of the given user.
-     *
-     * @param user user interested in the notifications
-     * @param format format on which the preferences apply
-     * @param type the filter type of the scope we want to retrieve, see {@link NotificationPreferenceScopeFilterType}
-     * @return the list of notification preference scopes.
-     * @throws NotificationException if error happens
-     *
-     * @since 9.7RC1
-     */
-    List<NotificationPreferenceScope> getNotificationPreferenceScopes(DocumentReference user, NotificationFormat format,
-            NotificationPreferenceScopeFilterType type) throws NotificationException;
-
-    /**
-     * Save an object's property in an hidden document.
-     *
-     * @param objectReference reference of the object to save
-     * @param property the name of the property to set
-     * @param value the value of the property to set
-     * @throws NotificationException if error happens
-     *
-     * @since 9.5RC1
-     */
-    void savePropertyInHiddenDocument(BaseObjectReference objectReference, String property, Object value)
-            throws NotificationException;
-
-    /**
-     * Return the URL of the given {@link DocumentReference} for the given action.
-     *
-     * @param documentReference the reference
-     * @param action the request action
-     * @param parameters the request parameters
-     * @return the URL of the given reference
-     *
-     * @since 9.6RC1
-     */
-    String getDocumentURL(DocumentReference documentReference, String action, String parameters);
 
     /**
      * Save the given {@link NotificationPreference} for the given user. If such notification already exists, it will

@@ -18,9 +18,9 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## Show the button to display the last authors / blame view.
 #set ($showLastAuthors = $request.showLastAuthors)
 #if ($showLastAuthors)
-  <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code")">Hide last authors</a>
+  <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code")">$services.localization.render('core.viewers.code.hideBlame')</a>
 #else
-  <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code&showLastAuthors=true")">Show last authors</a>
+  <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code&showLastAuthors=true")">$services.localization.render('core.viewers.code.showBlame')</a>
 #end
 <div class="revision-container">
   <table class="revision">

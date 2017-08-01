@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -36,10 +35,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFilter;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationManager;
-import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.internal.SimilarityCalculator;
+import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceManager;
+import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -67,8 +69,7 @@ public class DefaultNotificationManager implements NotificationManager
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    @Named("cached")
-    private ModelBridge modelBridge;
+    private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
     private AuthorizationManager authorizationManager;
@@ -378,18 +379,19 @@ public class DefaultNotificationManager implements NotificationManager
     @Override
     public List<NotificationPreference> getPreferences() throws NotificationException
     {
-        return modelBridge.getNotificationsPreferences(documentAccessBridge.getCurrentUserReference());
+        return notificationPreferenceManager.getNotificationsPreferences(
+                documentAccessBridge.getCurrentUserReference());
     }
 
     @Override
     public List<NotificationPreference> getPreferences(String userId) throws NotificationException
     {
-        return modelBridge.getNotificationsPreferences(documentReferenceResolver.resolve(userId));
+        return notificationPreferenceManager.getNotificationsPreferences(documentReferenceResolver.resolve(userId));
     }
 
     @Override
     public void setStartDate(String userId, Date startDate) throws NotificationException
     {
-        modelBridge.setStartDateForUser(documentReferenceResolver.resolve(userId), startDate);
+        notificationPreferenceManager.setStartDateForUser(documentReferenceResolver.resolve(userId), startDate);
     }
 }

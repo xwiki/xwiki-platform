@@ -17,12 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications;
+package org.xwiki.notifications.sources;
 
 import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
 /**

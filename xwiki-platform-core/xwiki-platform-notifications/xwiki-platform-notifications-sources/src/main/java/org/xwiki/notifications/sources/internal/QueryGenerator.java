@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -35,9 +36,12 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFilter;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationPreference;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -64,8 +68,7 @@ public class QueryGenerator
     private QueryManager queryManager;
 
     @Inject
-    @Named("cached")
-    private ModelBridge modelBridge;
+    private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -128,7 +131,7 @@ public class QueryGenerator
         // TODO: idea: handle the items of the watchlist too
 
         // First: get the preferences of the given user
-        List<NotificationPreference> preferences = modelBridge.getNotificationsPreferences(user);
+        List<NotificationPreference> preferences = notificationPreferenceManager.getNotificationsPreferences(user);
 
         // Then: generate the HQL query
         StringBuilder hql = new StringBuilder();
@@ -186,7 +189,9 @@ public class QueryGenerator
         String separator = "";
 
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterOR(user, format, type);
+            Map<NotificationProperty, String> properties =
+                    Collections.singletonMap(NotificationProperty.EVENT_TYPE, type);
+            String filterQuery = filter.queryFilterOR(user, format, properties);
             if (StringUtils.isNotBlank(filterQuery)) {
                 query.append(separator);
                 query.append(filterQuery);
@@ -203,7 +208,9 @@ public class QueryGenerator
             throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            String filterQuery = filter.queryFilterAND(user, format, type);
+            Map<NotificationProperty, String> properties =
+                    Collections.singletonMap(NotificationProperty.EVENT_TYPE, type);
+            String filterQuery = filter.queryFilterAND(user, format, properties);
             if (StringUtils.isNotBlank(filterQuery)) {
                 hql.append(" AND ");
                 hql.append(filterQuery);
@@ -219,7 +226,12 @@ public class QueryGenerator
             eventTypes.add(property.eventType);
         }
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<String, Object> params = filter.queryFilterParams(user, format, eventTypes);
+            List<Map<NotificationProperty, String>> propertiesList = new ArrayList<>();
+            for (String eventType : eventTypes) {
+                propertiesList.add(Collections.singletonMap(NotificationProperty.EVENT_TYPE, eventType));
+            }
+
+            Map<String, Object> params = filter.queryFilterParams(user, format, propertiesList);
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 query.bindValue(entry.getKey(), entry.getValue());
             }
@@ -329,7 +341,7 @@ public class QueryGenerator
             int number = 0;
             for (EventProperty property : propertyList) {
                 hql.append(separator);
-                hql.append(String.format("((event.type = :type_%d AND event.date >= :date_%d)", number, number));
+                hql.append(String.format("((event.type = :type_%s AND event.date >= :date_%d)", number, number));
                 number++;
                 handleFiltersOR(user, hql, format, property.eventType);
                 handleFiltersAND(user, hql, format, property.eventType);

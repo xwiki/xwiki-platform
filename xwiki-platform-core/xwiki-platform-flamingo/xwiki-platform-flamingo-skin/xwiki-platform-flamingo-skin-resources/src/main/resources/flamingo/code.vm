@@ -2,8 +2,6 @@
 ### Code page in the "view" mode
 ###
 $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
-$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', true)##
-$xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($titleToDisplay = $services.localization.render('core.viewers.code.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()]))
 #template('contentheader.vm')
 ## ----------------------------

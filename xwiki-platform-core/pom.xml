@@ -20,7 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
@@ -329,8 +330,79 @@
                     "classSimpleName": "NotificationScriptService",
                     "elementKind": "class",
                     "justification": "Young API, moved to org.xwiki.notifications.script.NotificationScriptService"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration javax.mail.internet.MimeMessage::getAllHeaderLines() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getAllHeaderLines() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration",
+                    "newType": "java.util.Enumeration<java.lang.String>",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getAllHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration javax.mail.internet.MimeMessage::getAllHeaders() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getAllHeaders() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration",
+                    "newType": "java.util.Enumeration<javax.mail.Header>",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getAllHeaders",
+                    "elementKind": "method",
+                    "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration javax.mail.internet.MimeMessage::getMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration",
+                    "newType": "java.util.Enumeration<java.lang.String>",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getMatchingHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration javax.mail.internet.MimeMessage::getMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration",
+                    "newType": "java.util.Enumeration<javax.mail.Header>",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getMatchingHeaders",
+                    "elementKind": "method",
+                    "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration javax.mail.internet.MimeMessage::getNonMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getNonMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration",
+                    "newType": "java.util.Enumeration<java.lang.String>",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getNonMatchingHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration javax.mail.internet.MimeMessage::getNonMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getNonMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration",
+                    "newType": "java.util.Enumeration<javax.mail.Header>",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getNonMatchingHeaders",
+                    "elementKind": "method",
+                    "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
                   }
-
                 ]
               }
             }

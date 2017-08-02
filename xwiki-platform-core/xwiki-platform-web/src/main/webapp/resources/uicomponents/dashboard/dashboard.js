@@ -522,9 +522,6 @@ XWiki.Dashboard = Class.create( {
     // recreate the drag & drops, to take into account the new added container as well. Re-create all because they all
     // need to take into account the new one
     this.createDragAndDrops();
-    // get the head element and insert the new css link element at the end
-    var headElt = $(document.getElementsByTagName('head')[0]);
-    headElt.insert(linkElement);
   },
 
   /**

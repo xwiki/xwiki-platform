@@ -321,6 +321,7 @@
       #if ($extensionDependencies.size() &gt; 0)
         = Dependencies =
 
+         Dependencies for this extension (${extension.getProperty('id').value} ${doc.getValue('lastVersion')}):
          #foreach($extensionDependency in $extensionDependencies)
           #set($dependencyDocumentName = $null)
           #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())

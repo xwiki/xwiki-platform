@@ -3,16 +3,12 @@ require.config({
     'moment': "$services.webjars.url('momentjs', 'moment.js')",
     'jdateformatparser': "$services.webjars.url('org.webjars.bower:moment-jdateformatparser', 'moment-jdateformatparser.js')",
     'daterangepicker': "$services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')"
-  },
-  shim: {
-    'moment': ['jdateformatparser'],
-    'daterangepicker': ['jquery', 'bootstrap', 'moment']
   }
 });
 
-require(['jquery', 'moment', 'daterangepicker', 'xwiki-events-bridge'],
-  function($, moment) {
-    var bindInputs = function(livetable) {
+require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'],
+  function($) {
+    var bindInputs = function(livetable, moment) {
       $(livetable).find('input[data-type="date"]').each(function(i, element) {
         var input = $(element);
         var hidden = input.prev('input[type="hidden"]');
@@ -82,8 +78,16 @@ require(['jquery', 'moment', 'daterangepicker', 'xwiki-events-bridge'],
       });
     };
 
-    $('.xwiki-livetable').each(function(i, element) {
-      bindInputs(element);
+    // jdateformatparser enhances moment using a require callback so we need to wait for it (because when you require a
+    // module the callback is not called immediately even if the module is already loaded; the callback is called on the
+    // next processor cycle).
+    // See XWIKI-14579: The picker to filter on Date types, in LiveTables, doesn't appear on IE 11 and Microsoft Edge 40
+    // See https://github.com/MadMG/moment-jdateformatparser/issues/20 (Loading with Require.js doesn't always work as
+    // expected)
+    require(['moment'], function(moment) {
+      $('.xwiki-livetable').each(function(i, livetable) {
+        bindInputs(livetable, moment);
+      });
     });
   }
 );

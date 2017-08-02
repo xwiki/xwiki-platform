@@ -262,7 +262,7 @@ public class ScopeNotificationEventTypeFilterTest
         when(serializer.serialize(SCOPE_EXCLUSIVE_REFERENCE_2)).thenReturn("space2.page2");
 
         // Prepare the notifications properties
-        List<Map<NotificationProperty, String>> propertiesList = new ArrayList<>();
+        List<Map<NotificationProperty, Object>> propertiesList = new ArrayList<>();
         for (String element : Arrays.asList("event1", "event2", "event3",
                 "exclusiveEvent1", "exclusiveEvent2")) {
             propertiesList.add(Collections.singletonMap(NotificationProperty.EVENT_TYPE, element));

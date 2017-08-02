@@ -189,7 +189,7 @@ public class QueryGenerator
         String separator = "";
 
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<NotificationProperty, String> properties =
+            Map<NotificationProperty, Object> properties =
                     Collections.singletonMap(NotificationProperty.EVENT_TYPE, type);
             String filterQuery = filter.queryFilterOR(user, format, properties);
             if (StringUtils.isNotBlank(filterQuery)) {
@@ -208,7 +208,7 @@ public class QueryGenerator
             throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<NotificationProperty, String> properties =
+            Map<NotificationProperty, Object> properties =
                     Collections.singletonMap(NotificationProperty.EVENT_TYPE, type);
             String filterQuery = filter.queryFilterAND(user, format, properties);
             if (StringUtils.isNotBlank(filterQuery)) {
@@ -226,7 +226,7 @@ public class QueryGenerator
             eventTypes.add(property.eventType);
         }
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            List<Map<NotificationProperty, String>> propertiesList = new ArrayList<>();
+            List<Map<NotificationProperty, Object>> propertiesList = new ArrayList<>();
             for (String eventType : eventTypes) {
                 propertiesList.add(Collections.singletonMap(NotificationProperty.EVENT_TYPE, eventType));
             }

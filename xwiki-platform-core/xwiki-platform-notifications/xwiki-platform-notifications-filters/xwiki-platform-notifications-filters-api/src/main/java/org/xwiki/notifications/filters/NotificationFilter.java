@@ -59,7 +59,7 @@ public interface NotificationFilter
      * @return the HQL code to inject
      */
     String queryFilterOR(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, String> properties);
+            Map<NotificationProperty, Object> properties);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "AND" statement (can
@@ -71,7 +71,7 @@ public interface NotificationFilter
      * @return the HQL code to inject
      */
     String queryFilterAND(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, String> properties);
+            Map<NotificationProperty, Object> properties);
 
     /**
      * Parameters to add to the query using bindValue().
@@ -82,5 +82,5 @@ public interface NotificationFilter
      * @return the values to bind to the query, mapped by value's name
      */
     Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationProperty, String>> propertiesList);
+            List<Map<NotificationProperty, Object>> propertiesList);
 }

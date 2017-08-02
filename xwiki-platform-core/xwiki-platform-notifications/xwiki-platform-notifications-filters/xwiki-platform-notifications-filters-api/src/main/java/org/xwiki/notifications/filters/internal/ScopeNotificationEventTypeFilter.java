@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +52,14 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
     }
 
     @Override
-    protected Map<String, Object> generateQueryRestrictionParams(String suffix)
+    protected Map<String, Object> generateQueryRestrictionParams(String suffix,
+            Map<NotificationProperty, Object> properties)
     {
-        // TODO
-        return null;
+        if (properties.containsKey(NotificationProperty.EVENT_TYPE)) {
+            return Collections.singletonMap(String.format("type_%s", suffix),
+                    properties.get(NotificationProperty.EVENT_TYPE));
+        }
+        return Collections.EMPTY_MAP;
     }
 
     @Override
@@ -65,7 +70,7 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
 
     @Override
     protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope, NotificationFormat format,
-            Map<NotificationProperty, String> properties)  {
+            Map<NotificationProperty, Object> properties)  {
         // We apply the filter only on scopes having the correct eventType
         return (properties.containsKey(NotificationProperty.EVENT_TYPE)
                 && scope.getEventType().equals(properties.get(NotificationProperty.EVENT_TYPE)));
@@ -73,12 +78,12 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
 
     @Override
     protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope, NotificationFormat format,
-            List<Map<NotificationProperty, String>> propertyList)  {
+            List<Map<NotificationProperty, Object>> propertyList)  {
         // Get every eventType contained in the given properties
         List<String> eventTypes = new ArrayList<>();
-        for (Map<NotificationProperty, String> properties : propertyList) {
+        for (Map<NotificationProperty, Object> properties : propertyList) {
             if (properties.containsKey(NotificationProperty.EVENT_TYPE)) {
-                eventTypes.add(properties.get(NotificationProperty.EVENT_TYPE));
+                eventTypes.add((String) properties.get(NotificationProperty.EVENT_TYPE));
             }
         }
 

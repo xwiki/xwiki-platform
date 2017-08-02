@@ -22,6 +22,7 @@ package org.xwiki.notifications.preferences.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
@@ -81,6 +83,25 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
                     "Unable to fetch the notifications preferences providers from the component manager", e);
         }
 
+    }
+
+    @Override
+    public List<NotificationPreference> getNotificationsPreferences(DocumentReference user, boolean isEnabled,
+            NotificationFormat format) throws NotificationException
+    {
+        List<NotificationPreference> preferences = getNotificationsPreferences(user);
+
+        Iterator<NotificationPreference> it = preferences.iterator();
+        while (it.hasNext()) {
+            NotificationPreference preference = it.next();
+
+            if (preference.isNotificationEnabled() != isEnabled
+                || !preference.getFormat().equals(format)) {
+                preferences.remove(preference);
+            }
+        }
+
+        return preferences;
     }
 
     @Override

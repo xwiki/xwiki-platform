@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Sources</name>
   <description>Handle how notifications are retrieved</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -97,7 +97,8 @@ public class QueryGeneratorTest
         when(pref1.getStartDate()).thenReturn(pref1StartDate);
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
-        when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
+        when(notificationPreferenceManager.getNotificationsPreferences(userReference, true,
+                NotificationFormat.ALERT)).thenReturn(Arrays.asList(pref1));
 
         when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
 

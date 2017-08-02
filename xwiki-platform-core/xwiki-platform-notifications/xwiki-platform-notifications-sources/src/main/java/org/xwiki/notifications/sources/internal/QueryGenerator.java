@@ -20,12 +20,10 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -84,38 +82,14 @@ public class QueryGenerator
     private NotificationFilterManager notificationFilterManager;
 
     /**
-     * Class used to store the property of an event used in the query.
-     *
-     * @since 9.7RC1
-     */
-    private class EventProperty
-    {
-        private String eventType;
-
-        private Date startDate;
-
-        /**
-         * Constructs a new {@link EventProperty}.
-         *
-         * @param eventType the type of the event
-         * @param startDate the start date of the event
-         */
-        EventProperty(String eventType, Date startDate)
-        {
-            this.eventType = eventType;
-            this.startDate = startDate;
-        }
-    }
-
-    /**
      * Generate the query.
      *
      * @param user user interested in the notifications
      * @param format only match notifications enabled for that format
-     * @param onlyUnread f only unread events should be returned
+     * @param onlyUnread if only unread events should be returned
      * @param endDate do not return events happened after this date
      * @param startDate do not return events happened before this date. Note that since 9.7RC1, this start date is
-     * completely optional, {@link NotificationPreference#startDate} should be used for more granular control on
+     * completely optional, {@link NotificationPreference#getStartDate()} should be used for more granular control on
      * notifications
      * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
      * @return the query to execute
@@ -130,8 +104,9 @@ public class QueryGenerator
         // TODO: create unit tests for all use-cases
         // TODO: idea: handle the items of the watchlist too
 
-        // First: get the preferences of the given user
-        List<NotificationPreference> preferences = notificationPreferenceManager.getNotificationsPreferences(user);
+        // First: get the active preferences of the given user
+        List<NotificationPreference> preferences = notificationPreferenceManager.getNotificationsPreferences(
+                user, true, format);
 
         // Then: generate the HQL query
         StringBuilder hql = new StringBuilder();
@@ -141,15 +116,11 @@ public class QueryGenerator
         }
         hql.append(LEFT_PARENTHESIS);
 
-        List<EventProperty> propertyList = handleEventPreferences(user, hql, preferences, format);
-        Set<String> eventTypes = new HashSet<>();
-        for (EventProperty property : propertyList) {
-            eventTypes.add(property.eventType);
-        }
+        handleEventPreferences(user, hql, preferences);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
-        if (preferences.isEmpty() || propertyList.isEmpty()) {
+        if (preferences.isEmpty() || preferences.isEmpty()) {
             return null;
         }
 
@@ -170,28 +141,26 @@ public class QueryGenerator
             query.bindValue("startDate", startDate);
         }
         query.bindValue("user", serializer.serialize(user));
-        handleEventPreferences(propertyList, query);
+        handleEventPreferences(preferences, query);
         handleBlackList(blackList, query);
         handleEndDate(endDate, query);
         handleWiki(user, query);
 
-        handleFiltersParams(user, query, format, propertyList);
+        handleFiltersParams(user, query, format, preferences);
 
         // Return the query
         return query;
     }
 
-    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationFormat format,
-            String type)
+    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationPreference preference)
             throws NotificationException
     {
         StringBuilder query = new StringBuilder();
         String separator = "";
 
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<NotificationProperty, Object> properties =
-                    Collections.singletonMap(NotificationProperty.EVENT_TYPE, type);
-            String filterQuery = filter.queryFilterOR(user, format, properties);
+            String filterQuery = filter.queryFilterOR(user, preference.getFormat(), preference.getProperties());
+
             if (StringUtils.isNotBlank(filterQuery)) {
                 query.append(separator);
                 query.append(filterQuery);
@@ -204,13 +173,12 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationFormat format, String type)
+    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationPreference preference)
             throws NotificationException
     {
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
-            Map<NotificationProperty, Object> properties =
-                    Collections.singletonMap(NotificationProperty.EVENT_TYPE, type);
-            String filterQuery = filter.queryFilterAND(user, format, properties);
+            String filterQuery = filter.queryFilterAND(user, preference.getFormat(), preference.getProperties());
+
             if (StringUtils.isNotBlank(filterQuery)) {
                 hql.append(" AND ");
                 hql.append(filterQuery);
@@ -219,16 +187,13 @@ public class QueryGenerator
     }
 
     private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format,
-            List<EventProperty> propertyList) throws NotificationException
+            List<NotificationPreference> preferences) throws NotificationException
     {
-        ArrayList<String> eventTypes = new ArrayList<>();
-        for (EventProperty property : propertyList) {
-            eventTypes.add(property.eventType);
-        }
         for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
+
             List<Map<NotificationProperty, Object>> propertiesList = new ArrayList<>();
-            for (String eventType : eventTypes) {
-                propertiesList.add(Collections.singletonMap(NotificationProperty.EVENT_TYPE, eventType));
+            for (NotificationPreference preference : preferences) {
+                propertiesList.add(preference.getProperties());
             }
 
             Map<String, Object> params = filter.queryFilterParams(user, format, propertiesList);
@@ -296,18 +261,24 @@ public class QueryGenerator
     }
 
     /**
-     * Bind the event preferences parameters to the query. Those parameters are usually declared in
-     * {@link #handleEventPreferences(DocumentReference, StringBuilder, List, NotificationFormat)}..
+     * Bind the notification preferences parameters to the query. Those parameters are usually declared in
+     * {@link #handleEventPreferences(DocumentReference, StringBuilder, List)}..
      *
-     * @param propertyList A list of {@link EventProperty}
+     * @param preferences A list of {@link NotificationPreference}
      * @param query the query
      */
-    private void handleEventPreferences(List<EventProperty> propertyList, Query query)
+    private void handleEventPreferences(List<NotificationPreference> preferences, Query query)
     {
         int number = 0;
-        for (EventProperty property : propertyList) {
-            query.bindValue(String.format("type_%d", number), property.eventType);
-            query.bindValue(String.format("date_%d", number), property.startDate);
+        for (NotificationPreference preference : preferences) {
+            if (preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
+                query.bindValue(String.format("application_%d", number),
+                        preference.getProperties().get(NotificationProperty.APPLICATION_ID));
+            } else if (preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
+                query.bindValue(String.format("type_%d", number),
+                        preference.getProperties().get(NotificationProperty.EVENT_TYPE));
+            }
+            query.bindValue(String.format("date_%d", number), preference.getStartDate());
             number++;
         }
     }
@@ -321,39 +292,47 @@ public class QueryGenerator
      * @param user the current user
      * @param hql the query
      * @param preferences a list of the user preferences
-     * @param format the format of event that we want to retrieve
      * @return a Map containing the event types in keys and their corresponding start dates as values
      * @throws NotificationException if an error occurred
      */
-    private List<EventProperty> handleEventPreferences(DocumentReference user, StringBuilder hql,
-            List<NotificationPreference> preferences, NotificationFormat format) throws NotificationException
+    private void handleEventPreferences(DocumentReference user, StringBuilder hql,
+            List<NotificationPreference> preferences) throws NotificationException
     {
-        List<EventProperty> propertyList = new ArrayList<>();
-        for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled()
-                    && preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
-                    && StringUtils.isNotBlank((String) preference.getProperties().get(NotificationProperty.EVENT_TYPE))
-                    && format.equals(preference.getFormat())) {
-                propertyList.add(new EventProperty((String) preference.getProperties()
-                        .get(NotificationProperty.EVENT_TYPE), preference.getStartDate()));
+        // Filter the notification preferences that are not bound to a specific EVENT_TYPE
+        // or APPLICATION_ID as those are the only parameters supported in the queries
+        Iterator<NotificationPreference> it = preferences.iterator();
+        while (it.hasNext()) {
+            NotificationPreference preference = it.next();
+
+            if (!preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
+                && !preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
+                preferences.remove(preference);
             }
         }
-        if (!propertyList.isEmpty()) {
+
+        if (!preferences.isEmpty()) {
             hql.append(LEFT_PARENTHESIS);
             String separator = "";
             int number = 0;
-            for (EventProperty property : propertyList) {
+            for (NotificationPreference preference : preferences) {
                 hql.append(separator);
-                hql.append(String.format("((event.type = :type_%s AND event.date >= :date_%d)", number, number));
+
+                if (preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
+                    hql.append(String.format("((event.application = :application_%s", number));
+                } else if (preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
+                    hql.append(String.format("((event.type = :type_%s", number));
+                }
+
+                hql.append(String.format(" AND event.date >= :date_%d)", number));
+
                 number++;
-                handleFiltersOR(user, hql, format, property.eventType);
-                handleFiltersAND(user, hql, format, property.eventType);
+                handleFiltersOR(user, hql, preference);
+                handleFiltersAND(user, hql, preference);
                 hql.append(RIGHT_PARENTHESIS);
                 separator = OR;
             }
             hql.append(RIGHT_PARENTHESIS);
         }
-        return propertyList;
     }
 
     private void handleWiki(DocumentReference user, Query query)

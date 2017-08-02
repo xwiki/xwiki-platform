@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -45,6 +46,18 @@ public interface NotificationPreferenceManager
      * @throws NotificationException if an error occurs
      */
     List<NotificationPreference> getNotificationsPreferences(DocumentReference user) throws NotificationException;
+
+    /**
+     * Get a list of registered {@link NotificationPreference} for the given user.
+     *
+     * @param user the user to use
+     * @param isEnabled should the preference be enabled ?
+     * @param format the format of notification described in the preference
+     * @return a list of {@link NotificationPreference}
+     * @throws NotificationException if an error occurs
+     */
+    List<NotificationPreference> getNotificationsPreferences(DocumentReference user, boolean isEnabled,
+            NotificationFormat format) throws NotificationException;
 
     /**
      * Update the start date for every notification preference that the user has.

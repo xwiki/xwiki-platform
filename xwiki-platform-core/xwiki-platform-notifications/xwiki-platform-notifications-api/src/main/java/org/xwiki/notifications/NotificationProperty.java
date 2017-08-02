@@ -19,28 +19,24 @@
  */
 package org.xwiki.notifications;
 
-import org.junit.Test;
-import org.xwiki.notifications.preferences.NotificationPreference;
-
-import static org.junit.Assert.assertEquals;
+import org.xwiki.stability.Unstable;
 
 /**
- * Unit tests for {@link NotificationPreference}.
+ * Possible properties that can be bound to a notification in order to characterize it.
  *
- * @since 9.6RC1
  * @version $Id$
+ * @since 9.7RC1
  */
-public class NotificationPreferenceTest
+@Unstable
+public enum NotificationProperty
 {
-    @Test
-    public void testPublicGetters() throws Exception
-    {
-        NotificationPreference testPreference = new NotificationPreference("eventType", true);
+    /**
+     * The ID of the application linked to the notification.
+     */
+    APPLICATION_ID,
 
-        assertEquals("eventType", testPreference.getEventType());
-
-        NotificationPreference testPreference2 = new NotificationPreference("eventType", true, NotificationFormat.EMAIL);
-
-        assertEquals(NotificationFormat.EMAIL, testPreference2.getFormat());
-    }
+    /**
+     * The type of the event linked to the notification.
+     */
+    EVENT_TYPE
 }

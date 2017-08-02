@@ -32,7 +32,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.NotificationProperty;
+import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.NotificationFormat;
 

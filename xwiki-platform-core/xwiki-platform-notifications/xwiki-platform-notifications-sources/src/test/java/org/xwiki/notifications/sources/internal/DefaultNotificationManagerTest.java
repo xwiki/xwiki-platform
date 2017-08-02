@@ -20,6 +20,7 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.internal.SimilarityCalculator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
@@ -93,7 +95,10 @@ public class DefaultNotificationManagerTest
                 anyBoolean(), nullable(Date.class),
                 nullable(Date.class), nullable(List.class))).thenReturn(query);
 
-        NotificationPreference pref1 = new NotificationPreference("create", true);
+        NotificationPreference pref1 = mock(NotificationPreference.class);
+        when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationProperty.EVENT_TYPE, "create"));
+        when(pref1.isNotificationEnabled()).thenReturn(true);
+
         when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
     }
 
@@ -141,7 +146,10 @@ public class DefaultNotificationManagerTest
     @Test
     public void getEventsWhenNoPreferences() throws Exception
     {
-        NotificationPreference pref1 = new NotificationPreference("create", false);
+        NotificationPreference pref1 = mock(NotificationPreference.class);
+        when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationProperty.EVENT_TYPE, "create"));
+        when(pref1.isNotificationEnabled()).thenReturn(false);
+
         when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
         // Test

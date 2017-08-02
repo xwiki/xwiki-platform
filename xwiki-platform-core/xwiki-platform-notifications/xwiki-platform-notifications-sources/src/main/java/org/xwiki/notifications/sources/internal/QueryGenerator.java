@@ -39,7 +39,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationProperty;
+import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.query.Query;
@@ -330,9 +330,12 @@ public class QueryGenerator
     {
         List<EventProperty> propertyList = new ArrayList<>();
         for (NotificationPreference preference : preferences) {
-            if (preference.isNotificationEnabled() && StringUtils.isNotBlank(preference.getEventType())
+            if (preference.isNotificationEnabled()
+                    && preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
+                    && StringUtils.isNotBlank((String) preference.getProperties().get(NotificationProperty.EVENT_TYPE))
                     && format.equals(preference.getFormat())) {
-                propertyList.add(new EventProperty(preference.getEventType(), preference.getStartDate()));
+                propertyList.add(new EventProperty((String) preference.getProperties()
+                        .get(NotificationProperty.EVENT_TYPE), preference.getStartDate()));
             }
         }
         if (!propertyList.isEmpty()) {

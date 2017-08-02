@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.stability.Unstable;
 
 /**

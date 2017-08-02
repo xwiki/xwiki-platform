@@ -17,23 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters;
+package org.xwiki.notifications.preferences;
+
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
- * Possible properties that can be bound to a notification in order to characterize it.
+ * A notification preference can (most of the time) be targeted to a certain user or group. A preference using
+ * this comportment can implement the following interface.
  *
  * @version $Id$
  * @since 9.7RC1
  */
-public enum NotificationProperty
+@Unstable
+public interface TargetableNotificationPreference extends NotificationPreference
 {
     /**
-     * The ID of the application linked to the notification.
+     * @return the user or the group that should be targeted by the given preference
      */
-    APPLICATION_ID,
-
-    /**
-     * The type of the event linked to the notification.
-     */
-    EVENT_TYPE
+    DocumentReference getTarget();
 }

@@ -33,6 +33,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.text.StringUtils;
 
@@ -96,8 +97,9 @@ public class DefaultModelBridge implements ModelBridge
                     if (obj != null) {
                         String objFormat = obj.getStringValue(FORMAT_FIELD);
                         Date objStartDate = obj.getDateValue(START_DATE_FIELD);
-                        preferences.add(new NotificationPreference(
+                        preferences.add(new TargetableNotificationEventTypePreference(
                                 obj.getStringValue(EVENT_TYPE_FIELD),
+                                userReference,
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0,
                                 StringUtils.isNotBlank(objFormat)
                                         ? NotificationFormat.valueOf(objFormat.toUpperCase())
@@ -160,7 +162,9 @@ public class DefaultModelBridge implements ModelBridge
         if (objects != null) {
             for (BaseObject object : objects) {
                 if (object != null
-                        && notificationPreference.getEventType().equals(object.getStringValue(EVENT_TYPE_FIELD))) {
+                        && notificationPreference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
+                        && notificationPreference.getProperties().get(NotificationProperty.EVENT_TYPE)
+                            .equals(object.getStringValue(EVENT_TYPE_FIELD))) {
                     String format = object.getStringValue(FORMAT_FIELD);
 
                     // Ensure that we have the correct notification format
@@ -188,6 +192,11 @@ public class DefaultModelBridge implements ModelBridge
 
             for (NotificationPreference notificationPreference : notificationPreferences) {
 
+                // Ensure that the notification preference has an event type to save
+                if (!notificationPreference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
+                    continue;
+                }
+
                 // Try to find the corresponding XObject for the notification preference
                 BaseObject preferenceObject = this.findNotificationPreference(document, notificationPreference);
 
@@ -198,7 +207,8 @@ public class DefaultModelBridge implements ModelBridge
                     document.addXObject(preferenceObject);
                 }
 
-                preferenceObject.set(EVENT_TYPE_FIELD, notificationPreference.getEventType(), context);
+                preferenceObject.set(EVENT_TYPE_FIELD,
+                        notificationPreference.getProperties().get(NotificationProperty.EVENT_TYPE), context);
                 preferenceObject.set(FORMAT_FIELD, notificationPreference.getFormat().name().toLowerCase(),
                         context);
                 preferenceObject.set(NOTIFICATION_ENABLED_FIELD,

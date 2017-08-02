@@ -22,52 +22,61 @@ package org.xwiki.notifications.preferences;
 import java.util.Date;
 import java.util.Map;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.stability.Unstable;
 
 /**
- * Represent a preference set by a user concerning a given type of event.
- * A {@link NotificationPreference} should be self-sufficient, therefore, it should contain every information needed
- * about what it does.
- * A preference is defined for a category of event, since a specific date and in a given format.
+ * Allows to build new {@link TargetableNotificationPreference}.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 9.7RC1
  */
+@Role
 @Unstable
-public interface NotificationPreference
+public interface TargetableNotificationPreferenceBuilder
 {
     /**
-     * @return either or not the notification is enabled for the event type or the application
+     * @return a freshly instanciated {@link TargetableNotificationPreference}
      */
-    boolean isNotificationEnabled();
+    TargetableNotificationPreference build();
 
     /**
-     * @return format of the notification
-     *
-     * @since 9.5RC1
+     * Prepare the builder for a new instance.
      */
-    NotificationFormat getFormat();
+    void prepare();
 
     /**
-     * @return the date from which notifications that match this preference should be retrieved
+     * Define if the notification preference is enabled or not.
      *
-     * @since 9.7RC1
+     * @param isEnabled true if the preference should be enabled
      */
-    Date getStartDate();
+    void setEnabled(boolean isEnabled);
 
     /**
-     * @return the properties of the given notification preference
-     *
-     * @since 9.7RC1
+     * @param format the format of the preference
      */
-    Map<NotificationProperty, Object> getProperties();
+    void setFormat(NotificationFormat format);
 
     /**
-     * @return the hint of the provider that the preference comes from. If no provider is defined, returns null.
-     *
-     * @since 9.7RC1
+     * @param properties a map of the preference properties
      */
-    String getProviderHint();
+    void setProperties(Map<NotificationProperty, Object> properties);
+
+    /**
+     * @param providerHint the hint of the provider of the preference
+     */
+    void setProviderHint(String providerHint);
+
+    /**
+     * @param startDate the start date of the preference
+     */
+    void setStartDate(Date startDate);
+
+    /**
+     * @param target the target of the preference
+     */
+    void setTarget(DocumentReference target);
 }

@@ -20,6 +20,8 @@
 package org.xwiki.notifications.script.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +32,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
+import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,6 +53,9 @@ public class NotificationPreferencesSaver
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
 
+    @Inject
+    private TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder;
+
     /**
      * Save preferences given as JSON.
      * @param json a list of preferences as JSON
@@ -65,10 +72,20 @@ public class NotificationPreferencesSaver
                 String eventType = (String) item.get("eventType");
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
-                toSave.add(new NotificationPreference(eventType, enabled, format));
+
+                targetableNotificationPreferenceBuilder.prepare();
+                targetableNotificationPreferenceBuilder.setEnabled(enabled);
+                targetableNotificationPreferenceBuilder.setFormat(format);
+                targetableNotificationPreferenceBuilder.setProviderHint("userProfile");
+                targetableNotificationPreferenceBuilder.setProperties(
+                        Collections.singletonMap(NotificationProperty.EVENT_TYPE, eventType));
+                targetableNotificationPreferenceBuilder.setTarget(userReference);
+                targetableNotificationPreferenceBuilder.setStartDate(new Date());
+
+                toSave.add(targetableNotificationPreferenceBuilder.build());
             }
 
-            notificationPreferenceManager.saveNotificationsPreferences(userReference, toSave);
+            notificationPreferenceManager.saveNotificationsPreferences(toSave);
 
         } catch (Exception e) {
             throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);

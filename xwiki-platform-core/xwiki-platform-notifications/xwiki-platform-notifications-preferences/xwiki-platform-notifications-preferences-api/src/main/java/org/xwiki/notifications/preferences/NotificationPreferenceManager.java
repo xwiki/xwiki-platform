@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification preferences.
@@ -33,6 +34,7 @@ import org.xwiki.notifications.NotificationException;
  * @since 9.7RC1
  */
 @Role
+@Unstable
 public interface NotificationPreferenceManager
 {
     /**
@@ -54,15 +56,14 @@ public interface NotificationPreferenceManager
     void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
 
     /**
-     * Save the given {@link NotificationPreference} for the given user. If such notification already exists, it will
+     * Save the given {@link NotificationPreference}. If such notification already exists, it will
      * be updated.
      *
-     * @param userReference the user we want to work on
      * @param notificationPreferences the list of notification preference to save
      * @throws NotificationException if error happens
      *
      * @since 9.7RC1
      */
-    void saveNotificationsPreferences(DocumentReference userReference,
-            List<NotificationPreference> notificationPreferences) throws NotificationException;
+    void saveNotificationsPreferences(List<NotificationPreference> notificationPreferences)
+            throws NotificationException;
 }

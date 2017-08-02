@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters;
+package org.xwiki.notifications.preferences;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -27,21 +27,37 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.stability.Unstable;
 
 /**
- * Provide an interface for interacting with user notification filters.
+ * Provides notifications preferences from multiple sources.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Role
 @Unstable
-public interface NotificationFilterManager
+public interface NotificationPreferenceProvider
 {
     /**
-     * Get all notifications filters, from all wikis if the user is global.
+     * Get the priority that the preferences given by this provider should have.
+     * This is useful when different notification preferences are in conflict.
      *
-     * @param user the user interested in notifications
-     * @return a collection of notification filters
-     * @throws NotificationException if error happens
+     * @return the priority of the provider
      */
-    Collection<NotificationFilter> getAllNotificationFilters(DocumentReference user) throws NotificationException;
+    int getProviderPriority();
+
+    /**
+     * Get every registered {@link NotificationPreference} for the given user.
+     *
+     * @param user the user for which to retrieve the notification preferences
+     * @return a list of notification preferences
+     * @throws NotificationException if an error happened
+     */
+    List<NotificationPreference> getPreferencesForUser(DocumentReference user) throws NotificationException;
+
+    /**
+     * Save a given list of preferences.
+     *
+     * @param preferences the {@link NotificationPreference} to save
+     * @throws NotificationException if an error occurred
+     */
+    void savePreferences(List<NotificationPreference> preferences) throws NotificationException;
 }

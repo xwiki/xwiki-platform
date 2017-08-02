@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationProperty;
+import org.xwiki.notifications.NotificationProperty;
 
 /**
  * Notification filter that handle the generic {@link NotificationPreferenceFilterScope}.

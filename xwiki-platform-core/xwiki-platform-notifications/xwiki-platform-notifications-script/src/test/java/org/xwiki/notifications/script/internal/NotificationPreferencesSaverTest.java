@@ -58,6 +58,7 @@ public class NotificationPreferencesSaverTest
         mocker.getComponentUnderTest().saveNotificationPreferences(
                 IOUtils.toString(getClass().getResourceAsStream("/preferences.json")), userRef);
 
-        verify(notificationPreferenceManager, times(1)).saveNotificationsPreferences(eq(userRef), any(List.class));
+        verify(notificationPreferenceManager, times(1)).saveNotificationsPreferences(
+                any(List.class));
     }
 }

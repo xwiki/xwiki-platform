@@ -19,12 +19,9 @@
  */
 package org.xwiki.administration.test.po;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.Select;
 
 /**
  * Represents the actions possible on the WYSIWYG Editor administration section.
@@ -34,20 +31,11 @@ import org.openqa.selenium.support.FindBy;
  */
 public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectionPage
 {
-    @FindBy(xpath = "//input[@type = 'submit' and @name = 'action_saveandcontinue']")
-    private WebElement saveButton;
-
     /**
-     * The text input used to enable a WYSIWYG editor plugin.
+     * The drop down used to select the default WYSIWYG editor.
      */
-    @FindBy(xpath = "//div[@class = 'hSortableWrapper'][1]//input[@type = 'text']")
-    private WebElement pluginInput;
-
-    /**
-     * The button used to enable a WYSIWYG editor plugin.
-     */
-    @FindBy(xpath = "//div[@class = 'hSortableWrapper'][1]//input[@type = 'image']")
-    private WebElement enablePluginButton;
+    @FindBy(name = "XWiki.EditorBindingClass_0_roleHint")
+    private WebElement defaultWYSIWYGEditorSelect;
 
     public WYSIWYGEditorAdministrationSectionPage()
     {
@@ -55,38 +43,24 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
     }
 
     /**
-     * @return the list of WYSIWYG editor plugins that are enabled
+     * Use this method to set or get the default WYSIWYG editor.
+     * 
+     * @return the drop down element used to select the default WYSIWYG editor
      */
-    public List<String> getEnabledPlugins()
+    public Select getDefaultWYSIWYGEditorSelect()
     {
-        List<String> plugins = new ArrayList<String>();
-        for (WebElement value : getDriver().findElements(
-            By.xpath("//div[@class = 'hSortableWrapper'][1]//span[@class = 'value']"))) {
-            plugins.add(value.getText());
-        }
-        return plugins;
+        return new Select(this.defaultWYSIWYGEditorSelect);
     }
 
     /**
-     * Enable the specified WYSIWYG editor plugin.
-     *
-     * @param name the name of the WYSIWYG editor plugin to enable
+     * The configuration properties for each WYSIWYG editor are displayed on separate tabs. Use this method to select
+     * the tab that corresponds to the WYSIWYG editor you want to configure.
+     * 
+     * @param editorId the id of a WYSIWYG editor
+     * @return the tab header that corresponds to the specified WYSIWYG editor
      */
-    public void enablePlugin(String name)
+    public WebElement getConfigurationTab(String editorId)
     {
-        pluginInput.clear();
-        pluginInput.sendKeys(name);
-        enablePluginButton.click();
-    }
-
-    /**
-     * Overwrite because the WYSIWYG Editor administration section uses a different Save button.
-     */
-    @Override
-    public void clickSave()
-    {
-        this.saveButton.click();
-        // The configuration is saved without reloading the page. Wait until the page is really saved.
-        waitForNotificationSuccessMessage("Saved");
+        return getDriver().findElementByCssSelector("a[role='tab'][data-editorid='" + editorId + "']");
     }
 }

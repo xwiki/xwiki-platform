@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -62,12 +61,20 @@ public interface NotificationPreference
      *
      * @since 9.7RC1
      */
-    Map<NotificationProperty, Object> getProperties();
+    Map<NotificationPreferenceProperty, Object> getProperties();
 
     /**
+     * The provider linked to a {@link NotificationPreference} is helpful as it permits the
+     * {@link NotificationPreferenceManager} to know where to save a given preference.
+     *
      * @return the hint of the provider that the preference comes from. If no provider is defined, returns null.
      *
      * @since 9.7RC1
      */
     String getProviderHint();
+
+    /**
+     * @return the category of the {@link NotificationPreference}
+     */
+    NotificationPreferenceCategory getCategory();
 }

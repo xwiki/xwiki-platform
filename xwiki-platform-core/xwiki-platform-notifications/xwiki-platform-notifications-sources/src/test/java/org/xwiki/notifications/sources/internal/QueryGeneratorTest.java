@@ -33,7 +33,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -92,7 +92,7 @@ public class QueryGeneratorTest
         pref1StartDate = new Date(100);
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
-        when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationProperty.EVENT_TYPE, "create"));
+        when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.getFormat()).thenReturn(NotificationFormat.ALERT);
         when(pref1.getStartDate()).thenReturn(pref1StartDate);
         when(pref1.isNotificationEnabled()).thenReturn(true);

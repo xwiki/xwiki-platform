@@ -20,9 +20,10 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -34,7 +35,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.text.StringUtils;
@@ -55,6 +57,10 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultModelBridge implements ModelBridge
 {
     private static final String EVENT_TYPE_FIELD = "eventType";
+
+    private static final String APPLICATION_ID_FIELD = "applicationId";
+
+    private static final String IS_WATCHLIST_FIELD = "isWatchlist";
 
     private static final String START_DATE_FIELD = "startDate";
 
@@ -102,11 +108,13 @@ public class DefaultModelBridge implements ModelBridge
                     if (obj != null) {
                         String objFormat = obj.getStringValue(FORMAT_FIELD);
                         Date objStartDate = obj.getDateValue(START_DATE_FIELD);
+                        int objIsWatchlist = obj.getIntValue(IS_WATCHLIST_FIELD, 0);
+
+                        Map<NotificationPreferenceProperty, Object> properties =
+                                extractNotificationPreferenceProperties(obj);
 
                         notificationPreferenceBuilder.prepare();
-                        notificationPreferenceBuilder.setProperties(
-                                Collections.singletonMap(NotificationProperty.EVENT_TYPE,
-                                        obj.getStringValue(EVENT_TYPE_FIELD)));
+                        notificationPreferenceBuilder.setProperties(properties);
                         notificationPreferenceBuilder.setStartDate(
                                 (objStartDate != null) ? objStartDate : doc.getCreationDate());
                         notificationPreferenceBuilder.setFormat(StringUtils.isNotBlank(objFormat)
@@ -115,6 +123,9 @@ public class DefaultModelBridge implements ModelBridge
                         notificationPreferenceBuilder.setTarget(userReference);
                         notificationPreferenceBuilder.setEnabled(
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0);
+                        notificationPreferenceBuilder.setCategory((objIsWatchlist == 0)
+                                ? NotificationPreferenceCategory.DEFAULT
+                                : NotificationPreferenceCategory.WATCHLIST);
 
                         preferences.add(notificationPreferenceBuilder.build());
                     }
@@ -127,6 +138,23 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    private Map<NotificationPreferenceProperty, Object> extractNotificationPreferenceProperties(BaseObject object)
+    {
+        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+
+        String eventType = object.getStringValue(EVENT_TYPE_FIELD);
+        if (StringUtils.isNotBlank(eventType)) {
+            properties.put(NotificationPreferenceProperty.EVENT_TYPE, eventType);
+        }
+
+        String applicationId = object.getStringValue(APPLICATION_ID_FIELD);
+        if (StringUtils.isNotBlank(applicationId)) {
+            properties.put(NotificationPreferenceProperty.APPLICATION_ID, applicationId);
+        }
+
+        return properties;
     }
 
     @Override
@@ -173,8 +201,8 @@ public class DefaultModelBridge implements ModelBridge
         if (objects != null) {
             for (BaseObject object : objects) {
                 if (object != null
-                        && notificationPreference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
-                        && notificationPreference.getProperties().get(NotificationProperty.EVENT_TYPE)
+                        && notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
+                        && notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)
                             .equals(object.getStringValue(EVENT_TYPE_FIELD))) {
                     String format = object.getStringValue(FORMAT_FIELD);
 
@@ -204,7 +232,7 @@ public class DefaultModelBridge implements ModelBridge
             for (NotificationPreference notificationPreference : notificationPreferences) {
 
                 // Ensure that the notification preference has an event type to save
-                if (!notificationPreference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
+                if (!notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                     continue;
                 }
 
@@ -219,7 +247,7 @@ public class DefaultModelBridge implements ModelBridge
                 }
 
                 preferenceObject.set(EVENT_TYPE_FIELD,
-                        notificationPreference.getProperties().get(NotificationProperty.EVENT_TYPE), context);
+                        notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE), context);
                 preferenceObject.set(FORMAT_FIELD, notificationPreference.getFormat().name().toLowerCase(),
                         context);
                 preferenceObject.set(NOTIFICATION_ENABLED_FIELD,

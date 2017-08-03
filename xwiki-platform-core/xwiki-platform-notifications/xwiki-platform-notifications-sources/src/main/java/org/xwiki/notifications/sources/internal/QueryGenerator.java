@@ -39,7 +39,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.query.Query;
@@ -273,12 +273,12 @@ public class QueryGenerator
     {
         int number = 0;
         for (NotificationPreference preference : preferences) {
-            if (preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
+            if (preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)) {
                 query.bindValue(String.format("application_%d", number),
-                        preference.getProperties().get(NotificationProperty.APPLICATION_ID));
-            } else if (preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
+                        preference.getProperties().get(NotificationPreferenceProperty.APPLICATION_ID));
+            } else if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                 query.bindValue(String.format("type_%d", number),
-                        preference.getProperties().get(NotificationProperty.EVENT_TYPE));
+                        preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE));
             }
             query.bindValue(String.format("date_%d", number), preference.getStartDate());
             number++;
@@ -306,8 +306,8 @@ public class QueryGenerator
         while (it.hasNext()) {
             NotificationPreference preference = it.next();
 
-            if (!preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
-                && !preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
+            if (!preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
+                && !preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)) {
                 it.remove();
             }
         }
@@ -324,10 +324,10 @@ public class QueryGenerator
                         notificationFilterManager.getNotificationFilters(user, preference);
 
                 // TODO: Move filters.size() somewhere else
-                if (preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)
+                if (preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)
                         && filters.size() > 0) {
                     hql.append(String.format("((event.application = :application_%s", number));
-                } else if (preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
+                } else if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                     hql.append(String.format("((event.type = :type_%s", number));
                 } else {
                     // If the current preference is not handled, we can skip it

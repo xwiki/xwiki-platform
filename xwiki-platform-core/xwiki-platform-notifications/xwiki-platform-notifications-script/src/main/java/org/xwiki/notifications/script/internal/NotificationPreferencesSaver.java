@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
@@ -78,7 +78,7 @@ public class NotificationPreferencesSaver
                 targetableNotificationPreferenceBuilder.setFormat(format);
                 targetableNotificationPreferenceBuilder.setProviderHint("userProfile");
                 targetableNotificationPreferenceBuilder.setProperties(
-                        Collections.singletonMap(NotificationProperty.EVENT_TYPE, eventType));
+                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
                 targetableNotificationPreferenceBuilder.setTarget(userReference);
                 targetableNotificationPreferenceBuilder.setStartDate(new Date());
 

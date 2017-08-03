@@ -35,7 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
@@ -122,8 +122,8 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
             for (NotificationPreference notificationPreference
                     : notificationPreferenceManager.getNotificationsPreferences(user)) {
                 if (notificationPreference.getFormat().equals(NotificationFormat.EMAIL)
-                        && notificationPreference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
-                        && notificationPreference.getProperties().get(NotificationProperty.EVENT_TYPE)
+                        && notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
+                        && notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)
                             .equals(compositeEvent.getType())) {
                     return notificationPreference.isNotificationEnabled();
                 }

@@ -36,7 +36,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.notifications.filters.internal.NotificationPreferenceFilterScope;
 import org.xwiki.notifications.filters.internal.NotificationPreferenceScopeFilterType;
@@ -150,7 +150,7 @@ public class ScopeNotificationEventTypeFilterTest
                         + "event.wiki = :wiki_scopeNotifEventTypeFilter_INCLUSIVE_1)",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
-                    NotificationFormat.ALERT, Collections.singletonMap(NotificationProperty.EVENT_TYPE, "event1")
+                    NotificationFormat.ALERT, Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event1")
         ));
 
         assertEquals(
@@ -159,7 +159,7 @@ public class ScopeNotificationEventTypeFilterTest
                                 "AND event.space LIKE :space_scopeNotifEventTypeFilter_INCLUSIVE_2 ESCAPE '!')",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
-                    NotificationFormat.ALERT, Collections.singletonMap(NotificationProperty.EVENT_TYPE, "event2")
+                    NotificationFormat.ALERT, Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event2")
         ));
 
         assertEquals(
@@ -168,7 +168,7 @@ public class ScopeNotificationEventTypeFilterTest
                         + "AND event.page = :page_scopeNotifEventTypeFilter_INCLUSIVE_3)",
                 mocker.getComponentUnderTest().queryFilterOR(
                     new DocumentReference("xwiki", "XWiki", "User"),
-                    NotificationFormat.ALERT, Collections.singletonMap(NotificationProperty.EVENT_TYPE, "event3")
+                    NotificationFormat.ALERT, Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event3")
         ));
     }
 
@@ -223,7 +223,7 @@ public class ScopeNotificationEventTypeFilterTest
                 mocker.getComponentUnderTest().queryFilterAND(
                         new DocumentReference("xwiki", "XWiki", "User"),
                         NotificationFormat.ALERT,
-                        Collections.singletonMap(NotificationProperty.EVENT_TYPE, "type1")
+                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "type1")
                 )
         );
 
@@ -234,7 +234,7 @@ public class ScopeNotificationEventTypeFilterTest
                 mocker.getComponentUnderTest().queryFilterAND(
                         new DocumentReference("xwiki", "XWiki", "User"),
                         NotificationFormat.ALERT,
-                        Collections.singletonMap(NotificationProperty.EVENT_TYPE, "exclusiveEvent1")
+                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "exclusiveEvent1")
                 )
         );
 
@@ -245,7 +245,7 @@ public class ScopeNotificationEventTypeFilterTest
                 mocker.getComponentUnderTest().queryFilterAND(
                         new DocumentReference("xwiki", "XWiki", "User"),
                         NotificationFormat.ALERT,
-                        Collections.singletonMap(NotificationProperty.EVENT_TYPE, "exclusiveEvent1")
+                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "exclusiveEvent1")
                 )
         );
     }
@@ -262,10 +262,10 @@ public class ScopeNotificationEventTypeFilterTest
         when(serializer.serialize(SCOPE_EXCLUSIVE_REFERENCE_2)).thenReturn("space2.page2");
 
         // Prepare the notifications properties
-        List<Map<NotificationProperty, Object>> propertiesList = new ArrayList<>();
+        List<Map<NotificationPreferenceProperty, Object>> propertiesList = new ArrayList<>();
         for (String element : Arrays.asList("event1", "event2", "event3",
                 "exclusiveEvent1", "exclusiveEvent2")) {
-            propertiesList.add(Collections.singletonMap(NotificationProperty.EVENT_TYPE, element));
+            propertiesList.add(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, element));
         }
 
         // Test

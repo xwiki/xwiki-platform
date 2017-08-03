@@ -1,1 +1,2 @@
 org.xwiki.notifications.preferences.internal.DefaultModelBridge
+org.xwiki.notifications.preferences.internal.NotificationPreferenceClassDocumentInitializer

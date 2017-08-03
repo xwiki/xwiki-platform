@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
@@ -72,7 +72,7 @@ public interface NotificationFilter
      * @return the HQL code to inject
      */
     String queryFilterOR(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, Object> properties);
+            Map<NotificationPreferenceProperty, Object> properties);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "AND" statement (can
@@ -84,7 +84,7 @@ public interface NotificationFilter
      * @return the HQL code to inject
      */
     String queryFilterAND(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, Object> properties);
+            Map<NotificationPreferenceProperty, Object> properties);
 
     /**
      * Parameters to add to the query using bindValue().
@@ -95,5 +95,5 @@ public interface NotificationFilter
      * @return the values to bind to the query, mapped by value's name
      */
     Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationProperty, Object>> propertiesList);
+            List<Map<NotificationPreferenceProperty, Object>> propertiesList);
 }

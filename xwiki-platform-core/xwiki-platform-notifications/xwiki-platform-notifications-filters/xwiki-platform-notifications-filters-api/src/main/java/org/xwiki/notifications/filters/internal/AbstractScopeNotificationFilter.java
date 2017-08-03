@@ -32,7 +32,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.NotificationFormat;
 
@@ -88,12 +88,12 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
      * @return a map of the query parameters to use
      */
     protected abstract Map<String, Object> generateQueryRestrictionParams(String suffix,
-            Map<NotificationProperty, Object> parameters);
+            Map<NotificationPreferenceProperty, Object> parameters);
 
     /**
      * Given a {@link NotificationPreferenceFilterScope} and the current filtering context (defined by a
-     * {@link NotificationFormat} and a map of {@link NotificationProperty}, determine if a the current filter should
-     * apply with the given scope.
+     * {@link NotificationFormat} and a map of {@link NotificationPreferenceProperty},
+     * determine if a the current filter should apply with the given scope.
      *
      * @param scope the reference scope
      * @param format the format of the notification to filter
@@ -101,7 +101,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
      * @return true if the filter should be applied to the given scope.
      */
     protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
-            NotificationFormat format, Map<NotificationProperty, Object> properties);
+            NotificationFormat format, Map<NotificationPreferenceProperty, Object> properties);
 
     /**
      * Based on the same principle as {@link AbstractScopeNotificationFilter#scopeMatchesFilteringContext(
@@ -113,7 +113,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
      * @return true if this scope can be applied to at least one of the given properties
      */
     protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
-            NotificationFormat format, List<Map<NotificationProperty, Object>> propertiesList);
+            NotificationFormat format, List<Map<NotificationPreferenceProperty, Object>> propertiesList);
 
     /**
      * Given a {@link NotificationPreferenceFilterScope} and the current filtering context (defined by a
@@ -137,7 +137,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
 
     @Override
     public String queryFilterOR(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, Object> properties)
+            Map<NotificationPreferenceProperty, Object> properties)
     {
         return this.generateQueryString(user, format, properties,
                 NotificationPreferenceScopeFilterType.INCLUSIVE);
@@ -145,7 +145,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
 
     @Override
     public String queryFilterAND(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, Object> properties)
+            Map<NotificationPreferenceProperty, Object> properties)
     {
         return this.generateQueryString(user, format, properties,
                 NotificationPreferenceScopeFilterType.EXCLUSIVE);
@@ -153,7 +153,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
 
     @Override
     public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationProperty, Object>> propertiesList)
+            List<Map<NotificationPreferenceProperty, Object>> propertiesList)
     {
         Map<String, Object> params =
                 this.generateQueryFilterParams(user, format, propertiesList,
@@ -225,7 +225,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
      * @since 9.7RC1
      */
     private String generateQueryString(DocumentReference user, NotificationFormat format,
-            Map<NotificationProperty, Object> properties, NotificationPreferenceScopeFilterType filterType)
+            Map<NotificationPreferenceProperty, Object> properties, NotificationPreferenceScopeFilterType filterType)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -290,7 +290,8 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
      * @since 9.7RC1
      */
     private Map<String, Object> generateQueryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationProperty, Object>> properties, NotificationPreferenceScopeFilterType filterType)
+            List<Map<NotificationPreferenceProperty, Object>> properties,
+            NotificationPreferenceScopeFilterType filterType)
     {
         Map<String, Object> params = new HashMap<>();
 

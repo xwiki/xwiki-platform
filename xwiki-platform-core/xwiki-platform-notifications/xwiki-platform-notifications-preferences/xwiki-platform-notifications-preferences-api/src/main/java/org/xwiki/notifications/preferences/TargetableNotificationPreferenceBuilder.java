@@ -25,7 +25,6 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -63,7 +62,7 @@ public interface TargetableNotificationPreferenceBuilder
     /**
      * @param properties a map of the preference properties
      */
-    void setProperties(Map<NotificationProperty, Object> properties);
+    void setProperties(Map<NotificationPreferenceProperty, Object> properties);
 
     /**
      * @param providerHint the hint of the provider of the preference
@@ -79,4 +78,9 @@ public interface TargetableNotificationPreferenceBuilder
      * @param target the target of the preference
      */
     void setTarget(DocumentReference target);
+
+    /**
+     * @param category the category of the preference
+     */
+    void setCategory(NotificationPreferenceCategory category);
 }

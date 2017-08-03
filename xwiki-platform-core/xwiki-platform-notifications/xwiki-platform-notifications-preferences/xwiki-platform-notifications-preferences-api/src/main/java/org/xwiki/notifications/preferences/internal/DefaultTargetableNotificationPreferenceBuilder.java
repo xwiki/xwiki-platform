@@ -27,7 +27,8 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.TargetableNotificationPreference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 
@@ -65,6 +66,7 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     public void prepare()
     {
         preference = new TargetablePreference();
+        preference.category = NotificationPreferenceCategory.DEFAULT;
     }
 
     @Override
@@ -80,7 +82,7 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     }
 
     @Override
-    public void setProperties(Map<NotificationProperty, Object> properties)
+    public void setProperties(Map<NotificationPreferenceProperty, Object> properties)
     {
         preference.properties = properties;
     }
@@ -101,5 +103,11 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     public void setTarget(DocumentReference target)
     {
         preference.target = target;
+    }
+
+    @Override
+    public void setCategory(NotificationPreferenceCategory category)
+    {
+        preference.category = category;
     }
 }

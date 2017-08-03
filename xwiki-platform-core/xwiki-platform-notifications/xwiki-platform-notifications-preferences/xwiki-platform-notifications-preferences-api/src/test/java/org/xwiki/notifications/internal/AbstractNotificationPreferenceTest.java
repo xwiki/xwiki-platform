@@ -25,7 +25,8 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.internal.AbstractNotificationPreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
@@ -43,9 +44,10 @@ public class AbstractNotificationPreferenceTest
     private class NotificationPreferenceImplementation extends AbstractNotificationPreference
     {
         public NotificationPreferenceImplementation(boolean isNotificationEnabled, NotificationFormat format,
-                Date startDate, String providerHint, Map<NotificationProperty, Object> properties)
+                NotificationPreferenceCategory category, Date startDate, String providerHint,
+                Map<NotificationPreferenceProperty, Object> properties)
         {
-            super(isNotificationEnabled, format, startDate, providerHint, properties);
+            super(isNotificationEnabled, format, category, startDate, providerHint, properties);
         }
     }
 
@@ -55,10 +57,11 @@ public class AbstractNotificationPreferenceTest
         Date testDate = new Date();
 
         NotificationPreference testPreference = new NotificationPreferenceImplementation(
-                true, NotificationFormat.ALERT, testDate, "userProfile",
-                Collections.singletonMap(NotificationProperty.EVENT_TYPE, "eventType"));
+                true, NotificationFormat.ALERT, NotificationPreferenceCategory.WATCHLIST,
+                testDate, "userProfile",
+                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "eventType"));
 
-        assertEquals("eventType", testPreference.getProperties().get(NotificationProperty.EVENT_TYPE));
+        assertEquals("eventType", testPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE));
 
         assertEquals(NotificationFormat.ALERT, testPreference.getFormat());
 
@@ -67,5 +70,7 @@ public class AbstractNotificationPreferenceTest
         assertEquals(testDate, testPreference.getStartDate());
 
         assertEquals("userProfile", testPreference.getProviderHint());
+
+        assertEquals(NotificationPreferenceCategory.WATCHLIST, testPreference.getCategory());
     }
 }

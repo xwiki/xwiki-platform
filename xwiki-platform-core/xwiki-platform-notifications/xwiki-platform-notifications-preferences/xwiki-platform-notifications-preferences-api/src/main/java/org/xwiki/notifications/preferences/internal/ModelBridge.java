@@ -37,7 +37,9 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 public interface ModelBridge
 {
     /**
-     * Return the notifications preferences of the given user.
+     * Return the notifications preferences that are stored as XObjects in the user profile.
+     * Return either {@link TargetableNotificationEventTypePreference}
+     * or {@link TargetableNotificationWatcherPreference}.
      *
      * @param userReference the document reference of a user
      * @return the list of preferences

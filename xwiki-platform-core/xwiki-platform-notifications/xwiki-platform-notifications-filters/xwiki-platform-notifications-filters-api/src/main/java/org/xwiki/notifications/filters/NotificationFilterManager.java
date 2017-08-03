@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -44,4 +45,17 @@ public interface NotificationFilterManager
      * @throws NotificationException if error happens
      */
     Collection<NotificationFilter> getAllNotificationFilters(DocumentReference user) throws NotificationException;
+
+    /**
+     * Get all the notification filters for the given user that matches the given notification preference.
+     *
+     * @param user the user to get filters from
+     * @param preference the preference that filters should match
+     * @return a collection of notification filters
+     * @throws NotificationException if error happens
+     */
+    Collection<NotificationFilter> getNotificationFilters(DocumentReference user, NotificationPreference preference)
+            throws NotificationException;
+
+
 }

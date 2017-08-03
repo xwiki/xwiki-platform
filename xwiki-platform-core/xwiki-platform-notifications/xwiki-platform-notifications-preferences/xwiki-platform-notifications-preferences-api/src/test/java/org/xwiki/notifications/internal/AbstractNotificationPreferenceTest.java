@@ -19,34 +19,44 @@
  */
 package org.xwiki.notifications.internal;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.internal.AbstractNotificationPreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
-import org.xwiki.notifications.preferences.internal.TargetableNotificationEventTypePreference;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit tests for {@link TargetableNotificationEventTypePreference}.
+ * Unit tests for {@link AbstractNotificationPreference}.
  *
  * @since 9.6RC1
  * @version $Id$
  */
-public class TargetableNotificationEventTypePreferenceTest
+public class AbstractNotificationPreferenceTest
 {
+    private class NotificationPreferenceImplementation extends AbstractNotificationPreference
+    {
+        public NotificationPreferenceImplementation(boolean isNotificationEnabled, NotificationFormat format,
+                Date startDate, String providerHint, Map<NotificationProperty, Object> properties)
+        {
+            super(isNotificationEnabled, format, startDate, providerHint, properties);
+        }
+    }
+
     @Test
     public void testPublicGetters() throws Exception
     {
         Date testDate = new Date();
-        DocumentReference target = new DocumentReference("xwiki", "space", "user");
 
-        NotificationPreference testPreference = new TargetableNotificationEventTypePreference(
-                "eventType", target, true, NotificationFormat.ALERT, testDate);
+        NotificationPreference testPreference = new NotificationPreferenceImplementation(
+                true, NotificationFormat.ALERT, testDate, "userProfile",
+                Collections.singletonMap(NotificationProperty.EVENT_TYPE, "eventType"));
 
         assertEquals("eventType", testPreference.getProperties().get(NotificationProperty.EVENT_TYPE));
 
@@ -56,6 +66,6 @@ public class TargetableNotificationEventTypePreferenceTest
 
         assertEquals(testDate, testPreference.getStartDate());
 
-        assertEquals(target, ((TargetableNotificationEventTypePreference) testPreference).getTarget());
+        assertEquals("userProfile", testPreference.getProviderHint());
     }
 }

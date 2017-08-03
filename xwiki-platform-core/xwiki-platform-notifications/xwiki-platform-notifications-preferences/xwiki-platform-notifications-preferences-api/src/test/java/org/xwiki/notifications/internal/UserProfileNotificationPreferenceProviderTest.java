@@ -26,8 +26,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.preferences.TargetableNotificationPreference;
 import org.xwiki.notifications.preferences.internal.ModelBridge;
-import org.xwiki.notifications.preferences.internal.TargetableNotificationEventTypePreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -76,9 +76,9 @@ public class UserProfileNotificationPreferenceProviderTest
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "user");
 
-        TargetableNotificationEventTypePreference pref1 = mock(TargetableNotificationEventTypePreference.class);
+        TargetableNotificationPreference pref1 = mock(TargetableNotificationPreference.class);
         when(pref1.getTarget()).thenReturn(userReference);
-        TargetableNotificationEventTypePreference pref2 = mock(TargetableNotificationEventTypePreference.class);
+        TargetableNotificationPreference pref2 = mock(TargetableNotificationPreference.class);
         when(pref2.getTarget()).thenReturn(userReference);
 
         mocker.getComponentUnderTest().savePreferences(Arrays.asList(pref1, pref2));

@@ -19,8 +19,10 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -152,13 +154,13 @@ public class QueryGenerator
         return query;
     }
 
-    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationPreference preference)
-            throws NotificationException
+    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationPreference preference,
+            Collection<NotificationFilter> filters) throws NotificationException
     {
         StringBuilder query = new StringBuilder();
         String separator = "";
 
-        for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
+        for (NotificationFilter filter : filters) {
             String filterQuery = filter.queryFilterOR(user, preference.getFormat(), preference.getProperties());
 
             if (StringUtils.isNotBlank(filterQuery)) {
@@ -173,10 +175,10 @@ public class QueryGenerator
         }
     }
 
-    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationPreference preference)
-            throws NotificationException
+    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationPreference preference,
+            Collection<NotificationFilter> filters) throws NotificationException
     {
-        for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
+        for (NotificationFilter filter : filters) {
             String filterQuery = filter.queryFilterAND(user, preference.getFormat(), preference.getProperties());
 
             if (StringUtils.isNotBlank(filterQuery)) {
@@ -189,17 +191,17 @@ public class QueryGenerator
     private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format,
             List<NotificationPreference> preferences) throws NotificationException
     {
-        for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
+        Map<String, Object> queryParameters = new HashMap<>();
 
-            List<Map<NotificationProperty, Object>> propertiesList = new ArrayList<>();
-            for (NotificationPreference preference : preferences) {
-                propertiesList.add(preference.getProperties());
+        for (NotificationPreference preference : preferences) {
+            for (NotificationFilter filter : notificationFilterManager.getNotificationFilters(user, preference)) {
+                queryParameters.putAll(filter.queryFilterParams(user, format,
+                        Arrays.asList(preference.getProperties())));
             }
+        }
 
-            Map<String, Object> params = filter.queryFilterParams(user, format, propertiesList);
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                query.bindValue(entry.getKey(), entry.getValue());
-            }
+        for (Map.Entry<String, Object> entry : queryParameters.entrySet()) {
+            query.bindValue(entry.getKey(), entry.getValue());
         }
     }
 
@@ -317,17 +319,26 @@ public class QueryGenerator
             for (NotificationPreference preference : preferences) {
                 hql.append(separator);
 
-                if (preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
+                // Get the notification filters related to the current preference
+                Collection<NotificationFilter> filters =
+                        notificationFilterManager.getNotificationFilters(user, preference);
+
+                // TODO: Move filters.size() somewhere else
+                if (preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)
+                        && filters.size() > 0) {
                     hql.append(String.format("((event.application = :application_%s", number));
                 } else if (preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)) {
                     hql.append(String.format("((event.type = :type_%s", number));
+                } else {
+                    // If the current preference is not handled, we can skip it
+                    continue;
                 }
 
                 hql.append(String.format(" AND event.date >= :date_%d)", number));
 
                 number++;
-                handleFiltersOR(user, hql, preference);
-                handleFiltersAND(user, hql, preference);
+                handleFiltersOR(user, hql, preference, filters);
+                handleFiltersAND(user, hql, preference, filters);
                 hql.append(RIGHT_PARENTHESIS);
                 separator = OR;
             }

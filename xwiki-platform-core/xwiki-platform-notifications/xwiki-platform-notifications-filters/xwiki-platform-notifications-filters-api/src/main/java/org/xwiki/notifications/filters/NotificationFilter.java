@@ -27,6 +27,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -48,6 +49,18 @@ public interface NotificationFilter
      * @return true if the event should be dismiss
      */
     boolean filterEvent(Event event, DocumentReference user, NotificationFormat format);
+
+    /**
+     * Determine if the current filter can be applied to the given preference.
+     * In order to do so, the {@link NotificationFilter} can rely on the different parameters of the
+     * {@link NotificationPreference}
+     *
+     * @param preference the preference to use
+     * @return true if the filter is compatible with the preference
+     *
+     * @since 9.7RC1
+     */
+    boolean matchesPreference(NotificationPreference preference);
 
     /**
      * HQL code to inject in the query to fetch notifications from the event stream, inside an "OR" statement (cannot

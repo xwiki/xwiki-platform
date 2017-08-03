@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -88,5 +90,24 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
                 throw new NotificationException(ERROR_MESSAGE, e);
             }
         }
+    }
+
+    @Override
+    public Collection<NotificationFilter> getNotificationFilters(DocumentReference user,
+            NotificationPreference preference) throws NotificationException
+    {
+        Collection<NotificationFilter> filters = getAllNotificationFilters(user);
+
+        Iterator<NotificationFilter> it = filters.iterator();
+
+        while (it.hasNext()) {
+            NotificationFilter filter = it.next();
+
+            if (!filter.matchesPreference(preference)) {
+                it.remove();
+            }
+        }
+
+        return filters;
     }
 }

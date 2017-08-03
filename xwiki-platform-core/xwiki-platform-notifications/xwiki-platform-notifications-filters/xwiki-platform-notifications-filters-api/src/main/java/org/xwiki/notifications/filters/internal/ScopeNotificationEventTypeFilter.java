@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationProperty;
+import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
  * Notification filter that handle the generic {@link NotificationPreferenceFilterScope}.
@@ -95,5 +96,11 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
             Event event)
     {
         return scope.getEventType().equals(event.getType());
+    }
+
+    @Override
+    public boolean matchesPreference(NotificationPreference preference)
+    {
+        return preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE);
     }
 }

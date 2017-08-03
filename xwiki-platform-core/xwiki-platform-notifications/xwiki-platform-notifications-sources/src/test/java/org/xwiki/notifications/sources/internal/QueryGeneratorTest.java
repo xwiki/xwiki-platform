@@ -262,9 +262,8 @@ public class QueryGeneratorTest
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
-        when(notificationFilterManager.getAllNotificationFilters(any(DocumentReference.class))).thenReturn(
-                Arrays.asList(notificationFilter1, notificationFilter2)
-        );
+        when(notificationFilterManager.getNotificationFilters(any(DocumentReference.class),
+                any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1, notificationFilter2));
 
         when(notificationFilter1.queryFilterOR(
                 any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
@@ -295,6 +294,9 @@ public class QueryGeneratorTest
                 any(List.class))).thenReturn(new HashedMap() {{
             put("someVal", "someValue2");
         }});
+
+        when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+        when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
 
         // Test
         mocker.getComponentUnderTest().generateQuery(

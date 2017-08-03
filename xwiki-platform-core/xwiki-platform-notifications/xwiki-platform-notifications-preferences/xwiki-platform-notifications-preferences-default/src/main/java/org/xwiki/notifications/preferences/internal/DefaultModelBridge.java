@@ -20,6 +20,7 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.NotificationProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -77,6 +79,9 @@ public class DefaultModelBridge implements ModelBridge
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private TargetableNotificationPreferenceBuilder notificationPreferenceBuilder;
+
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
             throws NotificationException
@@ -97,15 +102,21 @@ public class DefaultModelBridge implements ModelBridge
                     if (obj != null) {
                         String objFormat = obj.getStringValue(FORMAT_FIELD);
                         Date objStartDate = obj.getDateValue(START_DATE_FIELD);
-                        preferences.add(new TargetableNotificationEventTypePreference(
-                                obj.getStringValue(EVENT_TYPE_FIELD),
-                                userReference,
-                                obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0,
-                                StringUtils.isNotBlank(objFormat)
-                                        ? NotificationFormat.valueOf(objFormat.toUpperCase())
-                                        : NotificationFormat.ALERT,
-                                (objStartDate != null) ? objStartDate : doc.getCreationDate()
-                        ));
+
+                        notificationPreferenceBuilder.prepare();
+                        notificationPreferenceBuilder.setProperties(
+                                Collections.singletonMap(NotificationProperty.EVENT_TYPE,
+                                        obj.getStringValue(EVENT_TYPE_FIELD)));
+                        notificationPreferenceBuilder.setStartDate(
+                                (objStartDate != null) ? objStartDate : doc.getCreationDate());
+                        notificationPreferenceBuilder.setFormat(StringUtils.isNotBlank(objFormat)
+                                    ? NotificationFormat.valueOf(objFormat.toUpperCase())
+                                    : NotificationFormat.ALERT);
+                        notificationPreferenceBuilder.setTarget(userReference);
+                        notificationPreferenceBuilder.setEnabled(
+                                obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0);
+
+                        preferences.add(notificationPreferenceBuilder.build());
                     }
                 }
             }

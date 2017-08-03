@@ -97,7 +97,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
 
             if (preference.isNotificationEnabled() != isEnabled
                 || !preference.getFormat().equals(format)) {
-                preferences.remove(preference);
+                it.remove();
             }
         }
 

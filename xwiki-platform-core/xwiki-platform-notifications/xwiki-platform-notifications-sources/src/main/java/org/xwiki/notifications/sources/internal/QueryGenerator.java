@@ -306,7 +306,7 @@ public class QueryGenerator
 
             if (!preference.getProperties().containsKey(NotificationProperty.EVENT_TYPE)
                 && !preference.getProperties().containsKey(NotificationProperty.APPLICATION_ID)) {
-                preferences.remove(preference);
+                it.remove();
             }
         }
 

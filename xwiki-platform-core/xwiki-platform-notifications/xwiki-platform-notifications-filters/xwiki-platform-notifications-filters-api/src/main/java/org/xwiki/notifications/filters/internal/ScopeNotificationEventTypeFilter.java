@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
@@ -101,6 +102,7 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
     @Override
     public boolean matchesPreference(NotificationPreference preference)
     {
-        return preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
+        return preference.getCategory().equals(NotificationPreferenceCategory.DEFAULT)
+                && preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
     }
 }

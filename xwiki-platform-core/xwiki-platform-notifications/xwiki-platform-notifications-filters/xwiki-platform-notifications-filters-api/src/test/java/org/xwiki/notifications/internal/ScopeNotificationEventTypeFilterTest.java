@@ -36,6 +36,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.internal.ModelBridge;
 import org.xwiki.notifications.filters.internal.NotificationPreferenceFilterScope;
@@ -285,5 +287,25 @@ public class ScopeNotificationEventTypeFilterTest
         assertEquals("excludedWiki", results.get("wiki_scopeNotifEventTypeFilter_EXCLUSIVE_2"));
         assertEquals("space2.page2", results.get("page_scopeNotifEventTypeFilter_EXCLUSIVE_2"));
         assertEquals(9, results.size());
+    }
+
+    @Test
+    public void matchPreferenceWithCorrectPreference() throws Exception
+    {
+        NotificationPreference preference = mock(NotificationPreference.class);
+        when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.DEFAULT);
+        when(preference.getProperties()).thenReturn(
+                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, ""));
+
+        assertTrue(mocker.getComponentUnderTest().matchesPreference(preference));
+    }
+
+    @Test
+    public void matchPreferenceWithInorrectPreference() throws Exception
+    {
+        NotificationPreference preference = mock(NotificationPreference.class);
+        when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.WATCHLIST);
+
+        assertFalse(mocker.getComponentUnderTest().matchesPreference(preference));
     }
 }

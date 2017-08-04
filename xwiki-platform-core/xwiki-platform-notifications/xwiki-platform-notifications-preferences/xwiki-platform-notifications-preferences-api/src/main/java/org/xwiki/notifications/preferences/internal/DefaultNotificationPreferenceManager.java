@@ -20,10 +20,11 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -71,7 +72,10 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
 
             List<NotificationPreference> notificationPreferences = new ArrayList<>();
 
-            // TODO: Handle notification preferences conflicts
+            /**
+             * TODO: Handle notification preferences conflicts.
+             * That’s why {@link NotificationPreferenceProvider#getProviderPriority()} exists.
+             */
             for (NotificationPreferenceProvider provider : providers) {
                 notificationPreferences.addAll(provider.getPreferencesForUser(user));
             }
@@ -114,21 +118,34 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     public void saveNotificationsPreferences(List<NotificationPreference> notificationPreferences)
             throws NotificationException
     {
+        // We construct a map where each key is a provider hint and each value is a list of associated providers
+        // this allows calling each provider only once
+        Map<String, List<NotificationPreference>> preferencesMapping = new HashMap<>();
+
         for (NotificationPreference notificationPreference : notificationPreferences) {
             // Try to get the corresponding provider, if no provider can be found, discard the save of the preference
             String providerHint = notificationPreference.getProviderHint();
             if (componentManager.hasComponent(NotificationPreferenceProvider.class, providerHint)) {
-                try {
-                    NotificationPreferenceProvider provider =
-                            componentManager.getInstance(NotificationPreferenceProvider.class, providerHint);
 
-                    // TODO: Find a way to send the save order only once for every provider
-                    provider.savePreferences(Arrays.asList(notificationPreference));
-
-                } catch (ComponentLookupException e) {
-                    logger.error("Unable to retrieve the notification preference provide for hint {}: {}",
-                            providerHint, e);
+                if (!preferencesMapping.containsKey(providerHint)) {
+                    preferencesMapping.put(providerHint, new ArrayList<>());
                 }
+
+                preferencesMapping.get(providerHint).add(notificationPreference);
+            }
+        }
+
+        // Once we have created the mapping, save all the preferences using their correct providers
+        for (String providerHint : preferencesMapping.keySet()) {
+            try {
+                NotificationPreferenceProvider provider =
+                        componentManager.getInstance(NotificationPreferenceProvider.class, providerHint);
+
+                provider.savePreferences(preferencesMapping.get(providerHint));
+
+            } catch (ComponentLookupException e) {
+                logger.error("Unable to retrieve the notification preference provide for hint {}: {}",
+                        providerHint, e);
             }
         }
     }

@@ -1,5 +1,6 @@
 .xGallery {
   background-color: black;
+  max-width: 100%;
   padding: 10px;
   /* Position relative is required because some of the inner elements have position absolute and the gallery container
   must be their offset parent. */

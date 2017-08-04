@@ -611,7 +611,7 @@
                   </versionCheck>
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.platform</groupIdPrefix>
-                    <allowedVersionRegex>\$\{project.version\}|${platform.version}</allowedVersionRegex>
+                    <allowedVersionRegex>\$\{project.version\}|\[\$\{project.version\}\]|${platform.version}</allowedVersionRegex>
                   </versionCheck>
                 </validateDependencyVersion>
               </rules>

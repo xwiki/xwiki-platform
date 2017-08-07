@@ -1105,7 +1105,8 @@ public class TestUtils
 
     public boolean isInSourceViewMode()
     {
-        return getDriver().findElements(By.xpath("//textarea[@class = 'wiki-code']")).size() > 0;
+        String currentURL = getDriver().getCurrentUrl();
+        return currentURL.contains("/view/") && currentURL.contains("viewer=code");
     }
 
     public boolean isInInlineEditMode()

@@ -20,7 +20,7 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
 #else
   <a class="btn btn-default" href="$doc.getURL('view', "$!{optionalRevisionInfo}viewer=code&showLastAuthors=true")">$services.localization.render('core.viewers.code.showBlame')</a>
 #end
-<div class="revision-container">
+<div class="wiki-code">
   <table class="revision">
     <tbody class="group">
 #if ($showLastAuthors)

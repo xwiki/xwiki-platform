@@ -67,8 +67,7 @@ public class TemplateTest extends AbstractTest
     public void testCorrectTemplate()
     {
         saveVelocity(includeTemplate("code.vm"), true);
-        Assert.assertNotNull(getDriver().findElement(
-            By.xpath("//div[@id='xwikicontent']//textarea[@class='wiki-code']")));
+        Assert.assertNotNull(getDriver().findElement(By.xpath("//div[@id='xwikicontent']//.[@class='wiki-code']")));
     }
 
     /**

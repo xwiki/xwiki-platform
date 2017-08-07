@@ -11,6 +11,13 @@
 #set ($currentFlavor = $services.flavor.getFlavorExtension($currentNamespace))
 #set ($isCurrentFlavorValid = $currentFlavor && $currentFlavor.isValid($extensionNamespace))
 #set ($knownFlavors = $services.flavor.knownFlavors)
+#set ($knownFlavorId = $NULL)
+#foreach ($flavor in $knownFlavors)
+  #if ($flavor.id == $currentFlavor.id.id)
+    #set ($knownFlavorId = $flavor)
+    #break
+  #end
+#end
 #set ($knownInvalidFlavors = $services.flavor.knownInvalidFlavors)
 
 #macro(controller)
@@ -42,21 +49,41 @@
   #else
       == $services.localization.render('platform.extension.distributionWizard.flavorStepCurrentFlavorLabel')
 
+      $services.localization.render('platform.extension.distributionWizard.flavorStepCurrentFlavorHint')
+
       {{html}}#displayExtension($currentFlavor, true){{/html}}
 
       {{error}}$services.localization.render('platform.extension.distributionWizard.flavorStepCurrentFlavorInvalidError'){{/error}}
 
-    #if (!$knownInvalidFlavors.contains($currentFlavor.id.id))
+    #if ($knownInvalidFlavors.contains($currentFlavor.id.id))
+      ## The current flavor is known to have no compatible version
+      == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewLabel')
+
+      $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewHint')
+
+      #displayFlavorPickerStep()
+    #elseif ($knownFlavorId)
+      ## We know a compatible version of the current flavor
+      == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownLabel')
+
+      $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownHint')
+
+      #set ($knownFlavorExtension = $services.extension.resolve($knownFlavorId.id, $knownFlavorId.version))
+      {{html}}#displayExtension($knownFlavorExtension){{/html}}
+    #else
+      ## The current flavor is unknown
       == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeLabel')
+
+      $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeHint')
 
       #displayUpgradeInvalidFlavor()
 
       == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewLabel')
-    #else
-      == $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorInstallNewLabel')
-    #end
 
-    #displayFlavorPickerStep()
+      $services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorOrInstallNewHint')
+
+      #displayFlavorPickerStep()
+    #end
   #end
 #end
 
@@ -82,7 +109,8 @@
       #else
         #set ($upgradePlanIterator = $upgradePlan.tree.iterator())
         #if ($upgradePlanIterator.hasNext())
-          {{html}}#displayExtension($upgradePlanIterator.next()){{/html}}
+          #set ($upgradeExtension = $upgradePlanIterator.next().action.extension)
+          {{html}}#displayExtension($upgradeExtension){{/html}}
         #else
           {{error}}$services.localization.render('platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorNoUpgradeError', [$currentFlavor.id.id]){{/error}}
         #end

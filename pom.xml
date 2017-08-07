@@ -58,7 +58,7 @@
     <batik.version>1.9</batik.version>
 
     <tika.version>1.14</tika.version>
-    <pdfbox.version>2.0.6</pdfbox.version>
+    <pdfbox.version>2.0.7</pdfbox.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>

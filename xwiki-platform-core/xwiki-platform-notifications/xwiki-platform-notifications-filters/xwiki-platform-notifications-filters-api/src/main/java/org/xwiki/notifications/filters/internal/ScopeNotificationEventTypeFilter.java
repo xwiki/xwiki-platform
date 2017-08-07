@@ -19,11 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -47,49 +42,14 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
 {
     static final String FILTER_NAME = "scopeNotifEventTypeFilter";
 
-    private static final String PREFIX_FORMAT = "scopeNotifEventTypeFilter_%s_%d";
-
-    protected String generateQueryRestriction(String suffix) {
-        return String.format("event.type = :type_%s", suffix);
-    }
-
     @Override
-    protected Map<String, Object> generateQueryRestrictionParams(String suffix,
-            Map<NotificationPreferenceProperty, Object> properties)
+    protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
+            NotificationPreference preference)
     {
-        if (properties.containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
-            return Collections.singletonMap(String.format("type_%s", suffix),
-                    properties.get(NotificationPreferenceProperty.EVENT_TYPE));
-        }
-        return Collections.EMPTY_MAP;
-    }
-
-    @Override
-    protected String generateParameterSuffix(NotificationPreferenceScopeFilterType filterType, int parameterNumber)
-    {
-        return String.format(PREFIX_FORMAT, filterType.name(), parameterNumber);
-    }
-
-    @Override
-    protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope, NotificationFormat format,
-            Map<NotificationPreferenceProperty, Object> properties)  {
         // We apply the filter only on scopes having the correct eventType
-        return (properties.containsKey(NotificationPreferenceProperty.EVENT_TYPE)
-                && scope.getEventType().equals(properties.get(NotificationPreferenceProperty.EVENT_TYPE)));
-    }
-
-    @Override
-    protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope, NotificationFormat format,
-            List<Map<NotificationPreferenceProperty, Object>> propertyList)  {
-        // Get every eventType contained in the given properties
-        List<String> eventTypes = new ArrayList<>();
-        for (Map<NotificationPreferenceProperty, Object> properties : propertyList) {
-            if (properties.containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
-                eventTypes.add((String) properties.get(NotificationPreferenceProperty.EVENT_TYPE));
-            }
-        }
-
-        return eventTypes.contains(scope.getEventType());
+        return (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
+                && scope.getEventType().equals(
+                        preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)));
     }
 
     @Override

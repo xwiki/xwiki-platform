@@ -19,10 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -32,7 +28,17 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.expression.AndNode;
+import org.xwiki.notifications.filters.expression.EqualsNode;
+import org.xwiki.notifications.filters.expression.LikeNode;
+import org.xwiki.notifications.filters.expression.NotNode;
+import org.xwiki.notifications.filters.expression.OrNode;
+import org.xwiki.notifications.filters.expression.PropertyValueNode;
+import org.xwiki.notifications.filters.expression.StringValueNode;
+import org.xwiki.notifications.filters.expression.EmptyNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.NotificationFormat;
 
@@ -60,60 +66,15 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
     protected Logger logger;
 
     /**
-     * Generate a custom suffix for a query parameter. This suffix can use the passed parameters as a base for
-     * its generation and should be unique to every filter extending {@link AbstractScopeNotificationFilter}.
-     *
-     * @param filterType the type of filter we’re dealing with
-     * @param parameterNumber the number of the current parameter in the query
-     * @return a query parameter suffix that should be unique
-     */
-    protected abstract String generateParameterSuffix(NotificationPreferenceScopeFilterType filterType,
-            int parameterNumber);
-
-    /**
-     * As other filters can be defined out of {@link AbstractScopeNotificationFilter}, they will have to add their own
-     * conditions to the query that is made for the filter. This method allows a child class to define extra conditions
-     * on an event in a filter query.
-     *
-     * @param suffix a suffix that can be used to identify parameters used in the query
-     * @return a restriction on the filter query
-     */
-    protected abstract String generateQueryRestriction(String suffix);
-
-    /**
-     * From the restriction created in {@link #generateQueryRestriction(String)}, create a map of the corresponding
-     * query parameters with the given suffix.
-     *
-     * @param suffix the suffix that should be used in the parameters name
-     * @return a map of the query parameters to use
-     */
-    protected abstract Map<String, Object> generateQueryRestrictionParams(String suffix,
-            Map<NotificationPreferenceProperty, Object> parameters);
-
-    /**
      * Given a {@link NotificationPreferenceFilterScope} and the current filtering context (defined by a
-     * {@link NotificationFormat} and a map of {@link NotificationPreferenceProperty},
-     * determine if a the current filter should apply with the given scope.
+     * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
      *
      * @param scope the reference scope
-     * @param format the format of the notification to filter
-     * @param properties a map of properties describing the notification to filter
+     * @param preference the related notification preference
      * @return true if the filter should be applied to the given scope.
      */
     protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
-            NotificationFormat format, Map<NotificationPreferenceProperty, Object> properties);
-
-    /**
-     * Based on the same principle as {@link AbstractScopeNotificationFilter#scopeMatchesFilteringContext(
-     * NotificationPreferenceFilterScope, NotificationFormat, Map)}.
-     *
-     * @param scope the reference scope
-     * @param format the format of the notification to filter
-     * @param propertiesList a list of the properties to filter
-     * @return true if this scope can be applied to at least one of the given properties
-     */
-    protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
-            NotificationFormat format, List<Map<NotificationPreferenceProperty, Object>> propertiesList);
+            NotificationPreference preference);
 
     /**
      * Given a {@link NotificationPreferenceFilterScope} and the current filtering context (defined by a
@@ -136,32 +97,21 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
     }
 
     @Override
-    public String queryFilterOR(DocumentReference user, NotificationFormat format,
-            Map<NotificationPreferenceProperty, Object> properties)
+    public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
-        return this.generateQueryString(user, format, properties,
+        AbstractNode leftOperand = this.generateFilterExpression(user, preference,
                 NotificationPreferenceScopeFilterType.INCLUSIVE);
-    }
-
-    @Override
-    public String queryFilterAND(DocumentReference user, NotificationFormat format,
-            Map<NotificationPreferenceProperty, Object> properties)
-    {
-        return this.generateQueryString(user, format, properties,
+        AbstractNode rightOperand = this.generateFilterExpression(user, preference,
                 NotificationPreferenceScopeFilterType.EXCLUSIVE);
-    }
 
-    @Override
-    public Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationPreferenceProperty, Object>> propertiesList)
-    {
-        Map<String, Object> params =
-                this.generateQueryFilterParams(user, format, propertiesList,
-                        NotificationPreferenceScopeFilterType.INCLUSIVE);
-        params.putAll(this.generateQueryFilterParams(user, format, propertiesList,
-                NotificationPreferenceScopeFilterType.EXCLUSIVE));
+        if (leftOperand.equals(AbstractNode.EMPTY_NODE)) {
+            return rightOperand;
+        } else if (rightOperand.equals(AbstractNode.EMPTY_NODE)) {
+            return leftOperand;
+        } else {
+            return new AndNode(leftOperand, rightOperand);
+        }
 
-        return params;
     }
 
     /**
@@ -224,123 +174,72 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
      *
      * @since 9.7RC1
      */
-    private String generateQueryString(DocumentReference user, NotificationFormat format,
-            Map<NotificationPreferenceProperty, Object> properties, NotificationPreferenceScopeFilterType filterType)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String separator = "";
-
-        try {
-            int number = 0;
-            for (NotificationPreferenceFilterScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
-                    filterType)) {
-                number++;
-                if (!scopeMatchesFilteringContext(scope, format, properties)) {
-                    continue;
-                }
-
-                stringBuilder.append(separator);
-
-                // If we have an EXCLUSIVE filter, negate the filter block
-                stringBuilder.append(
-                        (filterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) ? "(" : " NOT (");
-
-                // Create a suffix to make sure our parameter has a unique name
-                final String suffix = generateParameterSuffix(filterType, number);
-
-                final String eventRestriction = generateQueryRestriction(suffix);
-
-                switch (scope.getScopeReference().getType()) {
-                    case DOCUMENT:
-                        stringBuilder.append(String.format(
-                                "(%s) AND event.wiki = :wiki_%s AND event.page = :page_%s",
-                                eventRestriction, suffix, suffix));
-                        break;
-                    case SPACE:
-                        stringBuilder.append(
-                                String.format(
-                                        "(%s) AND event.wiki = :wiki_%s AND event.space LIKE :space_%s ESCAPE '!'",
-                                        eventRestriction, suffix, suffix));
-                        break;
-                    case WIKI:
-                        stringBuilder.append(String.format("(%s) AND event.wiki = :wiki_%s",
-                                eventRestriction, suffix));
-                        break;
-                    default:
-                        break;
-                }
-
-                stringBuilder.append(")");
-
-                separator = (filterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) ? " OR " : " AND ";
-            }
-        } catch (NotificationException e) {
-            logger.warn(ERROR, e);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    /**
-     * Generate a map of parameters that should be used with the query made from
-     * {@link #queryFilterAND(DocumentReference, NotificationFormat, Map)}
-     * and {@link #queryFilterOR(DocumentReference, NotificationFormat, Map)}.
-     *
-     * @since 9.7RC1
-     */
-    private Map<String, Object> generateQueryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationPreferenceProperty, Object>> properties,
+    private AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
             NotificationPreferenceScopeFilterType filterType)
     {
-        Map<String, Object> params = new HashMap<>();
+        AbstractNode syntaxNode = new EmptyNode();
+        boolean isFirstPass = true;
 
         try {
-            int number = 0;
-            for (NotificationPreferenceFilterScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
-                    filterType)) {
-
-                // Create a suffix to make sure our parameter has a unique name
-                final String suffix = generateParameterSuffix(filterType, ++number);
-                final String wikiParam = "wiki_%s";
-
-                // Don't try to add parameters to the query if the scope does not match this filtering context
-                if (!scopeMatchesFilteringContext(scope, format, properties)) {
+            for (NotificationPreferenceFilterScope scope : modelBridge.getNotificationPreferenceScopes(user,
+                    preference.getFormat(), filterType)) {
+                if (!scopeMatchesFilteringContext(scope, preference)) {
                     continue;
                 }
 
+                AbstractNode tmpNode;
+
+                String wiki = scope.getScopeReference().extractReference(EntityType.WIKI).getName();
+                String space = serializer.serialize(scope.getScopeReference());
+                String page = serializer.serialize(scope.getScopeReference());
+
                 switch (scope.getScopeReference().getType()) {
                     case DOCUMENT:
-                        params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
-                                EntityType.WIKI).getName());
-                        params.put(String.format("page_%s", suffix),
-                                serializer.serialize(scope.getScopeReference()));
+                        tmpNode = new AndNode(
+                                new EqualsNode(
+                                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                                        new StringValueNode(wiki)),
+                                new EqualsNode(
+                                        new PropertyValueNode(NotificationFilterProperty.PAGE),
+                                        new StringValueNode(page)));
                         break;
                     case SPACE:
-                        params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
-                                EntityType.WIKI).getName());
-                        params.put(String.format("space_%s", suffix),
-                                escape(serializer.serialize(scope.getScopeReference())) + "%"
-                        );
+                        tmpNode = new AndNode(
+                                new EqualsNode(
+                                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                                        new StringValueNode(wiki)),
+                                new LikeNode(
+                                        new PropertyValueNode(NotificationFilterProperty.SPACE),
+                                        new StringValueNode(space)));
                         break;
                     case WIKI:
-                        params.put(String.format(wikiParam, suffix), scope.getScopeReference().extractReference(
-                                EntityType.WIKI).getName());
+                        tmpNode = new EqualsNode(
+                                new PropertyValueNode(NotificationFilterProperty.WIKI),
+                                new StringValueNode(wiki));
                         break;
                     default:
-                        break;
+                        continue;
+                }
+
+                // If we have an EXCLUSIVE filter, negate the filter node
+                if (filterType.equals(NotificationPreferenceScopeFilterType.EXCLUSIVE)) {
+                    tmpNode = new NotNode(tmpNode);
+                }
+
+                // Wrap the freshly created node in a AndNode or a OrNode depending on the filter type
+                if (isFirstPass) {
+                    isFirstPass = false;
+                    syntaxNode = tmpNode;
+                } else if (filterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) {
+                    syntaxNode = new OrNode(syntaxNode, tmpNode);
+                } else {
+                    syntaxNode = new AndNode(syntaxNode, tmpNode);
                 }
             }
         } catch (NotificationException e) {
             logger.warn(ERROR, e);
         }
 
-        return params;
-    }
-
-    protected String escape(String format)
-    {
-        // See EscapeLikeParametersQuery#convertParameters()
-        return format.replaceAll("([%_!])", "!$1");
+        return syntaxNode;
     }
 }

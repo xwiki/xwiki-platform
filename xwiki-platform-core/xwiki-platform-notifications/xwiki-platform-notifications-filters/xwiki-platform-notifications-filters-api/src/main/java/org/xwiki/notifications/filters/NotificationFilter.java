@@ -19,14 +19,11 @@
  */
 package org.xwiki.notifications.filters;
 
-import java.util.List;
-import java.util.Map;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
@@ -53,7 +50,7 @@ public interface NotificationFilter
     /**
      * Determine if the current filter can be applied to the given preference.
      * In order to do so, the {@link NotificationFilter} can rely on the different parameters of the
-     * {@link NotificationPreference}
+     * {@link NotificationPreference}.
      *
      * @param preference the preference to use
      * @return true if the filter is compatible with the preference
@@ -63,37 +60,13 @@ public interface NotificationFilter
     boolean matchesPreference(NotificationPreference preference);
 
     /**
-     * HQL code to inject in the query to fetch notifications from the event stream, inside an "OR" statement (cannot
-     * dismiss everything).
+     * Filtering expression to use when retrieving notifications.
      *
      * @param user the user interested in the notifications
-     * @param format format of the notification
-     * @param properties the properties of the notification to filter
-     * @return the HQL code to inject
-     */
-    String queryFilterOR(DocumentReference user, NotificationFormat format,
-            Map<NotificationPreferenceProperty, Object> properties);
-
-    /**
-     * HQL code to inject in the query to fetch notifications from the event stream, inside an "AND" statement (can
-     * dismiss everything).
+     * @param preference the notification preference associated with the filter
+     * @return a filtering expression
      *
-     * @param user the user interested in the notifications
-     * @param format format of the notification
-     * @param properties the properties of the notification to filter
-     * @return the HQL code to inject
+     * @since 9.7RC1
      */
-    String queryFilterAND(DocumentReference user, NotificationFormat format,
-            Map<NotificationPreferenceProperty, Object> properties);
-
-    /**
-     * Parameters to add to the query using bindValue().
-     *
-     * @param user the user interested in the notifications
-     * @param format format of the notification
-     * @param propertiesList a list of the properties to filter
-     * @return the values to bind to the query, mapped by value's name
-     */
-    Map<String, Object> queryFilterParams(DocumentReference user, NotificationFormat format,
-            List<Map<NotificationPreferenceProperty, Object>> propertiesList);
+    AbstractNode filterExpression(DocumentReference user, NotificationPreference preference);
 }

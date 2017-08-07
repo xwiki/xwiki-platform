@@ -19,13 +19,9 @@
  */
 package org.xwiki.notifications.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +32,13 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.expression.AndNode;
+import org.xwiki.notifications.filters.expression.EqualsNode;
+import org.xwiki.notifications.filters.expression.LikeNode;
+import org.xwiki.notifications.filters.expression.PropertyValueNode;
+import org.xwiki.notifications.filters.expression.StringValueNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -141,37 +144,77 @@ public class ScopeNotificationEventTypeFilterTest
     }
 
     @Test
-    public void queryFilterOR() throws Exception
+    public void filterExpressionCase1() throws Exception
     {
         // Mocks
         createPreferenceScopeMocks();
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_1)).thenReturn("wiki1");
 
-        // Verify
-        assertEquals(
-                "((event.type = :type_scopeNotifEventTypeFilter_INCLUSIVE_1) AND "
-                        + "event.wiki = :wiki_scopeNotifEventTypeFilter_INCLUSIVE_1)",
-                mocker.getComponentUnderTest().queryFilterOR(
-                    new DocumentReference("xwiki", "XWiki", "User"),
-                    NotificationFormat.ALERT, Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event1")
-        ));
+        NotificationPreference prop1 = mock(NotificationPreference.class);
+        when(prop1.getFormat()).thenReturn(NotificationFormat.ALERT);
+        when(prop1.getProperties()).thenReturn(
+                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event1"));
 
-        assertEquals(
-                "((event.type = :type_scopeNotifEventTypeFilter_INCLUSIVE_2) AND "
-                        + "event.wiki = :wiki_scopeNotifEventTypeFilter_INCLUSIVE_2 " +
-                                "AND event.space LIKE :space_scopeNotifEventTypeFilter_INCLUSIVE_2 ESCAPE '!')",
-                mocker.getComponentUnderTest().queryFilterOR(
-                    new DocumentReference("xwiki", "XWiki", "User"),
-                    NotificationFormat.ALERT, Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event2")
-        ));
+        AbstractNode test1 = mocker.getComponentUnderTest().filterExpression(
+                new DocumentReference("xwiki", "XWiki", "User"), prop1);
 
-        assertEquals(
-                "((event.type = :type_scopeNotifEventTypeFilter_INCLUSIVE_3) AND "
-                        + "event.wiki = :wiki_scopeNotifEventTypeFilter_INCLUSIVE_3 "
-                        + "AND event.page = :page_scopeNotifEventTypeFilter_INCLUSIVE_3)",
-                mocker.getComponentUnderTest().queryFilterOR(
-                    new DocumentReference("xwiki", "XWiki", "User"),
-                    NotificationFormat.ALERT, Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event3")
-        ));
+        AbstractNode expectedResult1 = new EqualsNode(
+                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new StringValueNode("wiki1"));
+
+        assertEquals(expectedResult1, test1);
+    }
+
+    @Test
+    public void filterExpressionCase2() throws Exception
+    {
+        // Mocks
+        createPreferenceScopeMocks();
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_2)).thenReturn("space_2");
+
+        NotificationPreference pref2 = mock(NotificationPreference.class);
+        when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
+        when(pref2.getProperties()).thenReturn(
+                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event2"));
+
+        AbstractNode test2 = mocker.getComponentUnderTest().filterExpression(
+                new DocumentReference("xwiki", "XWiki", "User"), pref2);
+
+        AbstractNode expectedResult2 = new AndNode(
+                new EqualsNode(
+                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new StringValueNode("wiki2")),
+                new LikeNode(
+                        new PropertyValueNode(NotificationFilterProperty.SPACE),
+                        new StringValueNode("space_2")));
+
+        assertEquals(expectedResult2, test2);
+    }
+
+    @Test
+    public void filterExpressionCase3() throws Exception
+    {
+        // Mocks
+        createPreferenceScopeMocks();
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_3)).thenReturn("space3.page3");
+
+        NotificationPreference pref3 = mock(NotificationPreference.class);
+        when(pref3.getFormat()).thenReturn(NotificationFormat.ALERT);
+        when(pref3.getProperties()).thenReturn(
+                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event3"));
+
+        AbstractNode test3 = mocker.getComponentUnderTest().filterExpression(
+                new DocumentReference("xwiki", "XWiki", "User"), pref3);
+
+        AbstractNode expectedResult3 = new AndNode(
+                new EqualsNode(
+                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new StringValueNode("wiki3")),
+                new EqualsNode(
+                        new PropertyValueNode(NotificationFilterProperty.PAGE),
+                        new StringValueNode("space3.page3")));
+
+        assertEquals(expectedResult3, test3);
     }
 
     private void createPreferenceScopeMocks() throws NotificationException
@@ -213,80 +256,6 @@ public class ScopeNotificationEventTypeFilterTest
                 any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.EXCLUSIVE))).thenReturn(
                         Arrays.asList(exclusiveScope1, exclusiveScope2)
         );
-    }
-
-    @Test
-    public void queryFilterAND() throws Exception
-    {
-        createPreferenceScopeMocks();
-
-        assertEquals(
-                StringUtils.EMPTY,
-                mocker.getComponentUnderTest().queryFilterAND(
-                        new DocumentReference("xwiki", "XWiki", "User"),
-                        NotificationFormat.ALERT,
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "type1")
-                )
-        );
-
-        assertEquals(
-                " NOT ((event.type = :type_scopeNotifEventTypeFilter_EXCLUSIVE_1) AND "
-                        + "event.wiki = :wiki_scopeNotifEventTypeFilter_EXCLUSIVE_1 "
-                        + "AND event.space LIKE :space_scopeNotifEventTypeFilter_EXCLUSIVE_1 ESCAPE '!')",
-                mocker.getComponentUnderTest().queryFilterAND(
-                        new DocumentReference("xwiki", "XWiki", "User"),
-                        NotificationFormat.ALERT,
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "exclusiveEvent1")
-                )
-        );
-
-        assertEquals(
-                " NOT ((event.type = :type_scopeNotifEventTypeFilter_EXCLUSIVE_1) AND "
-                        + "event.wiki = :wiki_scopeNotifEventTypeFilter_EXCLUSIVE_1 "
-                        + "AND event.space LIKE :space_scopeNotifEventTypeFilter_EXCLUSIVE_1 ESCAPE '!')",
-                mocker.getComponentUnderTest().queryFilterAND(
-                        new DocumentReference("xwiki", "XWiki", "User"),
-                        NotificationFormat.ALERT,
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "exclusiveEvent1")
-                )
-        );
-    }
-
-    @Test
-    public void queryFilterParams() throws Exception
-    {
-        // Mocks
-        createPreferenceScopeMocks();
-        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_1)).thenReturn("wiki1");
-        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_2)).thenReturn("space_2");
-        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_3)).thenReturn("space3.page3");
-        when(serializer.serialize(SCOPE_EXCLUSIVE_REFERENCE_1)).thenReturn("space1");
-        when(serializer.serialize(SCOPE_EXCLUSIVE_REFERENCE_2)).thenReturn("space2.page2");
-
-        // Prepare the notifications properties
-        List<Map<NotificationPreferenceProperty, Object>> propertiesList = new ArrayList<>();
-        for (String element : Arrays.asList("event1", "event2", "event3",
-                "exclusiveEvent1", "exclusiveEvent2")) {
-            propertiesList.add(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, element));
-        }
-
-        // Test
-        Map<String, Object> results = mocker.getComponentUnderTest().queryFilterParams(
-                new DocumentReference("xwiki", "XWiki", "User"),
-                NotificationFormat.ALERT, propertiesList
-        );
-
-        // Verify
-        assertEquals("wiki1", results.get("wiki_scopeNotifEventTypeFilter_INCLUSIVE_1"));
-        assertEquals("wiki2", results.get("wiki_scopeNotifEventTypeFilter_INCLUSIVE_2"));
-        assertEquals("space!_2%", results.get("space_scopeNotifEventTypeFilter_INCLUSIVE_2"));
-        assertEquals("wiki3", results.get("wiki_scopeNotifEventTypeFilter_INCLUSIVE_3"));
-        assertEquals("space3.page3", results.get("page_scopeNotifEventTypeFilter_INCLUSIVE_3"));
-        assertEquals("excludedWiki", results.get("wiki_scopeNotifEventTypeFilter_EXCLUSIVE_1"));
-        assertEquals("space1%", results.get("space_scopeNotifEventTypeFilter_EXCLUSIVE_1"));
-        assertEquals("excludedWiki", results.get("wiki_scopeNotifEventTypeFilter_EXCLUSIVE_2"));
-        assertEquals("space2.page2", results.get("page_scopeNotifEventTypeFilter_EXCLUSIVE_2"));
-        assertEquals(9, results.size());
     }
 
     @Test

@@ -55,7 +55,7 @@
     <gwt.version>2.7.0</gwt.version>
     <gwt.maven.plugin.version>2.7.0</gwt.maven.plugin.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
-    <batik.version>1.9.1</batik.version>
+    <batik.version>1.9</batik.version>
 
     <tika.version>1.14</tika.version>
     <pdfbox.version>2.0.7</pdfbox.version>

@@ -33,6 +33,12 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.expression.AndNode;
+import org.xwiki.notifications.filters.expression.EmptyNode;
+import org.xwiki.notifications.filters.expression.EqualsNode;
+import org.xwiki.notifications.filters.expression.PropertyValueNode;
+import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
@@ -43,6 +49,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -265,38 +272,33 @@ public class QueryGeneratorTest
         when(notificationFilterManager.getNotificationFilters(any(DocumentReference.class),
                 any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1, notificationFilter2));
 
-        when(notificationFilter1.queryFilterOR(
-                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
-                        .anyMap()))
-                .thenReturn("event.date = :someDate");
-        when(notificationFilter2.queryFilterOR(
-                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
-                        .anyMap()))
-                .thenReturn("event.eventType = :someVal");
+        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
+                .thenReturn(
+                        new AndNode(
+                                new EqualsNode(
+                                        new PropertyValueNode(NotificationFilterProperty.PAGE),
+                                        new StringValueNode("someValue1")),
+                                new EqualsNode(
+                                        new StringValueNode("1"),
+                                        new StringValueNode("1"))));
 
-        when(notificationFilter1.queryFilterAND(
-                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
-                        .anyMap()))
-                .thenReturn("1=1");
-        when(notificationFilter2.queryFilterAND(
-                any(DocumentReference.class), any(NotificationFormat.class), ArgumentMatchers
-                        .anyMap()))
-                .thenReturn("2=2");
-
-
-        when(notificationFilter1.queryFilterParams(any(DocumentReference.class),
-                any(NotificationFormat.class),
-                any(List.class))).thenReturn(new HashedMap() {{
-            put("someDate", "someValue1");
-        }});
-        when(notificationFilter2.queryFilterParams(any(DocumentReference.class),
-                any(NotificationFormat.class),
-                any(List.class))).thenReturn(new HashedMap() {{
-            put("someVal", "someValue2");
-        }});
+        when(notificationFilter2.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
+                .thenReturn(
+                        new AndNode(
+                                new EqualsNode(
+                                        new PropertyValueNode(NotificationFilterProperty.EVENT_TYPE),
+                                        new StringValueNode("someValue2")),
+                                new EqualsNode(
+                                        new StringValueNode("2"),
+                                        new StringValueNode("2"))));
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+
+        String hashedValue1 = sha256Hex("1");
+        String hashedValue2 = sha256Hex("2");
+        String hashedValueSomeValue1 = sha256Hex("someValue1");
+        String hashedValueSomeValue2 = sha256Hex("someValue2");
 
         // Test
         mocker.getComponentUnderTest().generateQuery(
@@ -306,21 +308,75 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
+                String.format("where event.user <> :user AND event.date >= :startDate "
+                                + "AND ((((event.type = :type_0 AND event.date >= :date_0) "
+                                + "AND ((event.page = :value_%s) "
+                                + "AND (:value_%s = :value_%s)) "
+                                + "AND ((event.eventType = :value_%s) AND (:value_%s = :value_%s))))) "
+                                + "AND event.id NOT IN (:blackList) "
+                                + "AND event.date <= :endDate AND event.hidden <> true "
+                                + "AND (event not in ("
+                                + "select status.activityEvent from ActivityEventStatusImpl status "
+                                + "where status.activityEvent = event "
+                                + "and status.entityId = :user and status.read = true)) "
+                                + "order by event.date DESC", hashedValueSomeValue1, hashedValue1, hashedValue1,
+                        hashedValueSomeValue2, hashedValue2, hashedValue2), Query.HQL);
+        /*verify(queryManager).createQuery(
                 "where event.user <> :user AND event.date >= :startDate AND " +
                         "((((event.type = :type_0 AND event.date >= :date_0)"
-                        + " AND (event.date = :someDate OR event.eventType = :someVal) AND 1=1 AND 2=2)))" +
+                        + " AND (event.date = :somePage OR event.eventType = :someVal) AND 1=1 AND 2=2)))" +
                         " AND event.id NOT IN (:blackList) AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
-                        "order by event.date DESC", Query.HQL);
+                        "order by event.date DESC", Query.HQL);*/
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
         verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
         verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
         verify(query).bindValue("startDate", startDate);
         verify(query).bindValue("endDate", untilDate);
         verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
-        verify(query).bindValue("someDate", "someValue1");
-        verify(query).bindValue("someVal", "someValue2");
+        verify(query).bindValue(String.format("value_%s", hashedValueSomeValue1), "someValue1");
+        verify(query).bindValue(String.format("value_%s", hashedValueSomeValue2), "someValue2");
+    }
+
+    @Test
+    public void generateQueryWithNoRelevantFilters() throws Exception
+    {
+        Date untilDate = new Date();
+
+        // Mocks
+        NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
+        when(notificationFilterManager.getNotificationFilters(any(DocumentReference.class),
+                any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1));
+
+        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
+                .thenReturn(new EmptyNode());
+
+        when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+
+        // Test
+        mocker.getComponentUnderTest().generateQuery(
+                new DocumentReference("xwiki", "XWiki", "UserA"),
+                NotificationFormat.ALERT,
+                true, untilDate, startDate, Arrays.asList("event1", "event2"));
+
+        // Verify
+        verify(queryManager).createQuery("where event.user <> :user AND event.date >= :startDate "
+                                + "AND ((((event.type = :type_0 AND event.date >= :date_0)))) "
+                                + "AND event.id NOT IN (:blackList) "
+                                + "AND event.date <= :endDate AND event.hidden <> true "
+                                + "AND (event not in ("
+                                + "select status.activityEvent from ActivityEventStatusImpl status "
+                                + "where status.activityEvent = event "
+                                + "and status.entityId = :user and status.read = true)) "
+                                + "order by event.date DESC", Query.HQL);
+
+        verify(query).bindValue("user", "xwiki:XWiki.UserA");
+        verify(query).bindValue(ArgumentMatchers.eq("type_0"), eq("create"));
+        verify(query).bindValue(ArgumentMatchers.eq("date_0"), eq(pref1StartDate));
+        verify(query).bindValue("startDate", startDate);
+        verify(query).bindValue("endDate", untilDate);
+        verify(query).bindValue("blackList", Arrays.asList("event1", "event2"));
     }
 
 }

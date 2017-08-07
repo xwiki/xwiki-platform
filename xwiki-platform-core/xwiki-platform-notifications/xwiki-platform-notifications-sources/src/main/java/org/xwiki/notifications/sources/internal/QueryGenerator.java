@@ -19,10 +19,9 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +38,13 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -118,7 +117,7 @@ public class QueryGenerator
         }
         hql.append(LEFT_PARENTHESIS);
 
-        handleEventPreferences(user, hql, preferences);
+        List<Map<String, String>> queryParameters = handleEventPreferences(user, hql, preferences);
 
         // No notification is returned if nothing is saved in the user settings
         // TODO: handle some defaults preferences that can be set in the administration
@@ -148,60 +147,32 @@ public class QueryGenerator
         handleEndDate(endDate, query);
         handleWiki(user, query);
 
-        handleFiltersParams(user, query, format, preferences);
+        handleFiltersParams(query, queryParameters);
 
         // Return the query
         return query;
     }
 
-    private void handleFiltersOR(DocumentReference user, StringBuilder hql, NotificationPreference preference,
-            Collection<NotificationFilter> filters) throws NotificationException
+    private void handleEventFilters(Collection<NotificationFilter> filters, DocumentReference user,
+            NotificationPreference preference, StringBuilder query, List<Map<String, String>> queryParameters)
     {
-        StringBuilder query = new StringBuilder();
-        String separator = "";
+        NFExpressionToHQLParser parser = new NFExpressionToHQLParser();
 
         for (NotificationFilter filter : filters) {
-            String filterQuery = filter.queryFilterOR(user, preference.getFormat(), preference.getProperties());
-
-            if (StringUtils.isNotBlank(filterQuery)) {
-                query.append(separator);
-                query.append(filterQuery);
-                separator = OR;
-            }
-        }
-
-        if (StringUtils.isNotBlank(query.toString())) {
-            hql.append(String.format(" AND (%s)", query.toString()));
-        }
-    }
-
-    private void handleFiltersAND(DocumentReference user, StringBuilder hql, NotificationPreference preference,
-            Collection<NotificationFilter> filters) throws NotificationException
-    {
-        for (NotificationFilter filter : filters) {
-            String filterQuery = filter.queryFilterAND(user, preference.getFormat(), preference.getProperties());
-
-            if (StringUtils.isNotBlank(filterQuery)) {
-                hql.append(" AND ");
-                hql.append(filterQuery);
+            AbstractNode node = filter.filterExpression(user, preference);
+            if (!node.equals(AbstractNode.EMPTY_NODE)) {
+                query.append(String.format(" AND (%s)", parser.parse(filter.filterExpression(user, preference))));
+                queryParameters.add(parser.getQueryParameters());
             }
         }
     }
 
-    private void handleFiltersParams(DocumentReference user, Query query, NotificationFormat format,
-            List<NotificationPreference> preferences) throws NotificationException
+    private void handleFiltersParams(Query query, List<Map<String, String>> parameters) throws NotificationException
     {
-        Map<String, Object> queryParameters = new HashMap<>();
-
-        for (NotificationPreference preference : preferences) {
-            for (NotificationFilter filter : notificationFilterManager.getNotificationFilters(user, preference)) {
-                queryParameters.putAll(filter.queryFilterParams(user, format,
-                        Arrays.asList(preference.getProperties())));
+        for (Map<String, String> queryParameters : parameters) {
+            for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
+                query.bindValue(entry.getKey(), entry.getValue());
             }
-        }
-
-        for (Map.Entry<String, Object> entry : queryParameters.entrySet()) {
-            query.bindValue(entry.getKey(), entry.getValue());
         }
     }
 
@@ -294,10 +265,10 @@ public class QueryGenerator
      * @param user the current user
      * @param hql the query
      * @param preferences a list of the user preferences
-     * @return a Map containing the event types in keys and their corresponding start dates as values
+     * @return a list of maps that contains query parameters
      * @throws NotificationException if an error occurred
      */
-    private void handleEventPreferences(DocumentReference user, StringBuilder hql,
+    private List<Map<String, String>> handleEventPreferences(DocumentReference user, StringBuilder hql,
             List<NotificationPreference> preferences) throws NotificationException
     {
         // Filter the notification preferences that are not bound to a specific EVENT_TYPE
@@ -312,7 +283,11 @@ public class QueryGenerator
             }
         }
 
+        List<Map<String, String>> queryParameters = new ArrayList<>();
+
         if (!preferences.isEmpty()) {
+            NFExpressionToHQLParser parser = new NFExpressionToHQLParser();
+
             hql.append(LEFT_PARENTHESIS);
             String separator = "";
             int number = 0;
@@ -337,13 +312,18 @@ public class QueryGenerator
                 hql.append(String.format(" AND event.date >= :date_%d)", number));
 
                 number++;
-                handleFiltersOR(user, hql, preference, filters);
-                handleFiltersAND(user, hql, preference, filters);
+
+                handleEventFilters(filters, user, preference, hql, queryParameters);
+
                 hql.append(RIGHT_PARENTHESIS);
                 separator = OR;
             }
             hql.append(RIGHT_PARENTHESIS);
+
+
         }
+
+        return queryParameters;
     }
 
     private void handleWiki(DocumentReference user, Query query)

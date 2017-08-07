@@ -27,12 +27,19 @@ import org.xwiki.model.reference.EntityReference;
  *
  * Example: only get "update" events when it concern pages inside the space "xwiki:Space1".
  *
+ * This scopes are used either for custom filters defined by the user in the notification center, or by the
+ * notification center watchlist.
+ *
  * @version $Id$
  * @since 9.5RC1
  */
 public class NotificationPreferenceFilterScope
 {
     private String eventType;
+
+    private String applicationId;
+
+    private boolean isWatchList;
 
     private EntityReference scopeReference;
 
@@ -42,13 +49,17 @@ public class NotificationPreferenceFilterScope
      * Construct a NotificationPreferenceFilterScope.
      *
      * @param eventType name of the event type to refine
+     * @param applicationId the id of the application to filter
+     * @param isWatchList wether this filter should be used for the notifications watchlist or not
      * @param scopeReference reference of the scope
      * @param scopeFilterType the type of filter associated with the scope
      */
-    public NotificationPreferenceFilterScope(String eventType, EntityReference scopeReference,
-            NotificationPreferenceScopeFilterType scopeFilterType)
+    public NotificationPreferenceFilterScope(String eventType, String applicationId, boolean isWatchList,
+            EntityReference scopeReference, NotificationPreferenceScopeFilterType scopeFilterType)
     {
         this.eventType = eventType;
+        this.applicationId = applicationId;
+        this.isWatchList = isWatchList;
         this.scopeReference = scopeReference;
         this.scopeFilterType = scopeFilterType;
     }
@@ -59,6 +70,22 @@ public class NotificationPreferenceFilterScope
     public String getEventType()
     {
         return eventType;
+    }
+
+    /**
+     * @return the ID of the related application
+     */
+    public String getApplicationId()
+    {
+        return applicationId;
+    }
+
+    /**
+     * @return whether this scope should be used for watchlist filtering or not
+     */
+    public boolean isWatchList()
+    {
+        return isWatchList;
     }
 
     /**

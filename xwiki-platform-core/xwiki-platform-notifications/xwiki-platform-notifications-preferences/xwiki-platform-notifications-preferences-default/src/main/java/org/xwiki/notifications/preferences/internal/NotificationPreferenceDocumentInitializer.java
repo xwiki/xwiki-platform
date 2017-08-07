@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.Notifications.Code.NotificationPreferenceClass")
 @Singleton
-public class NotificationPreferenceClassDocumentInitializer extends AbstractMandatoryClassInitializer
+public class NotificationPreferenceDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The path to the class parent document.
@@ -52,7 +52,7 @@ public class NotificationPreferenceClassDocumentInitializer extends AbstractMand
     /**
      * Default constructor.
      */
-    public NotificationPreferenceClassDocumentInitializer()
+    public NotificationPreferenceDocumentInitializer()
     {
         super(new LocalDocumentReference(PARENT_PATH, "NotificationPreferenceClass"));
     }

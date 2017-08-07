@@ -291,9 +291,9 @@ public class QueryGenerator
             hql.append(LEFT_PARENTHESIS);
             String separator = "";
             int number = 0;
-            for (NotificationPreference preference : preferences) {
-                hql.append(separator);
-
+            it = preferences.iterator();
+            while (it.hasNext()) {
+                NotificationPreference preference = it.next();
                 // Get the notification filters related to the current preference
                 Collection<NotificationFilter> filters =
                         notificationFilterManager.getNotificationFilters(user, preference);
@@ -301,11 +301,14 @@ public class QueryGenerator
                 // TODO: Move filters.size() somewhere else
                 if (preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)
                         && filters.size() > 0) {
+                    hql.append(separator);
                     hql.append(String.format("((event.application = :application_%s", number));
                 } else if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
+                    hql.append(separator);
                     hql.append(String.format("((event.type = :type_%s", number));
                 } else {
                     // If the current preference is not handled, we can skip it
+                    it.remove();
                     continue;
                 }
 

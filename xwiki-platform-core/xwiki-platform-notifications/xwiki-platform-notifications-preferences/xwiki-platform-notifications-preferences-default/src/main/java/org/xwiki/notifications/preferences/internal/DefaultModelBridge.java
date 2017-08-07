@@ -60,7 +60,7 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String APPLICATION_ID_FIELD = "applicationId";
 
-    private static final String IS_WATCHLIST_FIELD = "isWatchlist";
+    private static final String IS_WATCHLIST_FIELD = "isWatchList";
 
     private static final String START_DATE_FIELD = "startDate";
 
@@ -121,6 +121,7 @@ public class DefaultModelBridge implements ModelBridge
                                     ? NotificationFormat.valueOf(objFormat.toUpperCase())
                                     : NotificationFormat.ALERT);
                         notificationPreferenceBuilder.setTarget(userReference);
+                        notificationPreferenceBuilder.setProviderHint("userProfile");
                         notificationPreferenceBuilder.setEnabled(
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0);
                         notificationPreferenceBuilder.setCategory((objIsWatchlist == 0)

@@ -260,12 +260,12 @@
                 &lt;/dt&gt;
                 &lt;dd&gt;
                   &lt;select id="notificationFilterTypeSelector-${eventType}-${format}" name="notificationFilterTypeSelector" size="1"&gt;
-                    &lt;option value="inclusive" selected="true"&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option&gt;
+                    &lt;option value="inclusive" selected="selected"&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option&gt;
                     &lt;option value="exclusive"&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive'))&lt;/option&gt;
                   &lt;/select&gt;
                 &lt;/dd&gt;
                 &lt;dt&gt;
-                  &lt;label for="notificationFilterScopeLocationSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.location.label'))&lt;/label&gt;
+                  &lt;label&gt;$escapetool.xml($services.localization.render('notifications.filters.location.label'))&lt;/label&gt;
                   &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.location.hint'))&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd class="document-tree"&gt;

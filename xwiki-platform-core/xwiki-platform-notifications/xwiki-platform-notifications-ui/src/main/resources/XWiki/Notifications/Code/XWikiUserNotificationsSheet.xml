@@ -46,6 +46,48 @@
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+
+(% class="profile-section highlighted-profile-section notification-top-panel" %)
+(((
+{{html clean="false"}}
+&lt;h2&gt;$services.localization.render('notifications.settings.preferences')&lt;/h2&gt;
+&lt;div class="xform"&gt;
+  &lt;p class="xHint"&gt;$services.localization.render('notifications.settings.preferences.hint')&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="notification-top-panel-preferences"&gt;
+  &lt;div class="xform col-xs-6"&gt;
+    &lt;dl&gt;
+      &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('notifications.rss.feedLink')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')" id="notificationsRssLink" target="_blank" title="$services.localization.render('notifications.rss.feedLink')"&gt;
+          &lt;span class="fa fa-rss"&gt;&lt;/span&gt;&amp;nbsp;$services.localization.render('notifications.rss.feedLinkDescription')
+        &lt;/a&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+  &lt;div class="xform col-xs-6"&gt;
+    &lt;dl&gt;
+      &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('notifications.settings.email')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        #if ($services.notification.areEmailsEnabled())
+          #set ($interval = 'daily')
+          #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+          #if ("$!objInterval" != '')
+            #set ($interval = $objInterval.getValue('interval'))
+          #end
+          &lt;select class="notificationEmailInterval"&gt;
+            &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
+            &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
+            &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
+            &lt;option value="live" #if($interval == 'live')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live'))&lt;/option&gt;
+          &lt;/select&gt;
+        #end
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+)))
 (% class="profile-section highlighted-profile-section" %)
 (((
 {{html clean="false"}}
@@ -137,28 +179,6 @@
     #else
       #set ($appClass = 'appOdd')
     #end
-  #end
-  #if ($services.notification.areEmailsEnabled())
-  &lt;tfoot&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;/td&gt;
-      &lt;td&gt;&lt;/td&gt;
-      &lt;td&gt;
-        #set ($interval = 'daily')
-        #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
-        #if ("$!objInterval" != '')
-          #set ($interval = $objInterval.getValue('interval'))
-        #end
-        &lt;select class="notificationEmailInterval"&gt;
-          &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
-          &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
-          &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
-          &lt;option value="live" #if($interval == 'live')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live'))&lt;/option&gt;
-        &lt;/select&gt;
-      &lt;/td&gt;
-      &lt;td&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tfoot&gt;
   #end
 &lt;/table&gt;
 {{/html}}
@@ -1447,6 +1467,122 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
     </property>
     <property>
       <name>NotificationPreferencesTable</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>d5a3452c-09c6-4a49-b6bf-290528cd27f0</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.notification-top-panel-preferences {
+  display: inline-block;
+  width: 100%;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>NotificationPreferencesTopPanel</name>
     </property>
     <property>
       <parse/>

@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.List;
+
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -35,11 +37,7 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class NotificationPreferenceFilterScope
 {
-    private String eventType;
-
-    private String applicationId;
-
-    private boolean isWatchList;
+    private List<String> eventTypes;
 
     private EntityReference scopeReference;
 
@@ -48,44 +46,24 @@ public class NotificationPreferenceFilterScope
     /**
      * Construct a NotificationPreferenceFilterScope.
      *
-     * @param eventType name of the event type to refine
-     * @param applicationId the id of the application to filter
-     * @param isWatchList wether this filter should be used for the notifications watchlist or not
+     * @param eventTypes names of the event types to refine
      * @param scopeReference reference of the scope
      * @param scopeFilterType the type of filter associated with the scope
      */
-    public NotificationPreferenceFilterScope(String eventType, String applicationId, boolean isWatchList,
+    public NotificationPreferenceFilterScope(List<String> eventTypes,
             EntityReference scopeReference, NotificationPreferenceScopeFilterType scopeFilterType)
     {
-        this.eventType = eventType;
-        this.applicationId = applicationId;
-        this.isWatchList = isWatchList;
+        this.eventTypes = eventTypes;
         this.scopeReference = scopeReference;
         this.scopeFilterType = scopeFilterType;
     }
 
     /**
-     * @return the name of the event type to refine
+     * @return the names of the event types to refine
      */
-    public String getEventType()
+    public List<String> getEventTypes()
     {
-        return eventType;
-    }
-
-    /**
-     * @return the ID of the related application
-     */
-    public String getApplicationId()
-    {
-        return applicationId;
-    }
-
-    /**
-     * @return whether this scope should be used for watchlist filtering or not
-     */
-    public boolean isWatchList()
-    {
-        return isWatchList;
+        return eventTypes;
     }
 
     /**

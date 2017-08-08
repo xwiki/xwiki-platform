@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.filters.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,10 +42,6 @@ import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.notifications.filters.internal.ModelBridge;
-import org.xwiki.notifications.filters.internal.NotificationPreferenceFilterScope;
-import org.xwiki.notifications.filters.internal.NotificationPreferenceScopeFilterType;
-import org.xwiki.notifications.filters.internal.ScopeNotificationEventTypeFilter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -223,29 +219,29 @@ public class ScopeNotificationEventTypeFilterTest
         when(scope1.getScopeReference()).thenReturn(
                 SCOPE_INCLUSIVE_REFERENCE_1
         );
-        when(scope1.getEventType()).thenReturn("event1");
+        when(scope1.getEventTypes()).thenReturn(Arrays.asList("event1"));
 
         NotificationPreferenceFilterScope scope2 = mock(NotificationPreferenceFilterScope.class);
         when(scope2.getScopeReference()).thenReturn(
                 SCOPE_INCLUSIVE_REFERENCE_2
         );
-        when(scope2.getEventType()).thenReturn("event2");
+        when(scope2.getEventTypes()).thenReturn(Arrays.asList("event2"));
 
         NotificationPreferenceFilterScope scope3 = mock(NotificationPreferenceFilterScope.class);
         when(scope3.getScopeReference()).thenReturn(
                 SCOPE_INCLUSIVE_REFERENCE_3
         );
-        when(scope3.getEventType()).thenReturn("event3");
+        when(scope3.getEventTypes()).thenReturn(Arrays.asList("event3"));
 
         NotificationPreferenceFilterScope exclusiveScope1 = mock(NotificationPreferenceFilterScope.class);
         when(exclusiveScope1.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_1);
         when(exclusiveScope1.getScopeFilterType()).thenReturn(NotificationPreferenceScopeFilterType.EXCLUSIVE);
-        when(exclusiveScope1.getEventType()).thenReturn("exclusiveEvent1");
+        when(exclusiveScope1.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent1"));
 
         NotificationPreferenceFilterScope exclusiveScope2 = mock(NotificationPreferenceFilterScope.class);
         when(exclusiveScope2.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_2);
         when(exclusiveScope2.getScopeFilterType()).thenReturn(NotificationPreferenceScopeFilterType.EXCLUSIVE);
-        when(exclusiveScope2.getEventType()).thenReturn("exclusiveEvent2");
+        when(exclusiveScope2.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent2"));
 
         when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
                 any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.INCLUSIVE))).thenReturn(

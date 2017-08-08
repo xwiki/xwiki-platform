@@ -106,9 +106,7 @@ public class DefaultModelBridge implements ModelBridge
                         }
 
                         preferences.add(new NotificationPreferenceFilterScope(
-                                obj.getStringValue("eventType"),
-                                obj.getStringValue("appplicationId"),
-                                (obj.getIntValue("isWatchList", 0) == 1),
+                                obj.getListValue("eventType"),
                                 entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type),
                                 scopeFilterType
                         ));

@@ -48,8 +48,6 @@ public class NotificationPreferenceScopeDocumentInitializer extends AbstractMand
      */
     private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
-    private static final String SELECT = "select";
-
     private static final String INPUT = "input";
 
     private static final String SEPARATORS = "|, ";
@@ -65,8 +63,8 @@ public class NotificationPreferenceScopeDocumentInitializer extends AbstractMand
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("eventType", "Event Type", 64);
-        xclass.addTextField("applicationId", "Application ID", 64);
+        xclass.addStaticListField("eventType", "Event Type", 64, true,
+                false, "", INPUT, SEPARATORS);
         xclass.addStaticListField("format", "Format", 64, false,
                 "alert=Alert|email=E-mail", INPUT, SEPARATORS);
         xclass.addStaticListField("scope", "Filter scope", 64, false,
@@ -74,6 +72,5 @@ public class NotificationPreferenceScopeDocumentInitializer extends AbstractMand
         xclass.addStaticListField("scopeFilterType", "Filter type", 64, false,
                 "inclusive=Inclusive|exclusive=Exclusive", INPUT, SEPARATORS);
         xclass.addTextField("scopeReference", "Scope reference", 64);
-        xclass.addBooleanField("isWatchList", "Is part of the WatchList ?", SELECT, false);
     }
 }

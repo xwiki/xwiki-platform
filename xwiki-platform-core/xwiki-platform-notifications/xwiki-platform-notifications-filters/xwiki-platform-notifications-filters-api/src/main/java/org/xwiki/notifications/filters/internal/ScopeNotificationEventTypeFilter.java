@@ -48,7 +48,7 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
     {
         // We apply the filter only on scopes having the correct eventType
         return (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
-                && scope.getEventType().equals(
+                && scope.getEventTypes().contains(
                         preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)));
     }
 
@@ -56,7 +56,7 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
     protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope, NotificationFormat format,
             Event event)
     {
-        return scope.getEventType().equals(event.getType());
+        return scope.getEventTypes().contains(event.getType());
     }
 
     @Override

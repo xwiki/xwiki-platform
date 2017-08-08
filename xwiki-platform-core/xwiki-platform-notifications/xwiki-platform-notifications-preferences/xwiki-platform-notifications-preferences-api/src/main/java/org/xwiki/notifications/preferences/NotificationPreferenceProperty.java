@@ -31,11 +31,6 @@ import org.xwiki.stability.Unstable;
 public enum NotificationPreferenceProperty
 {
     /**
-     * The ID of the application linked to the notification.
-     */
-    APPLICATION_ID,
-
-    /**
      * The type of the event linked to the notification.
      */
     EVENT_TYPE

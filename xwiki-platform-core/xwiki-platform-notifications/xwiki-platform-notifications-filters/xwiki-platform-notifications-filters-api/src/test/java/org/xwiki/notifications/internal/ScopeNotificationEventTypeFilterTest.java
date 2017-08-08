@@ -273,7 +273,7 @@ public class ScopeNotificationEventTypeFilterTest
     public void matchPreferenceWithInorrectPreference() throws Exception
     {
         NotificationPreference preference = mock(NotificationPreference.class);
-        when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.WATCHLIST);
+        when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.SYSTEM);
 
         assertFalse(mocker.getComponentUnderTest().matchesPreference(preference));
     }

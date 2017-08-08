@@ -244,10 +244,7 @@ public class QueryGenerator
     {
         int number = 0;
         for (NotificationPreference preference : preferences) {
-            if (preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)) {
-                query.bindValue(String.format("application_%d", number),
-                        preference.getProperties().get(NotificationPreferenceProperty.APPLICATION_ID));
-            } else if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
+            if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                 query.bindValue(String.format("type_%d", number),
                         preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE));
             }
@@ -272,13 +269,11 @@ public class QueryGenerator
             List<NotificationPreference> preferences) throws NotificationException
     {
         // Filter the notification preferences that are not bound to a specific EVENT_TYPE
-        // or APPLICATION_ID as those are the only parameters supported in the queries
         Iterator<NotificationPreference> it = preferences.iterator();
         while (it.hasNext()) {
             NotificationPreference preference = it.next();
 
-            if (!preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
-                && !preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)) {
+            if (!preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                 it.remove();
             }
         }
@@ -298,12 +293,7 @@ public class QueryGenerator
                 Collection<NotificationFilter> filters =
                         notificationFilterManager.getNotificationFilters(user, preference);
 
-                // TODO: Move filters.size() somewhere else
-                if (preference.getProperties().containsKey(NotificationPreferenceProperty.APPLICATION_ID)
-                        && filters.size() > 0) {
-                    hql.append(separator);
-                    hql.append(String.format("((event.application = :application_%s", number));
-                } else if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
+                if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                     hql.append(separator);
                     hql.append(String.format("((event.type = :type_%s", number));
                 } else {

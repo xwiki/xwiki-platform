@@ -58,10 +58,6 @@ public class DefaultModelBridge implements ModelBridge
 {
     private static final String EVENT_TYPE_FIELD = "eventType";
 
-    private static final String APPLICATION_ID_FIELD = "applicationId";
-
-    private static final String IS_WATCHLIST_FIELD = "isWatchList";
-
     private static final String START_DATE_FIELD = "startDate";
 
     private static final String NOTIFICATION_ENABLED_FIELD = "notificationEnabled";
@@ -108,7 +104,6 @@ public class DefaultModelBridge implements ModelBridge
                     if (obj != null) {
                         String objFormat = obj.getStringValue(FORMAT_FIELD);
                         Date objStartDate = obj.getDateValue(START_DATE_FIELD);
-                        int objIsWatchlist = obj.getIntValue(IS_WATCHLIST_FIELD, 0);
 
                         Map<NotificationPreferenceProperty, Object> properties =
                                 extractNotificationPreferenceProperties(obj);
@@ -124,9 +119,7 @@ public class DefaultModelBridge implements ModelBridge
                         notificationPreferenceBuilder.setProviderHint("userProfile");
                         notificationPreferenceBuilder.setEnabled(
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0);
-                        notificationPreferenceBuilder.setCategory((objIsWatchlist == 0)
-                                ? NotificationPreferenceCategory.DEFAULT
-                                : NotificationPreferenceCategory.WATCHLIST);
+                        notificationPreferenceBuilder.setCategory(NotificationPreferenceCategory.DEFAULT);
 
                         preferences.add(notificationPreferenceBuilder.build());
                     }
@@ -148,11 +141,6 @@ public class DefaultModelBridge implements ModelBridge
         String eventType = object.getStringValue(EVENT_TYPE_FIELD);
         if (StringUtils.isNotBlank(eventType)) {
             properties.put(NotificationPreferenceProperty.EVENT_TYPE, eventType);
-        }
-
-        String applicationId = object.getStringValue(APPLICATION_ID_FIELD);
-        if (StringUtils.isNotBlank(applicationId)) {
-            properties.put(NotificationPreferenceProperty.APPLICATION_ID, applicationId);
         }
 
         return properties;

@@ -33,11 +33,6 @@ public enum NotificationPreferenceCategory
     DEFAULT,
 
     /**
-     * The preference is used in the user watchlist.
-     */
-    WATCHLIST,
-
-    /**
      * The preference is defined in the wiki administration and shouldn't be accessible to a non-admin user.
      */
     SYSTEM

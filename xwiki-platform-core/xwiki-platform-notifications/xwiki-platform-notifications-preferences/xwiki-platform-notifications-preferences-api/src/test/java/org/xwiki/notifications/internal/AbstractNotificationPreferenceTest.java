@@ -57,7 +57,7 @@ public class AbstractNotificationPreferenceTest
         Date testDate = new Date();
 
         NotificationPreference testPreference = new NotificationPreferenceImplementation(
-                true, NotificationFormat.ALERT, NotificationPreferenceCategory.WATCHLIST,
+                true, NotificationFormat.ALERT, NotificationPreferenceCategory.SYSTEM,
                 testDate, "userProfile",
                 Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "eventType"));
 
@@ -71,6 +71,6 @@ public class AbstractNotificationPreferenceTest
 
         assertEquals("userProfile", testPreference.getProviderHint());
 
-        assertEquals(NotificationPreferenceCategory.WATCHLIST, testPreference.getCategory());
+        assertEquals(NotificationPreferenceCategory.SYSTEM, testPreference.getCategory());
     }
 }

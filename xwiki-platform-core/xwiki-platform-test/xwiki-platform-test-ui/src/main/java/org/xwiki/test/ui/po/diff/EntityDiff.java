@@ -77,7 +77,7 @@ public class EntityDiff extends BaseElement
         for (WebElement line : getDriver().findElementsWithoutWaiting(element, By.xpath(".//td[3]"))) {
             if (getDriver().findElementsWithoutWaiting(line, By.tagName("ins")).size() > 0
                 || getDriver().findElementsWithoutWaiting(line, By.tagName("del")).size() > 0) {
-                diff.add(String.valueOf(getDriver().executeJavascript("return arguments[0].innerHTML", line)));
+                diff.add(line.getAttribute("innerHTML"));
             } else {
                 diff.add(line.getText());
             }

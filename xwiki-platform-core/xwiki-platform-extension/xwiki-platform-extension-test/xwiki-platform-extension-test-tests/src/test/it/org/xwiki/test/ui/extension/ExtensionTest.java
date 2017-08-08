@@ -414,7 +414,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         extension.addDependency(new DefaultExtensionDependency("org.xwiki.platform:xwiki-platform-sheet-api",
             new DefaultVersionConstraint("[3.2,)")));
         extension.addDependency(new DefaultExtensionDependency("org.xwiki.commons:xwiki-commons-diff-api",
-            new DefaultVersionConstraint("2.7")));
+            new DefaultVersionConstraint("[2.7,)")));
         extension.addDependency(new DefaultExtensionDependency("org.xwiki.platform:xwiki-platform-display-api",
             new DefaultVersionConstraint("100.1")));
         getRepositoryTestUtils().addExtension(extension);
@@ -447,14 +447,13 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         assertNotNull(directDependencies.get(3).getLink());
         assertEquals("XWiki Commons - Diff API", directDependencies.get(3).getName());
-        assertEquals("2.7", directDependencies.get(3).getVersion());
-        assertEquals("remote-core", directDependencies.get(3).getStatus());
-        assertTrue(directDependencies.get(3).getStatusMessage().matches("Version [^\\s]+ is provided"));
+        assertEquals("[2.7,)", directDependencies.get(3).getVersion());
+        assertEquals("core", directDependencies.get(3).getStatus());
+        assertTrue(directDependencies.get(3).getStatusMessage().matches("Provided"));
 
         assertEquals("XWiki Platform - Display API", directDependencies.get(4).getName());
         assertEquals("100.1", directDependencies.get(4).getVersion());
         assertEquals("remote-core-incompatible", directDependencies.get(4).getStatus());
-        assertTrue(directDependencies.get(4).getStatusMessage().matches("Incompatible with provided version [^\\s]+"));
 
         assertTrue(dependenciesPane.getBackwardDependencies().isEmpty());
 

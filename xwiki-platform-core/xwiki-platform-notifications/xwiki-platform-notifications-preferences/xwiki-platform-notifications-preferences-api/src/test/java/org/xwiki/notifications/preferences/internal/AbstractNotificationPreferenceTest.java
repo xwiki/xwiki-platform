@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.preferences.internal;
 
 import java.util.Collections;
 import java.util.Date;
@@ -28,8 +28,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.internal.AbstractNotificationPreference;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 
 import static org.junit.Assert.assertEquals;
 

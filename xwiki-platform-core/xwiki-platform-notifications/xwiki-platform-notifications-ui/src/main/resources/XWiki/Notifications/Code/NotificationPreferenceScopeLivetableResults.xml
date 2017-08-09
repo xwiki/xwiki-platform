@@ -53,7 +53,7 @@
     #if ("$!format" == '')
       #set ($format = 'alert')
     #end
-    #if ($obj.getValue('eventType') == "$!request.eventType" &amp;&amp; $format == "$!request.format")
+    #if ($obj.getValue('eventType').contains("$!request.eventType") &amp;&amp; $format == "$!request.format")
       #if ($obj.getValue('scope') == 'pageOnly')
         #set ($reference = $services.model.resolveDocument($obj.getValue('scopeReference')))
       #elseif ($obj.getValue('scope') == 'pageAndChildren')

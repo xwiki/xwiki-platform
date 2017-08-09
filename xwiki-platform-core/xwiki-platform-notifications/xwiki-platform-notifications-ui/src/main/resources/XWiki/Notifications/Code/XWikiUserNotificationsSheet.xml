@@ -199,7 +199,7 @@
       #if ("$!objFormat" == '')
         #set ($objFormat = 'alert')
       #end
-      #if ($obj.getValue('eventType') == $eventType &amp;&amp; $format == $objFormat)
+      #if ($obj.getValue('eventType').contains($eventType) &amp;&amp; $format == $objFormat)
         #set ($count = $count + 1)
       #end
     #end

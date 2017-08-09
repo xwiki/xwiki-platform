@@ -749,10 +749,16 @@ require(['jquery'], function($) {
 });
 
 // Activate the auto-save feature.
-require(['jquery', 'xwiki-ckeditor', 'autosave'], function($, ckeditorPromise) {
+require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge', 'autosave'], function($, ckeditorPromise) {
   ckeditorPromise.done(function(ckeditor) {
-    $('.ckeditor-textarea').each(function() {
-      ckeditor.replace(this);
+    var createEditors = function(container) {
+      container.find('.ckeditor-textarea').each(function() {
+        ckeditor.replace(this);
+      });
+    };
+    createEditors($(body));
+    $(document).on('xwiki:dom:updated', function(event, data) {
+      createEditors($(data.elements));
     });
   });
 });</code>

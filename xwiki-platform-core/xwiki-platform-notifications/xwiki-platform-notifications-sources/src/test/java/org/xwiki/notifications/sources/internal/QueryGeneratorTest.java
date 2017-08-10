@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.internal.util.collections.Sets;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -268,7 +269,7 @@ public class QueryGeneratorTest
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
         when(notificationFilterManager.getFilters(any(DocumentReference.class),
-                any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1, notificationFilter2));
+                any(NotificationPreference.class))).thenReturn(Sets.newSet(notificationFilter1, notificationFilter2));
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
                 .thenReturn(
@@ -345,7 +346,7 @@ public class QueryGeneratorTest
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
         when(notificationFilterManager.getFilters(any(DocumentReference.class),
-                any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1));
+                any(NotificationPreference.class))).thenReturn(Collections.singleton(notificationFilter1));
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
                 .thenReturn(new EmptyNode());

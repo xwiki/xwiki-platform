@@ -29,6 +29,7 @@ define('macroSelectorTranslationKeys', [], [
 define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $modal, translations) {
   'use strict';
   var macrosBySyntax = {},
+  allMacrosExcludedCategories = {},
 
   getMacros = function(syntaxId) {
     var deferred = $.Deferred();
@@ -38,9 +39,11 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     } else {
       var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', 'outputSyntax=plain');
       $.get(url, {data: 'list', syntaxId: syntaxId}).done(function(macros) {
-        if ($.isArray(macros)) {
-          macrosBySyntax[syntaxId || ''] = macros;
-          deferred.resolve(macros);
+        // Bulletproofing: check if the returned data is json since it could some HTML representing an error
+        if (typeof macros == 'object' && $.isArray(macros.list)) {
+          macrosBySyntax[syntaxId || ''] = macros.list;
+          allMacrosExcludedCategories = macros.options.allMacrosExcludedCategories;
+          deferred.resolve(macros.list);
         } else {
           deferred.reject.apply(deferred, arguments);
         }
@@ -81,6 +84,10 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     var filters = $(document.createElement('div')).addClass('macro-filters input-group');
     filters.append(textFilter).append(categoryFilter);
     this.removeClass('loading').append(filters).append(list);
+    // Filter the list of displayed macros to implement support for allMacrosExcludedCategories (i.e. when all macros
+    // is selected, don't display macros in some given categories). More generally this makes sure that the filtering
+    // is always done.
+    filterMacros.call(this)
   },
 
   createCategoryFilter = function(categories) {
@@ -141,11 +148,13 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       var name = $(this).find('.macro-name').text().toLowerCase();
       var description = $(this).find('.macro-description').text().toLowerCase();
       var category = $(this).attr('data-macroCategory');
-      // By default we hide Macros located in the special Internal and Deprecated categories so that they
-      // are less visible to users.
+      // We hide Macros located in some categories to exclude (e.g. internal and deprecated categories) so that they
+      // are less visible to users, to provide a simpler user experience by not bloating the macro list with
+      // macros that are less interesting to users.
+      // Note that when "All Macros" is selected selectedCategory is undefined.
       var hide = (text && name.indexOf(text) < 0 && description.indexOf(text) < 0) ||
         (typeof selectedCategory === 'string' && category !== selectedCategory) ||
-          (typeof selectedCategory !== 'string' && (category === 'Internal' || category === 'Deprecated'));
+          (typeof selectedCategory !== 'string' && $.inArray(category, allMacrosExcludedCategories) !== -1);
       $(this).removeClass('selected').toggleClass('hidden', hide);
     }).not('.hidden').first().addClass('selected');
     macroSelector.trigger('change');

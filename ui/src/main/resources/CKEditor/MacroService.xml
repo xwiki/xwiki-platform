@@ -60,22 +60,48 @@
   #end
 #end
 
+## ================================================================
+## Returned JSON format:
+##
+## {
+##   'options': {
+##     'allMacrosExcludedCategories': [
+##       (translated category name), ...
+##     ]
+##   },
+##   'list': [
+##     {
+##       'id': (macro id),
+##       'name': (translated macro name),
+##       'description': (translated macro description),
+##       'defaultCategory': (translated macro category),
+##     },
+##     ...
+##   ]
+## }
+## ================================================================
 #macro (getMacroList $syntaxId)
   #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
   #set ($syntax = $services.rendering.resolveSyntax($syntaxId))
-  #set ($data = [])
+  #set ($data = {})
+  #set ($allMacrosExcludedCategories = [])
+  #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Internal' 'Internal')"))
+  #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Deprecated' 'Deprecated')"))
+  #set ($discard = $data.put('options', { 'allMacrosExcludedCategories' : $allMacrosExcludedCategories }))
+  #set ($macroList = [])
   #foreach ($macroId in $macroManager.getMacroIds($syntax))
     #set ($macroDescriptor = $macroManager.getMacro($macroId).descriptor)
     #set ($macroTranslationKey = "rendering.macro.$macroId")
     #set ($macroCategoryTranslationKey = "rendering.macroCategory.$macroDescriptor.defaultCategory")
-    #set ($discard = $data.add({
+    #set ($discard = $macroList.add({
       'id': $macroId,
       'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
       'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
       'defaultCategory': "#maybeTranslate($macroCategoryTranslationKey $macroDescriptor.defaultCategory)"
     }))
   #end
-  #set ($data = $sorttool.sort($data, 'name'))
+  #set ($macroList = $sorttool.sort($macroList, 'name'))
+  #set ($discard = $data.put('list', $macroList))
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)

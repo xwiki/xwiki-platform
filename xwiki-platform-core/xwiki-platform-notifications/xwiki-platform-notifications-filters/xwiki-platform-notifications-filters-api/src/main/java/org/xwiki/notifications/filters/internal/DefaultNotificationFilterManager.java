@@ -60,7 +60,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     private ModelContext modelContext;
 
     @Override
-    public Collection<NotificationFilter> getAllNotificationFilters(DocumentReference user)
+    public Collection<NotificationFilter> getAllFilters(DocumentReference user)
             throws NotificationException
     {
         // If the user is from the main wiki, get filters from all wikis
@@ -93,10 +93,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public Collection<NotificationFilter> getNotificationFilters(DocumentReference user,
+    public Collection<NotificationFilter> getFilters(DocumentReference user,
             NotificationPreference preference) throws NotificationException
     {
-        Collection<NotificationFilter> filters = getAllNotificationFilters(user);
+        Collection<NotificationFilter> filters = getAllFilters(user);
 
         Iterator<NotificationFilter> it = filters.iterator();
 

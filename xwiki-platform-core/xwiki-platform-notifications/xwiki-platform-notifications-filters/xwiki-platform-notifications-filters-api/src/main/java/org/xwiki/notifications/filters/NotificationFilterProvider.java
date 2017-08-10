@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.filters;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -28,32 +28,41 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
 /**
- * Provide an interface for interacting with user notification filters.
+ * Role used to provide {@link NotificationFilter} to {@link NotificationFilterManager}.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Role
 @Unstable
-public interface NotificationFilterManager
+public interface NotificationFilterProvider
 {
     /**
-     * Get all notifications filters, from all wikis if the user is global.
+     * Get every registered {@link NotificationFilter} for the given user.
      *
-     * @param user the user interested in notifications
-     * @return a collection of notification filters
-     * @throws NotificationException if error happens
+     * @param user the user for which to retrieve the notification preferences
+     * @return a list of notification filters
+     * @throws NotificationException if an error happened
      */
-    Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
+    List<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
 
     /**
-     * Get all the notification filters for the given user that matches the given notification preference.
+     * Get every registered {@link NotificationFilter} for the given user and corresponding with the given
+     * {@link NotificationPreference}.
      *
-     * @param user the user to get filters from
-     * @param preference the preference that filters should match
-     * @return a collection of notification filters
-     * @throws NotificationException if error happens
+     * @param user the user for which to retrieve the notification filters
+     * @param preference the preference to use
+     * @return a list of notification filters
+     * @throws NotificationException if an error happened
      */
-    Collection<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
+    List<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
             throws NotificationException;
+
+    /**
+     * Save a given list of notification filters.
+     *
+     * @param filters the {@link NotificationFilter} to save
+     * @throws NotificationException if an error occurred
+     */
+    void saveFilters(List<NotificationFilter> filters) throws NotificationException;
 }

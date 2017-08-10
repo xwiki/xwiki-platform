@@ -123,7 +123,7 @@ public class DefaultNotificationPreferenceManagerTest
 
         mockPreferenceProviders(user);
 
-        List<NotificationPreference> preferences = mocker.getComponentUnderTest().getNotificationsPreferences(user);
+        List<NotificationPreference> preferences = mocker.getComponentUnderTest().getAllPreferences(user);
 
         assertEquals(4, preferences.size());
         assertTrue(preferences.contains(mockPreference11));
@@ -139,25 +139,25 @@ public class DefaultNotificationPreferenceManagerTest
 
         mockPreferenceProviders(user);
 
-        List<NotificationPreference> preferences = mocker.getComponentUnderTest().getNotificationsPreferences(user,
+        List<NotificationPreference> preferences = mocker.getComponentUnderTest().getPreferences(user,
                 true, NotificationFormat.ALERT);
 
         assertEquals(1, preferences.size());
         assertTrue(preferences.contains(mockPreference11));
 
-        preferences = mocker.getComponentUnderTest().getNotificationsPreferences(user,
+        preferences = mocker.getComponentUnderTest().getPreferences(user,
                 false, NotificationFormat.ALERT);
 
         assertEquals(1, preferences.size());
         assertTrue(preferences.contains(mockPreference21));
 
-        preferences = mocker.getComponentUnderTest().getNotificationsPreferences(user,
+        preferences = mocker.getComponentUnderTest().getPreferences(user,
                 true, NotificationFormat.EMAIL);
 
         assertEquals(1, preferences.size());
         assertTrue(preferences.contains(mockPreference12));
 
-        preferences = mocker.getComponentUnderTest().getNotificationsPreferences(user,
+        preferences = mocker.getComponentUnderTest().getPreferences(user,
                 false, NotificationFormat.EMAIL);
 
         assertEquals(1, preferences.size());
@@ -170,7 +170,7 @@ public class DefaultNotificationPreferenceManagerTest
         mockPreferenceProviders(new DocumentReference("xwiki", "test", "user"));
 
         mocker.getComponentUnderTest()
-                .saveNotificationsPreferences(
+                .savePreferences(
                         Arrays.asList(mockPreference11, mockPreference12, mockPreference21, mockPreference22));
 
         verify(mockPreferenceProvider1, times(1))

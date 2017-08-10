@@ -22,9 +22,7 @@ package org.xwiki.notifications.sources.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -104,7 +102,7 @@ public class QueryGeneratorTest
         when(pref1.getStartDate()).thenReturn(pref1StartDate);
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
-        when(notificationPreferenceManager.getNotificationsPreferences(userReference, true,
+        when(notificationPreferenceManager.getPreferences(userReference, true,
                 NotificationFormat.ALERT)).thenReturn(Arrays.asList(pref1));
 
         when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
@@ -269,7 +267,7 @@ public class QueryGeneratorTest
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
-        when(notificationFilterManager.getNotificationFilters(any(DocumentReference.class),
+        when(notificationFilterManager.getFilters(any(DocumentReference.class),
                 any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1, notificationFilter2));
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
@@ -346,7 +344,7 @@ public class QueryGeneratorTest
 
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
-        when(notificationFilterManager.getNotificationFilters(any(DocumentReference.class),
+        when(notificationFilterManager.getFilters(any(DocumentReference.class),
                 any(NotificationPreference.class))).thenReturn(Arrays.asList(notificationFilter1));
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))

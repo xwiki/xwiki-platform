@@ -249,7 +249,7 @@ public class DefaultNotificationManager implements NotificationManager
     private boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
             throws NotificationException
     {
-        for (NotificationFilter filter : notificationFilterManager.getAllNotificationFilters(user)) {
+        for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
             if (filter.filterEvent(event, user, format)) {
                 return true;
             }
@@ -379,14 +379,14 @@ public class DefaultNotificationManager implements NotificationManager
     @Override
     public List<NotificationPreference> getPreferences() throws NotificationException
     {
-        return notificationPreferenceManager.getNotificationsPreferences(
+        return notificationPreferenceManager.getAllPreferences(
                 documentAccessBridge.getCurrentUserReference());
     }
 
     @Override
     public List<NotificationPreference> getPreferences(String userId) throws NotificationException
     {
-        return notificationPreferenceManager.getNotificationsPreferences(documentReferenceResolver.resolve(userId));
+        return notificationPreferenceManager.getAllPreferences(documentReferenceResolver.resolve(userId));
     }
 
     @Override

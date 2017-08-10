@@ -45,7 +45,7 @@ public interface NotificationPreferenceManager
      * @return every {@link NotificationPreference} linked to this user
      * @throws NotificationException if an error occurs
      */
-    List<NotificationPreference> getNotificationsPreferences(DocumentReference user) throws NotificationException;
+    List<NotificationPreference> getAllPreferences(DocumentReference user) throws NotificationException;
 
     /**
      * Get a list of registered {@link NotificationPreference} for the given user.
@@ -56,7 +56,7 @@ public interface NotificationPreferenceManager
      * @return a list of {@link NotificationPreference}
      * @throws NotificationException if an error occurs
      */
-    List<NotificationPreference> getNotificationsPreferences(DocumentReference user, boolean isEnabled,
+    List<NotificationPreference> getPreferences(DocumentReference user, boolean isEnabled,
             NotificationFormat format) throws NotificationException;
 
     /**
@@ -72,11 +72,11 @@ public interface NotificationPreferenceManager
      * Save the given {@link NotificationPreference}. If such notification already exists, it will
      * be updated.
      *
-     * @param notificationPreferences the list of notification preference to save
+     * @param preferences the list of notification preference to save
      * @throws NotificationException if error happens
      *
      * @since 9.7RC1
      */
-    void saveNotificationsPreferences(List<NotificationPreference> notificationPreferences)
+    void savePreferences(List<NotificationPreference> preferences)
             throws NotificationException;
 }

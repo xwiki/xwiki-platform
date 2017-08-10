@@ -62,7 +62,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     private Logger logger;
 
     @Override
-    public List<NotificationPreference> getNotificationsPreferences(DocumentReference user)
+    public List<NotificationPreference> getAllPreferences(DocumentReference user)
             throws NotificationException
     {
         try {
@@ -90,10 +90,10 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     }
 
     @Override
-    public List<NotificationPreference> getNotificationsPreferences(DocumentReference user, boolean isEnabled,
+    public List<NotificationPreference> getPreferences(DocumentReference user, boolean isEnabled,
             NotificationFormat format) throws NotificationException
     {
-        List<NotificationPreference> preferences = getNotificationsPreferences(user);
+        List<NotificationPreference> preferences = getAllPreferences(user);
 
         Iterator<NotificationPreference> it = preferences.iterator();
         while (it.hasNext()) {
@@ -115,14 +115,14 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     }
 
     @Override
-    public void saveNotificationsPreferences(List<NotificationPreference> notificationPreferences)
+    public void savePreferences(List<NotificationPreference> preferences)
             throws NotificationException
     {
         // We construct a map where each key is a provider hint and each value is a list of associated providers
         // this allows calling each provider only once
         Map<String, List<NotificationPreference>> preferencesMapping = new HashMap<>();
 
-        for (NotificationPreference notificationPreference : notificationPreferences) {
+        for (NotificationPreference notificationPreference : preferences) {
             // Try to get the corresponding provider, if no provider can be found, discard the save of the preference
             String providerHint = notificationPreference.getProviderHint();
             if (componentManager.hasComponent(NotificationPreferenceProvider.class, providerHint)) {

@@ -106,7 +106,7 @@ public class QueryGenerator
         // TODO: idea: handle the items of the watchlist too
 
         // First: get the active preferences of the given user
-        List<NotificationPreference> preferences = notificationPreferenceManager.getNotificationsPreferences(
+        List<NotificationPreference> preferences = notificationPreferenceManager.getPreferences(
                 user, true, format);
 
         // Then: generate the HQL query
@@ -291,7 +291,7 @@ public class QueryGenerator
                 NotificationPreference preference = it.next();
                 // Get the notification filters related to the current preference
                 Collection<NotificationFilter> filters =
-                        notificationFilterManager.getNotificationFilters(user, preference);
+                        notificationFilterManager.getFilters(user, preference);
 
                 if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {
                     hql.append(separator);

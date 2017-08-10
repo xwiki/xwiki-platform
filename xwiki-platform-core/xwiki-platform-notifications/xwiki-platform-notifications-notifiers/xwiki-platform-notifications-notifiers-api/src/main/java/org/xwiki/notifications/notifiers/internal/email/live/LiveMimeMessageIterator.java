@@ -90,7 +90,7 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
         if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
-            for (NotificationFilter filter : this.notificationFilterManager.getAllNotificationFilters(user)) {
+            for (NotificationFilter filter : this.notificationFilterManager.getAllFilters(user)) {
                 Iterator<Event> it = resultCompositeEvent.getEvents().iterator();
                 while (it.hasNext()) {
                     Event event = it.next();
@@ -120,7 +120,7 @@ public class LiveMimeMessageIterator extends AbstractMimeMessageIterator
     {
         try {
             for (NotificationPreference notificationPreference
-                    : notificationPreferenceManager.getNotificationsPreferences(user)) {
+                    : notificationPreferenceManager.getAllPreferences(user)) {
                 if (notificationPreference.getFormat().equals(NotificationFormat.EMAIL)
                         && notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
                         && notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)

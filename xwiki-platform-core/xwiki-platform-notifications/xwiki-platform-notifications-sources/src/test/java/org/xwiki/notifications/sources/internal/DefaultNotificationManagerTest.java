@@ -99,7 +99,7 @@ public class DefaultNotificationManagerTest
         when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
-        when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
+        when(notificationPreferenceManager.getAllPreferences(userReference)).thenReturn(Arrays.asList(pref1));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class DefaultNotificationManagerTest
         when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.isNotificationEnabled()).thenReturn(false);
 
-        when(notificationPreferenceManager.getNotificationsPreferences(userReference)).thenReturn(Arrays.asList(pref1));
+        when(notificationPreferenceManager.getAllPreferences(userReference)).thenReturn(Arrays.asList(pref1));
 
         // Test
         List<CompositeEvent> results

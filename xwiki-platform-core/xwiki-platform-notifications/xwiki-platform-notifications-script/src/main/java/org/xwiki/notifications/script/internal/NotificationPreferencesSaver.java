@@ -85,7 +85,7 @@ public class NotificationPreferencesSaver
                 toSave.add(targetableNotificationPreferenceBuilder.build());
             }
 
-            notificationPreferenceManager.saveNotificationsPreferences(toSave);
+            notificationPreferenceManager.savePreferences(toSave);
 
         } catch (Exception e) {
             throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);

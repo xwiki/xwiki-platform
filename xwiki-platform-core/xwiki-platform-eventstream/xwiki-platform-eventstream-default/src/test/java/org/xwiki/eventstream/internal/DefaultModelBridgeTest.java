@@ -34,7 +34,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
@@ -44,6 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,18 +61,14 @@ public class DefaultModelBridgeTest
 
     private Provider<XWikiContext> contextProvider;
 
-    private AuthorizationManager authorizationManager;
-
-    private DocumentReferenceResolver documentReferenceResolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Before
     public void setUp() throws Exception
     {
         this.contextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
 
-        this.authorizationManager = this.mocker.registerMockComponent(AuthorizationManager.class);
-
-        this.documentReferenceResolver = this.mocker.registerMockComponent(DocumentReferenceResolver.class);
+        this.documentReferenceResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
     }
 
     @Test
@@ -119,7 +115,7 @@ public class DefaultModelBridgeTest
         LocalDocumentReference localDocumentReferenceType1 = mock(LocalDocumentReference.class);
 
         when(resolvedType1.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
-        when(this.documentReferenceResolver.resolve("type1")).thenReturn(resolvedType1);
+        when(this.documentReferenceResolver.resolve(eq("type1"))).thenReturn(resolvedType1);
         when(document.getXObjects()).thenReturn(documentXObjects);
 
         when(documentReferenceFromDocumentXObjects.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);

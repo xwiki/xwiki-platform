@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -53,6 +54,7 @@ public class DefaultModelBridge implements ModelBridge
     private Provider<XWikiContext> contextProvider;
 
     @Inject
+    @Named("default")
     private DocumentReferenceResolver documentReferenceResolver;
 
     @Override

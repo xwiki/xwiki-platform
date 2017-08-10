@@ -20,11 +20,11 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -153,7 +153,7 @@ public class QueryGenerator
         return query;
     }
 
-    private void handleEventFilters(Collection<NotificationFilter> filters, DocumentReference user,
+    private void handleEventFilters(Set<NotificationFilter> filters, DocumentReference user,
             NotificationPreference preference, StringBuilder query, List<Map<String, String>> queryParameters)
     {
         NFExpressionToHQLParser parser = new NFExpressionToHQLParser();
@@ -290,7 +290,7 @@ public class QueryGenerator
             while (it.hasNext()) {
                 NotificationPreference preference = it.next();
                 // Get the notification filters related to the current preference
-                Collection<NotificationFilter> filters =
+                Set<NotificationFilter> filters =
                         notificationFilterManager.getFilters(user, preference);
 
                 if (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)) {

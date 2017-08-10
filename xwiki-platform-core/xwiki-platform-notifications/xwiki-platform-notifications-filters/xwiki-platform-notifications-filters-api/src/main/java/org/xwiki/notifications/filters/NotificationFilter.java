@@ -69,4 +69,15 @@ public interface NotificationFilter
      * @since 9.7RC1
      */
     AbstractNode filterExpression(DocumentReference user, NotificationPreference preference);
+
+    /**
+     * Just as what is done in {@link NotificationPreference#getProviderHint()}, the provider linked to
+     * a {@link NotificationFilter} is helpful as it permits the {@link NotificationFilterManager} to know where
+     * to save a given preference.
+     *
+     * @return the hint of the provider that the filter comes from. If no provider is defined, returns null.
+     *
+     * @since 9.7RC1
+     */
+    String getProviderHint();
 }

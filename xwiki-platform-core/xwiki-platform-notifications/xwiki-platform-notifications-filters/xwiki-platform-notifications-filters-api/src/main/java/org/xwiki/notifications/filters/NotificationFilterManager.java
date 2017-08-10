@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.filters;
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,7 +44,7 @@ public interface NotificationFilterManager
      * @return a collection of notification filters
      * @throws NotificationException if error happens
      */
-    Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
+    Set<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
 
     /**
      * Get all the notification filters for the given user that matches the given notification preference.
@@ -54,6 +54,6 @@ public interface NotificationFilterManager
      * @return a collection of notification filters
      * @throws NotificationException if error happens
      */
-    Collection<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
+    Set<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
             throws NotificationException;
 }

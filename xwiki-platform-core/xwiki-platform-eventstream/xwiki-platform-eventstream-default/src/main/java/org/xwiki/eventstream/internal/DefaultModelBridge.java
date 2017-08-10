@@ -54,8 +54,7 @@ public class DefaultModelBridge implements ModelBridge
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    @Named("default")
-    private DocumentReferenceResolver documentReferenceResolver;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
     public DocumentReference getAuthorReference(EntityReference entityReference) throws EventStreamException

@@ -765,7 +765,6 @@
     </wikiDocumentLocale>
   </wikiDocument>
 </wikiSpace>
-<extension id="test" version="1.0"/>
 .#------------------------------------------------------------------------------
 .expect|xwiki+xar/1.1
 .configuration.source=${{{extension.repository}}}/test1-1.0.xar

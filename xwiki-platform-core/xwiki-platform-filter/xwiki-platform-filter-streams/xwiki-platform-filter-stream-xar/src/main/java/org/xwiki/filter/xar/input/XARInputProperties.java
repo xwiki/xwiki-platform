@@ -178,7 +178,9 @@ public class XARInputProperties extends XMLInputProperties
     @Deprecated
     public void setForceDocument(boolean forceDocument)
     {
-        this.sourceType = SourceType.DOCUMENT;
+        if (forceDocument) {
+            this.sourceType = SourceType.DOCUMENT;
+        }
     }
 
     /**

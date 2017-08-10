@@ -357,7 +357,7 @@ public class DocumentLocaleReader extends AbstractReader
         xmlReader.nextTag();
 
         this.currentSourceType = this.properties.getSourceType();
-        if (this.currentSourceType != null && this.currentSourceType != SourceType.DOCUMENT) {
+        if (this.currentSourceType != null) {
             switch (this.currentSourceType) {
                 case ATTACHMENT:
                     readAttachment(xmlReader, filter, proxyFilter);
@@ -384,11 +384,11 @@ public class DocumentLocaleReader extends AbstractReader
                     break;
 
                 default:
+                    readDocument(xmlReader, filter, proxyFilter);
+
                     break;
             }
         } else {
-            xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
-
             readDocument(xmlReader, filter, proxyFilter);
         }
     }
@@ -396,6 +396,8 @@ public class DocumentLocaleReader extends AbstractReader
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
+        xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
+
         this.currentSourceType = SourceType.DOCUMENT;
 
         // Initialize with a few defaults (thing that don't exist in old XAR format)

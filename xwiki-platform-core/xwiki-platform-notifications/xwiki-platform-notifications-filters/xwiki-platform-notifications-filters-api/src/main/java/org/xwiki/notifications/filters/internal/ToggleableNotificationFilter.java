@@ -19,23 +19,22 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
- * Determine the filter type of a {@link NotificationPreferenceFilterScope}.
- * This type can be either inclusive or exclusive. This will affect the comportment of the related
- * {@link NotificationPreferenceFilterScope}.
+ * This annotation characterise a notification filter that can be enabled or disabled in the preferences of every user.
  *
  * @version $Id$
  * @since 9.7RC1
  */
-public enum NotificationPreferenceScopeFilterType
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ToggleableNotificationFilter
 {
     /**
-     * This is the default scope type, the filter associated with this scope will be inclusive.
+     * @return the name of the notification filter
      */
-    INCLUSIVE,
-
-    /**
-     * The filter associated with this scope will be exclusive.
-     */
-    EXCLUSIVE
+    String value() default "";
 }

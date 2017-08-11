@@ -20,7 +20,9 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -62,6 +64,10 @@ public class DefaultModelBridge implements ModelBridge
             "NotificationPreferenceScopeClass", NOTIFICATION_CODE_SPACE
     );
 
+    private static final DocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS = new DocumentReference(
+            "ToggleableFilterPreferenceClass", NOTIFICATION_CODE_SPACE
+    );
+
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 
@@ -90,7 +96,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null && isCompatibleFormat(obj.getStringValue("format"), format)) {
                         String scopeType = obj.getStringValue("scope");
-                        NotificationPreferenceScopeFilterType scopeFilterType = this.extractScopeFilterType(obj);
+                        NotificationFilterType scopeFilterType = this.extractScopeFilterType(obj);
                         EntityType type;
                         if (scopeType.equals("pageOnly")) {
                             type = EntityType.DOCUMENT;
@@ -126,18 +132,18 @@ public class DefaultModelBridge implements ModelBridge
      * Extract the scopeFilterType parameter in the given {@link BaseObject}.
      * This is done in order to eliminate too much cyclomatic complexity in
      * {@link #getNotificationPreferenceScopes(DocumentReference, NotificationFormat)}.
-     * If no scopeFilterType is defined, the default is {@link NotificationPreferenceScopeFilterType#INCLUSIVE}.
+     * If no scopeFilterType is defined, the default is {@link NotificationFilterType#INCLUSIVE}.
      *
      * @param object the related base object
-     * @return the corresponding {@link NotificationPreferenceScopeFilterType}
+     * @return the corresponding {@link NotificationFilterType}
      * @since 9.7RC1
      */
-    private NotificationPreferenceScopeFilterType extractScopeFilterType(BaseObject object)
+    private NotificationFilterType extractScopeFilterType(BaseObject object)
     {
         String rawScopeFilterType = object.getStringValue("scopeFilterType");
         return (rawScopeFilterType != null && StringUtils.isNotBlank(rawScopeFilterType))
-                ? NotificationPreferenceScopeFilterType.valueOf(rawScopeFilterType.toUpperCase())
-                : NotificationPreferenceScopeFilterType.INCLUSIVE;
+                ? NotificationFilterType.valueOf(rawScopeFilterType.toUpperCase())
+                : NotificationFilterType.INCLUSIVE;
     }
 
     private boolean isCompatibleFormat(String format, NotificationFormat expectedFormat)
@@ -147,7 +153,7 @@ public class DefaultModelBridge implements ModelBridge
 
     @Override
     public List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference userReference,
-            NotificationFormat format, NotificationPreferenceScopeFilterType scopeFilterType)
+            NotificationFormat format, NotificationFilterType scopeFilterType)
             throws NotificationException
     {
         List<NotificationPreferenceFilterScope> preferences = new ArrayList<>();
@@ -160,5 +166,36 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    @Override
+    public Set<String> getDisabledNotificationFiltersHints(DocumentReference userReference)
+            throws NotificationException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        final DocumentReference notificationPreferencesScopeClass
+                = TOGGLEABLE_FILTER_PREFERENCE_CLASS.setWikiReference(userReference.getWikiReference());
+
+        Set<String> disabledFilters = new HashSet<>();
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(userReference, context);
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
+            if (preferencesObj != null) {
+                for (BaseObject obj : preferencesObj) {
+                    if (obj.getIntValue("isEnabled", 1) == 0) {
+                        disabledFilters.add(obj.getStringValue("filterName"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to get the toggleable filters preferences for the user [%s].",
+                            userReference), e);
+        }
+
+        return disabledFilters;
     }
 }

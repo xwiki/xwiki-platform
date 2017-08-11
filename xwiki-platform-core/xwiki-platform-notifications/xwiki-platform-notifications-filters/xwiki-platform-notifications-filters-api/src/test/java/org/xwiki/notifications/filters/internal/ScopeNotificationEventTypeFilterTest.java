@@ -235,21 +235,21 @@ public class ScopeNotificationEventTypeFilterTest
 
         NotificationPreferenceFilterScope exclusiveScope1 = mock(NotificationPreferenceFilterScope.class);
         when(exclusiveScope1.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_1);
-        when(exclusiveScope1.getScopeFilterType()).thenReturn(NotificationPreferenceScopeFilterType.EXCLUSIVE);
+        when(exclusiveScope1.getScopeFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(exclusiveScope1.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent1"));
 
         NotificationPreferenceFilterScope exclusiveScope2 = mock(NotificationPreferenceFilterScope.class);
         when(exclusiveScope2.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_2);
-        when(exclusiveScope2.getScopeFilterType()).thenReturn(NotificationPreferenceScopeFilterType.EXCLUSIVE);
+        when(exclusiveScope2.getScopeFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(exclusiveScope2.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent2"));
 
         when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
-                any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.INCLUSIVE))).thenReturn(
+                any(NotificationFormat.class), eq(NotificationFilterType.INCLUSIVE))).thenReturn(
                         Arrays.asList(scope1, scope2, scope3)
         );
 
         when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
-                any(NotificationFormat.class), eq(NotificationPreferenceScopeFilterType.EXCLUSIVE))).thenReturn(
+                any(NotificationFormat.class), eq(NotificationFilterType.EXCLUSIVE))).thenReturn(
                         Arrays.asList(exclusiveScope1, exclusiveScope2)
         );
     }

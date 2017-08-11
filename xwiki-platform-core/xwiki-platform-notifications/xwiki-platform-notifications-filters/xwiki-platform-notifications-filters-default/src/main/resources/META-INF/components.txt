@@ -1,2 +1,3 @@
 org.xwiki.notifications.filters.internal.DefaultModelBridge
 org.xwiki.notifications.filters.internal.NotificationPreferenceScopeDocumentInitializer
+org.xwiki.notifications.filters.internal.ToggleableFilterPreferenceDocumentInitializer

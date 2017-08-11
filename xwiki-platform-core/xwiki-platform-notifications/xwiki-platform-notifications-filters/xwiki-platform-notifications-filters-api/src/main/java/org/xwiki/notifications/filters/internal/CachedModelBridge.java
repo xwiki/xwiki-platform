@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,6 +46,8 @@ import org.xwiki.notifications.NotificationFormat;
 public class CachedModelBridge implements ModelBridge
 {
     private static final String USER_NOTIFICATIONS_PREFERENCES_SCOPE = "userNotificationsPreferencesScope";
+
+    private static final String USER_TOGGLEABLE_FILTER_PREFERENCES = "userToggleableFilterPreference";
 
     private static final String UNDERSCORE = "_";
 
@@ -73,7 +76,7 @@ public class CachedModelBridge implements ModelBridge
 
     @Override
     public List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format, NotificationPreferenceScopeFilterType type) throws NotificationException
+            NotificationFormat format, NotificationFilterType type) throws NotificationException
     {
         final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format + UNDERSCORE
                 + type.name();
@@ -88,5 +91,22 @@ public class CachedModelBridge implements ModelBridge
         context.setProperty(contextEntry, preferences);
 
         return preferences;
+    }
+
+    @Override
+    public Set<String> getDisabledNotificationFiltersHints(DocumentReference user)
+            throws NotificationException
+    {
+        final String contextEntry = USER_TOGGLEABLE_FILTER_PREFERENCES;
+
+        ExecutionContext context = execution.getContext();
+        if (context.hasProperty(contextEntry)) {
+            return (Set<String>) context.getProperty(contextEntry);
+        }
+
+        Set<String> disabledFiltersHints = modelBridge.getDisabledNotificationFiltersHints(user);
+        context.setProperty(contextEntry, disabledFiltersHints);
+
+        return disabledFiltersHints;
     }
 }

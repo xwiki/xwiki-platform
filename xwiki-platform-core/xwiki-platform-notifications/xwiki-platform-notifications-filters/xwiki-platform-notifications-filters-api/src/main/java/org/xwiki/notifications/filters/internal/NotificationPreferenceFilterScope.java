@@ -41,7 +41,7 @@ public class NotificationPreferenceFilterScope
 
     private EntityReference scopeReference;
 
-    private NotificationPreferenceScopeFilterType scopeFilterType;
+    private NotificationFilterType scopeFilterType;
 
     /**
      * Construct a NotificationPreferenceFilterScope.
@@ -51,7 +51,7 @@ public class NotificationPreferenceFilterScope
      * @param scopeFilterType the type of filter associated with the scope
      */
     public NotificationPreferenceFilterScope(List<String> eventTypes,
-            EntityReference scopeReference, NotificationPreferenceScopeFilterType scopeFilterType)
+            EntityReference scopeReference, NotificationFilterType scopeFilterType)
     {
         this.eventTypes = eventTypes;
         this.scopeReference = scopeReference;
@@ -77,7 +77,7 @@ public class NotificationPreferenceFilterScope
     /**
      * @return the type of filter associated to the scope
      */
-    public NotificationPreferenceScopeFilterType getScopeFilterType()
+    public NotificationFilterType getScopeFilterType()
     {
         return this.scopeFilterType;
     }

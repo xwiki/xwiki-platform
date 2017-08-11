@@ -39,7 +39,6 @@ import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.EmptyNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.NotificationFormat;
 
 /**
@@ -50,7 +49,7 @@ import org.xwiki.notifications.NotificationFormat;
  * @version $Id$
  * @since 9.7RC1
  */
-public abstract class AbstractScopeNotificationFilter implements NotificationFilter
+public abstract class AbstractScopeNotificationFilter extends AbstractNotificationFilter
 {
     private static final String ERROR = "Failed to filter the notifications.";
 
@@ -89,40 +88,10 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
     protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
             NotificationFormat format, Event event);
 
-    @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
-    {
-        return this.filterEventByFilterType(event, user, format, NotificationPreferenceScopeFilterType.EXCLUSIVE)
-                || this.filterEventByFilterType(event, user, format, NotificationPreferenceScopeFilterType.INCLUSIVE);
-    }
 
     @Override
-    public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
-    {
-        AbstractNode leftOperand = this.generateFilterExpression(user, preference,
-                NotificationPreferenceScopeFilterType.INCLUSIVE);
-        AbstractNode rightOperand = this.generateFilterExpression(user, preference,
-                NotificationPreferenceScopeFilterType.EXCLUSIVE);
-
-        if (leftOperand.equals(AbstractNode.EMPTY_NODE)) {
-            return rightOperand;
-        } else if (rightOperand.equals(AbstractNode.EMPTY_NODE)) {
-            return leftOperand;
-        } else {
-            return new AndNode(leftOperand, rightOperand);
-        }
-
-    }
-
-    /**
-     * Just as {@link #filterEvent(Event, DocumentReference, NotificationFormat)}, use the given user, the event, the
-     * format of the wanted notification and the type of filter we want to apply (see
-     * {@link NotificationPreferenceScopeFilterType}.
-     *
-     * @since 9.7RC1
-     */
-    private boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
-            NotificationPreferenceScopeFilterType scopeFilterType)
+    protected boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
+            NotificationFilterType filterType)
     {
         // Indicate if a restriction exist concerning this type of event
         boolean hasRestriction = false;
@@ -131,7 +100,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
 
         try {
             for (NotificationPreferenceFilterScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
-                    scopeFilterType)) {
+                    filterType)) {
                 if (scopeMatchesFilteringContext(scope, format, event)) {
                     hasRestriction = true;
 
@@ -139,7 +108,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
                             || event.getDocument().hasParent(scope.getScopeReference())) {
 
                         // If we have a match on an EXCLUSIVE filter, we don’t need to go any further
-                        if (scopeFilterType.equals(NotificationPreferenceScopeFilterType.EXCLUSIVE)) {
+                        if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
                             return true;
                         }
 
@@ -157,25 +126,13 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
          * In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
          * returned true.
          */
-        return (scopeFilterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)
+        return (filterType.equals(NotificationFilterType.INCLUSIVE)
                 && hasRestriction && !matchRestriction);
     }
 
-    /**
-     * Generate parts of a query used to retrieve events from a given user.
-     * Depending on the {@link NotificationPreferenceScopeFilterType} given, the generated query will have a different
-     * content.
-     *
-     * Generated syntax for INCLUSIVE filters:
-     * (--filter1--) OR (--filter2--) OR (--filter3--) ...
-     *
-     * Generated syntax for EXCLUSIVE filters:
-     * NOT (--filter1--) AND NOT (--filter2--) AND NOT (--filter3--) ...
-     *
-     * @since 9.7RC1
-     */
-    private AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
-            NotificationPreferenceScopeFilterType filterType)
+    @Override
+    protected AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+            NotificationFilterType filterType)
     {
         AbstractNode syntaxNode = new EmptyNode();
         boolean isFirstPass = true;
@@ -222,7 +179,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
                 }
 
                 // If we have an EXCLUSIVE filter, negate the filter node
-                if (filterType.equals(NotificationPreferenceScopeFilterType.EXCLUSIVE)) {
+                if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
                     tmpNode = new NotNode(tmpNode);
                 }
 
@@ -230,7 +187,7 @@ public abstract class AbstractScopeNotificationFilter implements NotificationFil
                 if (isFirstPass) {
                     isFirstPass = false;
                     syntaxNode = tmpNode;
-                } else if (filterType.equals(NotificationPreferenceScopeFilterType.INCLUSIVE)) {
+                } else if (filterType.equals(NotificationFilterType.INCLUSIVE)) {
                     syntaxNode = new OrNode(syntaxNode, tmpNode);
                 } else {
                     syntaxNode = new AndNode(syntaxNode, tmpNode);

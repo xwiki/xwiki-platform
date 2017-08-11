@@ -26,6 +26,7 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -56,12 +57,16 @@ public class DefaultNotificationFilterManagerTest
 
     private DocumentReference testUser;
 
+    private ModelBridge modelBridge;
+
     @Before
     public void setUp() throws Exception
     {
         componentManager = mocker.registerMockComponent(ComponentManager.class);
 
         wikiDescriptorManager = mocker.registerMockComponent(WikiDescriptorManager.class);
+
+        modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
 
         testUser = new DocumentReference("wiki", "test", "user");
 
@@ -90,7 +95,7 @@ public class DefaultNotificationFilterManagerTest
     }
 
     @Test
-    public void getAllNotificationsFiltersWithMainWiki() throws Exception
+    public void getAllFiltersWithMainWiki() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
@@ -104,7 +109,23 @@ public class DefaultNotificationFilterManagerTest
     }
 
     @Test
-    public void getNotificationsWithMatchingFilters() throws Exception
+    public void getAllFiltersWithOneDisabledFilter() throws Exception
+    {
+        SystemUserNotificationFilter disabledFilter = mock(SystemUserNotificationFilter.class);
+
+        when(componentManager.getInstanceMap(NotificationFilter.class))
+                .thenReturn(Collections.singletonMap("1", disabledFilter));
+
+        when(modelBridge.getDisabledNotificationFiltersHints(testUser))
+                .thenReturn(Collections.singleton(SystemUserNotificationFilter.FILTER_NAME));
+
+        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getAllFilters(testUser);
+
+        assertEquals(0, filters.size());
+    }
+
+    @Test
+    public void getFiltersWithMatchingFilters() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
@@ -123,7 +144,7 @@ public class DefaultNotificationFilterManagerTest
     }
 
     @Test
-    public void getNotificationsWithOneBadFilter() throws Exception
+    public void getFiltersWithOneBadFilter() throws Exception
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 

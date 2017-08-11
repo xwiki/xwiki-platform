@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.List;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,12 +54,21 @@ public interface ModelBridge
      *
      * @param user user interested in the notifications
      * @param format format on which the preferences apply
-     * @param type the filter type of the scope we want to retrieve, see {@link NotificationPreferenceScopeFilterType}
+     * @param type the filter type of the scope we want to retrieve, see {@link NotificationFilterType}
      * @return the list of notification preference scopes.
      * @throws NotificationException if error happens
      *
      * @since 9.7RC1
      */
     List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format, NotificationPreferenceScopeFilterType type) throws NotificationException;
+            NotificationFormat format, NotificationFilterType type) throws NotificationException;
+
+    /**
+     * Get all the notification filters that are marked as disabled in the user profile.
+     *
+     * @param user the user to use
+     * @return a set of ToggleableNotificationFilters names that are marked as disabled
+     * @throws NotificationException if an error happens
+     */
+    Set<String> getDisabledNotificationFiltersHints(DocumentReference user) throws NotificationException;
 }

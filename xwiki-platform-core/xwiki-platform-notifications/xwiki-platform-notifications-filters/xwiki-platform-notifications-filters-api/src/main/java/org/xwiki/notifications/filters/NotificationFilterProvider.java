@@ -19,8 +19,7 @@
  */
 package org.xwiki.notifications.filters;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -29,7 +28,7 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
 
 /**
- * Role used to provide {@link NotificationFilter} to the {@link NotificationFilterManager}.
+ * Role used to provide {@link NotificationFilter} to {@link NotificationFilterManager}.
  *
  * @version $Id$
  * @since 9.7RC1
@@ -39,21 +38,13 @@ import org.xwiki.stability.Unstable;
 public interface NotificationFilterProvider
 {
     /**
-     * Get the priority that the preferences given by this provider should have.
-     * This is useful when different notification preferences are in conflict.
-     *
-     * @return the priority of the provider
-     */
-    int getProviderPriority();
-
-    /**
      * Get every registered {@link NotificationFilter} for the given user.
      *
      * @param user the user for which to retrieve the notification preferences
      * @return a list of notification filters
      * @throws NotificationException if an error happened
      */
-    Set<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
+    List<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
 
     /**
      * Get every registered {@link NotificationFilter} for the given user and corresponding with the given
@@ -64,7 +55,7 @@ public interface NotificationFilterProvider
      * @return a list of notification filters
      * @throws NotificationException if an error happened
      */
-    Set<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
+    List<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
             throws NotificationException;
 
     /**
@@ -73,5 +64,5 @@ public interface NotificationFilterProvider
      * @param filters the {@link NotificationFilter} to save
      * @throws NotificationException if an error occurred
      */
-    void saveFilters(Collection<NotificationFilter> filters) throws NotificationException;
+    void saveFilters(List<NotificationFilter> filters) throws NotificationException;
 }

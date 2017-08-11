@@ -19,22 +19,24 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterProvider;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default implementation of {@link NotificationFilterManager}.
@@ -46,47 +48,66 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 @Singleton
 public class DefaultNotificationFilterManager implements NotificationFilterManager
 {
+    private static final String ERROR_MESSAGE = "Failed to get all the notification filters.";
+
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private ModelContext modelContext;
+
     @Override
-    public Set<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException
+    public Collection<NotificationFilter> getAllFilters(DocumentReference user)
+            throws NotificationException
     {
-        Set<NotificationFilter> filters = new HashSet<>();
+        // If the user is from the main wiki, get filters from all wikis
+        if (user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
 
-        /**
-         * TODO: Handle filter conflicts using {@link NotificationFilterProvider#getProviderPriority()}.
-         */
-        for (NotificationFilterProvider provider : getProviders()) {
-            filters.addAll(provider.getAllFilters(user));
+            String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
+
+            Map<String, NotificationFilter> filters = new HashMap<>();
+            try {
+                for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
+
+                    filters.putAll(componentManager.getInstanceMap(NotificationFilter.class));
+                }
+            } catch (Exception e) {
+                throw new NotificationException(ERROR_MESSAGE, e);
+            } finally {
+                modelContext.setCurrentEntityReference(new WikiReference(currentWikiId));
+            }
+
+            return filters.values();
+        } else {
+            // If the user is local, get filters from the current wiki only (we assume it's the wiki of the user).
+            try {
+                return componentManager.getInstanceList(NotificationFilter.class);
+            }  catch (Exception e) {
+                throw new NotificationException(ERROR_MESSAGE, e);
+            }
         }
-
-        return filters;
     }
 
     @Override
-    public Set<NotificationFilter> getFilters(DocumentReference user,
+    public Collection<NotificationFilter> getFilters(DocumentReference user,
             NotificationPreference preference) throws NotificationException
     {
-        Set<NotificationFilter> filters = new HashSet<>();
+        Collection<NotificationFilter> filters = getAllFilters(user);
 
-        for (NotificationFilterProvider provider : getProviders()) {
-            filters.addAll(provider.getFilters(user, preference));
+        Iterator<NotificationFilter> it = filters.iterator();
+
+        while (it.hasNext()) {
+            NotificationFilter filter = it.next();
+
+            if (!filter.matchesPreference(preference)) {
+                it.remove();
+            }
         }
 
         return filters;
-    }
-
-    /**
-     * @return a list of available {@link NotificationFilterProvider}.
-     * @throws NotificationException if an error occurred
-     */
-    private List<NotificationFilterProvider> getProviders() throws NotificationException
-    {
-        try {
-            return componentManager.getInstanceList(NotificationFilterProvider.class);
-        } catch (ComponentLookupException e) {
-            throw new NotificationException("Unable to retrieve a list of NotificationFilterProvider", e);
-        }
     }
 }

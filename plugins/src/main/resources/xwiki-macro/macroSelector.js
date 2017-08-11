@@ -29,7 +29,7 @@ define('macroSelectorTranslationKeys', [], [
 define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $modal, translations) {
   'use strict';
   var macrosBySyntax = {},
-  allMacrosExcludedCategories = {},
+  allMacrosExcludedCategories = [],
 
   getMacros = function(syntaxId) {
     var deferred = $.Deferred();
@@ -40,7 +40,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
       var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', 'outputSyntax=plain');
       $.get(url, {data: 'list', syntaxId: syntaxId}).done(function(macros) {
         // Bulletproofing: check if the returned data is json since it could some HTML representing an error
-        if (typeof macros == 'object' && $.isArray(macros.list)) {
+        if (typeof macros === 'object' && $.isArray(macros.list)) {
           macrosBySyntax[syntaxId || ''] = macros.list;
           allMacrosExcludedCategories = macros.options.allMacrosExcludedCategories;
           deferred.resolve(macros.list);
@@ -87,7 +87,7 @@ define('macroSelector', ['jquery', 'modal', 'l10n!macroSelector'], function($, $
     // Filter the list of displayed macros to implement support for allMacrosExcludedCategories (i.e. when all macros
     // is selected, don't display macros in some given categories). More generally this makes sure that the filtering
     // is always done.
-    filterMacros.call(this)
+    filterMacros.call(this);
   },
 
   createCategoryFilter = function(categories) {

@@ -57,7 +57,7 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public NotificationsUserProfilePage()
     {
-        getDriver().waitUntilElementIsVisible(notificationsPane, By.className("bootstrap-switch"));
+        getDriver().waitUntilElementIsVisible(notificationsPane, By.cssSelector(".notifPreferences .bootstrap-switch"));
 
         for (WebElement element : getDriver().findElements(By.cssSelector("tbody.applicationElem"))) {
             ApplicationPreferences pref = new ApplicationPreferences(element, getDriver());

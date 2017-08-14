@@ -33,8 +33,4 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ToggleableNotificationFilter
 {
-    /**
-     * @return the name of the notification filter
-     */
-    String value() default "";
 }

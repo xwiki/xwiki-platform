@@ -69,4 +69,11 @@ public interface NotificationFilter
      * @since 9.7RC1
      */
     AbstractNode filterExpression(DocumentReference user, NotificationPreference preference);
+
+    /**
+     * @return the name of the filter
+     *
+     * @since 9.7RC1
+     */
+    String getName();
 }

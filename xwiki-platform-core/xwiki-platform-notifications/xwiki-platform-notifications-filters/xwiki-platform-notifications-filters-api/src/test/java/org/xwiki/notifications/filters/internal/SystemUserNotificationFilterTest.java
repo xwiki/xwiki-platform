@@ -106,4 +106,10 @@ public class SystemUserNotificationFilterTest
     {
         assertTrue(mocker.getComponentUnderTest().matchesPreference(mock(NotificationPreference.class)));
     }
+
+    @Test
+    public void getName() throws Exception
+    {
+        assertEquals(SystemUserNotificationFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
+    }
 }

@@ -22,6 +22,7 @@ package org.xwiki.notifications.script;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,8 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
@@ -96,6 +99,9 @@ public class NotificationScriptService implements ScriptService
 
     @Inject
     private NotificationPreferencesSaver notificationPreferencesSaver;
+
+    @Inject
+    private NotificationFilterManager notificationFilterManager;
 
     /**
      * @param onyUnread either or not to return only unread events
@@ -317,5 +323,18 @@ public class NotificationScriptService implements ScriptService
     public void saveNotificationsPreferences(String json) throws NotificationException
     {
         notificationPreferencesSaver.saveNotificationPreferences(json, documentAccessBridge.getCurrentUserReference());
+    }
+
+    /**
+     * Get a set of notification filters that can be toggled by the current user.
+     *
+     * @return a set of notification filters that are toggleable
+     * @throws NotificationException if an error occurs
+     *
+     * @since 9.7RC1
+     */
+    public Set<NotificationFilter> getToggleableNotificationFilters() throws NotificationException
+    {
+        return notificationFilterManager.getToggleableFilters(documentAccessBridge.getCurrentUserReference());
     }
 }

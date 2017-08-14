@@ -48,6 +48,19 @@ notifications.filters.type.label=Filter type:
 notifications.filters.type.hint=How the filter should act towards an event in the given location
 notifications.filters.location.label=Filter scope:
 notifications.filters.location.hint=What part of the wiki should be concerned by the filter?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Advanced filtering options
+notifications.filters.advanced.toggles.hint=These filters are activated by default, you can disable them by using the button next to each filter
+notifications.filters.advanced.toggles.table.name=Filter name
+notifications.filters.advanced.toggles.table.description=Description
+notifications.filters.advanced.toggles.table.toggle=Toggle
+notifications.filters.advanced.modal.close=Close
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=System Filter
+notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
+
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings
 notifications.menu.clear=Clear All

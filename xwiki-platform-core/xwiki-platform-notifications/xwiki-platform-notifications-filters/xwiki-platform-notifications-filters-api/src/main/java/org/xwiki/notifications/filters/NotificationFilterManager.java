@@ -56,4 +56,13 @@ public interface NotificationFilterManager
      */
     Set<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
             throws NotificationException;
+
+    /**
+     * Get a set of filters that are toggleable for the given user.
+     *
+     * @param user the user to get filters from
+     * @return a set of toggleable filters
+     * @throws NotificationException if error happens
+     */
+    Set<NotificationFilter> getToggleableFilters(DocumentReference user) throws NotificationException;
 }

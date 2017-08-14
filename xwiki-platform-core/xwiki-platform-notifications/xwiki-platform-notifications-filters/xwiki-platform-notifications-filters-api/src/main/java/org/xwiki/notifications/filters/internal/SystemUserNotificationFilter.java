@@ -46,7 +46,7 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 @Component
 @Singleton
 @Named(SystemUserNotificationFilter.FILTER_NAME)
-@ToggleableNotificationFilter(SystemUserNotificationFilter.FILTER_NAME)
+@ToggleableNotificationFilter
 public class SystemUserNotificationFilter extends AbstractNotificationFilter
 {
     /**
@@ -93,5 +93,11 @@ public class SystemUserNotificationFilter extends AbstractNotificationFilter
     {
         // This filter is applied globally to every notification preference, therefore, we match all of them.
         return true;
+    }
+
+    @Override
+    public String getName()
+    {
+        return FILTER_NAME;
     }
 }

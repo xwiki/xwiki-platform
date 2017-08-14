@@ -116,6 +116,8 @@ public class DefaultNotificationFilterManagerTest
         when(componentManager.getInstanceMap(NotificationFilter.class))
                 .thenReturn(Collections.singletonMap("1", disabledFilter));
 
+        when(disabledFilter.getName()).thenReturn(SystemUserNotificationFilter.FILTER_NAME);
+
         when(modelBridge.getDisabledNotificationFiltersHints(testUser))
                 .thenReturn(Collections.singleton(SystemUserNotificationFilter.FILTER_NAME));
 

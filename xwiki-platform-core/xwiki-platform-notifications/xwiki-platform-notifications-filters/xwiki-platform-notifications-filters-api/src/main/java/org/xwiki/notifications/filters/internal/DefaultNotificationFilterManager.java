@@ -69,34 +69,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Set<NotificationFilter> getAllFilters(DocumentReference user)
             throws NotificationException
     {
-        // If the user is from the main wiki, get filters from all wikis
-        if (user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
-
-            String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
-
-            Map<String, NotificationFilter> filters = new HashMap<>();
-            try {
-                for (String wikiId : wikiDescriptorManager.getAllIds()) {
-                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
-
-                    filters.putAll(componentManager.getInstanceMap(NotificationFilter.class));
-                }
-            } catch (Exception e) {
-                throw new NotificationException(ERROR_MESSAGE, e);
-            } finally {
-                modelContext.setCurrentEntityReference(new WikiReference(currentWikiId));
-            }
-
-            return removeDisabledFilters(user, new HashSet<>(filters.values()));
-        } else {
-            // If the user is local, get filters from the current wiki only (we assume it's the wiki of the user).
-            try {
-                return removeDisabledFilters(user,
-                        new HashSet<>(componentManager.getInstanceList(NotificationFilter.class)));
-            }  catch (Exception e) {
-                throw new NotificationException(ERROR_MESSAGE, e);
-            }
-        }
+        return removeDisabledFilters(user, fetchAllFilters(user));
     }
 
     @Override
@@ -116,6 +89,24 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         }
 
         return filters;
+    }
+
+    @Override
+    public Set<NotificationFilter> getToggleableFilters(DocumentReference user) throws NotificationException
+    {
+        Set<NotificationFilter> userFilters = fetchAllFilters(user);
+
+        Iterator<NotificationFilter> it = userFilters.iterator();
+
+        while (it.hasNext()) {
+            NotificationFilter filter = it.next();
+
+            if (!filter.getClass().isAnnotationPresent(ToggleableNotificationFilter.class)) {
+                it.remove();
+            }
+        }
+
+        return userFilters;
     }
 
     /**
@@ -141,12 +132,50 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
             NotificationFilter filter = it.next();
 
             if (filter.getClass().isAnnotationPresent(ToggleableNotificationFilter.class)
-                    && disabledFiltersHints.contains(
-                            filter.getClass().getAnnotation(ToggleableNotificationFilter.class).value())) {
+                    && disabledFiltersHints.contains(filter.getName())) {
                 it.remove();
             }
         }
 
         return filters;
+    }
+
+    /**
+     * Fetches every filter available to the user, without taking care of whether the filter is disabled by the user
+     * or not.
+     *
+     * @param user the user to use
+     * @return a set of filters
+     * @throws NotificationException if an error occurs
+     */
+    private Set<NotificationFilter> fetchAllFilters(DocumentReference user) throws NotificationException
+    {
+        // If the user is from the main wiki, get filters from all wikis
+        if (user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
+
+            String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
+
+            Map<String, NotificationFilter> filters = new HashMap<>();
+            try {
+                for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
+
+                    filters.putAll(componentManager.getInstanceMap(NotificationFilter.class));
+                }
+            } catch (Exception e) {
+                throw new NotificationException(ERROR_MESSAGE, e);
+            } finally {
+                modelContext.setCurrentEntityReference(new WikiReference(currentWikiId));
+            }
+
+            return new HashSet<>(filters.values());
+        } else {
+            // If the user is local, get filters from the current wiki only (we assume it's the wiki of the user).
+            try {
+                return new HashSet<>(componentManager.getInstanceList(NotificationFilter.class));
+            }  catch (Exception e) {
+                throw new NotificationException(ERROR_MESSAGE, e);
+            }
+        }
     }
 }

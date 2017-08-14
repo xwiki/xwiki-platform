@@ -28,11 +28,11 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1488292213000</creationDate>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1488297950000</date>
-  <contentUpdateDate>1488296825000</contentUpdateDate>
-  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <date>1502717101000</date>
+  <contentUpdateDate>1502717101000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -50,6 +50,7 @@
 (((
 {{html clean="false"}}
 &lt;h2&gt;$services.localization.render('notifications.settings.title')&amp;nbsp;&lt;small&gt;&lt;a id="notificationsRssLink" title="$services.localization.render('notifications.rss.feedLink')" target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;$services.icon.renderHTML("rss")&lt;/a&gt;&lt;/small&gt;&lt;/h2&gt;
+#displayAdvancedFilterSettingsModal()
 &lt;table class="notifPreferences"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
@@ -188,6 +189,49 @@
     &lt;/div&gt;
   &lt;/td&gt;
 #end
+
+#**
+ * Add a button that opens a livetable listing every filters that can be toggled by the user.
+ *#
+#macro(displayAdvancedFilterSettingsModal)
+&lt;p&gt;
+  &lt;a href="#" data-target="#modal-advanced-filters-preferences" data-toggle="modal"&gt;
+    $services.localization.render('notifications.settings.filters.advanced')
+  &lt;/a&gt;
+&lt;/p&gt;
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-advanced-filters-preferences"&gt;
+  &lt;div class="modal-dialog" role="document"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class="modal-title"&gt;$services.localization.render('notifications.settings.filters.advanced')&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body"&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.toggles.hint'))&lt;/span&gt;
+        #set($collist  = ['name', 'description', 'toggle'])
+        #set($colprops = {
+          'name'       : { 'sortable': false },
+          'description': { 'sortable': false },
+          'toggle'     : { 'sortable': false, 'html': true}
+        })
+        #set($options  = {
+          'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceToggleableFiltersLivetableResults',
+          'rowCount'          : 10,
+          'description'       : 'This table lists all filters that are provided to the user by default and that can be disabled by the user.',
+          'translationPrefix' : 'notifications.filters.advanced.toggles.table.',
+          'outputOnlyHtml'    : true
+        })
+        #livetable("notificationToggleableFiltersLivetable" $collist $colprops $options)
+      &lt;/div&gt;
+      &lt;div class="modal-footer"&gt;
+        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.modal.close'))&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+  &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+&lt;/div&gt;&lt;!-- /.modal --&gt;
+#end
+
+
 #**
  * Add a button to see the scope livetable in a modal box
  *#
@@ -390,7 +434,7 @@ require.config({
 /**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget, AdvancedFilterPreferences) {
 
   /**
    * Page initialization
@@ -403,6 +447,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     $('.applicationElem').each(function() {
       applications.push(new ApplicationWidget($(this)));
     });
+
+    // Initialize the advanced filter preferences modal
+    new AdvancedFilterPreferences($('#modal-advanced-filters-preferences'));
 
     /**
      * Save the current settings
@@ -444,7 +491,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
      * happens in the meantime.
      */
     var nextSave = 0;
-    $(document).on('switchChange.bootstrapSwitch', function(event, state) {
+    $($('.notifPreferences')).on('switchChange.bootstrapSwitch', function(event, state) {
       if (nextSave != 0) {
         clearTimeout(nextSave);
       }
@@ -1113,6 +1160,169 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     </property>
     <property>
       <name>Event Type Filter</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>4</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>1e126b35-e7b9-4b79-a0e8-5b8f5db772ff</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('AdvancedFilterPreferences', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+  /**
+  * Construct the AdvancedFilterPreferences object.
+  */
+  return function(domElement) {
+    var self               = this;
+    self.domElement        = domElement;
+    self.toggles           = domElement.find('.notificationAdvancedFilterPreferenceCheckbox');
+    /**
+     * Initialization
+     */
+    self.init = function () {
+      // Enable bootstrap switches
+      $(self.toggles).bootstrapSwitch({
+        size: 'mini',
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
+      });
+
+      // On change
+      $(self.toggles).on('switchChange.bootstrapSwitch', function(event, state) {
+        setTimeout(function() { self.save($(event.target), state); }, 1);
+      });
+    };
+
+    /**
+     * Save the filter preference
+     */
+    self.save = function(elem, state) {
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+      var filterName = elem.attr('data-filterName');
+      var objectNumber = elem.attr('data-objectNumber');
+      if (objectNumber == '') {
+        // If the object does not exist yet, create it
+        var restURL = xm.restURL + '/objects?media=json';
+        var params = {
+          'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
+          'property#filterName': filterName,
+          'property#isEnabled': state ? '1' : '0'
+        };
+        $.post(restURL, params).done(function (data) {
+          elem.attr('data-objectNumber', data.number);
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        });
+      } else if (objectNumber != '') {
+        // If the object already exist, just update its value
+        var restURL = xm.restURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
+          + '/properties/isEnabled?media=json';
+        $.ajax(restURL, {
+          method: 'PUT',
+          contentType: 'text/plain',
+          data: state ? '1' : '0'
+        }).done(function (data) {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        });
+      }
+    };
+
+    // Call init
+    self.init();
+  };
+});
+</code>
+    </property>
+    <property>
+      <name>Advanced Filter Preferences</name>
     </property>
     <property>
       <parse>1</parse>

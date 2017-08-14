@@ -273,4 +273,10 @@ public class ScopeNotificationEventTypeFilterTest
 
         assertFalse(mocker.getComponentUnderTest().matchesPreference(preference));
     }
+
+    @Test
+    public void getName() throws Exception
+    {
+        assertEquals(ScopeNotificationEventTypeFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
+    }
 }

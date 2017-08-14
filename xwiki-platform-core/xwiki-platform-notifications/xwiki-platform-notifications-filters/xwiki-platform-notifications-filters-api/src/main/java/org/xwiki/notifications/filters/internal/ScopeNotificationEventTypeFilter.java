@@ -65,4 +65,10 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
         return preference.getCategory().equals(NotificationPreferenceCategory.DEFAULT)
                 && preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
     }
+
+    @Override
+    public String getName()
+    {
+        return FILTER_NAME;
+    }
 }

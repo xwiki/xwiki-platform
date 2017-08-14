@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
@@ -120,6 +122,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
      */
     private static final String DESCRIPTION = "A macro to define a dashboard.";
 
+    private static final String DASHBOARD_MACRO_CALLS = "dashboardMacroCalls";
+
     /**
      * CSS file skin extension, to include the dashboard css.
      */
@@ -152,6 +156,9 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
     @Inject
     private Logger logger;
 
+    @Inject
+    private Execution execution;
+
     /**
      * Instantiates the dashboard macro, setting the name, description and parameters type.
      */
@@ -165,6 +172,9 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
     public List<Block> execute(DashboardMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        // We don't allow calling the Dashboard macro inside the Dashboard macro to prevent recursions!
+        preventDashboardRecursion();
+
         // get the gadgets from the objects
         List<Gadget> gadgets;
         try {
@@ -216,7 +226,41 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         topLevel.setParameter("class",
             MACRO_NAME + (StringUtils.isEmpty(parameters.getStyle()) ? "" : " " + parameters.getStyle()));
 
+        // Reduce by 1 the recursive count so that we can have several dashboard macros rendered in the same context
+        reduceDashboardRecursionCounter();
+
         return Collections.<Block> singletonList(topLevel);
+    }
+
+    private void preventDashboardRecursion() throws MacroExecutionException
+    {
+        ExecutionContext ec = this.execution.getContext();
+        if (ec != null) {
+            Integer dashboardCalls = (Integer) ec.getProperty(DASHBOARD_MACRO_CALLS);
+            if (dashboardCalls != null) {
+                if (dashboardCalls > 0) {
+                    throw new MacroExecutionException(
+                        "Dashboard macro recursion detected. Don't call the Dashboard macro inside of itself...");
+                } else {
+                    ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls + 1);
+                }
+            } else {
+                ec.setProperty(DASHBOARD_MACRO_CALLS, 1);
+            }
+        }
+    }
+
+    private void reduceDashboardRecursionCounter() throws MacroExecutionException
+    {
+        ExecutionContext ec = this.execution.getContext();
+        if (ec != null) {
+            Integer dashboardCalls = (Integer) ec.getProperty(DASHBOARD_MACRO_CALLS);
+            if (dashboardCalls != null) {
+                if (dashboardCalls > 0) {
+                    ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
+                }
+            }
+        }
     }
 
     /**

@@ -280,7 +280,8 @@ public class XWiki extends Api
 
             return doc.newDocument(getXWikiContext());
         } catch (Exception ex) {
-            LOGGER.warn("Failed to access document " + reference + ": " + ex.getMessage());
+            LOGGER.warn("Failed to access document [{}]. Root reason: [{}]", reference,
+                ExceptionUtils.getRootCauseMessage(ex));
             return new Document(new XWikiDocument(reference), getXWikiContext());
         }
     }

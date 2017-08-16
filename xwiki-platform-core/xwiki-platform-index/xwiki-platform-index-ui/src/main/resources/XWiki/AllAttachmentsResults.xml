@@ -99,17 +99,6 @@
       'value': $author
     }))
   #end
-  ##
-  ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
-  ##
-  #if (!$hasAdmin &amp;&amp; $blacklistedSpaces &amp;&amp; $blacklistedSpaces.size() &gt; 0)
-    #set ($discard = $constraints.add('doc.space not in (:blacklistedSpaces)'))
-    #set ($discard = $queryParameters.add({
-      'name': 'blacklistedSpaces',
-      'match': 'exact',
-      'value': $blacklistedSpaces
-    }))
-  #end
   #set ($validSortOptions = ['filename', 'doc.name', 'doc.space', 'date', 'author'])
   #if ($validSortOptions.contains($request.sort))
     #set ($order = $request.sort)
@@ -133,7 +122,7 @@
   #end
   #set ($statement = $statement + " order by $order $dir")
   #set ($query = $services.query.hql($statement))
-  #set ($discard = $query.addFilter('attachment'))
+  #set ($discard = $query.addFilter('attachment').addFilter('hidden'))
   #set ($discard = $query.setLimit($limit).setOffset($offset))
   #foreach ($queryParameter in $queryParameters)
     #if ($queryParameter.match == 'exact')

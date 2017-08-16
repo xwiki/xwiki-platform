@@ -58,8 +58,7 @@ public class DefaultContentParserTest
 {
     @Rule
     public final MockitoComponentMockingRule<ContentParser> mocker =
-        new MockitoComponentMockingRule<ContentParser>(DefaultContentParser.class);
-
+        new MockitoComponentMockingRule<>(DefaultContentParser.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -78,7 +77,7 @@ public class DefaultContentParserTest
     }
 
     @Test
-    public void testNoMetadataSource() throws Exception
+    public void parseHasNoMetadataSource() throws Exception
     {
         XDOM xdom = mocker.getComponentUnderTest().parse("", Syntax.PLAIN_1_0);
 
@@ -86,15 +85,15 @@ public class DefaultContentParserTest
     }
 
     @Test
-    public void testAddingMetadataSource() throws Exception
+    public void parseIsAddingMetadataSource() throws Exception
     {
         XDOM xdom = mocker.getComponentUnderTest().parse("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE);
 
-        assertThat((String) xdom.getMetaData().getMetaData(MetaData.SOURCE), equalTo(SOURCE));
+        assertThat(xdom.getMetaData().getMetaData(MetaData.SOURCE), equalTo(SOURCE));
     }
 
     @Test
-    public void testMissingParserException() throws Exception
+    public void parseWhenNoParser() throws Exception
     {
         thrown.expect(MissingParserException.class);
         thrown.expectMessage("Failed to find a parser for syntax [XWiki 2.1]");

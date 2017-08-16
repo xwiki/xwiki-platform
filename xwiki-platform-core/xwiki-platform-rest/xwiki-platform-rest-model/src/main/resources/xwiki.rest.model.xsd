@@ -307,13 +307,22 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-        	<element name="id" type="string" minOccurs="0" maxOccurs="1"></element>
-        	<element name="request" type="xwiki:JobRequest" minOccurs="0" maxOccurs="1"></element>
-        	<element name="state" type="string"></element>
-        	<element name="progress" type="xwiki:JobProgress" minOccurs="0" maxOccurs="1"></element>
-        	<element name="log" type="xwiki:Log" minOccurs="0" maxOccurs="1"></element>
-        	<element name="startDate" type="dateTime"></element>
-        	<element name="endDate" type="dateTime"></element>
+          <element name="id" type="string" minOccurs="0"
+            maxOccurs="1">
+          </element>
+          <element name="request" type="xwiki:JobRequest" minOccurs="0"
+            maxOccurs="1">
+          </element>
+          <element name="state" type="string"></element>
+          <element name="progress" type="xwiki:JobProgress"
+            minOccurs="0" maxOccurs="1">
+          </element>
+          <element name="log" type="xwiki:Log" minOccurs="0"
+            maxOccurs="1">
+          </element>
+          <element name="startDate" type="dateTime"></element>
+          <element name="endDate" type="dateTime"></element>
+          <element name="errorMessage" type="string"></element>
         </sequence>
       </extension>
     </complexContent>

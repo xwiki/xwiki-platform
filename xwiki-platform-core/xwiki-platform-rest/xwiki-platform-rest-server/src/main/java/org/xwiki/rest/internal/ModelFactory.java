@@ -36,6 +36,7 @@ import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Request;
@@ -967,6 +968,9 @@ public class ModelFactory
             Calendar calendarEndDate = Calendar.getInstance();
             calendarEndDate.setTime(jobStatus.getEndDate());
             status.setEndDate(calendarEndDate);
+        }
+        if (jobStatus.getError() != null) {
+            status.setErrorMessage(ExceptionUtils.getStackTrace(jobStatus.getError()));
         }
 
         // Request

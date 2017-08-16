@@ -402,6 +402,17 @@
                     "methodName": "getNonMatchingHeaders",
                     "elementKind": "method",
                     "justification": "Caused by the move to JavaMail 1.6.0 which introduced generics in APIs"
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.rest.model.jaxb.JobStatus",
+                    "new": "class org.xwiki.rest.model.jaxb.JobStatus",
+                    "attribute": "propOrder",
+                    "oldValue": "{\"id\", \"request\", \"state\", \"progress\", \"log\", \"startDate\", \"endDate\"}",
+                    "newValue": "{\"id\", \"request\", \"state\", \"progress\", \"log\", \"startDate\", \"endDate\", \"errorMessage\"}",
+                    "annotationType": "javax.xml.bind.annotation.XmlType",
+                    "elementKind": "annotation",
+                    "justification": "Not a breakage"
                   }
                 ]
               }

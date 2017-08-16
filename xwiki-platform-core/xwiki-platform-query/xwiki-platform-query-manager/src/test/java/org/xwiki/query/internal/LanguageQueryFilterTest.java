@@ -66,7 +66,7 @@ public class LanguageQueryFilterTest
     }
 
     @Test
-    public void ffilterResults() throws Exception
+    public void filterResults() throws Exception
     {
         List<String> items = Arrays.asList("one", "two");
         List<String> result = this.mocker.getComponentUnderTest().filterResults(items);

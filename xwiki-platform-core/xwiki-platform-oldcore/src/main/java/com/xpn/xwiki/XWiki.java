@@ -6997,7 +6997,9 @@ public class XWiki implements EventListener
      * @throws XWikiException in case of error while performing the query
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
+     * @deprecated since 9.7RC1, use the QueryManager instead along with the "attachment" query filter
      */
+    @Deprecated
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {

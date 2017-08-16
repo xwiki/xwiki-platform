@@ -47,11 +47,16 @@ public class HqlQueryUtilsTest
 
         assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiSpace"));
 
+        assertTrue(HqlQueryUtils.isSafe("select attachment.filename from XWikiAttachment attachment"));
+        assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiAttachment"));
+
         // not allowed
 
         assertFalse(HqlQueryUtils.isSafe("select name from OtherTable"));
         assertFalse(HqlQueryUtils.isSafe("select doc.* from XWikiDocument doc, XWikiSpace space"));
         assertFalse(HqlQueryUtils.isSafe("select * from XWikiDocument doc"));
+        assertFalse(HqlQueryUtils.isSafe("select * from XWikiAttachment"));
+        assertFalse(HqlQueryUtils.isSafe("select attachment.mimeType from XWikiAttachment attachment"));
         assertFalse(HqlQueryUtils
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
         assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));

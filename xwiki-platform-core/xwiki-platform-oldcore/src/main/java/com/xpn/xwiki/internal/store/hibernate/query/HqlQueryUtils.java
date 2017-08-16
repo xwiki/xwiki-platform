@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.query;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +77,8 @@ public final class HqlQueryUtils
 
     private static final String SPACE_FIELD_HIDDEN = DOCUMENT_FIELD_HIDDEN;
 
+    private static final String ATTACHMENT_FIELD_FILENAME = "filename";
+
     private static final String FROM_REPLACEMENT = "$1";
 
     private static final Pattern FROM_DOC = Pattern.compile("com\\.xpn\\.xwiki\\.doc\\.([^ ]+)");
@@ -107,6 +110,8 @@ public final class HqlQueryUtils
         allowedSpaceFields.add(SPACE_FIELD_NAME);
         allowedSpaceFields.add(SPACE_FIELD_PARENT);
         allowedSpaceFields.add(SPACE_FIELD_HIDDEN);
+
+        ALLOWED_FIELDS.put("XWikiAttachment", Collections.singleton(ATTACHMENT_FIELD_FILENAME));
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HqlQueryUtils.class);

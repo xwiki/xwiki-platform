@@ -56,41 +56,59 @@
   #if (!$limit)
     #set ($limit = 15)
   #end
-  #set ($title = $request.get('doc.name'))
+  #set ($page = $request.get('doc.name'))
   #set ($author = $request.get('author'))
   #set ($space = $request.get('doc.space'))
   #set ($filename = $request.filename)
   #set ($formatDate = 'yyyy MMMM dd, HH:mm')
-  #set ($query = '')
+  #set ($constraints = [])
   #set ($queryParameters = [])
-  #if ($title)
-    #set ($title = $title.trim().toLowerCase())
-    #set ($query = $query + " and lower(doc.name) like ?")
-    #set ($discard = $queryParameters.add("%${title}%"))
-  #end
-  #if ($author)
-    #set ($author = $author.trim().toLowerCase())
-    #set ($query = $query + " and lower(attach.author) like ?")
-    #set ($discard = $queryParameters.add("%${author}%"))
-  #end
   #if ($filename)
     #set ($filename = $filename.trim().toLowerCase())
-    #set ($query = $query + " and lower(attach.filename) like ?")
-    #set ($discard = $queryParameters.add("%${filename}%"))
+    #set ($discard = $constraints.add('lower(attachment.filename) like :fileName'))
+    #set ($discard = $queryParameters.add({
+      'name': 'fileName',
+      'match': 'partial',
+      'value': $filename
+    }))
   #end
   #if ($space)
     #set ($space = $space.trim().toLowerCase())
-    #set ($query = $query + " and lower(doc.space) like ?")
-    #set ($discard = $queryParameters.add("%${space}%"))
+    #set ($discard = $constraints.add('lower(doc.space) like :space'))
+    #set ($discard = $queryParameters.add({
+      'name': 'space',
+      'match': 'partial',
+      'value': $space
+    }))
+  #end
+  #if ($page)
+    #set ($page = $page.trim().toLowerCase())
+    #set ($discard = $constraints.add('lower(doc.name) like :page'))
+    #set ($discard = $queryParameters.add({
+      'name': 'page',
+      'match': 'partial',
+      'value': $page
+    }))
+  #end
+  #if ($author)
+    #set ($author = $author.trim().toLowerCase())
+    #set ($discard = $constraints.add('lower(attachment.author) like :author'))
+    #set ($discard = $queryParameters.add({
+      'name': 'author',
+      'match': 'partial',
+      'value': $author
+    }))
   #end
   ##
   ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
   ##
-  #if (!$hasAdmin)
-    #foreach ($blacklistedSpace in $blacklistedSpaces)
-      #set ($query = "${query} and doc.space &lt;&gt; ?")
-      #set ($discard = $queryParameters.add($blacklistedSpace))
-    #end
+  #if (!$hasAdmin &amp;&amp; $blacklistedSpaces &amp;&amp; $blacklistedSpaces.size() &gt; 0)
+    #set ($discard = $constraints.add('doc.space not in (:blacklistedSpaces)'))
+    #set ($discard = $queryParameters.add({
+      'name': 'blacklistedSpaces',
+      'match': 'exact',
+      'value': $blacklistedSpaces
+    }))
   #end
   #set ($validSortOptions = ['filename', 'doc.name', 'doc.space', 'date', 'author'])
   #if ($validSortOptions.contains($request.sort))
@@ -99,7 +117,7 @@
     #set ($order = 'filename')
   #end
   #if (!$order.startsWith('doc.'))
-    #set ($order = "attach.${order}")
+    #set ($order = "attachment.${order}")
   #end
   #if ("$!request.dir" == 'desc')
     #set ($dir = 'desc')
@@ -109,12 +127,23 @@
   ##
   ## Compute the final query
   ##
-  #if ($query == "")
-    #set ($query = "1=1")
+  #set ($statement = '')
+  #if ($constraints.size() &gt; 0)
+    #set ($statement = $statement + ' where ' + $stringtool.join($constraints, ' and '))
   #end
-  #set ($sortedQuery = $query + " order by $order $dir")
-  #set ($items = $xwiki.searchAttachments($sortedQuery, $limit, $offset, $queryParameters))
-  #set ($totalItems = $xwiki.countAttachments($query, $queryParameters))
+  #set ($statement = $statement + " order by $order $dir")
+  #set ($query = $services.query.hql($statement))
+  #set ($discard = $query.addFilter('attachment'))
+  #set ($discard = $query.setLimit($limit).setOffset($offset))
+  #foreach ($queryParameter in $queryParameters)
+    #if ($queryParameter.match == 'exact')
+      #set ($discard = $query.bindValue($queryParameter.name, $queryParameter.value))
+    #elseif ($queryParameter.match == 'partial')
+      #set ($query = $query.bindValue($queryParameter.name).anyChars().literal($queryParameter.value).anyChars().query())
+    #end
+  #end
+  #set ($items = $query.execute())
+  #set ($totalItems = $query.count())
   #set ($returnedItems = $items.size())
   ## ==============================================
   ## json starts
@@ -125,12 +154,13 @@
 "offset": $mathtool.add($offset, 1),
 "reqNo": $mathtool.toInteger($request.reqNo),
 "rows": [
-#foreach ($attach in $items)
-  #set ($document = $attach.getDocument())
-  #set ($hasAccess = $xwiki.hasAccessLevel('view', $xcontext.user, $document.getFullName()))
+#foreach ($attachmentReference in $items)
+  #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
   #if ($velocityCount &gt; 1) , #end
   { "acclev" : $hasAccess,
   #if ($hasAccess)
+    #set ($document = $xwiki.getDocument($attachmentReference.parent))
+    #set ($attach = $document.getAttachment($attachmentReference.name))
     "page" : "$escapetool.javascript($document.name)",
     "space" : "$escapetool.javascript($document.space)",
     "fullname" : "$escapetool.javascript($document.fullName)",
@@ -144,7 +174,7 @@
     "authorurl" : "$xwiki.getURL($attach.author)",
     "type" : "$!escapetool.javascript($attach.getMimeType())"
   #else
-    "fullname": "$escapetool.javascript($docName)"
+    "fullname": "$escapetool.javascript($services.model.serialize($attachmentReference.parent, 'local'))"
   #end
   }
 #end

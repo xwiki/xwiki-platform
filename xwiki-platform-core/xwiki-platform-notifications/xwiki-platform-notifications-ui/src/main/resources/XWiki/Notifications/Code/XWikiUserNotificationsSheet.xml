@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -195,33 +194,59 @@
  *#
 #macro(displayAdvancedFilterSettingsModal)
 &lt;p&gt;
-  &lt;a href="#" data-target="#modal-advanced-filters-preferences" data-toggle="modal"&gt;
-    $services.localization.render('notifications.settings.filters.advanced')
+  &lt;a href="#" data-target="#modal-advanced-notifications-preferences" data-toggle="modal"&gt;
+    $services.localization.render('notifications.settings.advanced')
   &lt;/a&gt;
 &lt;/p&gt;
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-advanced-filters-preferences"&gt;
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-advanced-notifications-preferences"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
         &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
-        &lt;h4 class="modal-title"&gt;$services.localization.render('notifications.settings.filters.advanced')&lt;/h4&gt;
+        &lt;h4 class="modal-title"&gt;$services.localization.render('notifications.settings.advanced')&lt;/h4&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.toggles.hint'))&lt;/span&gt;
-        #set($collist  = ['name', 'description', 'toggle'])
-        #set($colprops = {
-          'name'       : { 'sortable': false },
-          'description': { 'sortable': false },
-          'toggle'     : { 'sortable': false, 'html': true}
-        })
-        #set($options  = {
-          'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceToggleableFiltersLivetableResults',
-          'rowCount'          : 10,
-          'description'       : 'This table lists all filters that are provided to the user by default and that can be disabled by the user.',
-          'translationPrefix' : 'notifications.filters.advanced.toggles.table.',
-          'outputOnlyHtml'    : true
-        })
-        #livetable("notificationToggleableFiltersLivetable" $collist $colprops $options)
+        &lt;form class="xform"&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label for="notificationAdvancedPreferenceEmailDiffCheckbox"&gt;$escapetool.xml($services.localization.render('notifications.preferences.advanced.emailDiff.title'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.preferences.advanced.emailDiff.hint'))&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              #set($checked = '')
+              #set ($objectNumber = '')
+              #foreach ($obj in $userDocument.getObjects('XWiki.Notifications.Code.EmailDiffsNotficationPreferenceClass'))
+                #if ($obj.getValue('isEnabled') == 1)
+                  #set ($checked = 'checked = "checked"')
+                  #set ($objectNumber = $!obj.reference.objectNumber)
+                #end
+              #end
+              &lt;input type='checkbox' id='notificationAdvancedPreferenceEmailDiffCheckbox' data-objectnumber='$objectNumber' $checked /&gt;
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label for="notificationToggleableFiltersLivetable"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.toggles.title'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.toggles.hint'))&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              #set($collist  = ['name', 'description', 'toggle'])
+              #set($colprops = {
+                'name'       : { 'sortable': false },
+                'description': { 'sortable': false },
+                'toggle'     : { 'sortable': false, 'html': true}
+              })
+              #set($options  = {
+                'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceToggleableFiltersLivetableResults',
+                'rowCount'          : 10,
+                'description'       : 'This table lists all filters that are provided to the user by default and that can be disabled by the user.',
+                'translationPrefix' : 'notifications.filters.advanced.toggles.table.',
+                'outputOnlyHtml'    : true
+              })
+              #livetable("notificationToggleableFiltersLivetable" $collist $colprops $options)
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/form&gt;
       &lt;/div&gt;
       &lt;div class="modal-footer"&gt;
         &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.modal.close'))&lt;/button&gt;
@@ -434,7 +459,7 @@ require.config({
 /**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget, AdvancedFilterPreferences) {
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedNotificationPreferences', 'AdvancedNotificationFilterPreferences', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget, AdvancedNotificationPreferences, AdvancedNotificationFilterPreferences) {
 
   /**
    * Page initialization
@@ -448,8 +473,11 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
       applications.push(new ApplicationWidget($(this)));
     });
 
-    // Initialize the advanced filter preferences modal
-    new AdvancedFilterPreferences($('#modal-advanced-filters-preferences'));
+    // Initialize the advanced notification filters preferences
+    new AdvancedNotificationFilterPreferences($('#modal-advanced-notifications-preferences'));
+
+    // Initialize the advanced notifications preferences
+    new AdvancedNotificationPreferences($('#modal-advanced-notifications-preferences'));
 
     /**
      * Save the current settings
@@ -1250,9 +1278,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
       <cache>long</cache>
     </property>
     <property>
-      <code>define('AdvancedFilterPreferences', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+      <code>define('AdvancedNotificationFilterPreferences', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
   /**
-  * Construct the AdvancedFilterPreferences object.
+  * Construct the AdvancedNotificationFilterPreferences object.
   */
   return function(domElement) {
     var self               = this;
@@ -1322,7 +1350,169 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
 </code>
     </property>
     <property>
-      <name>Advanced Filter Preferences</name>
+      <name>Advanced Notification Filter Preferences</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>5</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>9db25652-5b0d-47e9-a328-76a94a85703c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('AdvancedNotificationPreferences', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+  /**
+  * Construct the AdvancedNotificationPreferences object.
+  */
+  return function(domElement) {
+    var self               = this;
+    self.domElement        = domElement;
+    self.emailDiffToggle   = domElement.find('#notificationAdvancedPreferenceEmailDiffCheckbox');
+
+    /**
+     * Initialization
+     */
+    self.init = function () {
+      // Enable bootstrap switches
+      $(self.emailDiffToggle).bootstrapSwitch({
+        size: 'mini',
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
+      });
+
+      // On change
+      $(self.emailDiffToggle).on('switchChange.bootstrapSwitch', function(event, state) {
+        setTimeout(function() { self.saveEmailDiffPreference($(event.target), state); }, 1);
+      });
+    };
+
+    /**
+     * Save email diff preference
+     */
+    self.saveEmailDiffPreference = function(elem, state) {
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+      var objectNumber = elem.attr('data-objectNumber');
+      if (objectNumber == '') {
+        // If the object does not exist yet, create it
+        var restURL = xm.restURL + '/objects?media=json';
+        var params = {
+          'className': 'XWiki.Notifications.Code.EmailDiffsNotficationPreferenceClass',
+          'property#isEnabled': state ? '1' : '0'
+        };
+        $.post(restURL, params).done(function (data) {
+          elem.attr('data-objectNumber', data.number);
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        });
+      } else if (objectNumber != '') {
+        // If the object already exist, just update its value
+        var restURL = xm.restURL + '/objects/XWiki.Notifications.Code.EmailDiffsNotficationPreferenceClass/' + objectNumber
+          + '/properties/isEnabled?media=json';
+        $.ajax(restURL, {
+          method: 'PUT',
+          contentType: 'text/plain',
+          data: state ? '1' : '0'
+        }).done(function (data) {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        }).fail(function () {
+          notification.hide();
+          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        });
+      }
+    };
+
+    // Call init
+    self.init();
+  };
+});
+</code>
+    </property>
+    <property>
+      <name>Advanced Notifications Preferences</name>
     </property>
     <property>
       <parse>1</parse>
@@ -1447,6 +1637,121 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
     </property>
     <property>
       <name>NotificationPreferencesTable</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>97a82618-a86c-4098-ab57-4d7e2150cd2d</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#notificationToggleableFiltersLivetable-pagesize select {
+  width: auto;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>NotificationAdvancedPreferences</name>
     </property>
     <property>
       <parse/>

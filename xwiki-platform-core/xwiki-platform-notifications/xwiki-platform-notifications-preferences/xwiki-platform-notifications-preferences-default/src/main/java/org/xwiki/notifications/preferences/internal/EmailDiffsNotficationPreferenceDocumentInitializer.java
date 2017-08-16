@@ -32,15 +32,15 @@ import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Define the NotificationEmailPreferenceClass XClass.
+ * Define the EmailDiffsNotficationPreferenceClass XClass.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Component
-@Named("XWiki.Notifications.Code.NotificationEmailPreferenceClass")
+@Named("XWiki.Notifications.Code.EmailDiffsNotficationPreferenceClass")
 @Singleton
-public class NotificationEmailPreferenceDocumentInitializer extends AbstractMandatoryClassInitializer
+public class EmailDiffsNotficationPreferenceDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The path to the class parent document.
@@ -50,16 +50,14 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
     /**
      * Default constructor.
      */
-    public NotificationEmailPreferenceDocumentInitializer()
+    public EmailDiffsNotficationPreferenceDocumentInitializer()
     {
-        super(new LocalDocumentReference(PARENT_PATH, "NotificationEmailPreferenceClass"));
+        super(new LocalDocumentReference(PARENT_PATH, "EmailDiffsNotficationPreferenceClass"));
     }
 
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addStaticListField("interval", "Notification interval", 64,
-                false, "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live",
-                "select", "|, ");
+        xclass.addBooleanField("isEnabled", "Enable Email diffs ?", "select", false);
     }
 }

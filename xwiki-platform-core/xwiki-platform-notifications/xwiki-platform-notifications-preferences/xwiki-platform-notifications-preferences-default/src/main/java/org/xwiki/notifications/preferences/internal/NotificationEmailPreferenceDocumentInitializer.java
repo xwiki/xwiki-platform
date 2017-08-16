@@ -32,38 +32,34 @@ import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Define the NotificationPreferenceClass XClass.
+ * Define the NotificationEmailPreferenceClass XClass.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Component
-@Named("XWiki.Notifications.Code.NotificationPreferenceClass")
+@Named("XWiki.Notifications.Code.NotificationEmailPreferenceClass")
 @Singleton
-public class NotificationPreferenceDocumentInitializer extends AbstractMandatoryClassInitializer
+public class NotificationEmailPreferenceDocumentInitializer  extends AbstractMandatoryClassInitializer
 {
     /**
      * The path to the class parent document.
      */
     private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
-    private static final String SELECT = "select";
-
     /**
      * Default constructor.
      */
-    public NotificationPreferenceDocumentInitializer()
+    public NotificationEmailPreferenceDocumentInitializer()
     {
-        super(new LocalDocumentReference(PARENT_PATH, "NotificationPreferenceClass"));
+        super(new LocalDocumentReference(PARENT_PATH, "NotificationEmailPreferenceClass"));
     }
 
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("eventType", "Event Type", 64);
-        xclass.addStaticListField("format", "Format", 64, false,
-                "alert=Alert|email=E-mail", "input", "|, ");
-        xclass.addBooleanField("notificationEnabled", "Notification Enabled ?", SELECT, false);
-        xclass.addDateField("startDate", "Start date", "dd/MM/yyyy HH:mm:ss", 1);
+        xclass.addStaticListField("interval", "Notification interval", 64,
+                false, "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live",
+                "select", "|, ");
     }
 }

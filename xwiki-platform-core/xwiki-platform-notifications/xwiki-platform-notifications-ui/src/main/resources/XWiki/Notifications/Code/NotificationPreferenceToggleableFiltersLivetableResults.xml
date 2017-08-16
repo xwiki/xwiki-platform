@@ -60,7 +60,8 @@
       #set ($element = {
         'name': $services.localization.render("notifications.filters.name.$filter.name"),
         'description': $services.localization.render("notifications.filters.description.$filter.name"),
-        'toggle': $checkbox
+        'toggle': $checkbox,
+        'doc_viewable': true
       })
       #set ($discard = $elements.add($element))
     #end

@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.parser;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.Mockito.when;
@@ -99,5 +100,12 @@ public class DefaultContentParserTest
         thrown.expectMessage("Failed to find a parser for syntax [XWiki 2.1]");
         thrown.expectCause(any(ComponentLookupException.class));
         mocker.getComponentUnderTest().parse("", Syntax.XWIKI_2_1, DOCUMENT_REFERENCE);
+    }
+
+    @Test
+    public void parseWhenNullSource() throws Exception
+    {
+        XDOM xdom = mocker.getComponentUnderTest().parse(null, Syntax.PLAIN_1_0);
+        assertEquals(0, xdom.getChildren().size());
     }
 }

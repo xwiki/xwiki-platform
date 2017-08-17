@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
+  <content>{{template name="hierarchy_macros.vm" /}}
+
+{{velocity output="false"}}
 #macro (maybeApplyStringFilter $fieldName $defaultMatchType $constraints $queryParameters)
   #if ("$!request.getParameter($fieldName)" != '')
     #set ($fieldNameWithAlias = $fieldName)
@@ -90,14 +92,13 @@
   #set ($constraints = [])
   #set ($queryParameters = [])
   #maybeApplyStringFilter('filename' 'partial' $constraints $queryParameters)
-  #maybeApplyStringFilter('doc.space' 'partial' $constraints $queryParameters)
-  #maybeApplyStringFilter('doc.name' 'partial' $constraints $queryParameters)
+  #maybeApplyStringFilter('doc.fullName' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('author' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
   ##
   ## Sort the results.
   ##
-  #set ($validSortOptions = ['filename', 'doc.name', 'doc.space', 'date', 'author', 'mimeType'])
+  #set ($validSortOptions = ['filename', 'doc.fullName', 'date', 'author', 'mimeType'])
   #if ($validSortOptions.contains($request.sort))
     #set ($order = $request.sort)
   #else
@@ -151,21 +152,19 @@
   #if ($hasAccess)
     #set ($document = $xwiki.getDocument($attachmentReference.parent))
     #set ($attach = $document.getAttachment($attachmentReference.name))
+    #set ($location = "#hierarchy($attachmentReference.parent, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
     #set ($formatDate = 'yyyy MMMM dd, HH:mm')
-    "page" : "$escapetool.javascript($document.name)",
-    "space" : "$escapetool.javascript($document.space)",
-    "fullname" : "$escapetool.javascript($document.fullName)",
+    "fullName" : "$escapetool.javascript($location)",
     "filename" : "$escapetool.javascript($attach.filename)",
     "fileurl" : "$document.getAttachmentURL($attach.filename)",
-    "url" : "$document.getURL('view')",
-    "spaceurl" : "$xwiki.getURL("${document.space}.WebHome")",
     "date" : "$xwiki.formatDate($attach.date, $formatDate)",
     "author" : "$!escapetool.javascript($attach.author)",
     "authorname" : "$!escapetool.javascript($xwiki.getUserName($attach.author, false))",
     "authorurl" : "$xwiki.getURL($attach.author)",
     "mimeType" : "$!escapetool.javascript($attach.getMimeType())"
   #else
-    "fullname": "$escapetool.javascript($services.model.serialize($attachmentReference.parent, 'local'))"
+    #set ($location = "#hierarchy($attachmentReference.parent, {'limit': 5, 'plain': true, 'local': true, 'displayTitle': false})")
+    "fullName": "$escapetool.javascript($location)"
   #end
   }
 #end

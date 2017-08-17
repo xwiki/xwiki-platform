@@ -39,13 +39,41 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity wiki="false"}}
+  <content>{{velocity output="false"}}
+#macro (maybeApplyStringFilter $fieldName $defaultMatchType $constraints $queryParameters)
+  #if ("$!request.getParameter($fieldName)" != '')
+    #set ($fieldNameWithAlias = $fieldName)
+    #if ($fieldName.indexOf('.') &lt; 0)
+      #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
+    #end
+    #set ($matchType = $request.getParameter("${fieldName}_match"))
+    #if ("$!matchType" == '')
+      #set ($matchType = $defaultMatchType)
+    #end
+    #set ($parameterName = $fieldNameWithAlias.replace('.', '_'))
+    #if ($matchType == 'exact')
+      #set ($discard = $constraints.add("$fieldNameWithAlias = :$parameterName"))
+      #set ($parameterValue = $request.getParameter($fieldName))
+    #else
+      #set ($discard = $constraints.add("lower($fieldNameWithAlias) like :$parameterName"))
+      #set ($parameterValue = $request.getParameter($fieldName).trim().toLowerCase())
+    #end
+    #set ($discard = $queryParameters.add({
+      'name': $parameterName,
+      'match': $matchType,
+      'value': $parameterValue
+    }))
+  #end
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
 ## ============================================================================================
 ## This page is called from live grids via Ajax with the argument xpage=plain. It returns a
 ## set of results serialized in JSON.
 ## ============================================================================================
 #if ("$!request.get('xpage')" == 'plain')
-  $response.setContentType('application/json')##
+  #set ($discard = $response.setContentType('application/json'))
   #set ($offset = $mathtool.toInteger($request.get('offset')))
   ## offset starts from 0 in velocity and 1 in javascript
   #set ($offset = $offset - 1)
@@ -56,50 +84,20 @@
   #if (!$limit)
     #set ($limit = 15)
   #end
-  #set ($page = $request.get('doc.name'))
-  #set ($author = $request.get('author'))
-  #set ($space = $request.get('doc.space'))
-  #set ($filename = $request.filename)
-  #set ($formatDate = 'yyyy MMMM dd, HH:mm')
+  ##
+  ## Apply live table filters.
+  ##
   #set ($constraints = [])
   #set ($queryParameters = [])
-  #if ($filename)
-    #set ($filename = $filename.trim().toLowerCase())
-    #set ($discard = $constraints.add('lower(attachment.filename) like :fileName'))
-    #set ($discard = $queryParameters.add({
-      'name': 'fileName',
-      'match': 'partial',
-      'value': $filename
-    }))
-  #end
-  #if ($space)
-    #set ($space = $space.trim().toLowerCase())
-    #set ($discard = $constraints.add('lower(doc.space) like :space'))
-    #set ($discard = $queryParameters.add({
-      'name': 'space',
-      'match': 'partial',
-      'value': $space
-    }))
-  #end
-  #if ($page)
-    #set ($page = $page.trim().toLowerCase())
-    #set ($discard = $constraints.add('lower(doc.name) like :page'))
-    #set ($discard = $queryParameters.add({
-      'name': 'page',
-      'match': 'partial',
-      'value': $page
-    }))
-  #end
-  #if ($author)
-    #set ($author = $author.trim().toLowerCase())
-    #set ($discard = $constraints.add('lower(attachment.author) like :author'))
-    #set ($discard = $queryParameters.add({
-      'name': 'author',
-      'match': 'partial',
-      'value': $author
-    }))
-  #end
-  #set ($validSortOptions = ['filename', 'doc.name', 'doc.space', 'date', 'author'])
+  #maybeApplyStringFilter('filename' 'partial' $constraints $queryParameters)
+  #maybeApplyStringFilter('doc.space' 'partial' $constraints $queryParameters)
+  #maybeApplyStringFilter('doc.name' 'partial' $constraints $queryParameters)
+  #maybeApplyStringFilter('author' 'partial' $constraints $queryParameters)
+  #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
+  ##
+  ## Sort the results.
+  ##
+  #set ($validSortOptions = ['filename', 'doc.name', 'doc.space', 'date', 'author', 'mimeType'])
   #if ($validSortOptions.contains($request.sort))
     #set ($order = $request.sort)
   #else
@@ -127,7 +125,10 @@
   #foreach ($queryParameter in $queryParameters)
     #if ($queryParameter.match == 'exact')
       #set ($discard = $query.bindValue($queryParameter.name, $queryParameter.value))
-    #elseif ($queryParameter.match == 'partial')
+    #elseif ($queryParameter.match == 'prefix')
+      #set ($query = $query.bindValue($queryParameter.name).literal($queryParameter.value).anyChars().query())
+    #else
+      ## Partial match.
       #set ($query = $query.bindValue($queryParameter.name).anyChars().literal($queryParameter.value).anyChars().query())
     #end
   #end
@@ -150,6 +151,7 @@
   #if ($hasAccess)
     #set ($document = $xwiki.getDocument($attachmentReference.parent))
     #set ($attach = $document.getAttachment($attachmentReference.name))
+    #set ($formatDate = 'yyyy MMMM dd, HH:mm')
     "page" : "$escapetool.javascript($document.name)",
     "space" : "$escapetool.javascript($document.space)",
     "fullname" : "$escapetool.javascript($document.fullName)",
@@ -161,7 +163,7 @@
     "author" : "$!escapetool.javascript($attach.author)",
     "authorname" : "$!escapetool.javascript($xwiki.getUserName($attach.author, false))",
     "authorurl" : "$xwiki.getURL($attach.author)",
-    "type" : "$!escapetool.javascript($attach.getMimeType())"
+    "mimeType" : "$!escapetool.javascript($attach.getMimeType())"
   #else
     "fullname": "$escapetool.javascript($services.model.serialize($attachmentReference.parent, 'local'))"
   #end

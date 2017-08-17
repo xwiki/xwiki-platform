@@ -19,41 +19,22 @@
  */
 package org.xwiki.notifications.script;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.NotificationFilter;
-import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.preferences.NotificationPreferenceManager;
-import org.xwiki.notifications.sources.NotificationManager;
-import org.xwiki.notifications.notifiers.NotificationRenderer;
-import org.xwiki.notifications.script.internal.NotificationPreferencesSaver;
 import org.xwiki.notifications.script.internal.NotificationScriptEventHelper;
-import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
-
-import com.rometools.rome.io.SyndFeedOutput;
 
 /**
  * Script services for the notifications.
@@ -63,128 +44,37 @@ import com.rometools.rome.io.SyndFeedOutput;
  */
 @Component
 @Singleton
-@Named("notification")
+@Named(NotificationScriptService.ROLE_HINT)
 @Unstable
 public class NotificationScriptService implements ScriptService
 {
+    /**
+     * Hint of the component.
+     */
+    public static final String ROLE_HINT = "notification";
+
     @Inject
     private NotificationConfiguration notificationConfiguration;
-
-    @Inject
-    private NotificationManager notificationManager;
-
-    @Inject
-    private NotificationRenderer notificationRenderer;
-
-    @Inject
-    private NotificationRSSManager notificationRSSManager;
-
-    @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
-    private ContextualAuthorizationManager authorizationManager;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
     private NotificationScriptEventHelper notificationScriptEventHelper;
 
     @Inject
-    private NotificationPreferencesSaver notificationPreferencesSaver;
+    private ScriptServiceManager scriptServiceManager;
 
-    @Inject
-    private NotificationFilterManager notificationFilterManager;
 
     /**
-     * @param onyUnread either or not to return only unread events
-     * @param expectedCount number of expected events
-     * @return the matching events for the current user, could be less than expectedCount but not more
-     * @throws NotificationException if error happens
-     */
-    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
-    {
-        return notificationManager.getEvents(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onyUnread,
-                expectedCount
-        );
-    }
-
-    /**
-     * @param onyUnread either or not to return only unread events
-     * @param expectedCount number of expected events
-     * @param untilDate do not return events happened after this date
-     * @param blackList array of events id to exclude from the search
-     * @return the matching events for the current user, could be less than expectedCount but not more
-     * @throws NotificationException if error happens
-     */
-    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
-            throws NotificationException
-    {
-        return notificationManager.getEvents(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onyUnread,
-                expectedCount,
-                untilDate,
-                Arrays.asList(blackList)
-        );
-    }
-
-    /**
-     * @param onyUnread either or not to return only unread events
-     * @param expectedCount number of expected events
-     * @param untilDate do not return events happened after this date
-     * @param blackList list of events id to exclude from the search
-     * @return the matching events for the current user, could be less than expectedCount but not more
-     * @throws NotificationException if error happens
-     */
-    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
-            throws NotificationException
-    {
-        return notificationManager.getEvents(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onyUnread,
-                expectedCount,
-                untilDate,
-                blackList
-        );
-    }
-
-    /**
-     * Return the number of events to display as notifications concerning the current user.
+     * Get a sub script service related to wiki. (Note that we're voluntarily using an API name of "get" to make it
+     * extra easy to access Script Services from Velocity (since in Velocity writing <code>$services.wiki.name</code> is
+     * equivalent to writing <code>$services.wiki.get("name")</code>). It also makes it a short and easy API name for
+     * other scripting languages.
      *
-     * @param onlyUnread either if only unread events should be counted or all events
-     * @param maxCount maximum number of events to count
-     * @return the list of events to display as notifications
-     * @throws NotificationException if an error happens
+     * @param serviceName id of the script service
+     * @return the service asked or null if none could be found
      */
-    public long getEventsCount(boolean onlyUnread, int maxCount) throws NotificationException
+    public ScriptService get(String serviceName)
     {
-        return notificationManager.getEventsCount(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onlyUnread,
-                maxCount
-        );
-    }
-
-    /**
-     * Generate a rendering Block for a given event to display as notification.
-     * @param event the event to render
-     * @return a rendering block ready to display the event
-     * 
-     * @throws NotificationException if an error happens
-     */
-    public Block render(CompositeEvent event) throws NotificationException
-    {
-        return notificationRenderer.render(event);
+        return scriptServiceManager.get(ROLE_HINT + '.' + serviceName);
     }
 
     /**
@@ -244,97 +134,5 @@ public class NotificationScriptService implements ScriptService
     public void saveEventStatus(String eventId, boolean isRead) throws Exception
     {
         notificationScriptEventHelper.saveEventStatus(eventId, isRead);
-    }
-
-    /**
-     * Set the start date for the current user.
-     *
-     * @param startDate the date before which we ignore notifications
-     * @throws NotificationException if an error occurs
-     */
-    public void setStartDate(Date startDate) throws NotificationException
-    {
-        notificationPreferenceManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
-    }
-
-    /**
-     * Set the start date for every notification preference of the given user.
-     *
-     * @param userId id of the user
-     * @param startDate the date before which we ignore notifications
-     * @throws NotificationException if an error occurs
-     */
-    public void setStartDate(String userId, Date startDate) throws NotificationException
-    {
-        try {
-            this.authorizationManager.checkAccess(Right.EDIT, documentReferenceResolver.resolve(userId));
-            notificationManager.setStartDate(userId, startDate);
-        } catch (AccessDeniedException e) {
-            throw new NotificationException(
-                    String.format("Unable to save the start date of the notifications for the user [%s]", userId),
-                    e);
-        }
-    }
-
-    /**
-     * Get the RSS notifications feed of the given user.
-     *
-     * @param entryNumber number of entries to get
-     * @param onlyUnread if only unread events should be returned
-     * @return the notifications RSS feed
-     * @throws NotificationException if an error occurs
-     * @since 9.6RC1
-     */
-    public String getFeed(int entryNumber, boolean onlyUnread) throws NotificationException
-    {
-        String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
-        return this.getFeed(userId, entryNumber, onlyUnread);
-    }
-
-    /**
-     * Get the RSS notifications feed of the given user.
-     *
-     * @param userId id of the user
-     * @param entryNumber number of entries to get
-     * @param onlyUnread if only unread events should be returned
-     * @return the notifications RSS feed
-     * @throws NotificationException if an error occurs
-     * @since 9.6RC1
-     */
-    public String getFeed(String userId, int entryNumber, boolean onlyUnread) throws NotificationException
-    {
-        SyndFeedOutput output = new SyndFeedOutput();
-        try {
-            return output.outputString(this.notificationRSSManager.renderFeed(
-                    this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
-        } catch (Exception e) {
-            throw new NotificationException("Unable to render RSS feed", e);
-        }
-    }
-
-    /**
-     * Update notification preferences of the given user.
-     *
-     * @param json a list of notification preferences represented as JSON
-     * @throws NotificationException if an error occurs
-     *
-     * @since 9.7RC1
-     */
-    public void saveNotificationsPreferences(String json) throws NotificationException
-    {
-        notificationPreferencesSaver.saveNotificationPreferences(json, documentAccessBridge.getCurrentUserReference());
-    }
-
-    /**
-     * Get a set of notification filters that can be toggled by the current user.
-     *
-     * @return a set of notification filters that are toggleable
-     * @throws NotificationException if an error occurs
-     *
-     * @since 9.7RC1
-     */
-    public Set<NotificationFilter> getToggleableNotificationFilters() throws NotificationException
-    {
-        return notificationFilterManager.getToggleableFilters(documentAccessBridge.getCurrentUserReference());
     }
 }

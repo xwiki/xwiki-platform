@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.script.internal;
+package org.xwiki.notifications.preferences.script;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,29 +26,46 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Helper to save preferences given as JSON.
+ * Script service for the notification preferences.
  *
- * @version $Id$
  * @since 9.7RC1
+ * @version $Id$
  */
-@Component(roles = NotificationPreferencesSaver.class)
+@Component
+@Named("notification.preferences")
 @Singleton
-public class NotificationPreferencesSaver
+public class NotificationPreferenceScriptService implements ScriptService
 {
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
@@ -89,6 +106,48 @@ public class NotificationPreferencesSaver
 
         } catch (Exception e) {
             throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);
+        }
+    }
+
+    /**
+     * Update notification preferences of the given user.
+     *
+     * @param json a list of notification preferences represented as JSON
+     * @throws NotificationException if an error occurs
+     */
+    public void saveNotificationPreferences(String json) throws NotificationException
+    {
+        saveNotificationPreferences(json, documentAccessBridge.getCurrentUserReference());
+    }
+
+    /**
+     * Set the start date for the current user.
+     *
+     * @param startDate the date before which we ignore notifications
+     * @throws NotificationException if an error occurs
+     */
+    public void setStartDate(Date startDate) throws NotificationException
+    {
+        notificationPreferenceManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
+    }
+
+    /**
+     * Set the start date for every notification preference of the given user.
+     *
+     * @param userId id of the user
+     * @param startDate the date before which we ignore notifications
+     * @throws NotificationException if an error occurs
+     */
+    public void setStartDate(String userId, Date startDate) throws NotificationException
+    {
+        try {
+            DocumentReference user = documentReferenceResolver.resolve(userId);
+            this.authorizationManager.checkAccess(Right.EDIT, user);
+            notificationPreferenceManager.setStartDateForUser(user, startDate);
+        } catch (AccessDeniedException e) {
+            throw new NotificationException(
+                    String.format("Unable to save the start date of the notifications for the user [%s]", userId),
+                    e);
         }
     }
 }

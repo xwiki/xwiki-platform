@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.script.internal;
+package org.xwiki.notifications.preferences.script;
 
 import java.util.List;
 
@@ -30,18 +30,20 @@ import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
+ * Unit tests for {@link NotificationPreferenceScriptService}.
+ *
+ * @since 9.7RC1
  * @version $Id$
  */
-public class NotificationPreferencesSaverTest
+public class NotificationPreferenceScriptServiceTest
 {
     @Rule
-    public final MockitoComponentMockingRule<NotificationPreferencesSaver> mocker =
-            new MockitoComponentMockingRule<>(NotificationPreferencesSaver.class);
+    public final MockitoComponentMockingRule<NotificationPreferenceScriptService> mocker =
+            new MockitoComponentMockingRule<>(NotificationPreferenceScriptService.class);
 
     private NotificationPreferenceManager notificationPreferenceManager;
 

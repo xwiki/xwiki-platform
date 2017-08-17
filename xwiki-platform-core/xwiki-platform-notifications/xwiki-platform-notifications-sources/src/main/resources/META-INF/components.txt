@@ -1,2 +1,3 @@
 org.xwiki.notifications.sources.internal.DefaultNotificationManager
 org.xwiki.notifications.sources.internal.QueryGenerator
+org.xwiki.notifications.sources.script.NotificationSourcesScriptService

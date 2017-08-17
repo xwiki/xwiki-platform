@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set($discard = $response.setContentType('application/xml'))
-#set($result = $services.notification.getFeed(20, false))
+#set($result = $services.notification.notifiers.getFeed(20, false))
 $result
 {{/velocity}}
 </content>

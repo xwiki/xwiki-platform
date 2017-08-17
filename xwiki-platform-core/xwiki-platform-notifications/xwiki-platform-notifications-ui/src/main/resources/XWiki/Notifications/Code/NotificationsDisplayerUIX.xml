@@ -49,9 +49,9 @@
   #if ("$!request.untilDate" != '' &amp;&amp; "$!request.blackList" != '')
     #set ($untilDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.untilDate).longValue()).toDate())
     #set ($blackList = $request.blackList.split(','))
-    #set ($events = $services.notification.getEvents(false, $batchSize, $untilDate, $blackList))
+    #set ($events = $services.notification.sources.getEvents(false, $batchSize, $untilDate, $blackList))
   #else
-    #set ($events = $services.notification.getEvents(false, $batchSize))
+    #set ($events = $services.notification.sources.getEvents(false, $batchSize))
   #end
   #foreach ($status in $services.notification.getCompositeEventStatuses($events))
     #set ($event = $status.compositeEvent)
@@ -65,7 +65,7 @@
       #set ($discard = $notification.put('document', $services.model.serialize($event.document, 'default')))
     #end
     #try("notificationException")
-      #set ($discard = $notification.put('html', $services.rendering.render($services.notification.render($event), 'html/5.0')))
+      #set ($discard = $notification.put('html', $services.rendering.render($services.notification.notifiers.render($event), 'html/5.0')))
     #end
     #if ("$!notificationException" != '')
       #set ($discard = $notification.put('exception', $notificationException.toString()))
@@ -73,7 +73,7 @@
     #set ($discard = $notifications.add($notification))
   #end
   #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.getEventsCount(true, 21)})
+  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.sources.getEventsCount(true, 21)})
 #********************************************************
              Mark a notification as read
 ********************************************************#
@@ -95,7 +95,7 @@
   #if ("$!request.date" != '')
     #set ($startDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.date).longValue()).toDate())
   #end
-  #set ($discard = $services.notification.setStartDate($datetool.date))
+  #set ($discard = $services.notification.preferences.setStartDate($datetool.date))
 #end
 {{/velocity}}
 </content>

@@ -2,3 +2,4 @@ org.xwiki.notifications.preferences.internal.CachedModelBridge
 org.xwiki.notifications.preferences.internal.DefaultNotificationPreferenceManager
 org.xwiki.notifications.preferences.internal.DefaultTargetableNotificationPreferenceBuilder
 org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider
+org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService

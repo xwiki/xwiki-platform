@@ -46,7 +46,7 @@
     ##
     #set ($userDocument = $xwiki.getDocument($xcontext.getUserReference()))
     #set ($elements = [])
-    #set ($filters = $services.notification.getToggleableNotificationFilters())
+    #set ($filters = $services.notification.filters.getToggleableNotificationFilters())
     #foreach ($filter in $filters)
       #set ($checked = 'checked = "checked"')
       #set ($objectNumber = '')

@@ -37,6 +37,10 @@ public class AllTests
         // Disable the tour because it pops-up on the home page and many tests access the home page and they want to
         // skip the tour. We don't plan to test the tour here anyway.
         context.getUtil().loginAsAdmin();
+
+        // Disable syntax highlighting in the wiki editor
+        context.getUtil().disableSyntaxHighlighting();
+
         context.getUtil().gotoPage("TourCode", "TourJS", "save",
             "XWiki.JavaScriptExtension_0_use=onDemand&xredirect=" + context.getUtil().getURL("Main", "WebHome"));
     }

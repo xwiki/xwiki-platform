@@ -46,7 +46,7 @@ public interface ModelBridge
      *
      * @since 9.5RC1
      */
-    List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference user,
+    List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
             NotificationFormat format) throws NotificationException;
 
     /**
@@ -60,7 +60,7 @@ public interface ModelBridge
      *
      * @since 9.7RC1
      */
-    List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference user,
+    List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
             NotificationFormat format, NotificationFilterType type) throws NotificationException;
 
     /**

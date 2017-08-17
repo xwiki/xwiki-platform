@@ -58,24 +58,24 @@ public class CachedModelBridge implements ModelBridge
     private Execution execution;
 
     @Override
-    public List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference user,
+    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
             NotificationFormat format) throws NotificationException
     {
         final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format;
 
         ExecutionContext context = execution.getContext();
         if (context.hasProperty(contextEntry)) {
-            return (List<NotificationPreferenceFilterScope>) context.getProperty(contextEntry);
+            return (List<NotificationFilterPreferenceScope>) context.getProperty(contextEntry);
         }
 
-        List<NotificationPreferenceFilterScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format);
+        List<NotificationFilterPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format);
         context.setProperty(contextEntry, preferences);
 
         return preferences;
     }
 
     @Override
-    public List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference user,
+    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
             NotificationFormat format, NotificationFilterType type) throws NotificationException
     {
         final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format + UNDERSCORE
@@ -83,10 +83,10 @@ public class CachedModelBridge implements ModelBridge
 
         ExecutionContext context = execution.getContext();
         if (context.hasProperty(contextEntry)) {
-            return (List<NotificationPreferenceFilterScope>) context.getProperty(contextEntry);
+            return (List<NotificationFilterPreferenceScope>) context.getProperty(contextEntry);
         }
 
-        List<NotificationPreferenceFilterScope> preferences = modelBridge.getNotificationPreferenceScopes(
+        List<NotificationFilterPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(
                 user, format, type);
         context.setProperty(contextEntry, preferences);
 

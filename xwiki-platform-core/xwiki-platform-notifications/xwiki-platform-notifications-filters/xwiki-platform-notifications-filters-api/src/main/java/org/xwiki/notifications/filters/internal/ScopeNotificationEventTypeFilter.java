@@ -30,7 +30,7 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
- * Notification filter that handle the generic {@link NotificationPreferenceFilterScope}.
+ * Notification filter that handle the generic {@link NotificationFilterPreferenceScope}.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -43,7 +43,7 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
     static final String FILTER_NAME = "scopeNotifEventTypeFilter";
 
     @Override
-    protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
+    protected boolean scopeMatchesFilteringContext(NotificationFilterPreferenceScope scope,
             NotificationPreference preference)
     {
         // We apply the filter only on scopes having the correct eventType
@@ -53,7 +53,7 @@ public class ScopeNotificationEventTypeFilter extends AbstractScopeNotificationF
     }
 
     @Override
-    protected boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope, NotificationFormat format,
+    protected boolean scopeMatchesFilteringContext(NotificationFilterPreferenceScope scope, NotificationFormat format,
             Event event)
     {
         return scope.getEventTypes().contains(event.getType());

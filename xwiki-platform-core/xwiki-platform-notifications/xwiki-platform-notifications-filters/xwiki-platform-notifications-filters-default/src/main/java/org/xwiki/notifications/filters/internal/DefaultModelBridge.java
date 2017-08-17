@@ -78,7 +78,7 @@ public class DefaultModelBridge implements ModelBridge
     private Provider<XWikiContext> contextProvider;
 
     @Override
-    public List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference userReference,
+    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
             NotificationFormat format) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
@@ -87,7 +87,7 @@ public class DefaultModelBridge implements ModelBridge
         final DocumentReference notificationPreferencesScopeClass
                 = NOTIFICATION_PREFERENCE_SCOPE_CLASS.setWikiReference(userReference.getWikiReference());
 
-        List<NotificationPreferenceFilterScope> preferences = new ArrayList<>();
+        List<NotificationFilterPreferenceScope> preferences = new ArrayList<>();
 
         try {
             XWikiDocument doc = xwiki.getDocument(userReference, context);
@@ -106,12 +106,12 @@ public class DefaultModelBridge implements ModelBridge
                             type = EntityType.WIKI;
                         } else {
                             logger.warn(
-                                    "Scope [{}] is not supported as a NotificationPreferenceFilterScope (user [{}]).",
+                                    "Scope [{}] is not supported as a NotificationFilterPreferenceScope (user [{}]).",
                                     scopeType, userReference);
                             continue;
                         }
 
-                        preferences.add(new NotificationPreferenceFilterScope(
+                        preferences.add(new NotificationFilterPreferenceScope(
                                 obj.getListValue("eventType"),
                                 entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type),
                                 scopeFilterType
@@ -152,13 +152,13 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public List<NotificationPreferenceFilterScope> getNotificationPreferenceScopes(DocumentReference userReference,
+    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
             NotificationFormat format, NotificationFilterType scopeFilterType)
             throws NotificationException
     {
-        List<NotificationPreferenceFilterScope> preferences = new ArrayList<>();
+        List<NotificationFilterPreferenceScope> preferences = new ArrayList<>();
 
-        for (NotificationPreferenceFilterScope preference
+        for (NotificationFilterPreferenceScope preference
                 : this.getNotificationPreferenceScopes(userReference, format)) {
             if (preference.getScopeFilterType().equals(scopeFilterType)) {
                 preferences.add(preference);

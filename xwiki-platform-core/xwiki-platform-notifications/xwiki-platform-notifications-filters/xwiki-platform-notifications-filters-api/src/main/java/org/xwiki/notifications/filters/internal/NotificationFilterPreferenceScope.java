@@ -35,7 +35,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 9.5RC1
  */
-public class NotificationPreferenceFilterScope
+public class NotificationFilterPreferenceScope
 {
     private List<String> eventTypes;
 
@@ -44,13 +44,13 @@ public class NotificationPreferenceFilterScope
     private NotificationFilterType scopeFilterType;
 
     /**
-     * Construct a NotificationPreferenceFilterScope.
+     * Construct a NotificationFilterPreferenceScope.
      *
      * @param eventTypes names of the event types to refine
      * @param scopeReference reference of the scope
      * @param scopeFilterType the type of filter associated with the scope
      */
-    public NotificationPreferenceFilterScope(List<String> eventTypes,
+    public NotificationFilterPreferenceScope(List<String> eventTypes,
             EntityReference scopeReference, NotificationFilterType scopeFilterType)
     {
         this.eventTypes = eventTypes;

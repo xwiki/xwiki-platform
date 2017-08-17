@@ -65,18 +65,18 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
     protected Logger logger;
 
     /**
-     * Given a {@link NotificationPreferenceFilterScope} and the current filtering context (defined by a
+     * Given a {@link NotificationFilterPreferenceScope} and the current filtering context (defined by a
      * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
      *
      * @param scope the reference scope
      * @param preference the related notification preference
      * @return true if the filter should be applied to the given scope.
      */
-    protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
+    protected abstract boolean scopeMatchesFilteringContext(NotificationFilterPreferenceScope scope,
             NotificationPreference preference);
 
     /**
-     * Given a {@link NotificationPreferenceFilterScope} and the current filtering context (defined by a
+     * Given a {@link NotificationFilterPreferenceScope} and the current filtering context (defined by a
      * {@link NotificationFormat} and an {@link Event}, determine if a the current filter should
      * apply with the given scope.
      *
@@ -85,7 +85,7 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
      * @param event the {@link Event} to use
      * @return true if the filter should be applied to the given scope.
      */
-    protected abstract boolean scopeMatchesFilteringContext(NotificationPreferenceFilterScope scope,
+    protected abstract boolean scopeMatchesFilteringContext(NotificationFilterPreferenceScope scope,
             NotificationFormat format, Event event);
 
 
@@ -99,7 +99,7 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
         boolean matchRestriction = false;
 
         try {
-            for (NotificationPreferenceFilterScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
+            for (NotificationFilterPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
                     filterType)) {
                 if (scopeMatchesFilteringContext(scope, format, event)) {
                     hasRestriction = true;
@@ -138,7 +138,7 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
         boolean isFirstPass = true;
 
         try {
-            for (NotificationPreferenceFilterScope scope : modelBridge.getNotificationPreferenceScopes(user,
+            for (NotificationFilterPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user,
                     preference.getFormat(), filterType)) {
                 if (!scopeMatchesFilteringContext(scope, preference)) {
                     continue;

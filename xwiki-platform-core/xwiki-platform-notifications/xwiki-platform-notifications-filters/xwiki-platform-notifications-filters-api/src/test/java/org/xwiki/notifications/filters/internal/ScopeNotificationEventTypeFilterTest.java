@@ -215,30 +215,30 @@ public class ScopeNotificationEventTypeFilterTest
 
     private void createPreferenceScopeMocks() throws NotificationException
     {
-        NotificationPreferenceFilterScope scope1 = mock(NotificationPreferenceFilterScope.class);
+        NotificationFilterPreferenceScope scope1 = mock(NotificationFilterPreferenceScope.class);
         when(scope1.getScopeReference()).thenReturn(
                 SCOPE_INCLUSIVE_REFERENCE_1
         );
         when(scope1.getEventTypes()).thenReturn(Arrays.asList("event1"));
 
-        NotificationPreferenceFilterScope scope2 = mock(NotificationPreferenceFilterScope.class);
+        NotificationFilterPreferenceScope scope2 = mock(NotificationFilterPreferenceScope.class);
         when(scope2.getScopeReference()).thenReturn(
                 SCOPE_INCLUSIVE_REFERENCE_2
         );
         when(scope2.getEventTypes()).thenReturn(Arrays.asList("event2"));
 
-        NotificationPreferenceFilterScope scope3 = mock(NotificationPreferenceFilterScope.class);
+        NotificationFilterPreferenceScope scope3 = mock(NotificationFilterPreferenceScope.class);
         when(scope3.getScopeReference()).thenReturn(
                 SCOPE_INCLUSIVE_REFERENCE_3
         );
         when(scope3.getEventTypes()).thenReturn(Arrays.asList("event3"));
 
-        NotificationPreferenceFilterScope exclusiveScope1 = mock(NotificationPreferenceFilterScope.class);
+        NotificationFilterPreferenceScope exclusiveScope1 = mock(NotificationFilterPreferenceScope.class);
         when(exclusiveScope1.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_1);
         when(exclusiveScope1.getScopeFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(exclusiveScope1.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent1"));
 
-        NotificationPreferenceFilterScope exclusiveScope2 = mock(NotificationPreferenceFilterScope.class);
+        NotificationFilterPreferenceScope exclusiveScope2 = mock(NotificationFilterPreferenceScope.class);
         when(exclusiveScope2.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_2);
         when(exclusiveScope2.getScopeFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(exclusiveScope2.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent2"));

@@ -79,7 +79,9 @@ vbE8KME24CG4hi8FgmyXpbkzCAMEAQQBPV+bpVwGBChXkOEJQS4IUK4gjZEcFqNCgLIlaR05OIrS
   </attachment>
   <content>The sandbox is a part of your wiki that you can freely modify. It's meant to let you practice editing. You will discover how page editing works and create new pages. Simply click on **Edit** to get started!
 
-{{info}}Don't worry about overwriting or losing stuff when editing the page, you can always roll back to the first version of the page from the "History" tab at the bottom of the page.{{/info}}
+{{info}}
+Don't worry about overwriting or losing stuff when editing the page, you can always roll back to the first version of the page from the "History" tab at the bottom of the page.
+{{/info}}
 
 If you want to give a look to the underlying [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]], you can click on "Wiki code" in the "Show" menu or click on the "Source" tab when editing the page.
 
@@ -193,7 +195,9 @@ Macros allow you to make wiki content look better and to add additional features
 
 This macro allows you to draw users' attention to a specific piece of information:
 
-{{warning}}Hello World{{/warning}}
+{{warning}}
+Hello World
+{{/warning}}
 
 == Table of Contents ==
 

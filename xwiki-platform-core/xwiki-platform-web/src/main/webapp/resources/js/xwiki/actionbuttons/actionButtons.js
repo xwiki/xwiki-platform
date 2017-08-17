@@ -386,5 +386,22 @@ function updateForShortcut() {
 document.observe("xwiki:actions:save", updateForShortcut);
 document.observe("xwiki:actions:preview", updateForShortcut);
 // End XWiki augmentation.
+
+require(['jquery'], function ($) {
+  var $container = $('.bottombuttons');
+  var $buttons = $container.find('.buttons');
+  var $window = $(window);
+
+  $window.on("scroll resize load click", function() {
+    var position = $container.offset().top + $buttons.height() - $window.scrollTop();
+
+    if (position > $window.height()) {
+      $buttons.addClass('buttons-fixed');
+    } else {
+      $buttons.removeClass('buttons-fixed');
+    }
+  });
+});
+
 return XWiki;
 }(XWiki || {}));

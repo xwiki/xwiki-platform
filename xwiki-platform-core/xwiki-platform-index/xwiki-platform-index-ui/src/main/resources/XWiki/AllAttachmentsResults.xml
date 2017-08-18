@@ -57,8 +57,8 @@
       #set ($discard = $constraints.add("$fieldNameWithAlias = :$parameterName"))
       #set ($parameterValue = $request.getParameter($fieldName))
     #else
-      #set ($discard = $constraints.add("lower($fieldNameWithAlias) like :$parameterName"))
-      #set ($parameterValue = $request.getParameter($fieldName).trim().toLowerCase())
+      #set ($discard = $constraints.add("lower($fieldNameWithAlias) like lower(:$parameterName)"))
+      #set ($parameterValue = $request.getParameter($fieldName).trim())
     #end
     #set ($discard = $queryParameters.add({
       'name': $parameterName,
@@ -71,18 +71,17 @@
 
 {{velocity wiki="false"}}
 ## ============================================================================================
-## This page is called from live grids via Ajax with the argument xpage=plain. It returns a
-## set of results serialized in JSON.
+## This page is called by the Attachments live table via AJAX with the argument xpage=plain. It
+## returns a set of results serialized in JSON format.
 ## ============================================================================================
-#if ("$!request.get('xpage')" == 'plain')
-  #set ($discard = $response.setContentType('application/json'))
-  #set ($offset = $mathtool.toInteger($request.get('offset')))
-  ## offset starts from 0 in velocity and 1 in javascript
+#if ("$!request.xpage" == 'plain')
+  #set ($offset = $mathtool.toInteger($request.offset))
+  ## The offset sent by the live table starts at 1.
   #set ($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set ($offset = 0)
   #end
-  #set ($limit = $mathtool.toInteger($request.get('limit')))
+  #set ($limit = $mathtool.toInteger($request.limit))
   #if (!$limit)
     #set ($limit = 15)
   #end
@@ -95,32 +94,35 @@
   #maybeApplyStringFilter('doc.fullName' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('author' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
-  ##
-  ## Sort the results.
-  ##
-  #set ($validSortOptions = ['filename', 'doc.fullName', 'date', 'author', 'mimeType'])
-  #if ($validSortOptions.contains($request.sort))
-    #set ($order = $request.sort)
-  #else
-    #set ($order = 'filename')
-  #end
-  #if (!$order.startsWith('doc.'))
-    #set ($order = "attachment.${order}")
-  #end
-  #if ("$!request.dir" == 'desc')
-    #set ($dir = 'desc')
-  #else
-    #set ($dir = 'asc')
-  #end
-  ##
-  ## Compute the final query
-  ##
-  #set ($statement = '')
+  #set ($whereClause = '')
   #if ($constraints.size() &gt; 0)
-    #set ($statement = $statement + ' where ' + $stringtool.join($constraints, ' and '))
+    #set ($whereClause = 'where ' + $stringtool.join($constraints, ' and '))
   #end
-  #set ($statement = $statement + " order by $order $dir")
-  #set ($query = $services.query.hql($statement))
+  ##
+  ## Determine the sort field and direction.
+  ##
+  #set ($validSortFields = ['filename', 'doc.fullName', 'date', 'author', 'mimeType'])
+  #set ($sortField = $request.sort)
+  #if (!$validSortFields.contains($sortField))
+    #set ($sortField = 'filename')
+  #end
+  #set ($caseInsensitiveSort = $sortField != 'date')
+  #if (!$sortField.startsWith('doc.'))
+    #set ($sortField = "attachment.$sortField")
+  #end
+  #set ($direction = 'asc')
+  #if ("$!request.dir" == 'desc')
+    #set ($direction = 'desc')
+  #end
+  #if ($caseInsensitiveSort)
+    #set ($orderByClause = "order by lower($sortField) $direction, $sortField $direction")
+  #else
+    #set ($orderByClause = "order by $sortField $direction")
+  #end
+  ##
+  ## Compute the final query.
+  ##
+  #set ($query = $services.query.hql("$whereClause $orderByClause"))
   #set ($discard = $query.addFilter('attachment').addFilter('hidden'))
   #set ($discard = $query.setLimit($limit).setOffset($offset))
   #foreach ($queryParameter in $queryParameters)
@@ -133,45 +135,43 @@
       #set ($query = $query.bindValue($queryParameter.name).anyChars().literal($queryParameter.value).anyChars().query())
     #end
   #end
-  #set ($items = $query.execute())
-  #set ($totalItems = $query.count())
-  #set ($returnedItems = $items.size())
-  ## ==============================================
-  ## json starts
-  ## ==============================================
-{
-"totalrows": $totalItems,
-"returnedrows": #if($returnedItems &lt; $limit) $returnedItems #else $limit #end,
-"offset": $mathtool.add($offset, 1),
-"reqNo": $mathtool.toInteger($request.reqNo),
-"rows": [
-#foreach ($attachmentReference in $items)
-  #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
-  #if ($velocityCount &gt; 1) , #end
-  { "acclev" : $hasAccess,
-  #if ($hasAccess)
-    #set ($document = $xwiki.getDocument($attachmentReference.parent))
-    #set ($attach = $document.getAttachment($attachmentReference.name))
-    #set ($location = "#hierarchy($attachmentReference.parent, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
-    #set ($formatDate = 'yyyy MMMM dd, HH:mm')
-    "fullName" : "$escapetool.javascript($location)",
-    "filename" : "$escapetool.javascript($attach.filename)",
-    "fileurl" : "$document.getAttachmentURL($attach.filename)",
-    "date" : "$xwiki.formatDate($attach.date, $formatDate)",
-    "author" : "$!escapetool.javascript($attach.author)",
-    "authorname" : "$!escapetool.javascript($xwiki.getUserName($attach.author, false))",
-    "authorurl" : "$xwiki.getURL($attach.author)",
-    "mimeType" : "$!escapetool.javascript($attach.getMimeType())"
-  #else
-    #set ($location = "#hierarchy($attachmentReference.parent, {'limit': 5, 'plain': true, 'local': true, 'displayTitle': false})")
-    "fullName": "$escapetool.javascript($location)"
+  #set ($attachmentReferences = $query.execute())
+  #set ($results = {
+    "totalrows": $query.count(),
+    "returnedrows": $mathtool.min($attachmentReferences.size(), $limit),
+    "offset": $mathtool.add($offset, 1),
+    "reqNo": $mathtool.toInteger($request.reqNo),
+    "rows": []
+  })
+  #foreach ($attachmentReference in $attachmentReferences)
+    #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
+    #set ($location = "#hierarchy($attachmentReference.parent, {
+      'limit': 5,
+      'plain': $hasAccess.equals(false),
+      'local': true,
+      'displayTitle': false
+    })")
+    #set ($row = {
+      'acclev': $hasAccess,
+      'fullName': $location,
+      'filename': $attachmentReference.name,
+      'fileurl': $xwiki.getURL($attachmentReference)
+    })
+    #if ($hasAccess)
+      #set ($document = $xwiki.getDocument($attachmentReference.parent))
+      #set ($attachment = $document.getAttachment($attachmentReference.name))
+      #set ($discard = $row.putAll({
+        'date': $xwiki.formatDate($attachment.date, 'yyyy MMMM dd, HH:mm'),
+        'author': $attachment.author,
+        'authorname': $xwiki.getUserName($attachment.author, false),
+        'authorurl': $xwiki.getURL($attachment.author),
+        'mimeType': $attachment.mimeType
+      }))
+    #end
+    #set ($discard = $results.rows.add($row))
   #end
-  }
-#end
-]}
-## ==============================================
-## json ended
-## ==============================================
+  #set ($discard = $response.setContentType('application/json'))
+  $jsontool.serialize($results)
 #end
 {{/velocity}}</content>
   <object>

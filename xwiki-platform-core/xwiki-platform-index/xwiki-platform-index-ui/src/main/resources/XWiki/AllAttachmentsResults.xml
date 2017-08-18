@@ -67,14 +67,27 @@
     }))
   #end
 #end
+
+#macro (displayAttachmentMimeType $attachment)
+  &lt;div class="mime" data-type="$!escapetool.xml($attachment.mimeType)"&gt;
+    #if ($attachment.isImage())
+      &lt;span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))"&gt;
+        &lt;img src="$xwiki.getURL($attachmentReference, 'download', 'width=48')"
+          alt="$escapetool.xml($attachment.filename)" /&gt;
+      &lt;/span&gt;
+    #else
+      #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
+    #end
+  &lt;/div&gt;
+#end
 {{/velocity}}
 
 {{velocity wiki="false"}}
-## ============================================================================================
-## This page is called by the Attachments live table via AJAX with the argument xpage=plain. It
-## returns a set of results serialized in JSON format.
-## ============================================================================================
-#if ("$!request.xpage" == 'plain')
+## ========================================================================================
+## This page is requested asynchronously by the Attachments live table and returns a set of
+## results serialized in JSON format.
+## ========================================================================================
+#if ($xcontext.action == 'get')
   #set ($offset = $mathtool.toInteger($request.offset))
   ## The offset sent by the live table starts at 1.
   #set ($offset = $offset - 1)
@@ -165,7 +178,7 @@
         'author': $attachment.author,
         'authorname': $xwiki.getUserName($attachment.author, false),
         'authorurl': $xwiki.getURL($attachment.author),
-        'mimeType': $attachment.mimeType
+        'mimeType': "#displayAttachmentMimeType($attachment)"
       }))
     #end
     #set ($discard = $results.rows.add($row))

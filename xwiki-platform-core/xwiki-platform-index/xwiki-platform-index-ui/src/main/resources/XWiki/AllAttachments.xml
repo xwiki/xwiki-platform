@@ -40,26 +40,27 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set ($discard = $xwiki.ssx.use('XWiki.AllAttachments'))
 #set ($discard = $xwiki.jsx.use('XWiki.AllAttachments'))
-##
-#set ($collist = ['filename', 'doc.fullName', 'date', 'author', 'mimeType'])
-#set ($colprops = {
-                   'filename'  : { 'type' : 'text', 'size' : 10 },
-                   'doc.fullName'  : { 'type' : 'text', 'size' : 10 },
-                   'date'      : { 'type' : 'date', 'size' : 10, 'filterable' : false },
-                   'author'    : { 'type' : 'text', 'size' : 10 },
-                   'mimeType'  : { 'type' : 'multilist', 'class': 'XWiki.AllAttachments' }
-                 })
-#set($options = { 'url' : $xwiki.getURL('XWiki.AllAttachmentsResults', 'get', 'xpage=plain&amp;outputSyntax=plain'),
-                  'callback' : 'XWiki.index.displayAttachmentEntry',
-                  'translationPrefix' : 'platform.index.attachments.' })
-#livetable('allattachments' $collist $colprops $options)
+#set ($columns = ['mimeType', 'filename', 'doc.fullName', 'date', 'author'])
+#set ($columnsProperties = {
+  'mimeType': {'type': 'multilist', 'class': 'XWiki.AllAttachments'},
+  'filename': {'type': 'text'},
+  'doc.fullName': {'type': 'text'},
+  'date': {'type': 'date', 'filterable' : false},
+  'author': {'type': 'text'}
+})
+#set ($options = {
+  'resultPage': 'XWiki.AllAttachmentsResults',
+  'callback': 'XWiki.index.displayAttachmentEntry',
+  'translationPrefix': 'platform.index.attachments.'
+})
+#livetable('allattachments' $columns $columnsProperties $options)
+{{/velocity}}
 
-(% id="inaccessibleDocsMessage" class="hidden" %)
-(((
-{{info}}$services.localization.render('rightsmanager.documentrequireviewrights'){{/info}}
-)))
-{{/velocity}}</content>
+(% id="inaccessibleDocsMessage" class="hidden" %)(((
+  {{info}}{{translation key="rightsmanager.documentrequireviewrights" /}}{{/info}}
+)))</content>
   <class>
     <name>XWiki.AllAttachments</name>
     <customClass/>
@@ -171,120 +172,156 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function(){
-
-if (typeof XWiki == "undefined") {
-   XWiki = new Object();
-}
-
-if (typeof XWiki.index == "undefined") {
-   XWiki.index = new Object();
-}
-
-var mimetypes = {
-  "image/svg"                     : { "src" : "$xwiki.getSkinFile('icons/silk/vector.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.svg')}", "title" : "${services.localization.render('core.viewers.attachments.mime.svg')}" },
-  "application/svg+xml"           : { "src" : "$xwiki.getSkinFile('icons/silk/vector.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.svg')}", "title" : "${services.localization.render('core.viewers.attachments.mime.svg')}" },
-  "text/plain"                    : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_text.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.text')}", "title" : "${services.localization.render('core.viewers.attachments.mime.text')}"},
-  "text/html"                     : { "src" : "$xwiki.getSkinFile('icons/silk/html.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.html')}", "title" : "${services.localization.render('core.viewers.attachments.mime.html')}"},
-  "text/css"                      : { "src" : "$xwiki.getSkinFile('icons/silk/css.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.css')}", "title" : "${services.localization.render('core.viewers.attachments.mime.css')}" },
-  "application/xml"               : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_code.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.xml')}", "title" : "${services.localization.render('core.viewers.attachments.mime.xml')}" },
-  "application/pdf"               : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_acrobat.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.pdf')}", "title" : "${services.localization.render('core.viewers.attachments.mime.pdf')}" },
-  "application/postscript"        : { "src" : "$xwiki.getSkinFile('icons/silk/page_red.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.ps')}",   "title" : "${services.localization.render('core.viewers.attachments.mime.ps')}"  },
-  "application/msword"            : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_word.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.document')}", "title" : "${services.localization.render('core.viewers.attachments.mime.document')}"},
-  "application/powerpoint"        : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_powerpoint.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.presentation')}", "title" : "${services.localization.render('core.viewers.attachments.mime.presentation')}" },
-  "application/x-shockwave-flash" : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_flash.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.flash')}", "title" : "${services.localization.render('core.viewers.attachments.mime.flash')}" },
-  "application/x-tar"             : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_compressed.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.tar')}", "title" : "${services.localization.render('core.viewers.attachments.mime.tar')}" },
-  "application/zip"               : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_zip.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.zip')}", "title" : "${services.localization.render('core.viewers.attachments.mime.zip')}" },
-  "application/x-gzip"            : { "src" : "$xwiki.getSkinFile('icons/silk/page_white_compressed.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.gz')}", "title" : "${services.localization.render('core.viewers.attachments.mime.gz')}"  },
-  "application/java-archive"      : { "src" : "$xwiki.getSkinFile('icons/silk/cup.png')", "alt" : "${services.localization.render('core.viewers.attachments.mime.jar')}", "title" : "${services.localization.render('core.viewers.attachments.mime.jar')}" }
-};
-
-/**
- * JavasScript equivalent of the #mimetype macro.
- * Returns a 20px * 20px image (as an element) corresponding to the passed mimetype.
- * First lookup if the type is in the mimetypes object above, then handles some other cases (starts/end with, etc.)
- * This function should be cleaned at the same time the mimetype images and macro are.
- */
-function getMimeTypeImage(type) {
-  var image = undefined;
-  if (mimetypes[type]) {
-    image = new Element('img',{'src':mimetypes[type].src,'alt':mimetypes[type].alt,'title':mimetypes[type].title});
-  }
-  else if(type.match(/^image\//)) {
-    image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/picture.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.image')}", 'title': "${services.localization.render('core.viewers.attachments.mime.image')}"});
-  }
-  else if(type.match(/^text\//)) {
-    image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/page_white_text.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.text')}", 'title': "${services.localization.render('core.viewers.attachments.mime.text')}"});
-  }
-  else if(type.match(/^audio\//)){
-    image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/music.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.audio')}", 'title': "${services.localization.render('core.viewers.attachments.mime.audio')}"});
-  }
-  else if(type.match(/^video\//)){
-    image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/film.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.video')}", 'title': "${services.localization.render('core.viewers.attachments.mime.video')}"});
-  }
-  else if(type=="application/octet-stream") {
-    if (type.match(/\.xls$/)) {
-      image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/page_white_excel.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.spreadsheet')}", 'title': "${services.localization.render('core.viewers.attachments.mime.spreadsheet')}"});
-    }
-    else if (type.match(/\.bz$/)) {
-      image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/page_white_compressed.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.bz')}", 'title': "${services.localization.render('core.viewers.attachments.mime.bz')}"});
-    }
-    else if (type.match(/\.tgz$/)) {
-      image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/page_white_compressed.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.gz')}", 'title': "${services.localization.render('core.viewers.attachments.mime.gz')}"});
-    }
-    else if (type.match(/\.rar$/)) {
-      image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/page_white_compressed.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.rar')}", 'title': "${services.localization.render('core.viewers.attachments.mime.rar')}"});
-    }
-    else if (type.match(/\.(odt|odp|odf|ods|sxw|stw)$/)) {
-      image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/page.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.office')}", 'title': "${services.localization.render('core.viewers.attachments.mime.office')}"});
-    }
-  } 
-  else if (type.match(/^application\//)) {
-    image = new Element('img', {'src':"$xwiki.getSkinFile('icons/silk/cog.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.exe')}", 'title': "${services.localization.render('core.viewers.attachments.mime.exe')}"});
-  }
-  if (typeof image == "undefined") {
-    image = new Element('img', {'src': "$xwiki.getSkinFile('icons/silk/page_white.png')", 'alt':"${services.localization.render('core.viewers.attachments.mime.attachment')}", 'title': "${services.localization.render('core.viewers.attachments.mime.attachment')}"});
-  }
-  image.style.width = '16px';
-  image.style.height = '16px';
-  return image;
-}
-
-XWiki.index.displayAttachmentEntry = function (row, i, table) {
-  var inaccessibleDocs = false;
-  if(row.acclev == true) {
-    var fileLink = new Element('a', {'href' : row.fileurl}).update(row.filename);
-    var tr = new Element('tr').update(new Element('td').update(fileLink));
-    tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName));
-    tr.appendChild(new Element('td').update(row.date));
-    var aa = new Element('a', {'href' : row.authorurl}).update(row.authorname);
-    tr.appendChild(new Element('td').update(aa));
-    var type = new Element('td').update(getMimeTypeImage(row.mimeType));
-    tr.appendChild(type);
-    return tr;
-  } else {
+      <code>(function() {
+  var XWiki = window.XWiki || {};
+  XWiki.index = XWiki.index || {};
+  XWiki.index.displayAttachmentEntry = function (row, i, table) {
     var tr = new Element('tr');
-    var page = row.fullName;
-
-    var td1 = new Element('td').update("unavailable");
-    var td2 = new Element('td', {'class' : 'pagename'}).update(page + "*");
-    var td3 = new Element('td').update(" ");
-    var td4 = new Element('td').update(" ");
-    var td5 = new Element('td').update(" ");
-    var td6 = new Element('td').update(" ");
-    tr.appendChild(td1);
-    tr.appendChild(td2);
-    tr.appendChild(td3);
-    tr.appendChild(td4);
-    tr.appendChild(td5);
-    tr.appendChild(td6);
-    $('inaccessibleDocsMessage').removeClassName('hidden');
+    if (row.acclev == true) {
+      tr.appendChild(new Element('td').update(row.mimeType));
+      var fileLink = new Element('a', {'href': row.fileurl}).update(row.filename);
+      tr.appendChild(new Element('td').update(fileLink));
+      tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName));
+      tr.appendChild(new Element('td').update(row.date));
+      var authorLink = new Element('a', {'href' : row.authorurl}).update(row.authorname);
+      tr.appendChild(new Element('td').update(authorLink));
+    } else {
+      tr.appendChild(new Element('td'));
+      tr.appendChild(new Element('td'));
+      tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName + '*'));
+      tr.appendChild(new Element('td'));
+      tr.appendChild(new Element('td'));
+      $('inaccessibleDocsMessage').removeClassName('hidden');
+    }
     return tr;
   }
+})();</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.AllAttachments</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>24dc9320-6ff1-469d-817b-26a4d7057474</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+#allattachments .mime {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
 }
 
-})();
-</code>
+#allattachments .mime img {
+  max-height: 32px;
+  max-width: 48px;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name/>

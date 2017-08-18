@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Job;
@@ -91,7 +92,9 @@ public class JobsResourceImpl extends XWikiJobResource implements JobsResource
 
             // Fail the HTTP request if the job failed
             if (job.getStatus().getError() != null) {
-                throw new XWikiRestException("The job failed", job.getStatus().getError());
+                throw new XWikiRestException(
+                    "The job failed (" + ExceptionUtils.getRootCauseMessage(job.getStatus().getError()) + ")",
+                    job.getStatus().getError());
             }
         }
 

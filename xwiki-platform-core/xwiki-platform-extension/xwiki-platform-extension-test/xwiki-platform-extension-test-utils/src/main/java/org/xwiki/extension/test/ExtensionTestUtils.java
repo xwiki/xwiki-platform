@@ -20,15 +20,19 @@
 package org.xwiki.extension.test;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.IOUtils;
-import org.openqa.selenium.By;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Utility methods for extension manager functional tests.
@@ -41,40 +45,51 @@ public class ExtensionTestUtils
     /**
      * The key used to store an instance of this class in the context.
      */
-    public final static String PROPERTY_KEY = "extensionUtils";
+    public static final String PROPERTY_KEY = "extensionUtils";
 
     /**
      * The reference of the service page.
      */
-    private static final LocalDocumentReference SERVICE_REFERENCE = new LocalDocumentReference("ExtensionTest", "Service");
+    private static final LocalDocumentReference SERVICE_REFERENCE =
+        new LocalDocumentReference("ExtensionTest", "Service");
 
     /**
      * The generic test utility methods.
      */
     private final TestUtils utils;
 
+    private final Map<Integer, Boolean> initialized = new ConcurrentHashMap<>();
+
     /**
      * Creates a new instance.
      * 
      * @param utils the generic test utility methods
      */
-    public ExtensionTestUtils(TestUtils utils)
+    public ExtensionTestUtils(TestUtils utils) throws Exception
     {
         this.utils = utils;
+    }
 
-        // Create the service page if it does not exist
-        try (InputStream extensionTestService = this.getClass().getResourceAsStream("/extensionTestService.wiki")) {
-            // Make sure to save the service with superadmin
-            UsernamePasswordCredentials currentCredentials =
-                utils.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+    private void checkinit() throws Exception
+    {
+        int port = this.utils.getCurrentExecutor().getPort();
 
-            // Save the service
-            utils.rest().savePage(SERVICE_REFERENCE, IOUtils.toString(extensionTestService), "");
+        if (!this.initialized.containsKey(port)) {
+            // Create the service page if it does not exist
+            try (InputStream extensionTestService = this.getClass().getResourceAsStream("/extensionTestService.wiki")) {
+                // Make sure to save the service with superadmin
+                UsernamePasswordCredentials currentCredentials =
+                    this.utils.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
-            // Restore previous credentials
-            utils.setDefaultCredentials(currentCredentials);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to setup the service", e);
+                // Save the service
+                this.utils.rest().savePage(SERVICE_REFERENCE,
+                    IOUtils.toString(extensionTestService, StandardCharsets.UTF_8), "");
+
+                // Restore previous credentials
+                this.utils.setDefaultCredentials(currentCredentials);
+            }
+
+            this.initialized.put(port, true);
         }
     }
 
@@ -83,7 +98,7 @@ public class ExtensionTestUtils
      * 
      * @param extensionId the id of the extension to uninstall
      */
-    public void uninstall(String extensionId)
+    public void uninstall(String extensionId) throws Exception
     {
         uninstall(extensionId, false);
     }
@@ -94,11 +109,12 @@ public class ExtensionTestUtils
      * @param extensionId the id of the extension to uninstall
      * @param keepLocalCache whether to keep the local cached extension or not
      */
-    public void uninstall(String extensionId, boolean keepLocalCache)
+    public void uninstall(String extensionId, boolean keepLocalCache) throws Exception
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("extensionId", extensionId);
         parameters.put("keepLocalCache", String.valueOf(keepLocalCache));
+
         doAction("uninstall", parameters);
     }
 
@@ -107,27 +123,53 @@ public class ExtensionTestUtils
      * 
      * @param extensionId the id of the extension to install
      */
-    public void install(ExtensionId extensionId)
+    public void install(ExtensionId extensionId) throws Exception
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("extensionId", extensionId.getId());
         parameters.put("extensionVersion", extensionId.getVersion().getValue());
+
         doAction("install", parameters);
     }
 
     /**
      * Finishes the current job if there is one and its current state is WAITING.
      */
-    public void finishCurrentJob()
+    public void finishCurrentJob() throws Exception
     {
         doAction("finish", new HashMap<String, String>());
     }
 
-    private void doAction(String action, Map<String, String> parameters)
+    public boolean isInstalled(ExtensionId extensionId) throws Exception
     {
+        return isInstalled(extensionId, null);
+    }
+
+    public boolean isInstalled(ExtensionId extensionId, Namespace namespace) throws Exception
+    {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("extensionId", extensionId.getId());
+        parameters.put("extensionVersion", extensionId.getVersion().getValue());
+        if (namespace != null) {
+            String namespaceString = namespace.serialize();
+            parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");
+        }
+
+        return execute("is_installed", parameters).equals("true");
+    }
+
+    private void doAction(String action, Map<String, String> parameters) throws Exception
+    {
+        assertEquals("Done!", execute(action, parameters));
+    }
+
+    private String execute(String action, Map<String, String> parameters) throws Exception
+    {
+        checkinit();
+
         parameters.put("action", action);
         parameters.put("outputSyntax", "plain");
-        utils.gotoPage(SERVICE_REFERENCE, "get", parameters);
-        utils.getDriver().waitUntilElementHasTextContent(By.tagName("body"), "Done!");
+
+        return this.utils.executeAndGetBodyAsString(SERVICE_REFERENCE, parameters);
     }
 }

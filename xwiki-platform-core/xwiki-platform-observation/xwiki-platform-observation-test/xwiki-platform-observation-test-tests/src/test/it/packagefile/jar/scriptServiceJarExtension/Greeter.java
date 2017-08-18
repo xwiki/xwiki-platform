@@ -17,20 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.cluster.framework;
+package packagefile.jar.scriptServiceJarExtension;
 
-import org.xwiki.extension.test.ExtensionTestUtils;
-import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Base class for REST based clustering integration test.
- * 
- * @version $Id$
+ * Greets people.
  */
-public abstract class AbstractClusterHttpTest extends AbstractTest
+@Role
+public interface Greeter
 {
-    protected static ExtensionTestUtils getExtensionTestUtils()
-    {
-        return (ExtensionTestUtils) context.getProperties().get(ExtensionTestUtils.PROPERTY_KEY);
-    }
+    /**
+     * Greets the specified person.
+     * 
+     * @param name the name of the person to greet
+     * @return the greet message
+     */
+    String greet(String name);
 }

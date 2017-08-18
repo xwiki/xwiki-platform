@@ -46,9 +46,9 @@ public class PersistentTestContext
     private final XWikiWebDriver driver;
 
     /** Utility methods which should be available to tests and to pages. */
-    private final TestUtils util = new TestUtils();
+    private final TestUtils util;
 
-    private WebDriverFactory webDriverFactory = new WebDriverFactory();
+    private final WebDriverFactory webDriverFactory;
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -67,18 +67,22 @@ public class PersistentTestContext
     {
         this.executors = executors;
 
+        this.util = new TestUtils();
         this.util.setExecutors(executors);
 
         // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
         // extensions such as Firebug), simply uncomment the following line:
         // System.setProperty("webdriver.firefox.profile", "default");
+        this.webDriverFactory = new WebDriverFactory();
         this.driver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
     }
 
     public PersistentTestContext(PersistentTestContext toClone)
     {
         this.executors = toClone.executors;
+        this.util = toClone.util;
         this.driver = toClone.driver;
+        this.webDriverFactory = toClone.webDriverFactory;
         this.properties.putAll(toClone.properties);
     }
 

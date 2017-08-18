@@ -105,10 +105,9 @@ public class XWikiExecutor
     private boolean wasStarted;
 
     /**
-     * If true we've been successful in starting XWiki and we can stop it when the test exits. If not then we shouldn't
-     * try to stop XWiki since it's been started successfully.
+     * @see #isManaged()
      */
-    private boolean hasXWikiBeenStartedProperly;
+    private boolean managed;
 
     public class Response
     {
@@ -180,12 +179,22 @@ public class XWikiExecutor
     }
 
     /**
+     * @return true the XWiki instance was (successfully) started by the executor itself (other possibilities being
+     *         failed startup or already running instance).
+     * @since 9.7RC1
+     */
+    public boolean isManaged()
+    {
+        return this.managed;
+    }
+
+    /**
      * Start XWiki using the following strategy:
      * <ul>
-     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
-     *       running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
-     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance
-     *       is already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
+     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
+     * running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
+     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance is
+     * already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
      * </ul>
      */
     public void start() throws Exception
@@ -204,7 +213,7 @@ public class XWikiExecutor
                 getStopPort(), getRMIPort());
             startXWiki();
             waitForXWikiToLoad();
-            this.hasXWikiBeenStartedProperly = true;
+            this.managed = true;
         } else {
             LOGGER.info("XWiki server is already started at [{}]", getURL());
         }
@@ -219,8 +228,7 @@ public class XWikiExecutor
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
         // Send Process output and error streams to our logger.
-        PumpStreamHandler streamHandler = new PumpStreamHandler(
-            new XWikiLogOutputStream(XWikiLogOutputStream.STDOUT),
+        PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream(XWikiLogOutputStream.STDOUT),
             new XWikiLogOutputStream(XWikiLogOutputStream.STDERR));
 
         // Make sure we end the process when the JVM exits
@@ -299,8 +307,8 @@ public class XWikiExecutor
             GetMethod method = new GetMethod(url);
 
             // Don't retry automatically since we're doing that in the algorithm below
-            method.getParams()
-                .setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(0, false));
+            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+                new DefaultHttpMethodRetryHandler(0, false));
             // Set a socket timeout to ensure the server has no chance of not answering to our request...
             method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, 10000);
 
@@ -312,8 +320,8 @@ public class XWikiExecutor
                 response.responseBody = method.getResponseBody();
 
                 if (DEBUG) {
-                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url,
-                        response.responseCode, new String(response.responseBody));
+                    LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,
+                        new String(response.responseBody));
                 }
 
                 // check the http response code is either not an error, either "unauthorized"
@@ -341,7 +349,7 @@ public class XWikiExecutor
         LOGGER.debug("Checking if we need to stop the XWiki server running at [{}]...", getURL());
 
         // Do not try to stop XWiki if we've not been successful in starting it!
-        if (!this.hasXWikiBeenStartedProperly) {
+        if (!this.managed) {
             return;
         }
 

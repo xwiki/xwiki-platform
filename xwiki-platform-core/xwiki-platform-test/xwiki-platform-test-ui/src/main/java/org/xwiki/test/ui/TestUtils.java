@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -61,7 +62,6 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.NoSuchElementException;
@@ -92,6 +92,8 @@ import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+
+import static org.junit.Assert.fail;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
@@ -205,7 +207,7 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    private int currentExecutorIndex;
+    private int currentExecutorIndex = 0;
 
     /**
      * @since 7.3M1
@@ -876,6 +878,22 @@ public class TestUtils
     public String getURL(EntityReference reference, String action, String queryString)
     {
         return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString);
+    }
+
+    /**
+     * @since 9.7RC1
+     */
+    public String executeAndGetBodyAsString(EntityReference reference, Map<String, ?> queryParameters) throws Exception
+    {
+        String url = getURL(reference, "get", toQueryString(queryParameters));
+
+        GetMethod getMethod = executeGet(url);
+
+        String result = getMethod.getResponseBodyAsString();
+
+        getMethod.releaseConnection();
+
+        return result;
     }
 
     /**
@@ -1574,8 +1592,7 @@ public class TestUtils
     public static void assertStatuses(int actualCode, int... expectedCodes)
     {
         if (!ArrayUtils.contains(expectedCodes, actualCode)) {
-            Assert.fail(
-                "Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes) + "]");
+            fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes) + "]");
         }
     }
 
@@ -1585,7 +1602,23 @@ public class TestUtils
     public static <M extends HttpMethod> M assertStatusCodes(M method, boolean release, int... expectedCodes)
     {
         if (expectedCodes.length > 0) {
-            assertStatuses(method.getStatusCode(), expectedCodes);
+            int actualCode = method.getStatusCode();
+
+            if (!ArrayUtils.contains(expectedCodes, actualCode)) {
+                if (actualCode == Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
+                    String message;
+                    try {
+                        message = method.getResponseBodyAsString();
+                    } catch (IOException e) {
+                        message = "";
+                    }
+
+                    fail("Unexpected internal server error with message: [" + message + "]");
+                } else {
+                    fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes)
+                        + "]");
+                }
+            }
         }
 
         if (release) {

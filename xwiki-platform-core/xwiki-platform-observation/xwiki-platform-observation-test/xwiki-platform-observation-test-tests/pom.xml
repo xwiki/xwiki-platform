@@ -41,16 +41,34 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-maven</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-handler-jar</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-observation-remote</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-cluster</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -58,6 +76,23 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

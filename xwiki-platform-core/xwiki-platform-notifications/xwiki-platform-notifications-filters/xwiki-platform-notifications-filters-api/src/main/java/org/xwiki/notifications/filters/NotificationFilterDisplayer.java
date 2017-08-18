@@ -19,9 +19,35 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Set;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.notifications.NotificationException;
+import org.xwiki.rendering.block.Block;
+
 /**
- * This interface can be used to display a given notification filter
+ * This interface can be used to display a given notification filter with a corresponding preference.
+ *
+ * @version $Id$
+ * @since 9.7RC1
  */
+@Role
 public interface NotificationFilterDisplayer
 {
+    /**
+     * Using the given {@link NotificationFilter} and an associated {@link NotificationFilterPreference}, display
+     * the filter.
+     *
+     * @param filter the filter that should be displayed
+     * @param preference the preferences that should be used for rendering the block
+     * @return the rendered form of the given filter
+     * @throws NotificationException if error occurs
+     */
+    Block display(NotificationFilter filter, NotificationFilterPreference preference)
+            throws NotificationException;
+
+    /**
+     * @return a set of {@link NotificationFilter} names that are supported by the displayer.
+     */
+    Set<String> getSupportedFilters();
 }

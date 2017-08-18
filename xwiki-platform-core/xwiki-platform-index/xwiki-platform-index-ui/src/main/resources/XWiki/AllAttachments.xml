@@ -48,7 +48,7 @@
   'filename': {'type': 'text'},
   'doc.fullName': {'type': 'text'},
   'filesize': {'type': 'list', 'class': 'XWiki.AllAttachments'},
-  'date': {'type': 'date', 'filterable': false},
+  'date': {'type': 'date'},
   'author': {'type': 'text'}
 })
 #set ($options = {

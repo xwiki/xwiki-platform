@@ -232,12 +232,9 @@
       #set ($discard = $row.putAll({
         'mimeType': "#displayAttachmentMimeType($attachment)",
         'filesize': "#displayAttachmentSize($attachment)",
-        'date': $xwiki.formatDate($attachment.date, 'yyyy MMMM dd, HH:mm'),
-        'author': $xwiki.getUserName($attachment.author, false)
+        'date': $xwiki.formatDate($attachment.date),
+        'author': $xwiki.getUserName($attachment.author)
       }))
-      #if ($xwiki.exists($authorReference))
-        #set ($row.authorURL = $xwiki.getURL($authorReference))
-      #end
     #end
     #set ($discard = $results.rows.add($row))
   #end

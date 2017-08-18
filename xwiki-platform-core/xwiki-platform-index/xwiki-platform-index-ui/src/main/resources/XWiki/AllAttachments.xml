@@ -201,17 +201,12 @@
     var tr = new Element('tr');
     if (row.acclev == true) {
       tr.appendChild(new Element('td').update(row.mimeType));
-      var fileLink = new Element('a', {'href': row.fileurl}).update(row.filename);
+      var fileLink = new Element('a', {'href': row.fileurl}).update(row.filename.escapeHTML());
       tr.appendChild(new Element('td').update(fileLink));
       tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName));
       tr.appendChild(new Element('td').update(row.filesize));
-      tr.appendChild(new Element('td').update(row.date));
-      if (row.authorURL) {
-        var authorLink = new Element('a', {'href' : row.authorURL}).update(row.author);
-        tr.appendChild(new Element('td').update(authorLink));
-      } else {
-        tr.appendChild(new Element('td').update(row.author));
-      }
+      tr.appendChild(new Element('td').update(row.date.escapeHTML()));
+      tr.appendChild(new Element('td').update(row.author));
     } else {
       tr.appendChild(new Element('td'));
       tr.appendChild(new Element('td'));

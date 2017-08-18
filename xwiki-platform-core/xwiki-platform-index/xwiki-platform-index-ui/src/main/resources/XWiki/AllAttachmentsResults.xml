@@ -68,6 +68,37 @@
   #end
 #end
 
+#macro (maybeApplyRangeFilter $fieldName $constraints $queryParameters)
+  #if ("$!request.getParameter($fieldName)" != '')
+    #set ($fieldNameWithAlias = $fieldName)
+    #if ($fieldName.indexOf('.') &lt; 0)
+      #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
+    #end
+    #set ($parameterNamePrefix = $fieldNameWithAlias.replace('.', '_'))
+    #set ($range = $request.getParameter($fieldName).split('-'))
+    #set ($start = $mathtool.toInteger($range.get(0)))
+    #if ($start)
+      #set ($startParameterName = $parameterNamePrefix + '_start')
+      #set ($discard = $constraints.add("$fieldNameWithAlias &gt;= :$startParameterName"))
+      #set ($discard = $queryParameters.add({
+        'name': $startParameterName,
+        'match': 'exact',
+        'value': $start
+      }))
+    #end
+    #set ($end = $mathtool.toInteger($range.get(1)))
+    #if ($end)
+      #set ($endParameterName = $parameterNamePrefix + '_end')
+      #set ($discard = $constraints.add("$fieldNameWithAlias &lt; :$endParameterName"))
+      #set ($discard = $queryParameters.add({
+        'name': $endParameterName,
+        'match': 'exact',
+        'value': $end
+      }))
+    #end
+  #end
+#end
+
 #macro (displayAttachmentMimeType $attachment)
   &lt;div class="mime" data-type="$!escapetool.xml($attachment.mimeType)"&gt;
     #if ($attachment.isImage())
@@ -79,6 +110,10 @@
       #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
     #end
   &lt;/div&gt;
+#end
+
+#macro (displayAttachmentSize $attachment)
+  &lt;span class="size" data-size="$!escapetool.xml($attachment.longSize)"&gt;#dynamicsize($attachment.longSize)&lt;/span&gt;
 #end
 {{/velocity}}
 
@@ -103,10 +138,11 @@
   ##
   #set ($constraints = [])
   #set ($queryParameters = [])
+  #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
   #maybeApplyStringFilter('filename' 'partial' $constraints $queryParameters)
   #maybeApplyStringFilter('doc.fullName' 'partial' $constraints $queryParameters)
+  #maybeApplyRangeFilter('filesize' $constraints $queryParameters)
   #maybeApplyStringFilter('author' 'partial' $constraints $queryParameters)
-  #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
   #set ($whereClause = '')
   #if ($constraints.size() &gt; 0)
     #set ($whereClause = 'where ' + $stringtool.join($constraints, ' and '))
@@ -114,12 +150,12 @@
   ##
   ## Determine the sort field and direction.
   ##
-  #set ($validSortFields = ['filename', 'doc.fullName', 'date', 'author', 'mimeType'])
+  #set ($validSortFields = ['mimeType', 'filename', 'doc.fullName', 'filesize', 'date', 'author'])
   #set ($sortField = $request.sort)
   #if (!$validSortFields.contains($sortField))
     #set ($sortField = 'filename')
   #end
-  #set ($caseInsensitiveSort = $sortField != 'date')
+  #set ($caseInsensitiveSort = $sortField != 'date' &amp;&amp; $sortField != 'filesize')
   #if (!$sortField.startsWith('doc.'))
     #set ($sortField = "attachment.$sortField")
   #end
@@ -174,11 +210,12 @@
       #set ($document = $xwiki.getDocument($attachmentReference.parent))
       #set ($attachment = $document.getAttachment($attachmentReference.name))
       #set ($discard = $row.putAll({
+        'mimeType': "#displayAttachmentMimeType($attachment)",
+        'filesize': "#displayAttachmentSize($attachment)",
         'date': $xwiki.formatDate($attachment.date, 'yyyy MMMM dd, HH:mm'),
         'author': $attachment.author,
         'authorname': $xwiki.getUserName($attachment.author, false),
-        'authorurl': $xwiki.getURL($attachment.author),
-        'mimeType': "#displayAttachmentMimeType($attachment)"
+        'authorurl': $xwiki.getURL($attachment.author)
       }))
     #end
     #set ($discard = $results.rows.add($row))

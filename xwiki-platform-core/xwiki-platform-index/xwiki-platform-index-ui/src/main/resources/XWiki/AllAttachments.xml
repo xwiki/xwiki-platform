@@ -42,12 +42,13 @@
   <content>{{velocity}}
 #set ($discard = $xwiki.ssx.use('XWiki.AllAttachments'))
 #set ($discard = $xwiki.jsx.use('XWiki.AllAttachments'))
-#set ($columns = ['mimeType', 'filename', 'doc.fullName', 'date', 'author'])
+#set ($columns = ['mimeType', 'filename', 'doc.fullName', 'filesize', 'date', 'author'])
 #set ($columnsProperties = {
-  'mimeType': {'type': 'multilist', 'class': 'XWiki.AllAttachments'},
+  'mimeType': {'type': 'list', 'class': 'XWiki.AllAttachments'},
   'filename': {'type': 'text'},
   'doc.fullName': {'type': 'text'},
-  'date': {'type': 'date', 'filterable' : false},
+  'filesize': {'type': 'list', 'class': 'XWiki.AllAttachments'},
+  'date': {'type': 'date', 'filterable': false},
   'author': {'type': 'text'}
 })
 #set ($options = {
@@ -70,12 +71,33 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <filesize>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>filesize</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>File Size</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>0-10240=Tiny|10240-512000=Small|512000-5242880=Medium|5242880-x=Large</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </filesize>
     <mimeType>
       <cache>0</cache>
       <customDisplay/>
       <disabled>0</disabled>
       <displayType>select</displayType>
-      <multiSelect>1</multiSelect>
+      <multiSelect>0</multiSelect>
       <name>mimeType</name>
       <number>1</number>
       <picker>0</picker>
@@ -182,6 +204,7 @@
       var fileLink = new Element('a', {'href': row.fileurl}).update(row.filename);
       tr.appendChild(new Element('td').update(fileLink));
       tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName));
+      tr.appendChild(new Element('td').update(row.filesize));
       tr.appendChild(new Element('td').update(row.date));
       var authorLink = new Element('a', {'href' : row.authorurl}).update(row.authorname);
       tr.appendChild(new Element('td').update(authorLink));
@@ -189,6 +212,7 @@
       tr.appendChild(new Element('td'));
       tr.appendChild(new Element('td'));
       tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName + '*'));
+      tr.appendChild(new Element('td'));
       tr.appendChild(new Element('td'));
       tr.appendChild(new Element('td'));
       $('inaccessibleDocsMessage').removeClassName('hidden');

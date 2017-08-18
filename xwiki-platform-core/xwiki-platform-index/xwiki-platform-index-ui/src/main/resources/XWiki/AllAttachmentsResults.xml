@@ -228,14 +228,16 @@
     #if ($hasAccess)
       #set ($document = $xwiki.getDocument($attachmentReference.parent))
       #set ($attachment = $document.getAttachment($attachmentReference.name))
+      #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
         'mimeType': "#displayAttachmentMimeType($attachment)",
         'filesize': "#displayAttachmentSize($attachment)",
         'date': $xwiki.formatDate($attachment.date, 'yyyy MMMM dd, HH:mm'),
-        'author': $attachment.author,
-        'authorname': $xwiki.getUserName($attachment.author, false),
-        'authorurl': $xwiki.getURL($attachment.author)
+        'author': $xwiki.getUserName($attachment.author, false)
       }))
+      #if ($xwiki.exists($authorReference))
+        #set ($row.authorURL = $xwiki.getURL($authorReference))
+      #end
     #end
     #set ($discard = $results.rows.add($row))
   #end

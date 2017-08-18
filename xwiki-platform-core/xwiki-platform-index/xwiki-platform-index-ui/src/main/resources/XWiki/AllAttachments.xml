@@ -206,8 +206,12 @@
       tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName));
       tr.appendChild(new Element('td').update(row.filesize));
       tr.appendChild(new Element('td').update(row.date));
-      var authorLink = new Element('a', {'href' : row.authorurl}).update(row.authorname);
-      tr.appendChild(new Element('td').update(authorLink));
+      if (row.authorURL) {
+        var authorLink = new Element('a', {'href' : row.authorURL}).update(row.author);
+        tr.appendChild(new Element('td').update(authorLink));
+      } else {
+        tr.appendChild(new Element('td').update(row.author));
+      }
     } else {
       tr.appendChild(new Element('td'));
       tr.appendChild(new Element('td'));

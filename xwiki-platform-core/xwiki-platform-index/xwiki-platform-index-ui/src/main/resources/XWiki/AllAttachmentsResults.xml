@@ -242,43 +242,4 @@
   $jsontool.serialize($results)
 #end
 {{/velocity}}</content>
-  <object>
-    <name>XWiki.AllAttachmentsResults</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>bf8888e5-2c90-47ab-9a47-dec1db8bdd54</guid>
-    <class>
-      <name>XWiki.RequiredRightClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <level>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>level</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>level</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>edit|programming</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </level>
-    </class>
-    <property>
-      <level>programming</level>
-    </property>
-  </object>
 </xwikidoc>

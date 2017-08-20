@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -117,7 +118,14 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
                 currentDocumentReference = documentReferenceResolver.resolve(result);
                 XWikiDocument document = xWikiContext.getWiki().getDocument(currentDocumentReference, xWikiContext);
 
-                migrateDocument(document);
+                logger.debug("Migrating document [{}]...", result);
+
+                try {
+                    migrateDocument(document);
+                } catch (XWikiException e) {
+                    logger.warn("Failed to migrate document [{}] : [{}]", result,
+                            ExceptionUtils.getRootCauseMessage(e));
+                }
             }
 
             // When every document has been migrated, we can then delete the old XClass
@@ -125,7 +133,6 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
                     xWikiContext.getWiki().getDocument(OLD_XCLASS_REFERENCE, xWikiContext), xWikiContext);
 
         } catch (QueryException e) {
-            // TODO: Improve error log.
             logger.error("Failed to perform a query on the current wiki.", e);
         }
     }

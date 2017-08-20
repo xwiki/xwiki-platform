@@ -39,7 +39,7 @@ import org.xwiki.template.TemplateManager;
  * This is the default implementation of a {@link NotificationFilterDisplayer}.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
 @Component
 @Singleton

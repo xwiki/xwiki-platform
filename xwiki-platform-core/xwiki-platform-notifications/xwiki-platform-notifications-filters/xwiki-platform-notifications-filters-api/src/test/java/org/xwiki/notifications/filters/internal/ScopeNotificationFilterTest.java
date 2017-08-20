@@ -25,14 +25,22 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 import org.xwiki.eventstream.Event;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.LikeNode;
@@ -55,7 +63,7 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class ScopeNotificationEventTypeFilterTest
+public class ScopeNotificationFilterTest
 {
     public static final WikiReference SCOPE_INCLUSIVE_REFERENCE_1 = new WikiReference("wiki1");
 
@@ -72,17 +80,19 @@ public class ScopeNotificationEventTypeFilterTest
             new DocumentReference("excludedWiki", "space2", "page2");
 
     @Rule
-    public final MockitoComponentMockingRule<ScopeNotificationEventTypeFilter> mocker =
-            new MockitoComponentMockingRule<>(ScopeNotificationEventTypeFilter.class);
+    public final MockitoComponentMockingRule<ScopeNotificationFilter> mocker =
+            new MockitoComponentMockingRule<>(ScopeNotificationFilter.class);
 
-    private ModelBridge modelBridge;
+    private NotificationFilterManager notificationFilterManager;
     private EntityReferenceSerializer<String> serializer;
+    private EntityReferenceResolver<String> resolver;
 
     @Before
     public void setUp() throws Exception
     {
-        modelBridge = mocker.getInstance(ModelBridge.class, "cached");
+        notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        resolver = mocker.getInstance(EntityReferenceResolver.TYPE_STRING);
     }
 
     @Test
@@ -215,43 +225,58 @@ public class ScopeNotificationEventTypeFilterTest
 
     private void createPreferenceScopeMocks() throws NotificationException
     {
-        NotificationFilterPreferenceScope scope1 = mock(NotificationFilterPreferenceScope.class);
-        when(scope1.getScopeReference()).thenReturn(
-                SCOPE_INCLUSIVE_REFERENCE_1
-        );
-        when(scope1.getEventTypes()).thenReturn(Arrays.asList("event1"));
+        NotificationFilterPreference preference1 = mockNotificationFilterPreference("wiki1",
+                SCOPE_INCLUSIVE_REFERENCE_1, NotificationFilterType.INCLUSIVE, "event1");
 
-        NotificationFilterPreferenceScope scope2 = mock(NotificationFilterPreferenceScope.class);
-        when(scope2.getScopeReference()).thenReturn(
-                SCOPE_INCLUSIVE_REFERENCE_2
-        );
-        when(scope2.getEventTypes()).thenReturn(Arrays.asList("event2"));
+        NotificationFilterPreference preference2 = mockNotificationFilterPreference("wiki2:space2",
+                SCOPE_INCLUSIVE_REFERENCE_2, NotificationFilterType.INCLUSIVE, "event2");
 
-        NotificationFilterPreferenceScope scope3 = mock(NotificationFilterPreferenceScope.class);
-        when(scope3.getScopeReference()).thenReturn(
-                SCOPE_INCLUSIVE_REFERENCE_3
-        );
-        when(scope3.getEventTypes()).thenReturn(Arrays.asList("event3"));
+        NotificationFilterPreference preference3 = mockNotificationFilterPreference(
+                "wiki3:space3.page3", SCOPE_INCLUSIVE_REFERENCE_3, NotificationFilterType.INCLUSIVE,
+                "event3");
 
-        NotificationFilterPreferenceScope exclusiveScope1 = mock(NotificationFilterPreferenceScope.class);
-        when(exclusiveScope1.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_1);
-        when(exclusiveScope1.getScopeFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(exclusiveScope1.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent1"));
+        NotificationFilterPreference exclusivePreference1 = mockNotificationFilterPreference(
+                "excludedWiki:space1", SCOPE_EXCLUSIVE_REFERENCE_1, NotificationFilterType.EXCLUSIVE,
+                "exclusiveEvent1");
 
-        NotificationFilterPreferenceScope exclusiveScope2 = mock(NotificationFilterPreferenceScope.class);
-        when(exclusiveScope2.getScopeReference()).thenReturn(SCOPE_EXCLUSIVE_REFERENCE_2);
-        when(exclusiveScope2.getScopeFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
-        when(exclusiveScope2.getEventTypes()).thenReturn(Arrays.asList("exclusiveEvent2"));
+        NotificationFilterPreference exclusivePreference2 = mockNotificationFilterPreference(
+                "excludedWiki:space2.page2", SCOPE_EXCLUSIVE_REFERENCE_2,
+                NotificationFilterType.EXCLUSIVE, "exclusiveEvent2");
 
-        when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
-                any(NotificationFormat.class), eq(NotificationFilterType.INCLUSIVE))).thenReturn(
-                        Arrays.asList(scope1, scope2, scope3)
+        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class),  any(NotificationFilter.class)))
+                .thenReturn(Sets.newSet(preference1, preference2, preference3));
+        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class), any(NotificationFilter.class),
+                eq(NotificationFilterType.INCLUSIVE), any(NotificationFormat.class))).thenReturn(
+                        Sets.newSet(preference1, preference2, preference3)
         );
 
-        when(modelBridge.getNotificationPreferenceScopes(any(DocumentReference.class),
-                any(NotificationFormat.class), eq(NotificationFilterType.EXCLUSIVE))).thenReturn(
-                        Arrays.asList(exclusiveScope1, exclusiveScope2)
+        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class), any(NotificationFilter.class),
+                eq(NotificationFilterType.EXCLUSIVE), any(NotificationFormat.class))).thenReturn(
+                        Sets.newSet(exclusivePreference1, exclusivePreference2)
         );
+    }
+
+    private NotificationFilterPreference mockNotificationFilterPreference(String entityStringValue,
+            EntityReference resultReference, NotificationFilterType filterType, String eventName)
+    {
+        NotificationFilterProperty property;
+        if (resultReference.getType().equals(EntityType.DOCUMENT)) {
+            property = NotificationFilterProperty.PAGE;
+        } else if (resultReference.getType().equals(EntityType.SPACE)) {
+            property = NotificationFilterProperty.SPACE;
+        } else {
+            property = NotificationFilterProperty.WIKI;
+        }
+
+        NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
+        when(preference.getProperties(property)).thenReturn(Collections.singletonList(entityStringValue));
+
+        when(preference.getProperties(eq(NotificationFilterProperty.EVENT_TYPE))).thenReturn(Arrays.asList(eventName));
+        when(preference.getFilterType()).thenReturn(filterType);
+
+        when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
+
+        return preference;
     }
 
     @Test
@@ -277,6 +302,6 @@ public class ScopeNotificationEventTypeFilterTest
     @Test
     public void getName() throws Exception
     {
-        assertEquals(ScopeNotificationEventTypeFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
+        assertEquals(ScopeNotificationFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
     }
 }

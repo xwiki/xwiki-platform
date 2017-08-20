@@ -30,6 +30,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
@@ -91,7 +92,6 @@ public class SystemUserNotificationFilter extends AbstractNotificationFilter
     @Override
     public boolean matchesPreference(NotificationPreference preference)
     {
-        // This filter is applied globally to every notification preference, therefore, we match all of them.
         return true;
     }
 

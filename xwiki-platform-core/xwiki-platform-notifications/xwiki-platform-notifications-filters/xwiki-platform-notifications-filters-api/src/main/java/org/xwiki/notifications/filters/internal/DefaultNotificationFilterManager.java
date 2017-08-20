@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,14 +31,20 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterDisplayer;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -60,6 +67,9 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
 
     @Inject
     private ModelContext modelContext;
+
+    @Inject
+    private NotificationFilterDisplayer defaultNotificationFilterDisplayer;
 
     @Inject
     @Named("cached")
@@ -92,6 +102,32 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
+            throws NotificationException
+    {
+        return modelBridge.getFilterPreferences(user, filter);
+    }
+
+    @Override
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
+            NotificationFilterType filterType, NotificationFormat format) throws NotificationException
+    {
+        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user, filter);
+
+        Iterator<NotificationFilterPreference> it = preferences.iterator();
+
+        while (it.hasNext()) {
+            NotificationFilterPreference preference = it.next();
+
+            if (!preference.getFilterFormats().contains(format) || !preference.getFilterType().equals(filterType)) {
+                it.remove();
+            }
+        }
+
+        return preferences;
+    }
+
+    @Override
     public Set<NotificationFilter> getToggleableFilters(DocumentReference user) throws NotificationException
     {
         Set<NotificationFilter> userFilters = fetchAllFilters(user);
@@ -107,6 +143,31 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         }
 
         return userFilters;
+    }
+
+    @Override
+    public Block displayFilter(NotificationFilter filter, NotificationFilterPreference preference)
+            throws NotificationException
+    {
+        /**
+         * Try to find a {@link NotificationFilterDisplayer} that corresponds to the given filter.
+         * If no renderer is found, fallback on the default one.
+         */
+        try {
+            List<NotificationFilterDisplayer> renderers =
+                    componentManager.getInstanceList(NotificationFilterDisplayer.class);
+
+            for (NotificationFilterDisplayer renderer : renderers) {
+                if (renderer.getSupportedFilters().contains(filter.getName())) {
+                    return renderer.display(filter, preference);
+                }
+            }
+
+            return defaultNotificationFilterDisplayer.display(filter, preference);
+        } catch (ComponentLookupException e) {
+            throw new NotificationException(String.format(
+                    "Unable get a list of NotificationFilterDisplayer for filter [%s].", filter), e);
+        }
     }
 
     /**

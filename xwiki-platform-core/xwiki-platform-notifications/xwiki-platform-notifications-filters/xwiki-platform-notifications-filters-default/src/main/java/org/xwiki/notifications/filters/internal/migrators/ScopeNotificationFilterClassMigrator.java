@@ -57,13 +57,13 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Singleton
 public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataMigration
 {
+    private static final List<String> NOTIFICATION_CODE_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+
     private static final LocalDocumentReference OLD_XCLASS_REFERENCE =
-            new LocalDocumentReference(Arrays.asList("XWiki", "Notifications", "Code"),
-                    "NotificationPreferenceScopeClass");
+            new LocalDocumentReference(NOTIFICATION_CODE_PATH, "NotificationPreferenceScopeClass");
 
     private static final LocalDocumentReference NEW_XCLASS_REFERENCE =
-            new LocalDocumentReference(Arrays.asList("XWiki", "Notifications", "Code"),
-                    "NotificationFilterPreferenceClass");
+            new LocalDocumentReference(NOTIFICATION_CODE_PATH, "NotificationFilterPreferenceClass");
 
     @Inject
     private QueryManager queryManager;
@@ -135,7 +135,7 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
      *
      * @param document the document to migrate
      */
-    private void migrateDocument(XWikiDocument document)
+    private void migrateDocument(XWikiDocument document) throws XWikiException
     {
         List<BaseObject> oldXObjects = document.getXObjects(OLD_XCLASS_REFERENCE);
 
@@ -144,6 +144,10 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
         }
 
         document.removeXObjects(OLD_XCLASS_REFERENCE);
+
+        xcontextProvider.get().getWiki().saveDocument(document,
+                "[UPGRADE] XObject migration from ScopeNotificationFilterClass to NotificationPreferenceFilterClass.",
+                xcontextProvider.get());
     }
 
     private BaseObject generateNewXObject(BaseObject oldXObject)
@@ -179,6 +183,8 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
                 break;
             case "wiki":
                 newXObject.setStringListValue("wikis", oldXObjectScopeReference);
+                break;
+            default:
                 break;
         }
 

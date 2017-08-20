@@ -19,13 +19,13 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.List;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 /**
  * Internal role that make requests to the model and avoid a direct dependency to oldcore.
@@ -37,31 +37,15 @@ import org.xwiki.notifications.NotificationFormat;
 public interface ModelBridge
 {
     /**
-     * Get all notification preference scope of the given user.
+     * Get all the notification preferences that corresponds to the given filter and to the given user.
      *
-     * @param user user interested in the notifications
-     * @param format format on which the preferences apply
-     * @return the list of notification preference scopes.
-     * @throws NotificationException if error happens
-     *
-     * @since 9.5RC1
+     * @param user the user from which we need to extract the preference
+     * @param filter the filter that should match the extracted notification preferences
+     * @return a set of available filter preferences
+     * @throws NotificationException if an error happens
      */
-    List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format) throws NotificationException;
-
-    /**
-     * Get all notification preference scope of the given user.
-     *
-     * @param user user interested in the notifications
-     * @param format format on which the preferences apply
-     * @param type the filter type of the scope we want to retrieve, see {@link NotificationFilterType}
-     * @return the list of notification preference scopes.
-     * @throws NotificationException if error happens
-     *
-     * @since 9.7RC1
-     */
-    List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format, NotificationFilterType type) throws NotificationException;
+    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
+            throws NotificationException;
 
     /**
      * Get all the notification filters that are marked as disabled in the user profile.

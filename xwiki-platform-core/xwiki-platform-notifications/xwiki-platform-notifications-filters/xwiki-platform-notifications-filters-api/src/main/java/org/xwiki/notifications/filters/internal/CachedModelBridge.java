@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -31,7 +30,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 /**
  * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid
@@ -45,9 +45,9 @@ import org.xwiki.notifications.NotificationFormat;
 @Singleton
 public class CachedModelBridge implements ModelBridge
 {
-    private static final String USER_NOTIFICATIONS_PREFERENCES_SCOPE = "userNotificationsPreferencesScope";
-
     private static final String USER_TOGGLEABLE_FILTER_PREFERENCES = "userToggleableFilterPreference";
+
+    private static final String USER_FILTER_PREFERENCES = "userNotificationFilterPreferences";
 
     private static final String UNDERSCORE = "_";
 
@@ -58,36 +58,17 @@ public class CachedModelBridge implements ModelBridge
     private Execution execution;
 
     @Override
-    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format) throws NotificationException
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user,
+            NotificationFilter filter) throws NotificationException
     {
-        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format;
+        final String contextEntry = USER_FILTER_PREFERENCES + UNDERSCORE + filter.getName();
 
         ExecutionContext context = execution.getContext();
         if (context.hasProperty(contextEntry)) {
-            return (List<NotificationFilterPreferenceScope>) context.getProperty(contextEntry);
+            return (Set<NotificationFilterPreference>) context.getProperty(contextEntry);
         }
 
-        List<NotificationFilterPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(user, format);
-        context.setProperty(contextEntry, preferences);
-
-        return preferences;
-    }
-
-    @Override
-    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference user,
-            NotificationFormat format, NotificationFilterType type) throws NotificationException
-    {
-        final String contextEntry = USER_NOTIFICATIONS_PREFERENCES_SCOPE + UNDERSCORE + format + UNDERSCORE
-                + type.name();
-
-        ExecutionContext context = execution.getContext();
-        if (context.hasProperty(contextEntry)) {
-            return (List<NotificationFilterPreferenceScope>) context.getProperty(contextEntry);
-        }
-
-        List<NotificationFilterPreferenceScope> preferences = modelBridge.getNotificationPreferenceScopes(
-                user, format, type);
+        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user, filter);
         context.setProperty(contextEntry, preferences);
 
         return preferences;

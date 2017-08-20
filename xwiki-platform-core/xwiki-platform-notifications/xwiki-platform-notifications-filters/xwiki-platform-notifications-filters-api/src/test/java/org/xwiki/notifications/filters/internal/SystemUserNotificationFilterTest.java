@@ -27,6 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;

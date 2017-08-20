@@ -23,6 +23,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;

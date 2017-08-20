@@ -21,14 +21,20 @@ package org.xwiki.notifications.filters.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.LikeNode;
@@ -40,57 +46,39 @@ import org.xwiki.notifications.filters.expression.EmptyNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
 /**
- * Abstract class that helps defining notification filters based on a scope in the wiki.
- * The classes extending this abstract can then choose to filter either based on the eventType of the event,
- * or the applicationId of the event, for example.
+ * Define a notification filter based on a scope in the wiki.
  *
  * @version $Id$
  * @since 9.7RC1
  */
-public abstract class AbstractScopeNotificationFilter extends AbstractNotificationFilter
+@Component
+@Named(ScopeNotificationFilter.FILTER_NAME)
+@Singleton
+public class ScopeNotificationFilter extends AbstractNotificationFilter
 {
+    static final String FILTER_NAME = "scopeNotificationFilter";
+
     private static final String ERROR = "Failed to filter the notifications.";
 
     @Inject
-    @Named("cached")
-    protected ModelBridge modelBridge;
+    private NotificationFilterManager notificationFilterManager;
 
     @Inject
     @Named("local")
-    protected EntityReferenceSerializer<String> serializer;
+    private EntityReferenceSerializer<String> serializer;
 
     @Inject
-    protected Logger logger;
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
-    /**
-     * Given a {@link NotificationFilterPreferenceScope} and the current filtering context (defined by a
-     * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
-     *
-     * @param scope the reference scope
-     * @param preference the related notification preference
-     * @return true if the filter should be applied to the given scope.
-     */
-    protected abstract boolean scopeMatchesFilteringContext(NotificationFilterPreferenceScope scope,
-            NotificationPreference preference);
-
-    /**
-     * Given a {@link NotificationFilterPreferenceScope} and the current filtering context (defined by a
-     * {@link NotificationFormat} and an {@link Event}, determine if a the current filter should
-     * apply with the given scope.
-     *
-     * @param scope the reference scope
-     * @param format the format of the notification to filter
-     * @param event the {@link Event} to use
-     * @return true if the filter should be applied to the given scope.
-     */
-    protected abstract boolean scopeMatchesFilteringContext(NotificationFilterPreferenceScope scope,
-            NotificationFormat format, Event event);
-
+    @Inject
+    private Logger logger;
 
     @Override
-    protected boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
+    public boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
             NotificationFilterType filterType)
     {
         // Indicate if a restriction exist concerning this type of event
@@ -99,13 +87,19 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
         boolean matchRestriction = false;
 
         try {
-            for (NotificationFilterPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user, format,
-                    filterType)) {
-                if (scopeMatchesFilteringContext(scope, format, event)) {
+            for (NotificationFilterPreference preference
+                    : notificationFilterManager.getFilterPreferences(user, this, filterType, format)) {
+
+                // Wrap the current NotificationFilterPreference in a ScopeNotificationFilterPreference in order to
+                // access #getScopeReference
+                ScopeNotificationFilterPreference scopePreference =
+                        new ScopeNotificationFilterPreference(preference, entityReferenceResolver);
+
+                if (scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
                     hasRestriction = true;
 
-                    if (event.getDocument().equals(scope.getScopeReference())
-                            || event.getDocument().hasParent(scope.getScopeReference())) {
+                    if (event.getDocument().equals(scopePreference.getScopeReference())
+                            || event.getDocument().hasParent(scopePreference.getScopeReference())) {
 
                         // If we have a match on an EXCLUSIVE filter, we don’t need to go any further
                         if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
@@ -131,26 +125,31 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
     }
 
     @Override
-    protected AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+    public AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
             NotificationFilterType filterType)
     {
         AbstractNode syntaxNode = new EmptyNode();
         boolean isFirstPass = true;
 
         try {
-            for (NotificationFilterPreferenceScope scope : modelBridge.getNotificationPreferenceScopes(user,
-                    preference.getFormat(), filterType)) {
-                if (!scopeMatchesFilteringContext(scope, preference)) {
+            for (NotificationFilterPreference filterPreference
+                    : notificationFilterManager.getFilterPreferences(user, this, filterType,
+                            preference.getFormat())) {
+
+                ScopeNotificationFilterPreference filterPreferenceScope =
+                        new ScopeNotificationFilterPreference(filterPreference, entityReferenceResolver);
+
+                if (!scopeMatchesFilteringContext(filterPreference, preference)) {
                     continue;
                 }
 
                 AbstractNode tmpNode;
 
-                String wiki = scope.getScopeReference().extractReference(EntityType.WIKI).getName();
-                String space = serializer.serialize(scope.getScopeReference());
-                String page = serializer.serialize(scope.getScopeReference());
+                String wiki = filterPreferenceScope.getScopeReference().extractReference(EntityType.WIKI).getName();
+                String space = serializer.serialize(filterPreferenceScope.getScopeReference());
+                String page = serializer.serialize(filterPreferenceScope.getScopeReference());
 
-                switch (scope.getScopeReference().getType()) {
+                switch (filterPreferenceScope.getScopeReference().getType()) {
                     case DOCUMENT:
                         tmpNode = new AndNode(
                                 new EqualsNode(
@@ -198,5 +197,35 @@ public abstract class AbstractScopeNotificationFilter extends AbstractNotificati
         }
 
         return syntaxNode;
+    }
+
+    @Override
+    public boolean matchesPreference(NotificationPreference preference)
+    {
+        return preference.getCategory().equals(NotificationPreferenceCategory.DEFAULT)
+                && preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
+    }
+
+    @Override
+    public String getName()
+    {
+        return FILTER_NAME;
+    }
+
+    /**
+     * Given a {@link NotificationFilterPreference} and the current filtering context (defined by a
+     * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
+     *
+     * @param scope the reference scope
+     * @param preference the related notification preference
+     * @return true if the filter should be applied to the given scope.
+     */
+    private boolean scopeMatchesFilteringContext(NotificationFilterPreference scope,
+            NotificationPreference preference)
+    {
+        // We apply the filter only on scopes having the correct eventType
+        return (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
+                && scope.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
+                preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)));
     }
 }

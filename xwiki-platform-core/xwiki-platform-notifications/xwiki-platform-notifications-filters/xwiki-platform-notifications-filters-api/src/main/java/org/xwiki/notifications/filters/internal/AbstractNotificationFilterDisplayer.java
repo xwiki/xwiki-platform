@@ -62,8 +62,13 @@ public abstract class AbstractNotificationFilterDisplayer implements Notificatio
 
     protected void cleanUpContext()
     {
-        currentScriptContext.setAttribute(FILTER, oldContextValues.get(FILTER), ScriptContext.ENGINE_SCOPE);
-        currentScriptContext.setAttribute(FILTER_PREFERENCE, oldContextValues.get(FILTER_PREFERENCE),
-                ScriptContext.ENGINE_SCOPE);
+        if (oldContextValues.get(FILTER) != null) {
+            currentScriptContext.setAttribute(FILTER, oldContextValues.get(FILTER), ScriptContext.ENGINE_SCOPE);
+        }
+
+        if (oldContextValues.get(FILTER_PREFERENCE) != null) {
+            currentScriptContext.setAttribute(FILTER_PREFERENCE, oldContextValues.get(FILTER_PREFERENCE),
+                    ScriptContext.ENGINE_SCOPE);
+        }
     }
 }

@@ -1,5 +1,6 @@
 org.xwiki.notifications.filters.internal.CachedModelBridge
+org.xwiki.notifications.filters.internal.DefaultNotificationFilterDisplayer
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterManager
-org.xwiki.notifications.filters.internal.ScopeNotificationEventTypeFilter
+org.xwiki.notifications.filters.internal.ScopeNotificationFilter
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
 org.xwiki.notifications.filters.script.NotificationFiltersScriptService

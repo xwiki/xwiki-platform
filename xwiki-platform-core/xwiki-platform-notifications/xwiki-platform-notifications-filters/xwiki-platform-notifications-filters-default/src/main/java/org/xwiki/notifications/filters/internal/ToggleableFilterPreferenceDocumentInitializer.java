@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * This XClass is used to store filters information in the user profile.
  *
  * @version $Id$
- * @since 9.7R1
+ * @since 9.7RC1
  */
 @Component
 @Named("XWiki.Notifications.Code.ToggleableFilterPreferenceClass")

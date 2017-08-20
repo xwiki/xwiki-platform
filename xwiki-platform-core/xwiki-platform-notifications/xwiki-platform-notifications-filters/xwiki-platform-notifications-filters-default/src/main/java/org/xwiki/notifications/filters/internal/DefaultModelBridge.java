@@ -19,25 +19,26 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.text.StringUtils;
+import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,109 +61,69 @@ public class DefaultModelBridge implements ModelBridge
             )
     );
 
-    private static final DocumentReference NOTIFICATION_PREFERENCE_SCOPE_CLASS = new DocumentReference(
-            "NotificationPreferenceScopeClass", NOTIFICATION_CODE_SPACE
+    private static final DocumentReference NOTIFICATION_FILTER_PREFERENCE_CLASS = new DocumentReference(
+            "NotificationFilterPreferenceClass", NOTIFICATION_CODE_SPACE
     );
 
     private static final DocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS = new DocumentReference(
             "ToggleableFilterPreferenceClass", NOTIFICATION_CODE_SPACE
     );
 
-    @Inject
-    private EntityReferenceResolver<String> entityReferenceResolver;
-
-    @Inject
-    private Logger logger;
+    private static final String FILTER_NAME = "filterName";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Override
-    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
-            NotificationFormat format) throws NotificationException
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
+            throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        final DocumentReference notificationPreferencesScopeClass
-                = NOTIFICATION_PREFERENCE_SCOPE_CLASS.setWikiReference(userReference.getWikiReference());
+        final DocumentReference notificationFilterPreferenceClass
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
-        List<NotificationFilterPreferenceScope> preferences = new ArrayList<>();
+        Set<NotificationFilterPreference> preferences = new HashSet<>();
 
         try {
-            XWikiDocument doc = xwiki.getDocument(userReference, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
+            XWikiDocument doc = xwiki.getDocument(user, context);
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
-                    if (obj != null && isCompatibleFormat(obj.getStringValue("format"), format)) {
-                        String scopeType = obj.getStringValue("scope");
-                        NotificationFilterType scopeFilterType = this.extractScopeFilterType(obj);
-                        EntityType type;
-                        if (scopeType.equals("pageOnly")) {
-                            type = EntityType.DOCUMENT;
-                        } else if (scopeType.equals("pageAndChildren")) {
-                            type = EntityType.SPACE;
-                        } else if (scopeType.equals("wiki")) {
-                            type = EntityType.WIKI;
-                        } else {
-                            logger.warn(
-                                    "Scope [{}] is not supported as a NotificationFilterPreferenceScope (user [{}]).",
-                                    scopeType, userReference);
-                            continue;
+                    if (obj != null && filter.getName().equals(obj.getStringValue(FILTER_NAME))) {
+                        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties = new HashMap<>();
+
+                        filterPreferenceProperties.put(NotificationFilterProperty.APPLICATION,
+                                obj.getListValue("applications"));
+                        filterPreferenceProperties.put(NotificationFilterProperty.EVENT_TYPE,
+                                obj.getListValue("eventTypes"));
+                        filterPreferenceProperties.put(NotificationFilterProperty.PAGE,
+                                obj.getListValue("pages"));
+                        filterPreferenceProperties.put(NotificationFilterProperty.SPACE,
+                                obj.getListValue("spaces"));
+                        filterPreferenceProperties.put(NotificationFilterProperty.WIKI,
+                                obj.getListValue("wikis"));
+
+                        NotificationFilterType filterType = NotificationFilterType.valueOf(
+                                obj.getStringValue("filterType").toUpperCase());
+
+                        Set<NotificationFormat> filterFormats = new HashSet<>();
+                        for (String format : (List<String>) obj.getListValue("filterFormat")) {
+                            filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
                         }
 
-                        preferences.add(new NotificationFilterPreferenceScope(
-                                obj.getListValue("eventType"),
-                                entityReferenceResolver.resolve(obj.getStringValue("scopeReference"), type),
-                                scopeFilterType
-                        ));
+                        preferences.add(new DefaultNotificationFilterPreference(
+                                filterType,
+                                filterFormats,
+                                filterPreferenceProperties));
                     }
                 }
             }
         } catch (Exception e) {
             throw new NotificationException(
                     String.format("Failed to get the notification preferences scope for the user [%s].",
-                            userReference), e);
-        }
-
-        return preferences;
-    }
-
-    /**
-     * Extract the scopeFilterType parameter in the given {@link BaseObject}.
-     * This is done in order to eliminate too much cyclomatic complexity in
-     * {@link #getNotificationPreferenceScopes(DocumentReference, NotificationFormat)}.
-     * If no scopeFilterType is defined, the default is {@link NotificationFilterType#INCLUSIVE}.
-     *
-     * @param object the related base object
-     * @return the corresponding {@link NotificationFilterType}
-     * @since 9.7RC1
-     */
-    private NotificationFilterType extractScopeFilterType(BaseObject object)
-    {
-        String rawScopeFilterType = object.getStringValue("scopeFilterType");
-        return (rawScopeFilterType != null && StringUtils.isNotBlank(rawScopeFilterType))
-                ? NotificationFilterType.valueOf(rawScopeFilterType.toUpperCase())
-                : NotificationFilterType.INCLUSIVE;
-    }
-
-    private boolean isCompatibleFormat(String format, NotificationFormat expectedFormat)
-    {
-        return format != null && NotificationFormat.valueOf(format.toUpperCase()) == expectedFormat;
-    }
-
-    @Override
-    public List<NotificationFilterPreferenceScope> getNotificationPreferenceScopes(DocumentReference userReference,
-            NotificationFormat format, NotificationFilterType scopeFilterType)
-            throws NotificationException
-    {
-        List<NotificationFilterPreferenceScope> preferences = new ArrayList<>();
-
-        for (NotificationFilterPreferenceScope preference
-                : this.getNotificationPreferenceScopes(userReference, format)) {
-            if (preference.getScopeFilterType().equals(scopeFilterType)) {
-                preferences.add(preference);
-            }
+                            user), e);
         }
 
         return preferences;
@@ -186,7 +147,7 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj.getIntValue("isEnabled", 1) == 0) {
-                        disabledFilters.add(obj.getStringValue("filterName"));
+                        disabledFilters.add(obj.getStringValue(FILTER_NAME));
                     }
                 }
             }

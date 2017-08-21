@@ -52,8 +52,7 @@
     <hsqldb.version>2.4.0</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <gwt.version>2.7.0</gwt.version>
-    <gwt.maven.plugin.version>2.7.0</gwt.maven.plugin.version>
+    <ckeditor.version>1.16-SNAPSHOT</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.9</batik.version>
 
@@ -230,18 +229,12 @@
         <artifactId>struts-tiles</artifactId>
         <version>1.3.10</version>
       </dependency>
-      <!-- Standard dependencies used in GWT modules -->
+      <!-- Embedded in the Standard Flavor and used by the Dashboard Application (to add/edit gadgets) -->
       <dependency>
-        <groupId>com.google.gwt</groupId>
-        <artifactId>gwt-user</artifactId>
-        <version>${gwt.version}</version>
-        <!-- Only needed at build time -->
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.gwt</groupId>
-        <artifactId>gwt-servlet</artifactId>
-        <version>${gwt.version}</version>
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>application-ckeditor-ui</artifactId>
+        <version>${ckeditor.version}</version>
+        <type>xar</type>
       </dependency>
       <!-- Used at least in Solr Search and in Infinispan Cache -->
       <dependency>

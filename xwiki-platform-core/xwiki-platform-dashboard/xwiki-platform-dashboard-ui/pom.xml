@@ -49,5 +49,11 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <!-- Required for the Macro Wizard that is used by the Gadget Wizard. -->
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>application-ckeditor-ui</artifactId>
+      <type>xar</type>
+    </dependency>
   </dependencies>
 </project>

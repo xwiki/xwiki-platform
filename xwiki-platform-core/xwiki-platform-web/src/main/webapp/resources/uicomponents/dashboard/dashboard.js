@@ -1,3 +1,9 @@
+require.config({
+  paths: {
+    gadgetWizard: "$xwiki.getSkinFile('uicomponents/dashboard/gadgetWizard', true)"
+  }
+});
+
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Dashboard = Class.create( {
@@ -236,34 +242,20 @@ XWiki.Dashboard = Class.create( {
    * @param event the click event on the add gadget button
    */
   onAddGadgetClick : function(event) {
-    // get the gadget wizard and start adding a gadget
-    Wysiwyg.onModuleLoad(function() {
-      if (!this.gadgetWizard) {
-        this.gadgetWizard = new XWiki.GadgetWizard(this.createGadgetWizardConfig());
-      }
-      this.gadgetWizard.add(this.onAddGadgetComplete.bind(this));
-    }.bind(this));
+    this.runGadgetWizard($(event.target), null, this.onAddGadgetComplete.bind(this));
   },
 
-  /**
-   * Creates a new configuration object to be passed to a GadgetWizard's constructor.
-   *
-   * Contains mainly context information like the current document, the source document and the syntax.
-   */
-  createGadgetWizardConfig : function () {
-    var config = {
-      // FIXME: use the 'xwiki-meta' require module instead of duplicating the code here.
-      wiki: document.documentElement.getAttribute('data-xwiki-wiki'),
-      space: document.documentElement.getAttribute('data-xwiki-space'),
-      page: document.documentElement.getAttribute('data-xwiki-page'),
-      syntax: XWiki.docsyntax,
-      soureceWiki: this.sourceWiki,
-      sourceSpace: this.sourceSpace,
-      sourcePage: this.sourcePage
+  runGadgetWizard: function(button, gadget, callback) {
+    if (button.hasClassName('loading')) {
+      return;
     }
-
-    return config;
-  }.bind(this),
+    button.addClassName('loading');
+    require(['gadgetWizard'], function(gadgetWizard) {
+      gadgetWizard(gadget).done(callback).always(function() {
+        button.removeClassName('loading');
+      });
+    });
+  },
 
   /**
    * Handles the command to actually add the gadget, after the user has filled in the wizard
@@ -351,14 +343,11 @@ XWiki.Dashboard = Class.create( {
           macroCall = this._parseMacroCallComment(macroComment);
         }
 
-        // and finally start the wizard with all this data
-        Wysiwyg.onModuleLoad(function() {
-          if (!this.gadgetWizard) {
-            this.gadgetWizard = new XWiki.GadgetWizard(this.createGadgetWizardConfig());
-          }
-          this.gadgetWizard.edit(macroCall, title, function(gadgetInstance) {
-            this.onEditGadgetComplete(gadgetId, gadgetInstance);
-          }.bind(this));
+        this.runGadgetWizard($(event.target), {
+          title: title,
+          content: macroCall
+        }, function(gadgetConfig) {
+          this.onEditGadgetComplete(gadgetId, gadgetConfig);
         }.bind(this));
       } else {
         // this is not a macro, cannot be edited with wysiwyg macro dialog. Display a message, pointing the user to 

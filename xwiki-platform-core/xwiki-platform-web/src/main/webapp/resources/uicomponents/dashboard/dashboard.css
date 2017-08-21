@@ -62,6 +62,11 @@
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 
+.gadget-actions .edit.action.loading,
+.dashboard-edit .addgadget.loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+}
+
 .gadget .gadget-actions {
   display: none;
   position: absolute;

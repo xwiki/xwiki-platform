@@ -39,7 +39,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>dashboard.templateProvider.description=Customisable gadgets</content>
+  <content>dashboard.templateProvider.description=Customisable gadgets
+
+dashboard.gadgetSelector.title=Select Gadget
+dashboard.gadgetEditor.title=Edit Gadget
+dashboard.gadgetEditor.changeGadget.label=Change Gadget
+dashboard.gadgetEditor.gadgetTitle.label=Gadget Title
+dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget, to appear in the top of the gadget panel on the dashboard (can contain velocity code).</content>
   <object>
     <name>Dashboard.Translations</name>
     <number>0</number>

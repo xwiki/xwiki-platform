@@ -278,10 +278,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
             // include the effects.js and dragdrop.js that are needed by the dashboard js
             this.jsfx.use("js/scriptaculous/effects.js");
             this.jsfx.use("js/scriptaculous/dragdrop.js");
-            Map<String, Object> fxParamsNonDeferredForceSkinAction = new HashMap<String, Object>();
-            fxParamsNonDeferredForceSkinAction.put("defer", false);
-            fxParamsNonDeferredForceSkinAction.putAll(fxParamsForceSkinAction);
-            this.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferredForceSkinAction);
             this.jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
         }
     }

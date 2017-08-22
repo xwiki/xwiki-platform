@@ -19,7 +19,8 @@
  */
 package org.xwiki.localization.script;
 
-import java.nio.charset.Charset;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -296,9 +297,8 @@ public class LocalizationScriptService implements ScriptService
         Set<Locale> locales = new HashSet<>();
         locales.addAll(Arrays.asList(Locale.getAvailableLocales()));
 
-        try {
-            LineIterator iterator = IOUtils.lineIterator(
-                    environment.getResourceAsStream("/WEB-INF/xwiki-locales.txt"), Charset.forName("UTF-8"));
+        try (InputStream resource = environment.getResourceAsStream("/WEB-INF/xwiki-locales.txt")) {
+            LineIterator iterator = IOUtils.lineIterator(resource, StandardCharsets.US_ASCII);
             while (iterator.hasNext()) {
                 String line = iterator.nextLine();
                 if (StringUtils.isNotBlank(line)) {

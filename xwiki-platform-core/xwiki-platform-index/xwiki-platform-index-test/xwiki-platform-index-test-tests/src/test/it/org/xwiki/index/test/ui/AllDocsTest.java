@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -46,6 +47,13 @@ import static org.junit.Assert.*;
  */
 public class AllDocsTest extends AbstractTest
 {
+    @Before
+    public void setUp() throws Exception
+    {
+        getUtil().loginAsSuperAdmin();
+        getUtil().deleteSpace(getTestClassName());
+    }
+
     @Test
     public void tableViewTabActions() throws Exception
     {
@@ -74,7 +82,15 @@ public class AllDocsTest extends AbstractTest
     @Test
     public void recycleBinTab() throws Exception
     {
-        getUtil().loginAsSuperAdminAndGotoPage(AllDocsPage.getURL());
+        // Create a document and delete it
+        getUtil().createPageWithAttachment(Arrays.asList(getTestClassName(), "DeleteableSpace"),"document",
+                null, "Document", null, null, "file.txt",
+                getClass().getResourceAsStream("/file.txt"), TestUtils.SUPER_ADMIN_CREDENTIALS);
+        
+        getUtil().loginAsSuperAdmin();
+        getUtil().deleteSpace(getTestClassName());
+        getUtil().gotoPage(AllDocsPage.getURL());
+
         AllDocsPage page = new AllDocsPage();
         assertTrue("Deleted documents tab is not visible to Admin", page.hasDeletedDocsTab());
         assertTrue("Deleted attachments tab is not visible to Admin", page.hasDeletedAttachmentsTab());
@@ -94,7 +110,7 @@ public class AllDocsTest extends AbstractTest
     public void treeViewTab() throws Exception
     {
         // Create a tree structure.
-        String spaceName = getTestMethodName();
+        String spaceName = getTestClassName();
         getUtil().createPage(spaceName, "WebHome", null, null);
         getUtil().createPageWithAttachment(Arrays.asList(spaceName, "A", "B"), "C", null, "Child Page", null, null,
             "file.txt", getClass().getResourceAsStream("/file.txt"), TestUtils.SUPER_ADMIN_CREDENTIALS);

@@ -40,11 +40,9 @@ You need Maven 3.1+ in order to build this extension.
     ## functional test modules.
     mvn org.apache.maven.plugins:maven-release-plugin:2.5:perform -DskipTests -Darguments="-DskipTests -Dxwiki.enforcer.skip=true" -Pintegration-tests
 
-    ## Finish the release on http://nexus.xwiki.org (Staging Repositories)
-
     ## Update the documentation page on http://extensions.xwiki.org
     ## Keep the release notes (the list of JIRA issues) only for the 2 most recent releases.
 
-    ## Announce the release
+    ## Announce the release on https://forum.xwiki.org/c/News
 
-    ## Update the version used in XWiki Enterprise
+    ## Update the version used in XWiki Standard Flavor

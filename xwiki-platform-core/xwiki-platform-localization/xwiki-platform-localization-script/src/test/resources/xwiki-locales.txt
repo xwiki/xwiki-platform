@@ -1,0 +1,4 @@
+fr
+en
+ro
+mr_IN

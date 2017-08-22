@@ -380,7 +380,7 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
   var locales = [
 #set ($separator = '')
 #set ($currentLocale = $services.localization.currentLocale)
-#set ($locales = $currentLocale.getAvailableLocales())
+#set ($locales = $services.localization.availableLocales)
 #foreach ($locale in $sorttool.sort($locales, 'displayName'))
   #if ("$!locale" != '')
     $separator

@@ -21,6 +21,7 @@ package org.xwiki.localization.script;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -32,6 +33,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -42,8 +44,15 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LocalizationScriptServiceTest
 {
@@ -63,6 +72,8 @@ public class LocalizationScriptServiceTest
     private LocalizationScriptService localizationScriptService;
 
     private Translation translation;
+
+    private Environment environment;
 
     @Before
     public void setUp() throws Exception
@@ -93,6 +104,8 @@ public class LocalizationScriptServiceTest
         when(translation.render(Locale.ROOT, ArrayUtils.EMPTY_OBJECT_ARRAY)).thenReturn(new WordBlock("message"));
         when(localizationManager.getTranslation("key", Locale.ROOT)).thenReturn(translation);
         when(localizationContext.getCurrentLocale()).thenReturn(Locale.ROOT);
+
+        environment = mocker.getInstance(Environment.class);
     }
 
     @Test
@@ -124,5 +137,19 @@ public class LocalizationScriptServiceTest
     {
         when(localizationContext.getCurrentLocale()).thenReturn(Locale.ENGLISH);
         assertEquals(Locale.ENGLISH, localizationScriptService.getCurrentLocale());
+    }
+
+    @Test
+    public void getAvailableLocales() throws Exception
+    {
+        when(environment.getResourceAsStream(eq("/WEB-INF/xwiki-locales.txt"))).thenReturn(
+                getClass().getResourceAsStream("/xwiki-locales.txt"));
+        Set<Locale> locales = localizationScriptService.getAvailableLocales();
+        assertNotNull(locales);
+        assertFalse(locales.isEmpty());
+        assertTrue(locales.contains(new Locale("fr")));
+        assertTrue(locales.contains(new Locale("it")));
+        assertTrue(locales.contains(new Locale("mr_IN")));
+        assertFalse(locales.contains(new Locale("whatever")));
     }
 }

@@ -325,6 +325,22 @@
                   },
                   {
                     "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.rss.NotificationRSSRenderer",
+                    "package": "org.xwiki.notifications.rss",
+                    "classSimpleName": "NotificationRSSRenderer",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.notifiers.rss.NotificationRSSRenderer"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.notifications.rss.NotificationRSSManager",
+                    "package": "org.xwiki.notifications.rss",
+                    "classSimpleName": "NotificationRSSManager",
+                    "elementKind": "interface",
+                    "justification": "Young API, moved to org.xwiki.notifications.notifiers.rss.NotificationRSSManager"
+                  },
+                  {
+                    "code": "java.class.removed",
                     "old": "class org.xwiki.notifications.script.NotificationScriptService",
                     "package": "org.xwiki.notifications.script",
                     "classSimpleName": "NotificationScriptService",

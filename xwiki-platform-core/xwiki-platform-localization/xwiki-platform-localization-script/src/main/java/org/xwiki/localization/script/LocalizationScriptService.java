@@ -40,6 +40,8 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 
+import com.ibm.icu.util.ULocale;
+
 /**
  * Provides Component-specific Scripting APIs.
  * 
@@ -266,5 +268,16 @@ public class LocalizationScriptService implements ScriptService
         }
 
         return result;
+    }
+
+    /**
+     * @return the list of all known locales
+     * @since 9.7RC1
+     * @since 8.4.6
+     * @since 9.6.1
+     */
+    public ULocale[] getKnownLocales()
+    {
+        return ULocale.getAvailableLocales();
     }
 }

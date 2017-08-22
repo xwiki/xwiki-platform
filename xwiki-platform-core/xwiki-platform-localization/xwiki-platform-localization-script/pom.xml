@@ -45,7 +45,11 @@
       <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>59.1</version>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

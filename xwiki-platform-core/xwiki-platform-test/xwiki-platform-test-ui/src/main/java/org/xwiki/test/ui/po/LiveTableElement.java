@@ -257,4 +257,23 @@ public class LiveTableElement extends BaseElement
             getDriver().setTimeout(originalTimeout);
         }
     }
+
+    /**
+     * Sorts the live table on the specified column.
+     *
+     * @param columnTitle the column to sort on
+     * @since 9.7RC1
+     */
+    public void sortBy(String columnTitle)
+    {
+        // Make extra sure Selenium can't go quicker than the live table status by forcing it before sorting.
+        getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
+            + "-ajax-loader').removeClassName('hidden')");
+
+        String xpath = String.format("//table[@id = '%s']//th[contains(@class, 'xwiki-livetable-display-header-text')"
+            + " and contains(@class, 'sortable') and normalize-space(.) = '%s']", this.livetableId, columnTitle);
+        getDriver().findElement(By.xpath(xpath)).click();
+
+        waitUntilReady();
+    }
 }

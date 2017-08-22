@@ -54,7 +54,8 @@
 #set ($options = {
   'resultPage': 'XWiki.AllAttachmentsResults',
   'callback': 'XWiki.index.displayAttachmentEntry',
-  'translationPrefix': 'platform.index.attachments.'
+  'translationPrefix': 'platform.index.attachments.',
+  'selectedColumn': 'filename'
 })
 #livetable('allattachments' $columns $columnsProperties $options)
 {{/velocity}}

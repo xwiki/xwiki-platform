@@ -36,9 +36,7 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Tests for the AllDocs page.
@@ -155,7 +153,7 @@ public class AllDocsTest extends AbstractTest
     @IgnoreBrowsers({
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")})
-    public void attachmentsTabFiltering() throws Exception
+    public void attachmentsTabFilteringAndSorting() throws Exception
     {
         // Create 2 pages with attachments so that this test filter returns only one.
         // Note that we need to be logged in.
@@ -166,24 +164,45 @@ public class AllDocsTest extends AbstractTest
 
         AllDocsPage docsPage = AllDocsPage.gotoPage();
         LiveTableElement liveTable = docsPage.clickAttachmentsTab();
-        // Here we test if all the Columns are displayed
-        Assert.assertTrue("No Filename column found", liveTable.hasColumn("Filename"));
-        Assert.assertTrue("No Space column found", liveTable.hasColumn("Space"));
-        Assert.assertTrue("No Date column found", liveTable.hasColumn("Date"));
-        Assert.assertTrue("No Author column found", liveTable.hasColumn("Author"));
-        Assert.assertTrue("No Type column found", liveTable.hasColumn("Type"));
-        Assert.assertTrue("No Page column found", liveTable.hasColumn("Page"));
 
-        // Here we filter the livetable
-        liveTable.filterColumn("xwiki-livetable-allattachments-filter-2", "th");
-        List<WebElement> pageResults = getDriver().findElements(By.xpath("//td[@class='pagename']"));
-        Assert.assertEquals(1, pageResults.size());
+        // Here we test if all the Columns are displayed.
+        assertTrue("No Type column found", liveTable.hasColumn("Type"));
+        assertTrue("No Name column found", liveTable.hasColumn("Name"));
+        assertTrue("No Location column found", liveTable.hasColumn("Location"));
+        assertTrue("No Size column found", liveTable.hasColumn("Size"));
+        assertTrue("No Date column found", liveTable.hasColumn("Date"));
+        assertTrue("No Author column found", liveTable.hasColumn("Author"));
 
-        // Here we get the results that remain after applying the filter
-        // and we check if there is a result that doesn't contain the filter, the test will fail
-        for (int i = 0; i < pageResults.size(); i++) {
-            String text = pageResults.get(i).getText();
-            Assert.assertTrue("This [" + text + "] should not be here !", text.toLowerCase().contains("th"));
-        }
+        assertEquals(2, liveTable.getRowCount());
+
+        // Filter by attachment file name.
+        liveTable.filterColumn("xwiki-livetable-allattachments-filter-2", "t1");
+        assertEquals(1, liveTable.getRowCount());
+        assertEquals("attachment1.txt", liveTable.getCell(liveTable.getRow(1), 2).getText());
+
+        // Clear the filter.
+        liveTable.filterColumn("xwiki-livetable-allattachments-filter-2", "");
+
+        // Filter by attachment location.
+        liveTable.filterColumn("xwiki-livetable-allattachments-filter-3", "th");
+        assertEquals(1, liveTable.getRowCount());
+        assertEquals("AllDocsTestOtherPage", liveTable.getCell(liveTable.getRow(1), 3).getText());
+
+        // Clear the filter.
+        liveTable.filterColumn("xwiki-livetable-allattachments-filter-3", "");
+
+        // Sort by attachment file name. The live table should be already sorted by file name ascending. This will
+        // reverse the order.
+        assertEquals("attachment2.txt", liveTable.getCell(liveTable.getRow(2), 2).getText());
+        liveTable.sortBy("Name");
+        assertEquals(2, liveTable.getRowCount());
+        assertEquals("attachment2.txt", liveTable.getCell(liveTable.getRow(1), 2).getText());
+
+        // Sort by attachment location.
+        liveTable.sortBy("Location");
+        assertEquals("AllDocsTestPage", liveTable.getCell(liveTable.getRow(2), 3).getText());
+        liveTable.sortBy("Location");
+        assertEquals(2, liveTable.getRowCount());
+        assertEquals("AllDocsTestPage", liveTable.getCell(liveTable.getRow(1), 3).getText());
     }
 }

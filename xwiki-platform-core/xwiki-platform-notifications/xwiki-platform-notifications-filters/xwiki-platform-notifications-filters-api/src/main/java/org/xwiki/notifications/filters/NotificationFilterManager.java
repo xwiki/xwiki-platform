@@ -60,6 +60,15 @@ public interface NotificationFilterManager
             throws NotificationException;
 
     /**
+     * Get a set of every {@link NotificationFilterPreference} that are available for the current user.
+     *
+     * @param user the user to get preferences from
+     * @return a set of notification filters
+     * @throws NotificationException if error happens
+     */
+    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
+
+    /**
      * Get a set of {@link NotificationFilterPreference} that matches the given filter for the given user.
      *
      * @param user the user to get preferences from

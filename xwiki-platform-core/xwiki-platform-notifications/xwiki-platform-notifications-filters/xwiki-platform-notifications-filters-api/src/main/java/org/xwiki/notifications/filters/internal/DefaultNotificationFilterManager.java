@@ -102,17 +102,34 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
+    {
+        return modelBridge.getFilterPreferences(user);
+    }
+
+    @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
             throws NotificationException
     {
-        return modelBridge.getFilterPreferences(user, filter);
+        Set<NotificationFilterPreference> preferences = getFilterPreferences(user);
+
+        Iterator<NotificationFilterPreference> it = preferences.iterator();
+        while (it.hasNext()) {
+            NotificationFilterPreference preference = it.next();
+
+            if (!filter.getName().equals(preference.getFilterName())) {
+                it.remove();
+            }
+        }
+
+        return preferences;
     }
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
             NotificationFilterType filterType, NotificationFormat format) throws NotificationException
     {
-        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user, filter);
+        Set<NotificationFilterPreference> preferences = getFilterPreferences(user, filter);
 
         Iterator<NotificationFilterPreference> it = preferences.iterator();
 

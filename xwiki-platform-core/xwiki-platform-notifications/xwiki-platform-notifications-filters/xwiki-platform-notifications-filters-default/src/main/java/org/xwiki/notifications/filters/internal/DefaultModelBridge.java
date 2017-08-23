@@ -35,7 +35,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -71,11 +70,13 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String FILTER_NAME = "filterName";
 
+    private static final String IS_ENABLED = "isEnabled";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
             throws NotificationException
     {
         XWikiContext context = contextProvider.get();
@@ -91,7 +92,7 @@ public class DefaultModelBridge implements ModelBridge
             List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
-                    if (obj != null && filter.getName().equals(obj.getStringValue(FILTER_NAME))) {
+                    if (obj != null) {
                         Map<NotificationFilterProperty, List<String>> filterPreferenceProperties = new HashMap<>();
 
                         filterPreferenceProperties.put(NotificationFilterProperty.APPLICATION,
@@ -109,11 +110,14 @@ public class DefaultModelBridge implements ModelBridge
                                 obj.getStringValue("filterType").toUpperCase());
 
                         Set<NotificationFormat> filterFormats = new HashSet<>();
-                        for (String format : (List<String>) obj.getListValue("filterFormat")) {
+                        for (String format : (List<String>) obj.getListValue("filterFormats")) {
                             filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
                         }
 
                         preferences.add(new DefaultNotificationFilterPreference(
+                                obj.getStringValue("filterPreferenceName"),
+                                obj.getStringValue(FILTER_NAME),
+                                (obj.getIntValue(IS_ENABLED, 1) == 1),
                                 filterType,
                                 filterFormats,
                                 filterPreferenceProperties));
@@ -146,7 +150,7 @@ public class DefaultModelBridge implements ModelBridge
             List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
-                    if (obj.getIntValue("isEnabled", 1) == 0) {
+                    if (obj.getIntValue(IS_ENABLED, 1) == 0) {
                         disabledFilters.add(obj.getStringValue(FILTER_NAME));
                     }
                 }

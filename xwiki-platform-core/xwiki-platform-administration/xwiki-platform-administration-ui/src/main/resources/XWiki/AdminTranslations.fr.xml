@@ -43,7 +43,26 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+XWiki.XWikiPreferences_default_language.hint=Sélectionner la langue par défaut du wiki
+XWiki.XWikiPreferences_showannotations.hint=Afficher la section Annotations dans la page.
+XWiki.XWikiPreferences_showattachments.hint=Afficher la section Pièces jointes dans la page.
+XWiki.XWikiPreferences_showcomments.hint=Afficher la section Commentaires dans la page.
+XWiki.XWikiPreferences_showhistory.hint=Afficher la section Historique dans la page.
+XWiki.XWikiPreferences_showinformation.hint=Afficher la section Informations dans la page.
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Empêcher les utilisateurs de créer des pages wiki sans titre.
 admin.colorthemes.global=Global
 admin.colorthemes.local=Local
+admin.edit=Modifier
+admin.title=Titre
+admin.wysiwyg.description=Sélectionnez l'éditeur WYSIWYG par défaut et paramétrez le.
+administration.menu.search.hint=Rechercher...
+administration.menu.search.noResults=Aucun résultat.
+administration.section.analytics.status=Status
+administration.section.export.author.hint=Auteur du package.
+administration.section.export.version.hint=Version du package.
+administration.sectionTitle=Administration \: {0}
+administration.sectionTitle.global=Administration globale \: {0} 
+administration.title=Administration
+administration.title.global=Administration globale
 </content>
 </xwikidoc>

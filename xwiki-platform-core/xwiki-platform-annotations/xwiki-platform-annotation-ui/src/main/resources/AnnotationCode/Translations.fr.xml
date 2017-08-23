@@ -44,11 +44,14 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 AnnotationCode.AnnotationConfig_activated=Les annotations sont activées
+AnnotationCode.AnnotationConfig_activated.hint=Indique si les annotations sont actives sur le wiki
 AnnotationCode.AnnotationConfig_annotationClass=Classe XWiki définissant la structure des annotations
 AnnotationCode.AnnotationConfig_displayHighlight=Par défaut, surligner le texte annoté
 AnnotationCode.AnnotationConfig_displayed=Par défaut, afficher les annotations
+AnnotationCode.AnnotationConfig_displayed.hint=Indique si les annotations sont affichées par défaut ou seulement en utilisant l'option "Afficher les annotations" de la page
 AnnotationCode.AnnotationConfig_exceptionSpaces=Sauf pour les espaces suivants
 admin.annotations=Annotations
+admin.annotations.description=Paramétrer les annotations
 annotations.action.create.cancel.text=Annuler
 annotations.action.create.error.notarget=L'annotation n'est associée à aucun document.
 annotations.action.create.error.unauthorized=Vous n'êtes pas autorisés à annoter ce document.

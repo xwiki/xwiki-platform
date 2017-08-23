@@ -95,7 +95,8 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                 ScopeNotificationFilterPreference scopePreference =
                         new ScopeNotificationFilterPreference(preference, entityReferenceResolver);
 
-                if (scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
+                if (scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
+                    || scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
                     hasRestriction = true;
 
                     if (event.getDocument().equals(scopePreference.getScopeReference())
@@ -223,9 +224,10 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
     private boolean scopeMatchesFilteringContext(NotificationFilterPreference scope,
             NotificationPreference preference)
     {
-        // We apply the filter only on scopes having the correct eventType
+        // We apply the filter only on scopes having the correct eventType, or no eventType
         return (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
-                && scope.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
-                preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)));
+                && (scope.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
+                    || scope.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
+                            preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE))));
     }
 }

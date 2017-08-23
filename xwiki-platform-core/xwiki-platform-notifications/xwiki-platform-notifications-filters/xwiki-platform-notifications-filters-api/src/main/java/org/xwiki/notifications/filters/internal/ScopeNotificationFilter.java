@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -121,8 +123,7 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
          * In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
          * returned true.
          */
-        return (filterType.equals(NotificationFilterType.INCLUSIVE)
-                && hasRestriction && !matchRestriction);
+        return (filterType.equals(NotificationFilterType.INCLUSIVE) && hasRestriction && !matchRestriction);
     }
 
     @Override
@@ -133,9 +134,17 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
         boolean isFirstPass = true;
 
         try {
-            for (NotificationFilterPreference filterPreference
-                    : notificationFilterManager.getFilterPreferences(user, this, filterType,
-                            preference.getFormat())) {
+            // Get every filterPreference linked to the current filter
+            Set<NotificationFilterPreference> notificationFilterPreferences;
+            if (preference != null) {
+                notificationFilterPreferences = notificationFilterManager.getFilterPreferences(
+                        user, this, filterType, preference.getFormat());
+            } else {
+                notificationFilterPreferences = notificationFilterManager.getFilterPreferences(
+                        user, this, filterType);
+            }
+
+            for (NotificationFilterPreference filterPreference : notificationFilterPreferences) {
 
                 ScopeNotificationFilterPreference filterPreferenceScope =
                         new ScopeNotificationFilterPreference(filterPreference, entityReferenceResolver);
@@ -144,39 +153,7 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                     continue;
                 }
 
-                AbstractNode tmpNode;
-
-                String wiki = filterPreferenceScope.getScopeReference().extractReference(EntityType.WIKI).getName();
-                String space = serializer.serialize(filterPreferenceScope.getScopeReference());
-                String page = serializer.serialize(filterPreferenceScope.getScopeReference());
-
-                switch (filterPreferenceScope.getScopeReference().getType()) {
-                    case DOCUMENT:
-                        tmpNode = new AndNode(
-                                new EqualsNode(
-                                        new PropertyValueNode(NotificationFilterProperty.WIKI),
-                                        new StringValueNode(wiki)),
-                                new EqualsNode(
-                                        new PropertyValueNode(NotificationFilterProperty.PAGE),
-                                        new StringValueNode(page)));
-                        break;
-                    case SPACE:
-                        tmpNode = new AndNode(
-                                new EqualsNode(
-                                        new PropertyValueNode(NotificationFilterProperty.WIKI),
-                                        new StringValueNode(wiki)),
-                                new LikeNode(
-                                        new PropertyValueNode(NotificationFilterProperty.SPACE),
-                                        new StringValueNode(space)));
-                        break;
-                    case WIKI:
-                        tmpNode = new EqualsNode(
-                                new PropertyValueNode(NotificationFilterProperty.WIKI),
-                                new StringValueNode(wiki));
-                        break;
-                    default:
-                        continue;
-                }
+                AbstractNode tmpNode = generateNode(filterPreferenceScope);
 
                 // If we have an EXCLUSIVE filter, negate the filter node
                 if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
@@ -217,17 +194,55 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
      * Given a {@link NotificationFilterPreference} and the current filtering context (defined by a
      * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
      *
-     * @param scope the reference scope
-     * @param preference the related notification preference
+     * @param filterPreference the reference scope
+     * @param preference the related notification preference, can be null
      * @return true if the filter should be applied to the given scope.
      */
-    private boolean scopeMatchesFilteringContext(NotificationFilterPreference scope,
+    private boolean scopeMatchesFilteringContext(NotificationFilterPreference filterPreference,
             NotificationPreference preference)
     {
-        // We apply the filter only on scopes having the correct eventType, or no eventType
-        return (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
-                && (scope.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
-                    || scope.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
+        return ((preference == null
+                    || preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE))
+                && (filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
+                    || filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
                             preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE))));
+    }
+
+    /**
+     * Given {@link ScopeNotificationFilterPreference}, generate the associated node restriction.
+     *
+     * @param filterPreferenceScope the preference to use
+     * @return the generated node
+     */
+    AbstractNode generateNode(ScopeNotificationFilterPreference filterPreferenceScope)
+    {
+        String wiki = filterPreferenceScope.getScopeReference().extractReference(EntityType.WIKI).getName();
+        String space = serializer.serialize(filterPreferenceScope.getScopeReference());
+        String page = serializer.serialize(filterPreferenceScope.getScopeReference());
+
+        switch (filterPreferenceScope.getScopeReference().getType()) {
+            case DOCUMENT:
+                return new AndNode(
+                        new EqualsNode(
+                                new PropertyValueNode(NotificationFilterProperty.WIKI),
+                                new StringValueNode(wiki)),
+                        new EqualsNode(
+                                new PropertyValueNode(NotificationFilterProperty.PAGE),
+                                new StringValueNode(page)));
+            case SPACE:
+                return new AndNode(
+                        new EqualsNode(
+                                new PropertyValueNode(NotificationFilterProperty.WIKI),
+                                new StringValueNode(wiki)),
+                        new LikeNode(
+                                new PropertyValueNode(NotificationFilterProperty.SPACE),
+                                new StringValueNode(space)));
+            case WIKI:
+                return new EqualsNode(
+                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new StringValueNode(wiki));
+            default:
+                return new EmptyNode();
+        }
     }
 }

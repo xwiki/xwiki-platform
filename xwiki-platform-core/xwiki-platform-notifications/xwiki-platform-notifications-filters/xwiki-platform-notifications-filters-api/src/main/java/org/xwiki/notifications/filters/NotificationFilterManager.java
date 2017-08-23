@@ -80,6 +80,20 @@ public interface NotificationFilterManager
             throws NotificationException;
 
     /**
+     * Get a set of {@link NotificationFilterPreference} that matches the given filter for the given user and
+     * the given filter type.
+     *
+     * @param user the user to get preferences from
+     * @param filter the filter that should match the preferences
+     * @param filterType the type of the filter
+     * @return a set of notification filter preferences that corresponds to the given filter, the user and the filter
+     * type
+     * @throws NotificationException if error happens
+     */
+    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
+            NotificationFilterType filterType) throws NotificationException;
+
+    /**
      * Get a set of {@link NotificationFilterPreference} that matches the given user and also the given filter,
      * filter type and format.
      *

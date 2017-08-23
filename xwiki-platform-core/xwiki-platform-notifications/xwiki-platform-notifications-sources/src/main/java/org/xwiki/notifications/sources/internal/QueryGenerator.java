@@ -59,6 +59,12 @@ public class QueryGenerator
 {
     private static final String OR = " OR ";
 
+    private static final String OR_BLOCK = " OR (%s)";
+
+    private static final String AND_BLOCK = " AND (%s)";
+
+    private static final String BLOCK = "(%s)";
+
     private static final String LEFT_PARENTHESIS = "(";
 
     private static final String RIGHT_PARENTHESIS = ")";
@@ -117,12 +123,20 @@ public class QueryGenerator
         }
         hql.append(LEFT_PARENTHESIS);
 
-        List<Map<String, String>> queryParameters = handleEventPreferences(user, hql, preferences);
+        StringBuilder tmpBuilder = new StringBuilder();
+        List<Map<String, String>> queryParameters = handleEventPreferences(user, tmpBuilder, preferences);
 
-        // No notification is returned if nothing is saved in the user settings
-        // TODO: handle some defaults preferences that can be set in the administration
-        if (preferences.isEmpty() || preferences.isEmpty()) {
-            return null;
+        if (!tmpBuilder.toString().isEmpty()) {
+            hql.append(String.format(BLOCK, tmpBuilder.toString()));
+        }
+
+        // Handle the global notification filters
+        tmpBuilder = new StringBuilder();
+        List<Map<String, String>> tmpQueryParameters = handleGlobalFilters(user, tmpBuilder);
+
+        if (!tmpBuilder.toString().isEmpty()) {
+            hql.append(String.format((queryParameters.isEmpty()) ? BLOCK : AND_BLOCK, tmpBuilder.toString()));
+            queryParameters.addAll(tmpQueryParameters);
         }
 
         hql.append(RIGHT_PARENTHESIS);
@@ -153,6 +167,29 @@ public class QueryGenerator
         return query;
     }
 
+    private List<Map<String, String>> handleGlobalFilters(DocumentReference user, StringBuilder hql)
+            throws NotificationException
+    {
+        List<Map<String, String>> queryParameters = new ArrayList<>();
+
+        NFExpressionToHQLParser parser = new NFExpressionToHQLParser();
+
+        String separator = BLOCK;
+
+        for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
+            AbstractNode node = filter.filterExpression(user);
+
+            String parserResult = parser.parse(node);
+            if (!node.equals(AbstractNode.EMPTY_NODE) && !parserResult.isEmpty()) {
+                hql.append(String.format(separator, parserResult));
+                queryParameters.add(parser.getQueryParameters());
+                separator = OR_BLOCK;
+            }
+        }
+
+        return queryParameters;
+    }
+
     private void handleEventFilters(Collection<NotificationFilter> filters, DocumentReference user,
             NotificationPreference preference, StringBuilder query, List<Map<String, String>> queryParameters)
     {
@@ -161,7 +198,7 @@ public class QueryGenerator
         for (NotificationFilter filter : filters) {
             AbstractNode node = filter.filterExpression(user, preference);
             if (!node.equals(AbstractNode.EMPTY_NODE)) {
-                query.append(String.format(" AND (%s)", parser.parse(filter.filterExpression(user, preference))));
+                query.append(String.format(AND_BLOCK, parser.parse(filter.filterExpression(user, preference))));
                 queryParameters.add(parser.getQueryParameters());
             }
         }
@@ -281,8 +318,6 @@ public class QueryGenerator
         List<Map<String, String>> queryParameters = new ArrayList<>();
 
         if (!preferences.isEmpty()) {
-            NFExpressionToHQLParser parser = new NFExpressionToHQLParser();
-
             hql.append(LEFT_PARENTHESIS);
             String separator = "";
             int number = 0;

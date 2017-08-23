@@ -122,8 +122,8 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.user <> :user AND event.date >= :startDate AND (((("
-                        + "event.type = :type_0 AND event.date >= :date_0))))" +
+                "where event.user <> :user AND event.date >= :startDate AND ((((("
+                        + "event.type = :type_0 AND event.date >= :date_0)))))" +
                         " AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
@@ -148,8 +148,8 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.user <> :user AND event.date >= :startDate AND (((("
-                        + "event.type = :type_0 AND event.date >= :date_0))))" +
+                "where event.user <> :user AND event.date >= :startDate AND ((((("
+                        + "event.type = :type_0 AND event.date >= :date_0)))))" +
                         " AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
@@ -171,8 +171,8 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.user <> :user AND event.date >= :startDate AND (((("
-                        + "event.type = :type_0 AND event.date >= :date_0))))" +
+                "where event.user <> :user AND event.date >= :startDate AND ((((("
+                        + "event.type = :type_0 AND event.date >= :date_0)))))" +
                         " AND event.hidden <> true " +
                         "order by event.date DESC", Query.HQL);
         verify(query).bindValue("user", "xwiki:XWiki.UserA");
@@ -194,8 +194,8 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.user <> :user AND event.date >= :startDate AND (((("
-                        + "event.type = :type_0 AND event.date >= :date_0))))" +
+                "where event.user <> :user AND event.date >= :startDate AND ((((("
+                        + "event.type = :type_0 AND event.date >= :date_0)))))" +
                         " AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
@@ -220,8 +220,8 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.user <> :user AND (((("
-                        + "event.type = :type_0 AND event.date >= :date_0))))" +
+                "where event.user <> :user AND ((((("
+                        + "event.type = :type_0 AND event.date >= :date_0)))))" +
                         " AND event.id NOT IN (:blackList) AND event.date <= :endDate AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true)) " +
@@ -246,8 +246,8 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery(
-                "where event.user <> :user AND event.date >= :startDate AND (((("
-                        + "event.type = :type_0 AND event.date >= :date_0))))" +
+                "where event.user <> :user AND event.date >= :startDate AND ((((("
+                        + "event.type = :type_0 AND event.date >= :date_0)))))" +
                         " AND event.hidden <> true AND " +
                         "(event not in (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :user and status.read = true))" +
@@ -308,10 +308,10 @@ public class QueryGeneratorTest
         // Verify
         verify(queryManager).createQuery(
                 String.format("where event.user <> :user AND event.date >= :startDate "
-                                + "AND ((((event.type = :type_0 AND event.date >= :date_0) "
+                                + "AND (((((event.type = :type_0 AND event.date >= :date_0) "
                                 + "AND ((event.page = :value_%s) "
                                 + "AND (:value_%s = :value_%s)) "
-                                + "AND ((event.eventType = :value_%s) AND (:value_%s = :value_%s))))) "
+                                + "AND ((event.eventType = :value_%s) AND (:value_%s = :value_%s)))))) "
                                 + "AND event.id NOT IN (:blackList) "
                                 + "AND event.date <= :endDate AND event.hidden <> true "
                                 + "AND (event not in ("
@@ -361,7 +361,7 @@ public class QueryGeneratorTest
 
         // Verify
         verify(queryManager).createQuery("where event.user <> :user AND event.date >= :startDate "
-                                + "AND ((((event.type = :type_0 AND event.date >= :date_0)))) "
+                                + "AND (((((event.type = :type_0 AND event.date >= :date_0))))) "
                                 + "AND event.id NOT IN (:blackList) "
                                 + "AND event.date <= :endDate AND event.hidden <> true "
                                 + "AND (event not in ("

@@ -69,21 +69,21 @@ public class NotificationFilterPreferenceDocumentInitializer extends AbstractMan
         xclass.addTextField("filterPreferenceName", "Name of the filter preference", 256);
         xclass.addBooleanField("isEnabled", "Is enabled ?", SELECT, true);
         xclass.addTextField("filterName", "Filter name", 64);
-        xclass.addStaticListField("filterType", "Filter type", 5, false,
+        xclass.addStaticListField("filterType", "Filter type", 5, false, true,
                 "inclusive=Inclusive|exclusive=Exclusive", SELECT, SEPARATORS);
-        xclass.addStaticListField("filterFormats", "Formats", 5, true,
+        xclass.addStaticListField("filterFormats", "Formats", 5, true, true,
                 "alert=Alert|email=E-mail", SELECT, SEPARATORS);
 
         xclass.addStaticListField("applications", "Applications", 64, true,
-                false, StringUtils.EMPTY, INPUT, SEPARATORS);
+                true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("eventTypes", "Event types", 64, true,
-                false, StringUtils.EMPTY, INPUT, SEPARATORS);
+                true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addUsersField("users", "Users", true);
         xclass.addStaticListField("pages", "Pages", 64, true,
-                false, StringUtils.EMPTY, INPUT, SEPARATORS);
+                true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("spaces", "Spaces", 64, true,
-                false, StringUtils.EMPTY, INPUT, SEPARATORS);
+                true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("wikis", "Wikis", 64, true,
-                false, StringUtils.EMPTY, INPUT, SEPARATORS);
+                true, StringUtils.EMPTY, INPUT, SEPARATORS);
     }
 }

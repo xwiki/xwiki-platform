@@ -60,6 +60,12 @@ public abstract class AbstractNotificationFilter implements NotificationFilter
         }
     }
 
+    @Override
+    public AbstractNode filterExpression(DocumentReference user)
+    {
+        return filterExpression(user, null);
+    }
+
     /**
      * Just as {@link #filterEvent(Event, DocumentReference, NotificationFormat)}, use the given user, the event, the
      * format of the wanted notification and the type of filter we want to apply (see
@@ -81,6 +87,10 @@ public abstract class AbstractNotificationFilter implements NotificationFilter
      *
      * Generated AST for EXCLUSIVE filters:
      * NOT (--filter1--) AND NOT (--filter2--) AND NOT (--filter3--) ...
+     *
+     * @param user the user for which we should apply the filter
+     * @param preference the preference under which this filter applies. Note that this preference can be null.
+     * @param filterType the filter type (INCLUSIVE or EXCLUSIVE) to use
      *
      * @since 9.7RC1
      */

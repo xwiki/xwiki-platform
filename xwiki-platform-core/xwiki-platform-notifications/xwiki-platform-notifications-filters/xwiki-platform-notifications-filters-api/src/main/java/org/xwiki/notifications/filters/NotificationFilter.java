@@ -71,6 +71,17 @@ public interface NotificationFilter
     AbstractNode filterExpression(DocumentReference user, NotificationPreference preference);
 
     /**
+     * Filtering expression to use when retrieving notifications.
+     * Note that this filtering expression will not be bound to any notification preference.
+     *
+     * @param user the user interested in the notifications
+     * @return a filtering expression
+     *
+     * @since 9.8RC1
+     */
+    AbstractNode filterExpression(DocumentReference user);
+
+    /**
      * @return the name of the filter
      *
      * @since 9.7RC1

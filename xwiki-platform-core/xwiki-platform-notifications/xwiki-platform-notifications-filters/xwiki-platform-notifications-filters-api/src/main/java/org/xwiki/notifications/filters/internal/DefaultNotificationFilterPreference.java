@@ -37,6 +37,12 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  */
 public class DefaultNotificationFilterPreference implements NotificationFilterPreference
 {
+    private boolean isEnabled;
+
+    private String filterName;
+
+    private String filterPreferenceName;
+
     private NotificationFilterType filterType;
 
     private Set<NotificationFormat> notificationFormats;
@@ -46,17 +52,41 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     /**
      * Constructs a new {@link DefaultNotificationFilterPreference}.
      *
+     * @param filterPreferenceName the name of the filter preference
+     * @param filterName the name of the filter corresponding to the given filter
+     * @param isEnabled determine if the current filter preference is enabled
      * @param filterType the type of the filter
      * @param notificationFormats a set of formats used by the filter
      * @param preferenceProperties the properties of the filter preference
      */
-    public DefaultNotificationFilterPreference(NotificationFilterType filterType,
-            Set<NotificationFormat> notificationFormats,
+    public DefaultNotificationFilterPreference(String filterPreferenceName, String filterName, boolean isEnabled,
+            NotificationFilterType filterType, Set<NotificationFormat> notificationFormats,
             Map<NotificationFilterProperty, List<String>> preferenceProperties)
     {
+        this.filterPreferenceName = filterPreferenceName;
+        this.filterName = filterName;
+        this.isEnabled = isEnabled;
         this.filterType = filterType;
         this.notificationFormats = notificationFormats;
         this.preferenceProperties = preferenceProperties;
+    }
+
+    @Override
+    public String getFilterPreferenceName()
+    {
+        return filterPreferenceName;
+    }
+
+    @Override
+    public String getFilterName()
+    {
+        return filterName;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return isEnabled;
     }
 
     @Override

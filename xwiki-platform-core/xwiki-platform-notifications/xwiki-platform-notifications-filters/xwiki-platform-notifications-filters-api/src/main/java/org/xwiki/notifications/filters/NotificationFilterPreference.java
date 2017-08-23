@@ -51,6 +51,21 @@ public interface NotificationFilterPreference
     List<String> getProperties(NotificationFilterProperty property);
 
     /**
+     * @return the name of the filter preference.
+     */
+    String getFilterPreferenceName();
+
+    /**
+     * @return the name of the filter corresponding to this preference.
+     */
+    String getFilterName();
+
+    /**
+     * @return true if the current notification preference is enabled.
+     */
+    boolean isEnabled();
+
+    /**
      * @return the type of the filter described by this preference.
      */
     NotificationFilterType getFilterType();

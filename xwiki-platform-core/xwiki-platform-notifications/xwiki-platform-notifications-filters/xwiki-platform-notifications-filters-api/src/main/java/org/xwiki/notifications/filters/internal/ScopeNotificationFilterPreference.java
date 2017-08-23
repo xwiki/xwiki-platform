@@ -77,6 +77,24 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
+    public String getFilterPreferenceName()
+    {
+        return filterPreference.getFilterPreferenceName();
+    }
+
+    @Override
+    public String getFilterName()
+    {
+        return filterPreference.getFilterName();
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return filterPreference.isEnabled();
+    }
+
+    @Override
     public NotificationFilterType getFilterType()
     {
         return filterPreference.getFilterType();

@@ -30,7 +30,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 /**
@@ -47,9 +46,7 @@ public class CachedModelBridge implements ModelBridge
 {
     private static final String USER_TOGGLEABLE_FILTER_PREFERENCES = "userToggleableFilterPreference";
 
-    private static final String USER_FILTER_PREFERENCES = "userNotificationFilterPreferences";
-
-    private static final String UNDERSCORE = "_";
+    private static final String USER_FILTER_PREFERENCES = "userAllNotificationFilterPreferences";
 
     @Inject
     private ModelBridge modelBridge;
@@ -58,17 +55,18 @@ public class CachedModelBridge implements ModelBridge
     private Execution execution;
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user,
-            NotificationFilter filter) throws NotificationException
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
-        final String contextEntry = USER_FILTER_PREFERENCES + UNDERSCORE + filter.getName();
+        final String contextEntry = USER_FILTER_PREFERENCES;
 
         ExecutionContext context = execution.getContext();
+        /*
         if (context.hasProperty(contextEntry)) {
             return (Set<NotificationFilterPreference>) context.getProperty(contextEntry);
         }
+        */
 
-        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user, filter);
+        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user);
         context.setProperty(contextEntry, preferences);
 
         return preferences;

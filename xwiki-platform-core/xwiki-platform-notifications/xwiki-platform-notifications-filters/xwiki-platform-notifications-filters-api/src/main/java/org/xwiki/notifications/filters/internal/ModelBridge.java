@@ -24,7 +24,6 @@ import java.util.Set;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 /**
@@ -37,15 +36,13 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 public interface ModelBridge
 {
     /**
-     * Get all the notification preferences that corresponds to the given filter and to the given user.
+     * Get all the notification preferences that corresponds to the given user.
      *
      * @param user the user from which we need to extract the preference
-     * @param filter the filter that should match the extracted notification preferences
      * @return a set of available filter preferences
      * @throws NotificationException if an error happens
      */
-    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
-            throws NotificationException;
+    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
 
     /**
      * Get all the notification filters that are marked as disabled in the user profile.

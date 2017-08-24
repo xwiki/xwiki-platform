@@ -99,13 +99,13 @@ public class SystemUserNotificationFilterTest
                 new PropertyValueNode(NotificationFilterProperty.USER),
                 new StringValueNode("serializedSystemUser")),
                 mocker.getComponentUnderTest().generateFilterExpression(
-                        randomUser, fakePreference, NotificationFilterType.EXCLUSIVE));
+                        randomUser, null, NotificationFilterType.EXCLUSIVE));
     }
 
     @Test
     public void matchesPreference() throws Exception
     {
-        assertTrue(mocker.getComponentUnderTest().matchesPreference(mock(NotificationPreference.class)));
+        assertFalse(mocker.getComponentUnderTest().matchesPreference(mock(NotificationPreference.class)));
     }
 
     @Test

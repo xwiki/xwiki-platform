@@ -29,6 +29,12 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Enable or disable notifications from the event stream (for customization purpose).
+ * A {@link NotificationFilter} has two goals :
+ * <ul>
+ *     <li>Pre-Filtering : Generate a query (made with {@link AbstractNode}) that will be used to retrieve a specific
+ *     subset of notifications from a provider.</li>
+ *     <li>Post-Filtering : given an {@link Event}, determine if this event should be filtered or not.</li>
+ * </ul>
  *
  * @version $Id$
  * @since 9.5RC1
@@ -39,7 +45,7 @@ public interface NotificationFilter
 {
     /**
      * Enable or disable an event in the notification list (post-filter).
-     *
+     *For a given {@link NotificationPreference}, generate a filter associated with this preference
      * @param event an event
      * @param user the user interested in the notification
      * @param format format of the notification
@@ -82,6 +88,10 @@ public interface NotificationFilter
     AbstractNode filterExpression(DocumentReference user);
 
     /**
+     * Get the name of the filter. This is useful as {@link NotificationFilterPreference} will be able to be linked to
+     * this filter using its name. If the {@link NotificationFilter} is used as a component, consider defining
+     * the hint of this component as the name of the filter.
+     *
      * @return the name of the filter
      *
      * @since 9.7RC1

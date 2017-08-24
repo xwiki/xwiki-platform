@@ -194,6 +194,10 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
      * Given a {@link NotificationFilterPreference} and the current filtering context (defined by a
      * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
      *
+     * Note that we allow the {@link NotificationPreference} to be null and the
+     * {@link NotificationFilterPreference} to have an empty {@link NotificationPreferenceProperty#EVENT_TYPE} property.
+     * This is done to allow the filter to be applied globally and match all events.
+     *
      * @param filterPreference the reference scope
      * @param preference the related notification preference, can be null
      * @return true if the filter should be applied to the given scope.
@@ -201,15 +205,14 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
     private boolean scopeMatchesFilteringContext(NotificationFilterPreference filterPreference,
             NotificationPreference preference)
     {
-        return ((preference == null
-                    || preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE))
-                && (filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
-                    || filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
+        return ((preference == null && filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty())
+                || (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
+                    && filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
                             preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE))));
     }
 
     /**
-     * Given {@link ScopeNotificationFilterPreference}, generate the associated node restriction.
+     * Given {@link ScopeNotificationFilterPreference}, generate the associated scope restriction.
      *
      * @param filterPreferenceScope the preference to use
      * @return the generated node

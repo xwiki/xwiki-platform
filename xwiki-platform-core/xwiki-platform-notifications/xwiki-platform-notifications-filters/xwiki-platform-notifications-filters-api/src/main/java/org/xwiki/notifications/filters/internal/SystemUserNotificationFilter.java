@@ -41,6 +41,8 @@ import org.xwiki.notifications.preferences.NotificationPreference;
  * Define notification filters that are activated by default on every user and that filter the notifications
  * coming from the system user.
  *
+ * This filter is not bound to any {@link NotificationPreference} and should be applied globally.
+ *
  * @version $Id$
  * @since 9.7RC1
  */
@@ -80,7 +82,7 @@ public class SystemUserNotificationFilter extends AbstractNotificationFilter
     protected AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
             NotificationFilterType filterType)
     {
-        if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
+        if (preference == null && filterType.equals(NotificationFilterType.EXCLUSIVE)) {
             return new NotEqualsNode(
                     new PropertyValueNode(NotificationFilterProperty.USER),
                     new StringValueNode(serializer.serialize(systemUser)));
@@ -92,7 +94,8 @@ public class SystemUserNotificationFilter extends AbstractNotificationFilter
     @Override
     public boolean matchesPreference(NotificationPreference preference)
     {
-        return true;
+        // As the filter is applied globally, it’s not bound to any preference
+        return false;
     }
 
     @Override

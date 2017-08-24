@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -91,7 +90,7 @@
 (% class="profile-section highlighted-profile-section" %)
 (((
 {{html clean="false"}}
-&lt;h2&gt;$services.localization.render('notifications.settings.title')&amp;nbsp;&lt;small&gt;&lt;a id="notificationsRssLink" title="$services.localization.render('notifications.rss.feedLink')" target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;$services.icon.renderHTML("rss")&lt;/a&gt;&lt;/small&gt;&lt;/h2&gt;
+&lt;h2&gt;$services.localization.render('notifications.settings.title')&lt;/h2&gt;
 #displayAdvancedFilterSettingsModal()
 &lt;table class="notifPreferences"&gt;
   &lt;thead&gt;
@@ -183,6 +182,99 @@
 &lt;/table&gt;
 {{/html}}
 )))
+
+(% class="profile-section highlighted-profile-section" %)
+(((
+{{html clean="false"}}
+&lt;h2&gt;$escapetool.xml($services.localization.render('notifications.settings.filters.preferences.title'))&lt;/h2&gt;
+&lt;div class="xform"&gt;
+  &lt;div class="row"&gt;
+    &lt;p class="xHint col-md-10"&gt;$escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))&lt;/p&gt;
+    &lt;div class="col-md-2"&gt;
+      &lt;button class="btn btn-default btn-addfilter" data-target="#modal-add-filter-preference" data-toggle="modal"&gt;
+        &lt;span class="fa fa-plus"&gt;&lt;/span&gt;&amp;nbsp;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))
+      &lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  #set($collist  = ['name', 'filterType', 'eventTypes', 'notificationFormats', '_actions'])
+  #set($colprops = {
+    'name':                { 'sortable': true, 'html': true },
+    'filterType':          { 'sortable': true },
+    'eventTypes':          { 'sortable': true, 'html': true },
+    'notificationFormats': { 'sortable': true, 'html': true },
+    '_actions':            { 'sortable': false, 'actions': ['edit', 'delete']}
+  })
+  #set($options  = {
+    'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
+    'rowCount'          : 10,
+    'description'       : 'This table lists every filter registered for the current user.',
+    'translationPrefix' : 'notifications.settings.filters.preferences.table.',
+    'extraParams'       : "eventType=&amp;format=&amp;user=${services.model.serialize($doc.documentReference, 'default')}",
+    'outputOnlyHtml'    : true
+  })
+
+  #livetable("notificationFilterPreferencesLiveTable" $collist $colprops $options)
+&lt;/div&gt;
+
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-preference"&gt;
+  &lt;div class="modal-dialog" role="document"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class="modal-title"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body"&gt;
+        &lt;form class="xform"&gt;
+          &lt;dl class="location-picker"&gt;
+            &lt;dt&gt;
+              &lt;label for="notificationFilterTypeSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.label'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.hint'))&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;select id="notificationFilterTypeSelector" name="notificationFilterTypeSelector" size="1"&gt;
+                &lt;option value="inclusive" selected="selected"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.filterType.inclusive'))&lt;/option&gt;
+                &lt;option value="exclusive"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.filterType.exclusive'))&lt;/option&gt;
+              &lt;/select&gt;
+            &lt;/dd&gt;
+            &lt;dt&gt;
+              &lt;label for="notificationFilterEventTypeSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.eventType.label'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.eventType.hint'))&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;select id="notificationFilterEventTypeSelector" name="notificationFilterEventTypeSelector" size="5" multiple&gt;
+                #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+                  &lt;option value="$descriptor.eventType"&gt;$escapetool.xml($services.localization.render($descriptor.description))&lt;/option&gt;
+                #end
+              &lt;/select&gt;
+            &lt;/dd&gt;
+            &lt;dt&gt;
+              &lt;label&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.location.label'))&lt;/label&gt;
+              &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.addPreference.location.hint'))&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd class="document-tree"&gt;
+              #documentTree({
+                'class': 'location-tree',
+                'finder': true,
+                'showAttachments': false,
+                'showRoot': false,
+                'showTerminalDocuments': true,
+                'showTranslations': false,
+                'showWikis': true
+              })
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-footer"&gt;
+        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$services.localization.render('notifications.filters.cancel')&lt;/button&gt;
+        &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;$services.localization.render('notifications.filters.submit')&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+  &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+&lt;/div&gt;&lt;!-- /.modal --&gt;
+{{/html}}
+)))
+
 #**
  * Display a preference button for an event type and a given format
  *#
@@ -200,12 +292,6 @@
     &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-objnumber="$!preference.number" data-filter="${type.filter}"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
-      #if ($type.filter == 'WIKI_FILTER' || $type.filter == 'WIKI_AND_SPACE_FILTER' || $type.filter == 'WIKI_SPACE_AND_DOCUMENT_FILTER')
-        #displayScopeLivetable($type.eventType, $type.filter, $format)
-      #elseif($type.filter == 'CUSTOM_FILTER')
-        ## TODO: handle UIX from other wikis
-        $services.uix.getExtensions('notification.profile.filter', {'select': $type.eventType})
-      #end
     &lt;/div&gt;
   &lt;/td&gt;
 #end
@@ -249,111 +335,6 @@
     &lt;/div&gt;&lt;!-- /.modal-content --&gt;
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
 &lt;/div&gt;&lt;!-- /.modal --&gt;
-#end
-
-
-#**
- * Add a button to see the scope livetable in a modal box
- *#
-#macro(displayScopeLivetable $eventType $filterType $format)
-  &lt;div class="notificationPreferenceScopeContainer"&gt;
-    #set ($count = 0)
-    #foreach ($obj in $doc.getObjects('XWiki.Notifications.Code.NotificationPreferenceScopeClass'))
-      #set ($objFormat = $obj.getValue('format'))
-      #if ("$!objFormat" == '')
-        #set ($objFormat = 'alert')
-      #end
-      #if ($obj.getValue('eventType').contains($eventType) &amp;&amp; $format == $objFormat)
-        #set ($count = $count + 1)
-      #end
-    #end
-    #set ($showTerminalDocuments = ($filterType == 'WIKI_SPACE_AND_DOCUMENT_FILTER'))
-    &lt;p&gt;
-      &lt;button class="btn btn-xs btn-default filterButton" data-target="#modal-${eventType}-${format}" data-toggle="modal"&gt;
-        $services.localization.render('notifications.settings.filters', ["&lt;span class='notificationPreferenceScopeCount'&gt;$count&lt;/span&gt;"])
-      &lt;/button&gt;
-    &lt;/p&gt;
-    &lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-${eventType}-${format}"&gt;
-      &lt;div class="modal-dialog" role="document"&gt;
-        &lt;div class="modal-content"&gt;
-          &lt;div class="modal-header"&gt;
-            &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
-            &lt;h4 class="modal-title"&gt;Filters&lt;/h4&gt;
-          &lt;/div&gt;
-          &lt;div class="modal-body"&gt;
-            #set($collist  = ['scope', 'location', 'scopeFilterType', '_actions'])
-            #set($colprops = {
-              'scope':          { 'sortable': false, 'html': true},
-              'location':       { 'sortable': false, 'html': true },
-              'scopeFilterType':{ 'sortable': true},
-              '_actions':       { 'sortable': false, 'actions': ['delete']}
-            })
-            #set($options  = {
-              'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceScopeLivetableResults',
-              'rowCount'          : 10,
-              'description'       : 'This table lists all watched elements.',
-              'translationPrefix' : 'notifications.preferences.scope.table.',
-              'extraParams'       : "eventType=${eventType}&amp;format=${format}&amp;user=${services.model.serialize($doc.documentReference, 'default')}",
-              'outputOnlyHtml'    : true
-            })
-            #livetable("notificationPreferenceScopeContainer-${eventType}-${format}" $collist $colprops $options)
-            &lt;p&gt;&lt;button class="btn btn-primary btn-addfilter"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/button&gt;&lt;/p&gt;
-          &lt;/div&gt;
-          &lt;div class="modal-footer"&gt;
-            &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;&lt;!-- /.modal-content --&gt;
-      &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
-    &lt;/div&gt;&lt;!-- /.modal --&gt;
-    ## TODO: handle properly the "WIKI" filter with a wiki picker instead
-    ## TODO: add an option so the user can select a page without its children
-    ## Note: we put the picker modal here to avoid having a modal in a modal (nested modals ;))
-    &lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-scope-${eventType}-${format}"&gt;
-      &lt;div class="modal-dialog" role="document"&gt;
-        &lt;div class="modal-content"&gt;
-          &lt;div class="modal-header"&gt;
-            &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
-            &lt;h4 class="modal-title"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/h4&gt;
-          &lt;/div&gt;
-          &lt;div class="modal-body"&gt;
-            &lt;form class="xform"&gt;
-              &lt;dl class="location-picker"&gt;
-                &lt;dt&gt;
-                  &lt;label for="notificationFilterTypeSelector-${eventType}-${format}"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.label'))&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.hint'))&lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;
-                  &lt;select id="notificationFilterTypeSelector-${eventType}-${format}" name="notificationFilterTypeSelector" size="1"&gt;
-                    &lt;option value="inclusive" selected="selected"&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive'))&lt;/option&gt;
-                    &lt;option value="exclusive"&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive'))&lt;/option&gt;
-                  &lt;/select&gt;
-                &lt;/dd&gt;
-                &lt;dt&gt;
-                  &lt;label&gt;$escapetool.xml($services.localization.render('notifications.filters.location.label'))&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.location.hint'))&lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd class="document-tree"&gt;
-                  #documentTree({
-                    'class': 'location-tree',
-                    'finder': true,
-                    'showAttachments': false,
-                    'showRoot': false,
-                    'showTerminalDocuments': true,
-                    'showTranslations': false,
-                    'showWikis': true
-                  })
-                &lt;/dd&gt;
-              &lt;/dl&gt;
-            &lt;/form&gt;
-          &lt;/div&gt;
-          &lt;div class="modal-footer"&gt;
-            &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$services.localization.render('notifications.filters.cancel')&lt;/button&gt;
-            &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;$services.localization.render('notifications.filters.submit')&lt;/button&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;&lt;!-- /.modal-content --&gt;
-      &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
-    &lt;/div&gt;&lt;!-- /.modal --&gt;
-  &lt;/div&gt;
 #end
 {{/velocity}}
 </content>
@@ -1583,6 +1564,121 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
     </property>
     <property>
       <name>NotificationPreferencesTopPanel</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>2</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>0b577f22-3c27-4365-a965-29605ca5886d</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#notificationFilterPreferencesLiveTable select.pagesizeselect {
+  width: auto;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>NotificationFilterPreferences</name>
     </property>
     <property>
       <parse/>

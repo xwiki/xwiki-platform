@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults" locale="">
+  <web>XWiki.Notifications.Code</web>
+  <name>NotificationFilterPreferenceLivetableResults</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1503326667000</creationDate>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1503567968000</date>
+  <contentUpdateDate>1503567258000</contentUpdateDate>
+  <version>1.1</version>
+  <title>NotificationFilterPreferenceLivetableResults</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ($xcontext.action == 'get')
+##
+## Build the list of NotificationFilterPreference related to the given user.
+##
+#set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
+#set ($restBaseURL = $services.rest.url($document.documentReference))
+#set ($elements = [])
+
+## Get a list of available filters for the user
+#foreach ($filter in $services.notification.filters.getFilters())
+#foreach ($preference in $services.notification.filters.getFilterPreferences($filter))
+#set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
+
+## Compute the list of event types
+#set($eventTypeList = '')
+#if ($preference.getProperties('EVENT_TYPE').isEmpty())
+#set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
+#else
+#foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
+#set ($eventTypeList = $eventTypeList + $eventType + '&lt;br/&gt;')
+#end
+#end
+
+## Compute the list of notification formats
+#set($notificationFormatsList = '')
+#foreach ($notificationFormat in $preference.getFilterFormats())
+#set ($notificationFormatsList = $notificationFormatsList + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;br/&gt;')
+#end
+
+#set ($element = {
+'name'               : $display,
+'filterType'         : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
+'eventTypes'         : $eventTypeList,
+'notificationFormats': $notificationFormatsList,
+'doc_viewable'       : true
+})
+#set ($discard = $elements.add($element))
+#end
+#end
+
+##
+## JSON.
+##
+#set ($discard = $response.setContentType('application/json'))
+#set ($offset = $numbertool.toNumber($request.offset))
+#if (!$offset)
+#set ($offset = 1)
+#end
+$jsontool.serialize({
+'totalrows'   : $elements.size(),
+'reqNo'       : $request.reqNo,
+'returnedrows': $elements.size(),
+'offset'      : $offset,
+'rows'        : $elements
+})
+#end
+{{/velocity}}</content>
+</xwikidoc>

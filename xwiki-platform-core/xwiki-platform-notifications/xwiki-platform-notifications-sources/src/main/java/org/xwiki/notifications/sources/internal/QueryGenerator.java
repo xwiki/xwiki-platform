@@ -167,6 +167,16 @@ public class QueryGenerator
         return query;
     }
 
+    /**
+     * Generate a part of the query using each of the {@link NotificationFilter} retrieved from the
+     * {@link NotificationFilterManager}. Each {@link NotificationFilter} is called without any associated
+     * {@link NotificationPreference}.
+     *
+     * @param user the user used to retrieve the {@link NotificationFilter}
+     * @param hql the {@link StringBuilder} used for the query
+     * @return a list of maps of parameters that should be used for the query
+     * @throws NotificationException
+     */
     private List<Map<String, String>> handleGlobalFilters(DocumentReference user, StringBuilder hql)
             throws NotificationException
     {

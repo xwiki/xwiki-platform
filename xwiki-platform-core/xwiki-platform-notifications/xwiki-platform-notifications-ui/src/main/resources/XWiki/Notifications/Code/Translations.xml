@@ -61,6 +61,42 @@ notifications.filters.advanced.modal.close=Close
 notifications.filters.name.systemUserNotificationFilter=System Filter
 notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
 
+## Filter Types
+notifications.filters.type.inclusive=Inclusive
+notifications.filters.type.exclusive=Exclusive
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
+notifications.filters.preferences.scopeNotificationFilter.page=Page only
+notifications.filters.preferences.scopeNotificationFilter.space=Page and children
+notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+
+notifications.filters.preferences.allEvents=All events
+
+notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
+notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
+
+notifications.filters.preferences.addPreference.eventType.label=Event Type
+notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter ?
+
+notifications.filters.preferences.addPreference.location.label=Filter Scope
+notifications.filters.preferences.addPreference.location.hint=Which document should be targeted by the filter ?
+
+## Notifications formats
+notifications.format.alert=Alert
+notifications.format.email=Email
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Filters
+notifications.settings.filters.preferences.hint=Create filters to control more precisely when the active events should trigger notifications.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Name
+notifications.settings.filters.preferences.table.filterType=Filter Type
+notifications.settings.filters.preferences.table.eventTypes=Events
+notifications.settings.filters.preferences.table.notificationFormats=Formats
+notifications.settings.filters.preferences.table._actions=Actions
+
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Settings
 notifications.menu.clear=Clear All
@@ -76,7 +112,7 @@ notifications.settings.saving=Your settings are being saved...
 notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
 notifications.settings.filters=Filters ({0})
-notifications.settings.addFilter=Add a filter
+notifications.settings.addFilter=Add a new filter
 notifications.settings.errorFilterWiki=Error: you must select a wiki, not a page
 notifications.settings.preferences=Preferences
 notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.

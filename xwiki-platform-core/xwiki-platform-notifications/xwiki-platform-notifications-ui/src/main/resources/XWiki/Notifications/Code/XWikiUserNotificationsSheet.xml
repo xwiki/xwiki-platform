@@ -61,7 +61,7 @@
         &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.email'))&lt;/th&gt;
         #set ($colsCount = 3)
       #end
-      &lt;td&gt;&lt;/td&gt;
+      &lt;th&gt;&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##

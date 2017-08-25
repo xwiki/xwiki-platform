@@ -95,6 +95,7 @@ notifications.settings.filters.preferences.table.name=Name
 notifications.settings.filters.preferences.table.filterType=Filter Type
 notifications.settings.filters.preferences.table.eventTypes=Events
 notifications.settings.filters.preferences.table.notificationFormats=Formats
+notifications.settings.filters.preferences.table.isEnabled=Is enabled ?
 notifications.settings.filters.preferences.table._actions=Actions
 
 notifications.menu.header=Notifications

@@ -68,12 +68,20 @@
 #set ($notificationFormatsList = $notificationFormatsList + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;br/&gt;')
 #end
 
+#set ($isEnabled = '')
+#if ($preference.isEnabled())
+  #set ($isEnabled = 'checked = "checked"')
+#end
+#set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled /&gt;")
+
 #set ($element = {
-'name'               : $display,
-'filterType'         : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-'eventTypes'         : $eventTypeList,
-'notificationFormats': $notificationFormatsList,
-'doc_viewable'       : true
+'filterPreferenceName': $preference.getName(),
+'name'                : $display,
+'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
+'eventTypes'          : $eventTypeList,
+'notificationFormats' : $notificationFormatsList,
+'isEnabled'           : $isEnabled,
+'doc_viewable'        : true
 })
 #set ($discard = $elements.add($element))
 #end

@@ -40,6 +40,8 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class ScriptExtensionRewriter implements ExtensionRewriter
 {
+    private static final long serialVersionUID = 1L;
+
     private static final List<String> ROOT_NAMESPACES = Arrays.asList((String) null);
 
     private Set<String> installOnRootNamespace = new HashSet<>();

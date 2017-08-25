@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.cluster.internal;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,13 +52,7 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
      * The events supported by this converter. We only share install and uninstall jobs since other job don't touch
      * anything.
      */
-    private static final Set<String> JOBS = new HashSet<String>()
-    {
-        {
-            add(UninstallJob.JOBTYPE);
-            add(InstallJob.JOBTYPE);
-        }
-    };
+    private static final Set<String> JOBS = new HashSet<>(Arrays.asList(UninstallJob.JOBTYPE, InstallJob.JOBTYPE));
 
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
@@ -65,10 +60,14 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
         if (localEvent.getEvent() instanceof JobStartedEvent) {
             JobStartedEvent jobEvent = (JobStartedEvent) localEvent.getEvent();
 
-            if (JOBS.contains(jobEvent.getJobId())) {
-                remoteEvent.setEvent(jobEvent);
+            // Share only specific jobs
+            if (JOBS.contains(jobEvent.getJobType())) {
+                // Don't send back remote jobs
+                if (!jobEvent.getRequest().isRemote()) {
+                    remoteEvent.setEvent(jobEvent);
 
-                return true;
+                    return true;
+                }
             }
         }
 
@@ -81,19 +80,21 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
         if (remoteEvent.getEvent() instanceof JobStartedEvent) {
             JobStartedEvent jobEvent = (JobStartedEvent) remoteEvent.getEvent();
 
-            Request request = jobEvent.getRequest();
+            if (JOBS.contains(jobEvent.getJobType())) {
+                Request request = jobEvent.getRequest();
 
-            // Indicate the job has been triggered by a remote event
-            if (!(request instanceof AbstractRequest)) {
-                request = new DefaultRequest(request);
+                // Indicate the job has been triggered by a remote event
+                if (!(request instanceof AbstractRequest)) {
+                    request = new DefaultRequest(request);
+                }
+                ((AbstractRequest) request).setRemote(true);
+
+                // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job
+                // which will generate a new JobStartedEvent
+                localEvent.setEvent(new RemoteExtensionJobStartedEvent(jobEvent.getJobType(), request));
+
+                return true;
             }
-            ((AbstractRequest) request).setRemote(true);
-
-            // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job which
-            // will generate a new JobStartedEvent
-            localEvent.setEvent(new RemoteJobStartedEvent(jobEvent.getJobType(), request));
-
-            return true;
         }
 
         return false;

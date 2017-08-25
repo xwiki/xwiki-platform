@@ -28,14 +28,14 @@ import org.xwiki.job.event.JobStartedEvent;
  * Internal event used to start a new job.
  * 
  * @version $Id$
- * @since 4.0M1
+ * @since 9.7
  */
-public class RemoteJobStartedEvent extends JobStartedEvent
+public class RemoteExtensionJobStartedEvent extends JobStartedEvent
 {
     /**
-     * Match any {@link RemoteJobStartedEvent}.
+     * Match any {@link RemoteExtensionJobStartedEvent}.
      */
-    public RemoteJobStartedEvent()
+    public RemoteExtensionJobStartedEvent()
     {
 
     }
@@ -44,7 +44,7 @@ public class RemoteJobStartedEvent extends JobStartedEvent
      * @param jobType the event related job type
      * @param request the event related job request
      */
-    public RemoteJobStartedEvent(String jobType, Request request)
+    public RemoteExtensionJobStartedEvent(String jobType, Request request)
     {
         super((List<String>) null, jobType, request);
     }
@@ -52,7 +52,7 @@ public class RemoteJobStartedEvent extends JobStartedEvent
     /**
      * @param jobEvent the event to copy
      */
-    public RemoteJobStartedEvent(JobStartedEvent jobEvent)
+    public RemoteExtensionJobStartedEvent(JobStartedEvent jobEvent)
     {
         super(jobEvent);
     }

@@ -55,7 +55,7 @@ public class RemoteListener implements EventListener
     /**
      * The events supported by this listener.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new RemoteJobStartedEvent());
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new RemoteExtensionJobStartedEvent());
 
     /**
      * Used to start new job.
@@ -84,16 +84,16 @@ public class RemoteListener implements EventListener
     @Override
     public void onEvent(Event event, Object data, Object source)
     {
-        RemoteJobStartedEvent jobEvent = (RemoteJobStartedEvent) event;
+        RemoteExtensionJobStartedEvent jobEvent = (RemoteExtensionJobStartedEvent) event;
 
         try {
             Job job = this.jobExecutor.execute(jobEvent.getJobType(), jobEvent.getRequest());
 
-            for (LogEvent log : job.getStatus().getLog(LogLevel.ERROR)) {
+            for (LogEvent log : job.getStatus().getLog().getLogs(LogLevel.ERROR)) {
                 this.logger.error(log.getMessage(), log.getArgumentArray());
             }
         } catch (JobException e) {
-            this.logger.error("Failed to execute remote job [" + jobEvent + "]", e);
+            this.logger.error("Failed to execute remote job [{}]", jobEvent, e);
         }
 
     }

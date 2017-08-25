@@ -32,6 +32,8 @@ import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
+import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.job.Request;
 import org.xwiki.rest.internal.JAXBConverter;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
@@ -74,6 +76,17 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
         ExtensionId extensionId = new ExtensionId("maven:jar", "1.0");
 
         /////////////////////////////////////////////
+        // Make sure it's not yet installed on node 0 and node 1
+
+        getUtil().switchExecutor(0);
+        assertTrue("The extension is already installed on node0",
+            !getExtensionTestUtils().isInstalled(extensionId, Namespace.ROOT));
+
+        getUtil().switchExecutor(1);
+        assertTrue("The extension is already installed on node1",
+            !getExtensionTestUtils().isInstalled(extensionId, Namespace.ROOT));
+
+        /////////////////////////////////////////////
         // Install extension on node 0
 
         getUtil().switchExecutor(0);
@@ -82,17 +95,8 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
         installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), null));
         installRequest.setInteractive(false);
         installRequest.addExtension(extensionId);
-        installRequest.setRootModificationsAllowed(true);
 
-        JobRequest request = AbstractTest.componentManager.<ModelFactory>getInstance(ModelFactory.class)
-            .toRestJobRequest(installRequest);
-
-        Map<String, Object[]> queryParameters = new HashMap<>();
-        queryParameters.put("jobType", new Object[] { "install" });
-        queryParameters.put("async", new Object[] { false });
-
-        TestUtils.assertStatusCodes(getUtil().rest().executePut(JobsResource.class, request, queryParameters), true,
-            TestUtils.STATUS_OK);
+        executeJob("install", installRequest);
 
         /////////////////////////////////////////////
         // Make sure it has been installed on node 0
@@ -106,13 +110,57 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
         getUtil().switchExecutor(1);
 
         long t1 = System.currentTimeMillis();
-        long t2;
         while (!getExtensionTestUtils().isInstalled(extensionId, Namespace.ROOT)) {
-            t2 = System.currentTimeMillis();
-            if (t2 - t1 > 10000L) {
+            if (System.currentTimeMillis() - t1 > 10000L) {
                 fail("The extension was not installed on node1");
             }
             Thread.sleep(100);
         }
+
+        /////////////////////////////////////////////
+        // Uninstall extension from node 1
+
+        getUtil().switchExecutor(1);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest
+            .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), null));
+        uninstallRequest.setInteractive(false);
+        uninstallRequest.addExtension(extensionId);
+
+        executeJob("uninstall", uninstallRequest);
+
+        /////////////////////////////////////////////
+        // Make sure it has been uninstalled from node 1
+
+        assertTrue("The extension is still installed on node1",
+            !getExtensionTestUtils().isInstalled(extensionId, Namespace.ROOT));
+
+        /////////////////////////////////////////////
+        // Make sure it has been uninstalled from node 0
+
+        getUtil().switchExecutor(1);
+
+        t1 = System.currentTimeMillis();
+        while (getExtensionTestUtils().isInstalled(extensionId, Namespace.ROOT)) {
+            if (System.currentTimeMillis() - t1 > 10000L) {
+                fail("The extension is still installed on node0");
+            }
+            Thread.sleep(100);
+        }
+
+    }
+
+    private void executeJob(String jobType, Request jobRequest) throws Exception
+    {
+        JobRequest request =
+            AbstractTest.componentManager.<ModelFactory>getInstance(ModelFactory.class).toRestJobRequest(jobRequest);
+
+        Map<String, Object[]> queryParameters = new HashMap<>();
+        queryParameters.put("jobType", new Object[] { jobType });
+        queryParameters.put("async", new Object[] { false });
+
+        TestUtils.assertStatusCodes(getUtil().rest().executePut(JobsResource.class, request, queryParameters), true,
+            TestUtils.STATUS_OK);
     }
 }

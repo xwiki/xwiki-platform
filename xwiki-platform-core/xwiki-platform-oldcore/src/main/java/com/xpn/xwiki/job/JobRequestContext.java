@@ -19,10 +19,12 @@
  */
 package com.xpn.xwiki.job;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
@@ -38,12 +40,14 @@ import com.xpn.xwiki.web.XWikiRequest;
  * @version $Id$
  * @since 8.3RC1
  */
-public class JobRequestContext
+public class JobRequestContext implements Serializable
 {
     /**
      * The key to user in the {@link Request} properties map.
      */
     public static final String KEY = "oldcore.xwikicontext";
+
+    private static final long serialVersionUID = 1L;
 
     private boolean wikiIdSet;
 
@@ -51,11 +55,15 @@ public class JobRequestContext
 
     private boolean documentSet;
 
-    private XWikiDocument document;
+    private DocumentReference documentReference;
+
+    private transient XWikiDocument document;
 
     private boolean sDocumentSet;
 
-    private XWikiDocument sDocument;
+    private DocumentReference sDocumentReference;
+
+    private transient XWikiDocument sDocument;
 
     private boolean userReferenceSet;
 
@@ -175,20 +183,37 @@ public class JobRequestContext
     }
 
     /**
+     * @param documentReference the reference of the current document
+     * @since 9.7
+     */
+    public void setDocumentReference(DocumentReference documentReference)
+    {
+        if (!Objects.equals(documentReference, this.documentReference)) {
+            this.documentReference = documentReference;
+
+            this.document = null;
+            this.documentSet = true;
+        }
+    }
+
+    /**
+     * @return the reference of the current document
+     * @since 9.7
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return documentReference;
+    }
+
+    /**
      * @param document the current document
      */
     public void setDocument(XWikiDocument document)
     {
         this.document = document;
         this.documentSet = true;
-    }
 
-    /**
-     * @return the current document
-     */
-    public XWikiDocument getDocument()
-    {
-        return this.document;
+        this.documentReference = document != null ? document.getDocumentReferenceWithLocale() : null;
     }
 
     /**
@@ -200,12 +225,45 @@ public class JobRequestContext
     }
 
     /**
+     * @return the current document
+     */
+    public XWikiDocument getDocument()
+    {
+        return this.document;
+    }
+
+    /**
+     * @param sdocumentReference the reference of the document holding the current author
+     * @since 9.7
+     */
+    public void setSDocumentReference(DocumentReference sdocumentReference)
+    {
+        if (!Objects.equals(sdocumentReference, this.sDocumentReference)) {
+            this.sDocumentReference = sdocumentReference;
+
+            this.sDocument = null;
+            this.sDocumentSet = true;
+        }
+    }
+
+    /**
+     * @return the reference of the document holding the current author
+     * @since 9.7
+     */
+    public DocumentReference getSDocumentReference()
+    {
+        return sDocumentReference;
+    }
+
+    /**
      * @param sdocument the document holding the current author
      */
     public void setSDocument(XWikiDocument sdocument)
     {
         this.sDocument = sdocument;
         this.sDocumentSet = true;
+
+        this.sDocumentReference = sdocument != null ? sdocument.getDocumentReferenceWithLocale() : null;
     }
 
     /**

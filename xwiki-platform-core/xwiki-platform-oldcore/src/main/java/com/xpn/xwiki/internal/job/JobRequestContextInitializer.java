@@ -24,12 +24,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.JobStartedEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
@@ -47,6 +49,9 @@ public class JobRequestContextInitializer extends AbstractEventListener
 {
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private Logger logger;
 
     /**
      * The default constructor.
@@ -79,12 +84,14 @@ public class JobRequestContextInitializer extends AbstractEventListener
 
                 // Document
                 if (jobRequestContext.isDocumentSet()) {
-                    xcontext.setDoc(jobRequestContext.getDocument());
+                    XWikiDocument document = getDocument(jobRequestContext, xcontext);
+                    xcontext.setDoc(document);
                 }
 
                 // Secure document
                 if (jobRequestContext.isSDocumentSet()) {
-                    xcontext.put(XWikiDocument.CKEY_SDOC, jobRequestContext.getSDocument());
+                    XWikiDocument sdocument = getSDocument(jobRequestContext, xcontext);
+                    xcontext.put(XWikiDocument.CKEY_SDOC, sdocument);
                 }
 
                 // Request
@@ -94,5 +101,37 @@ public class JobRequestContextInitializer extends AbstractEventListener
                 }
             }
         }
+    }
+
+    private XWikiDocument getDocument(JobRequestContext jobRequestContext, XWikiContext xcontext)
+    {
+        if (jobRequestContext.getDocument() != null) {
+            return jobRequestContext.getDocument();
+        } else if (jobRequestContext.getDocumentReference() != null) {
+            try {
+                return xcontext.getWiki().getDocument(jobRequestContext.getDocumentReference(), xcontext);
+            } catch (XWikiException e) {
+                this.logger.error("Failed to get document with reference [{}]",
+                    jobRequestContext.getDocumentReference(), e);
+            }
+        }
+
+        return null;
+    }
+
+    private XWikiDocument getSDocument(JobRequestContext jobRequestContext, XWikiContext xcontext)
+    {
+        if (jobRequestContext.getSDocument() != null) {
+            return jobRequestContext.getSDocument();
+        } else if (jobRequestContext.getSDocumentReference() != null) {
+            try {
+                return xcontext.getWiki().getDocument(jobRequestContext.getSDocumentReference(), xcontext);
+            } catch (XWikiException e) {
+                this.logger.error("Failed to get secure document with reference [{}]",
+                    jobRequestContext.getSDocumentReference(), e);
+            }
+        }
+
+        return null;
     }
 }

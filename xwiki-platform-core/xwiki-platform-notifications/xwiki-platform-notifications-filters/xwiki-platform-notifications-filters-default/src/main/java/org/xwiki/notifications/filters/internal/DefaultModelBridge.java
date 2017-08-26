@@ -72,6 +72,8 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String IS_ENABLED = "isEnabled";
 
+    private static final String IS_ACTIVE = "isActive";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -114,13 +116,19 @@ public class DefaultModelBridge implements ModelBridge
                             filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
                         }
 
-                        preferences.add(new DefaultNotificationFilterPreference(
-                                obj.getStringValue("filterPreferenceName"),
-                                obj.getStringValue(FILTER_NAME),
-                                (obj.getIntValue(IS_ENABLED, 1) == 1),
-                                filterType,
-                                filterFormats,
-                                filterPreferenceProperties));
+                        // Create the new filter preference and add it to the list of preferences
+                        DefaultNotificationFilterPreference notificationFilterPreference
+                                = new DefaultNotificationFilterPreference();
+                        notificationFilterPreference.setFilterPreferenceName(
+                                obj.getStringValue("filterPreferenceName"));
+                        notificationFilterPreference.setFilterName(obj.getStringValue(FILTER_NAME));
+                        notificationFilterPreference.setEnabled(obj.getIntValue(IS_ENABLED, 1) == 1);
+                        notificationFilterPreference.setActive(obj.getIntValue(IS_ACTIVE, 1) == 1);
+                        notificationFilterPreference.setFilterType(filterType);
+                        notificationFilterPreference.setNotificationFormats(filterFormats);
+                        notificationFilterPreference.setPreferenceProperties(filterPreferenceProperties);
+
+                        preferences.add(notificationFilterPreference);
                     }
                 }
             }

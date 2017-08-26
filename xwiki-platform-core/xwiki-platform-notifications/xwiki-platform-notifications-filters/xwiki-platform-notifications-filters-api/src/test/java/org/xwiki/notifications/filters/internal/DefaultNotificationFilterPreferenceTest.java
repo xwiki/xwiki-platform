@@ -47,18 +47,26 @@ public class DefaultNotificationFilterPreferenceTest
         String filterPreferenceName = "fp1";
         String filterName = "f1";
         boolean isEnabled = true;
+        boolean isActive = true;
         NotificationFilterType filterType = NotificationFilterType.INCLUSIVE;
         Set<NotificationFormat> notificationFormats = Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL);
         Map<NotificationFilterProperty, List<String>> propertiesMap = new HashMap<>();
 
         propertiesMap.put(NotificationFilterProperty.APPLICATION, Arrays.asList("a1", "a2"));
 
-        DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference(
-                filterPreferenceName, filterName, isEnabled, filterType, notificationFormats, propertiesMap);
+        DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
+        preference.setFilterPreferenceName(filterPreferenceName);
+        preference.setFilterName(filterName);
+        preference.setEnabled(isEnabled);
+        preference.setActive(isActive);
+        preference.setFilterType(filterType);
+        preference.setNotificationFormats(notificationFormats);
+        preference.setPreferenceProperties(propertiesMap);
 
         assertEquals(filterPreferenceName, preference.getFilterPreferenceName());
         assertEquals(filterName, preference.getFilterName());
         assertEquals(isEnabled, preference.isEnabled());
+        assertEquals(isActive, preference.isActive());
         assertEquals(filterType, preference.getFilterType());
         assertEquals(notificationFormats, preference.getFilterFormats());
         assertEquals(propertiesMap.get(NotificationFilterProperty.APPLICATION),

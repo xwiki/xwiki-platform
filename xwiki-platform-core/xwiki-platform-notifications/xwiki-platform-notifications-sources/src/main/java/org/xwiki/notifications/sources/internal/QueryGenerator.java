@@ -38,6 +38,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -110,6 +111,12 @@ public class QueryGenerator
         // TODO: create a role so extensions can inject their own complex query parts
         // TODO: create unit tests for all use-cases
         // TODO: idea: handle the items of the watchlist too
+
+        // Ensure that we have at least one filter preference that is active
+        if (notificationFilterManager.getFilterPreferences(user).stream().noneMatch(
+                NotificationFilterPreference::isActive)) {
+            return null;
+        }
 
         // First: get the active preferences of the given user
         List<NotificationPreference> preferences = notificationPreferenceManager.getPreferences(
@@ -357,8 +364,6 @@ public class QueryGenerator
                 separator = OR;
             }
             hql.append(RIGHT_PARENTHESIS);
-
-
         }
 
         return queryParameters;

@@ -27,4 +27,5 @@
 <suppressions>
   <suppress checks="ClassFanOutComplexity" files="NFExpressionToHQLParser.java"/>
   <suppress checks="CyclomaticComplexity" files="NFExpressionToHQLParser.java"/>
+  <suppress checks="ExecutableStatementCount" files="QueryGenerator.java"/>
 </suppressions>

@@ -112,15 +112,16 @@ public class QueryGenerator
         // TODO: create unit tests for all use-cases
         // TODO: idea: handle the items of the watchlist too
 
-        // Ensure that we have at least one filter preference that is active
-        if (notificationFilterManager.getFilterPreferences(user).stream().noneMatch(
-                NotificationFilterPreference::isActive)) {
-            return null;
-        }
-
         // First: get the active preferences of the given user
         List<NotificationPreference> preferences = notificationPreferenceManager.getPreferences(
                 user, true, format);
+
+        // Ensure that we have at least one filter preference that is active
+        if (preferences.isEmpty()
+            && notificationFilterManager.getFilterPreferences(user).stream().noneMatch(
+                NotificationFilterPreference::isActive)) {
+            return null;
+        }
 
         // Then: generate the HQL query
         StringBuilder hql = new StringBuilder();
@@ -130,19 +131,21 @@ public class QueryGenerator
         }
         hql.append(LEFT_PARENTHESIS);
 
-        StringBuilder tmpBuilder = new StringBuilder();
-        List<Map<String, String>> queryParameters = handleEventPreferences(user, tmpBuilder, preferences);
+        // Add notification preferences and filters based on those notification preferences
+        StringBuilder preferencesBuilder = new StringBuilder();
+        List<Map<String, String>> queryParameters = handleEventPreferences(user, preferencesBuilder, preferences);
 
-        if (!tmpBuilder.toString().isEmpty()) {
-            hql.append(String.format(BLOCK, tmpBuilder.toString()));
+        if (!preferencesBuilder.toString().isEmpty()) {
+            hql.append(String.format(BLOCK, preferencesBuilder.toString()));
         }
 
         // Handle the global notification filters
-        tmpBuilder = new StringBuilder();
-        List<Map<String, String>> tmpQueryParameters = handleGlobalFilters(user, tmpBuilder);
+        StringBuilder globalFiltersBuilder = new StringBuilder();
+        List<Map<String, String>> tmpQueryParameters = handleGlobalFilters(user, globalFiltersBuilder);
 
-        if (!tmpBuilder.toString().isEmpty()) {
-            hql.append(String.format((queryParameters.isEmpty()) ? BLOCK : AND_BLOCK, tmpBuilder.toString()));
+        if (!globalFiltersBuilder.toString().isEmpty()) {
+            hql.append(String.format((preferencesBuilder.toString().isEmpty()) ? BLOCK : AND_BLOCK,
+                    globalFiltersBuilder.toString()));
             queryParameters.addAll(tmpQueryParameters);
         }
 

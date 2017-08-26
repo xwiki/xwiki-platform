@@ -32,6 +32,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EmptyNode;
@@ -105,6 +106,11 @@ public class QueryGeneratorTest
 
         when(notificationPreferenceManager.getPreferences(userReference, true,
                 NotificationFormat.ALERT)).thenReturn(Arrays.asList(pref1));
+
+        NotificationFilterPreference fakeFilterPreference = mock(NotificationFilterPreference.class);
+        when(fakeFilterPreference.isActive()).thenReturn(true);
+        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class)))
+                .thenReturn(Sets.newSet(fakeFilterPreference));
 
         when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(0);
 

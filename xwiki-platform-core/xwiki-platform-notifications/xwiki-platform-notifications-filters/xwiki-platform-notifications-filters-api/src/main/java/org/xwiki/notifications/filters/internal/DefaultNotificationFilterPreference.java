@@ -39,6 +39,8 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 {
     private boolean isEnabled;
 
+    private boolean isActive;
+
     private String filterName;
 
     private String filterPreferenceName;
@@ -49,32 +51,20 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private Map<NotificationFilterProperty, List<String>> preferenceProperties;
 
-    /**
-     * Constructs a new {@link DefaultNotificationFilterPreference}.
-     *
-     * @param filterPreferenceName the name of the filter preference
-     * @param filterName the name of the filter corresponding to the given filter
-     * @param isEnabled determine if the current filter preference is enabled
-     * @param filterType the type of the filter
-     * @param notificationFormats a set of formats used by the filter
-     * @param preferenceProperties the properties of the filter preference
-     */
-    public DefaultNotificationFilterPreference(String filterPreferenceName, String filterName, boolean isEnabled,
-            NotificationFilterType filterType, Set<NotificationFormat> notificationFormats,
-            Map<NotificationFilterProperty, List<String>> preferenceProperties)
-    {
-        this.filterPreferenceName = filterPreferenceName;
-        this.filterName = filterName;
-        this.isEnabled = isEnabled;
-        this.filterType = filterType;
-        this.notificationFormats = notificationFormats;
-        this.preferenceProperties = preferenceProperties;
-    }
-
     @Override
     public String getFilterPreferenceName()
     {
         return filterPreferenceName;
+    }
+
+    /**
+     * Set the current filter preference name.
+     *
+     * @param filterPreferenceName the name of the filter preference
+     */
+    public void setFilterPreferenceName(String filterPreferenceName)
+    {
+        this.filterPreferenceName = filterPreferenceName;
     }
 
     @Override
@@ -83,10 +73,46 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         return filterName;
     }
 
+    /**
+     * Set the name of the filter that this preference is attached to.
+     *
+     * @param filterName the name of the filter
+     */
+    public void setFilterName(String filterName)
+    {
+        this.filterName = filterName;
+    }
+
     @Override
     public boolean isEnabled()
     {
         return isEnabled;
+    }
+
+    /**
+     * Set the enabled status of the current filter preference.
+     *
+     * @param isEnabled true if the filter preference should be enabled
+     */
+    public void setEnabled(boolean isEnabled)
+    {
+        this.isEnabled = isEnabled;
+    }
+
+    @Override
+    public boolean isActive()
+    {
+        return isActive;
+    }
+
+    /**
+     * Set the active status of the current filter preference.
+     *
+     * @param isActive true if the filter preference should be active, false if the preference should be passive
+     */
+    public void setActive(boolean isActive)
+    {
+        this.isActive = isActive;
     }
 
     @Override
@@ -95,15 +121,45 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         return preferenceProperties.getOrDefault(property, Collections.EMPTY_LIST);
     }
 
+    /**
+     * Set the properties of the current filter preference.
+     *
+     * @param preferenceProperties a map of lists defining the filter preference properties
+     */
+    public void setPreferenceProperties(Map<NotificationFilterProperty, List<String>> preferenceProperties)
+    {
+        this.preferenceProperties = preferenceProperties;
+    }
+
     @Override
     public NotificationFilterType getFilterType()
     {
         return filterType;
     }
 
+    /**
+     * Set the filter type of the current filter preference.
+     *
+     * @param filterType the filter type
+     */
+    public void setFilterType(NotificationFilterType filterType)
+    {
+        this.filterType = filterType;
+    }
+
     @Override
     public Set<NotificationFormat> getFilterFormats()
     {
         return notificationFormats;
+    }
+
+    /**
+     * Set the notification formats of the current filter preference.
+     *
+     * @param notificationFormats the filter formats
+     */
+    public void setNotificationFormats(Set<NotificationFormat> notificationFormats)
+    {
+        this.notificationFormats = notificationFormats;
     }
 }

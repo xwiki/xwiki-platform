@@ -73,6 +73,8 @@ public class NotificationFilterPreferenceDocumentInitializer extends AbstractMan
                 "inclusive=Inclusive|exclusive=Exclusive", SELECT, SEPARATORS);
         xclass.addStaticListField("filterFormats", "Formats", 5, true, true,
                 "alert=Alert|email=E-mail", SELECT, SEPARATORS);
+        xclass.addBooleanField("isActive",
+                "Should the filter preference force the retrieval of notifications ?", SELECT, true);
 
         xclass.addStaticListField("applications", "Applications", 64, true,
                 true, StringUtils.EMPTY, INPUT, SEPARATORS);

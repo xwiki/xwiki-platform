@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.filters.expression;
 
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractUnaryOperatorNode;
 import org.xwiki.stability.Unstable;
 
@@ -37,7 +37,7 @@ public final class NotNode extends AbstractUnaryOperatorNode
      *
      * @param operand the operand of the node.
      */
-    public NotNode(AbstractNode operand)
+    public NotNode(AbstractOperatorNode operand)
     {
         super(operand);
     }

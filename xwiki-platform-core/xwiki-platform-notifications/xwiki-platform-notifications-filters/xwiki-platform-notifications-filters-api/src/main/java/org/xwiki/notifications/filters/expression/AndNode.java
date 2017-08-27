@@ -19,8 +19,8 @@
  */
 package org.xwiki.notifications.filters.expression;
 
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -38,7 +38,7 @@ public final class AndNode extends AbstractBinaryOperatorNode
      * @param leftOperand the left operand
      * @param rightOperand the right operand
      */
-    public AndNode(AbstractNode leftOperand, AbstractNode rightOperand)
+    public AndNode(AbstractOperatorNode leftOperand, AbstractOperatorNode rightOperand)
     {
         super(leftOperand, rightOperand);
     }

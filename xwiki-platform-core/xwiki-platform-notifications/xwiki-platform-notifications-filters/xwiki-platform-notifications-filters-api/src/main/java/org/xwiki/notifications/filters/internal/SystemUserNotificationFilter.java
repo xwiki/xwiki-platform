@@ -31,11 +31,10 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.NotEqualsNode;
-import org.xwiki.notifications.filters.expression.PropertyValueNode;
-import org.xwiki.notifications.filters.expression.StringValueNode;
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
+
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Define notification filters that are activated by default on every user and that filter the notifications
@@ -79,15 +78,13 @@ public class SystemUserNotificationFilter extends AbstractNotificationFilter
     }
 
     @Override
-    protected AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+    protected AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
             NotificationFilterType filterType)
     {
         if (preference == null && filterType.equals(NotificationFilterType.EXCLUSIVE)) {
-            return new NotEqualsNode(
-                    new PropertyValueNode(NotificationFilterProperty.USER),
-                    new StringValueNode(serializer.serialize(systemUser)));
+            return value(NotificationFilterProperty.USER).notEq(value(serializer.serialize(systemUser)));
         } else {
-            return AbstractNode.EMPTY_NODE;
+            return null;
         }
     }
 

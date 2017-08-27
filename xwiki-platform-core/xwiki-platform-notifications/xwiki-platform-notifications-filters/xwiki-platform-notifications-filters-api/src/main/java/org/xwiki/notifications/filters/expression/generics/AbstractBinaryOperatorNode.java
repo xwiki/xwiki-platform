@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * @since 9.7RC1
  */
 @Unstable
-public abstract class AbstractBinaryOperatorNode extends AbstractNode
+public abstract class AbstractBinaryOperatorNode extends AbstractOperatorNode
 {
     private AbstractNode leftOperand;
 

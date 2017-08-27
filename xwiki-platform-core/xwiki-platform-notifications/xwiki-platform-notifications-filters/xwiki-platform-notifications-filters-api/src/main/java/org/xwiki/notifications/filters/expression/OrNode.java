@@ -20,7 +20,7 @@
 package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -38,7 +38,7 @@ public final class OrNode extends AbstractBinaryOperatorNode
      * @param leftOperand the left OR operand
      * @param rightOperand the right OR operand
      */
-    public OrNode(AbstractNode leftOperand, AbstractNode rightOperand)
+    public OrNode(AbstractOperatorNode leftOperand, AbstractOperatorNode rightOperand)
     {
         super(leftOperand, rightOperand);
     }

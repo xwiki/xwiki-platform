@@ -24,8 +24,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
@@ -46,17 +46,17 @@ public abstract class AbstractNotificationFilter implements NotificationFilter
     @Override
     public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
-        AbstractNode leftOperand = this.generateFilterExpression(user, preference,
+        AbstractOperatorNode leftOperand = this.generateFilterExpression(user, preference,
                 NotificationFilterType.INCLUSIVE);
-        AbstractNode rightOperand = this.generateFilterExpression(user, preference,
+        AbstractOperatorNode rightOperand = this.generateFilterExpression(user, preference,
                 NotificationFilterType.EXCLUSIVE);
 
-        if (leftOperand.equals(AbstractNode.EMPTY_NODE)) {
+        if (leftOperand == null) {
             return rightOperand;
-        } else if (rightOperand.equals(AbstractNode.EMPTY_NODE)) {
+        } else if (rightOperand == null) {
             return leftOperand;
         } else {
-            return new AndNode(leftOperand, rightOperand);
+            return leftOperand.and(rightOperand);
         }
     }
 
@@ -91,9 +91,10 @@ public abstract class AbstractNotificationFilter implements NotificationFilter
      * @param user the user for which we should apply the filter
      * @param preference the preference under which this filter applies. Note that this preference can be null.
      * @param filterType the filter type (INCLUSIVE or EXCLUSIVE) to use
+     * @return the generated {@link AbstractOperatorNode}, null if no node could be generated
      *
      * @since 9.7RC1
      */
-    protected abstract AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
-            NotificationFilterType filterType);
+    protected abstract AbstractOperatorNode generateFilterExpression(DocumentReference user,
+            NotificationPreference preference, NotificationFilterType filterType);
 }

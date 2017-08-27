@@ -92,8 +92,7 @@ public class SystemUserNotificationFilterTest
     {
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
-        assertEquals(AbstractNode.EMPTY_NODE,
-                mocker.getComponentUnderTest().generateFilterExpression(
+        assertEquals(null, mocker.getComponentUnderTest().generateFilterExpression(
                         randomUser, fakePreference, NotificationFilterType.INCLUSIVE));
         assertEquals(new NotEqualsNode(
                 new PropertyValueNode(NotificationFilterProperty.USER),

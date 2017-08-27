@@ -19,52 +19,36 @@
  */
 package org.xwiki.notifications.filters.expression.generics;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.notifications.filters.expression.AndNode;
+import org.xwiki.notifications.filters.expression.OrNode;
 
 /**
- * Unary operand node definition for a filtering expression. This class can be extended in order to define new
- * unary operations.
+ * Generic operator node definition for filtering expressions.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
-@Unstable
-public abstract class AbstractUnaryOperatorNode extends AbstractOperatorNode
+public abstract class AbstractOperatorNode extends AbstractNode
 {
-    private AbstractNode operand;
-
     /**
-     * Constructs a new {@link AbstractUnaryOperatorNode}.
+     * Helper to construct new {@link AndNode} using the current object.
      *
-     * @param operand the node operand
+     * @param node the node that should be the second operand of the AND node
+     * @return a {@link AndNode} with the current object as the first operator and the given node as the second operator
      */
-    public AbstractUnaryOperatorNode(AbstractNode operand)
+    public AndNode and(AbstractOperatorNode node)
     {
-        if (operand == null) {
-            throw new NullPointerException("A unary operand should have its operand defined.");
-        }
-
-        this.operand = operand;
+        return new AndNode(this, node);
     }
 
     /**
-     * @return the node operand
+     * Helper to construct new {@link OrNode} using the current object.
+     *
+     * @param node the node that should be the second operand of the OR node
+     * @return a {@link OrNode} with the current object as the first operator and the given node as the second operator
      */
-    public AbstractNode getOperand()
+    public OrNode or(AbstractOperatorNode node)
     {
-        return operand;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        return (o instanceof AbstractUnaryOperatorNode
-                && operand.equals(((AbstractUnaryOperatorNode) o).operand));
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return 13 + operand.hashCode();
+        return new OrNode(this, node);
     }
 }

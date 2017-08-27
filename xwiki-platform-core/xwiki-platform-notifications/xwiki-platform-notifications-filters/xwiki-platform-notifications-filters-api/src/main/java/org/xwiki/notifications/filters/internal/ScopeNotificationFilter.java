@@ -37,19 +37,14 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.AndNode;
-import org.xwiki.notifications.filters.expression.EqualsNode;
-import org.xwiki.notifications.filters.expression.LikeNode;
-import org.xwiki.notifications.filters.expression.NotNode;
-import org.xwiki.notifications.filters.expression.OrNode;
-import org.xwiki.notifications.filters.expression.PropertyValueNode;
-import org.xwiki.notifications.filters.expression.StringValueNode;
-import org.xwiki.notifications.filters.expression.EmptyNode;
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Define a notification filter based on a scope in the wiki.
@@ -127,10 +122,10 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
     }
 
     @Override
-    public AbstractNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+    public AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
             NotificationFilterType filterType)
     {
-        AbstractNode syntaxNode = new EmptyNode();
+        AbstractOperatorNode syntaxNode = null;
         boolean isFirstPass = true;
 
         try {
@@ -153,11 +148,11 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                     continue;
                 }
 
-                AbstractNode tmpNode = generateNode(filterPreferenceScope);
+                AbstractOperatorNode tmpNode = generateNode(filterPreferenceScope);
 
                 // If we have an EXCLUSIVE filter, negate the filter node
                 if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
-                    tmpNode = new NotNode(tmpNode);
+                    tmpNode = not(tmpNode);
                 }
 
                 // Wrap the freshly created node in a AndNode or a OrNode depending on the filter type
@@ -165,9 +160,9 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                     isFirstPass = false;
                     syntaxNode = tmpNode;
                 } else if (filterType.equals(NotificationFilterType.INCLUSIVE)) {
-                    syntaxNode = new OrNode(syntaxNode, tmpNode);
+                    syntaxNode = syntaxNode.or(tmpNode);
                 } else {
-                    syntaxNode = new AndNode(syntaxNode, tmpNode);
+                    syntaxNode = syntaxNode.or(tmpNode);
                 }
             }
         } catch (NotificationException e) {
@@ -217,7 +212,7 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
      * @param filterPreferenceScope the preference to use
      * @return the generated node
      */
-    AbstractNode generateNode(ScopeNotificationFilterPreference filterPreferenceScope)
+    AbstractOperatorNode generateNode(ScopeNotificationFilterPreference filterPreferenceScope)
     {
         String wiki = filterPreferenceScope.getScopeReference().extractReference(EntityType.WIKI).getName();
         String space = serializer.serialize(filterPreferenceScope.getScopeReference());
@@ -225,27 +220,18 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
 
         switch (filterPreferenceScope.getScopeReference().getType()) {
             case DOCUMENT:
-                return new AndNode(
-                        new EqualsNode(
-                                new PropertyValueNode(NotificationFilterProperty.WIKI),
-                                new StringValueNode(wiki)),
-                        new EqualsNode(
-                                new PropertyValueNode(NotificationFilterProperty.PAGE),
-                                new StringValueNode(page)));
+                return value(NotificationFilterProperty.WIKI).eq(value(wiki))
+                        .and(value(NotificationFilterProperty.PAGE).eq(value(page)));
+
             case SPACE:
-                return new AndNode(
-                        new EqualsNode(
-                                new PropertyValueNode(NotificationFilterProperty.WIKI),
-                                new StringValueNode(wiki)),
-                        new LikeNode(
-                                new PropertyValueNode(NotificationFilterProperty.SPACE),
-                                new StringValueNode(space)));
+                return value(NotificationFilterProperty.WIKI).eq(value(wiki))
+                        .and(value(NotificationFilterProperty.SPACE).like(value(space)));
+
             case WIKI:
-                return new EqualsNode(
-                        new PropertyValueNode(NotificationFilterProperty.WIKI),
-                        new StringValueNode(wiki));
+                return value(NotificationFilterProperty.WIKI).eq(value(wiki));
+
             default:
-                return new EmptyNode();
+                return null;
         }
     }
 }

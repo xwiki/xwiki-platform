@@ -22,14 +22,20 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -37,6 +43,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,6 +65,8 @@ public class DefaultNotificationFilterManagerTest
 
     private DocumentReference testUser;
 
+    private NotificationFilterPreferenceProvider testProvider;
+
     private ModelBridge modelBridge;
 
     @Before
@@ -69,6 +79,11 @@ public class DefaultNotificationFilterManagerTest
         modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
 
         testUser = new DocumentReference("wiki", "test", "user");
+
+        testProvider = mock(NotificationFilterPreferenceProvider.class);
+        when(componentManager.getInstanceList(NotificationFilterPreferenceProvider.class))
+                .thenReturn(Collections.singletonList(testProvider));
+
 
         // Set a default comportment for the wikiDescriptorManager
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("wiki");
@@ -161,5 +176,87 @@ public class DefaultNotificationFilterManagerTest
                 .getFilters(testUser, preference);
 
         assertEquals(0, filters.size());
+    }
+
+    @Test
+    public void testFilterPreferences() throws Exception
+    {
+        NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
+        NotificationFilterPreference filterPreference2 = mock(NotificationFilterPreference.class);
+
+        when(testProvider.getFilterPreferences(testUser)).thenReturn(Sets.newSet(filterPreference1, filterPreference2));
+
+        Set<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest().getFilterPreferences(testUser);
+
+        assertTrue(resultSet.contains(filterPreference1));
+        assertTrue(resultSet.contains(filterPreference2));
+        assertEquals(2, resultSet.size());
+    }
+
+    @Test
+    public void testFilterPreferencesWithFilter() throws Exception
+    {
+        NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
+        when(filterPreference1.getFilterName()).thenReturn("someFilter");
+        NotificationFilterPreference filterPreference2 = mock(NotificationFilterPreference.class);
+        when(filterPreference2.getFilterName()).thenReturn("fakeFilter");
+
+        when(testProvider.getFilterPreferences(testUser)).thenReturn(Sets.newSet(filterPreference1, filterPreference2));
+
+        NotificationFilter fakeFilter = mock(NotificationFilter.class);
+        when(fakeFilter.getName()).thenReturn("fakeFilter");
+
+        Set<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest()
+                .getFilterPreferences(testUser, fakeFilter);
+
+        assertTrue(resultSet.contains(filterPreference2));
+        assertEquals(1, resultSet.size());
+    }
+
+    @Test
+    public void testFilterPreferencesWithFilterAndFilterType() throws Exception
+    {
+        NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
+        when(filterPreference1.getFilterName()).thenReturn("someFilter");
+        when(filterPreference1.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        NotificationFilterPreference filterPreference2 = mock(NotificationFilterPreference.class);
+        when(filterPreference2.getFilterName()).thenReturn("fakeFilter");
+        when(filterPreference2.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        NotificationFilterPreference filterPreference3 = mock(NotificationFilterPreference.class);
+        when(filterPreference3.getFilterName()).thenReturn("someFilter");
+        when(filterPreference3.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
+        NotificationFilterPreference filterPreference4 = mock(NotificationFilterPreference.class);
+        when(filterPreference4.getFilterName()).thenReturn("fakeFilter");
+        when(filterPreference4.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
+
+        when(testProvider.getFilterPreferences(testUser)).thenReturn(
+                Sets.newSet(filterPreference1, filterPreference2, filterPreference3, filterPreference4));
+
+        NotificationFilter fakeFilter = mock(NotificationFilter.class);
+        when(fakeFilter.getName()).thenReturn("fakeFilter");
+
+        Set<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest()
+                .getFilterPreferences(testUser, fakeFilter, NotificationFilterType.INCLUSIVE);
+
+        assertTrue(resultSet.contains(filterPreference4));
+        assertEquals(1, resultSet.size());
+    }
+
+    @Test
+    public void saveFilterPreferences() throws Exception
+    {
+        when(componentManager.hasComponent(NotificationFilterPreferenceProvider.class, "testProvider"))
+                .thenReturn(true);
+        when(componentManager.getInstance(NotificationFilterPreferenceProvider.class, "testProvider"))
+                .thenReturn(testProvider);
+
+        Set<NotificationFilterPreference> testSet = new HashSet<>();
+        NotificationFilterPreference testPref1 = mock(NotificationFilterPreference.class);
+        when(testPref1.getProviderHint()).thenReturn("testProvider");
+        testSet.add(testPref1);
+
+        mocker.getComponentUnderTest().saveFilterPreferences(testSet);
+
+        verify(testProvider, times(1)).saveFilterPreferences(testSet);
     }
 }

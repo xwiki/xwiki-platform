@@ -54,8 +54,7 @@ public class DefaultNotificationFilterPreferenceTest
 
         propertiesMap.put(NotificationFilterProperty.APPLICATION, Arrays.asList("a1", "a2"));
 
-        DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
-        preference.setFilterPreferenceName(filterPreferenceName);
+        DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference(filterPreferenceName);
         preference.setFilterName(filterName);
         preference.setEnabled(isEnabled);
         preference.setActive(isActive);

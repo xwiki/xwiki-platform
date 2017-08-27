@@ -45,11 +45,23 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private String filterPreferenceName;
 
+    private String providerHint;
+
     private NotificationFilterType filterType;
 
     private Set<NotificationFormat> notificationFormats;
 
     private Map<NotificationFilterProperty, List<String>> preferenceProperties;
+
+    /**
+     * Constructs a new {@link DefaultNotificationFilterPreference} using the given filter preference name.
+     *
+     * @param filterPreferenceName the name of the filter preference
+     */
+    public DefaultNotificationFilterPreference(String filterPreferenceName)
+    {
+        this.filterPreferenceName = filterPreferenceName;
+    }
 
     @Override
     public String getFilterPreferenceName()
@@ -81,6 +93,23 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setFilterName(String filterName)
     {
         this.filterName = filterName;
+    }
+
+    @Override
+    public String getProviderHint()
+    {
+        return providerHint;
+    }
+
+    /**
+     * Set the hint of the {@link org.xwiki.notifications.filters.NotificationFilterPreferenceProvider} associated
+     * with this preference.
+     *
+     * @param providerHint the name of the provider
+     */
+    public void setProviderHint(String providerHint)
+    {
+        this.providerHint = providerHint;
     }
 
     @Override

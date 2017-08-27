@@ -89,6 +89,12 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     @Override
+    public String getProviderHint()
+    {
+        return filterPreference.getProviderHint();
+    }
+
+    @Override
     public boolean isEnabled()
     {
         return filterPreference.isEnabled();

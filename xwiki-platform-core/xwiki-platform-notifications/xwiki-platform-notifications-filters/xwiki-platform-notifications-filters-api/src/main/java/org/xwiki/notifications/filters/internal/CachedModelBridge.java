@@ -60,6 +60,7 @@ public class CachedModelBridge implements ModelBridge
         final String contextEntry = USER_FILTER_PREFERENCES;
 
         ExecutionContext context = execution.getContext();
+        // TODO: Somehow, this cache doesn't work : the context returns null instead of a set.
         /*
         if (context.hasProperty(contextEntry)) {
             return (Set<NotificationFilterPreference>) context.getProperty(contextEntry);

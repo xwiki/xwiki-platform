@@ -117,6 +117,15 @@ public interface NotificationFilterManager
     Set<NotificationFilter> getToggleableFilters(DocumentReference user) throws NotificationException;
 
     /**
+     * Save the given set of {@link NotificationFilterPreference} against their respective
+     * {@link NotificationFilterPreferenceProvider}.
+     *
+     * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save
+     * @throws NotificationException if error happens
+     */
+    void saveFilterPreferences(Set<NotificationFilterPreference> notificationFilterPreferences);
+
+    /**
      * Render a {@link NotificationFilter} using an associated {@link NotificationFilterPreference}.
      *
      * @param filter the filter to use

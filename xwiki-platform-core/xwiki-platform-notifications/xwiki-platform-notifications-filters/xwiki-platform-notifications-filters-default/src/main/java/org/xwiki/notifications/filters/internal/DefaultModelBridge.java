@@ -118,9 +118,9 @@ public class DefaultModelBridge implements ModelBridge
 
                         // Create the new filter preference and add it to the list of preferences
                         DefaultNotificationFilterPreference notificationFilterPreference
-                                = new DefaultNotificationFilterPreference();
-                        notificationFilterPreference.setFilterPreferenceName(
-                                obj.getStringValue("filterPreferenceName"));
+                                = new DefaultNotificationFilterPreference(obj.getStringValue("filterPreferenceName"));
+
+                        notificationFilterPreference.setProviderHint("userProfile");
                         notificationFilterPreference.setFilterName(obj.getStringValue(FILTER_NAME));
                         notificationFilterPreference.setEnabled(obj.getIntValue(IS_ENABLED, 1) == 1);
                         notificationFilterPreference.setActive(obj.getIntValue(IS_ACTIVE, 1) == 1);

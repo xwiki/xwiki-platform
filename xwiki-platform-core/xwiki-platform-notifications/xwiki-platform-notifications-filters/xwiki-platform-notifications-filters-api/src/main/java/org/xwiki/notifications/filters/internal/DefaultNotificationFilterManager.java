@@ -30,6 +30,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -42,6 +44,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterDisplayer;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
@@ -75,6 +78,9 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     @Named("cached")
     private ModelBridge modelBridge;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Set<NotificationFilter> getAllFilters(DocumentReference user)
             throws NotificationException
@@ -104,7 +110,21 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
-        return modelBridge.getFilterPreferences(user);
+        Set<NotificationFilterPreference> filterPreferences = new HashSet<>();
+
+        try {
+            List<NotificationFilterPreferenceProvider> providers
+                    = componentManager.getInstanceList(NotificationFilterPreferenceProvider.class);
+
+            for (NotificationFilterPreferenceProvider provider : providers) {
+                filterPreferences.addAll(provider.getFilterPreferences(user));
+            }
+
+            return filterPreferences;
+        } catch (ComponentLookupException e) {
+            throw new NotificationException(String.format("Unable to fetch a list of notification preference "
+                    + "providers with user [%s].", user));
+        }
     }
 
     @Override
@@ -135,8 +155,8 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         while (it.hasNext()) {
             NotificationFilterPreference preference = it.next();
 
-            if (!filter.getName().equals(preference.getFilterName())
-                    || !preference.getFilterType().equals(filterType)) {
+            if (!(filter.getName().equals(preference.getFilterName())
+                    && preference.getFilterType().equals(filterType))) {
                 it.remove();
             }
         }
@@ -179,6 +199,41 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         }
 
         return userFilters;
+    }
+
+    @Override
+    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
+    {
+        Map<String, Set<NotificationFilterPreference>> preferencesMapping = new HashMap<>();
+
+        for (NotificationFilterPreference filterPreference : filterPreferences) {
+            // Try to get the corresponding provider, if no provider can be found, discard the save of the preference
+            String providerHint = filterPreference.getProviderHint();
+            if (componentManager.hasComponent(NotificationFilterPreferenceProvider.class, providerHint)) {
+                if (!preferencesMapping.containsKey(providerHint)) {
+                    preferencesMapping.put(providerHint, new HashSet<>());
+                }
+
+                preferencesMapping.get(providerHint).add(filterPreference);
+            }
+        }
+
+        // Once we have created the mapping, save all the preferences using their correct providers
+        for (String providerHint : preferencesMapping.keySet()) {
+            try {
+                NotificationFilterPreferenceProvider provider =
+                        componentManager.getInstance(NotificationFilterPreferenceProvider.class, providerHint);
+
+                provider.saveFilterPreferences(preferencesMapping.get(providerHint));
+
+            } catch (ComponentLookupException e) {
+                logger.error("Unable to retrieve the notification filter preference provider for hint [{}]: [{}]",
+                        providerHint, e);
+            } catch (NotificationException e) {
+                logger.warn("Unable save the filter preferences [{}] against the provider [{}]: [{}]",
+                        preferencesMapping.get(providerHint), providerHint, ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
     }
 
     @Override

@@ -51,12 +51,14 @@ public abstract class AbstractNotificationFilter implements NotificationFilter
         AbstractOperatorNode rightOperand = this.generateFilterExpression(user, preference,
                 NotificationFilterType.EXCLUSIVE);
 
-        if (leftOperand == null) {
+        if (rightOperand != null && leftOperand != null) {
+            return leftOperand.and(rightOperand);
+        } else if (rightOperand != null) {
             return rightOperand;
-        } else if (rightOperand == null) {
+        } else if (leftOperand != null) {
             return leftOperand;
         } else {
-            return leftOperand.and(rightOperand);
+            return AbstractNode.EMPTY_NODE;
         }
     }
 

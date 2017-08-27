@@ -61,6 +61,11 @@ public interface NotificationFilterPreference
     String getFilterName();
 
     /**
+     * @return the name of the {@link NotificationFilterPreferenceProvider} associated with this preference.
+     */
+    String getProviderHint();
+
+    /**
      * @return true if the current notification preference is enabled.
      */
     boolean isEnabled();

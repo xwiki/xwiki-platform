@@ -36,6 +36,7 @@ import org.xwiki.text.StringUtils;
 
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 import static org.junit.Assert.assertEquals;
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Unit tests for {@link NFExpressionToHQLParser}.
@@ -80,9 +81,11 @@ public class NFExpressionToHQLParserTest
     @Test
     public void parseWithNotNode()
     {
-        AbstractNode testAST = new NotNode(new StringValueNode(TEST_VALUE_1));
+        AbstractNode testAST = new NotNode(new EqualsNode(new StringValueNode(TEST_VALUE_1),
+                new StringValueNode(TEST_VALUE_2)));
 
-        assertEquals(String.format(" NOT (:%s)", TEST_VALUE_1_IDENTIFIER), parser.parse(testAST));
+        assertEquals(String.format(" NOT (:%s = :%s)", TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER),
+                parser.parse(testAST));
     }
 
     @Test
@@ -106,19 +109,21 @@ public class NFExpressionToHQLParserTest
     @Test
     public void parseWithOrNode()
     {
-        AbstractNode testAST = new OrNode(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
+        AbstractNode testAST = value(TEST_VALUE_1).eq(value(TEST_VALUE_2))
+                .or(value(TEST_VALUE_1).eq(value(TEST_VALUE_2)));
 
-        assertEquals(String.format("(:%s) OR (:%s)", TEST_VALUE_1_IDENTIFIER,
-                TEST_VALUE_2_IDENTIFIER), parser.parse(testAST));
+        assertEquals(String.format("(:%s = :%s) OR (:%s = :%s)", TEST_VALUE_1_IDENTIFIER,
+                TEST_VALUE_2_IDENTIFIER, TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER), parser.parse(testAST));
     }
 
     @Test
     public void parseWithAndNode()
     {
-        AbstractNode testAST = new AndNode(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
+        AbstractNode testAST = value(TEST_VALUE_1).eq(value(TEST_VALUE_2))
+                .and(value(TEST_VALUE_1).eq(value(TEST_VALUE_2)));
 
-        assertEquals(String.format("(:%s) AND (:%s)", TEST_VALUE_1_IDENTIFIER,
-                TEST_VALUE_2_IDENTIFIER), parser.parse(testAST));
+        assertEquals(String.format("(:%s = :%s) AND (:%s = :%s)", TEST_VALUE_1_IDENTIFIER,
+                TEST_VALUE_2_IDENTIFIER, TEST_VALUE_1_IDENTIFIER, TEST_VALUE_2_IDENTIFIER), parser.parse(testAST));
     }
 
     @Test

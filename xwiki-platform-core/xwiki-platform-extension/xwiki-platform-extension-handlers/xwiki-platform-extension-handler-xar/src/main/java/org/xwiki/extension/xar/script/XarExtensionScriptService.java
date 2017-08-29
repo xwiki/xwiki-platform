@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.job.ExtensionRequest;
@@ -47,7 +46,6 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionReposito
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.question.ConflictQuestion;
-import org.xwiki.filter.FilterException;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
@@ -266,7 +264,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     {
         try {
             return safe(this.packager.getXWikiDocument(reference));
-        } catch (FilterException | IOException | ComponentLookupException | XarException e) {
+        } catch (IOException | XarException e) {
             throw new XarExtensionExtension(String.format("Failed to get standard version of document [%s]", reference),
                 e);
         }
@@ -285,7 +283,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     {
         try {
             return safe(this.packager.getXWikiDocument(reference, extensionId));
-        } catch (FilterException | IOException | ComponentLookupException | XarException e) {
+        } catch (IOException | XarException e) {
             throw new XarExtensionExtension(
                 String.format("Failed to get standard version of document [%s] from extension with id [%s]", reference,
                     extensionId),
@@ -306,7 +304,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     {
         try {
             return safe(this.packager.getXWikiDocument(reference, extension));
-        } catch (FilterException | IOException | ComponentLookupException | XarException e) {
+        } catch (IOException | XarException e) {
             throw new XarExtensionExtension(String.format(
                 "Failed to get standard version of document [%s] from extension [%s]", reference, extension), e);
         }

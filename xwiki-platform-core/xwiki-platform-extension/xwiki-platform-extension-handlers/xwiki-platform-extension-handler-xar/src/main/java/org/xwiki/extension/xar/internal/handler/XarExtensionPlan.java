@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
@@ -40,7 +39,6 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
-import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -230,7 +228,7 @@ public class XarExtensionPlan implements Closeable
     }
 
     public XWikiDocument getPreviousXWikiDocument(DocumentReference documentReference, Packager packager)
-        throws FilterException, ComponentLookupException, IOException
+        throws XarException, IOException
     {
         WikiReference wikiReference = documentReference.getWikiReference();
         LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
@@ -239,7 +237,7 @@ public class XarExtensionPlan implements Closeable
     }
 
     public XWikiDocument getPreviousXWikiDocument(WikiReference wikiReference, LocalDocumentReference localReference,
-        Packager packager) throws FilterException, ComponentLookupException, IOException
+        Packager packager) throws XarException, IOException
     {
         XarExtensionPlanEntry xarPlanEntry = getPreviousXarExtensionPlanEntry(wikiReference.getName(), localReference);
 

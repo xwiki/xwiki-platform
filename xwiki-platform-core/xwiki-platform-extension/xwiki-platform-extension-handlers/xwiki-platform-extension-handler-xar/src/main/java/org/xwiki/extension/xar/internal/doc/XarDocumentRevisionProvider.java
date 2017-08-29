@@ -26,11 +26,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.xar.XarException;
 
@@ -59,7 +57,7 @@ public class XarDocumentRevisionProvider extends AbstractDocumentRevisionProvide
 
         try {
             return this.packager.getXWikiDocument(reference, extensionId);
-        } catch (FilterException | IOException | ComponentLookupException | XarException e) {
+        } catch (IOException | XarException e) {
             throw new XWikiException("Failed to load extension document [" + reference + "] in [" + revision + "]", e);
         }
     }

@@ -136,7 +136,7 @@ public class Packager
     }
 
     public void importXAR(String comment, File xarFile, PackageConfiguration configuration)
-        throws IOException, XWikiException, ComponentLookupException, FilterException, WikiManagerException
+        throws IOException, XWikiException, XarException, WikiManagerException
     {
         if (configuration.getWiki() == null) {
             Collection<String> wikis = this.wikiDescriptors.getAllIds();
@@ -150,8 +150,7 @@ public class Packager
     }
 
     private XarMergeResult importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
-        PackageConfiguration configuration)
-        throws IOException, ComponentLookupException, XWikiException, FilterException
+        PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
@@ -162,8 +161,7 @@ public class Packager
     }
 
     private XarMergeResult importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
-        PackageConfiguration configuration)
-        throws IOException, ComponentLookupException, XWikiException, FilterException
+        PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
@@ -200,8 +198,7 @@ public class Packager
     }
 
     private XarEntryMergeResult importDocumentToWiki(String comment, WikiReference wikiReference,
-        InputStream inputStream, PackageConfiguration configuration)
-        throws XWikiException, FilterException, ComponentLookupException, IOException
+        InputStream inputStream, PackageConfiguration configuration) throws XWikiException, XarException, IOException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -313,7 +310,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
-        XarFile xarFile) throws FilterException, IOException, ComponentLookupException
+        XarFile xarFile) throws XarException, IOException
     {
         XarEntry realEntry = xarFile.getEntry(documentReference);
         if (realEntry != null) {
@@ -321,6 +318,8 @@ public class Packager
 
             try {
                 return getXWikiDocument(stream, wikiReference);
+            } catch (Exception e) {
+                throw new XarException("Failed to read entry [" + realEntry + "]", e);
             } finally {
                 stream.close();
             }
@@ -340,8 +339,7 @@ public class Packager
         return documentReference;
     }
 
-    public XWikiDocument getXWikiDocument(DocumentReference reference)
-        throws FilterException, IOException, ComponentLookupException, XarException
+    public XWikiDocument getXWikiDocument(DocumentReference reference) throws IOException, XarException
     {
         if (reference != null) {
             Collection<XarInstalledExtension> extensions =
@@ -355,7 +353,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(DocumentReference reference, ExtensionId extensionId)
-        throws FilterException, IOException, ComponentLookupException, XarException
+        throws IOException, XarException
     {
         if (reference != null) {
             if (extensionId != null) {
@@ -370,7 +368,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(DocumentReference reference, XarInstalledExtension extension)
-        throws FilterException, IOException, ComponentLookupException, XarException
+        throws XarException, IOException
     {
         if (reference != null) {
             // Remove the version if any since it does not make sense in a XAR
@@ -384,7 +382,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
-        XarInstalledExtension extension) throws FilterException, IOException, ComponentLookupException, XarException
+        XarInstalledExtension extension) throws XarException, IOException
     {
         try (
             XarFile xarFile = new XarFile(new File(extension.getFile().getAbsolutePath()), extension.getXarPackage())) {
@@ -411,8 +409,8 @@ public class Packager
     /**
      * @since 9.3RC1
      */
-    public void reset(DocumentReference reference, DocumentReference authorReference) throws FilterException,
-        IOException, ComponentLookupException, XarException, XWikiException, XarExtensionExtension
+    public void reset(DocumentReference reference, DocumentReference authorReference)
+        throws IOException, XarException, XWikiException, XarExtensionExtension
     {
         Collection<XarInstalledExtension> installedExtensions =
             getXarInstalledExtensionRepository().getXarInstalledExtensions(reference);

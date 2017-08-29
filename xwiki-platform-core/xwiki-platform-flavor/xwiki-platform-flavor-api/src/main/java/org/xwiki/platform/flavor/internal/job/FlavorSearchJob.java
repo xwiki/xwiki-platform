@@ -21,9 +21,11 @@ package org.xwiki.platform.flavor.internal.job;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -32,6 +34,7 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstallException;
@@ -39,6 +42,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
 import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanTree;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.version.IncompatibleVersionConstraintException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
@@ -69,7 +73,9 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     @Inject
     private ExtensionManager extensionManager;
 
-    private List<Extension> foundFlavors = new CopyOnWriteArrayList<>();
+    private final List<Extension> foundFlavors = new CopyOnWriteArrayList<>();
+
+    private final Map<ExtensionDependency, Boolean> validatedExtensions = new HashMap<>();
 
     @Override
     public String getType()
@@ -129,6 +135,39 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Cheating by considering extension matching recommended version as valid. The goal is to speed up a lot the flavor
+     * resolution and anyway the extension will be validated again when actually installing it so it's safe, false
+     * positives should be very rare.
+     * 
+     * @see org.xwiki.extension.job.internal.AbstractInstallPlanJob#installMandatoryExtensionDependency(org.xwiki.extension.ExtensionDependency,
+     *      java.lang.String, java.util.List, java.util.Map)
+     */
+    @Override
+    protected void installMandatoryExtensionDependency(ExtensionDependency extensionDependency, String namespace,
+        List<ModifableExtensionPlanNode> parentBranch, Map<String, ExtensionDependency> managedDependencies)
+        throws InstallException, IncompatibleVersionConstraintException, ResolveException
+    {
+        // Cheating a bit to speed up resolution:
+        // Skip it when we already know it's valid
+        // Skip it when it's matching recommended version
+        Boolean valid = Boolean.FALSE;
+        try {
+            if (this.validatedExtensions.get(extensionDependency) == Boolean.TRUE
+                && this.configuration.getRecomendedVersionConstraint(extensionDependency.getId()) == null) {
+                super.installMandatoryExtensionDependency(extensionDependency, namespace, parentBranch,
+                    managedDependencies);
+            }
+
+            valid = Boolean.TRUE;
+        } finally {
+            // Remember the extension is valid
+            this.validatedExtensions.put(extensionDependency, valid);
+        }
     }
 
     @Override

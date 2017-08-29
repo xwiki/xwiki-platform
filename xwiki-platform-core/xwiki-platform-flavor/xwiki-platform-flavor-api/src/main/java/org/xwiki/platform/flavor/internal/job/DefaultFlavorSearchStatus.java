@@ -35,6 +35,7 @@ import org.xwiki.platform.flavor.job.FlavorSearchRequest;
  * @version $Id$
  * @since 8.0RC1
  */
+// FIXME: should not extend ExtensionPlan
 public class DefaultFlavorSearchStatus extends DefaultExtensionPlan<FlavorSearchRequest> implements FlavorSearchStatus
 {
     /**

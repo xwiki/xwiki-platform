@@ -26,14 +26,14 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.properties.ConverterManager;
 
 /**
- * Wrap a Commons Configuration instance into a XWiki {@link ConfigurationSource}. This allows us to reuse the <a href=
- * "http://commons.apache.org/configuration/">numerous types of Configuration<a/> provided by Commons Configuration
- * (properties file, XML files, databases, etc).
+ * Wrap a Commons Configuration instance into a XWiki {@link ConfigurationSource}. This allows us to reuse the
+ * <a href= "http://commons.apache.org/configuration/">numerous types of Configuration<a/> provided by Commons
+ * Configuration (properties file, XML files, databases, etc).
  * 
  * @version $Id$
  * @since 1.6M1
@@ -99,12 +99,12 @@ public class CommonsConfigurationSource implements ConfigurationSource
             } else if (null != getProperty(key)) {
                 result = (T) this.converterManager.convert(valueClass, getProperty(key));
             }
-        } catch (org.apache.commons.configuration.ConversionException e) {
-            throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["
-                + valueClass.getName() + "]", e);
+        } catch (org.apache.commons.configuration2.ex.ConversionException e) {
+            throw new org.xwiki.configuration.ConversionException(
+                "Key [" + key + "] is not of type [" + valueClass.getName() + "]", e);
         } catch (org.xwiki.properties.converter.ConversionException e) {
-            throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["
-                + valueClass.getName() + "]", e);
+            throw new org.xwiki.configuration.ConversionException(
+                "Key [" + key + "] is not of type [" + valueClass.getName() + "]", e);
         }
 
         return result;

@@ -21,7 +21,7 @@ package org.xwiki.test.cluster;
 
 import java.util.List;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class AllTests
             PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
             properties.setProperty("observation.remote.enabled", "true");
             properties.setProperty("observation.remote.channels", channelName);
-            executor.saveXWikiProperties(properties);
+            executor.saveXWikiProperties();
 
             // Force bind_addr since tcp jgroups configuration expect cluster members to listen localhost by default
             executor.setXWikiOpts("-Djgroups.bind_addr=localhost -Xmx512m -XX:MaxPermSize=128m");
@@ -81,7 +81,7 @@ public class AllTests
             properties.setProperty("extension.repositories",
                 "maven-test:maven:" + repositoryUtil.getMavenRepository().toURI());
 
-            executor.saveXWikiProperties(properties);
+            executor.saveXWikiProperties();
         }
     }
 

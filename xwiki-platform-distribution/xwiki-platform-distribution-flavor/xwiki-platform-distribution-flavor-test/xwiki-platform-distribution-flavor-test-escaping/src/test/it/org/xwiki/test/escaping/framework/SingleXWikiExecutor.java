@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.escaping.framework;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 
 /**
@@ -74,7 +74,7 @@ public final class SingleXWikiExecutor extends XWikiExecutor
                 if (!properties.containsKey("extension.repositories")) {
                     properties.setProperty("extension.repositories", "");
                 }
-                saveXWikiProperties(properties);
+                saveXWikiProperties();
             }
 
             super.start();

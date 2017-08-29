@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class AllTests
         // Disable core extension resolve because Jetty is not ready when it starts
         properties.setProperty("extension.core.resolve", false);
 
-        executor.saveXWikiProperties(properties);
+        executor.saveXWikiProperties();
     }
 
     @PageObjectSuite.PostStart

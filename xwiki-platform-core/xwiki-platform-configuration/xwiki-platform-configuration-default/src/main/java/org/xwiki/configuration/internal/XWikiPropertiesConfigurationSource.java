@@ -26,9 +26,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.configuration.BaseConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.BaseConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -74,7 +76,10 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         File file = new File("/etc/xwiki/" + XWIKI_PROPERTIES_FILE);
         if (file.exists()) {
             try {
-                return new PropertiesConfiguration(file);
+                FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                    new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                        .configure(new Parameters().properties().setFile(file));
+                return builder.getConfiguration();
             } catch (Exception e) {
                 // Note: if we cannot read the configuration file for any reason we log a warning but continue since
                 // XWiki will use default values for all configurable elements.
@@ -88,7 +93,10 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         try {
             xwikiPropertiesUrl = this.environment.getResource(XWIKI_PROPERTIES_WARPATH);
             if (xwikiPropertiesUrl != null) {
-                return new PropertiesConfiguration(xwikiPropertiesUrl);
+                FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                    new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                        .configure(new Parameters().properties().setURL(xwikiPropertiesUrl));
+                return builder.getConfiguration();
             } else {
                 // We use a debug logging level here since we consider it's ok that there's no XWIKI_PROPERTIES_FILE
                 // available, in which case default values are used.

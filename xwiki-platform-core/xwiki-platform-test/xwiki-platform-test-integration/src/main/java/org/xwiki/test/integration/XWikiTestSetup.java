@@ -22,10 +22,10 @@ package org.xwiki.test.integration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.configuration2.PropertiesConfiguration;
+
 import junit.extensions.TestSetup;
 import junit.framework.Test;
-
-import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
@@ -69,7 +69,7 @@ public class XWikiTestSetup extends TestSetup
             // Don't set any extension repository since we don't need it and we don't want to require internet
             // connection for the tests.
             properties.setProperty("extension.repositories", "");
-            executor.saveXWikiProperties(properties);
+            executor.saveXWikiProperties();
 
             this.executors.add(executor);
         }

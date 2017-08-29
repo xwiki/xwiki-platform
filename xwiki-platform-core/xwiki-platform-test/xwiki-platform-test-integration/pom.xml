@@ -59,8 +59,8 @@
     </dependency>
     <!-- Manipulate xwiki.properties -->
     <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-configuration2</artifactId>
     </dependency>
     <!-- Make it easy to debug flickering tests by repeating them.
          See http://tempus-fugit.googlecode.com/svn/site/documentation/annotations.html#aRepeating -->

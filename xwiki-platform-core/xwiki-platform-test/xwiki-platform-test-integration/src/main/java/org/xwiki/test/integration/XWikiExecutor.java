@@ -27,7 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
@@ -98,6 +101,8 @@ public class XWikiExecutor
     private Map<String, String> environment = new HashMap<String, String>();
 
     private DefaultExecuteResultHandler startedProcessHandler;
+
+    private FileBasedConfigurationBuilder<PropertiesConfiguration> xwikipropertiesBuilder;
 
     /**
      * Was XWiki server already started. We don't try to stop it if it was already started.
@@ -459,24 +464,13 @@ public class XWikiExecutor
     /**
      * @since 4.2M1
      */
-    private PropertiesConfiguration getPropertiesConfiguration(String path) throws Exception
+    private PropertiesConfiguration getPropertiesConfiguration(String path) throws ConfigurationException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        this.xwikipropertiesBuilder =
+            new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                .configure(new Parameters().properties().setFileName(path));
 
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(path);
-
-            try {
-                properties.load(fis);
-            } finally {
-                fis.close();
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.debug("Failed to load properties [" + path + "]", e);
-        }
-
-        return properties;
+        return xwikipropertiesBuilder.getConfiguration();
     }
 
     public void saveXWikiCfg(Properties properties) throws Exception
@@ -496,9 +490,9 @@ public class XWikiExecutor
     /**
      * @since 4.2M1
      */
-    public void saveXWikiProperties(PropertiesConfiguration properties) throws Exception
+    public void saveXWikiProperties() throws Exception
     {
-        savePropertiesConfiguration(getXWikiPropertiesPath(), properties);
+        this.xwikipropertiesBuilder.save();
     }
 
     private void saveProperties(String path, Properties properties) throws Exception
@@ -506,16 +500,6 @@ public class XWikiExecutor
         FileOutputStream fos = new FileOutputStream(path);
         try {
             properties.store(fos, null);
-        } finally {
-            fos.close();
-        }
-    }
-
-    private void savePropertiesConfiguration(String path, PropertiesConfiguration properties) throws Exception
-    {
-        FileOutputStream fos = new FileOutputStream(path);
-        try {
-            properties.save(fos);
         } finally {
             fos.close();
         }

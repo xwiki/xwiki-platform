@@ -497,6 +497,23 @@
                       <resource>META-INF/cxf/bus-extensions.txt</resource>
                     </resources>
                   </exception>
+                  <!-- Seems to be the same thing -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>commons-configuration</groupId>
+                        <artifactId>commons-configuration</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-configuration2</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <resources>
+                      <resource>PropertyList-1.0.dtd</resource>
+                      <resource>properties.dtd</resource>
+                    </resources>
+                  </exception>
                 </exceptions>
                 <ignoredResourcePatterns>
                   <!-- Exclude XWiki's Component registration file -->

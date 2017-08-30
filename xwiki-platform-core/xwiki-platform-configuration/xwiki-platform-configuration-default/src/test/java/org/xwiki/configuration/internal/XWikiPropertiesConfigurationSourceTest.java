@@ -19,13 +19,20 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.jmock.Expectations;
+import java.util.Arrays;
+import java.util.Properties;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiPropertiesConfigurationSource}.
@@ -33,44 +40,40 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 3.0M1
  */
-public class XWikiPropertiesConfigurationSourceTest extends AbstractComponentTestCase
+public class XWikiPropertiesConfigurationSourceTest
 {
-    private XWikiPropertiesConfigurationSource source;
+    @Rule
+    public MockitoComponentMockingRule<ConfigurationSource> mocker =
+        new MockitoComponentMockingRule<>(XWikiPropertiesConfigurationSource.class);
 
-    private Logger logger;
+    private Environment environment;
 
     @Before
-    @Override
-    public void setUp() throws Exception
+    public void before() throws ComponentLookupException
     {
-        super.setUp();
-
-        final Environment environment = getMockery().mock(Environment.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(environment).getResource("/WEB-INF/xwiki.properties");
-            will(returnValue(null));
-        }});
-
-        // Set a mock Logger to capture all log outputs and perform verifications
-        this.logger = getMockery().mock(Logger.class);
-
-        this.source = new XWikiPropertiesConfigurationSource();
-        ReflectionUtils.setFieldValue(this.source, "environment", environment);
-        ReflectionUtils.setFieldValue(this.source, "logger", this.logger);
+        this.environment = this.mocker.getInstance(Environment.class);
     }
 
     @Test
     public void testInitializeWhenNoPropertiesFile() throws Exception
     {
-        getMockery().checking(new Expectations() {{
-            // This is the test
-            oneOf(logger).debug("No configuration file [{}] found. Using default configuration values.",
-                "/WEB-INF/xwiki.properties");
-        }});
-
-        this.source.initialize();
-
         // Verifies that we can get a property from the source (i.e. that it's correctly initialized)
-        this.source.getProperty("key");
+        this.mocker.getComponentUnderTest().getProperty("key");
+
+        verify(this.mocker.getMockedLogger()).debug(
+            "No configuration file [{}] found. Using default configuration values.", "/WEB-INF/xwiki.properties");
+    }
+
+    @Test
+    public void testListParsing() throws ComponentLookupException
+    {
+        when(environment.getResource("/WEB-INF/xwiki.properties"))
+            .thenReturn(getClass().getResource("/xwiki.properties"));
+
+        assertEquals(Arrays.asList("value1", "value2"),
+            this.mocker.getComponentUnderTest().getProperty("listProperty"));
+
+        Properties properties = this.mocker.getComponentUnderTest().getProperty("propertiesProperty", Properties.class);
+        assertEquals("value1", properties.get("prop1"));
     }
 }

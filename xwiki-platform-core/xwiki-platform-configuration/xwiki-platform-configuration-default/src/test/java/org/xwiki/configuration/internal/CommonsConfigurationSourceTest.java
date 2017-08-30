@@ -19,6 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -92,10 +93,10 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
     @Test(expected = ConversionException.class)
     public void testBooleanPropertyWhenConversionError()
     {
-        configuration.setProperty("boolean", true);
+        configuration.setProperty("property", "");
 
         // Try to retrieve a Boolean property as a String
-        source.getProperty("boolean", String.class);
+        source.getProperty("property", Color.class);
     }
 
     @Test

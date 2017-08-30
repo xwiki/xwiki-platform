@@ -19,13 +19,12 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,13 +56,13 @@ public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
 
         CommonsConfigurationSource source1 = new CommonsConfigurationSource();
         ReflectionUtils.setFieldValue(source1, "converterManager", converterManager);
-        this.config1 = new BaseConfiguration();
+        this.config1 = new PropertiesConfiguration();
         source1.setConfiguration(this.config1);
         this.composite.addConfigurationSource(source1);
 
         CommonsConfigurationSource source2 = new CommonsConfigurationSource();
         ReflectionUtils.setFieldValue(source2, "converterManager", converterManager);
-        this.config2 = new BaseConfiguration();
+        this.config2 = new PropertiesConfiguration();
         source2.setConfiguration(this.config2);
         this.composite.addConfigurationSource(source2);
     }
@@ -154,17 +153,8 @@ public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
     public void testTypeConversionsWhenDefaultValuesAreNotUsed()
     {
         config1.setProperty("key1", "true");
-        config1.setProperty("key2", "item1,item2");
-        config1.setProperty("key3", "prop1=value1,prop2=value2");
 
         // Default value is not used since the property exists and is converted to boolean automatically
         Assert.assertTrue(composite.getProperty("key1", false));
-
-        // Default value is not used since the property exists and is converted to List automatically
-        Assert.assertEquals(Arrays.asList("item1", "item2"), composite.getProperty("key2", new ArrayList<String>()));
-
-        // Default value is not used since the property exists and is converted to Properties automatically
-        Properties props = composite.getProperty("key3", new Properties());
-        Assert.assertEquals("value1", props.getProperty("prop1"));
     }
 }

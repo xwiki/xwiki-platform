@@ -30,6 +30,7 @@ import java.util.Properties;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -468,7 +469,8 @@ public class XWikiExecutor
     {
         this.xwikipropertiesBuilder =
             new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
-                .configure(new Parameters().properties().setFileName(path));
+                .configure(new Parameters().properties().setListDelimiterHandler(new DefaultListDelimiterHandler(','))
+                    .setFileName(path));
 
         return xwikipropertiesBuilder.getConfiguration();
     }

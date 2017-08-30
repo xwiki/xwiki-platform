@@ -90,21 +90,22 @@ public class CommonsConfigurationSource implements ConfigurationSource
         T result = null;
 
         try {
-            if (String.class.getName().equals(valueClass.getName())) {
+            if (String.class == valueClass) {
                 result = (T) getConfiguration().getString(key);
             } else if (List.class.isAssignableFrom(valueClass)) {
                 result = (T) getConfiguration().getList(key);
             } else if (Properties.class.isAssignableFrom(valueClass)) {
                 result = (T) getConfiguration().getProperties(key);
-            } else if (null != getProperty(key)) {
-                result = (T) this.converterManager.convert(valueClass, getProperty(key));
+            } else {
+                Object value = getProperty(key);
+                if (value != null) {
+                    result = this.converterManager.convert(valueClass, getProperty(key));
+                }
             }
-        } catch (org.apache.commons.configuration2.ex.ConversionException e) {
+        } catch (org.apache.commons.configuration2.ex.ConversionException
+            | org.xwiki.properties.converter.ConversionException e) {
             throw new org.xwiki.configuration.ConversionException(
-                "Key [" + key + "] is not of type [" + valueClass.getName() + "]", e);
-        } catch (org.xwiki.properties.converter.ConversionException e) {
-            throw new org.xwiki.configuration.ConversionException(
-                "Key [" + key + "] is not of type [" + valueClass.getName() + "]", e);
+                "Key [" + key + "] is not compatible with type [" + valueClass.getName() + "]", e);
         }
 
         return result;
@@ -113,7 +114,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @Override
     public List<String> getKeys()
     {
-        List<String> keysList = new ArrayList<String>();
+        List<String> keysList = new ArrayList<>();
         Iterator<String> keys = getConfiguration().getKeys();
         while (keys.hasNext()) {
             keysList.add(keys.next());

@@ -32,6 +32,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -93,7 +94,8 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
             if (xwikiPropertiesUrl != null) {
                 FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                     new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
-                        .configure(new Parameters().properties().setURL(xwikiPropertiesUrl));
+                        .configure(new Parameters().properties()
+                            .setListDelimiterHandler(new DefaultListDelimiterHandler(',')).setURL(xwikiPropertiesUrl));
                 return builder.getConfiguration();
             } else {
                 // We use a debug logging level here since we consider it's ok that there's no XWIKI_PROPERTIES_FILE

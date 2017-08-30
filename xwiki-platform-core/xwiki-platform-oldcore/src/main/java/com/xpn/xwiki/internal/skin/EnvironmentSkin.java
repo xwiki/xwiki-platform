@@ -27,9 +27,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -93,10 +91,7 @@ public class EnvironmentSkin extends AbstractSkin
             URL url = this.environment.getResource(getSkinFolder() + "skin.properties");
             if (url != null) {
                 try {
-                    FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
-                        new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
-                            .configure(new Parameters().properties().setURL(url));
-                    this.properties = builder.getConfiguration();
+                    this.properties = new Configurations().properties(url);
                 } catch (ConfigurationException e) {
                     LOGGER.error("Failed to load skin [{}] properties file ([])", this.id, url,
                         ExceptionUtils.getRootCauseMessage(e));

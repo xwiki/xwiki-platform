@@ -30,6 +30,7 @@ import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -76,10 +77,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         File file = new File("/etc/xwiki/" + XWIKI_PROPERTIES_FILE);
         if (file.exists()) {
             try {
-                FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
-                    new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
-                        .configure(new Parameters().properties().setFile(file));
-                return builder.getConfiguration();
+                return new Configurations().properties(file);
             } catch (Exception e) {
                 // Note: if we cannot read the configuration file for any reason we log a warning but continue since
                 // XWiki will use default values for all configurable elements.

@@ -384,10 +384,12 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
                 levels.add(entry.getKey());
             }
         }
-        if (levels.contains(null) && levels.contains(EntityType.WIKI)) {
-            levels.remove(null);
-        } else {
-            return null;
+        if (levels.contains(null)) {
+            if (levels.contains(EntityType.WIKI)) {
+                levels.remove(null);
+            } else {
+                return null;
+            }
         }
         return EnumSet.copyOf(levels);
     }

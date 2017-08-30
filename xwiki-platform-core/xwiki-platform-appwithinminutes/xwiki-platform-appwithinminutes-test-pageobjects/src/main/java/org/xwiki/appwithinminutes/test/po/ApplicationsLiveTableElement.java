@@ -19,7 +19,7 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.ConfirmationPage;

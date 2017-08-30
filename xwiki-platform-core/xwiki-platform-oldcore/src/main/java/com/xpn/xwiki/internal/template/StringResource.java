@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.filter.input.StringInputSource;
 
 import com.xpn.xwiki.internal.skin.AbstractInputSourceResource;
@@ -42,6 +42,6 @@ public class StringResource extends AbstractInputSourceResource<StringInputSourc
     public String getURL(boolean forceSkinAction) throws Exception
     {
         // A StringResource does not depends on a particular URL
-        throw new NotImplementedException();
+        throw new NotImplementedException("Method not implemented");
     }
 }

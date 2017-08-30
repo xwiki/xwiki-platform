@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -267,7 +267,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         SimpleSearchPane searchBar = adminPage.getSearchBar();
         assertEquals("Core extensions", searchBar.getRepositorySelect().getFirstSelectedOption().getText());
 
-        ExtensionPane extension = adminPage.getSearchResults().getExtension(RandomUtils.nextInt(20));
+        ExtensionPane extension = adminPage.getSearchResults().getExtension(RandomUtils.nextInt(0, 20));
         assertEquals("core", extension.getStatus());
         assertEquals("Provided", extension.getStatusMessage());
         assertNull(extension.getInstallButton());

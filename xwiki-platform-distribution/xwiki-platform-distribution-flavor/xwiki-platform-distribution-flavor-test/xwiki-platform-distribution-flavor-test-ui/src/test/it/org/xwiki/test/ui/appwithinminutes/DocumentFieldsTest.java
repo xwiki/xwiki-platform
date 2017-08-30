@@ -21,7 +21,7 @@ package org.xwiki.test.ui.appwithinminutes;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

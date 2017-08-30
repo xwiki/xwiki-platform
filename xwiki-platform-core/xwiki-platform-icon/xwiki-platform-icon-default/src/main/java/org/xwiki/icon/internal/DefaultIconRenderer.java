@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.icon.Icon;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;

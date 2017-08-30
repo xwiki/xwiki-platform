@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
@@ -39,6 +39,6 @@ public class TemplateEnvironmentResource extends AbstractEnvironmentResource
     public String getURL(boolean forceSkinAction) throws Exception
     {
         // Does not make any sense in this case
-        throw new NotImplementedException();
+        throw new NotImplementedException("Method not implemented");
     }
 }

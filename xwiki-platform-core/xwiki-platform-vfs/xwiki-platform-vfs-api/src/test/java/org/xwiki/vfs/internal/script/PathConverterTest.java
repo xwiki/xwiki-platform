@@ -22,7 +22,7 @@ package org.xwiki.vfs.internal.script;
 import java.net.URI;
 import java.nio.file.Path;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;

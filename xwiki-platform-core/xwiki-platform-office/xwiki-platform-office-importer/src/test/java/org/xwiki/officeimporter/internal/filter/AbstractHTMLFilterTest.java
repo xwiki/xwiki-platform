@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.w3c.dom.Document;

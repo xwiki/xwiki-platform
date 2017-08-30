@@ -21,7 +21,7 @@ package com.xpn.xwiki.plugin.activitystream.impl;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;

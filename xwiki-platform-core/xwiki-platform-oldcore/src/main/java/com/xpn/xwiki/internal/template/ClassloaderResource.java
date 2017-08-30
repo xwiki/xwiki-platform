@@ -21,7 +21,7 @@ package com.xpn.xwiki.internal.template;
 
 import java.net.URL;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.filter.input.DefaultURLInputSource;
 import org.xwiki.filter.input.URLInputSource;
 
@@ -46,6 +46,6 @@ public class ClassloaderResource extends AbstractInputSourceResource<URLInputSou
     public String getURL(boolean forceSkinAction) throws Exception
     {
         // Does not make any sense in this case
-        throw new NotImplementedException();
+        throw new NotImplementedException("Method not implemented");
     }
 }

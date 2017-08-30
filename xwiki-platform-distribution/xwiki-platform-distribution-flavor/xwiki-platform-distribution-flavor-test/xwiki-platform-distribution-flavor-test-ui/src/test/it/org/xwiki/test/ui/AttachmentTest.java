@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui;
 
-import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -138,7 +138,7 @@ public class AttachmentTest extends AbstractTest
         // image width because we want the code that resizes the image on the server side to be executed (even if the
         // image is not actually resized).
         ViewPage viewPage = getUtil().createPage(getClass().getSimpleName(), getTestMethodName(),
-            String.format("[[image:image.gif||width=%s]]", (20 + RandomUtils.nextInt(200))), getTestClassName());
+            String.format("[[image:image.gif||width=%s]]", (20 + RandomUtils.nextInt(0, 200))), getTestClassName());
 
         // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
         // view mode) is fixed.

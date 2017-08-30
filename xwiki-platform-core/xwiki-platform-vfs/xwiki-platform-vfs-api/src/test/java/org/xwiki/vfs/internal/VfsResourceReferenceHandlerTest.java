@@ -31,7 +31,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;

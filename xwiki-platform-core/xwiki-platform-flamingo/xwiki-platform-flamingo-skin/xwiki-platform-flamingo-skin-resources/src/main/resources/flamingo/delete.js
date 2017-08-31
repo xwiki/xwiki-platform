@@ -190,7 +190,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
           handleQuestion();
           return;
         }
-        if (data.progress.offset < 1) {
+        if (data.state != 'FINISHED') {
           setTimeout(getProgressStatus, 1000);
         } else {
           whenTerminated();

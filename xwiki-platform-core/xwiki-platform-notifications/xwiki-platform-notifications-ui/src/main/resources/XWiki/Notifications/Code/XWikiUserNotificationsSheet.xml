@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -41,12 +42,47 @@
   <content>{{template name="locationPicker_macros.vm" /}}
 
 {{velocity}}
+######################################################
+### CSS and JAVASCRIPTS
+######################################################
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+######################################################
+### GLOBALS
+######################################################
+##
+## Get all event types and group them by applications
+##
+#set ($types = [])
+#foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+  #set ($discard = $types.add({
+    'applicationName' : "$!services.localization.render($descriptor.applicationName)",
+    'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
+    'description'     : "$!services.localization.render($descriptor.description)",
+    'eventType'       : "$!descriptor.eventType",
+    'filter'          : "$!descriptor.filter",
+    'applicationId'   : "$!descriptor.applicationId"
+  }))
+#end
+#set ($apps = [])
+#set ($lastAppId = '')
+#foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
+  #if ($lastAppId != $type.applicationId)
+    #set ($lastAppId = $type.applicationId)
+    #set ($lastApp = [])
+    #set ($discard = $apps.add($lastApp))
+  #end
+  #set ($discard = $lastApp.add($type))
+#end
+######################################################
+### TITLE
+######################################################
 = $services.localization.render('notifications.settings.title') =
-
+######################################################
+### EMAIL PREFERENCES
+######################################################
 #if ($services.notification.areEmailsEnabled())
 (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
 (((
@@ -77,6 +113,9 @@
 {{/html}}
 )))
 #end
+######################################################
+### APPLICATIONS
+######################################################
 (% class="profile-section highlighted-profile-section column full xform" %)
 (((
 {{html clean="false"}}
@@ -100,84 +139,18 @@
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##
-  ## Get all event types and group them by applications
-  ##
-  #set ($types = [])
-  #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-    #set ($discard = $types.add({
-      'applicationName' : "$!services.localization.render($descriptor.applicationName)",
-      'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
-      'description'     : "$!services.localization.render($descriptor.description)",
-      'eventType'       : "$!descriptor.eventType",
-      'filter'          : "$!descriptor.filter",
-      'applicationId'   : "$!descriptor.applicationId"
-    }))
-  #end
-  #set ($apps = [])
-  #set ($lastAppId = '')
-  #foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
-    #if ($lastAppId != $type.applicationId)
-      #set ($lastAppId = $type.applicationId)
-      #set ($lastApp = [])
-      #set ($discard = $apps.add($lastApp))
-    #end
-    #set ($discard = $lastApp.add($type))
-  #end
-  ##
   ## Display all applications
   ##
   #set ($appClass = "appOdd")
   #foreach ($app in $apps)
-    #set ($type = $app[0])
-    &lt;tbody class="applicationElem $appClass" data-applicationid="$escapetool.xml($type.applicationId)"&gt;
-      ##
-      ## Display the application row
-      ##
-      &lt;tr&gt;
-        ## Application Name and Icon
-        &lt;th style="vertical-align: top;"&gt;
-          $type.applicationIcon $escapetool.xml($type.applicationName)
-        &lt;/th&gt;
-        ## Alert switch
-        &lt;td class="notificationAppCell loading" data-format="alert"&gt;
-          &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
-        &lt;/td&gt;
-        ## Email switch
-        #if ($services.notification.areEmailsEnabled())
-          &lt;td class="notificationAppCell loading" data-format="email"&gt;
-            &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
-          &lt;/td&gt;
-        #end
-        ## Collapse button
-        &lt;td class="notificationCollapseButtonCell"&gt;
-          &lt;button class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-      ##
-      ## Display all events of this application
-      ##
-      #foreach($type in $app)
-        &lt;tr class="rowEventType hidden" data-eventtype="$type.eventType"&gt;
-          &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
-          #displayPreference($type, 'alert')
-          #if ($services.notification.areEmailsEnabled())
-            #displayPreference($type, 'email')
-          #end
-          &lt;td&gt;&lt;/td&gt;
-        &lt;/tr&gt;
-      #end
-    &lt;/tbody&gt;
-    ## TODO: replace that with proper CSS rules :)
-    #if ($appClass == 'appOdd')
-      #set ($appClass = 'appEven')
-    #else
-      #set ($appClass = 'appOdd')
-    #end
+    #displayApp($app)
   #end
 &lt;/table&gt;
 {{/html}}
 )))
-
+######################################################
+### FILTERS
+######################################################
 (% class="profile-section highlighted-profile-section filterPreferences column full" %)
 (((
 {{html clean="false"}}
@@ -212,7 +185,9 @@
   #livetable("notificationFilterPreferencesLiveTable" $collist $colprops $options)
   #displayAdvancedFilterSettingsModal()
 &lt;/div&gt;
-
+######################################################
+### ADD FILTER MODAL
+######################################################
 &lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-add-filter-preference"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
@@ -286,6 +261,56 @@
 &lt;/div&gt;&lt;!-- /.modal --&gt;
 {{/html}}
 )))
+
+#**
+ * Display Application
+ *#
+#macro(displayApp $app)
+  #set ($type = $app[0])
+  &lt;tbody class="applicationElem $appClass" data-applicationid="$escapetool.xml($type.applicationId)"&gt;
+    ##
+    ## Display the application row
+    ##
+    &lt;tr&gt;
+      ## Application Name and Icon
+      &lt;th style="vertical-align: top;"&gt;
+        $type.applicationIcon $escapetool.xml($type.applicationName)
+      &lt;/th&gt;
+      ## Alert switch
+      &lt;td class="notificationAppCell loading" data-format="alert"&gt;
+        &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
+      &lt;/td&gt;
+      ## Email switch
+      #if ($services.notification.areEmailsEnabled())
+        &lt;td class="notificationAppCell loading" data-format="email"&gt;
+          &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
+        &lt;/td&gt;
+      #end
+      ## Collapse button
+      &lt;td class="notificationCollapseButtonCell"&gt;
+        &lt;button class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    ##
+    ## Display all events of this application
+    ##
+    #foreach($type in $app)
+      &lt;tr class="rowEventType hidden" data-eventtype="$type.eventType"&gt;
+        &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
+        #displayPreference($type, 'alert')
+        #if ($services.notification.areEmailsEnabled())
+          #displayPreference($type, 'email')
+        #end
+        &lt;td&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    #end
+  &lt;/tbody&gt;
+  #if ($appClass == 'appOdd')
+    #set ($appClass = 'appEven')
+  #else
+    #set ($appClass = 'appOdd')
+  #end
+#end
 
 #**
  * Display a preference button for an event type and a given format
@@ -1090,9 +1115,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
 
         var scopeType = 'pageOnly';
         var reference = node.data.id;
-        var filterType = self.filterTypeSelector.find('option:selected').val();
-        var notificationFormats = self.notificationFormatSelector.find('option:selected').val();
-        var eventTypes = (self.eventTypeSelector.find('option:selected').val() !== undefined) ? self.eventTypeSelector.find('option:selected').val() : [];
+        var filterType = self.filterTypeSelector.val();
+        var notificationFormats = self.notificationFormatSelector.val();
+        var eventTypes = self.eventTypeSelector.val();
 
         var payload = {
           'className': 'XWiki.Notifications.Code.NotificationFilterPreferenceClass',
@@ -1100,8 +1125,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
           'property#filterPreferenceName': Date.now(),
           'property#isEnabled': 1,
           'property#filterType': filterType,
-          'property#filterFormats': notificationFormats.toString(),
-          'property#eventTypes': eventTypes.toString()
+          'property#filterFormats': notificationFormats.join(','),
+          'property#eventTypes': eventTypes.join(',')
         };
 
         if (node.data.type == 'wiki') {
@@ -1427,8 +1452,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
   width: 33%;
 }
 .notificationCollapseButtonCell {
-  text-align: right;
   vertical-align: top;
+  text-align: right;
 }</code>
     </property>
     <property>

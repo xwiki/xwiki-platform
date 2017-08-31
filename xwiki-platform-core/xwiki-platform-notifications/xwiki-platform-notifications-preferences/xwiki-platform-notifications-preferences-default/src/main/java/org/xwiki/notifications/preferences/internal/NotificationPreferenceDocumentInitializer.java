@@ -47,7 +47,7 @@ public class NotificationPreferenceDocumentInitializer extends AbstractMandatory
      */
     private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
-    private static final String SELECT = "select";
+    private static final String CHECKBOX = "checkbox";
 
     /**
      * Default constructor.
@@ -63,7 +63,7 @@ public class NotificationPreferenceDocumentInitializer extends AbstractMandatory
         xclass.addTextField("eventType", "Event Type", 64);
         xclass.addStaticListField("format", "Format", 64, false,
                 "alert=Alert|email=E-mail", "input", "|, ");
-        xclass.addBooleanField("notificationEnabled", "Notification Enabled ?", SELECT, false);
+        xclass.addBooleanField("notificationEnabled", "Notification Enabled ?", CHECKBOX, false);
         xclass.addDateField("startDate", "Start date", "dd/MM/yyyy HH:mm:ss", 1);
     }
 }

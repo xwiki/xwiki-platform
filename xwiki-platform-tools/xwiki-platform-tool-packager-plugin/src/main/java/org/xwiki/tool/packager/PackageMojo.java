@@ -155,6 +155,18 @@ public class PackageMojo extends AbstractOldCoreMojo
     @Parameter(defaultValue = "true")
     private boolean test;
 
+    /**
+     * Automatically drop ProgrammingRights when evaluating scripts in wiki pages, in order to make sure that by
+     * default wiki pages don't require PR. Only active if {@link #test} is true and {@link #isSkipTests()} is false.
+     * <p>
+     * Also note that it's possible to exclude some pages from being tested by setting the system property named
+     * {@code xwiki.prcheck.excludePattern} (e.g. {@code .*:XWiki\.DeletedDocuments}).
+     *
+     * @since 9.8RC1
+     */
+    @Parameter(defaultValue = "true")
+    private boolean testProgrammingRights;
+
     private File webappsDirectory;
 
     private File xwikiWebappDirectory;
@@ -680,6 +692,13 @@ public class PackageMojo extends AbstractOldCoreMojo
             getDependencyManagementVersion(pomProject, "org.slf4j", "jcl-over-slf4j"), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.slf4j", "log4j-over-slf4j",
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
+
+        // Add a special JAR used for functional tests to discover if some scripts in some wiki page require Programming
+        // Rights.
+        if (this.test && !isSkipTests() && this.testProgrammingRights) {
+            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+                "xwiki-platform-test-checker", getXWikiPlatformVersion(), null, "jar"));
+        }
 
         // Also add the skins artifacts, that may have JAR dependencies
         mandatoryTopLevelArtifacts.addAll(getSkinArtifacts());

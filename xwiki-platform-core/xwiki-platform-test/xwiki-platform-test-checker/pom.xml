@@ -24,23 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-test</artifactId>
     <version>9.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-test</artifactId>
-  <name>XWiki Platform - Test - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Test - Parent POM</description>
-  <properties>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-  </properties>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-test-checker</module>
-    <module>xwiki-platform-test-integration</module>
-    <module>xwiki-platform-test-oldcore</module>
-    <module>xwiki-platform-test-page</module>
-    <module>xwiki-platform-test-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-test-checker</artifactId>
+  <name>XWiki Platform - Test - Runtime Checker Tools</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Runtime Checker Tools</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

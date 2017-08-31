@@ -454,6 +454,7 @@ position: relative;
   {{include reference='XWiki.RatingsMacros'/}}
 #end
 {{/velocity}}
+
 {{velocity}}
 #if($canView)
   #set($configurationDoc = $services.ratings.getConfigurationDocument($doc.documentReference))

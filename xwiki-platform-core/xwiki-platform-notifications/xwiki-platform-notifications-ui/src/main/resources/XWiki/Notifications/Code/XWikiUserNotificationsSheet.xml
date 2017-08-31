@@ -249,8 +249,13 @@
             &lt;/dt&gt;
             &lt;dd&gt;
               &lt;select id="notificationFilterEventTypeSelector" name="notificationFilterEventTypeSelector" size="5" multiple&gt;
-                #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-                  &lt;option value="$descriptor.eventType"&gt;$escapetool.xml($services.localization.render($descriptor.description))&lt;/option&gt;
+                #foreach ($app in $apps)
+                  #set ($type = $app[0])
+                  &lt;optgroup label="$escapetool.xml($type.applicationName)"&gt;
+                  #foreach($descriptor in $app)
+                    &lt;option value="$escapetool.xml($descriptor.eventType)"&gt;$escapetool.xml($services.localization.render($descriptor.description))&lt;/option&gt;
+                  #end
+                  &lt;/optgroup&gt;
                 #end
               &lt;/select&gt;
             &lt;/dd&gt;

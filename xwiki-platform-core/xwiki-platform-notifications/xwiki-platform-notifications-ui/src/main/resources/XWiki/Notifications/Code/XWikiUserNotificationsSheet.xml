@@ -85,7 +85,7 @@
 &lt;table class="notifPreferences"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th style="width: 250px; vertical-align: top;"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
+      &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
       &lt;th&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('notifications.settings.menu'))
         &lt;small class="xHint"&gt;$services.localization.render('notifications.settings.menu.hint', [$services.icon.renderHTML('bell')])&lt;/small&gt;
       &lt;/th&gt;
@@ -96,7 +96,7 @@
         &lt;/th&gt;
         #set ($colsCount = 3)
       #end
-      &lt;th&gt;&lt;/th&gt;
+      &lt;td&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##
@@ -1402,17 +1402,21 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
     </property>
     <property>
       <code>.notifPreferences tbody {
-            margin-top: 2em;
-            }
-            .notifPreferences .appOdd {
-            background: #e5e5e5;
-            }
-            .notifPreferences .appEven {
-            background: #fafafa;
-            }
-            .notifPreferences .rowApp td, .notifPreferences .rowApp th{
-            height: 3em;
-            }</code>
+  margin-top: 2em;
+}
+.notifPreferences .appOdd {
+  background: #e5e5e5;
+}
+.notifPreferences .appEven {
+  background: #fafafa;
+}
+.notifPreferences .rowApp td, .notifPreferences .rowApp th{
+  height: 3em;
+}
+.notifPreferences th{
+  vertical-align: top;
+  width: 33%;
+}</code>
     </property>
     <property>
       <contentType>CSS</contentType>

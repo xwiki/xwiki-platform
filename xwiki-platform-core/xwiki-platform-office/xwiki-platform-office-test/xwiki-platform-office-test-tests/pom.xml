@@ -44,6 +44,8 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin, \
       com.xpn.xwiki.plugin.fileupload.FileUploadPlugin
     </xwikiCfgPlugins>
+    <!-- Exclude the XWiki.OfficeImporterAdmin page from the PR checker since it requires PR ATM -->
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.OfficeImporterAdmin</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <!-- Note: We depend on the POM of xwiki-platform-office-ui in order to include its transitive

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Filter.WebHome" locale="">
+<xwikidoc version="1.3" reference="Filter.WebHome" locale="">
   <web>Filter</web>
   <name>WebHome</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1475761760000</date>
-  <contentUpdateDate>1475761760000</contentUpdateDate>
+  <date>1504206815000</date>
+  <contentUpdateDate>1504206779000</contentUpdateDate>
   <version>1.1</version>
   <title>Filter streams</title>
   <comment/>
@@ -290,6 +290,45 @@ $('filter_output_type').observe('change', function() {
     </property>
     <property>
       <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>Filter.WebHome</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>710a9c71-8450-4f28-92cc-2cd39b7437ba</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>programming</level>
     </property>
   </object>
 </xwikidoc>

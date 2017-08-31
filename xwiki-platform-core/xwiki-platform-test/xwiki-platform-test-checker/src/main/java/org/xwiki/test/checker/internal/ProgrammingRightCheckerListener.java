@@ -37,9 +37,12 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.event.ScriptEvaluatedEvent;
 import org.xwiki.script.event.ScriptEvaluatingEvent;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Drop Programming Rights (PR) for all scripts in wiki pages so that functional tests can discover pages that require
@@ -63,6 +66,9 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
+
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
     public void initialize() throws InitializationException
@@ -91,7 +97,8 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
         XWikiContext context = this.xwikiContextProvider.get();
 
         // Should the current document be excluded from the PR check?
-        DocumentReference currentDocReference = context.getDoc().getDocumentReference();
+        XWikiDocument contextDocument = context.getDoc();
+        DocumentReference currentDocReference = contextDocument.getDocumentReference();
         if (this.excludePattern != null && this.excludePattern.matcher(currentDocReference.toString()).matches()) {
             this.logger.info("PRChecker: Skipping check for [{}] since it's excluded", currentDocReference);
             return;
@@ -100,11 +107,19 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
         if (event instanceof ScriptEvaluatingEvent) {
             // Save the original value
             Boolean originalValue = (Boolean) context.get(XWikiConstant.DROPPED_PERMISSIONS);
+            boolean logPrinted = false;
             if (originalValue != null) {
                 context.put(PRCHECK_KEY, originalValue);
+                boolean hasPR = this.contextualAuthorizationManager.hasAccess(Right.PROGRAM, currentDocReference);
+                if (hasPR) {
+                    this.logger.info("PRChecker: Dropping permissions for page [{}], which had PR",
+                        currentDocReference);
+                    logPrinted = true;
+                }
             }
-            // Note: in order to not drown the console with logs, we only log in debug mode
-            this.logger.debug("PRChecker: Dropping permissions for page [{}]", currentDocReference);
+            if (!logPrinted) {
+                this.logger.debug("PRChecker: Dropping permissions for page [{}]", currentDocReference);
+            }
             context.dropPermissions();
         } else {
             // Restore the original value

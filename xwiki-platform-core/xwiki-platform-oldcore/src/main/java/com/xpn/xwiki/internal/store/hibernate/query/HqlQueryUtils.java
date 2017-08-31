@@ -55,6 +55,8 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  */
 public final class HqlQueryUtils
 {
+    private static final String FIELD_ID = "id";
+
     private static final String DOCUMENT_FIELD_FULLNAME = "fullName";
 
     private static final String DOCUMENT_FIELD_NAME = "name";
@@ -78,6 +80,16 @@ public final class HqlQueryUtils
     private static final String SPACE_FIELD_HIDDEN = DOCUMENT_FIELD_HIDDEN;
 
     private static final String ATTACHMENT_FIELD_FILENAME = "filename";
+
+    private static final String DELETEDATTACHMENT_FIELD_ID = FIELD_ID;
+
+    private static final String DELETEDATTACHMENT_FIELD_FILENAME = ATTACHMENT_FIELD_FILENAME;
+
+    private static final String DELETEDOCUMENT_FIELD_ID = FIELD_ID;
+
+    private static final String DELETEDOCUMENT_FIELD_FULLNAME = DOCUMENT_FIELD_FULLNAME;
+
+    private static final String DELETEDOCUMENT_FIELD_LANGUAGE = DOCUMENT_FIELD_LANGUAGE;
 
     private static final String FROM_REPLACEMENT = "$1";
 
@@ -104,6 +116,12 @@ public final class HqlQueryUtils
         allowedDocFields.add(DOCUMENT_FIELD_TRANSLATION);
         allowedDocFields.add(DOCUMENT_FIELD_HIDDEN);
 
+        Set<String> allowedDeletedDocumentFields = new HashSet<>();
+        ALLOWED_FIELDS.put("XWikiDeletedDocument", allowedDeletedDocumentFields);
+        allowedDeletedDocumentFields.add(DELETEDOCUMENT_FIELD_ID);
+        allowedDeletedDocumentFields.add(DELETEDOCUMENT_FIELD_FULLNAME);
+        allowedDeletedDocumentFields.add(DELETEDOCUMENT_FIELD_LANGUAGE);
+
         Set<String> allowedSpaceFields = new HashSet<>();
         ALLOWED_FIELDS.put("XWikiSpace", allowedSpaceFields);
         allowedSpaceFields.add(SPACE_FIELD_REFERENCE);
@@ -112,6 +130,12 @@ public final class HqlQueryUtils
         allowedSpaceFields.add(SPACE_FIELD_HIDDEN);
 
         ALLOWED_FIELDS.put("XWikiAttachment", Collections.singleton(ATTACHMENT_FIELD_FILENAME));
+
+        Set<String> allowedDeletedAttachmentFields = new HashSet<>();
+        ALLOWED_FIELDS.put("DeletedAttachment", allowedDeletedAttachmentFields);
+        allowedDeletedAttachmentFields.add(DELETEDATTACHMENT_FIELD_ID);
+        allowedDeletedAttachmentFields.add(DELETEDATTACHMENT_FIELD_FILENAME);
+
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HqlQueryUtils.class);

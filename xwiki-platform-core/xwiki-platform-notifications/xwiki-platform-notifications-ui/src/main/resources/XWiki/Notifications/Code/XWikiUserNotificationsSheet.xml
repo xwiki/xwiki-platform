@@ -314,7 +314,7 @@
 #macro(displayAdvancedFilterSettingsModal)
 &lt;p&gt;
   &lt;a href="#" data-target="#modal-advanced-filters-preferences" data-toggle="modal" class="btn btn-default"&gt;
-    $services.localization.render('notifications.settings.filters.advanced')
+    $escapetool.xml($services.localization.render('notifications.settings.filters.advanced'))
   &lt;/a&gt;
 &lt;/p&gt;
 &lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-advanced-filters-preferences"&gt;

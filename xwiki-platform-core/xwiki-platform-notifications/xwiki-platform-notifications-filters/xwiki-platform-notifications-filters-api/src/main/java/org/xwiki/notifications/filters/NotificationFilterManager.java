@@ -121,7 +121,6 @@ public interface NotificationFilterManager
      * {@link NotificationFilterPreferenceProvider}.
      *
      * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save
-     * @throws NotificationException if error happens
      */
     void saveFilterPreferences(Set<NotificationFilterPreference> notificationFilterPreferences);
 

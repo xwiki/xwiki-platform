@@ -85,7 +85,9 @@
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
         <version>${project.version}</version>
         <!-- Make sure that the pages are imported with the superadmin user that we use in our tests so that they have
-             programming rights. We need since since some Bot Listener use Groovy. -->
+             programming rights. We need since since some pages such as XWiki.DeletedDocumentsJSON,
+             XWiki.DeletedDocuments, XWiki.DeletedAttachments currently require PR.
+        -->
         <configuration>
           <importUser>superadmin</importUser>
         </configuration>

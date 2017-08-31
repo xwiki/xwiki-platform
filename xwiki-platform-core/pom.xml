@@ -137,7 +137,154 @@
                   }
                 },
                 "ignore" : [
-                  // Add more ignores below...
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.notifications.filters.expression.generics.AbstractNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "filterExpression",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.rendering.block.Block org.xwiki.notifications.filters.NotificationFilterManager::displayFilter(org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterPreference) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "displayFilter",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "getFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "getFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "getFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference> org.xwiki.notifications.filters.NotificationFilterManager::getFilterPreferences(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilter, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "getFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::saveFilterPreferences(java.util.Set<org.xwiki.notifications.filters.NotificationFilterPreference>)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "saveFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.filters.expression.AndNode::<init>(===org.xwiki.notifications.filters.expression.generics.AbstractNode===, org.xwiki.notifications.filters.expression.generics.AbstractNode)",
+                    "new": "parameter void org.xwiki.notifications.filters.expression.AndNode::<init>(===org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode===, org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode)",
+                    "oldType": "org.xwiki.notifications.filters.expression.generics.AbstractNode",
+                    "newType": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "AndNode",
+                    "methodName": "<init>",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.filters.expression.AndNode::<init>(org.xwiki.notifications.filters.expression.generics.AbstractNode, ===org.xwiki.notifications.filters.expression.generics.AbstractNode===)",
+                    "new": "parameter void org.xwiki.notifications.filters.expression.AndNode::<init>(org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode, ===org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode===)",
+                    "oldType": "org.xwiki.notifications.filters.expression.generics.AbstractNode",
+                    "newType": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "AndNode",
+                    "methodName": "<init>",
+                    "parameterIndex": "1",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.filters.expression.NotNode::<init>(===org.xwiki.notifications.filters.expression.generics.AbstractNode===)",
+                    "new": "parameter void org.xwiki.notifications.filters.expression.NotNode::<init>(===org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode===)",
+                    "oldType": "org.xwiki.notifications.filters.expression.generics.AbstractNode",
+                    "newType": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "NotNode",
+                    "methodName": "<init>",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.filters.expression.OrNode::<init>(===org.xwiki.notifications.filters.expression.generics.AbstractNode===, org.xwiki.notifications.filters.expression.generics.AbstractNode)",
+                    "new": "parameter void org.xwiki.notifications.filters.expression.OrNode::<init>(===org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode===, org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode)",
+                    "oldType": "org.xwiki.notifications.filters.expression.generics.AbstractNode",
+                    "newType": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "OrNode",
+                    "methodName": "<init>",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.filters.expression.OrNode::<init>(org.xwiki.notifications.filters.expression.generics.AbstractNode, ===org.xwiki.notifications.filters.expression.generics.AbstractNode===)",
+                    "new": "parameter void org.xwiki.notifications.filters.expression.OrNode::<init>(org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode, ===org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode===)",
+                    "oldType": "org.xwiki.notifications.filters.expression.generics.AbstractNode",
+                    "newType": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "OrNode",
+                    "methodName": "<init>",
+                    "parameterIndex": "1",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode",
+                    "new": "class org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode",
+                    "superClass": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression.generics",
+                    "classSimpleName": "AbstractBinaryOperatorNode",
+                    "elementKind": "class",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.notifications.filters.expression.generics.AbstractUnaryOperatorNode",
+                    "new": "class org.xwiki.notifications.filters.expression.generics.AbstractUnaryOperatorNode",
+                    "superClass": "org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode",
+                    "package": "org.xwiki.notifications.filters.expression.generics",
+                    "classSimpleName": "AbstractUnaryOperatorNode",
+                    "elementKind": "class",
+                    "justification": "Young API"
+                  }
                 ]
               }
             }

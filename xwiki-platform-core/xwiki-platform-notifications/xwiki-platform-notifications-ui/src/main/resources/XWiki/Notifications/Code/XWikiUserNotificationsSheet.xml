@@ -149,7 +149,7 @@
           &lt;/td&gt;
         #end
         ## Collapse button
-        &lt;td&gt;
+        &lt;td class="notificationCollapseButtonCell"&gt;
           &lt;button class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
         &lt;/td&gt;
       &lt;/tr&gt;
@@ -185,7 +185,7 @@
 &lt;div class="xform"&gt;
   &lt;div class="row"&gt;
     &lt;p class="xHint col-md-10"&gt;$escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))&lt;/p&gt;
-    &lt;div class="col-md-2"&gt;
+    &lt;div class="col-md-2 text-right"&gt;
       &lt;button class="btn btn-default btn-addfilter" data-target="#modal-add-filter-preference" data-toggle="modal"&gt;
         &lt;span class="fa fa-plus"&gt;&lt;/span&gt;&amp;nbsp;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))
       &lt;/button&gt;
@@ -1418,9 +1418,17 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
 .notifPreferences .rowApp td, .notifPreferences .rowApp th{
   height: 3em;
 }
-.notifPreferences th{
+.notifPreferences th:nth-child(1) {
+  vertical-align: top;
+  width: 250px;
+}
+.notificationAppCell {
   vertical-align: top;
   width: 33%;
+}
+.notificationCollapseButtonCell {
+  text-align: right;
+  vertical-align: top;
 }</code>
     </property>
     <property>

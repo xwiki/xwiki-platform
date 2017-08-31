@@ -55,7 +55,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
-      <version>1.1</version>
     </dependency>
     <!-- Manipulate xwiki.properties -->
     <dependency>
@@ -109,7 +108,7 @@
                 org/xwiki/test/integration/AntBuildListener.java,
                 org/xwiki/test/integration/XWikiExecutor.java,
                 org/xwiki/test/integration/XWikiTestSetup.java,
-                org/xwiki/test/integration/XWikiExecutorSuite.java,
+                org/xwiki/test/integration/XWikiExecutorSuite.java
               </excludes>
             </configuration>
           </execution>

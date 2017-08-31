@@ -202,6 +202,8 @@ public class XWikiExecutor
      * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance is
      * already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
      * </ul>
+     * 
+     * @throws Exception when failing to start XWiki
      */
     public void start() throws Exception
     {
@@ -481,7 +483,7 @@ public class XWikiExecutor
     }
 
     /**
-     * @deprecated since 4.2M1 use {@link #saveXWikiProperties(PropertiesConfiguration)} instead
+     * @deprecated since 4.2M1 use {@link #saveXWikiProperties()} instead
      */
     @Deprecated
     public void saveXWikiProperties(Properties properties) throws Exception

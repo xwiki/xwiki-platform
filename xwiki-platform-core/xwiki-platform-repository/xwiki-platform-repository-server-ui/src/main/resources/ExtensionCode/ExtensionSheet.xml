@@ -100,7 +100,7 @@
 
     ## Viewing
     ##
-    {{box cssClass="floatinginfobox"}}
+    {{box cssClass="floatinginfobox col-xs-12 col-sm-6 pull-right"}}
       #if ($hasEdit)
         #if ($proxyExtensionObject)
           #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
@@ -200,7 +200,8 @@
       )))
     {{/box}}
 
-    {{box cssClass="toc"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}
+    {{box cssClass="toc col-xs-12 col-sm-6"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}
+    (%class="clearfix"%)((()))
   #else
     ## Editing
     ##
@@ -485,7 +486,6 @@
 
 .box.floatinginfobox {
   margin-top: 0;
-  max-width: 50%;
 }
 
 .extensionSummary {
@@ -652,8 +652,10 @@
   padding-bottom: 0;
 }
 
-.box.floatinginfobox, .box.toc {
-  max-width: 49%;
+@media (min-width: 768px) {
+  .box.floatinginfobox, .box.toc {
+    max-width: 49%;
+  }
 }
 
 .box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */

@@ -50,42 +50,48 @@
 
 ## Get a list of available filters for the user
 #foreach ($filter in $services.notification.filters.getFilters())
-#foreach ($preference in $services.notification.filters.getFilterPreferences($filter))
-#set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
+  #foreach ($preference in $services.notification.filters.getFilterPreferences($filter))
+    #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
 
-## Compute the list of event types
-#set($eventTypeList = '')
-#if ($preference.getProperties('EVENT_TYPE').isEmpty())
-#set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
-#else
-#foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
-#set ($eventTypeList = $eventTypeList + $eventType + '&lt;br/&gt;')
-#end
-#end
+    ## Compute the list of event types
+    #set($eventTypeList = '&lt;ul class="list-unstyled"&gt;')
+    #if ($preference.getProperties('EVENT_TYPE').isEmpty())
+      #set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
+    #else
+      #set ($types = {})
+      #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+        #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
+      #end
+      #foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
+        #set ($eventTypeList = $eventTypeList + '&lt;li&gt;' + $types.get($eventType) + '&lt;/li&gt;')
+      #end
+    #end
+    #set($eventTypeList = $eventTypeList + '&lt;/ul&gt;')
 
-## Compute the list of notification formats
-#set($notificationFormatsList = '')
-#foreach ($notificationFormat in $preference.getFilterFormats())
-#set ($notificationFormatsList = $notificationFormatsList + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;br/&gt;')
-#end
+    ## Compute the list of notification formats
+    #set($notificationFormatsList = '&lt;ul class="list-unstyled"&gt;')
+    #foreach ($notificationFormat in $preference.getFilterFormats())
+      #set ($notificationFormatsList = $notificationFormatsList + '&lt;li&gt;' + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;/li&gt;')
+    #end
+    #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
 
-#set ($isEnabled = '')
-#if ($preference.isEnabled())
-  #set ($isEnabled = 'checked = "checked"')
-#end
-#set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled /&gt;")
+    #set ($isEnabled = '')
+    #if ($preference.isEnabled())
+      #set ($isEnabled = 'checked = "checked"')
+    #end
+    #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled /&gt;")
 
-#set ($element = {
-'filterPreferenceName': $preference.getName(),
-'name'                : $display,
-'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-'eventTypes'          : $eventTypeList,
-'notificationFormats' : $notificationFormatsList,
-'isEnabled'           : $isEnabled,
-'doc_viewable'        : true
-})
-#set ($discard = $elements.add($element))
-#end
+    #set ($element = {
+      'filterPreferenceName': $preference.filterPreferenceName,
+      'name'                : $display,
+      'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
+      'eventTypes'          : $eventTypeList,
+      'notificationFormats' : $notificationFormatsList,
+      'isEnabled'           : $isEnabled,
+      'doc_viewable'        : true
+    })
+    #set ($discard = $elements.add($element))
+  #end
 #end
 
 ##
@@ -94,14 +100,14 @@
 #set ($discard = $response.setContentType('application/json'))
 #set ($offset = $numbertool.toNumber($request.offset))
 #if (!$offset)
-#set ($offset = 1)
+  #set ($offset = 1)
 #end
 $jsontool.serialize({
-'totalrows'   : $elements.size(),
-'reqNo'       : $request.reqNo,
-'returnedrows': $elements.size(),
-'offset'      : $offset,
-'rows'        : $elements
+  'totalrows'   : $elements.size(),
+  'reqNo'       : $request.reqNo,
+  'returnedrows': $elements.size(),
+  'offset'      : $offset,
+  'rows'        : $elements
 })
 #end
 {{/velocity}}</content>

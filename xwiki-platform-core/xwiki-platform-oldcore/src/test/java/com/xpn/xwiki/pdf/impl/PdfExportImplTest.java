@@ -26,12 +26,14 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AllLogRule;
+import org.xwiki.text.StringUtils;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -99,6 +101,11 @@ public class PdfExportImplTest
         when(doc.getExternalURL("view", xcontext)).thenReturn("http://localhost:8080/export");
         xcontext.setDoc(doc);
 
-        assertTrue(pdfExport.applyCSS(html, css, xcontext).contains("<span style=\"color: red; \">Hello</span>"));
+        String modifiedHTML = pdfExport.applyCSS(html, css, xcontext);
+
+        // Verify that the SPAN's style attribute gets updated
+        assertTrue(modifiedHTML.contains("<span style=\"color: red; background: white; \">Hello</span>"));
+        // Also verify that the CSS is applied only to the span
+        assertEquals(1, StringUtils.countMatches(modifiedHTML, "color: red"));
     }
 }

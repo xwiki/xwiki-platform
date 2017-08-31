@@ -159,8 +159,8 @@ public class PackageMojo extends AbstractOldCoreMojo
      * Automatically drop ProgrammingRights when evaluating scripts in wiki pages, in order to make sure that by
      * default wiki pages don't require PR. Only active if {@link #test} is true and {@link #isSkipTests()} is false.
      * <p>
-     * Also note that it's possible to exclude some pages from being tested by setting the system property named
-     * {@code xwiki.prcheck.excludePattern} (e.g. {@code .*:XWiki\.DeletedDocuments}).
+     * Also note that it's possible to exclude some pages from being tested by setting an XWiki property named
+     * {@code test.prchecker.excludePattern} (e.g. {@code .*:XWiki\.DeletedDocuments}) in xwiki.properties.
      *
      * @since 9.8RC1
      */

@@ -35,6 +35,7 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <dependency>

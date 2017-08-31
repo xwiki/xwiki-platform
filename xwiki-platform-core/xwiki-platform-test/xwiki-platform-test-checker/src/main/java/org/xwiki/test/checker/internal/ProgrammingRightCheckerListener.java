@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -46,8 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Drop Programming Rights (PR) for all scripts in wiki pages so that functional tests can discover pages that require
- * PR and shouldn't. Also note that it's possible to exclude some pages from being tested by setting the system property
- * named {@code xwiki.prcheck.excludePattern} (e.g. {@code .*:XWiki\.DeletedDocuments}).
+ * PR and shouldn't. Also note that it's possible to exclude some pages from being tested by setting an XWiki property
+ * named {@code test.prchecker.excludePattern} (e.g. {@code .*:XWiki\.DeletedDocuments}) in xwiki.properties.
  *
  * @version $Id$
  * @since 9.8RC1
@@ -70,10 +71,14 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
+
     @Override
     public void initialize() throws InitializationException
     {
-        String regex = System.getProperty("xwiki.prcheck.excludePattern");
+        String regex = this.configurationSource.getProperty("test.prchecker.excludePattern");
         if (regex != null) {
             this.excludePattern = Pattern.compile(regex);
         }

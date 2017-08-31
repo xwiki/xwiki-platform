@@ -110,18 +110,25 @@ public class ProgrammingRightCheckerListener implements EventListener, Initializ
         }
 
         if (event instanceof ScriptEvaluatingEvent) {
+
+            // Make it simpler to debug why a test will fail with the PR checker active by logging that we dropped
+            // permissions.
+            boolean logPrinted = false;
+            boolean hasPR = this.contextualAuthorizationManager.hasAccess(Right.PROGRAM, currentDocReference);
+            if (hasPR) {
+                // Ideally we would print this in info mode but since right now all pages have PR by default, this is
+                // just swamping the logs...
+                this.logger.debug("PRChecker: Dropping permissions for page [{}], which had PR",
+                    currentDocReference);
+                logPrinted = true;
+            }
+
             // Save the original value
             Boolean originalValue = (Boolean) context.get(XWikiConstant.DROPPED_PERMISSIONS);
-            boolean logPrinted = false;
             if (originalValue != null) {
                 context.put(PRCHECK_KEY, originalValue);
-                boolean hasPR = this.contextualAuthorizationManager.hasAccess(Right.PROGRAM, currentDocReference);
-                if (hasPR) {
-                    this.logger.info("PRChecker: Dropping permissions for page [{}], which had PR",
-                        currentDocReference);
-                    logPrinted = true;
-                }
             }
+
             if (!logPrinted) {
                 this.logger.debug("PRChecker: Dropping permissions for page [{}]", currentDocReference);
             }

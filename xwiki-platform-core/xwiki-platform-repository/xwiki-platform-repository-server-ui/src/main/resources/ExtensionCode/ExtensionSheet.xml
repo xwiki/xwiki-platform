@@ -535,6 +535,9 @@
 }</code>
     </property>
     <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
       <name>Extension CSS</name>
     </property>
     <property>
@@ -677,6 +680,9 @@
 .floatinginfobox td {
   vertical-align: baseline;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Junco</name>

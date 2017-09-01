@@ -44,8 +44,10 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin, \
       com.xpn.xwiki.plugin.fileupload.FileUploadPlugin
     </xwikiCfgPlugins>
-    <!-- Exclude the XWiki.OfficeImporterAdmin page from the PR checker since it requires PR ATM -->
-    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.OfficeImporterAdmin</xwikiPropertiesAdditionalProperties>
+    <!-- Exclude the XWiki.XWikiPreferences from the PR checker since the XWiki.OfficeImporterAdmin page calls
+         the "officemanager" ScriptService which requires PR and that pages is executed in the context of
+         XWiki.XWikiPreferences (which is the current doc) -->
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.XWikiPreferences</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <!-- Note: We depend on the POM of xwiki-platform-office-ui in order to include its transitive

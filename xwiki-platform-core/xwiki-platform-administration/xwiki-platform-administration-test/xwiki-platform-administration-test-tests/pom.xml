@@ -49,6 +49,10 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- XWiki.ResetPassword uses the saveAsAuthor() API which performs a check on whether permissions have been dropped
+         and since the PR checker works by dropping permissions, it causes the user to become guest and thus the doc
+         save fails. Thus we need to exclude the page from the PR checker -->
+    <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.ResetPassword</xwikiPropertiesAdditionalProperties>
   </properties>
   <dependencies>
     <dependency>

@@ -171,7 +171,7 @@
     'eventTypes':          { 'sortable': true, 'html': true },
     'notificationFormats': { 'sortable': true, 'html': true },
     'isEnabled':           { 'html' : true },
-    '_actions':            { 'sortable': false, 'actions': ['edit', 'delete']}
+    '_actions':            { 'sortable': false, 'actions': ['delete']}
   })
   #set($options  = {
     'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
@@ -1325,6 +1325,154 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
     </property>
     <property>
       <name>Advanced Filter Preferences</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
+    <number>5</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>e9f94eea-e8da-4fac-98e7-c0268036118c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-meta', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm) {
+
+  // Globals
+  var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
+  var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
+
+  // Callback on livetable row printing
+  $(document).on('xwiki:livetable:newrow', function(event, data) {
+    // Delete action
+    $(data.row).find('a.actiondelete').click(function(event) {
+      event.preventDefault();
+      new XWiki.widgets.ConfirmationBox({
+        onYes: function() {
+          var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.inProgress'))", 'inprogress');
+          $.post(serviceURL, {
+            action: 'deleteFilterPreference',
+            filterPreferenceName: data.data.filterPreferenceName,
+            csrf: xm.form_token
+          }).done(function() {
+            notif.hide();
+            new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.done'))", 'done');
+            window.livetable_notificationFilterPreferencesLiveTable.refresh();
+          }).fail(function() {
+            notif.hide();
+            new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.error'))", 'error');
+          });
+        }
+      });
+    });
+    // Enable / Disable action
+    $(data.row).find('.isEnabled .bootstrap-switch').on('switchChange.bootstrapSwitch', function(event, state) {
+      // TODO: Translation keys
+      var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');
+      $.post(serviceURL, {
+        action: 'setFilterPreferenceEnabled',
+        filterPreferenceName: data.data.filterPreferenceName,
+        enabled: state,
+        csrf: xm.form_token
+      }).done(function() {
+        notif.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
+      }).fail(function() {
+        notif.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+      });
+    });
+  });
+  
+  // Initializer
+  $(document).ready(function() {
+    // This script is usually loaded after the livetable is displayed and so the previous callback is not called.
+    // Because of that, we need
+    window.livetable_notificationFilterPreferencesLiveTable.refresh();
+  });
+});</code>
+    </property>
+    <property>
+      <name>Filter Preferences Livetable Callback</name>
     </property>
     <property>
       <parse>1</parse>

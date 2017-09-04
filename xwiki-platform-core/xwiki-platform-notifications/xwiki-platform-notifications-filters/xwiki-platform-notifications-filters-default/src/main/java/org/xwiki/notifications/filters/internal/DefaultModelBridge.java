@@ -38,6 +38,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -73,6 +74,8 @@ public class DefaultModelBridge implements ModelBridge
     private static final String IS_ENABLED = "isEnabled";
 
     private static final String IS_ACTIVE = "isActive";
+
+    private static final String FILTER_PREFERENCE_NAME = "filterPreferenceName";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -119,7 +122,7 @@ public class DefaultModelBridge implements ModelBridge
                         // Create the new filter preference and add it to the list of preferences
                         DefaultNotificationFilterPreference notificationFilterPreference
                                 = new DefaultNotificationFilterPreference(
-                                        obj.getStringValue("filterPreferenceName"));
+                                        obj.getStringValue(FILTER_PREFERENCE_NAME));
 
                         notificationFilterPreference.setProviderHint("userProfile");
                         notificationFilterPreference.setFilterName(obj.getStringValue(FILTER_NAME));
@@ -171,5 +174,72 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return disabledFilters;
+    }
+
+    @Override
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        final DocumentReference notificationFilterPreferenceClass
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+        boolean shouldSave = false;
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(user, context);
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
+            if (preferencesObj != null) {
+                for (BaseObject obj : preferencesObj) {
+                    if (obj != null
+                            && StringUtils.equals(filterPreferenceName, obj.getStringValue(FILTER_PREFERENCE_NAME))) {
+                        doc.removeXObject(obj);
+                        shouldSave = true;
+                    }
+                }
+            }
+            if (shouldSave) {
+                xwiki.saveDocument(doc, String.format("Remove filter preference [%s].", filterPreferenceName), context);
+            }
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to delete filters [%s] for user [%s].", filterPreferenceName, user), e);
+        }
+
+    }
+
+    @Override
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+            throws NotificationException
+    {
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        final DocumentReference notificationFilterPreferenceClass
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+        boolean shouldSave = false;
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(user, context);
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
+            if (preferencesObj != null) {
+                for (BaseObject obj : preferencesObj) {
+                    if (obj != null
+                            && StringUtils.equals(filterPreferenceName, obj.getStringValue(FILTER_PREFERENCE_NAME))
+                            && (obj.getIntValue(IS_ENABLED) != 0) == enabled) {
+                        obj.setIntValue(IS_ENABLED, enabled ? 1 : 0);
+                        shouldSave = true;
+                    }
+                }
+            }
+            if (shouldSave) {
+                xwiki.saveDocument(doc, String.format("%s filter preference [%s].",
+                        enabled ? "Enable" : "Disable", filterPreferenceName), context);
+            }
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to update enabled state filters [%s] for user [%s].",
+                            filterPreferenceName, user), e);
+        }
     }
 }

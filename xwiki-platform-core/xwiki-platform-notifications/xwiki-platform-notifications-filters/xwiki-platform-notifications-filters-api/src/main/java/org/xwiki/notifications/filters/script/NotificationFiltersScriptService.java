@@ -104,4 +104,31 @@ public class NotificationFiltersScriptService implements ScriptService
     {
         return notificationFilterManager.displayFilter(filter, preference);
     }
+
+    /**
+     * Delete a filter preference.
+     * @param filterPreferenceName name of the filter preference
+     * @throws NotificationException if an error happens
+     *
+     * @since 9.8RC1
+     */
+    void deleteFilterPreference(String filterPreferenceName) throws NotificationException
+    {
+        notificationFilterManager.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceName);
+    }
+
+    /**
+     * Enable or disable a filter preference.
+     * @param filterPreferenceName name of the filter preference
+     * @param enabled either or not the filter preference should be enabled
+     * @throws NotificationException if an error happens
+     *
+     * @since 9.8RC1
+     */
+    void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException
+    {
+        notificationFilterManager.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceName, enabled);
+    }
 }

@@ -261,6 +261,37 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         }
     }
 
+    @Override
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    {
+        try {
+            for (NotificationFilterPreferenceProvider provider
+                    : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
+                            NotificationFilterPreferenceProvider.class)) {
+                provider.deleteFilterPreference(user, filterPreferenceName);
+            }
+
+        } catch (ComponentLookupException e) {
+            logger.info("Failed to remove the filter preference [{}].", filterPreferenceName, e);
+        }
+    }
+
+    @Override
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+            throws NotificationException
+    {
+        try {
+            for (NotificationFilterPreferenceProvider provider
+                    : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
+                    NotificationFilterPreferenceProvider.class)) {
+                provider.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+            }
+
+        } catch (ComponentLookupException e) {
+            logger.info("Failed to enable or disabled the filter preference [{}].", filterPreferenceName, e);
+        }
+    }
+
     /**
      * Goes through every given {@link NotificationFilter}. One of the filters implements
      * {@link ToggleableNotificationFilter}, checks if the given user has disabled this filter. If so, remove the

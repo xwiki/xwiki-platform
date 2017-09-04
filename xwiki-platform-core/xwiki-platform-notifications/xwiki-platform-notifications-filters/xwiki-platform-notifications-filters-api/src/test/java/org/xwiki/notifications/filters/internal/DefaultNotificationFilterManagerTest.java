@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -42,6 +41,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -258,5 +258,27 @@ public class DefaultNotificationFilterManagerTest
         mocker.getComponentUnderTest().saveFilterPreferences(testSet);
 
         verify(testProvider, times(1)).saveFilterPreferences(testSet);
+    }
+
+    @Test
+    public void deleteFilterPreference() throws Exception
+    {
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "UserA");
+        mocker.getComponentUnderTest().deleteFilterPreference(user, "myFilter");
+
+        verify(testProvider, times(1)).deleteFilterPreference(eq(user), eq("myFilter"));
+    }
+
+    @Test
+    public void setFilterPreferenceEnabled() throws Exception
+    {
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "UserA");
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled(user, "myFilter1", true);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled(user, "myFilter2", false);
+
+        verify(testProvider, times(1)).setFilterPreferenceEnabled(eq(user),
+                eq("myFilter1"), eq(true));
+        verify(testProvider, times(1)).setFilterPreferenceEnabled(eq(user),
+                eq("myFilter2"), eq(false));
     }
 }

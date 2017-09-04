@@ -89,4 +89,17 @@ public class CachedModelBridge implements ModelBridge
 
         return disabledFiltersHints;
     }
+
+    @Override
+    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    {
+        modelBridge.deleteFilterPreference(user, filterPreferenceName);
+    }
+
+    @Override
+    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+            throws NotificationException
+    {
+        modelBridge.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+    }
 }

@@ -137,12 +137,22 @@
                   }
                 },
                 "ignore" : [
+                  // Add more ignores below...
                   {
                     "code": "java.method.addedToInterface",
                     "new": "method org.xwiki.notifications.filters.expression.generics.AbstractNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference)",
                     "package": "org.xwiki.notifications.filters",
                     "classSimpleName": "NotificationFilter",
                     "methodName": "filterExpression",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::deleteFilterPreference(org.xwiki.model.reference.DocumentReference, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "deleteFilterPreference",
                     "elementKind": "method",
                     "justification": "Young API"
                   },
@@ -197,6 +207,15 @@
                     "package": "org.xwiki.notifications.filters",
                     "classSimpleName": "NotificationFilterManager",
                     "methodName": "saveFilterPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "setFilterPreferenceEnabled",
                     "elementKind": "method",
                     "justification": "Young API"
                   },

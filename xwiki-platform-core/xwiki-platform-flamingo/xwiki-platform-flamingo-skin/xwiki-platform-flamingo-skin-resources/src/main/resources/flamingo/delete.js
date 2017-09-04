@@ -186,14 +186,12 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
       // Note: we use JSON because it is easier to parse with javascript
       $.ajax(url, {'data': {'media': 'json'}}).done(function (data) {
         updateProgressBar(data.progress.offset);
-        if (data.state == 'WAITING') {
+        if (data.state === 'WAITING') {
           handleQuestion();
-          return;
-        }
-        if (data.state != 'FINISHED') {
-          setTimeout(getProgressStatus, 1000);
-        } else {
+        } else if (data.state === 'FINISHED') {
           whenTerminated();
+        } else {
+          setTimeout(getProgressStatus, 1000);
         }
       });
     };

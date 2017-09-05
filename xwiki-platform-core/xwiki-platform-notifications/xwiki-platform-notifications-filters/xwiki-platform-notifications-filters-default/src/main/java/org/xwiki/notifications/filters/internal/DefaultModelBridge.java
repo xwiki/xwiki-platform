@@ -226,7 +226,7 @@ public class DefaultModelBridge implements ModelBridge
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null
                             && StringUtils.equals(filterPreferenceName, obj.getStringValue(FILTER_PREFERENCE_NAME))
-                            && (obj.getIntValue(IS_ENABLED) != 0) == enabled) {
+                            && (obj.getIntValue(IS_ENABLED) != 0) != enabled) {
                         obj.setIntValue(IS_ENABLED, enabled ? 1 : 0);
                         shouldSave = true;
                     }

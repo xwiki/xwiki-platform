@@ -66,7 +66,6 @@
 #elseif ("$!request.action" == 'setFilterPreferenceEnabled')
   #try()
     #if ($services.csrf.isTokenValid($request.csrf))
-      $stringtool.equals("$!request.enabled", 'true')
       $services.notification.filters.setFilterPreferenceEnabled($request.filterPreferenceName, $stringtool.equals("$!request.enabled", 'true'))
     #else
       $response.sendError(401, 'Bad CSRF Token')

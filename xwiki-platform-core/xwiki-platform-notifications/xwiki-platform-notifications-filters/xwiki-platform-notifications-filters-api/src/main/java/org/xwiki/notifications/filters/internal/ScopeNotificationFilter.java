@@ -19,12 +19,14 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -200,10 +202,40 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
     private boolean scopeMatchesFilteringContext(NotificationFilterPreference filterPreference,
             NotificationPreference preference)
     {
-        return ((preference == null && filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty())
-                || (preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
-                    && filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(
-                            preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE))));
+        if (preference == null) {
+            return matchAllEvents(filterPreference);
+        } else {
+            return matchEventType(filterPreference, preference);
+        }
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @return either or not the preference should be applied to all events
+     */
+    private boolean matchAllEvents(NotificationFilterPreference filterPreference)
+    {
+        // When the list of event types concerned by the filter is empty, we consider that the filter concerns
+        // all events.
+        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @param preference a notification preference
+     * @return if the filter preference concerns the event of the notification preference
+     */
+    private boolean matchEventType(NotificationFilterPreference filterPreference, NotificationPreference preference)
+    {
+        // The event types concerned by the filter
+        List<String> filterEventTypes = filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE);
+
+        // The event type concerned by the notification preference
+        Object preferenceEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+
+        // There is a match of the preference event type is not blank (it should not...) and if the filter concerns it
+        return preferenceEventType != null && StringUtils.isNotBlank((String) preferenceEventType)
+                && filterEventTypes.contains(preferenceEventType);
     }
 
     /**

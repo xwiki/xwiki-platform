@@ -149,18 +149,6 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, x
     var watchPageSwitch  = $('#tmWatchDocument');
     var watchSpaceSwitch = $('#tmWatchSpace');
     var watchWikiSwitch  = $('#tmWatchWiki');
-  
-    ///
-    /// Apply the bootstrap switch plugin to the watchlist inputs
-    ///
-    $('notifications-watchlist-item input').each(function() {
-      var input = $(this);
-      input.bootstrapSwitch('onColor', 'success');
-      input.bootstrapSwitch('offColor', 'danger');
-      input.bootstrapSwitch('onText', '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.on'))');
-      input.bootstrapSwitch('offText', '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.off'))');
-      input.bootstrapSwitch('size', 'small');
-    });
     
     ///
     /// Set the icon corresponding to each switch

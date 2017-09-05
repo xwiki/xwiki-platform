@@ -165,11 +165,11 @@ public class NotificationsTest extends AbstractTest
         assertTrue(system.isCollapsed());
         system.setCollapsed(false);
         assertFalse(system.isCollapsed());
-        assertEquals("System", system.getApplicationName());
+        assertEquals("Pages", system.getApplicationName());
         assertEquals("A comment is posted", p.getEventType(SYSTEM, ADD_COMMENT).getEventTypeDescription());
         assertEquals("A new page is created", p.getEventType(SYSTEM, CREATE).getEventTypeDescription());
         assertEquals("A page is deleted", p.getEventType(SYSTEM, DELETE).getEventTypeDescription());
-        assertEquals("A page is updated", p.getEventType(SYSTEM, UPDATE).getEventTypeDescription());
+        assertEquals("A page is modified", p.getEventType(SYSTEM, UPDATE).getEventTypeDescription());
 
         // Check default
         assertEquals(BootstrapSwitch.State.OFF, p.getApplicationState(SYSTEM, ALERT_FORMAT));

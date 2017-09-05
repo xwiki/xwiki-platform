@@ -1,4 +1,4 @@
-System:
+Pages:
   [create] [Title 1](http://localhost:8080/xwiki/bin/view/NotificationsTest/Page1).
   By user1.
   2017/06/27 15:49

@@ -27,7 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.data.MediaType;
 import org.restlet.ext.servlet.ServletUtils;
+import org.restlet.representation.Representation;
 import org.restlet.routing.Filter;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
@@ -59,6 +61,12 @@ public class XWikiSetupCleanupFilter extends Filter
          */
         getContext().getAttributes().put(Constants.HTTP_REQUEST, getHttpRequest(request));
 
+        // Workaround bug in Restlet. See https://github.com/restlet/restlet-framework-java/issues/1271.
+        Representation entity = request.getEntity();
+        if (entity.getMediaType() == null) {
+            entity.setMediaType(MediaType.APPLICATION_OCTET_STREAM);
+        }
+
         return Filter.CONTINUE;
     }
 
@@ -74,7 +82,7 @@ public class XWikiSetupCleanupFilter extends Filter
                 componentManager.release(component);
             } catch (ComponentLifecycleException e) {
                 getLogger().log(Level.WARNING, "Unable to release component [{0}]. ({1})",
-                    new Object[] {component.getClass().getName(), e.getMessage()});
+                    new Object[] { component.getClass().getName(), e.getMessage() });
             }
         }
 
@@ -94,11 +102,11 @@ public class XWikiSetupCleanupFilter extends Filter
     private List<XWikiRestComponent> getReleasableComponents(ComponentManager componentManager)
     {
         try {
-            ExecutionContext executionContext = componentManager.<Execution> getInstance(Execution.class).getContext();
+            ExecutionContext executionContext = componentManager.<Execution>getInstance(Execution.class).getContext();
             @SuppressWarnings("unchecked")
             List<XWikiRestComponent> releasableComponents =
                 (List<XWikiRestComponent>) executionContext.getProperty(Constants.RELEASABLE_COMPONENT_REFERENCES);
-            return releasableComponents != null ? releasableComponents : Collections.<XWikiRestComponent> emptyList();
+            return releasableComponents != null ? releasableComponents : Collections.<XWikiRestComponent>emptyList();
         } catch (Exception e) {
             getLogger().log(Level.WARNING, "Failed to retrieve the list of releasable components.", e);
             return Collections.emptyList();

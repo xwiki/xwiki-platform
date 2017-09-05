@@ -31,13 +31,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
-import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
+import org.restlet.ext.servlet.ServletUtils;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
-import org.xwiki.rest.Constants;
 import org.xwiki.rest.XWikiRestComponent;
 
 /**
@@ -48,8 +47,8 @@ import org.xwiki.rest.XWikiRestComponent;
  * @version $Id$
  * @since 2.3M1
  */
-public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends AnnotationRequest> implements
-    MessageBodyReader<T>, XWikiRestComponent
+public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends AnnotationRequest>
+    implements MessageBodyReader<T>, XWikiRestComponent
 {
     /**
      * The parameter name for a field requested to appear in the annotations stub. <br>
@@ -73,8 +72,8 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
 
     @Override
     public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-        MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
-        WebApplicationException
+        MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+        throws IOException, WebApplicationException
     {
         ObjectFactory objectFactory = new ObjectFactory();
         T annotationRequest = getReadObjectInstance(objectFactory);
@@ -83,9 +82,9 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
             // Try to parse a form from the content of this request
             // FIXME should this method even try to read and consume the entity stream at all ?
             // It seems it is already consumed upstream by the time this body reader is invoked.
-            Form form = new Form(Request.getCurrent().getEntity());
+            Form form = new Form(org.restlet.Request.getCurrent().getEntity());
 
-            if (form.getNames().size() != 0) {
+            if (!form.getNames().isEmpty()) {
                 for (String paramName : form.getNames()) {
                     for (String paramValue : form.getValuesArray(paramName)) {
                         saveField(annotationRequest, paramName, paramValue, objectFactory);
@@ -95,19 +94,18 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
         } catch (IllegalStateException e) {
             // If the entity stream has been consumed already by a filter, Restlet will complain with an ISE
             // Try to read data using the parameters
-            HttpServletRequest httpServletRequest =
-                (HttpServletRequest) Context.getCurrent().getAttributes().get(Constants.HTTP_REQUEST);
-            for (Object entryObj : httpServletRequest.getParameterMap().entrySet()) {
-                Map.Entry entry = (Map.Entry) entryObj;
+            HttpServletRequest httpServletRequest = ServletUtils.getRequest(Request.getCurrent());
+
+            for (Map.Entry<String, String[]> entry : httpServletRequest.getParameterMap().entrySet()) {
                 // FIXME: this needs to be done right, it can interfere with the custom parameters names
                 // skip method & media parameters, used by REST to carry its own parameters
                 if ("method".equals(entry.getKey()) || "media".equals(entry.getKey())) {
                     continue;
                 }
                 // save all the values of this field, one by one
-                String[] paramValues = (String[]) entry.getValue();
+                String[] paramValues = entry.getValue();
                 for (String value : paramValues) {
-                    saveField(annotationRequest, (String) entry.getKey(), value, objectFactory);
+                    saveField(annotationRequest, entry.getKey(), value, objectFactory);
                 }
             }
         }

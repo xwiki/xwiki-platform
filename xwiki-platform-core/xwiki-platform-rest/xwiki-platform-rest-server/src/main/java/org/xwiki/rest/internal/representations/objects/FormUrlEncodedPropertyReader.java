@@ -35,12 +35,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.restlet.Context;
+import org.restlet.Request;
 import org.restlet.data.Form;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rest.Constants;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Property;
@@ -58,21 +58,18 @@ public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
     private static final String PROPERTY_PREFIX = "property#";
 
     @Override
-    public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
         return Property.class.isAssignableFrom(type);
     }
 
     @Override
     public Property readFrom(Class<Property> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-        MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException,
-        WebApplicationException
+        MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+        throws IOException, WebApplicationException
     {
         ObjectFactory objectFactory = new ObjectFactory();
         Property property = objectFactory.createProperty();
-
-        HttpServletRequest httpServletRequest =
-            (HttpServletRequest) Context.getCurrent().getAttributes().get(Constants.HTTP_REQUEST);
 
         Representation representation =
             new InputRepresentation(entityStream, org.restlet.data.MediaType.APPLICATION_WWW_FORM);
@@ -83,9 +80,11 @@ public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
          * read data using getParameter()
          */
         if (form.getNames().isEmpty()) {
-            Enumeration names = httpServletRequest.getParameterNames();
+            HttpServletRequest httpServletRequest = ServletUtils.getRequest(Request.getCurrent());
+
+            Enumeration<String> names = httpServletRequest.getParameterNames();
             while (names.hasMoreElements()) {
-                String name = (String) names.nextElement();
+                String name = names.nextElement();
                 if (name.startsWith(PROPERTY_PREFIX)) {
                     property.setName(name.replace(PROPERTY_PREFIX, ""));
                     property.setValue(httpServletRequest.getParameter(name));

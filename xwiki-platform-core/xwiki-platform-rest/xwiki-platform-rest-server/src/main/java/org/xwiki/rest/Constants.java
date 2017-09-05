@@ -26,6 +26,10 @@ public class Constants
 {
     /**
      * The key used to store the current HTTP request object in the current Restlet context.
+     * 
+     * @deprecated since 9.8RC1, use org.restlet.ext.servlet.ServletUtils.getRequest(org.restlet.Request.getCurrent())
+     *             instead
      */
+    @Deprecated
     public static final String HTTP_REQUEST = "httpRequest";
 }

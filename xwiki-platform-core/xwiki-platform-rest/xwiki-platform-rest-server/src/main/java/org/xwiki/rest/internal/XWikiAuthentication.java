@@ -25,9 +25,10 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Form;
-import org.restlet.engine.http.header.HeaderConstants;
+import org.restlet.data.Header;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.util.Series;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -98,9 +99,10 @@ public class XWikiAuthentication extends ChallengeAuthenticator
          * After performing the authentication we should add headers to the response to allow applications to verify if
          * the authentication is still valid We are also adding the XWiki version at the same moment.
          */
-        Form responseHeaders = (Form) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        Series<Header> responseHeaders =
+            (Series<Header>) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (responseHeaders == null) {
-            responseHeaders = new Form();
+            responseHeaders = new Series<>(Header.class);
             response.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, responseHeaders);
         }
         responseHeaders.add("XWiki-User", serializer.serialize(xwikiContext.getUserReference()));

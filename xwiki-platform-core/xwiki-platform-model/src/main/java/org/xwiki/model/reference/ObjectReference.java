@@ -64,6 +64,7 @@ public class ObjectReference extends EntityReference
 
     /**
      * Deprecated constructor.
+     * 
      * @param wiki wiki where the parent document of the object is
      * @param space space where the parent document of the object is
      * @param document parent document of the object
@@ -120,5 +121,14 @@ public class ObjectReference extends EntityReference
     public ObjectReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
         return new ObjectReference(this, oldParent, newParent);
+    }
+
+    /**
+     * @return the reference of the document holding this object
+     * @since 9.8RC1
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return (DocumentReference) getParent();
     }
 }

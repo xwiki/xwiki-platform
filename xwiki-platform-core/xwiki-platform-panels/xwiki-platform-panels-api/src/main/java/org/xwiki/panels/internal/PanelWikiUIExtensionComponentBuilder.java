@@ -19,59 +19,55 @@
  */
 package org.xwiki.panels.internal;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
+import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
-import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Allows to build {@link PanelWikiUIExtension} components.
  *
  * @version $Id$
- * @since 4.3M1
+ * @since 9.8RC1
  */
 @Component
 @Singleton
-@Named("panels")
-public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilder
+@Named(PanelWikiUIExtensionComponentBuilder.CLASS_REFERENCE_STRING)
+public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectComponentBuilder
 {
     /**
-     * The query manager, used to search for documents defining panels.
+     * The local reference of the class used to defined panels xobjects as a String.
      */
-    @Inject
-    private QueryManager queryManager;
+    public static final String CLASS_REFERENCE_STRING = "Panels.PanelClass";
+
+    /**
+     * The local reference of the class used to defined panels xobjects.
+     */
+    public static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("Panels", "PanelClass");
 
     /**
      * The component manager.
      */
     @Inject
     private ComponentManager componentManager;
-
-    /**
-     * Document access bridge.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Content parser used to parse the panel content.
@@ -83,56 +79,28 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
     @Named("current")
     private DocumentReferenceResolver<String> currentResolver;
 
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
     @Override
-    public List<DocumentReference> getDocumentReferences()
+    public EntityReference getClassReference()
     {
-        List<DocumentReference> references = new ArrayList<DocumentReference>();
-
-        try {
-            Query query =
-                queryManager.createQuery("select doc.fullName from Document doc, doc.object(Panels.PanelClass) "
-                    + "as panel", Query.XWQL);
-            List<String> results = query.execute();
-            for (String fullName : results) {
-                references.add(this.currentResolver.resolve(fullName));
-            }
-        } catch (Exception e) {
-            // Fail "silently"
-            e.printStackTrace();
-        }
-
-        return references;
+        return CLASS_REFERENCE;
     }
 
     @Override
-    public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
+    public List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
+        String content = baseObject.getStringValue("content");
+        Syntax syntax = baseObject.getOwnerDocument().getSyntax();
+        DocumentReference documentReference = baseObject.getOwnerDocument().getDocumentReference();
+        DocumentReference authorReference = baseObject.getOwnerDocument().getAuthorReference();
 
-        List<WikiComponent> components = new ArrayList<WikiComponent>();
-        DocumentReference panelXClass = new DocumentReference(xcontext.getWikiId(), "Panels", "PanelClass");
-        String content = (String) documentAccessBridge.getProperty(reference, panelXClass, "content");
-        Syntax syntax = null;
-        DocumentReference authorReference;
+        XDOM xdom = this.parser.parse(content, syntax, documentReference);
 
         try {
-            syntax = documentAccessBridge.getDocument(reference).getSyntax();
-            authorReference = xcontext.getWiki().getDocument(reference, xcontext).getAuthorReference();
-            XDOM xdom = parser.parse(content, syntax, reference);
-
-            components.add(new PanelWikiUIExtension(reference, authorReference, xdom, syntax, componentManager));
-        } catch (WikiComponentException e) {
-            throw e;
+            return Collections.<WikiComponent>singletonList(new PanelWikiUIExtension(baseObject.getReference(),
+                authorReference, xdom, syntax, this.componentManager));
         } catch (ComponentLookupException e) {
-            throw new WikiComponentException(String.format("Failed to initialize Panel UI extension [%s]", reference),
+            throw new WikiComponentException(String.format("Failed to initialize Panel UI extension [%s]", baseObject),
                 e);
-        } catch (Exception e) {
-            throw new WikiComponentException(String.format("Failed to retrieve panel document [%s]", reference), e);
         }
-
-        return components;
     }
 }

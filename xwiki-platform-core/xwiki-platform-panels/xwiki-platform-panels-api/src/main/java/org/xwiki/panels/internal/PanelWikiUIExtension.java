@@ -31,6 +31,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
@@ -42,6 +43,8 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.uiextension.UIExtension;
+
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Provides a bridge between Panels defined in XObjects and {@link UIExtension}.
@@ -66,7 +69,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
      *      org.xwiki.model.reference.DocumentReference, org.xwiki.rendering.block.XDOM,
      *      org.xwiki.rendering.syntax.Syntax, org.xwiki.component.manager.ComponentManager)
      */
-    private final DocumentReference documentReference;
+    private final BaseObjectReference panelReference;
 
     /**
      * @see #PanelWikiUIExtension(org.xwiki.model.reference.DocumentReference,
@@ -106,17 +109,17 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     /**
      * Default constructor.
      *
-     * @param documentReference The document in which the panel is defined
+     * @param panelReference The reference of the object in which the panel is defined
      * @param authorReference The author of the document in which the panel is defined
      * @param xdom The content to display for this panel
      * @param syntax The syntax in which the content is written
      * @param componentManager The XWiki content manager
      * @throws ComponentLookupException If module dependencies are missing
      */
-    public PanelWikiUIExtension(DocumentReference documentReference, DocumentReference authorReference, XDOM xdom,
+    public PanelWikiUIExtension(BaseObjectReference panelReference, DocumentReference authorReference, XDOM xdom,
         Syntax syntax, ComponentManager componentManager) throws ComponentLookupException
     {
-        this.documentReference = documentReference;
+        this.panelReference = panelReference;
         this.authorReference = authorReference;
         this.xdom = xdom;
         this.syntax = syntax;
@@ -130,7 +133,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     @Override
     public String getId()
     {
-        return serializer.serialize(documentReference);
+        return this.serializer.serialize(getDocumentReference());
     }
 
     @Override
@@ -142,13 +145,19 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     @Override
     public DocumentReference getDocumentReference()
     {
-        return documentReference;
+        return this.panelReference.getDocumentReference();
+    }
+
+    @Override
+    public EntityReference getEntityReference()
+    {
+        return this.panelReference;
     }
 
     @Override
     public DocumentReference getAuthorReference()
     {
-        return authorReference;
+        return this.authorReference;
     }
 
     @Override
@@ -156,7 +165,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     {
         // We need to clone the xdom to avoid transforming the original and make it useless after the first
         // transformation
-        final XDOM transformedXDOM = xdom.clone();
+        final XDOM transformedXDOM = this.xdom.clone();
 
         this.progress.startStep(getDocumentReference(), "panel.progress.execute", "Execute panel [{}]",
             getDocumentReference());
@@ -172,7 +181,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
                 return null;
             }, getAuthorReference());
         } catch (Exception e) {
-            LOGGER.error("Error while executing transformation for panel [{}]", this.documentReference.toString());
+            LOGGER.error("Error while executing transformation for panel [{}]", this.panelReference);
         } finally {
             this.progress.endStep(getDocumentReference());
         }

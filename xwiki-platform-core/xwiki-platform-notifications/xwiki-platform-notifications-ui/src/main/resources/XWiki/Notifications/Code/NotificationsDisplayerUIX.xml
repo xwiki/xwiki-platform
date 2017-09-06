@@ -96,6 +96,22 @@
     #set ($startDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.date).longValue()).toDate())
   #end
   #set ($discard = $services.notification.preferences.setStartDate($datetool.date))
+#********************************************************
+             Watch/Unwatch a location
+********************************************************#
+#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; ('watchLocation' == $request.action || 'unwatchLocation' == $request.action))
+  #if ("$!request.type" == 'space')
+    #set ($location = $services.model.resolveSpace($request.location))
+  #elseif ("$!request.type" == 'wiki')
+    #set ($location = $services.model.createWikiReference($request.location))
+  #else
+    #set ($location = $services.model.resolveDocument($request.location))
+  #end
+  #if ('watchLocation' == $request.action)
+    #set ($discard = $services.notification.watch.watchLocation($location))
+  #else
+    #set ($discard = $services.notification.watch.unwatchLocation($location))
+  #end
 #end
 {{/velocity}}
 </content>
@@ -414,6 +430,190 @@
   </object>
   <object>
     <name>XWiki.Notifications.Code.NotificationsDisplayerUIX</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>82a6ca49-41a5-4f5e-ac75-2a931740b7ec</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
+#set ($jsExtension = '.min.js')
+#if (!$services.debug.minify)
+  #set ($jsExtension = '.js')
+#end
+require.config({
+  paths: {
+    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', "js/bootstrap-switch${jsExtension}")'
+  },
+  shim: {
+    'bootstrap-switch' : ['jquery']
+  }
+});
+require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, xm) {
+  'use strict';
+  // Most of the code comes from the deprecated Watchlist Application
+  $(document).ready(function() {
+
+    ///
+    /// Get the notification inputs for future usage
+    ///
+    var watchWikiSwitch  = $('#notificationWiki');
+    var watchSpaceSwitch = $('#notificationPageAndChildren');
+    var watchPageSwitch  = $('#notificationPageOnly');
+
+    ///
+    /// Set the icon corresponding to each switch
+    ///
+    watchPageSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('page'))');
+    watchSpaceSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))');
+    watchWikiSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('wiki'))');
+
+    ///
+    /// Add a tooltip to each switch
+    ///
+    $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
+      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
+      placement: 'bottom'
+    });
+    var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
+    if (xm.documentReference.getName() != 'WebHome') {
+      // Adapt the tooltip when the current document is terminal
+      watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
+    }
+    $('.bootstrap-switch-id-notificationPageOnly').tooltip({
+      title: watchSpaceToolTip,
+      placement: 'bottom'
+    });
+    $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
+      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.wiki'))',
+      placement: 'bottom'
+    });
+
+    /**
+     * Change the watchlist status of a document/space/wiki.
+     */
+    var changeWatchListStatus = function (action, location, type) {
+      /**
+       * URL to the service that return the notifications to display
+       */
+      var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      $.post(url, {
+        'action': action,
+        'location': location,
+        'type': type
+      }).fail (function() {
+        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('watchlist.notifications.changeStatusError'))', 'error');
+      });
+    }
+
+    ///
+    /// Change the watchlist status when the switched are manipulated by the user
+    ///
+    watchPageSwitch.bootstrapSwitch('onSwitchChange', function (event, status) {
+      changeWatchListStatus(status ? 'watchLocation' : 'unwatchLocation', XWiki.Model.serialize(xm.documentReference), 'document');
+    });
+    watchSpaceSwitch.bootstrapSwitch('onSwitchChange', function (event, status) {
+      changeWatchListStatus(status ? 'watchLocation' : 'unwatchLocation', XWiki.Model.serialize(xm.documentReference.extractReference(XWiki.EntityType.SPACE)), 'space');
+    });
+    watchWikiSwitch.bootstrapSwitch('onSwitchChange', function (event, status) {
+      changeWatchListStatus(status ? 'watchLocation' : 'unwatchLocation', XWiki.Model.serialize(xm.documentReference.extractReference(XWiki.EntityType.WIKI)), 'wiki');
+    });
+
+    ///
+    /// Avoid the dropdown menu to be closed when the user click on the bootstrap switch
+    ///
+    $('.notifications-toggles .bootstrap-switch').click(function(event) {
+      event.stopImmediatePropagation();
+    });
+ });
+});</code>
+    </property>
+    <property>
+      <name>Notifications Toggle</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsDisplayerUIX</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>0c93bccb-231c-40ff-a50a-c1706e724afe</guid>
@@ -586,7 +786,11 @@
   max-height: 15px;
   max-width: 15px;
 }
-</code>
+
+.notifications-toggles .bootstrap-switch .bootstrap-switch-label {
+  background-image: linear-gradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor 50%);
+  color: $theme.buttonSecondaryTextColor;
+}</code>
     </property>
     <property>
       <contentType>CSS</contentType>
@@ -679,19 +883,32 @@
   &lt;li&gt;
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
     &lt;div class="notifications-header clearfix"&gt;
-    &lt;div class="col-xs-4"&gt;
-    &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;div class="col-xs-8 text-right"&gt;
-    &lt;p&gt;
-    &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;
-    $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;
-    &amp;nbsp;
-    &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
-    $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))&lt;/a&gt;&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;div class="notifications-header-uix col-xs-12"&gt;&lt;/div&gt;
+      &lt;div class="col-xs-4"&gt;
+        &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class="col-xs-8 text-right"&gt;
+        &lt;p&gt;
+          &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;
+            $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
+          &lt;/a&gt;
+          &amp;nbsp;
+          &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
+            $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
+          &lt;/a&gt;
+        &lt;/p&gt;
+      &lt;/div&gt;
+      ##
+      ## Display the 3 toggle buttons
+      ##
+      &lt;div class="col-xs-12 notifications-toggles"&gt;
+        #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationDirectlyWatched($scope))checked="checked"#end#end
+        &lt;pre&gt;&lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+      &lt;div class="notifications-header-uix col-xs-12"&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class="notifications-area loading clearfix"&gt;
     &lt;/div&gt;

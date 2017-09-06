@@ -360,21 +360,22 @@ public class DefaultModelBridge implements ModelBridge
      */
     private void convertFilterPreferenceToBaseObject(NotificationFilterPreference filterPreference, BaseObject obj)
     {
+        obj.setStringValue(FILTER_PREFERENCE_NAME, filterPreference.getFilterPreferenceName());
         obj.setStringValue(FIELD_FILTER_NAME, filterPreference.getFilterName());
         obj.setIntValue(FIELD_IS_ENABLED, filterPreference.isEnabled() ? 1 : 0);
         obj.setIntValue(FIELD_IS_ACTIVE, filterPreference.isActive() ? 1 : 0);
         obj.setStringValue(FIELD_FILTER_TYPE, filterPreference.getFilterType().name().toLowerCase());
-        obj.setStringListValue(FIELD_FILTER_FORMATS,
+        obj.setDBStringListValue(FIELD_FILTER_FORMATS,
                 toCollectionOfStrings(filterPreference.getFilterFormats()));
-        obj.setStringListValue(FIELD_APPLICATIONS,
+        obj.setDBStringListValue(FIELD_APPLICATIONS,
                 filterPreference.getProperties(NotificationFilterProperty.APPLICATION));
-        obj.setStringListValue(FIELD_EVENT_TYPES,
+        obj.setDBStringListValue(FIELD_EVENT_TYPES,
                 filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE));
-        obj.setStringListValue(FIELD_PAGES,
+        obj.setDBStringListValue(FIELD_PAGES,
                 filterPreference.getProperties(NotificationFilterProperty.PAGE));
-        obj.setStringListValue(FIELD_SPACES,
+        obj.setDBStringListValue(FIELD_SPACES,
                 filterPreference.getProperties(NotificationFilterProperty.SPACE));
-        obj.setStringListValue(FIELD_WIKIS,
+        obj.setDBStringListValue(FIELD_WIKIS,
                 filterPreference.getProperties(NotificationFilterProperty.WIKI));
     }
 

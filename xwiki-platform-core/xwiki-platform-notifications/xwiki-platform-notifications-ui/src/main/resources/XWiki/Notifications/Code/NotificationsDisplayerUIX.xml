@@ -545,7 +545,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     ///
     /// Add a tooltip to each switch
     ///
-    $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
+    $('.bootstrap-switch-id-notificationPageOnly').tooltip({
       title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
       placement: 'bottom'
     });
@@ -554,11 +554,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       // Adapt the tooltip when the current document is terminal
       watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
     }
-    $('.bootstrap-switch-id-notificationPageOnly').tooltip({
+    $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
       title: watchSpaceToolTip,
       placement: 'bottom'
     });
-    $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
+    $('.bootstrap-switch-id-notificationWiki').tooltip({
       title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.wiki'))',
       placement: 'bottom'
     });

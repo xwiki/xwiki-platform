@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +37,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
@@ -59,7 +61,10 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class ScopeNotificationFilter extends AbstractNotificationFilter
 {
-    static final String FILTER_NAME = "scopeNotificationFilter";
+    /**
+     * Name of the filter.
+     */
+    public static final String FILTER_NAME = "scopeNotificationFilter";
 
     private static final String ERROR = "Failed to filter the notifications.";
 
@@ -86,13 +91,13 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
         boolean matchRestriction = false;
 
         try {
-            for (NotificationFilterPreference preference
-                    : notificationFilterManager.getFilterPreferences(user, this, filterType, format)) {
+            Iterator<NotificationFilterPreference> iterator = getUserScopeFilterPreferences(user, format, filterType);
+            while (iterator.hasNext()) {
 
                 // Wrap the current NotificationFilterPreference in a ScopeNotificationFilterPreference in order to
                 // access #getScopeReference
                 ScopeNotificationFilterPreference scopePreference =
-                        new ScopeNotificationFilterPreference(preference, entityReferenceResolver);
+                        new ScopeNotificationFilterPreference(iterator.next(), entityReferenceResolver);
 
                 if (scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
                     || scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
@@ -115,12 +120,25 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
             logger.warn(ERROR, e);
         }
 
-        /**
+        /*
          * In case we have an INCLUSIVE filter, we check if we had a restriction that was not satisfied.
          * In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
          * returned true.
          */
         return (filterType.equals(NotificationFilterType.INCLUSIVE) && hasRestriction && !matchRestriction);
+    }
+
+    private Iterator<NotificationFilterPreference> getUserScopeFilterPreferences(DocumentReference user,
+            NotificationFormat format, NotificationFilterType filterType) throws NotificationException
+    {
+        return getScopeFilterPreferencesIterator(
+                notificationFilterManager.getFilterPreferences(user, this, filterType, format));
+    }
+
+    private Iterator<NotificationFilterPreference> getScopeFilterPreferencesIterator(
+            Collection<NotificationFilterPreference> preferences)
+    {
+        return preferences.stream().filter(preference -> FILTER_NAME.equals(preference.getFilterName())).iterator();
     }
 
     @Override
@@ -141,12 +159,14 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                         user, this, filterType);
             }
 
-            for (NotificationFilterPreference filterPreference : notificationFilterPreferences) {
+            Iterator<NotificationFilterPreference> iterator
+                    = getScopeFilterPreferencesIterator(notificationFilterPreferences);
+            while (iterator.hasNext()) {
 
                 ScopeNotificationFilterPreference filterPreferenceScope =
-                        new ScopeNotificationFilterPreference(filterPreference, entityReferenceResolver);
+                        new ScopeNotificationFilterPreference(iterator.next(), entityReferenceResolver);
 
-                if (!scopeMatchesFilteringContext(filterPreference, preference)) {
+                if (!scopeMatchesFilteringContext(filterPreferenceScope, preference)) {
                     continue;
                 }
 

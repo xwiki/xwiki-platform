@@ -1,0 +1,2 @@
+org.xwiki.notifications.filters.watch.internal.DefaultWatchedEntitiesManager
+org.xwiki.notifications.filters.watch.internal.DefaultWatchedEntityFactory

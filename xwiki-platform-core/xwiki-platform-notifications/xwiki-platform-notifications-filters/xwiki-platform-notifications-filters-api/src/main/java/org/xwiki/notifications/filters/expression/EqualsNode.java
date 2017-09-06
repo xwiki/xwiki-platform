@@ -54,4 +54,10 @@ public final class EqualsNode extends AbstractBinaryOperatorNode
     {
         return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s = %s", getLeftOperand(), getRightOperand());
+    }
 }

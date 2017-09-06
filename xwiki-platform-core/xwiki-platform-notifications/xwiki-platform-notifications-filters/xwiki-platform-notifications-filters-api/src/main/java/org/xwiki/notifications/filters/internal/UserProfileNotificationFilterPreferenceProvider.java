@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
@@ -47,6 +48,9 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     @Named("cached")
     private ModelBridge modelBridge;
 
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
             throws NotificationException
@@ -58,19 +62,20 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
             throws NotificationException
     {
-        // TODO
+        modelBridge.saveFilterPreferences(documentAccessBridge.getCurrentUserReference(), filterPreferences);
     }
 
     @Override
-    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
     {
-        modelBridge.deleteFilterPreference(user, filterPreferenceName);
+        modelBridge.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(), filterPreferenceName);
     }
 
     @Override
-    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
             throws NotificationException
     {
-        modelBridge.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+        modelBridge.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
+                filterPreferenceName, enabled);
     }
 }

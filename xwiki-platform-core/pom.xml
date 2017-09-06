@@ -149,7 +149,7 @@
                   },
                   {
                     "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::deleteFilterPreference(org.xwiki.model.reference.DocumentReference, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::deleteFilterPreference(java.lang.String) throws org.xwiki.notifications.NotificationException",
                     "package": "org.xwiki.notifications.filters",
                     "classSimpleName": "NotificationFilterManager",
                     "methodName": "deleteFilterPreference",
@@ -212,7 +212,7 @@
                   },
                   {
                     "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::setFilterPreferenceEnabled(org.xwiki.model.reference.DocumentReference, java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::setFilterPreferenceEnabled(java.lang.String, boolean) throws org.xwiki.notifications.NotificationException",
                     "package": "org.xwiki.notifications.filters",
                     "classSimpleName": "NotificationFilterManager",
                     "methodName": "setFilterPreferenceEnabled",

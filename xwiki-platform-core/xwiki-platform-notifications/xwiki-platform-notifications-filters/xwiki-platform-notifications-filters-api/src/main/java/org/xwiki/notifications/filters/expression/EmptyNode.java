@@ -42,4 +42,10 @@ public final class EmptyNode extends AbstractNode
     {
         return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return "()";
+    }
 }

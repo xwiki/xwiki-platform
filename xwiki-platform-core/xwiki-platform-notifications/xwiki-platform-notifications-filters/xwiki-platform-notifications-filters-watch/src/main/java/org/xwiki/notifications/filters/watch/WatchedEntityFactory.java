@@ -17,46 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.expression;
+package org.xwiki.notifications.filters.watch;
 
-import org.xwiki.notifications.filters.NotificationFilterProperty;
-import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * Define value node containing a {@link NotificationFilterProperty}.
+ * Helper to create watched entity references.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
+@Role
 @Unstable
-public final class PropertyValueNode extends AbstractValueNode<NotificationFilterProperty>
+public interface WatchedEntityFactory
 {
     /**
-     * Constructs a new value node using {@link NotificationFilterProperty}.
-     *
-     * @param content the content of the node
+     * Create a watched location reference.
+     * @param location the reference of the location to watch
+     * @return the watched location reference
      */
-    public PropertyValueNode(NotificationFilterProperty content)
-    {
-        super(content);
-    }
+    WatchedLocationReference createWatchedLocationReference(EntityReference location);
 
-    @Override
-    public boolean equals(Object o)
-    {
-        return (o instanceof PropertyValueNode && super.equals(o));
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%s", getContent());
-    }
+    /**
+     * Create a watched user reference.
+     * @param userId the ID of the user to watch
+     * @return the watched user reference
+     */
+    WatchedUserReference createWatchedUserReference(String userId);
 }

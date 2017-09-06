@@ -262,13 +262,13 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
                     : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
                             NotificationFilterPreferenceProvider.class)) {
-                provider.deleteFilterPreference(user, filterPreferenceName);
+                provider.deleteFilterPreference(filterPreferenceName);
             }
 
         } catch (ComponentLookupException e) {
@@ -277,14 +277,14 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
+    public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
             throws NotificationException
     {
         try {
             for (NotificationFilterPreferenceProvider provider
                     : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
                     NotificationFilterPreferenceProvider.class)) {
-                provider.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+                provider.setFilterPreferenceEnabled(filterPreferenceName, enabled);
             }
 
         } catch (ComponentLookupException e) {

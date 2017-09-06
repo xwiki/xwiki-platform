@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
@@ -74,4 +75,15 @@ public interface ModelBridge
      */
     void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
             throws NotificationException;
+
+    /**
+     * Save a collection of NotificationFilterPreferences.
+     * @param user reference of the user concerned by the filter preference
+     * @param filterPreferences a list of NotificationFilterPreference
+     * @throws NotificationException if an error happens
+     *
+     * @since 9.8RC1
+     */
+    void saveFilterPreferences(DocumentReference user, Collection<NotificationFilterPreference> filterPreferences)
+        throws NotificationException;
 }

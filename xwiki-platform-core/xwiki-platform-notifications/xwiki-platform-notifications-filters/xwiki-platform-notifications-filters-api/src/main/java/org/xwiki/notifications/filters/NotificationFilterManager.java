@@ -137,23 +137,20 @@ public interface NotificationFilterManager
 
     /**
      * Delete a filter preference.
-     * @param user reference of the user concerned by the filter preference
      * @param filterPreferenceName name of the filter preference
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException;
+    void deleteFilterPreference(String filterPreferenceName) throws NotificationException;
 
     /**
      * Enable or disable a filter preference.
-     * @param user reference of the user concerned by the filter preference
      * @param filterPreferenceName name of the filter preference
      * @param enabled either or not the filter preference should be enabled
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
-            throws NotificationException;
+    void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException;
 }

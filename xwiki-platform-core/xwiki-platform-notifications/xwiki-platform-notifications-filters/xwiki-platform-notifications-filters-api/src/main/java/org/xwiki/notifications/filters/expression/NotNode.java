@@ -53,4 +53,10 @@ public final class NotNode extends AbstractUnaryOperatorNode
     {
         return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("NOT (%s)", getOperand());
+    }
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collection;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -101,5 +102,12 @@ public class CachedModelBridge implements ModelBridge
             throws NotificationException
     {
         modelBridge.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+    }
+
+    @Override
+    public void saveFilterPreferences(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
+    {
+        modelBridge.saveFilterPreferences(user, filterPreferences);
     }
 }

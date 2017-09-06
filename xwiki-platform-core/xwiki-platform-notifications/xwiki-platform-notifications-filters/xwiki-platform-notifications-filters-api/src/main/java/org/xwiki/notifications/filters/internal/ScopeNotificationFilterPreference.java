@@ -69,6 +69,21 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     /**
+     * Construct a new ScopeNotificationFilterPreference.
+     *
+     * @param filterPreference the {@link NotificationFilterPreference} to wrap
+     * @param scopeReference the reference of the location concerned by the scope notification filter
+     *
+     * @since 9.8RC1
+     */
+    public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
+            EntityReference scopeReference)
+    {
+        this.filterPreference = filterPreference;
+        this.scopeReference = scopeReference;
+    }
+
+    /**
      * @return the resolved reference of the current notification preference.
      */
     public EntityReference getScopeReference()

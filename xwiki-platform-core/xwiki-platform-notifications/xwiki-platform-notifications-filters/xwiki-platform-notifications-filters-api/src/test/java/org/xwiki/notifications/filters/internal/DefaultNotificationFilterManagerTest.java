@@ -263,22 +263,20 @@ public class DefaultNotificationFilterManagerTest
     @Test
     public void deleteFilterPreference() throws Exception
     {
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "UserA");
-        mocker.getComponentUnderTest().deleteFilterPreference(user, "myFilter");
+        mocker.getComponentUnderTest().deleteFilterPreference("myFilter");
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq(user), eq("myFilter"));
+        verify(testProvider, times(1)).deleteFilterPreference(eq("myFilter"));
     }
 
     @Test
     public void setFilterPreferenceEnabled() throws Exception
     {
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "UserA");
-        mocker.getComponentUnderTest().setFilterPreferenceEnabled(user, "myFilter1", true);
-        mocker.getComponentUnderTest().setFilterPreferenceEnabled(user, "myFilter2", false);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled("myFilter1", true);
+        mocker.getComponentUnderTest().setFilterPreferenceEnabled("myFilter2", false);
 
-        verify(testProvider, times(1)).setFilterPreferenceEnabled(eq(user),
+        verify(testProvider, times(1)).setFilterPreferenceEnabled(
                 eq("myFilter1"), eq(true));
-        verify(testProvider, times(1)).setFilterPreferenceEnabled(eq(user),
+        verify(testProvider, times(1)).setFilterPreferenceEnabled(
                 eq("myFilter2"), eq(false));
     }
 }

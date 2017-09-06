@@ -27,44 +27,13 @@
     <artifactId>xwiki-platform-notifications-filters</artifactId>
     <version>9.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-filters-api</artifactId>
-  <name>XWiki Platform - Notifications - Filters - API</name>
-  <description>Handle the filters that can be applied on notifications</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
-  </properties>
+  <artifactId>xwiki-platform-notifications-filters-watch</artifactId>
+  <name>XWiki Platform - Notifications - Filters - Watch</name>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-api</artifactId>
+      <artifactId>xwiki-platform-notifications-filters-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-component-wiki</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-preferences-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

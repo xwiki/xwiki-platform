@@ -17,47 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.expression;
+package org.xwiki.notifications.filters.watch;
 
-import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
-import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.stability.Unstable;
 
 /**
- * Define a OR condition in a filtering expression.
+ * Reference to a user to watch.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
 @Unstable
-public final class OrNode extends AbstractBinaryOperatorNode
+public class WatchedUserReference implements WatchedEntityReference
 {
+    private String userId;
+
     /**
-     * Constructs a new OR node.
-     *
-     * @param leftOperand the left OR operand
-     * @param rightOperand the right OR operand
+     * Construct a WatchedUserReference.
+     * @param userId id of the user to watch.
      */
-    public OrNode(AbstractOperatorNode leftOperand, AbstractOperatorNode rightOperand)
+    public WatchedUserReference(String userId)
     {
-        super(leftOperand, rightOperand);
+        this.userId = userId;
     }
 
     @Override
-    public boolean equals(Object o)
+    public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
-        return (o instanceof OrNode && super.equals(o));
+        // TODO: implement this along with the UserFilter
+        return false;
     }
 
     @Override
-    public int hashCode()
+    public boolean match(NotificationFilterPreference notificationFilterPreference)
     {
-        return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
+        // TODO: implement this along with the UserFilter
+        return false;
     }
 
     @Override
-    public String toString()
+    public NotificationFilterPreference createFilterPreference()
     {
-        return String.format("(%s OR %s)", getLeftOperand(), getRightOperand());
+        // TODO: implement this along with the UserFilter
+        return null;
     }
 }

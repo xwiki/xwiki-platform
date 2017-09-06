@@ -63,6 +63,24 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.filterPreferenceName = filterPreferenceName;
     }
 
+    /**
+     * Constructs a new {@link DefaultNotificationFilterPreference} as a copy of an other one (Important: fields are
+     * copied by references, not by values).
+     *
+     * @param source the object to copy
+     */
+    public DefaultNotificationFilterPreference(DefaultNotificationFilterPreference source)
+    {
+        this.isEnabled = source.isEnabled;
+        this.isActive = source.isActive;
+        this.filterName = source.filterName;
+        this.filterPreferenceName = source.filterPreferenceName;
+        this.providerHint = source.providerHint;
+        this.filterType = source.filterType;
+        this.notificationFormats = source.notificationFormats;
+        this.preferenceProperties = source.preferenceProperties;
+    }
+
     @Override
     public String getFilterPreferenceName()
     {

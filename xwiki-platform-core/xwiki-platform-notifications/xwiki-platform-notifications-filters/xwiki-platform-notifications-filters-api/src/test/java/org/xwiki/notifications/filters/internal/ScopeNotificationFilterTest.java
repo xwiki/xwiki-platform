@@ -223,6 +223,30 @@ public class ScopeNotificationFilterTest
         assertEquals(expectedResult3, test3);
     }
 
+    @Test
+    public void filterExpressionWithAllEvents() throws Exception
+    {
+        // Mocks
+        NotificationFilterPreference preference = mockNotificationFilterPreference("wiki1",
+                SCOPE_INCLUSIVE_REFERENCE_1, NotificationFilterType.INCLUSIVE, null);
+
+        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class),  any(NotificationFilter.class),
+                eq(NotificationFilterType.INCLUSIVE))).thenReturn(Sets.newSet(preference));
+
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_1)).thenReturn("wiki1");
+
+        AbstractNode test = mocker.getComponentUnderTest().filterExpression(
+                new DocumentReference("xwiki", "XWiki", "User"));
+
+        AbstractNode expectedResult = new EqualsNode(
+                new PropertyValueNode(NotificationFilterProperty.WIKI),
+                new StringValueNode("wiki1")
+        );
+
+        assertEquals(expectedResult, test);
+    }
+
+
     private void createPreferenceScopeMocks() throws NotificationException
     {
         NotificationFilterPreference preference1 = mockNotificationFilterPreference("wiki1",
@@ -270,8 +294,9 @@ public class ScopeNotificationFilterTest
 
         NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
         when(preference.getProperties(property)).thenReturn(Collections.singletonList(entityStringValue));
-
-        when(preference.getProperties(eq(NotificationFilterProperty.EVENT_TYPE))).thenReturn(Arrays.asList(eventName));
+        when(preference.getFilterName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
+        when(preference.getProperties(eq(NotificationFilterProperty.EVENT_TYPE))).thenReturn(
+                eventName != null ? Arrays.asList(eventName) : Collections.emptyList());
         when(preference.getFilterType()).thenReturn(filterType);
 
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);

@@ -87,6 +87,8 @@ public class ExpressionNodeToHQLConverter
         }
     }
 
+    private static final String VARIABLE_NAME = ":%s";
+
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
@@ -190,7 +192,7 @@ public class ExpressionNodeToHQLConverter
 
             result.queryParameters.put(mapKey, nodeContent);
 
-            returnValue = String.format(":%s", mapKey);
+            returnValue = String.format(VARIABLE_NAME, mapKey);
         } else if (value instanceof EntityReferenceNode) {
             String stringValue = serializer.serialize(((EntityReferenceNode) value).getContent());
 
@@ -198,7 +200,7 @@ public class ExpressionNodeToHQLConverter
 
             result.queryParameters.put(mapKey, stringValue);
 
-            returnValue = String.format(":%s", mapKey);
+            returnValue = String.format(VARIABLE_NAME, mapKey);
         } else if (value instanceof DateValueNode) {
             DateValueNode dateValueNode = (DateValueNode) value;
             String stringValue = dateValueNode.getContent().toString();
@@ -207,7 +209,7 @@ public class ExpressionNodeToHQLConverter
 
             result.queryParameters.put(mapKey, dateValueNode.getContent());
 
-            returnValue = String.format(":%s", mapKey);
+            returnValue = String.format(VARIABLE_NAME, mapKey);
         } else if (value instanceof BooleanValueNode) {
             returnValue = ((BooleanValueNode) value).getContent().toString();
         } else {

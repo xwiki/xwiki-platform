@@ -287,7 +287,7 @@ public class ExpressionNodeToHQLConverter
         } else if (operator instanceof InListOfReadEventsNode) {
             InListOfReadEventsNode inList = (InListOfReadEventsNode) operator;
 
-            returnValue = String.format("IN (select status.activityEvent from ActivityEventStatusImpl status "
+            returnValue = String.format("event IN (select status.activityEvent from ActivityEventStatusImpl status "
                     + "where status.activityEvent = event and status.entityId = :userStatusRead and status.read = true)"
             );
 

@@ -150,7 +150,7 @@ public class QueryGeneratorTest
                         "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
                         "AND (event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799)) " +
                         "AND (event.hidden <> true)) " +
-                        "AND ( NOT (IN (select status.activityEvent from ActivityEventStatusImpl status " +
+                        "AND ( NOT (event IN (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :userStatusRead " +
                         "and status.read = true))) " +
                         "ORDER BY event.date DESC", Query.HQL);
@@ -191,7 +191,7 @@ public class QueryGeneratorTest
                         "event.user <> :entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead) " +
                         "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
                         "AND (event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799)) " +
-                        "AND ( NOT (IN (" +
+                        "AND ( NOT (event IN (" +
                         "select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event " +
                         "and status.entityId = :userStatusRead and status.read = true))) " +
@@ -263,7 +263,7 @@ public class QueryGeneratorTest
                         "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
                         "AND (event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799)) " +
                         "AND (event.date <= :date_582ce8e50c9ad1782bdd021604912ed119e6ab2ff58a094f23b3be0ce6105306)) " +
-                        "AND (event.hidden <> true)) AND ( NOT (IN (" +
+                        "AND (event.hidden <> true)) AND ( NOT (event IN (" +
                         "select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :userStatusRead " +
                         "and status.read = true))) " +

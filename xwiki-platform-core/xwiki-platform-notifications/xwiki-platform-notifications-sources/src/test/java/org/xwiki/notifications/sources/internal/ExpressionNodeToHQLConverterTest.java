@@ -273,7 +273,7 @@ public class ExpressionNodeToHQLConverterTest
         ExpressionNodeToHQLConverter.HQLQuery result = parser.parse(testAST);
 
         assertEquals(" NOT (" +
-                        "IN (select status.activityEvent from ActivityEventStatusImpl status " +
+                        "event IN (select status.activityEvent from ActivityEventStatusImpl status " +
                         "where status.activityEvent = event and status.entityId = :userStatusRead " +
                         "and status.read = true))",
                 result.getQuery());

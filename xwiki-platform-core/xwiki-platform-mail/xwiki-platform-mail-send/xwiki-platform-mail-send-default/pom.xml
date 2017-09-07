@@ -94,6 +94,13 @@
       <artifactId>greenmail</artifactId>
       <version>1.5.0</version>
       <scope>test</scope>
+      <exclusions>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
  * Define a IN operation in a filtering expression.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
 @Unstable
 public final class InNode extends AbstractOperatorNode
@@ -39,6 +39,11 @@ public final class InNode extends AbstractOperatorNode
 
     private Collection<AbstractValueNode> values;
 
+    /**
+     * Construct an IN operation node.
+     * @param leftOperand the left operand
+     * @param values a list of values
+     */
     public InNode(AbstractValueNode leftOperand,
             Collection<AbstractValueNode> values)
     {
@@ -54,6 +59,9 @@ public final class InNode extends AbstractOperatorNode
         return leftOperand;
     }
 
+    /**
+     * @return the values
+     */
     public Collection<AbstractValueNode> getValues()
     {
         return values;

@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Define value node containing a {@link Boolean}.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
 @Unstable
 public final class BooleanValueNode extends AbstractValueNode<Boolean>

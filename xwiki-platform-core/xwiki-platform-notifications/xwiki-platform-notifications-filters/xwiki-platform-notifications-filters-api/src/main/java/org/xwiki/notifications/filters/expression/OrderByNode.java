@@ -22,39 +22,66 @@ package org.xwiki.notifications.filters.expression;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
+ * Define an ORDER BY operation in a filtering expression.
+ *
  * @version $Id$
+ * @since 9.8RC1
  */
 public class OrderByNode extends AbstractOperatorNode
 {
+    /**
+     * The different kind of ordering.
+     */
     public enum Order {
+        /**
+         * Ascending order.
+         */
         ASC,
+        /**
+         * Descending order.
+         */
         DESC
     }
 
     private AbstractOperatorNode query;
 
-    private PropertyValueNode content;
+    private PropertyValueNode property;
 
     private Order order;
 
-    public OrderByNode(AbstractOperatorNode query, PropertyValueNode content,
+    /**
+     * Construct an ORDER BY node.
+     * @param query the query to order
+     * @param property the property on which to order on
+     * @param order the order to use
+     */
+    public OrderByNode(AbstractOperatorNode query, PropertyValueNode property,
             Order order)
     {
         this.query = query;
-        this.content = content;
+        this.property = property;
         this.order = order;
     }
 
+    /**
+     * @return the query to order
+     */
     public AbstractOperatorNode getQuery()
     {
         return query;
     }
 
-    public PropertyValueNode getContent()
+    /**
+     * @return the property to order on
+     */
+    public PropertyValueNode getProperty()
     {
-        return content;
+        return property;
     }
 
+    /**
+     * @return the order to use
+     */
     public Order getOrder()
     {
         return order;
@@ -63,6 +90,6 @@ public class OrderByNode extends AbstractOperatorNode
     @Override
     public String toString()
     {
-        return String.format("%s ORDER BY %s %s", query, content, order.name());
+        return String.format("%s ORDER BY %s %s", query, property, order.name());
     }
 }

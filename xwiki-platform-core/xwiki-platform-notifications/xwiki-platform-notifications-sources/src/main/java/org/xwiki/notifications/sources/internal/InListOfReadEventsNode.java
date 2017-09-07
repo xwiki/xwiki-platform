@@ -23,17 +23,27 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
+ * Special node to filter on events that has been read by the given user.
+ *
  * @version $Id$
+ * @since 9.8RC1
  */
 public class InListOfReadEventsNode extends AbstractOperatorNode
 {
     private DocumentReference user;
 
+    /**
+     * Construct an InListOfReadEventsNode.
+     * @param user the user
+     */
     public InListOfReadEventsNode(DocumentReference user)
     {
         this.user = user;
     }
 
+    /**
+     * @return the user
+     */
     public DocumentReference getUser()
     {
         return user;

@@ -20,24 +20,75 @@
 package org.xwiki.notifications.filters.expression;
 
 /**
+ * The several properties you can have in an {@link org.xwiki.eventstream.Event}.
+ *
  * @version $Id$
+ * @since 9.8RC1
  */
 public enum EventProperty
 {
+    /**
+     * The ID of the event.
+     */
     ID,
+    /**
+     * The group ID of the event.
+     */
     GROUP_ID,
+    /**
+     * The stream the event belongs to.
+     */
     STREAM,
+    /**
+     * The date of the event.
+     */
     DATE,
+    /**
+     * The importance of the event.
+     */
     IMPORTANCE,
+    /**
+     * The type of the event.
+     */
     TYPE,
+    /**
+     * The application the event belongs to.
+     */
     APPLICATION,
+    /**
+     * The user who created the event.
+     */
     USER,
+    /**
+     * The wiki concerned by the event.
+     */
     WIKI,
+    /**
+     * The space concerned by the event.
+     */
     SPACE,
+    /**
+     * The page concerned by the event.
+     */
     PAGE,
+    /**
+     * Either of the event is hidden or not.
+     */
     HIDDEN,
+    /**
+     * The URL of the page concerned by the event.
+     */
     URL,
+    /**
+     * The title of the page concerned by the event.
+     */
     TITLE,
+    /**
+     * The content of the event.
+     */
     BODY,
+    /**
+     * The version of the page concerned by the event.
+     */
     DOCUMENT_VERSION
 }

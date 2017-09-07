@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Define value node containing a {@link EntityReference}.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
 @Unstable
 public final class EntityReferenceNode extends AbstractValueNode<EntityReference>

@@ -163,7 +163,7 @@ public class QueryGenerator
 
         // Condition 2: (maybe) events have happened after the given start date
         if (startDate != null) {
-            topNode = new AndNode (
+            topNode = new AndNode(
                     topNode,
                     new GreaterThanNode(
                             new PropertyValueNode(EventProperty.DATE),
@@ -171,8 +171,6 @@ public class QueryGenerator
                     )
             );
         }
-
-
 
         // Condition 3: handle other preferences
         AbstractOperatorNode preferencesNode = handleEventPreferences(user, preferences);
@@ -205,7 +203,6 @@ public class QueryGenerator
         topNode = handleEventStatus(onlyUnread, user, topNode);
         topNode = handleWiki(user, topNode);
         topNode = handleOrder(topNode);
-
 
         return topNode;
     }
@@ -299,7 +296,7 @@ public class QueryGenerator
     private AbstractOperatorNode handleEndDate(Date endDate, AbstractOperatorNode topNode)
     {
         if (endDate != null) {
-            topNode = new AndNode(
+            return new AndNode(
                     topNode,
                     new LesserThanNode(
                         new PropertyValueNode(EventProperty.DATE),
@@ -318,7 +315,7 @@ public class QueryGenerator
                 values.add(new StringValueNode(value));
             }
 
-            topNode = new AndNode(
+            return new AndNode(
                     topNode,
                     new NotNode(
                             new InNode(
@@ -335,7 +332,7 @@ public class QueryGenerator
     {
         // If the user is a local user
         if (!user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
-            topNode = new AndNode(
+            return new AndNode(
                     topNode,
                     new EqualsNode(
                             new PropertyValueNode(EventProperty.WIKI),
@@ -359,7 +356,7 @@ public class QueryGenerator
             AbstractOperatorNode topNode)
     {
         if (onlyUnread) {
-            topNode = new AndNode(
+            return new AndNode(
                     topNode,
                     new NotNode(
                             new InListOfReadEventsNode(user)
@@ -373,7 +370,7 @@ public class QueryGenerator
     {
         // Don't show hidden events unless the user want to display hidden pages
         if (userPreferencesSource.getProperty("displayHiddenDocuments", 0) == 0) {
-            topNode = new AndNode(
+            return new AndNode(
                     topNode,
                     new NotEqualsNode(
                             new PropertyValueNode(EventProperty.HIDDEN),

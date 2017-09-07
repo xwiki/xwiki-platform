@@ -86,7 +86,7 @@ public class ExpressionNodeToHQLConverterTest
     public void parseWithPropertyValueNode()
     {
         // Check with a PropertyValueNode first
-        assertEquals("event.eventType", parser.parse(new PropertyValueNode(EventProperty.TYPE)).getQuery());
+        assertEquals("event.type", parser.parse(new PropertyValueNode(EventProperty.TYPE)).getQuery());
     }
 
     @Test

@@ -303,6 +303,30 @@
                     "classSimpleName": "AbstractUnaryOperatorNode",
                     "elementKind": "class",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.filters.expression.PropertyValueNode::<init>(===org.xwiki.notifications.filters.NotificationFilterProperty===)",
+                    "new": "parameter void org.xwiki.notifications.filters.expression.PropertyValueNode::<init>(===org.xwiki.notifications.filters.expression.EventProperty===)",
+                    "oldType": "org.xwiki.notifications.filters.NotificationFilterProperty",
+                    "newType": "org.xwiki.notifications.filters.expression.EventProperty",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "PropertyValueNode",
+                    "methodName": "<init>",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.class.superTypeTypeParametersChanged",
+                    "old": "class org.xwiki.notifications.filters.expression.PropertyValueNode",
+                    "new": "class org.xwiki.notifications.filters.expression.PropertyValueNode",
+                    "oldSuperType": "org.xwiki.notifications.filters.expression.generics.AbstractValueNode<org.xwiki.notifications.filters.NotificationFilterProperty>",
+                    "newSuperType": "org.xwiki.notifications.filters.expression.generics.AbstractValueNode<org.xwiki.notifications.filters.expression.EventProperty>",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "PropertyValueNode",
+                    "elementKind": "class",
+                    "justification": "Young API"
                   }
                 ]
               }

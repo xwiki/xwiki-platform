@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.filters.expression.generics;
 
-import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
@@ -46,7 +46,7 @@ public final class ExpressionBuilder
      * @param property the value of the node
      * @return the generated {@link PropertyValueNode}
      */
-    public static PropertyValueNode value(NotificationFilterProperty property)
+    public static PropertyValueNode value(EventProperty property)
     {
         return new PropertyValueNode(property);
     }

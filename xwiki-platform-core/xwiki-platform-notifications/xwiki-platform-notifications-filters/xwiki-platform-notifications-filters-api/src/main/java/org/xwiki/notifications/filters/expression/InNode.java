@@ -19,33 +19,50 @@
  */
 package org.xwiki.notifications.filters.expression;
 
-import org.xwiki.notifications.filters.NotificationFilterProperty;
+import java.util.Collection;
+
+import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.stability.Unstable;
 
 /**
- * Define value node containing a {@link NotificationFilterProperty}.
+ * Define a IN operation in a filtering expression.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Unstable
-public final class PropertyValueNode extends AbstractValueNode<EventProperty>
+public final class InNode extends AbstractOperatorNode
 {
-    /**
-     * Constructs a new value node using {@link NotificationFilterProperty}.
-     *
-     * @param content the content of the node
-     */
-    public PropertyValueNode(EventProperty content)
+    private AbstractValueNode leftOperand;
+
+    private Collection<AbstractValueNode> values;
+
+    public InNode(AbstractValueNode leftOperand,
+            Collection<AbstractValueNode> values)
     {
-        super(content);
+        this.leftOperand = leftOperand;
+        this.values = values;
+    }
+
+    /**
+     * @return the left operand
+     */
+    public AbstractNode getLeftOperand()
+    {
+        return leftOperand;
+    }
+
+    public Collection<AbstractValueNode> getValues()
+    {
+        return values;
     }
 
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof PropertyValueNode && super.equals(o));
+        return (o instanceof InNode && super.equals(o));
     }
 
     @Override
@@ -57,6 +74,15 @@ public final class PropertyValueNode extends AbstractValueNode<EventProperty>
     @Override
     public String toString()
     {
-        return String.format("%s", getContent());
+        StringBuilder s = new StringBuilder(leftOperand.toString());
+        s.append(" IN (");
+        String separator = "";
+        for (AbstractValueNode value : values) {
+            s.append(separator);
+            s.append(value.toString());
+            separator = ", ";
+        }
+        s.append(")");
+        return s.toString();
     }
 }

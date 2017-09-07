@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters.expression;
 
 import org.junit.Test;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 
 import static org.junit.Assert.assertEquals;
@@ -36,17 +35,17 @@ public class TestExpressionToString
         AbstractNode node = new AndNode(
                 new OrNode(
                         new EqualsNode(
-                                new PropertyValueNode(NotificationFilterProperty.WIKI),
+                                new PropertyValueNode(EventProperty.WIKI),
                                 new StringValueNode("value1")
                         ),
                         new NotEqualsNode(
-                                new PropertyValueNode(NotificationFilterProperty.SPACE),
+                                new PropertyValueNode(EventProperty.SPACE),
                                 new StringValueNode("value2")
                         )
                 ),
                 new NotNode(
                         new LikeNode(
-                                new PropertyValueNode(NotificationFilterProperty.PAGE),
+                                new PropertyValueNode(EventProperty.PAGE),
                                 new StringValueNode("value3%")
                         )
                 )

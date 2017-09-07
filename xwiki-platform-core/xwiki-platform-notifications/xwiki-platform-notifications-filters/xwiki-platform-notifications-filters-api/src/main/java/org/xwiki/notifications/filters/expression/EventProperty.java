@@ -17,23 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.expression.generics;
-
-import org.xwiki.notifications.filters.expression.EmptyNode;
-import org.xwiki.notifications.filters.expression.ExpressionNode;
-import org.xwiki.stability.Unstable;
+package org.xwiki.notifications.filters.expression;
 
 /**
- * AbstractNode definition for a filtering expression.
- *
  * @version $Id$
- * @since 9.7RC1
  */
-@Unstable
-public abstract class AbstractNode implements ExpressionNode
+public enum EventProperty
 {
-    /**
-     * Generic {@link EmptyNode} that can be used for comparison.
-     */
-    public static final EmptyNode EMPTY_NODE = new EmptyNode();
+    ID,
+    GROUP_ID,
+    STREAM,
+    DATE,
+    IMPORTANCE,
+    TYPE,
+    APPLICATION,
+    USER,
+    WIKI,
+    SPACE,
+    PAGE,
+    HIDDEN,
+    URL,
+    TITLE,
+    BODY,
+    DOCUMENT_VERSION
 }

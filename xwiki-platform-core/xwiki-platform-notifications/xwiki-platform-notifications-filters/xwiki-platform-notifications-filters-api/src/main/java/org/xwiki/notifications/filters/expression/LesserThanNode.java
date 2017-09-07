@@ -19,33 +19,34 @@
  */
 package org.xwiki.notifications.filters.expression;
 
-import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.stability.Unstable;
 
 /**
- * Define value node containing a {@link NotificationFilterProperty}.
+ * Define a "<=" condition in a filtering expression.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Unstable
-public final class PropertyValueNode extends AbstractValueNode<EventProperty>
+public final class LesserThanNode extends AbstractBinaryOperatorNode
 {
     /**
-     * Constructs a new value node using {@link NotificationFilterProperty}.
+     * Constructs a new "<=" node.
      *
-     * @param content the content of the node
+     * @param leftOperand the left operand
+     * @param rightOperand the right operand
      */
-    public PropertyValueNode(EventProperty content)
+    public LesserThanNode(AbstractValueNode leftOperand, AbstractValueNode rightOperand)
     {
-        super(content);
+        super(leftOperand, rightOperand);
     }
 
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof PropertyValueNode && super.equals(o));
+        return (o instanceof LesserThanNode && super.equals(o));
     }
 
     @Override
@@ -57,6 +58,6 @@ public final class PropertyValueNode extends AbstractValueNode<EventProperty>
     @Override
     public String toString()
     {
-        return String.format("%s", getContent());
+        return String.format("%s <= %s", getLeftOperand(), getRightOperand());
     }
 }

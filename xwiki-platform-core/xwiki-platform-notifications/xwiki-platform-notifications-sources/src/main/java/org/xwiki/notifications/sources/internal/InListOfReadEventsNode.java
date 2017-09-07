@@ -17,23 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.expression.generics;
+package org.xwiki.notifications.sources.internal;
 
-import org.xwiki.notifications.filters.expression.EmptyNode;
-import org.xwiki.notifications.filters.expression.ExpressionNode;
-import org.xwiki.stability.Unstable;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
- * AbstractNode definition for a filtering expression.
- *
  * @version $Id$
- * @since 9.7RC1
  */
-@Unstable
-public abstract class AbstractNode implements ExpressionNode
+public class InListOfReadEventsNode extends AbstractOperatorNode
 {
-    /**
-     * Generic {@link EmptyNode} that can be used for comparison.
-     */
-    public static final EmptyNode EMPTY_NODE = new EmptyNode();
+    private DocumentReference user;
+
+    public InListOfReadEventsNode(DocumentReference user)
+    {
+        this.user = user;
+    }
+
+    public DocumentReference getUser()
+    {
+        return user;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "LIST_OF_READ_EVENTS";
+    }
 }

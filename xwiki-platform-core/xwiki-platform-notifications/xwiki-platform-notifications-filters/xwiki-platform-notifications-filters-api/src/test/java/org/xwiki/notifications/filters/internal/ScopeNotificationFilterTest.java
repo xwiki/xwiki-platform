@@ -43,6 +43,7 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.LikeNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
@@ -165,7 +166,7 @@ public class ScopeNotificationFilterTest
                 new DocumentReference("xwiki", "XWiki", "User"), prop1);
 
         AbstractNode expectedResult1 = new EqualsNode(
-                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new PropertyValueNode(EventProperty.WIKI),
                         new StringValueNode("wiki1"));
 
         assertEquals(expectedResult1, test1);
@@ -188,10 +189,10 @@ public class ScopeNotificationFilterTest
 
         AbstractNode expectedResult2 = new AndNode(
                 new EqualsNode(
-                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new PropertyValueNode(EventProperty.WIKI),
                         new StringValueNode("wiki2")),
                 new LikeNode(
-                        new PropertyValueNode(NotificationFilterProperty.SPACE),
+                        new PropertyValueNode(EventProperty.SPACE),
                         new StringValueNode("space_2")));
 
         assertEquals(expectedResult2, test2);
@@ -214,10 +215,10 @@ public class ScopeNotificationFilterTest
 
         AbstractNode expectedResult3 = new AndNode(
                 new EqualsNode(
-                        new PropertyValueNode(NotificationFilterProperty.WIKI),
+                        new PropertyValueNode(EventProperty.WIKI),
                         new StringValueNode("wiki3")),
                 new EqualsNode(
-                        new PropertyValueNode(NotificationFilterProperty.PAGE),
+                        new PropertyValueNode(EventProperty.PAGE),
                         new StringValueNode("space3.page3")));
 
         assertEquals(expectedResult3, test3);
@@ -239,7 +240,7 @@ public class ScopeNotificationFilterTest
                 new DocumentReference("xwiki", "XWiki", "User"));
 
         AbstractNode expectedResult = new EqualsNode(
-                new PropertyValueNode(NotificationFilterProperty.WIKI),
+                new PropertyValueNode(EventProperty.WIKI),
                 new StringValueNode("wiki1")
         );
 

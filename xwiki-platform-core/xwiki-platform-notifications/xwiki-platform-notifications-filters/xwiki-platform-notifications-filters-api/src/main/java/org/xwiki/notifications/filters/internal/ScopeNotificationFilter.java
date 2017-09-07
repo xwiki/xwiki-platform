@@ -42,6 +42,7 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
@@ -272,15 +273,15 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
 
         switch (filterPreferenceScope.getScopeReference().getType()) {
             case DOCUMENT:
-                return value(NotificationFilterProperty.WIKI).eq(value(wiki))
-                        .and(value(NotificationFilterProperty.PAGE).eq(value(page)));
+                return value(EventProperty.WIKI).eq(value(wiki))
+                        .and(value(EventProperty.PAGE).eq(value(page)));
 
             case SPACE:
-                return value(NotificationFilterProperty.WIKI).eq(value(wiki))
-                        .and(value(NotificationFilterProperty.SPACE).like(value(space)));
+                return value(EventProperty.WIKI).eq(value(wiki))
+                        .and(value(EventProperty.SPACE).like(value(space)));
 
             case WIKI:
-                return value(NotificationFilterProperty.WIKI).eq(value(wiki));
+                return value(EventProperty.WIKI).eq(value(wiki));
 
             default:
                 return null;

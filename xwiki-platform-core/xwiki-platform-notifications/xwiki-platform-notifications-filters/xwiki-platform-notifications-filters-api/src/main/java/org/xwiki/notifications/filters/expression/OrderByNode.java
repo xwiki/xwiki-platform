@@ -17,23 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.expression.generics;
+package org.xwiki.notifications.filters.expression;
 
-import org.xwiki.notifications.filters.expression.EmptyNode;
-import org.xwiki.notifications.filters.expression.ExpressionNode;
-import org.xwiki.stability.Unstable;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
- * AbstractNode definition for a filtering expression.
- *
  * @version $Id$
- * @since 9.7RC1
  */
-@Unstable
-public abstract class AbstractNode implements ExpressionNode
+public class OrderByNode extends AbstractOperatorNode
 {
-    /**
-     * Generic {@link EmptyNode} that can be used for comparison.
-     */
-    public static final EmptyNode EMPTY_NODE = new EmptyNode();
+    public enum Order {
+        ASC,
+        DESC
+    }
+
+    private AbstractOperatorNode query;
+
+    private PropertyValueNode content;
+
+    private Order order;
+
+    public OrderByNode(AbstractOperatorNode query, PropertyValueNode content,
+            Order order)
+    {
+        this.query = query;
+        this.content = content;
+        this.order = order;
+    }
+
+    public AbstractOperatorNode getQuery()
+    {
+        return query;
+    }
+
+    public PropertyValueNode getContent()
+    {
+        return content;
+    }
+
+    public Order getOrder()
+    {
+        return order;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s ORDER BY %s %s", query, content, order.name());
+    }
 }

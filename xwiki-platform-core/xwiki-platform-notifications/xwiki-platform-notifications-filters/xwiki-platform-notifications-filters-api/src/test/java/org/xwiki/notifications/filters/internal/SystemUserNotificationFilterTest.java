@@ -26,12 +26,11 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -95,7 +94,7 @@ public class SystemUserNotificationFilterTest
         assertEquals(null, mocker.getComponentUnderTest().generateFilterExpression(
                         randomUser, fakePreference, NotificationFilterType.INCLUSIVE));
         assertEquals(new NotEqualsNode(
-                new PropertyValueNode(NotificationFilterProperty.USER),
+                new PropertyValueNode(EventProperty.USER),
                 new StringValueNode("serializedSystemUser")),
                 mocker.getComponentUnderTest().generateFilterExpression(
                         randomUser, null, NotificationFilterType.EXCLUSIVE));

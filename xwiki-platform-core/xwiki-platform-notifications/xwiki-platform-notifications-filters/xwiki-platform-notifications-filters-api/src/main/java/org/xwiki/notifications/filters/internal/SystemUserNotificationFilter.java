@@ -29,8 +29,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
@@ -82,7 +82,7 @@ public class SystemUserNotificationFilter extends AbstractNotificationFilter
             NotificationFilterType filterType)
     {
         if (preference == null && filterType.equals(NotificationFilterType.EXCLUSIVE)) {
-            return value(NotificationFilterProperty.USER).notEq(value(serializer.serialize(systemUser)));
+            return value(EventProperty.USER).notEq(value(serializer.serialize(systemUser)));
         } else {
             return null;
         }

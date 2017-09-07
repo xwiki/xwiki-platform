@@ -120,6 +120,7 @@ public class QueryGenerator
         for (Map.Entry<String, Object> queryParameter : result.getQueryParameters().entrySet()) {
             query.bindValue(queryParameter.getKey(), queryParameter.getValue());
         }
+
         return query;
     }
 
@@ -282,6 +283,7 @@ public class QueryGenerator
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;
                 } else {
+                    // TODO: fix bug here: user <> System User with OR makes every event returned
                     globalFiltersNode = new OrNode(
                             globalFiltersNode,
                             (AbstractOperatorNode) node

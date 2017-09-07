@@ -193,7 +193,7 @@ public class ScopeNotificationFilterTest
                         new StringValueNode("wiki2")),
                 new LikeNode(
                         new PropertyValueNode(EventProperty.SPACE),
-                        new StringValueNode("space_2")));
+                        new StringValueNode("space_2%")));
 
         assertEquals(expectedResult2, test2);
     }

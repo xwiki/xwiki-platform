@@ -100,9 +100,14 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                 ScopeNotificationFilterPreference scopePreference =
                         new ScopeNotificationFilterPreference(iterator.next(), entityReferenceResolver);
 
-                if (scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
+                boolean isAllEventFilter
+                        = scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
+
+                if (isAllEventFilter
                     || scopePreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
-                    hasRestriction = true;
+                    if (!isAllEventFilter) {
+                        hasRestriction = true;
+                    }
 
                     if (event.getDocument().equals(scopePreference.getScopeReference())
                             || event.getDocument().hasParent(scopePreference.getScopeReference())) {
@@ -113,7 +118,6 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                         }
 
                         matchRestriction = true;
-                        break;
                     }
                 }
             }
@@ -121,11 +125,11 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
             logger.warn(ERROR, e);
         }
 
-        /*
-         * In case we have an INCLUSIVE filter, we check if we had a restriction that was not satisfied.
-         * In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
-         * returned true.
-         */
+        //
+        // In case we have an INCLUSIVE filter, we check if we had a restriction that was not satisfied.
+        // In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
+        // returned true.
+        //
         return (filterType.equals(NotificationFilterType.INCLUSIVE) && hasRestriction && !matchRestriction);
     }
 
@@ -278,7 +282,7 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
 
             case SPACE:
                 return value(EventProperty.WIKI).eq(value(wiki))
-                        .and(value(EventProperty.SPACE).like(value(space)));
+                        .and(value(EventProperty.SPACE).like(value(String.format("%s%%", space))));
 
             case WIKI:
                 return value(EventProperty.WIKI).eq(value(wiki));

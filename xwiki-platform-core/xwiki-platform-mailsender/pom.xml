@@ -50,9 +50,10 @@
       <version>1.7</version>
       <scope>test</scope>
       <exclusions>
+        <!-- Already part of Java SE -->
         <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

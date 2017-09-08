@@ -151,7 +151,7 @@ public class DeletedDocument extends Api
         try {
             XWikiDocument doc = new XWikiDocument();
             doc.setFullName(getFullName(), this.context);
-            if (!hasAccessLevel(ADMIN_RIGHT, getFullName()) && !hasAccessLevel("delete", getFullName())) {
+            if (!hasAccessLevel("delete", getFullName())) {
                 return false;
             }
             String waitdays;

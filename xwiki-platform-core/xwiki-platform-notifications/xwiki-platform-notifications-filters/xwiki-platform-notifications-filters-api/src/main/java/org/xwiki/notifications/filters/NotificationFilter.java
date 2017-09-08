@@ -45,7 +45,7 @@ public interface NotificationFilter
 {
     /**
      * Enable or disable an event in the notification list (post-filter).
-     *For a given {@link NotificationPreference}, generate a filter associated with this preference
+     *
      * @param event an event
      * @param user the user interested in the notification
      * @param format format of the notification

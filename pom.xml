@@ -55,7 +55,7 @@
     <ckeditor.version>1.16</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.9</batik.version>
-
+    <restlet.version>2.3.10</restlet.version>
     <tika.version>1.14</tika.version>
     <pdfbox.version>2.0.7</pdfbox.version>
 
@@ -446,6 +446,115 @@
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-x86asm</artifactId>
         <version>1.0.2</version>
+      </dependency>
+
+      <!-- Restlet -->
+      <dependency>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet.ext.jaxrs</artifactId>
+        <version>${restlet.version}</version>
+        <exclusions>
+          <!-- Version too recent.
+               TODO: remove when upgrading to Servlet 3.1+ -->
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+          </exclusion>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+          </exclusion>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>jaxb-api</artifactId>
+            <groupId>javax.xml.bind</groupId>
+          </exclusion>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <groupId>javax.xml.stream</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+          </exclusion>
+          <!-- We use a more accurate and up to date JSON framework version -->
+          <exclusion>
+            <artifactId>org.restlet.lib.org.json</artifactId>
+            <groupId>org.restlet.jse</groupId>
+          </exclusion>
+          <!-- The recent one have a different id so we can't rely on dependencyManagement -->
+          <exclusion>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+          </exclusion>
+          <exclusion>
+            <!-- Restlet does not declare the right version of JAX-RS API... -->
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+      <!-- We need Jackson for a proper JSON representation of our REST resources.
+          See XWIKI-9136: Rest API JSON does not retrieve inherited fields -->
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet.ext.jackson</artifactId>
+        <version>${restlet.version}</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <!-- Wrong version of Woodstox -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+      <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
+          above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
+          good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
+          JAXB converter for XML representation. -->
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet.ext.jaxb</artifactId>
+        <version>${restlet.version}</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+          </exclusion>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>jaxb-api</artifactId>
+            <groupId>javax.xml.bind</groupId>
+          </exclusion>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>stax-api</artifactId>
+            <groupId>javax.xml.stream</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.restlet.jee</groupId>
+        <artifactId>org.restlet.ext.servlet</artifactId>
+        <version>${restlet.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- We use "se" version of the client API -->
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

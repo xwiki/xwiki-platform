@@ -43,6 +43,7 @@
 #end
 
 #foreach($docextralink in $docextralinks)
+  #set ($idHref = '')
   #set ($extraAnchor = $docextralink.get(0))
   #set ($extraText = $docextralink.get(1))
   #set ($extraCount = $docextralink.get(2))

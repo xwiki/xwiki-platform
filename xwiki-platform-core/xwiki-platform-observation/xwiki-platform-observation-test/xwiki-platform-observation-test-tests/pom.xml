@@ -70,6 +70,12 @@
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
@@ -126,11 +132,42 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Start Hsqldb -->
+      <plugin>
+        <groupId>org.onebusaway.plugins</groupId>
+        <artifactId>maven-hsqldb-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>start-hsqldb</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <dbName>${xwiki.database.directory}/xwiki_db</dbName>
+          <isTransient>false</isTransient>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
       <!-- Generate XWiki instances -->
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
         <version>${project.version}</version>
+        <configuration>
+          <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
+        </configuration>
         <executions>
           <execution>
             <id>xwiki-0</id>
@@ -173,33 +210,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <!-- Start Hsqldb -->
-      <plugin>
-        <groupId>org.onebusaway.plugins</groupId>
-        <artifactId>maven-hsqldb-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <id>start-hsqldb</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <dbName>${xwiki.database.directory}/xwiki_db</dbName>
-          <isTransient>false</isTransient>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
 
       <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only

@@ -1574,16 +1574,29 @@ public class TestUtils
      */
     public void setWikiPreference(String propertyName, String value) throws Exception
     {
-        ObjectPropertyReference propertyReference =
-            new ObjectPropertyReference(propertyName, new ObjectReference("XWiki.XWikiPreferences[0]",
-                new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences")));
+        DocumentReference documentReference = new DocumentReference(getCurrentWiki(), "XWiki", "XWikiPreferences");
+        ObjectReference objectReference = new ObjectReference("XWiki.XWikiPreferences[0]", documentReference);
 
-        Property property = new Property();
-        property.setValue(value);
+        Property property = RestTestUtils.property(propertyName, value);
 
-        TestUtils.assertStatusCodes(
-            rest().executePut(ObjectPropertyResource.class, property, rest().toElements(propertyReference)), true,
-            STATUS_ACCEPTED);
+        org.xwiki.rest.model.jaxb.Object preferenceObject = rest().get(objectReference, false);
+
+        if (preferenceObject == null) {
+            // The object does not exist, create it
+
+            preferenceObject = RestTestUtils.object("XWiki.XWikiPreferences");
+            preferenceObject.withProperties(property);
+
+            TestUtils.assertStatusCodes(
+                rest().executePost(ObjectsResource.class, preferenceObject, rest().toElements(documentReference)), true,
+                STATUS_CREATED);
+        } else {
+            // The object exist just set the property (faster than updating the whole object)
+
+            TestUtils.assertStatusCodes(
+                rest().executePut(ObjectPropertyResource.class, property, rest().toElements(objectReference)), true,
+                STATUS_ACCEPTED);
+        }
     }
 
     /**
@@ -2108,6 +2121,46 @@ public class TestUtils
         }
 
         /**
+         * @since 9.8RC1
+         */
+        public org.xwiki.rest.model.jaxb.Object object(EntityReference parentReference, String className)
+        {
+            return object(parentReference, className, 0);
+        }
+
+        /**
+         * @since 9.8RC1
+         */
+        public org.xwiki.rest.model.jaxb.Object object(EntityReference parentReference, String className, int number)
+        {
+            org.xwiki.rest.model.jaxb.Object obj = new org.xwiki.rest.model.jaxb.Object();
+
+            // Add current wiki if the reference does not contains any
+            EntityReference wikiReference = parentReference.extractReference(EntityType.WIKI);
+            if (wikiReference == null) {
+                obj.setWiki(this.testUtils.getCurrentWiki());
+            } else {
+                obj.setWiki(wikiReference.getName());
+            }
+
+            // Add spaces
+            EntityReference spaceReference =
+                parentReference.extractReference(EntityType.SPACE).removeParent(wikiReference);
+            obj.setSpace(referenceSerializer.serialize(spaceReference));
+
+            // Add page
+            EntityReference documentReference = parentReference.extractReference(EntityType.DOCUMENT);
+            obj.setPageName(documentReference.getName());
+
+            // Add class reference
+            obj.setClassName(className);
+            // Add object number
+            obj.setNumber(number);
+
+            return obj;
+        }
+
+        /**
          * @since 7.3M1
          */
         public void savePage(EntityReference reference) throws Exception
@@ -2504,6 +2557,25 @@ public class TestUtils
             }
 
             return resource;
+        }
+
+        public static Property getProperty(String name, org.xwiki.rest.model.jaxb.Object preferencesObject,
+            boolean create)
+        {
+            for (Property property : preferencesObject.getProperties()) {
+                if (property.getName().equals(name)) {
+                    return property;
+                }
+            }
+
+            if (create) {
+                Property property = property(name, null);
+                preferencesObject.getProperties().add(property);
+
+                return property;
+            }
+
+            return null;
         }
     }
 

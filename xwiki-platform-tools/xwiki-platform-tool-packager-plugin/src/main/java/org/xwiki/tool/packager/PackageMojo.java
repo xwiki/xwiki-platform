@@ -156,8 +156,14 @@ public class PackageMojo extends AbstractOldCoreMojo
     private boolean test;
 
     /**
-     * Automatically drop ProgrammingRights when evaluating scripts in wiki pages, in order to make sure that by
-     * default wiki pages don't require PR. Only active if {@link #test} is true and {@link #isSkipTests()} is false.
+     * The location of the hibernate configuration file.
+     */
+    @Parameter
+    private File hibernateConfiguration;
+
+    /**
+     * Automatically drop ProgrammingRights when evaluating scripts in wiki pages, in order to make sure that by default
+     * wiki pages don't require PR. Only active if {@link #test} is true and {@link #isSkipTests()} is false.
      * <p>
      * Also note that it's possible to exclude some pages from being tested by setting an XWiki property named
      * {@code test.prchecker.excludePattern} (e.g. {@code .*:XWiki\.DeletedDocuments}) in xwiki.properties.
@@ -185,7 +191,9 @@ public class PackageMojo extends AbstractOldCoreMojo
         this.libDirectory = new File(this.webInfDirectory, "lib");
 
         this.permanentDirectory = new File(this.outputPackageDirectory, "data");
-        this.hibernateConfig = new File(this.webInfDirectory, "hibernate.cfg.xml");
+        if (!this.hibernateConfig.exists()) {
+            this.hibernateConfig = new File(this.webInfDirectory, "hibernate.cfg.xml");
+        }
 
         // Generate and copy config files.
         getLog().info("Copying Configuration files ...");

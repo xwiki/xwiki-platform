@@ -36,7 +36,6 @@ import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -50,19 +49,9 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Singleton
-@Named(PanelWikiUIExtensionComponentBuilder.CLASS_REFERENCE_STRING)
+@Named(PanelClassDocumentInitializer.CLASS_REFERENCE_STRING)
 public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectComponentBuilder
 {
-    /**
-     * The local reference of the class used to defined panels xobjects as a String.
-     */
-    public static final String CLASS_REFERENCE_STRING = "Panels.PanelClass";
-
-    /**
-     * The local reference of the class used to defined panels xobjects.
-     */
-    public static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("Panels", "PanelClass");
-
     /**
      * The component manager.
      */
@@ -82,7 +71,7 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectCompo
     @Override
     public EntityReference getClassReference()
     {
-        return CLASS_REFERENCE;
+        return PanelClassDocumentInitializer.CLASS_REFERENCE;
     }
 
     @Override

@@ -10,17 +10,17 @@
     #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder', {'hierarchy': 'parentchild'}]))
   #else
     #if ($doc.name == 'WebHome')
-      #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder']))
+      #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder', '', 'tmChildren']))
     #else
       ## Terminal document
-      #set ($discard = $docextralinks.add(['siblings', $services.localization.render('docextra.siblings'), -1, 'folder']))
+      #set ($discard = $docextralinks.add(['siblings', $services.localization.render('docextra.siblings'), -1, 'folder', '', 'tmSiblings']))
     #end
   #end
   #if($xcontext.action == 'view' && $viewer != 'content' && !$doc.isNew())
     #set ($discard = $docextralinks.add(['content', $services.localization.render('core.links.content'), -1, 'file']))
   #end
   #if($viewer != 'comments' && $showcomments && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'comment']))
+    #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'comment', '', 'tmComment']))
   #end
   #if($showannotations && !$doc.isNew())
     #if(!$annotationCount)
@@ -32,17 +32,18 @@
     #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'pushpin']))
   #end
   #if($viewer != 'attachments' && $showattachments && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'attach']))
+    #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'attach', '', 'tmAttachments']))
   #end
   #if($viewer != 'history' && $showhistory && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'time']))
+    #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'time', '', 'tmHistory']))
   #end
   #if($viewer != 'information' && $showinformation && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'information']))
+    #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'information', '', 'tmInformation']))
   #end
 #end
 
 #foreach($docextralink in $docextralinks)
+  #set ($idHref = '')
   #set ($extraAnchor = $docextralink.get(0))
   #set ($extraText = $docextralink.get(1))
   #set ($extraCount = $docextralink.get(2))
@@ -54,6 +55,9 @@
   #if ($docextralink.size() > 4)
     #set ($extraParams = $docextralink.get(4))
   #end
+  #if ($docextralink.size() > 5)
+    #set ($idHref = $docextralink.get(5))
+  #end
   #if ($extraCount > 0)
     #set ($extraText = "$extraText ($extraCount)")
   #end
@@ -63,7 +67,7 @@
   #else
     #set ($url = $doc.getURL('view', "viewer=$escapetool.url($extraAnchor)"))
   #end
-  #submenuitem($url, $escapetool.xml($extraText), '', '', $glyphIcon)
+  #submenuitem($url, $escapetool.xml($extraText), $idHref, '', $glyphIcon)
 #end
 
 ###########################################

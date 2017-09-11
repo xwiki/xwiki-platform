@@ -29,7 +29,11 @@
   </parent>
   <artifactId>xwiki-platform-notifications-filters-watchlistbridge</artifactId>
   <name>XWiki Platform - Notifications - Filters - Watchlist Bridge</name>
-  <description>Enable the preferences of the watchlist of the new notifications module</description>
+  <description>Enable the preferences of the watchlist of the new notifications module.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Notifications - Watchlist Bridge Module</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

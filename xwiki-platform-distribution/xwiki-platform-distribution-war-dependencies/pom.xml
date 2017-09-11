@@ -600,6 +600,27 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Notification -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Bridge to make notification use the preferences of the watchlist -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-watchlistbridge</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- ********************************************************************** -->
     <!-- Stuff filled with Maven hacks making them hard to install as extension right now -->
 

@@ -24,17 +24,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-notifications</artifactId>
+    <artifactId>xwiki-platform-notifications-filters</artifactId>
     <version>9.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-notifications-filters</artifactId>
-  <name>XWiki Platform - Notifications - Filters - Parent POM</name>
-  <description>Handle how notifications can be filtered</description>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xwiki-platform-notifications-filters-api</module>
-    <module>xwiki-platform-notifications-filters-default</module>
-    <module>xwiki-platform-notifications-filters-watch</module>
-    <module>xwiki-platform-notifications-filters-watchlistbridge</module>
-  </modules>
+  <artifactId>xwiki-platform-notifications-filters-watchlistbridge</artifactId>
+  <name>XWiki Platform - Notifications - Filters - Watchlist Bridge</name>
+  <description>Enable the preferences of the watchlist of the new notifications module</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

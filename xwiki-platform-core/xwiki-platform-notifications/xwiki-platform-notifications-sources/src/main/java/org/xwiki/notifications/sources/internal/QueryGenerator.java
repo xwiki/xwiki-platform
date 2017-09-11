@@ -114,6 +114,10 @@ public class QueryGenerator
         ExpressionNodeToHQLConverter.HQLQuery result = hqlConverter.parse(
                 generateQueryExpression(user, format, onlyUnread, endDate, startDate, blackList)
         );
+        if (result.getQuery().isEmpty()) {
+            return null;
+        }
+
         Query query = queryManager.createQuery(String.format("where %s", result.getQuery()), Query.HQL);
         for (Map.Entry<String, Object> queryParameter : result.getQueryParameters().entrySet()) {
             query.bindValue(queryParameter.getKey(), queryParameter.getValue());

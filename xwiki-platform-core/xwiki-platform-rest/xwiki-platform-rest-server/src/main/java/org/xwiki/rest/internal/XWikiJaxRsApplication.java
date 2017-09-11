@@ -23,14 +23,16 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
 
-import org.restlet.Context;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rest.internal.Constants;
 import org.xwiki.rest.XWikiRestComponent;
 
 /**
@@ -47,36 +49,27 @@ import org.xwiki.rest.XWikiRestComponent;
  * 
  * @version $Id$
  */
+@Component(roles = Application.class)
+@Singleton
 public class XWikiJaxRsApplication extends Application
 {
-    /*
-     * The set containing all the discovered resources and providers that will constitute the JAX-RS application.
-     */
-    private Set<Class< ? >> jaxRsClasses;
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
-    public XWikiJaxRsApplication(Context context)
+    @Override
+    public Set<Class<?>> getClasses()
     {
-        this.jaxRsClasses = new HashSet<Class< ? >>();
-
-        ComponentManager componentManager =
-            (ComponentManager) context.getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        Set<Class<?>> jaxRsClasses = new HashSet<>();
 
         /* Look up all the component that are marked as XWikiRestComponent. */
         List<ComponentDescriptor<XWikiRestComponent>> cds =
-            componentManager.getComponentDescriptorList((Type) XWikiRestComponent.class);
+            this.componentManagerProvider.get().getComponentDescriptorList((Type) XWikiRestComponent.class);
 
         for (ComponentDescriptor<XWikiRestComponent> cd : cds) {
-            this.jaxRsClasses.add(cd.getImplementation());
-            context.getLogger().log(Level.FINE, String.format("%s registered.", cd.getImplementation().getName()));
+            jaxRsClasses.add(cd.getImplementation());
         }
 
-        context.getLogger().log(Level.INFO, "RESTful API subsystem initialized.");
-    }
-
-    @Override
-    public Set<Class< ? >> getClasses()
-    {
         return jaxRsClasses;
     }
-
 }

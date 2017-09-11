@@ -22,15 +22,20 @@ package org.xwiki.rest.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.restlet.ext.jaxrs.InstantiateException;
 import org.restlet.ext.jaxrs.ObjectFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.rest.internal.Constants;
 import org.xwiki.rest.XWikiRestComponent;
 
 /**
@@ -41,28 +46,23 @@ import org.xwiki.rest.XWikiRestComponent;
  * 
  * @version $Id$
  */
+@Component(roles = ObjectFactory.class)
+@Singleton
 public class ComponentsObjectFactory implements ObjectFactory
 {
-    /**
-     * The component manager used to lookup and instantiate components.
-     */
-    private ComponentManager componentManager;
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
-    /**
-     * Constructor
-     * 
-     * @param componentManager The component manager to be used.
-     */
-    public ComponentsObjectFactory(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
+    @Inject
+    private Execution execution;
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T getInstance(Class<T> clazz) throws InstantiateException
     {
         try {
+            ComponentManager componentManager = this.componentManagerProvider.get();
+
             // Use the component manager to lookup the class. This ensure that injections are properly executed.
             XWikiRestComponent component = componentManager.getInstance(XWikiRestComponent.class, clazz.getName());
 
@@ -73,11 +73,11 @@ public class ComponentsObjectFactory implements ObjectFactory
 
             // Retrieve the list of releasable components from the execution context. This is used to store component
             // instances that need to be released at the end of the request.
-            ExecutionContext executionContext = componentManager.<Execution> getInstance(Execution.class).getContext();
+            ExecutionContext executionContext = this.execution.getContext();
             List<XWikiRestComponent> releasableComponentReferences =
                 (List<XWikiRestComponent>) executionContext.getProperty(Constants.RELEASABLE_COMPONENT_REFERENCES);
             if (releasableComponentReferences == null) {
-                releasableComponentReferences = new ArrayList<XWikiRestComponent>();
+                releasableComponentReferences = new ArrayList<>();
                 executionContext.setProperty(Constants.RELEASABLE_COMPONENT_REFERENCES, releasableComponentReferences);
             }
 

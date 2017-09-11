@@ -25,13 +25,13 @@ import java.util.logging.LogManager;
 import javax.servlet.ServletException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.restlet.Application;
 import org.restlet.Context;
+import org.restlet.ext.jaxrs.JaxRsApplication;
+import org.restlet.ext.servlet.ServerServlet;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rest.internal.Constants;
-
-import org.restlet.ext.servlet.ServerServlet;
 
 /**
  * <p>
@@ -58,24 +58,50 @@ public class XWikiRestletServlet extends ServerServlet
     @Override
     protected Application createApplication(Context context)
     {
-        Application application = super.createApplication(context);
-
-        /* Retrieve the application context in order to populate it with relevant variables. */
-        Context applicationContext = application.getContext();
+        Context applicationContext = context.createChildContext();
 
         /* Retrieve the component manager and make it available in the restlet application context. */
-        ComponentManager componentManager = getComponentManager(context);
+        ComponentManager componentManager = getComponentManager();
         applicationContext.getAttributes().put(Constants.XWIKI_COMPONENT_MANAGER, componentManager);
 
-        /* Set the object factory for instantiating components. */
-        if (application instanceof XWikiRestletJaxRsApplication) {
-            XWikiRestletJaxRsApplication jaxrsApplication = (XWikiRestletJaxRsApplication) application;
-            jaxrsApplication.setObjectFactory(new ComponentsObjectFactory(componentManager));
-        } else {
-            log("The Restlet application is not an instance of XWikiRestletJaxRsApplication. Please check your web.xml");
+        JaxRsApplication application;
+        try {
+            application = componentManager.getInstance(JaxRsApplication.class);
+        } catch (ComponentLookupException e) {
+            log("Failed to lookup default JAX-RS Application", e);
+
+            return null;
+        }
+        application.setContext(applicationContext);
+
+        // Make the servlet available
+        try {
+            JaxRsServletProvider applicationProvider = componentManager.getInstance(JaxRsServletProvider.class);
+            applicationProvider.setApplication(this);
+        } catch (ComponentLookupException e) {
+            log("Failed to lookup JaxRsApplicationProvider. Dyncamically added/removed resources won'tbe supported", e);
         }
 
         return application;
+    }
+
+    @Override
+    public void destroy()
+    {
+        super.destroy();
+
+        // FIXME: not super nice but destroy() is pretty much useless and Restlet is really not designed in a dynamic
+        // way...
+        try {
+            FieldUtils.writeField(this, "application", null, true);
+            FieldUtils.writeField(this, "component", null, true);
+            FieldUtils.writeField(this, "helper", null, true);
+            getServletContext().removeAttribute("org.restlet.ext.servlet.ServerServlet.server.RestletServlet");
+            getServletContext().removeAttribute("org.restlet.ext.servlet.ServerServlet.application.RestletServlet");
+            getServletContext().removeAttribute("org.restlet.ext.servlet.ServerServlet.component.RestletServlet");
+        } catch (IllegalAccessException e) {
+            log("Failed to destroy Restlet servlet", e);
+        }
     }
 
     @Override
@@ -106,14 +132,12 @@ public class XWikiRestletServlet extends ServerServlet
     }
 
     /**
-     * Finds the correct Component Manager to use to find REST Resource components. This is important so that
-     * components registered in a children Component Manager are found (for example a REST Resource Component added
-     * in a subwiki).
+     * Finds the correct Component Manager to use to find REST Resource components. This is important so that components
+     * registered in a children Component Manager are found (for example a REST Resource Component added in a subwiki).
      *
-     * @param context the RESTlet context
      * @return the Context Component Manager or if it doesn't exist the Root Component Manager
      */
-    private ComponentManager getComponentManager(Context context)
+    private ComponentManager getComponentManager()
     {
         ComponentManager result =
             (ComponentManager) getServletContext().getAttribute("org.xwiki.component.manager.ComponentManager");

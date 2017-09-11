@@ -20,7 +20,7 @@
 package org.xwiki.notifications.filters.expression.generics;
 
 import org.xwiki.notifications.filters.expression.EqualsNode;
-import org.xwiki.notifications.filters.expression.LikeNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.stability.Unstable;
 
@@ -83,16 +83,16 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     }
 
     /**
-     * Helper that allows to create {@link LikeNode} without having to instantiate new objects.
+     * Helper that allows to create {@link StartsWith} without having to instantiate new objects.
      *
      * @param node the node that will be the second operand of the "like" node
-     * @return a {@link LikeNode} where the current object is the first operand and the parameter is the second operand
+     * @return a {@link StartsWith} where the current object is the first operand and the parameter is the second operand
      *
      * @since 9.8RC1
      */
-    public LikeNode like(AbstractValueNode node)
+    public StartsWith startsWith(AbstractValueNode node)
     {
-        return new LikeNode(this, node);
+        return new StartsWith(this, node);
     }
 
     /**

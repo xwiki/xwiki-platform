@@ -36,7 +36,7 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
-import org.xwiki.notifications.filters.expression.LikeNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.OrNode;
@@ -244,8 +244,8 @@ public class ExpressionNodeToHQLConverter
         } else if (operator instanceof NotEqualsNode) {
             returnValue = String.format("%s <> %s", parseValue((AbstractValueNode) operator.getLeftOperand(), result),
                     parseValue((AbstractValueNode) operator.getRightOperand(), result));
-        } else if (operator instanceof LikeNode) {
-            returnValue = String.format("%s LIKE %s ESCAPE '!'",
+        } else if (operator instanceof StartsWith) {
+            returnValue = String.format("%s LIKE concat(%s, '%%') ESCAPE '!'",
                     parseValue((AbstractValueNode) operator.getLeftOperand(), result),
                     parseValue((AbstractValueNode) operator.getRightOperand(), true, result));
         } else if (operator instanceof GreaterThanNode) {

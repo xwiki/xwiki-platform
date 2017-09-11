@@ -327,7 +327,36 @@
                     "classSimpleName": "PropertyValueNode",
                     "elementKind": "class",
                     "justification": "Young API"
-                  }
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method org.xwiki.notifications.filters.expression.generics.AbstractNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.preferences.NotificationPreference)",
+                    "new": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.preferences.NotificationPreference)",
+                    "oldType": "org.xwiki.notifications.filters.expression.generics.AbstractNode",
+                    "newType": "org.xwiki.notifications.filters.expression.ExpressionNode",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "filterExpression",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilterType)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "filterExpression",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.notifications.filters.expression.LikeNode",
+                    "package": "org.xwiki.notifications.filters.expression",
+                    "classSimpleName": "LikeNode",
+                    "elementKind": "class",
+                    "justification": "Young API"
+                    }
                 ]
               }
             }

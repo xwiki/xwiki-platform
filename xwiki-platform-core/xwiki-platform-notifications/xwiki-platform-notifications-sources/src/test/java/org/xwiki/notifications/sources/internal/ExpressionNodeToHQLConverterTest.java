@@ -36,7 +36,7 @@ import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
-import org.xwiki.notifications.filters.expression.LikeNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.OrderByNode;
@@ -148,11 +148,11 @@ public class ExpressionNodeToHQLConverterTest
     }
 
     @Test
-    public void parseWithLikeNode()
+    public void parseWithStartsWithNode()
     {
-        AbstractNode testAST = new LikeNode(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
+        AbstractNode testAST = new StartsWith(new StringValueNode(TEST_VALUE_1), new StringValueNode(TEST_VALUE_2));
 
-        assertEquals(String.format(":%s LIKE :%s ESCAPE '!'", TEST_VALUE_1_IDENTIFIER,
+        assertEquals(String.format(":%s LIKE concat(:%s, '%%') ESCAPE '!'", TEST_VALUE_1_IDENTIFIER,
                 TEST_VALUE_2_IDENTIFIER), parser.parse(testAST).getQuery());
     }
 

@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.stability.Unstable;
@@ -70,22 +71,23 @@ public interface NotificationFilter
      *
      * @param user the user interested in the notifications
      * @param preference the notification preference associated with the filter
-     * @return a filtering expression
+     * @return the updated query
      *
      * @since 9.7RC1
      */
-    AbstractNode filterExpression(DocumentReference user, NotificationPreference preference);
+    ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference);
 
     /**
      * Filtering expression to use when retrieving notifications.
      * Note that this filtering expression will not be bound to any notification preference.
-     *
+
      * @param user the user interested in the notifications
-     * @return a filtering expression
+     * @param type of the expected notification filter
+     * @return a filtering expression or null
      *
      * @since 9.8RC1
      */
-    AbstractNode filterExpression(DocumentReference user);
+    ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type);
 
     /**
      * Get the name of the filter. This is useful as {@link NotificationFilterPreference} will be able to be linked to

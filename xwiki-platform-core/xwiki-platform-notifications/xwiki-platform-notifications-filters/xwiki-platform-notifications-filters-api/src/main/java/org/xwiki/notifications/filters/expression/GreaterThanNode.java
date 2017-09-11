@@ -24,7 +24,7 @@ import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.stability.Unstable;
 
 /**
- * Define a >= condition in a filtering expression.
+ * Define a &gt;= condition in a filtering expression.
  *
  * @version $Id$
  * @since 9.8RC1
@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
 public final class GreaterThanNode extends AbstractBinaryOperatorNode
 {
     /**
-     * Constructs a new ">=" node.
+     * Constructs a new "&gt;=" node.
      *
      * @param leftOperand the left operand
      * @param rightOperand the right operand

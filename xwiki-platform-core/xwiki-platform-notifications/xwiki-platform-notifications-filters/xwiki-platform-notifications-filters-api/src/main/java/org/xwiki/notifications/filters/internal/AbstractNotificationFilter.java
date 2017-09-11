@@ -46,26 +46,26 @@ public abstract class AbstractNotificationFilter implements NotificationFilter
     @Override
     public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
-        AbstractOperatorNode leftOperand = this.generateFilterExpression(user, preference,
+        AbstractOperatorNode inclusiveFilter = this.generateFilterExpression(user, preference,
                 NotificationFilterType.INCLUSIVE);
-        AbstractOperatorNode rightOperand = this.generateFilterExpression(user, preference,
+        AbstractOperatorNode exclusiveFilter = this.generateFilterExpression(user, preference,
                 NotificationFilterType.EXCLUSIVE);
 
-        if (rightOperand != null && leftOperand != null) {
-            return leftOperand.and(rightOperand);
-        } else if (rightOperand != null) {
-            return rightOperand;
-        } else if (leftOperand != null) {
-            return leftOperand;
+        if (inclusiveFilter != null && exclusiveFilter != null) {
+            return inclusiveFilter.and(exclusiveFilter);
+        } else if (exclusiveFilter != null) {
+            return exclusiveFilter;
+        } else if (inclusiveFilter != null) {
+            return inclusiveFilter;
         } else {
             return AbstractNode.EMPTY_NODE;
         }
     }
 
     @Override
-    public AbstractNode filterExpression(DocumentReference user)
+    public AbstractNode filterExpression(DocumentReference user, NotificationFilterType type)
     {
-        return filterExpression(user, null);
+        return generateFilterExpression(user, null, type);
     }
 
     /**

@@ -24,21 +24,21 @@ import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.stability.Unstable;
 
 /**
- * Define a LIKE operation in a filtering expression.
+ * Define a LIKE ("value_%") operation in a filtering expression.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Unstable
-public final class LikeNode extends AbstractBinaryOperatorNode
+public final class StartsWith extends AbstractBinaryOperatorNode
 {
     /**
-     * Constructs a new LIKE node.
+     * Constructs a new StartsWith node.
      *
      * @param leftOperand the left operand
      * @param rightOperand the right operand
      */
-    public LikeNode(AbstractValueNode leftOperand, AbstractValueNode rightOperand)
+    public StartsWith(AbstractValueNode leftOperand, AbstractValueNode rightOperand)
     {
         super(leftOperand, rightOperand);
     }
@@ -46,7 +46,7 @@ public final class LikeNode extends AbstractBinaryOperatorNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof LikeNode && super.equals(o));
+        return (o instanceof StartsWith && super.equals(o));
     }
 
     @Override
@@ -58,6 +58,6 @@ public final class LikeNode extends AbstractBinaryOperatorNode
     @Override
     public String toString()
     {
-        return String.format("%s ~= %s", getLeftOperand(), getRightOperand());
+        return String.format("%s ~= %s%%", getLeftOperand(), getRightOperand());
     }
 }

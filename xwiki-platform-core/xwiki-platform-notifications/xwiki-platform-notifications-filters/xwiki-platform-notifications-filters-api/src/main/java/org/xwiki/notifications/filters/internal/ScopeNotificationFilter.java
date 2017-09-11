@@ -151,7 +151,6 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
             NotificationFilterType filterType)
     {
         AbstractOperatorNode syntaxNode = null;
-        boolean isFirstPass = true;
 
         try {
             // Get every filterPreference linked to the current filter
@@ -183,13 +182,12 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
                 }
 
                 // Wrap the freshly created node in a AndNode or a OrNode depending on the filter type
-                if (isFirstPass) {
-                    isFirstPass = false;
+                if (syntaxNode == null) {
                     syntaxNode = tmpNode;
                 } else if (filterType.equals(NotificationFilterType.INCLUSIVE)) {
                     syntaxNode = syntaxNode.or(tmpNode);
                 } else {
-                    syntaxNode = syntaxNode.or(tmpNode);
+                    syntaxNode = syntaxNode.and(tmpNode);
                 }
             }
         } catch (NotificationException e) {
@@ -282,7 +280,7 @@ public class ScopeNotificationFilter extends AbstractNotificationFilter
 
             case SPACE:
                 return value(EventProperty.WIKI).eq(value(wiki))
-                        .and(value(EventProperty.SPACE).like(value(String.format("%s%%", space))));
+                        .and(value(EventProperty.SPACE).startsWith(value(space)));
 
             case WIKI:
                 return value(EventProperty.WIKI).eq(value(wiki));

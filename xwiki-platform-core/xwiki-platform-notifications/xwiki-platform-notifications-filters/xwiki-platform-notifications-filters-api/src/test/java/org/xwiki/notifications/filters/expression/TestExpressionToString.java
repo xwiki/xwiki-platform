@@ -44,7 +44,7 @@ public class TestExpressionToString
                         )
                 ),
                 new NotNode(
-                        new LikeNode(
+                        new StartsWith(
                                 new PropertyValueNode(EventProperty.PAGE),
                                 new StringValueNode("value3%")
                         )

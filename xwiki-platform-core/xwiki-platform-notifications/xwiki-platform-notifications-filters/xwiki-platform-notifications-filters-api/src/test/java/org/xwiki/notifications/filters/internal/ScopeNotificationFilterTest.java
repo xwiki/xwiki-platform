@@ -44,7 +44,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
-import org.xwiki.notifications.filters.expression.LikeNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
@@ -191,9 +191,9 @@ public class ScopeNotificationFilterTest
                 new EqualsNode(
                         new PropertyValueNode(EventProperty.WIKI),
                         new StringValueNode("wiki2")),
-                new LikeNode(
+                new StartsWith(
                         new PropertyValueNode(EventProperty.SPACE),
-                        new StringValueNode("space_2%")));
+                        new StringValueNode("space_2")));
 
         assertEquals(expectedResult2, test2);
     }
@@ -237,7 +237,8 @@ public class ScopeNotificationFilterTest
         when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_1)).thenReturn("wiki1");
 
         AbstractNode test = mocker.getComponentUnderTest().filterExpression(
-                new DocumentReference("xwiki", "XWiki", "User"));
+                new DocumentReference("xwiki", "XWiki", "User"),
+                NotificationFilterType.INCLUSIVE);
 
         AbstractNode expectedResult = new EqualsNode(
                 new PropertyValueNode(EventProperty.WIKI),

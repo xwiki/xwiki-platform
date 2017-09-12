@@ -94,7 +94,7 @@ public class UsersNotificationFilter extends AbstractScopeOrUserNotificationFilt
 
         // In case the user list contains more than 1 user...
         while (userIterator.hasNext()) {
-            node = node.and(value(EventProperty.USER).eq(value(userIterator.next())));
+            node = node.or(value(EventProperty.USER).eq(value(userIterator.next())));
         }
 
         return node;

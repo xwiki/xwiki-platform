@@ -51,7 +51,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     private NotificationFilterManager notificationFilterManager;
 
     @Override
-    public void watchEntity(DocumentReference user, WatchedEntityReference entity) throws NotificationException
+    public void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
         Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
 
@@ -74,7 +74,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     }
 
     @Override
-    public void unwatchEntity(DocumentReference user, WatchedEntityReference entity)
+    public void unwatchEntity(WatchedEntityReference entity, DocumentReference user)
             throws NotificationException
     {
         Stream<NotificationFilterPreference> prefs = getAllEventsFilterPreferences(user);
@@ -87,13 +87,13 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     }
 
     @Override
-    public boolean isEntityWatched(DocumentReference user, WatchedEntityReference entity) throws NotificationException
+    public boolean isEntityWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
         return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.match(pref));
     }
 
     @Override
-    public boolean isEntityDirectlyWatched(DocumentReference user, WatchedEntityReference entity)
+    public boolean isEntityDirectlyWatched(WatchedEntityReference entity, DocumentReference user)
             throws NotificationException
     {
         return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.matchExactly(pref));

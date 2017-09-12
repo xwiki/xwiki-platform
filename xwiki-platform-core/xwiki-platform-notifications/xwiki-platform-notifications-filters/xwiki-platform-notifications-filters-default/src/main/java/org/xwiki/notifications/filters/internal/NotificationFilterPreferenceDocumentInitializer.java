@@ -71,7 +71,7 @@ public class NotificationFilterPreferenceDocumentInitializer extends AbstractMan
         xclass.addTextField("filterPreferenceName", "Name of the filter preference", 256);
         xclass.addBooleanField("isEnabled", "Is enabled ?", CHECKBOX, true);
         xclass.addTextField("filterName", "Filter name", 64);
-        xclass.addStaticListField("filterType", "Filter type", 5, false, true,
+        xclass.addStaticListField("filterType", "Filter type", 5, false, false,
                 "inclusive=Inclusive|exclusive=Exclusive", SELECT, SEPARATORS);
         xclass.addStaticListField("filterFormats", "Formats", 5, true, true,
                 "alert=Alert|email=E-mail", SELECT, SEPARATORS);

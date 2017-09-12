@@ -65,8 +65,9 @@ public class NotificationWatchScriptService implements ScriptService
      */
     public void watchLocation(EntityReference location) throws NotificationException
     {
-        watchedEntitiesManager.watchEntity(documentAccessBridge.getCurrentUserReference(),
-                watchedEntityFactory.createWatchedLocationReference(location));
+        watchedEntitiesManager.watchEntity(watchedEntityFactory.createWatchedLocationReference(location),
+                documentAccessBridge.getCurrentUserReference()
+        );
     }
 
     /**
@@ -77,8 +78,9 @@ public class NotificationWatchScriptService implements ScriptService
      */
     public void unwatchLocation(EntityReference location) throws NotificationException
     {
-        watchedEntitiesManager.unwatchEntity(documentAccessBridge.getCurrentUserReference(),
-                watchedEntityFactory.createWatchedLocationReference(location));
+        watchedEntitiesManager.unwatchEntity(watchedEntityFactory.createWatchedLocationReference(location),
+                documentAccessBridge.getCurrentUserReference()
+        );
     }
 
     /**
@@ -88,8 +90,9 @@ public class NotificationWatchScriptService implements ScriptService
      */
     public boolean isLocationWatched(EntityReference location) throws NotificationException
     {
-        return watchedEntitiesManager.isEntityWatched(documentAccessBridge.getCurrentUserReference(),
-                watchedEntityFactory.createWatchedLocationReference(location));
+        return watchedEntitiesManager.isEntityWatched(watchedEntityFactory.createWatchedLocationReference(location),
+                documentAccessBridge.getCurrentUserReference()
+        );
     }
 
     /**
@@ -99,7 +102,9 @@ public class NotificationWatchScriptService implements ScriptService
      */
     public boolean isLocationDirectlyWatched(EntityReference location) throws NotificationException
     {
-        return watchedEntitiesManager.isEntityDirectlyWatched(documentAccessBridge.getCurrentUserReference(),
-                watchedEntityFactory.createWatchedLocationReference(location));
+        return watchedEntitiesManager.isEntityDirectlyWatched(
+                watchedEntityFactory.createWatchedLocationReference(location),
+                documentAccessBridge.getCurrentUserReference()
+        );
     }
 }

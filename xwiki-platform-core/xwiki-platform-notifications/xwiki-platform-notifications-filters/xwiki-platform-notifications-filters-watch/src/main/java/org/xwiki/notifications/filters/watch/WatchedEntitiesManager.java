@@ -38,34 +38,34 @@ public interface WatchedEntitiesManager
     /**
      * Add a filter to watch the specified entity.
      *
-     * @param user user that will watch the entity
      * @param entity the entity to watch
+     * @param user user that will watch the entity
      * @throws NotificationException if an error happens
      */
-    void watchEntity(DocumentReference user, WatchedEntityReference entity) throws NotificationException;
+    void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
     /**
      * Remove a filter to stop watching the specified entity.
      *
-     * @param user user that will watch the entity
      * @param entity the entity to watch
+     * @param user user that will watch the entity
      * @throws NotificationException if an error happens
      */
-    void unwatchEntity(DocumentReference user, WatchedEntityReference entity) throws NotificationException;
+    void unwatchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
     /**
-     * @param user a user
      * @param entity the entity
+     * @param user a user
      * @return either or not the entity is already watched by the given user
      * @throws NotificationException if an error happens
      */
-    boolean isEntityWatched(DocumentReference user, WatchedEntityReference entity) throws NotificationException;
+    boolean isEntityWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
     /**
-     * @param user a user
      * @param entity the entity
+     * @param user a user
      * @return either or not the location is directly watched by the user
      * @throws NotificationException if an error happens
      */
-    boolean isEntityDirectlyWatched(DocumentReference user, WatchedEntityReference entity) throws NotificationException;
+    boolean isEntityDirectlyWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 }

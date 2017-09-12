@@ -58,6 +58,6 @@ public final class StartsWith extends AbstractBinaryOperatorNode
     @Override
     public String toString()
     {
-        return String.format("%s ~= %s%%", getLeftOperand(), getRightOperand());
+        return String.format("%s STARTS WITH %s", getLeftOperand(), getRightOperand());
     }
 }

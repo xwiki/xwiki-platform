@@ -1,0 +1,266 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.notifications.filters.internal;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.xwiki.eventstream.Event;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
+import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
+
+/**
+ * Helper to implement {@link ScopeNotificationFilter} and {@link UsersNotificationFilter}.
+ *
+ * @param <T> the specialized type of the notification filter preference
+ * @version $Id$
+ * @since 9.8RC1
+ */
+public abstract class AbstractScopeOrUserNotificationFilter<T extends NotificationFilterPreference>
+        extends AbstractNotificationFilter
+{
+    private static final String ERROR = "Failed to filter the notifications.";
+
+    @Inject
+    protected NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    protected Logger logger;
+
+    protected String filterName;
+
+    /**
+     * Construct a AbstractScopeOrUserNotificationFilter.
+     * @param filterName name of the filter
+     */
+    public AbstractScopeOrUserNotificationFilter(String filterName)
+    {
+        this.filterName = filterName;
+    }
+
+    @Override
+    public boolean filterEventByFilterType(Event event, DocumentReference user, NotificationFormat format,
+            NotificationFilterType filterType)
+    {
+        // Indicate if a restriction exist concerning this type of event
+        boolean hasRestriction = false;
+        // Indicate if a restriction matches the document of the event
+        boolean matchRestriction = false;
+
+        try {
+            Iterator<NotificationFilterPreference> iterator = getUserFilterPreferences(user, format, filterType);
+            while (iterator.hasNext()) {
+
+                T preference = convertPreferences(iterator.next());
+
+                boolean isAllEventFilter = preference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
+                boolean doesEventTypeMatchFilter
+                        = preference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType());
+
+                hasRestriction |= !isAllEventFilter && doesEventTypeMatchFilter;
+                if (isAllEventFilter || doesEventTypeMatchFilter) {
+
+                    if (isEventCompatibleWithPreference(event, preference)) {
+
+                        // If we have a match on an EXCLUSIVE filter, we don’t need to go any further
+                        if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
+                            return true;
+                        }
+
+                        matchRestriction = true;
+                    }
+                }
+            }
+        } catch (NotificationException e) {
+            logger.warn(ERROR, e);
+        }
+
+        //
+        // In case we have an INCLUSIVE filter, we check if we had a restriction that was not satisfied.
+        // In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
+        // returned true.
+        //
+        return (filterType.equals(NotificationFilterType.INCLUSIVE) && hasRestriction && !matchRestriction);
+    }
+
+    protected abstract T convertPreferences(NotificationFilterPreference pref);
+
+    protected abstract boolean isEventCompatibleWithPreference(Event event, T preference)
+            throws NotificationException;
+
+    protected Iterator<NotificationFilterPreference> getUserFilterPreferences(DocumentReference user,
+            NotificationFormat format, NotificationFilterType filterType) throws NotificationException
+    {
+        return getUserFilterPreferencesIterator(
+                notificationFilterManager.getFilterPreferences(user, this, filterType, format));
+    }
+
+    protected Iterator<NotificationFilterPreference> getUserFilterPreferencesIterator(
+            Collection<NotificationFilterPreference> preferences)
+    {
+        return preferences.stream().filter(isNotificationFilterPreferenceOfCurrentFilter()).iterator();
+    }
+
+    protected Predicate<NotificationFilterPreference> isNotificationFilterPreferenceOfCurrentFilter()
+    {
+        return preference -> filterName.equals(preference.getFilterName());
+    }
+
+    /**
+     * Given a {@link NotificationFilterPreference} and the current filtering context (defined by a
+     * {@link NotificationPreference}), determine if a the current filter should apply with the given scope.
+     *
+     * Note that we allow the {@link NotificationPreference} to be null and the
+     * {@link NotificationFilterPreference} to have an empty {@link NotificationPreferenceProperty#EVENT_TYPE} property.
+     * This is done to allow the filter to be applied globally and match all events.
+     *
+     * @param filterPreference the reference user
+     * @param preference the related notification preference, can be null
+     * @return true if the filter should be applied to the given scope.
+     */
+    protected boolean preferencesMatchesFilteringContext(NotificationFilterPreference filterPreference,
+            NotificationPreference preference)
+    {
+        if (preference == null) {
+            return matchAllEvents(filterPreference);
+        } else {
+            return matchEventType(filterPreference, preference);
+        }
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @return either or not the preference should be applied to all events
+     */
+    private boolean matchAllEvents(NotificationFilterPreference filterPreference)
+    {
+        // When the list of event types concerned by the filter is empty, we consider that the filter concerns
+        // all events.
+        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @param preference a notification preference
+     * @return if the filter preference concerns the event of the notification preference
+     */
+    private boolean matchEventType(NotificationFilterPreference filterPreference, NotificationPreference preference)
+    {
+        // The event types concerned by the filter
+        List<String> filterEventTypes = filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE);
+
+        // The event type concerned by the notification preference
+        Object preferenceEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+
+        // There is a match of the preference event type is not blank (it should not...) and if the filter concerns it
+        return preferenceEventType != null && StringUtils.isNotBlank((String) preferenceEventType)
+                && filterEventTypes.contains(preferenceEventType);
+    }
+
+    @Override
+    public String getName()
+    {
+        return filterName;
+    }
+
+    @Override
+    public AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+            NotificationFilterType filterType)
+    {
+        AbstractOperatorNode syntaxNode = null;
+
+        try {
+            // Get every filterPreference linked to the current filter
+            Set<NotificationFilterPreference> notificationFilterPreferences;
+            if (preference != null) {
+                notificationFilterPreferences = notificationFilterManager.getFilterPreferences(
+                        user, this, filterType, preference.getFormat());
+            } else {
+                notificationFilterPreferences = notificationFilterManager.getFilterPreferences(
+                        user, this, filterType);
+            }
+
+            Iterator<NotificationFilterPreference> iterator
+                    = getUserFilterPreferencesIterator(notificationFilterPreferences);
+            while (iterator.hasNext()) {
+
+                T pref = convertPreferences(iterator.next());
+
+                if (!preferencesMatchesFilteringContext(pref, preference)) {
+                    continue;
+                }
+
+                AbstractOperatorNode tmpNode = generateNode(pref);
+
+                // If we have an EXCLUSIVE filter, negate the filter node
+                if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
+                    tmpNode = not(tmpNode);
+                }
+
+                // Wrap the freshly created node in a AndNode or a OrNode depending on the filter type
+                if (syntaxNode == null) {
+                    syntaxNode = tmpNode;
+                } else if (filterType.equals(NotificationFilterType.INCLUSIVE)) {
+                    syntaxNode = syntaxNode.or(tmpNode);
+                } else {
+                    syntaxNode = syntaxNode.and(tmpNode);
+                }
+            }
+        } catch (NotificationException e) {
+            logger.warn(ERROR, e);
+        }
+
+        return syntaxNode;
+    }
+
+    /**
+     * Given {@link NotificationFilterPreference}, generate the associated restriction.
+     *
+     * @param filterPreference the preference to use
+     * @return the generated node
+     */
+    protected abstract AbstractOperatorNode generateNode(T filterPreference);
+
+    @Override
+    public boolean matchesPreference(NotificationPreference preference)
+    {
+        return preference.getCategory().equals(NotificationPreferenceCategory.DEFAULT)
+                && preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
+    }
+
+}

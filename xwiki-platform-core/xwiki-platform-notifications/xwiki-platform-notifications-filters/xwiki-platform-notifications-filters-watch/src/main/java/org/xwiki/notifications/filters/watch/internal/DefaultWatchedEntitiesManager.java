@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -78,7 +79,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             throws NotificationException
     {
         Stream<NotificationFilterPreference> prefs = getAllEventsFilterPreferences(user);
-        Optional<NotificationFilterPreference> pref = prefs.filter(p -> entity.matchExactly(p)).findFirst();
+        Optional<NotificationFilterPreference> pref = prefs.filter(p -> entity.matchExactly(p)
+            && p.getFilterFormats().containsAll(Arrays.asList(NotificationFormat.values()))).findFirst();
         if (!pref.isPresent()) {
             throw new NotificationException("The entity is not watched.");
         }
@@ -89,14 +91,16 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     @Override
     public boolean isEntityWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
-        return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.match(pref));
+        return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.match(pref)
+                && pref.getFilterFormats().containsAll(Arrays.asList(NotificationFormat.values())));
     }
 
     @Override
     public boolean isEntityDirectlyWatched(WatchedEntityReference entity, DocumentReference user)
             throws NotificationException
     {
-        return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.matchExactly(pref));
+        return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.matchExactly(pref)
+            && pref.getFilterFormats().containsAll(Arrays.asList(NotificationFormat.values())));
     }
 
     private Stream<NotificationFilterPreference> getAllEventsFilterPreferences(DocumentReference user)

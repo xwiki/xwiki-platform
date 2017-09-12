@@ -4,4 +4,5 @@ org.xwiki.notifications.filters.internal.DefaultNotificationFilterManager
 org.xwiki.notifications.filters.internal.ScopeNotificationFilter
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
 org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider
+org.xwiki.notifications.filters.internal.UsersNotificationFilter
 org.xwiki.notifications.filters.script.NotificationFiltersScriptService

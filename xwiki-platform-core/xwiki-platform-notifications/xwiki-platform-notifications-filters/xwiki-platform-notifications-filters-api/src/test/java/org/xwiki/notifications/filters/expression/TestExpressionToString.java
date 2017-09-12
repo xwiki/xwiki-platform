@@ -51,7 +51,7 @@ public class TestExpressionToString
                 )
         );
 
-        assertEquals("((WIKI = \"value1\" OR SPACE <> \"value2\") AND NOT (PAGE ~= \"value3%\"))",
+        assertEquals("((WIKI = \"value1\" OR SPACE <> \"value2\") AND NOT (PAGE STARTS WITH \"value3%\"))",
                 node.toString());
     }
 }

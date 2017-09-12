@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,9 +29,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.job.event.JobEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
@@ -40,11 +38,11 @@ import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.BeginEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XARImportingEvent;
 
 /**
  * Automatically watch modified documents.
@@ -65,27 +63,13 @@ public class AutomaticWatchModeListener extends AbstractEventListener
     /**
      * The skipped events group matcher.
      */
-    private static final BeginEvent SKIPPED_EVENTS = otherEvent -> {
-        // 1. Skip bulk user actions as do not reflect expressed interest in the particular pages.
-
-        // 2. Skip events coming from background jobs, since they are not attributed and are not relevant to a
-        // particular user's behavior. E.g.: XWiki initialization job (mandatory document initializers, plugin
-        // initializers, etc.)
-
-        return otherEvent instanceof WikiCreatingEvent || otherEvent instanceof XARImportingEvent
-            || otherEvent instanceof JobEvent;
-    };
+    private static final BeginEvent SKIPPED_EVENTS = event -> event instanceof BeginFoldEvent;
 
     /**
      * The events to match.
      */
-    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentCreatedEvent());
-            add(new DocumentUpdatedEvent());
-        }
-    };
+    private static final List<Event> LISTENER_EVENTS = Arrays.asList(new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent());
 
     /**
      * Used to detect if certain events are not independent, i.e. executed in the context of other events, case in which
@@ -135,7 +119,7 @@ public class AutomaticWatchModeListener extends AbstractEventListener
      */
     private void documentModifiedHandler(Event event, XWikiDocument currentDoc, XWikiContext context)
     {
-        DocumentReference userReference = currentDoc.getContentAuthorReference();
+        DocumentReference userReference = currentDoc.getAuthorReference();
 
         // Avoid handling guests or the superadmin user.
         if (userReference == null || !context.getWiki().exists(userReference, context)) {

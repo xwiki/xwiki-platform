@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.Notifications.Code.AutomaticWatchModeClass")
 @Singleton
-public class AutomaticWatchModelClassDocumentInitializer extends AbstractMandatoryClassInitializer
+public class AutomaticWatchModeClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The path to the class parent document.
@@ -55,7 +55,7 @@ public class AutomaticWatchModelClassDocumentInitializer extends AbstractMandato
     /**
      * Default constructor.
      */
-    public AutomaticWatchModelClassDocumentInitializer()
+    public AutomaticWatchModeClassDocumentInitializer()
     {
         super(CLASS_REFERENCE);
     }

@@ -76,10 +76,14 @@
     #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
 
     #set ($isEnabled = '')
+    #set ($isDisabled = '')
+    #if ($preference.filterPreferenceName.startsWith('watchlist_'))
+      #set ($isDisabled = 'disabled = "disabled"')
+    #end
     #if ($preference.isEnabled())
       #set ($isEnabled = 'checked = "checked"')
     #end
-    #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled /&gt;")
+    #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled $isDisabled /&gt;")
 
     #set ($element = {
       'filterPreferenceName': $preference.filterPreferenceName,

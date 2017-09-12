@@ -266,6 +266,10 @@ public class DefaultModelBridge implements ModelBridge
     public void saveFilterPreferences(DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
+        if (user == null) {
+            return;
+        }
+
         // Convert the collection of preferences to save to a Map sorted by filter names
         Map<String, NotificationFilterPreference> toSave = filterPreferences.stream().collect(
                 Collectors.toMap(NotificationFilterPreference::getFilterPreferenceName, Function.identity())

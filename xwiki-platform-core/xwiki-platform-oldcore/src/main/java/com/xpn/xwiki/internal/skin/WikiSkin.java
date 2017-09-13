@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.skin;
 
 import org.slf4j.Logger;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 
@@ -34,10 +33,11 @@ public class WikiSkin extends AbstractSkin
 {
     private WikiSkinUtils utils;
 
-    public WikiSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration, 
-            WikiSkinUtils utils, Logger logger, SyntaxFactory syntaxFactory)
+    public WikiSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
+        WikiSkinUtils utils, Logger logger)
     {
-        super(id, skinManager, configuration, logger, syntaxFactory);
+        super(id, skinManager, configuration, logger);
+
         this.utils = utils;
     }
 

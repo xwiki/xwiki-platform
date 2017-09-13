@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
@@ -79,17 +78,14 @@ public abstract class AbstractSkin implements Skin
     protected Skin parent;
 
     private Logger logger;
-    
-    private SyntaxFactory syntaxFactory;
-    
+
     public AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
-        Logger logger, SyntaxFactory syntaxFactory)
+        Logger logger)
     {
         this.id = id;
         this.skinManager = skinManager;
         this.configuration = configuration;
         this.logger = logger;
-        this.syntaxFactory = syntaxFactory;
     }
 
     @Override
@@ -144,12 +140,12 @@ public abstract class AbstractSkin implements Skin
                 return targetSyntax;
             }
         }
-        
+
         Skin parent = getParent();
         if (parent != null) {
             targetSyntax = parent.getOutputSyntax();
         }
-        
+
         // Fallback to the XHTML 1.0 syntax for backward compatibility
         return targetSyntax != null ? targetSyntax : Syntax.XHTML_1_0;
     }
@@ -162,12 +158,11 @@ public abstract class AbstractSkin implements Skin
     private Syntax parseSyntax(Skin skin, String syntax)
     {
         try {
-            return syntaxFactory.createSyntaxFromIdString(syntax);
+            return Syntax.valueOf(syntax);
         } catch (ParseException e) {
-            logger.warn("Failed to parse the syntax [{}] configured by the skin [{}].",
-                    syntax, skin.getId());
+            logger.warn("Failed to parse the syntax [{}] configured by the skin [{}].", syntax, skin.getId());
         }
-        
+
         // let getOutputSyntax() do the proper fallback
         return null;
     }

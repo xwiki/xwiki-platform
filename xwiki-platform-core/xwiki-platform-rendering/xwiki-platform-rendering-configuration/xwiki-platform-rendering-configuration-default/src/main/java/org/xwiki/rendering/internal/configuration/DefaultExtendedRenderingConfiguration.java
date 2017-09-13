@@ -36,7 +36,6 @@ import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 
 import com.xpn.xwiki.CoreConfiguration;
 
@@ -73,9 +72,6 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
 
     @Inject
     private CoreConfiguration coreConfiguration;
-
-    @Inject
-    private SyntaxFactory syntaxFactory;
 
     /**
      * Used to lookup parsers and renderers to discover available syntaxes.
@@ -153,10 +149,10 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
         List<Syntax> syntaxes = new ArrayList<>();
         for (String syntaxAsString : syntaxesAsStrings) {
             try {
-                syntaxes.add(this.syntaxFactory.createSyntaxFromIdString(syntaxAsString));
+                syntaxes.add(Syntax.valueOf(syntaxAsString));
             } catch (ParseException e) {
-                throw new RuntimeException(
-                    String.format("Failed to convert [%s] into Syntax object", syntaxAsString), e);
+                throw new RuntimeException(String.format("Failed to convert [%s] into Syntax object", syntaxAsString),
+                    e);
             }
         }
         return syntaxes;

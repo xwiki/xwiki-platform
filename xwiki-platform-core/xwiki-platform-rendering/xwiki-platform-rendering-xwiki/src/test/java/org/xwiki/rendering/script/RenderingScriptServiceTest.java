@@ -40,7 +40,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.test.mockito.StringReaderMatcher;
@@ -109,8 +109,7 @@ public class RenderingScriptServiceTest
     @Test
     public void resolveSyntax() throws Exception
     {
-        SyntaxFactory syntaxFactory = this.mocker.getInstance(SyntaxFactory.class);
-        when(syntaxFactory.createSyntaxFromIdString("xwiki/2.1")).thenReturn(Syntax.XWIKI_2_1);
+        when(Syntax.valueOf("xwiki/2.1")).thenReturn(Syntax.XWIKI_2_1);
 
         assertEquals(Syntax.XWIKI_2_1, this.mocker.getComponentUnderTest().resolveSyntax("xwiki/2.1"));
     }
@@ -118,8 +117,7 @@ public class RenderingScriptServiceTest
     @Test
     public void resolveSyntaxWhenInvalid() throws Exception
     {
-        SyntaxFactory syntaxFactory = this.mocker.getInstance(SyntaxFactory.class);
-        when(syntaxFactory.createSyntaxFromIdString("unknown")).thenThrow(new ParseException("invalid"));
+        when(Syntax.valueOf("unknown")).thenThrow(new ParseException("invalid"));
 
         Assert.assertNull(this.mocker.getComponentUnderTest().resolveSyntax("unknown"));
     }

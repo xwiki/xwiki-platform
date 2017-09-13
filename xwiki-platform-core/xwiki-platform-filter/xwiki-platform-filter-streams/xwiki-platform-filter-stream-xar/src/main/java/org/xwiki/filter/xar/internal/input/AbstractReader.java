@@ -23,14 +23,11 @@ package org.xwiki.filter.xar.internal.input;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.filter.FilterException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.filter.FilterException;
 
 /**
  * @version $Id$
@@ -38,10 +35,7 @@ import org.xwiki.filter.FilterException;
  */
 public abstract class AbstractReader
 {
-    @Inject
-    protected SyntaxFactory syntaxFactory;
-
-    protected <T> T convert(Class< ? > type, String source) throws FilterException
+    protected <T> T convert(Class<?> type, String source) throws FilterException
     {
         Object value = source;
 
@@ -50,11 +44,11 @@ public abstract class AbstractReader
         } else if (type == Date.class) {
             value = StringUtils.isNotEmpty(source) ? new Date(Long.parseLong(source)) : null;
         } else if (type == Boolean.class) {
-            value = StringUtils.isNotEmpty(source) ? Boolean.valueOf(source).booleanValue() : null;
+            value = StringUtils.isNotEmpty(source) ? Boolean.parseBoolean(source) : null;
         } else if (type == Syntax.class) {
             if (StringUtils.isNotEmpty(source)) {
                 try {
-                    value = this.syntaxFactory.createSyntaxFromIdString(source);
+                    value = Syntax.valueOf(source);
                 } catch (ParseException e) {
                     throw new FilterException(String.format("Failed to create Syntax istance for [%s]", source), e);
                 }

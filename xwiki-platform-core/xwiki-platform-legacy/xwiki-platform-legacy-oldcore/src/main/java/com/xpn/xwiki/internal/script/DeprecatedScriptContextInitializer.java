@@ -19,12 +19,14 @@
  */
 package com.xpn.xwiki.internal.script;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
 
 import com.xpn.xwiki.web.Utils;
@@ -39,13 +41,21 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @Component
 @Named("msg")
 @Singleton
-public class MsgScriptContextInitializer implements ScriptContextInitializer
+public class DeprecatedScriptContextInitializer implements ScriptContextInitializer
 {
+    @Inject
+    private SyntaxFactory syntaxFactory;
+
     @Override
     public void initialize(ScriptContext scriptContext)
     {
         // Make deprecated XWiki message tool available from scripts
         scriptContext.setAttribute("msg", new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class)),
             ScriptContext.ENGINE_SCOPE);
+
+        // Make the Syntax Factory component available from Script.
+        // TODO: We need to decide how we want to expose components in general and how to protect users from
+        // "dangerous" apis.
+        scriptContext.setAttribute("syntaxFactory", this.syntaxFactory, ScriptContext.ENGINE_SCOPE);
     }
 }

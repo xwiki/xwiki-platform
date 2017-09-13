@@ -33,7 +33,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 
@@ -56,9 +55,9 @@ public class EnvironmentSkin extends AbstractSkin
     private Provider<XWikiContext> xcontextProvider;
 
     public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
-        Logger logger, SyntaxFactory syntaxFactory, Environment environment, Provider<XWikiContext> xcontextProvider)
+        Logger logger, Environment environment, Provider<XWikiContext> xcontextProvider)
     {
-        super(id, skinManager, configuration, logger, syntaxFactory);
+        super(id, skinManager, configuration, logger);
 
         this.environment = environment;
         this.xcontextProvider = xcontextProvider;

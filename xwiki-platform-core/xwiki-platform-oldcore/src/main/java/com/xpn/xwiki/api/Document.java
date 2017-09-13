@@ -40,14 +40,12 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
-import org.xwiki.filter.output.OutputTarget;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.XWiki;
@@ -375,8 +373,7 @@ public class Document extends Api
     public String getRenderedTitle(String syntaxId) throws XWikiException
     {
         try {
-            return this.doc.getRenderedTitle(Utils.getComponent(SyntaxFactory.class).createSyntaxFromIdString(syntaxId),
-                getXWikiContext());
+            return this.doc.getRenderedTitle(Syntax.valueOf(syntaxId), getXWikiContext());
         } catch (ParseException e) {
             LOGGER.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
 

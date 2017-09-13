@@ -135,7 +135,6 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -562,11 +561,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private JobProgressManager progress;
 
-    /**
-     * @see #getSyntaxFactory()
-     */
-    private SyntaxFactory syntaxFactory;
-
     private ContextualLocalizationManager localization;
 
     /**
@@ -719,18 +713,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return this.uidStringEntityReferenceSerializer;
-    }
-
-    /**
-     * Used to create proper {@link Syntax} objects.
-     */
-    private SyntaxFactory getSyntaxFactory()
-    {
-        if (this.syntaxFactory == null) {
-            this.syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
-        }
-
-        return this.syntaxFactory;
     }
 
     private ContextualLocalizationManager getLocalization()
@@ -1322,12 +1304,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
             XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
-            fakeDocument.setSyntax(getSyntaxFactory().createSyntaxFromIdString(sourceSyntaxId));
+            fakeDocument.setSyntax(Syntax.valueOf(sourceSyntaxId));
             fakeDocument.setContent(text);
 
             // We don't let displayer take care of the context isolation because we don't want the fake document to be
             // context document
-            return fakeDocument.display(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId), false, true,
+            return fakeDocument.display(Syntax.valueOf(targetSyntaxId), false, true,
                 restrictedTransformationContext, false);
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
@@ -5130,10 +5112,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         List<DocumentReference> children = new ArrayList<DocumentReference>();
 
         try {
-            Query query = getStore().getQueryManager().createQuery(
-                "select distinct doc.fullName from XWikiDocument doc where "
+            Query query = getStore().getQueryManager()
+                .createQuery("select distinct doc.fullName from XWikiDocument doc where "
                     + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
-                Query.XWQL);
+                    Query.XWQL);
             query.addFilter(Utils.getComponent(QueryFilter.class, "hidden"));
             query.bindValue("prefixedFullName",
                 getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
@@ -6929,7 +6911,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             syntax = Syntax.XWIKI_1_0;
         } else {
             try {
-                syntax = getSyntaxFactory().createSyntaxFromIdString(syntaxId);
+                syntax = Syntax.valueOf(syntaxId);
             } catch (ParseException e) {
                 syntax = getDefaultDocumentSyntax();
                 LOGGER.warn("Failed to set syntax [" + syntaxId + "] for ["
@@ -8161,7 +8143,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void convertSyntax(String targetSyntaxId, XWikiContext context) throws XWikiException
     {
         try {
-            convertSyntax(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId), context);
+            convertSyntax(Syntax.valueOf(targetSyntaxId), context);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
@@ -8402,8 +8384,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Syntax syntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
 
         if (syntax == null || (!Utils.getComponentManager().hasComponent(Parser.class, syntax.toIdString())
-            && !Syntax.XWIKI_2_1.equals(syntax)))
-        {
+            && !Syntax.XWIKI_2_1.equals(syntax))) {
             LOGGER.warn("Failed to find parser for the default syntax [{}]. Defaulting to xwiki/2.1 syntax.", syntax);
             syntax = Syntax.XWIKI_2_1;
         }

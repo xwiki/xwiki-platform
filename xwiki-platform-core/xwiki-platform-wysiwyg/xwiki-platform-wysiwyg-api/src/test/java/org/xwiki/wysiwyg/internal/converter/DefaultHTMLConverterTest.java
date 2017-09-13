@@ -28,8 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
-import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
@@ -41,12 +39,13 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
+import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,8 +65,8 @@ public class DefaultHTMLConverterTest
      * A component manager that automatically mocks all dependencies of {@link DefaultHTMLConverter}.
      */
     @Rule
-    public MockitoComponentMockingRule<HTMLConverter> mocker = new MockitoComponentMockingRule<HTMLConverter>(
-        DefaultHTMLConverter.class);
+    public MockitoComponentMockingRule<HTMLConverter> mocker =
+        new MockitoComponentMockingRule<HTMLConverter>(DefaultHTMLConverter.class);
 
     @AfterComponent
     public void overrideComponent() throws Exception
@@ -94,7 +93,8 @@ public class DefaultHTMLConverterTest
         HTMLCleaner cleaner = mocker.getInstance(HTMLCleaner.class);
         when(cleaner.clean(html)).thenReturn(html);
 
-        PrintRendererFactory printRendererFactory = this.mocker.registerMockComponent(PrintRendererFactory.class, syntaxId);
+        PrintRendererFactory printRendererFactory =
+            this.mocker.registerMockComponent(PrintRendererFactory.class, syntaxId);
 
         PrintRenderer printRenderer = mock(PrintRenderer.class);
         when(printRendererFactory.createRenderer(any(WikiPrinter.class))).thenReturn(printRenderer);
@@ -118,7 +118,7 @@ public class DefaultHTMLConverterTest
         // The source should be parsed.
         Parser parser = this.mocker.registerMockComponent(Parser.class, syntaxId);
 
-        XDOM xdom = new XDOM(Collections.<Block> emptyList());
+        XDOM xdom = new XDOM(Collections.<Block>emptyList());
         when(parser.parse(any(StringReader.class))).thenReturn(xdom);
 
         Assert.assertEquals("", mocker.getComponentUnderTest().toHTML(source, syntaxId));
@@ -154,14 +154,13 @@ public class DefaultHTMLConverterTest
         when(cleaner.clean(html)).thenReturn(html);
 
         // Verify the HTML is parsed into XDOM.
-        XDOM xdom = new XDOM(Collections.<Block> emptyList());
+        XDOM xdom = new XDOM(Collections.<Block>emptyList());
         Parser xhtmlParser = mocker.getInstance(Parser.class, "xhtml/1.0");
         when(xhtmlParser.parse(any(StringReader.class))).thenReturn(xdom);
 
         // Verify the specified syntax is used.
-        SyntaxFactory syntaxFactory = mocker.getInstance(SyntaxFactory.class);
         Syntax syntax = mock(Syntax.class);
-        when(syntaxFactory.createSyntaxFromIdString(syntaxId)).thenReturn(syntax);
+        when(Syntax.valueOf(syntaxId)).thenReturn(syntax);
 
         Assert.assertEquals("", mocker.getComponentUnderTest().parseAndRender(html, syntaxId));
 

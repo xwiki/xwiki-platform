@@ -146,7 +146,7 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -376,8 +376,6 @@ public class XWiki implements EventListener
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
     private EntityReferenceSerializer<String> localStringEntityReferenceSerializer;
-
-    private SyntaxFactory syntaxFactory;
 
     private ResourceReferenceManager resourceReferenceManager;
 
@@ -651,15 +649,6 @@ public class XWiki implements EventListener
         }
 
         return this.localStringEntityReferenceSerializer;
-    }
-
-    private SyntaxFactory getSyntaxFactory()
-    {
-        if (this.syntaxFactory == null) {
-            this.syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-        }
-
-        return this.syntaxFactory;
     }
 
     private ResourceReferenceManager getResourceReferenceManager()
@@ -3649,7 +3638,7 @@ public class XWiki implements EventListener
         Syntax syntax;
 
         try {
-            syntax = getSyntaxFactory().createSyntaxFromIdString(syntaxId);
+            syntax = Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
             syntax = getDefaultDocumentSyntaxInternal();
         }

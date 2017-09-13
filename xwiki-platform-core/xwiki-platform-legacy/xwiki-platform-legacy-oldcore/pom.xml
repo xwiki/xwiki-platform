@@ -71,6 +71,13 @@
       </exclusions>
     </dependency>
 
+    <!-- Legacy oldcore needs some legacy classes from legacy rendering -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-legacy-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
     <dependency>

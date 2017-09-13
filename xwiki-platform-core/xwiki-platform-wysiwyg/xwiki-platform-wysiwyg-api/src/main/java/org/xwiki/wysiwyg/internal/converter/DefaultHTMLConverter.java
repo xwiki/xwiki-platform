@@ -28,8 +28,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
-import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
@@ -41,11 +39,12 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
+import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 /**
  * Converts HTML into/from markup syntax.
@@ -85,12 +84,6 @@ public class DefaultHTMLConverter implements HTMLConverter
     private StreamParser xhtmlStreamParser;
 
     /**
-     * The component used to create syntax instances from syntax identifiers.
-     */
-    @Inject
-    private SyntaxFactory syntaxFactory;
-
-    /**
      * Used to update the rendering context.
      */
     @Inject
@@ -104,7 +97,7 @@ public class DefaultHTMLConverter implements HTMLConverter
      * rendering module and the WYSIWYG editor supports them.
      * 
      * @see <a href="https://jira.xwiki.org/browse/XRENDERING-78">XWIKI-3260: Add markers to modified XDOM by
-     * Transformations/Macros</a>
+     *      Transformations/Macros</a>
      */
     @Inject
     @Named("macro")
@@ -155,7 +148,7 @@ public class DefaultHTMLConverter implements HTMLConverter
             XDOM xdom = parser.parse(new StringReader(source));
 
             // Execute the macro transformation
-            executeMacroTransformation(xdom, this.syntaxFactory.createSyntaxFromIdString(syntaxId));
+            executeMacroTransformation(xdom, Syntax.valueOf(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -181,11 +174,11 @@ public class DefaultHTMLConverter implements HTMLConverter
             // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
             // data is used as the default syntax for macro content. We have to change this to the specified syntax
             // because HTML is used only to be able to edit the source syntax in the WYSIWYG editor.
-            Syntax syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+            Syntax syntax = Syntax.valueOf(syntaxId);
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
 
             // Execute the macro transformation
-            executeMacroTransformation(xdom, this.syntaxFactory.createSyntaxFromIdString(syntaxId));
+            executeMacroTransformation(xdom, Syntax.valueOf(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();

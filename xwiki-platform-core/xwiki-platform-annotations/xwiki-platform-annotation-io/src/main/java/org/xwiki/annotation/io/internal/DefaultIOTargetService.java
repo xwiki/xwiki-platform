@@ -40,7 +40,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -123,8 +123,8 @@ public class DefaultIOTargetService implements IOTargetService
                 return dab.getDocumentSyntaxId(reference);
             }
         } catch (Exception e) {
-            throw new IOServiceException("An exception has occurred while getting the syntax of the source for "
-                + reference, e);
+            throw new IOServiceException(
+                "An exception has occurred while getting the syntax of the source for " + reference, e);
         }
     }
 
@@ -145,8 +145,7 @@ public class DefaultIOTargetService implements IOTargetService
         try {
             EntityReference ref = referenceResolver.resolve(reference, EntityType.DOCUMENT);
             if (ref.getType() == EntityType.OBJECT_PROPERTY) {
-                return getTransformedXDOM(getObjectPropertyContent(new ObjectPropertyReference(ref)),
-                    sourceSyntaxId);
+                return getTransformedXDOM(getObjectPropertyContent(new ObjectPropertyReference(ref)), sourceSyntaxId);
             } else if (ref.getType() == EntityType.DOCUMENT) {
                 return getDocumentXDOM(new DocumentReference(ref));
             } else {
@@ -175,21 +174,21 @@ public class DefaultIOTargetService implements IOTargetService
         XDOM xdom = parser.parse(new StringReader(content));
 
         // run transformations
-        SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
         TransformationContext txContext =
-            new TransformationContext(xdom, syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
+            new TransformationContext(xdom, Syntax.valueOf(sourceSyntaxId));
         TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, txContext);
 
         return xdom;
     }
 
-    private String getObjectPropertyContent(ObjectPropertyReference reference) {
+    private String getObjectPropertyContent(ObjectPropertyReference reference)
+    {
         BaseObjectReference objRef = new BaseObjectReference(reference.getParent());
         DocumentReference docRef = new DocumentReference(objRef.getParent());
         if (objRef.getObjectNumber() != null) {
-            return dab.getProperty(docRef, objRef.getXClassReference(),
-                objRef.getObjectNumber(), reference.getName()).toString();
+            return dab.getProperty(docRef, objRef.getXClassReference(), objRef.getObjectNumber(), reference.getName())
+                .toString();
         } else {
             return dab.getProperty(docRef, objRef.getXClassReference(), reference.getName()).toString();
         }

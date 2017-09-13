@@ -58,7 +58,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -136,7 +136,6 @@ public class XWikiMockitoTest
         this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
         this.mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
         this.mocker.registerMockComponent(EntityReferenceProvider.class);
-        this.mocker.registerMockComponent(SyntaxFactory.class);
         this.mocker.registerMockComponent(ResourceReferenceManager.class);
         this.mocker.registerMockComponent(Environment.class);
         this.mocker.registerMockComponent(ObservationManager.class);

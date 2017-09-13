@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 
 import com.xpn.xwiki.CoreConfiguration;
 
@@ -54,14 +53,6 @@ public class DefaultCoreConfiguration implements CoreConfiguration
     @Inject
     @Named("all")
     private ConfigurationSource configuration;
-
-    /**
-     * Used to parse the syntax specified as a String in the configuration.
-     *
-     * @since 2.3M1
-     */
-    @Inject
-    private SyntaxFactory syntaxFactory;
 
     /**
      * Main XWiki Properties configuration source, see {@link #getDefaultDocumentSyntax()}.
@@ -97,11 +88,10 @@ public class DefaultCoreConfiguration implements CoreConfiguration
         // Try to parse the syntax and if it fails defaults to the XWiki Syntax 2.1
         Syntax syntax;
         try {
-            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+            syntax = Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
-            this.logger.warn(
-                "Invalid default document Syntax [" + syntaxId + "], defaulting to [" + Syntax.XWIKI_2_1.toIdString()
-                    + "] instead", e);
+            this.logger.warn("Invalid default document Syntax [" + syntaxId + "], defaulting to ["
+                + Syntax.XWIKI_2_1.toIdString() + "] instead", e);
             syntax = Syntax.XWIKI_2_1;
         }
 

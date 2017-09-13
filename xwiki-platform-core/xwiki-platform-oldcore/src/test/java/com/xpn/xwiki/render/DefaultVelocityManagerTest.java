@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -61,7 +60,6 @@ public class DefaultVelocityManagerTest
     @Before
     public void before() throws Exception
     {
-        this.mocker.registerMockComponent(SyntaxFactory.class);
         this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
         this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,

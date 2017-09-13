@@ -40,7 +40,6 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
@@ -122,8 +121,8 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             // finally store the updates
             ioService.updateAnnotations(target, toUpdate);
         } catch (Exception e) {
-            throw new MaintainerServiceException("An exception occurred while updating annotations for content at "
-                + target, e);
+            throw new MaintainerServiceException(
+                "An exception occurred while updating annotations for content at " + target, e);
         }
     }
 
@@ -145,8 +144,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
 
         // run transformations -> although it's going to be at least strange to handle rendered content since there
         // is no context
-        SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
-        Syntax sourceSyntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+        Syntax sourceSyntax = Syntax.valueOf(syntaxId);
         TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
         transformationManager.performTransformations(xdom, sourceSyntax);
 
@@ -184,15 +182,12 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             return updated;
         }
 
-        String spacelessLeftContext =
-            StringUtils.isEmpty(annotation.getSelectionLeftContext()) ? "" : spaceStripperContentAlterer.alter(
-                annotation.getSelectionLeftContext()).getContent().toString();
-        String spacelessRightContext =
-            StringUtils.isEmpty(annotation.getSelectionRightContext()) ? "" : spaceStripperContentAlterer.alter(
-                annotation.getSelectionRightContext()).getContent().toString();
-        String spacelessSelection =
-            StringUtils.isEmpty(annotation.getSelection()) ? "" : spaceStripperContentAlterer.alter(
-                annotation.getSelection()).getContent().toString();
+        String spacelessLeftContext = StringUtils.isEmpty(annotation.getSelectionLeftContext()) ? ""
+            : spaceStripperContentAlterer.alter(annotation.getSelectionLeftContext()).getContent().toString();
+        String spacelessRightContext = StringUtils.isEmpty(annotation.getSelectionRightContext()) ? ""
+            : spaceStripperContentAlterer.alter(annotation.getSelectionRightContext()).getContent().toString();
+        String spacelessSelection = StringUtils.isEmpty(annotation.getSelection()) ? ""
+            : spaceStripperContentAlterer.alter(annotation.getSelection()).getContent().toString();
         String spacelessContext = spacelessLeftContext + spacelessSelection + spacelessRightContext;
         // get the positions for the first character in selection and last character in selection (instead of first out)
         // to protect selection boundaries (spaces are grouped to the left when altered and we don't want extra spaces
@@ -291,9 +286,8 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             String contextLeft = renderedCurrentContent.substring(alteredCStart, alteredCStart + cLeftSize);
             String selection =
                 renderedCurrentContent.substring(alteredCStart + cLeftSize, alteredCStart + cLeftSize + alteredSLength);
-            String contextRight =
-                renderedCurrentContent.substring(alteredCStart + cLeftSize + alteredSLength, alteredCStart + cLeftSize
-                    + alteredSLength + cRightSize);
+            String contextRight = renderedCurrentContent.substring(alteredCStart + cLeftSize + alteredSLength,
+                alteredCStart + cLeftSize + alteredSLength + cRightSize);
             // and finally update the context & selection
             annotation.setSelection(selection, contextLeft, contextRight);
 
@@ -301,10 +295,8 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
             ensureUnique(annotation, renderedCurrentContent, alteredCStart, cLeftSize, alteredSLength, cRightSize);
 
             // if the annotations selection and/or context have changed during the recompute, set the update flag
-            updated =
-                updated
-                    || !(selection.equals(originalSelection) && contextLeft.equals(originalLeftContext) && contextRight
-                        .equals(originalRightContext));
+            updated = updated || !(selection.equals(originalSelection) && contextLeft.equals(originalLeftContext)
+                && contextRight.equals(originalRightContext));
         }
 
         return updated;
@@ -438,14 +430,12 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
         int expansion = 1;
         // advance until the next space is encountered in subject, from position, to the right by default and left if
         // it's specified otherwise
-        boolean isSpaceOrEnd =
-            toLeft ? position - expansion < 0 || subject.charAt(position - expansion) == ' '
-                : position + expansion > subject.length() || subject.charAt(position + expansion - 1) == ' ';
+        boolean isSpaceOrEnd = toLeft ? position - expansion < 0 || subject.charAt(position - expansion) == ' '
+            : position + expansion > subject.length() || subject.charAt(position + expansion - 1) == ' ';
         while (!isSpaceOrEnd) {
             expansion++;
-            isSpaceOrEnd =
-                toLeft ? position - expansion < 0 || subject.charAt(position - expansion) == ' '
-                    : position + expansion > subject.length() || subject.charAt(position + expansion - 1) == ' ';
+            isSpaceOrEnd = toLeft ? position - expansion < 0 || subject.charAt(position - expansion) == ' '
+                : position + expansion > subject.length() || subject.charAt(position + expansion - 1) == ' ';
         }
 
         return expansion - 1;

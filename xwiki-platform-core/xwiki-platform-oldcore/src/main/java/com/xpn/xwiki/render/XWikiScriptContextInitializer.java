@@ -27,7 +27,7 @@ import javax.script.ScriptContext;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+
 import org.xwiki.script.ScriptContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -52,8 +52,6 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
     @Inject
     private Logger logger;
 
-    @Inject
-    private SyntaxFactory syntaxFactory;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -79,12 +77,6 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             // which is for internal use only. In this manner we control what the user can access.
             // We use "xcontext" because "context" is a reserved binding in JSR-223 specifications
             scriptContext.setAttribute("xcontext", new Context(xcontext), ScriptContext.ENGINE_SCOPE);
-
-            // Make the Syntax Factory component available from Script.
-            // TODO: We need to decide how we want to expose components in general and how to protect users from
-            // "dangerous" apis.
-            // TODO: Actually this should probably be moved to legacy, we have a rendering ScriptService now
-            scriptContext.setAttribute("syntaxFactory", this.syntaxFactory, ScriptContext.ENGINE_SCOPE);
         }
 
         // Current document

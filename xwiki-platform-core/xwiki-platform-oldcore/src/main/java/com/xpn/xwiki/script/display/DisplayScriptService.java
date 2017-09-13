@@ -40,7 +40,6 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
 
@@ -87,12 +86,6 @@ public class DisplayScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    /**
-     * The component used to create syntax instances from syntax identifiers.
-     */
-    @Inject
-    private SyntaxFactory syntaxFactory;
-
     @Inject
     private RenderingContext renderingContext;
 
@@ -103,7 +96,7 @@ public class DisplayScriptService implements ScriptService
             String outputSyntaxId = (String) parameters.get("outputSyntaxId");
             if (outputSyntaxId != null) {
                 try {
-                    outputSyntax = this.syntaxFactory.createSyntaxFromIdString(outputSyntaxId);
+                    outputSyntax = Syntax.valueOf(outputSyntaxId);
                 } catch (Exception e) {
                     this.logger.error("Failed to parse output syntax ID [{}].", outputSyntaxId, e);
                     return null;

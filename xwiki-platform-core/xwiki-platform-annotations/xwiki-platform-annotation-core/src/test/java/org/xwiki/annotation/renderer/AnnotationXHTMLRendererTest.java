@@ -19,8 +19,6 @@
  */
 package org.xwiki.annotation.renderer;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,11 +34,12 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.test.MockWikiModel;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Renderer tests for the XHTML annotations renderer, from the test files.
@@ -178,7 +177,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
      */
     private static void addFileToTest(String docName)
     {
-        files.add(new String[] {docName});
+        files.add(new String[] { docName });
     }
 
     /**
@@ -219,12 +218,11 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
     {
         Parser parser = getComponentManager().getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
         XDOM xdom = parser.parse(new StringReader(docFactory.getDocument(docName).getSource()));
-        SyntaxFactory syntaxFactory = getComponentManager().getInstance(SyntaxFactory.class);
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
         TransformationContext context = new TransformationContext(xdom,
-            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax()));
+            Syntax.valueOf(docFactory.getDocument(docName).getSyntax()));
         context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
         transformationManager.performTransformations(xdom, context);
 
@@ -237,8 +235,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         xdom.traverse(renderer);
 
-        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getAnnotatedContent(), printer
-            .toString());
+        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getAnnotatedContent(),
+            printer.toString());
     }
 
     /**
@@ -251,12 +249,11 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
     {
         Parser parser = getComponentManager().getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
         XDOM xdom = parser.parse(new StringReader(docFactory.getDocument(docName).getSource()));
-        SyntaxFactory syntaxFactory = getComponentManager().getInstance(SyntaxFactory.class);
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
         TransformationContext context = new TransformationContext(xdom,
-            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax()));
+            Syntax.valueOf(docFactory.getDocument(docName).getSyntax()));
         context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
         transformationManager.performTransformations(xdom, context);
 
@@ -267,7 +264,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         xdom.traverse(renderer);
 
-        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getRenderedContent(), printer
-            .toString());
+        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getRenderedContent(),
+            printer.toString());
     }
 }

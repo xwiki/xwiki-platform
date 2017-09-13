@@ -32,13 +32,14 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.CoreConfiguration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,9 +57,8 @@ public class DefaultExtendedRenderingConfigurationTest
     @Before
     public void configure() throws Exception
     {
-        Provider<ComponentManager> contextComponentManagerProvider =
-            this.mocker.registerMockComponent(
-                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        Provider<ComponentManager> contextComponentManagerProvider = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(contextComponentManagerProvider.get()).thenReturn(this.mocker);
     }
 
@@ -96,16 +96,15 @@ public class DefaultExtendedRenderingConfigurationTest
         when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(null);
 
         ConfigurationSource xwikiCfgSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        when(xwikiCfgSource.getProperty("xwiki.rendering.syntaxes", List.class)).thenReturn(
-            Arrays.asList("xwiki/2.0", "xwiki/2.1"));
+        when(xwikiCfgSource.getProperty("xwiki.rendering.syntaxes", List.class))
+            .thenReturn(Arrays.asList("xwiki/2.0", "xwiki/2.1"));
 
         // Register some Syntaxes for the test
 
-        SyntaxFactory syntaxFactory = this.mocker.getInstance(SyntaxFactory.class);
         Syntax xwikiSyntax20 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.0");
-        when(syntaxFactory.createSyntaxFromIdString("xwiki/2.0")).thenReturn(xwikiSyntax20);
+        when(Syntax.valueOf("xwiki/2.0")).thenReturn(xwikiSyntax20);
         Syntax xwikiSyntax21 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.1");
-        when(syntaxFactory.createSyntaxFromIdString("xwiki/2.1")).thenReturn(xwikiSyntax21);
+        when(Syntax.valueOf("xwiki/2.1")).thenReturn(xwikiSyntax21);
         Parser xwikiSyntax20Parser = this.mocker.registerMockComponent(Parser.class, "xwiki/2.0");
         when(xwikiSyntax20Parser.getSyntax()).thenReturn(xwikiSyntax20);
         Parser xwikiSyntax21Parser = this.mocker.registerMockComponent(Parser.class, "xwiki/2.1");
@@ -168,8 +167,7 @@ public class DefaultExtendedRenderingConfigurationTest
     public void getConfiguredAndDisabledSyntaxesWhenConfigXObjectExists() throws Exception
     {
         ConfigurationSource renderingSource = this.mocker.getInstance(ConfigurationSource.class, "rendering");
-        when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(
-            Arrays.asList("syntax1/1.0", "syntax2/1.0"));
+        when(renderingSource.getProperty("disabledSyntaxes")).thenReturn(Arrays.asList("syntax1/1.0", "syntax2/1.0"));
 
         // Register some Syntaxes for the test
 
@@ -180,9 +178,8 @@ public class DefaultExtendedRenderingConfigurationTest
         Syntax syntax2 = new Syntax(new SyntaxType("syntax2", "Syntax 2"), "1.0");
         when(syntax2Parser.getSyntax()).thenReturn(syntax2);
 
-        SyntaxFactory syntaxFactory = this.mocker.getInstance(SyntaxFactory.class);
-        when(syntaxFactory.createSyntaxFromIdString("syntax1/1.0")).thenReturn(syntax1);
-        when(syntaxFactory.createSyntaxFromIdString("syntax2/1.0")).thenReturn(syntax2);
+        when(Syntax.valueOf("syntax1/1.0")).thenReturn(syntax1);
+        when(Syntax.valueOf("syntax2/1.0")).thenReturn(syntax2);
 
         Parser xwikiSyntax20Parser = this.mocker.registerMockComponent(Parser.class, "xwiki/2.0");
         Syntax xwikiSyntax20 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.0");

@@ -28,15 +28,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.environment.Environment;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.test.AllLogRule;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link EnvironmentSkin}.
@@ -60,9 +61,8 @@ public class EnvironmentSkinTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
 
-        this.skin =
-            new EnvironmentSkin("test", mock(InternalSkinManager.class), mock(InternalSkinConfiguration.class),
-                mock(Logger.class), mock(SyntaxFactory.class), this.environment, xcontextProvider);
+        this.skin = new EnvironmentSkin("test", mock(InternalSkinManager.class), mock(InternalSkinConfiguration.class),
+            mock(Logger.class), this.environment, xcontextProvider);
     }
 
     @Test

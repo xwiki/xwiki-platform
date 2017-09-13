@@ -47,7 +47,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -68,12 +68,6 @@ public class RenderingScriptService implements ScriptService
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
-
-    /**
-     * @see #resolveSyntax(String)
-     */
-    @Inject
-    private SyntaxFactory syntaxFactory;
 
     @Inject
     private Logger logger;
@@ -187,7 +181,7 @@ public class RenderingScriptService implements ScriptService
     {
         Syntax syntax;
         try {
-            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+            syntax = Syntax.valueOf(syntaxId);
         } catch (ParseException exception) {
             syntax = null;
         }

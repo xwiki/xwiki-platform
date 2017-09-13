@@ -92,6 +92,8 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String FIELD_WIKIS = "wikis";
 
+    private static final String FIELD_USERS = "users";
+
     private static final String FIELD_FILTER_TYPE = "filterType";
 
     private static final String FIELD_FILTER_FORMATS = "filterFormats";
@@ -117,18 +119,8 @@ public class DefaultModelBridge implements ModelBridge
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
-                        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties = new HashMap<>();
-
-                        filterPreferenceProperties.put(NotificationFilterProperty.APPLICATION,
-                                obj.getListValue(FIELD_APPLICATIONS));
-                        filterPreferenceProperties.put(NotificationFilterProperty.EVENT_TYPE,
-                                obj.getListValue(FIELD_EVENT_TYPES));
-                        filterPreferenceProperties.put(NotificationFilterProperty.PAGE,
-                                obj.getListValue(FIELD_PAGES));
-                        filterPreferenceProperties.put(NotificationFilterProperty.SPACE,
-                                obj.getListValue(FIELD_SPACES));
-                        filterPreferenceProperties.put(NotificationFilterProperty.WIKI,
-                                obj.getListValue(FIELD_WIKIS));
+                        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
+                                createNotificationFilterPropertiesMap(obj);
 
                         NotificationFilterType filterType = NotificationFilterType.valueOf(
                                 obj.getStringValue(FIELD_FILTER_TYPE).toUpperCase());
@@ -162,6 +154,25 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return preferences;
+    }
+
+    private Map<NotificationFilterProperty, List<String>> createNotificationFilterPropertiesMap(BaseObject obj)
+    {
+        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties = new HashMap<>();
+
+        filterPreferenceProperties.put(NotificationFilterProperty.APPLICATION,
+                obj.getListValue(FIELD_APPLICATIONS));
+        filterPreferenceProperties.put(NotificationFilterProperty.EVENT_TYPE,
+                obj.getListValue(FIELD_EVENT_TYPES));
+        filterPreferenceProperties.put(NotificationFilterProperty.PAGE,
+                obj.getListValue(FIELD_PAGES));
+        filterPreferenceProperties.put(NotificationFilterProperty.SPACE,
+                obj.getListValue(FIELD_SPACES));
+        filterPreferenceProperties.put(NotificationFilterProperty.WIKI,
+                obj.getListValue(FIELD_WIKIS));
+        filterPreferenceProperties.put(NotificationFilterProperty.USER,
+                obj.getListValue(FIELD_USERS));
+        return filterPreferenceProperties;
     }
 
     @Override

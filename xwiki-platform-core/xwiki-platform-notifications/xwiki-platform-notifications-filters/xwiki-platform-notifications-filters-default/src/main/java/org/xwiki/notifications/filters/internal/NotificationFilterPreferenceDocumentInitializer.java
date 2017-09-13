@@ -82,7 +82,8 @@ public class NotificationFilterPreferenceDocumentInitializer extends AbstractMan
                 true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("eventTypes", "Event types", 64, true,
                 true, StringUtils.EMPTY, INPUT, SEPARATORS);
-        xclass.addUsersField("users", "Users", true);
+        xclass.addStaticListField("users", "Users", 10, true, true,
+                StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("pages", "Pages", 64, true,
                 true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("spaces", "Spaces", 64, true,

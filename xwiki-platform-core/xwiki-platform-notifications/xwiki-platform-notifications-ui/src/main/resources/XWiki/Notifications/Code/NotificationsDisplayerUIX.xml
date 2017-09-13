@@ -510,7 +510,8 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
+      <code>#if ($services.notification.watch.isEnabled())
+## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
 #set ($jsExtension = '.min.js')
 #if (!$services.debug.minify)
   #set ($jsExtension = '.js')
@@ -600,7 +601,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       event.stopImmediatePropagation();
     });
  });
-});</code>
+});
+#end</code>
     </property>
     <property>
       <name>Notifications Toggle</name>
@@ -903,10 +905,12 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       ##
       ## Display the 3 toggle buttons
       ##
-      &lt;div class="col-xs-12 notifications-toggles"&gt;
-        #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationDirectlyWatched($scope))checked="checked"#end#end
-        &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
-      &lt;/div&gt;
+      #if ($services.notification.watch.isEnabled())
+        &lt;div class="col-xs-12 notifications-toggles"&gt;
+          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationDirectlyWatched($scope))checked="checked"#end#end
+          &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
+        &lt;/div&gt;
+      #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
       &lt;/div&gt;
     &lt;/div&gt;

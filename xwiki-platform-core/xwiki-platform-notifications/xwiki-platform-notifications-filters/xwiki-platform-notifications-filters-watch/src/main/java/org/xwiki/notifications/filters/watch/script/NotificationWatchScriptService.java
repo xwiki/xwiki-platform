@@ -27,6 +27,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.script.service.ScriptService;
@@ -56,6 +57,17 @@ public class NotificationWatchScriptService implements ScriptService
 
     @Inject
     private WatchedEntityFactory watchedEntityFactory;
+
+    @Inject
+    private WatchedEntitiesConfiguration configuration;
+
+    /**
+     * @return if the "watched entities" feature is enabled
+     */
+    public boolean isEnabled()
+    {
+        return configuration.isEnabled();
+    }
 
     /**
      * Add a filter to watch the specified location.

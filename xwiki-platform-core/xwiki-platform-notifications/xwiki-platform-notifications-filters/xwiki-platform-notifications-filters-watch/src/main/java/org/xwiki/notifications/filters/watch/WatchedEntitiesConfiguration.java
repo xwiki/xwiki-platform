@@ -34,6 +34,11 @@ import org.xwiki.stability.Unstable;
 public interface WatchedEntitiesConfiguration
 {
     /**
+     * @return if the watched entities feature is enabled
+     */
+    boolean isEnabled();
+
+    /**
      * @param user the user
      * @return the automatic watch mode configured fot the given user
      */

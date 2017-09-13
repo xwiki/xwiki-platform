@@ -58,6 +58,13 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
     private ConfigurationSource configurationSource;
 
     @Override
+    public boolean isEnabled()
+    {
+        return StringUtils.equalsIgnoreCase("true",
+                configurationSource.getProperty("notifications.watchedEntities.enabled", "false"));
+    }
+
+    @Override
     public AutomaticWatchMode getAutomaticWatchMode(DocumentReference user)
     {
         Object value = documentAccessBridge.getProperty(user, getAbsoluteClassReference(user),

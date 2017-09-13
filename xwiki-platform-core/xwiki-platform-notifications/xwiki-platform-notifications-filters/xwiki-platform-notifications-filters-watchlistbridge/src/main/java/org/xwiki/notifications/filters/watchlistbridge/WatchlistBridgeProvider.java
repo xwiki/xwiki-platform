@@ -44,6 +44,7 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.ScopeNotificationFilter;
+import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 
 import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWiki;
@@ -85,12 +86,19 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     private Provider<XWikiContext> contextProvider;
 
     @Inject
+    private WatchedEntitiesConfiguration configuration;
+
+    @Inject
     private Logger logger;
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
             throws NotificationException
     {
+        if (!configuration.isEnabled()) {
+            return Collections.emptySet();
+        }
+
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
@@ -157,6 +165,10 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     @Override
     public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
     {
+        if (!configuration.isEnabled()) {
+            return;
+        }
+
         String[] parts = filterPreferenceName.split("_");
         if (parts.length != 3 && "watchlist".equals(parts[0])) {
             return;

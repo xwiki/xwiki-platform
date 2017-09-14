@@ -23,9 +23,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Objects;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.TestUtils.RestTestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 
 /**
  * UI tests for the UI Extension feature.
@@ -44,20 +50,19 @@ public class UIExtensionTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         // Delete pages that we create in the test
-        getUtil().deletePage(getTestClassName(), HELLOWORLD_UIX_PAGE);
-        getUtil().deletePage(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE);
-
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().rest().delete(new LocalDocumentReference(getTestClassName(), HELLOWORLD_UIX_PAGE));
+        getUtil().rest().delete(new LocalDocumentReference(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE));
     }
 
     @Test
-    public void testUIExtension()
+    public void testUIExtension() throws Exception
     {
         // Test Java UI extensions
-        final ViewPage testPage = getUtil().createPage(getTestClassName(), HELLOWORLD_UIX_PAGE, "{{velocity}}\n"
+        getUtil().rest().savePage(new LocalDocumentReference(getTestClassName(), HELLOWORLD_UIX_PAGE),
+            "{{velocity}}\n"
             + "\n"
             + "{{html}}\n"
             + "#foreach($uix in $services.uix.getExtensions('hello', {'sortByParameter' : 'HelloWorldKey'}))"
@@ -68,28 +73,35 @@ public class UIExtensionTest extends AbstractTest
             + "#foreach($uix in $services.uix.getExtensions('hello', {'sortByParameter' : 'HelloWorldKey'}))\n"
             + "$uix.parameters\n"
             + "#end\n"
-            + "{{/velocity}}\n", "Hello World");
-        Assert.assertEquals("HelloWorld\n"
-            + "{HelloWorldKey=HelloWorldValue}", testPage.getContent());
+            + "{{/velocity}}\n", "");
 
         // Test Wiki UI extension
 
-        getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
-            "name", "helloWikiWorld2",
-            "extensionPointId", "hello",
-            "content", "HelloWikiWorld2",
-            "parameters", "HelloWorldKey=zz2_$xcontext.user");
-        getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
-            "name", "helloWikiWorld1",
-            "extensionPointId", "hello",
-            "content", "HelloWikiWorld1",
-            "parameters", "HelloWorldKey=zz1_$xcontext.user");
-        getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
+        Page extensionsPage = getUtil().rest().page(new LocalDocumentReference(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE));
+        Objects objects = new Objects();
+        extensionsPage.setObjects(objects);
+        Object object = RestTestUtils.object(WikiUIExtensionConstants.CLASS_REFERENCE_STRING);
+        object.setNumber(0);
+        object.withProperties(RestTestUtils.property("name", "helloWikiWorld2"));
+        object.withProperties(RestTestUtils.property("extensionPointId", "hello"));
+        object.withProperties(RestTestUtils.property("content", "HelloWikiWorld2"));
+        object.withProperties(RestTestUtils.property("parameters", "HelloWorldKey=zz2_$xcontext.user"));
+        objects.withObjectSummaries(object);
+        object = RestTestUtils.object(WikiUIExtensionConstants.CLASS_REFERENCE_STRING);
+        object.setNumber(1);
+        object.withProperties(RestTestUtils.property("name", "helloWikiWorld1"));
+        object.withProperties(RestTestUtils.property("extensionPointId", "hello"));
+        object.withProperties(RestTestUtils.property("content", "HelloWikiWorld1"));
+        object.withProperties(RestTestUtils.property("parameters", "HelloWorldKey=zz1_$xcontext.user"));
+        objects.withObjectSummaries(object);
+        getUtil().rest().save(extensionsPage);
+
+        ViewPage page = getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
         Assert.assertEquals("HelloWorld\n"
             + "HelloWikiWorld1\n"
             + "HelloWikiWorld2\n"
             + "{HelloWorldKey=HelloWorldValue}\n"
             + "{HelloWorldKey=zz1_XWiki.superadmin}\n"
-            + "{HelloWorldKey=zz2_XWiki.superadmin}", testPage.getContent());
+            + "{HelloWorldKey=zz2_XWiki.superadmin}", page.getContent());
     }
 }

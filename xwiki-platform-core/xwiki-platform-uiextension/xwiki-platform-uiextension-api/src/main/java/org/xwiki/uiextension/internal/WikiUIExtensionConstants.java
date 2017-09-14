@@ -19,8 +19,9 @@
  */
 package org.xwiki.uiextension.internal;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+
+import com.xpn.xwiki.XWiki;
 
 /**
  * Constants for XClasses and XProperties.
@@ -34,8 +35,14 @@ public interface WikiUIExtensionConstants
     /**
      * Extension XClass reference.
      */
-    EntityReference UI_EXTENSION_CLASS = new EntityReference(new EntityReference("UIExtensionClass",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE)));
+    LocalDocumentReference UI_EXTENSION_CLASS = new LocalDocumentReference(XWiki.SYSTEM_SPACE, "UIExtensionClass");
+
+    /**
+     * Extension XClass reference.
+     * 
+     * @since 9.8RC1
+     */
+    String CLASS_REFERENCE_STRING = XWiki.SYSTEM_SPACE + ".UIExtensionClass";
 
     /**
      * Extension Point ID property.

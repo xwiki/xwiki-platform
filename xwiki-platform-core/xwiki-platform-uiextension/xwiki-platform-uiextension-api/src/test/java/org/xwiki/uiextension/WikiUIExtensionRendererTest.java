@@ -82,11 +82,11 @@ public class WikiUIExtensionRendererTest
         when(xdom.clone()).thenReturn(xdom);
         when(execution.getContext().getProperty("xwikicontext")).thenReturn(xcontext);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getDocument(DOC_REF, xcontext)).thenReturn(xdoc);
         when(xcontext.getWiki().getDocument(DOC_REF, xcontext)).thenReturn(xdoc);
         when(xdoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(xdoc.getDocumentReference()).thenReturn(DOC_REF);
 
-        WikiUIExtensionRenderer renderer = new WikiUIExtensionRenderer("roleHint", "", DOC_REF, cm);
+        WikiUIExtensionRenderer renderer = new WikiUIExtensionRenderer("roleHint", "", xdoc, cm);
 
         Block block = renderer.execute();
         Assert.assertEquals(0, block.getChildren().size());

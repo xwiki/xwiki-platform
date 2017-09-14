@@ -23,9 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
@@ -38,7 +36,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
  * @since 8.1RC1
  */
 @Component
-@Named("XWiki.UIExtensionClass")
+@Named(WikiUIExtensionConstants.CLASS_REFERENCE_STRING)
 @Singleton
 public class UIExtensionClassDocumentInitializer extends AbstractMandatoryClassInitializer
     implements WikiUIExtensionConstants
@@ -48,7 +46,7 @@ public class UIExtensionClassDocumentInitializer extends AbstractMandatoryClassI
      */
     public UIExtensionClassDocumentInitializer()
     {
-        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "UIExtensionClass"));
+        super(WikiUIExtensionConstants.UI_EXTENSION_CLASS);
     }
 
     @Override

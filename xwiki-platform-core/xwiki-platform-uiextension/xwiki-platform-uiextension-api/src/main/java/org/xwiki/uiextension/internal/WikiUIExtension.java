@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
@@ -55,10 +56,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiUIExtension.class);
 
-    /**
-     * @see #WikiUIExtension
-     */
-    private final DocumentReference documentReference;
+    private final ObjectReference objectReference;
 
     /**
      * @see #WikiUIExtension
@@ -114,7 +112,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         this.id = id;
         this.extensionPointId = extensionPointId;
         this.authorReference = authorReference;
-        this.documentReference = (DocumentReference) objectReference.getParent();
+        this.objectReference = objectReference;
 
         this.authorExecutor = authorExecutor;
     }
@@ -178,7 +176,8 @@ public class WikiUIExtension implements UIExtension, WikiComponent
             try {
                 return this.authorExecutor.call(this.renderer::execute, getAuthorReference());
             } catch (Exception e) {
-                LOGGER.error("Error while executing transformation for extension [{}]", documentReference.toString());
+                LOGGER.error("Error while executing transformation for extension [{}]",
+                    this.objectReference.toString());
             }
         }
 
@@ -188,7 +187,13 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     @Override
     public DocumentReference getDocumentReference()
     {
-        return documentReference;
+        return this.objectReference.getDocumentReference();
+    }
+
+    @Override
+    public EntityReference getEntityReference()
+    {
+        return this.objectReference;
     }
 
     @Override

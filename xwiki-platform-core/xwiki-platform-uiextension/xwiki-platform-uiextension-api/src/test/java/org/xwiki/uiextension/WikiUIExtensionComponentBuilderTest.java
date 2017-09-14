@@ -20,8 +20,6 @@
 package org.xwiki.uiextension;
 
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,9 +31,9 @@ import org.junit.Test;
 import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
+import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -54,21 +52,24 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
-    public MockitoComponentMockingRule<WikiComponentBuilder> mocker =
-        new MockitoComponentMockingRule<WikiComponentBuilder>(WikiUIExtensionComponentBuilder.class,
-            WikiComponentBuilder.class, "uiextension");
+    public MockitoComponentMockingRule<WikiBaseObjectComponentBuilder> mocker =
+        new MockitoComponentMockingRule<WikiBaseObjectComponentBuilder>(WikiUIExtensionComponentBuilder.class);
 
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(mocker);
 
-    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension",
-        Locale.ROOT);
+    private static final DocumentReference DOC_REF =
+        new DocumentReference("xwiki", "XWiki", "MyUIExtension", Locale.ROOT);
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
@@ -80,8 +81,8 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
         // Required by BaseObjectReference
         DocumentReferenceResolver<String> resolver =
             this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
-        when(resolver.resolve("XWiki.UIExtension")).thenReturn(
-            new DocumentReference("xwiki", "XWiki", "UIExtensionClass"));
+        when(resolver.resolve("XWiki.UIExtension"))
+            .thenReturn(new DocumentReference("xwiki", "XWiki", "UIExtensionClass"));
 
         DelegateComponentManager wikiComponentManager = new DelegateComponentManager();
         wikiComponentManager.setComponentManager(this.mocker);
@@ -109,27 +110,12 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildComponentsWithoutExtensionObject() throws Exception
-    {
-        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Collections.<BaseObject>emptyList());
-
-        try {
-            this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
-            fail("Should have thrown an exception");
-        } catch (WikiComponentException expected) {
-            assertEquals("No UI extension object could be found in document [xwiki:XWiki.MyUIExtension()]",
-                expected.getMessage());
-        }
-    }
-
-    @Test
     public void buildGlobalComponentsWithoutPR() throws Exception
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "global");
-        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Arrays.asList(null, extensionObject));
 
         try {
-            this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
+            this.mocker.getComponentUnderTest().buildComponents(extensionObject);
             fail("You shouldn't be able to register global UI extensions without PR.");
         } catch (WikiComponentException expected) {
             assertEquals("Registering global UI extensions requires programming rights", expected.getMessage());
@@ -140,10 +126,9 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     public void buildWikiLevelComponentsWithoutAdminRights() throws Exception
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "wiki");
-        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Arrays.asList(null, extensionObject));
 
         try {
-            this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
+            this.mocker.getComponentUnderTest().buildComponents(extensionObject);
             fail("You shouldn't be able to register UI extensions at wiki level without wiki admin rights.");
         } catch (WikiComponentException expected) {
             assertEquals("Registering UI extensions at wiki level requires wiki administration rights",
@@ -154,15 +139,13 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     @Test
     public void buildComponents() throws Exception
     {
-        BaseObject extensionObject =
-            createExtensionObject("name", "extensionPointId", "content",
-                "key=value=foo\nkey2=value2\ninvalid=\n\n=invalid", "user");
-        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Arrays.asList(null, extensionObject));
+        BaseObject extensionObject = createExtensionObject("name", "extensionPointId", "content",
+            "key=value=foo\nkey2=value2\ninvalid=\n\n=invalid", "user");
 
         ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
 
-        List<WikiComponent> components = this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
+        List<WikiComponent> components = this.mocker.getComponentUnderTest().buildComponents(extensionObject);
 
         assertEquals(1, components.size());
         verify(contentParser).parse("content", Syntax.XWIKI_2_1, DOC_REF);
@@ -189,6 +172,9 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
         BaseObjectReference objectReference =
             new BaseObjectReference(new ObjectReference("XWiki.UIExtensionClass[0]", DOC_REF));
         when(extensionObject.getReference()).thenReturn(objectReference);
+
+        when(extensionObject.getOwnerDocument()).thenReturn(this.componentDoc);
+
         return extensionObject;
     }
 }

@@ -70,6 +70,7 @@ public class UsersNotificationFilterTest
         DocumentReference userB = new DocumentReference("xwiki", "XWiki", "UserB");
 
         when(event.getUser()).thenReturn(userB);
+        when(event.getType()).thenReturn("update");
 
         NotificationFilterPreference notificationFilterPreference = mock(NotificationFilterPreference.class);
 
@@ -79,7 +80,7 @@ public class UsersNotificationFilterTest
 
         when(notificationFilterPreference.getFilterName()).thenReturn("usersNotificationFilter");
         when(notificationFilterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE)).thenReturn(
-                Collections.emptyList());
+                Collections.singletonList("update"));
         when(notificationFilterPreference.getProperties(NotificationFilterProperty.USER)).thenReturn(
                 Collections.singletonList("xwiki:XWiki.UserB"));
 

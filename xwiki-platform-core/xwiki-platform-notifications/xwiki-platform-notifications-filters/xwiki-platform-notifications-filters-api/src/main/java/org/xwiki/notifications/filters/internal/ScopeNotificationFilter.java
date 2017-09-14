@@ -25,15 +25,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
-
-import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Define a notification filter based on a scope in the wiki.
@@ -52,19 +47,21 @@ public class ScopeNotificationFilter extends AbstractScopeOrUserNotificationFilt
     public static final String FILTER_NAME = "scopeNotificationFilter";
 
     @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> serializer;
+    private LocationOperatorNodeGenerator locationOperatorNodeGenerator;
 
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 
+    /**
+     * Constructs a ScopeNotificationFilter.
+     */
     public ScopeNotificationFilter()
     {
         super(FILTER_NAME);
     }
 
     @Override
-    protected boolean isEventCompatibleWithPreference(Event event, ScopeNotificationFilterPreference scopePreference)
+    protected boolean matchRestriction(Event event, ScopeNotificationFilterPreference scopePreference)
             throws NotificationException
     {
         return event.getDocument().equals(scopePreference.getScopeReference())
@@ -80,24 +77,6 @@ public class ScopeNotificationFilter extends AbstractScopeOrUserNotificationFilt
     @Override
     protected AbstractOperatorNode generateNode(ScopeNotificationFilterPreference filterPreferenceScope)
     {
-        String wiki = filterPreferenceScope.getScopeReference().extractReference(EntityType.WIKI).getName();
-        String space = serializer.serialize(filterPreferenceScope.getScopeReference());
-        String page = serializer.serialize(filterPreferenceScope.getScopeReference());
-
-        switch (filterPreferenceScope.getScopeReference().getType()) {
-            case DOCUMENT:
-                return value(EventProperty.WIKI).eq(value(wiki))
-                        .and(value(EventProperty.PAGE).eq(value(page)));
-
-            case SPACE:
-                return value(EventProperty.WIKI).eq(value(wiki))
-                        .and(value(EventProperty.SPACE).startsWith(value(space)));
-
-            case WIKI:
-                return value(EventProperty.WIKI).eq(value(wiki));
-
-            default:
-                return null;
-        }
+        return locationOperatorNodeGenerator.generateNode(filterPreferenceScope.getScopeReference());
     }
 }

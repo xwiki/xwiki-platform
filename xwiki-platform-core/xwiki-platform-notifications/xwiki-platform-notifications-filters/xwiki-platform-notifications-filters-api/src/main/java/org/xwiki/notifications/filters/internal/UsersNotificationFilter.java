@@ -72,7 +72,7 @@ public class UsersNotificationFilter extends AbstractScopeOrUserNotificationFilt
     }
 
     @Override
-    protected boolean isEventCompatibleWithPreference(Event event, NotificationFilterPreference preference)
+    protected boolean matchRestriction(Event event, NotificationFilterPreference preference)
             throws NotificationException
     {
         List<String> watchedUsers = preference.getProperties(NotificationFilterProperty.USER);
@@ -80,7 +80,7 @@ public class UsersNotificationFilter extends AbstractScopeOrUserNotificationFilt
     }
 
     @Override
-    protected Predicate<NotificationFilterPreference> isNotificationFilterPreferenceOfCurrentFilter()
+    protected Predicate<NotificationFilterPreference> filter()
     {
         return preference -> FILTER_NAME.equals(preference.getFilterName())
                 && !preference.getProperties(NotificationFilterProperty.USER).isEmpty();

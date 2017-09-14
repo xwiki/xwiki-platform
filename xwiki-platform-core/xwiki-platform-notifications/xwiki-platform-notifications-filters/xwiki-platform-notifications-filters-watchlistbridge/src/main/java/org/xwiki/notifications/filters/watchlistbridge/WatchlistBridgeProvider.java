@@ -43,8 +43,8 @@ import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
+import org.xwiki.notifications.filters.watch.internal.WatchedEntitiesNotificationFilter;
 
 import com.google.common.collect.Sets;
 import com.xpn.xwiki.XWiki;
@@ -148,7 +148,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         pref.setEnabled(true);
         pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         pref.setProviderHint(PROVIDER_HINT);
-        pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
+        pref.setFilterName(WatchedEntitiesNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
         pref.setPreferenceProperties(new HashMap<>());
         return pref;

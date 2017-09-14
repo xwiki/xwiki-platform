@@ -35,8 +35,8 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.ScopeNotificationFilterPreference;
+import org.xwiki.notifications.filters.watch.internal.WatchedEntitiesNotificationFilter;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.stability.Unstable;
 
@@ -75,7 +75,8 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
-        if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())) {
+        if (WatchedEntitiesNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
+            && notificationFilterPreference.getProperties(NotificationFilterProperty.USER).isEmpty()) {
             ScopeNotificationFilterPreference scope
                     = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
             return entityReference.equals(scope.getScopeReference());
@@ -107,7 +108,7 @@ public class WatchedLocationReference implements WatchedEntityReference
         // Fields
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
-        filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
+        filterPreference.setFilterName(WatchedEntitiesNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
 

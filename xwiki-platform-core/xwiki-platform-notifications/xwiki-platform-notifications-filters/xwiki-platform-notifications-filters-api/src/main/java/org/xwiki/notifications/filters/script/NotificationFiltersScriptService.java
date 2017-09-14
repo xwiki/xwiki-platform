@@ -114,6 +114,7 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
     {
+
         notificationFilterManager.deleteFilterPreference(filterPreferenceName);
     }
 

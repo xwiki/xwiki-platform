@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Define a LIKE ("value_%") operation in a filtering expression.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.8RC1
  */
 @Unstable
 public final class StartsWith extends AbstractBinaryOperatorNode

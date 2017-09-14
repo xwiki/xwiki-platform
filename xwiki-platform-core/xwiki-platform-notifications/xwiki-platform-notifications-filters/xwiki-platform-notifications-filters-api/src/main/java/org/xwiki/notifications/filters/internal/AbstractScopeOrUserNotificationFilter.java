@@ -83,19 +83,15 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
         boolean matchRestriction = false;
 
         try {
-            Iterator<NotificationFilterPreference> iterator = getUserFilterPreferences(user, format, filterType);
+            Iterator<NotificationFilterPreference> iterator = getFilterPreferences(user, format, filterType);
             while (iterator.hasNext()) {
 
                 T preference = convertPreferences(iterator.next());
 
-                boolean isAllEventFilter = preference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
-                boolean doesEventTypeMatchFilter
-                        = preference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType());
+                if (preference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
+                    hasRestriction = true;
 
-                hasRestriction |= !isAllEventFilter && doesEventTypeMatchFilter;
-                if (isAllEventFilter || doesEventTypeMatchFilter) {
-
-                    if (isEventCompatibleWithPreference(event, preference)) {
+                    if (matchRestriction(event, preference)) {
 
                         // If we have a match on an EXCLUSIVE filter, we don’t need to go any further
                         if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
@@ -120,23 +116,23 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
 
     protected abstract T convertPreferences(NotificationFilterPreference pref);
 
-    protected abstract boolean isEventCompatibleWithPreference(Event event, T preference)
+    protected abstract boolean matchRestriction(Event event, T preference)
             throws NotificationException;
 
-    protected Iterator<NotificationFilterPreference> getUserFilterPreferences(DocumentReference user,
+    protected Iterator<NotificationFilterPreference> getFilterPreferences(DocumentReference user,
             NotificationFormat format, NotificationFilterType filterType) throws NotificationException
     {
-        return getUserFilterPreferencesIterator(
+        return getFilterPreferencesIterator(
                 notificationFilterManager.getFilterPreferences(user, this, filterType, format));
     }
 
-    protected Iterator<NotificationFilterPreference> getUserFilterPreferencesIterator(
+    protected Iterator<NotificationFilterPreference> getFilterPreferencesIterator(
             Collection<NotificationFilterPreference> preferences)
     {
-        return preferences.stream().filter(isNotificationFilterPreferenceOfCurrentFilter()).iterator();
+        return preferences.stream().filter(filter()).iterator();
     }
 
-    protected Predicate<NotificationFilterPreference> isNotificationFilterPreferenceOfCurrentFilter()
+    protected Predicate<NotificationFilterPreference> filter()
     {
         return preference -> filterName.equals(preference.getFilterName());
     }
@@ -216,7 +212,7 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
             }
 
             Iterator<NotificationFilterPreference> iterator
-                    = getUserFilterPreferencesIterator(notificationFilterPreferences);
+                    = getFilterPreferencesIterator(notificationFilterPreferences);
             while (iterator.hasNext()) {
 
                 T pref = convertPreferences(iterator.next());

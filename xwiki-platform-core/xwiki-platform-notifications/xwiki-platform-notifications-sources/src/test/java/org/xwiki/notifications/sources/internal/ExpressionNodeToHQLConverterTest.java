@@ -39,7 +39,6 @@ import org.xwiki.notifications.filters.expression.LesserThanNode;
 import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.NotNode;
-import org.xwiki.notifications.filters.expression.OrderByNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;

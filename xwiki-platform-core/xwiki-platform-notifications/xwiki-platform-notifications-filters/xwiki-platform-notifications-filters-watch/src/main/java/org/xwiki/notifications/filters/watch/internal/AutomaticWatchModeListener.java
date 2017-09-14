@@ -101,12 +101,9 @@ public class AutomaticWatchModeListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiDocument currentDoc = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
-
         // Does not auto-watch updated or created documents when they are in the context of other events.
-        if (!observationContext.isIn(SKIPPED_EVENTS)) {
-            documentModifiedHandler(event, currentDoc, context);
+        if (configuration.isEnabled() && !observationContext.isIn(SKIPPED_EVENTS)) {
+            documentModifiedHandler(event, (XWikiDocument) source, (XWikiContext) data);
         }
     }
 

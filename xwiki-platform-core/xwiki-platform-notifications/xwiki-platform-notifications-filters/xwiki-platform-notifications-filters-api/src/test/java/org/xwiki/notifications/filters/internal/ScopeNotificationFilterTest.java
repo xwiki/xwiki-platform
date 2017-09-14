@@ -51,6 +51,7 @@ import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -64,6 +65,7 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
+@ComponentList(LocationOperatorNodeGenerator.class)
 public class ScopeNotificationFilterTest
 {
     public static final WikiReference SCOPE_INCLUSIVE_REFERENCE_1 = new WikiReference("wiki1");
@@ -92,7 +94,8 @@ public class ScopeNotificationFilterTest
     public void setUp() throws Exception
     {
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        serializer = mock(EntityReferenceSerializer.class);
+        mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, "local", serializer);
         resolver = mocker.getInstance(EntityReferenceResolver.TYPE_STRING);
     }
 

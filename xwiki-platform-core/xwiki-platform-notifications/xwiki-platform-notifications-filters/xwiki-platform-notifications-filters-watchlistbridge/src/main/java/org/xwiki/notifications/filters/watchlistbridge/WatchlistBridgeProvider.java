@@ -170,7 +170,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         }
 
         String[] parts = filterPreferenceName.split("_");
-        if (parts.length != 3 && "watchlist".equals(parts[0])) {
+        if (parts.length != 3 || !"watchlist".equals(parts[0])) {
             return;
         }
         String type = extractType(parts);

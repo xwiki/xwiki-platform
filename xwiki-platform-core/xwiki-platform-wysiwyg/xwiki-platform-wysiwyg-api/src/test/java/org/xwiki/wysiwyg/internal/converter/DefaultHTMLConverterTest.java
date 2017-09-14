@@ -158,10 +158,6 @@ public class DefaultHTMLConverterTest
         Parser xhtmlParser = mocker.getInstance(Parser.class, "xhtml/1.0");
         when(xhtmlParser.parse(any(StringReader.class))).thenReturn(xdom);
 
-        // Verify the specified syntax is used.
-        Syntax syntax = mock(Syntax.class);
-        when(Syntax.valueOf(syntaxId)).thenReturn(syntax);
-
         Assert.assertEquals("", mocker.getComponentUnderTest().parseAndRender(html, syntaxId));
 
         // Verify that the macro transformations have been executed.
@@ -181,6 +177,6 @@ public class DefaultHTMLConverterTest
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
 
         // Verify that the syntax meta data has been set.
-        Assert.assertSame(syntax, xdom.getMetaData().getMetaData(MetaData.SYNTAX));
+        Assert.assertEquals(Syntax.valueOf("syntax/x.y"), xdom.getMetaData().getMetaData(MetaData.SYNTAX));
     }
 }

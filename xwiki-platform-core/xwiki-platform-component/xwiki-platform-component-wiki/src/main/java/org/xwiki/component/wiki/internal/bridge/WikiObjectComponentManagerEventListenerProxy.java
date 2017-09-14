@@ -87,7 +87,7 @@ public class WikiObjectComponentManagerEventListenerProxy
      * This method is responsible look through every {@link WikiObjectComponentBuilder} and get their role hints, which
      * is also the class name of the wiki object they should be working with.
      */
-    private List<EntityReference> collectWikiObjectsList()
+    List<EntityReference> collectWikiObjectsList()
     {
         List<EntityReference> wikiObjectsList = new ArrayList<>();
 
@@ -154,7 +154,7 @@ public class WikiObjectComponentManagerEventListenerProxy
      * {@link com.xpn.xwiki.internal.event.XObjectEvent} to build and register the component(s) contained in
      * this entity reference.
      *
-     * @param objectReference the reference containing the parameters needed to instanciate the new component(s)
+     * @param objectReference the reference containing the parameters needed to instantiate the new component(s)
      * @param baseObject the base object corresponding to the XObject
      * @param componentBuilder the builder that should be used in order to build the component
      */

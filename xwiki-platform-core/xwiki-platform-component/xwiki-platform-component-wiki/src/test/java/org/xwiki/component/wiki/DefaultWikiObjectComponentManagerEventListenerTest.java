@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
 import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
@@ -101,7 +100,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     {
         List<Event> events = this.mocker.getComponentUnderTest().getEvents();
 
-        assertEquals(5, events.size());
+        assertEquals(6, events.size());
     }
 
     @Test

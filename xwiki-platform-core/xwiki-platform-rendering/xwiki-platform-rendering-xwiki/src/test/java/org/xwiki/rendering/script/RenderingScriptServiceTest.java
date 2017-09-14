@@ -109,16 +109,12 @@ public class RenderingScriptServiceTest
     @Test
     public void resolveSyntax() throws Exception
     {
-        when(Syntax.valueOf("xwiki/2.1")).thenReturn(Syntax.XWIKI_2_1);
-
         assertEquals(Syntax.XWIKI_2_1, this.mocker.getComponentUnderTest().resolveSyntax("xwiki/2.1"));
     }
 
     @Test
     public void resolveSyntaxWhenInvalid() throws Exception
     {
-        when(Syntax.valueOf("unknown")).thenThrow(new ParseException("invalid"));
-
         Assert.assertNull(this.mocker.getComponentUnderTest().resolveSyntax("unknown"));
     }
 

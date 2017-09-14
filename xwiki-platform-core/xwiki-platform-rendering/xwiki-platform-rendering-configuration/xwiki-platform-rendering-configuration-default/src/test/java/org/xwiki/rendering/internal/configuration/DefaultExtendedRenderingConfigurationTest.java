@@ -101,20 +101,16 @@ public class DefaultExtendedRenderingConfigurationTest
 
         // Register some Syntaxes for the test
 
-        Syntax xwikiSyntax20 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.0");
-        when(Syntax.valueOf("xwiki/2.0")).thenReturn(xwikiSyntax20);
-        Syntax xwikiSyntax21 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.1");
-        when(Syntax.valueOf("xwiki/2.1")).thenReturn(xwikiSyntax21);
-        Parser xwikiSyntax20Parser = this.mocker.registerMockComponent(Parser.class, "xwiki/2.0");
-        when(xwikiSyntax20Parser.getSyntax()).thenReturn(xwikiSyntax20);
-        Parser xwikiSyntax21Parser = this.mocker.registerMockComponent(Parser.class, "xwiki/2.1");
-        when(xwikiSyntax21Parser.getSyntax()).thenReturn(xwikiSyntax21);
+        Parser xwikiSyntax20Parser = this.mocker.registerMockComponent(Parser.class, Syntax.XWIKI_2_0.toIdString());
+        when(xwikiSyntax20Parser.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        Parser xwikiSyntax21Parser = this.mocker.registerMockComponent(Parser.class, Syntax.XWIKI_2_1.toIdString());
+        when(xwikiSyntax21Parser.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
-        Parser syntax1Parser = this.mocker.registerMockComponent(Parser.class, "syntax1/1.0");
         Syntax syntax1 = new Syntax(new SyntaxType("syntax1", "Syntax 1"), "1.0");
+        Parser syntax1Parser = this.mocker.registerMockComponent(Parser.class, syntax1.toIdString());
         when(syntax1Parser.getSyntax()).thenReturn(syntax1);
-        Parser syntax2Parser = this.mocker.registerMockComponent(Parser.class, "syntax2/1.0");
         Syntax syntax2 = new Syntax(new SyntaxType("syntax2", "Syntax 2"), "1.0");
+        Parser syntax2Parser = this.mocker.registerMockComponent(Parser.class, syntax2.toIdString());
         when(syntax2Parser.getSyntax()).thenReturn(syntax2);
 
         List<Syntax> disabledSyntaxes = this.mocker.getComponentUnderTest().getDisabledSyntaxes();
@@ -124,8 +120,8 @@ public class DefaultExtendedRenderingConfigurationTest
 
         List<Syntax> configuredSyntaxes = this.mocker.getComponentUnderTest().getConfiguredSyntaxes();
         assertEquals(2, configuredSyntaxes.size());
-        assertTrue(configuredSyntaxes.contains(xwikiSyntax20));
-        assertTrue(configuredSyntaxes.contains(xwikiSyntax21));
+        assertTrue(configuredSyntaxes.contains(Syntax.XWIKI_2_0));
+        assertTrue(configuredSyntaxes.contains(Syntax.XWIKI_2_1));
     }
 
     @Test
@@ -177,9 +173,6 @@ public class DefaultExtendedRenderingConfigurationTest
         Parser syntax2Parser = this.mocker.registerMockComponent(Parser.class, "syntax2/1.0");
         Syntax syntax2 = new Syntax(new SyntaxType("syntax2", "Syntax 2"), "1.0");
         when(syntax2Parser.getSyntax()).thenReturn(syntax2);
-
-        when(Syntax.valueOf("syntax1/1.0")).thenReturn(syntax1);
-        when(Syntax.valueOf("syntax2/1.0")).thenReturn(syntax2);
 
         Parser xwikiSyntax20Parser = this.mocker.registerMockComponent(Parser.class, "xwiki/2.0");
         Syntax xwikiSyntax20 = new Syntax(new SyntaxType("xwiki", "XWiki"), "2.0");

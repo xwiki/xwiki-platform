@@ -87,7 +87,7 @@ public class WikiObjectComponentManagerEventListenerProxy
      * This method is responsible look through every {@link WikiObjectComponentBuilder} and get their role hints, which
      * is also the class name of the wiki object they should be working with.
      */
-    List<EntityReference> collectWikiObjectsList()
+    private List<EntityReference> collectWikiObjectsList()
     {
         List<EntityReference> wikiObjectsList = new ArrayList<>();
 

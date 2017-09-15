@@ -20,12 +20,18 @@
 package org.xwiki.component.wiki;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
@@ -100,7 +106,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     {
         List<Event> events = this.mocker.getComponentUnderTest().getEvents();
 
-        assertEquals(6, events.size());
+        assertEquals(5, events.size());
     }
 
     @Test
@@ -131,7 +137,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     @Test
     public void testOnEventWithUncompatibleEvent() throws Exception
     {
-        this.mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
+        this.mocker.getComponentUnderTest().onEvent(new XObjectAddedEvent(), null, null);
 
         verify(this.wikiObjectComponentManagerEventListenerProxy, times(0))
                 .registerAllObjectComponents();
@@ -142,32 +148,35 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     }
 
     @Test
-    public void testOnXObjectAddedEvent() throws Exception
+    public void testOnDocumentCreatedEvent() throws Exception
     {
-        this.verifyXObjectAddOrUpdate(mock(XObjectAddedEvent.class));
+        this.verifyXObjectAddOrUpdate(mock(DocumentCreatedEvent.class));
     }
 
     @Test
-    public void testOnXObjectUpdatedEvent() throws Exception
+    public void testOnDocumentUpdatedEvent() throws Exception
     {
-        this.verifyXObjectAddOrUpdate(mock(XObjectUpdatedEvent.class));
+        this.verifyXObjectAddOrUpdate(mock(DocumentUpdatedEvent.class));
     }
 
     @Test
-    public void testOnXObjectDeletedEvent() throws Exception
+    public void testOnDocumentDeletedEvent() throws Exception
     {
-        XObjectDeletedEvent event = mock(XObjectDeletedEvent.class);
+        DocumentDeletedEvent event = mock(DocumentDeletedEvent.class);
         XWikiDocument source = mock(XWikiDocument.class);
         XWikiDocument oldXObjectDocument = mock(XWikiDocument.class);
-        BaseObject xObject = mock(BaseObject.class);
 
+        BaseObject xObject = mock(BaseObject.class);
         BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
 
-        when(event.getReference()).thenReturn(xObjectReference);
         when(source.getOriginalDocument()).thenReturn(oldXObjectDocument);
-        when(oldXObjectDocument.getXObject(any(EntityReference.class))).thenReturn(xObject);
         when(xObject.getReference()).thenReturn(xObjectReference);
 
+        DocumentReference xObjectClassReference = (DocumentReference) this.xClassReferences.get(0);
+        Map<DocumentReference, List<BaseObject>> fakeDocumentXObjects = new HashMap<>();
+        fakeDocumentXObjects.put(xObjectClassReference, Collections.singletonList(xObject));
+
+        when(oldXObjectDocument.getXObjects()).thenReturn(fakeDocumentXObjects);
         mockAssociatedComponentBuilderMethod(xObject);
 
         this.mocker.getComponentUnderTest().onEvent(event, source, null);
@@ -197,16 +206,20 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
         return builder;
     }
 
-    private void verifyXObjectAddOrUpdate(XObjectEvent event) throws Exception
+    private void verifyXObjectAddOrUpdate(AbstractDocumentEvent event) throws Exception
     {
         XWikiDocument fakeSource = mock(XWikiDocument.class);
 
         BaseObject xObject = mock(BaseObject.class);
         BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
+        DocumentReference xObjectClassReference = (DocumentReference) this.xClassReferences.get(0);
 
-        when(event.getReference()).thenReturn(xObjectReference);
         when(xObject.getReference()).thenReturn(xObjectReference);
-        when(fakeSource.getXObject(any(EntityReference.class))).thenReturn(xObject);
+
+        Map<DocumentReference, List<BaseObject>> fakeDocumentXObjects = new HashMap<>();
+        fakeDocumentXObjects.put(xObjectClassReference, Collections.singletonList(xObject));
+
+        when(fakeSource.getXObjects()).thenReturn(fakeDocumentXObjects);
 
         WikiObjectComponentBuilder builder = mockAssociatedComponentBuilderMethod(xObject);
 

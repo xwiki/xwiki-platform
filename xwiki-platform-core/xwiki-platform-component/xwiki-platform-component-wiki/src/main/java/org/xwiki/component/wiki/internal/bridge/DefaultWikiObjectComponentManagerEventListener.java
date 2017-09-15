@@ -24,7 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
@@ -39,10 +42,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -85,19 +84,14 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
     {
         super(DefaultWikiObjectComponentManagerEventListener.EVENT_LISTENER_NAME,
                 new ApplicationReadyEvent(), new WikiReadyEvent(),
-                new DocumentUpdatedEvent(),
-                new XObjectAddedEvent(), new XObjectUpdatedEvent(), new XObjectDeletedEvent());
+                new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        /* If we are dealing with an XObject related event, then it might be related to a
-         * WikiObjectComponentBuilder */
-        if (event instanceof XObjectEvent) {
-            handleXObjectEvent((XObjectEvent) event, (XWikiDocument) source);
-        } else if (event instanceof DocumentUpdatedEvent) {
-            handleDocumentUpdatedEvent((XWikiDocument) source);
+        if (event instanceof AbstractDocumentEvent) {
+            handleDocumentEvents((AbstractDocumentEvent) event, (XWikiDocument) source);
 
         /* If we are at application startup time, we have to instantiate every document or object that we can find
          * in the wiki */
@@ -108,42 +102,29 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
         }
     }
 
-    private void handleXObjectEvent(XObjectEvent event, XWikiDocument sourceDocument) {
+    private void handleDocumentEvents(AbstractDocumentEvent event, XWikiDocument sourceDocument) {
         XWikiDocument document;
 
-        // If we are dealing with a XObjectDeletedEvent, we have to retrieve the original XObject document.
-        if (event instanceof XObjectDeletedEvent) {
+        // If we are dealing with a DocumentDeletedEvent, we have to retrieve the original document.
+        if (event instanceof DocumentDeletedEvent) {
             document = sourceDocument.getOriginalDocument();
         } else {
             document = sourceDocument;
         }
 
-        BaseObject baseObject =
-                document.getXObject(event.getReference());
-
-        // If the modified XObject can produce a WikiComponent
-        WikiObjectComponentBuilder componentBuilder =
-                this.getAssociatedComponentBuilder(baseObject.getXClassReference());
-        if (componentBuilder != null) {
-            if (event instanceof XObjectAddedEvent || event instanceof XObjectUpdatedEvent) {
-                this.wikiObjectComponentManagerEventListenerProxy
-                        .registerObjectComponents(baseObject.getReference(), baseObject, componentBuilder);
-            } else if (event instanceof XObjectDeletedEvent) {
-                this.wikiObjectComponentManagerEventListenerProxy
-                        .unregisterObjectComponents(baseObject.getReference());
-            }
-        }
-    }
-
-    private void handleDocumentUpdatedEvent(XWikiDocument document) {
         for (DocumentReference xClassReference : document.getXObjects().keySet()) {
             WikiObjectComponentBuilder componentBuilder =
                     this.getAssociatedComponentBuilder(xClassReference);
 
             if (componentBuilder != null) {
                 for (BaseObject baseObject : document.getXObjects().get(xClassReference)) {
-                    this.wikiObjectComponentManagerEventListenerProxy
-                            .registerObjectComponents(baseObject.getReference(), baseObject, componentBuilder);
+                    if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
+                        this.wikiObjectComponentManagerEventListenerProxy
+                                .registerObjectComponents(baseObject.getReference(), baseObject, componentBuilder);
+                    } else if (event instanceof DocumentDeletedEvent) {
+                        this.wikiObjectComponentManagerEventListenerProxy
+                                .unregisterObjectComponents(baseObject.getReference());
+                    }
                 }
             }
         }

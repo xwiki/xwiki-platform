@@ -27,12 +27,13 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.EntityType;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.query.QueryBuilder;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +46,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
+    /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "dblist";
 
     /**
@@ -111,25 +117,19 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            String hqlQuery = getQuery(context);
-
-            if (hqlQuery == null) {
+            try {
+                DefaultParameterizedType dbListQueryBuilderType =
+                    new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
+                QueryBuilder<DBListClass> dbListQueryBuilder = Utils.getComponent(dbListQueryBuilderType);
+                // Execute the query with the rights of the class last author.
+                AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+                list = makeList(authorExecutor.call(() -> {
+                    return dbListQueryBuilder.build(this).execute();
+                }, getOwnerDocument().getAuthorReference()));
+            } catch (Exception e) {
+                LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",
+                    ExceptionUtils.getRootCauseMessage(e));
                 list = new ArrayList<>();
-            } else {
-                try {
-                    // We need the query manager
-                    QueryManager queryManager = Utils.getComponent(QueryManager.class);
-                    // We create the query
-                    Query query = queryManager.createQuery(hqlQuery, Query.HQL);
-                    // The DBlist may come from an other wiki
-                    String wikiName = getReference().extractReference(EntityType.WIKI).getName();
-                    query.setWiki(wikiName);
-                    // We execute the query to create the list of values.
-                    list = makeList(query.execute());
-                } catch (Exception e) {
-                    LOGGER.error("Failed to get the list", e);
-                    list = new ArrayList<>();
-                }
             }
             setCachedDBList(list, context);
         }
@@ -200,7 +200,9 @@ public class DBListClass extends ListClass
      *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
+     * @deprecated since 9.8RC1, use the {@code QueryBuilder<DBListClass>} component instead
      */
+    @Deprecated
     public String getQuery(XWikiContext context)
     {
         // First, get the hql query entered by the user.

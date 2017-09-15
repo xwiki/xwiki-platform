@@ -1543,19 +1543,41 @@ document.observe('xwiki:dom:loaded', function() {
             resultId : "id",
             resultValue : "space",
             resultInfo : "space"
+        },
+        "propertyValues" : {
+            script: function(input) {
+              return [
+                '$request.contextPath', 'rest',
+                'wikis', encodeURIComponent(XWiki.currentWiki),
+                'classes', encodeURIComponent(input.getAttribute('data-className')),
+                'properties', encodeURIComponent(input.getAttribute('data-propertyName')),
+                'values'
+              ].join('/');
+            },
+            varname: "fp",
+            noresults: "Value not found",
+            json: true,
+            resultsParameter : "propertyValues",
+            resultId : "value",
+            resultValue : "value",
+            resultInfo : "metaData.label",
+            minchars: 0
         }
     };
     var addSuggests = function(elements) {
       if (typeof(XWiki.widgets.Suggest) != "undefined") {
         var keys = Object.keys(suggestionsMapping);
         for (var i=0;i<keys.length;i++) {
-          var selector = 'input.suggest' + keys[i].capitalize();
+          var selector = 'input.suggest' + keys[i].substr(0, 1).toUpperCase() + keys[i].substr(1);
           elements.each(function(element) {$(element).select(selector).each(function(item) {
             if (!item.hasClassName('initialized')) {
               var options = {
                 timeout : 30000
               };
               Object.extend(options, suggestionsMapping[keys[i]]);
+              if (typeof options.script === 'function') {
+                options.script = options.script(item);
+              }
               // Create the Suggest.
               var suggest = new XWiki.widgets.Suggest(item, options);
               item.addClassName('initialized');

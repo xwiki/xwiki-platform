@@ -9,4 +9,5 @@ org.xwiki.query.internal.CountDocumentFilter
 org.xwiki.query.internal.LanguageQueryFilter
 org.xwiki.query.internal.EscapeLikeParametersFilter
 org.xwiki.query.internal.AttachmentQueryFilter
+org.xwiki.query.internal.TextQueryFilter
 org.xwiki.query.script.QueryManagerScriptService

@@ -356,7 +356,18 @@
                     "classSimpleName": "LikeNode",
                     "elementKind": "class",
                     "justification": "Young API"
-                    }
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.rest.model.jaxb.LinkCollection",
+                    "new": "class org.xwiki.rest.model.jaxb.LinkCollection",
+                    "attribute": "value",
+                    "oldValue": "{org.xwiki.rest.model.jaxb.HistorySummary.class, org.xwiki.rest.model.jaxb.Attribute.class, org.xwiki.rest.model.jaxb.Translation.class, org.xwiki.rest.model.jaxb.JobLog.class, org.xwiki.rest.model.jaxb.JobStatus.class, org.xwiki.rest.model.jaxb.Syntaxes.class, org.xwiki.rest.model.jaxb.SearchResults.class, org.xwiki.rest.model.jaxb.SearchResult.class, org.xwiki.rest.model.jaxb.Tags.class, org.xwiki.rest.model.jaxb.Tag.class, org.xwiki.rest.model.jaxb.Properties.class, org.xwiki.rest.model.jaxb.Translations.class, org.xwiki.rest.model.jaxb.ObjectSummary.class, org.xwiki.rest.model.jaxb.Objects.class, org.xwiki.rest.model.jaxb.Classes.class, org.xwiki.rest.model.jaxb.Class.class, org.xwiki.rest.model.jaxb.Property.class, org.xwiki.rest.model.jaxb.Attachment.class, org.xwiki.rest.model.jaxb.Comment.class, org.xwiki.rest.model.jaxb.Comments.class, org.xwiki.rest.model.jaxb.Attachments.class, org.xwiki.rest.model.jaxb.History.class, org.xwiki.rest.model.jaxb.PageSummary.class, org.xwiki.rest.model.jaxb.Space.class, org.xwiki.rest.model.jaxb.Wiki.class, org.xwiki.rest.model.jaxb.Pages.class, org.xwiki.rest.model.jaxb.Spaces.class, org.xwiki.rest.model.jaxb.Wikis.class, org.xwiki.rest.model.jaxb.Xwiki.class}",
+                    "newValue": "{org.xwiki.rest.model.jaxb.HistorySummary.class, org.xwiki.rest.model.jaxb.Attribute.class, org.xwiki.rest.model.jaxb.Translation.class, org.xwiki.rest.model.jaxb.JobLog.class, org.xwiki.rest.model.jaxb.JobStatus.class, org.xwiki.rest.model.jaxb.Syntaxes.class, org.xwiki.rest.model.jaxb.SearchResults.class, org.xwiki.rest.model.jaxb.SearchResult.class, org.xwiki.rest.model.jaxb.Tags.class, org.xwiki.rest.model.jaxb.Tag.class, org.xwiki.rest.model.jaxb.Properties.class, org.xwiki.rest.model.jaxb.Translations.class, org.xwiki.rest.model.jaxb.ObjectSummary.class, org.xwiki.rest.model.jaxb.Objects.class, org.xwiki.rest.model.jaxb.Classes.class, org.xwiki.rest.model.jaxb.Class.class, org.xwiki.rest.model.jaxb.PropertyValues.class, org.xwiki.rest.model.jaxb.Property.class, org.xwiki.rest.model.jaxb.Attachment.class, org.xwiki.rest.model.jaxb.Comment.class, org.xwiki.rest.model.jaxb.Comments.class, org.xwiki.rest.model.jaxb.Attachments.class, org.xwiki.rest.model.jaxb.History.class, org.xwiki.rest.model.jaxb.PageSummary.class, org.xwiki.rest.model.jaxb.Space.class, org.xwiki.rest.model.jaxb.Wiki.class, org.xwiki.rest.model.jaxb.Pages.class, org.xwiki.rest.model.jaxb.Spaces.class, org.xwiki.rest.model.jaxb.Wikis.class, org.xwiki.rest.model.jaxb.Xwiki.class}",
+                    "annotationType": "javax.xml.bind.annotation.XmlSeeAlso",
+                    "elementKind": "annotation",
+                    "justification": "Added the PropertyValues element to the REST model to be used by the ClassPropertyValues resource."
+                  }
                 ]
               }
             }

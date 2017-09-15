@@ -30,6 +30,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.*;
@@ -44,8 +45,8 @@ import static org.mockito.Mockito.*;
 public class AttachmentQueryFilterTest
 {
     @Rule
-    public MockitoComponentMockingRule<AttachmentQueryFilter> mocker =
-        new MockitoComponentMockingRule<AttachmentQueryFilter>(AttachmentQueryFilter.class);
+    public MockitoComponentMockingRule<QueryFilter> mocker =
+        new MockitoComponentMockingRule<QueryFilter>(AttachmentQueryFilter.class);
 
     @Test
     public void filterStatementWithoutFromAndWhere() throws Exception
@@ -100,10 +101,10 @@ public class AttachmentQueryFilterTest
         List<Object[]> results = new ArrayList<>();
         results.add(new Object[] {"A.B", "image.png"});
 
-        DocumentReferenceResolver<String> documentReferenceResolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
+        DocumentReferenceResolver<String> currentDocumentReferenceResolver =
+            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         DocumentReference documentReference = new DocumentReference("wiki", "A", "B");
-        when(documentReferenceResolver.resolve("A.B")).thenReturn(documentReference);
+        when(currentDocumentReferenceResolver.resolve("A.B")).thenReturn(documentReference);
 
         List<AttachmentReference> attachmentReferences = this.mocker.getComponentUnderTest().filterResults(results);
         AttachmentReference expectedAttachmentReference = new AttachmentReference("image.png", documentReference);

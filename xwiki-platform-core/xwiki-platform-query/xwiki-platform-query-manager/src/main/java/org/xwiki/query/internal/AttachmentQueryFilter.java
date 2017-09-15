@@ -60,6 +60,7 @@ public class AttachmentQueryFilter extends AbstractWhereQueryFilter
     private static final String FROM_DOC_TABLE = " XWikiDocument doc";
 
     @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override

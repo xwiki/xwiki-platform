@@ -85,6 +85,11 @@ com.xpn.xwiki.internal.model.reference.CurrentWikiReferenceProvider
 com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
+com.xpn.xwiki.internal.objects.classes.DefaultDBListQueryBuilder
+com.xpn.xwiki.internal.objects.classes.ExplicitlyAllowedValuesDBListQueryBuilder
+com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesDBListQueryBuilder
+com.xpn.xwiki.internal.objects.classes.UsedValuesListQueryBuilder
+com.xpn.xwiki.internal.objects.classes.ViewableAllowedDBListValueFilter
 com.xpn.xwiki.internal.objects.classes.XClassMigratorListener
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter

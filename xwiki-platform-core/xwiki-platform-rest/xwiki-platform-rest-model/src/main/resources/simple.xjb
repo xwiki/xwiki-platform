@@ -37,4 +37,12 @@
         printMethod="javax.xml.bind.DatatypeConverter.printDateTime"
     />
   </jaxb:globalBindings>
+
+  <jaxb:bindings schemaLocation="xwiki.rest.model.xsd">
+    <jaxb:bindings node="//xs:element[@name = 'propertyValue']">
+      <!-- We use an existing Java class because we want to control how the property value meta data is serialized in
+        JSON format. -->
+      <jaxb:class ref="org.xwiki.rest.model.jaxb.PropertyValue" />
+    </jaxb:bindings>
+  </jaxb:bindings>
 </jaxb:bindings>

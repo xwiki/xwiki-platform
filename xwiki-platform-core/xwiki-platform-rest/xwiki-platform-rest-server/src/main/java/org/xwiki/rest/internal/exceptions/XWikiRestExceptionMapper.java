@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiRestComponent;
@@ -60,9 +61,9 @@ public class XWikiRestExceptionMapper implements ExceptionMapper<XWikiRestExcept
         } else if (cause instanceof QueryException) {
             QueryException queryException = (QueryException) cause;
 
-            return Response.serverError()
-                    .entity(String.format("%s\n%s\n", exception.getMessage(), queryException.getCause().getMessage()))
-                    .type(MediaType.TEXT_PLAIN).build();
+            return Response.serverError().entity(
+                String.format("%s\n%s\n", exception.getMessage(), ExceptionUtils.getRootCauseMessage(queryException)))
+                .type(MediaType.TEXT_PLAIN).build();
         }
 
         return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();

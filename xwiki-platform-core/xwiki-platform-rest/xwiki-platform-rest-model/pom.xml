@@ -30,6 +30,18 @@
   <artifactId>xwiki-platform-rest-model</artifactId>
   <name>XWiki Platform - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <!-- Test dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

@@ -361,7 +361,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
- * Preview a class field.
+ * Preview a class field (requires Programming Right).
  *#
 #macro(previewField)
   ## Find the request parameter that specifies the field template.
@@ -403,8 +403,10 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($discard = $xclass.fromMap({$fieldName: $values.toArray($stringArray)}, $object.getXWikiObject()))
   #end
   ##
-  ## Display the field.
+  ## Display the field (with the rights of the current user).
   #set($field = $doc.getxWikiClass().get($fieldName))
+  ## Note that we don't modify the cached document because the previous line has cloned it.
+  #set ($discard = $doc.document.setAuthorReference($xcontext.userReference))
   {{html clean="false"}}#displayPropertyEditInput($field, "${doc.fullName}_0_", $object){{/html}}
 #end
 

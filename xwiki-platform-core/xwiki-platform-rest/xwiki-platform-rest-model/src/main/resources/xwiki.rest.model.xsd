@@ -277,14 +277,14 @@
       </extension>
     </complexContent>
   </complexType>
-  
+
   <complexType name="JobProgress">
     <sequence>
       <element name="offset" type="double"></element>
       <element name="currentLevelOffset" type="double"></element>
     </sequence>
   </complexType>
-  
+
   <complexType name="LogEvent">
     <sequence>
       <element name="level" type="string"></element>
@@ -302,7 +302,7 @@
       </extension>
     </complexContent>
   </complexType>
-  
+
   <complexType name="JobStatus">
     <complexContent>
       <extension base="xwiki:LinkCollection">
@@ -330,13 +330,11 @@
 
   <complexType name="JobRequest">
     <sequence>
-    	<element name="id" type="xwiki:JobId" maxOccurs="1"
-    		minOccurs="0">
-    	</element>
-    	<element name="interactive" type="boolean"></element>
-    	<element name="remote" type="boolean"></element>
-    	<element name="verbose" type="boolean" default="true"></element>
-    	<element name="property" type="xwiki:MapEntry" minOccurs="0" maxOccurs="unbounded"></element>
+      <element name="id" type="xwiki:JobId" maxOccurs="1" minOccurs="0"></element>
+      <element name="interactive" type="boolean"></element>
+      <element name="remote" type="boolean"></element>
+      <element name="verbose" type="boolean" default="true"></element>
+      <element name="property" type="xwiki:MapEntry" minOccurs="0" maxOccurs="unbounded"></element>
     </sequence>
   </complexType>
 
@@ -441,6 +439,20 @@
   <element name="attachment" type="xwiki:Attachment"></element>
 
   <element name="property" type="xwiki:Property"></element>
+
+  <element name="propertyValues">
+    <complexType>
+      <complexContent>
+        <extension base="xwiki:LinkCollection">
+          <sequence>
+            <!-- We replace "anyType" with the actual type in the separate bindings file. We do this becuase we want to
+              control how the property value meta data (a Map) is serialized in JSON format. -->
+            <element name="propertyValue" type="anyType" minOccurs="0" maxOccurs="unbounded"></element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
 
   <element name="class" type="xwiki:Class"></element>
 
@@ -569,7 +581,7 @@
   </complexType>
 
   <element name="syntaxes" type="xwiki:Syntaxes"></element>
-  
+
   <element name="jobStatus" type="xwiki:JobStatus"></element>
 
   <element name="jobLog" type="xwiki:Log"></element>
@@ -578,16 +590,22 @@
 
 
   <complexType name="MapEntry">
-  	<sequence>
-  		<element name="key" type="string"></element>
-        <element name="value" type="anyType"></element>
-  	</sequence>
+    <sequence>
+      <element name="key" type="string"></element>
+      <element name="value" type="anyType"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="Map">
+    <sequence>
+      <element name="entry" type="xwiki:MapEntry" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
   </complexType>
 
 
-    <complexType name="JobId">
-    	<sequence>
-    		<element name="element" type="string" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    </complexType>
+  <complexType name="JobId">
+    <sequence>
+      <element name="element" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
 </schema>

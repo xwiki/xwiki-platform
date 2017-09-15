@@ -209,6 +209,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
     private void verifyXObjectAddOrUpdate(AbstractDocumentEvent event) throws Exception
     {
         XWikiDocument fakeSource = mock(XWikiDocument.class);
+        XWikiDocument fakeOldSource = mock(XWikiDocument.class);
 
         BaseObject xObject = mock(BaseObject.class);
         BaseObjectReference xObjectReference = mock(BaseObjectReference.class);
@@ -220,6 +221,7 @@ public class DefaultWikiObjectComponentManagerEventListenerTest
         fakeDocumentXObjects.put(xObjectClassReference, Collections.singletonList(xObject));
 
         when(fakeSource.getXObjects()).thenReturn(fakeDocumentXObjects);
+        when(fakeSource.getOriginalDocument()).thenReturn(fakeOldSource);
 
         WikiObjectComponentBuilder builder = mockAssociatedComponentBuilderMethod(xObject);
 

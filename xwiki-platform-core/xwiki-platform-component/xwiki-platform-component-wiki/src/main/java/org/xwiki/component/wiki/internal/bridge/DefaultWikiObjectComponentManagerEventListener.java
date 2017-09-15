@@ -102,29 +102,42 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
         }
     }
 
-    private void handleDocumentEvents(AbstractDocumentEvent event, XWikiDocument sourceDocument) {
-        XWikiDocument document;
-
-        // If we are dealing with a DocumentDeletedEvent, we have to retrieve the original document.
-        if (event instanceof DocumentDeletedEvent) {
-            document = sourceDocument.getOriginalDocument();
-        } else {
-            document = sourceDocument;
+    private void handleDocumentEvents(AbstractDocumentEvent event, XWikiDocument document)
+    {
+        if (event instanceof DocumentUpdatedEvent || event instanceof DocumentDeletedEvent) {
+            unRegisterObjectComponents(document.getOriginalDocument());
         }
 
+        if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
+            registerObjectComponents(document);
+        }
+    }
+
+    private void registerObjectComponents(XWikiDocument document)
+    {
         for (DocumentReference xClassReference : document.getXObjects().keySet()) {
             WikiObjectComponentBuilder componentBuilder =
                     this.getAssociatedComponentBuilder(xClassReference);
 
             if (componentBuilder != null) {
                 for (BaseObject baseObject : document.getXObjects().get(xClassReference)) {
-                    if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
-                        this.wikiObjectComponentManagerEventListenerProxy
-                                .registerObjectComponents(baseObject.getReference(), baseObject, componentBuilder);
-                    } else if (event instanceof DocumentDeletedEvent) {
-                        this.wikiObjectComponentManagerEventListenerProxy
-                                .unregisterObjectComponents(baseObject.getReference());
-                    }
+                    this.wikiObjectComponentManagerEventListenerProxy
+                            .registerObjectComponents(baseObject.getReference(), baseObject, componentBuilder);
+                }
+            }
+        }
+    }
+
+    private void unRegisterObjectComponents(XWikiDocument document)
+    {
+        for (DocumentReference xClassReference : document.getXObjects().keySet()) {
+            WikiObjectComponentBuilder componentBuilder =
+                    this.getAssociatedComponentBuilder(xClassReference);
+
+            if (componentBuilder != null) {
+                for (BaseObject baseObject : document.getXObjects().get(xClassReference)) {
+                    this.wikiObjectComponentManagerEventListenerProxy
+                            .unregisterObjectComponents(baseObject.getReference());
                 }
             }
         }

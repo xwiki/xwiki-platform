@@ -261,7 +261,6 @@ public class NotificationsTest extends AbstractTest
         // The user 1 creates a new page, the user 2 shouldn’t receive any notification
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         getUtil().createPage(getTestClassName(), "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
-        getUtil().gotoPage(getTestClassName(), "WebHome");
 
         getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         getUtil().gotoPage(getTestClassName(), "WebHome");
@@ -270,7 +269,6 @@ public class NotificationsTest extends AbstractTest
         assertFalse(tray.areNotificationsAvailable());
 
         // The user 2 will now enable his notifications for new pages
-        getUtil().login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);

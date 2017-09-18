@@ -37,7 +37,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -83,20 +82,13 @@ public class WatchedEntitiesNotificationFilter implements NotificationFilter
     private LocationOperatorNodeGenerator locationOperatorNodeGenerator;
 
     @Inject
-    private EntityReferenceSerializer<String> defaultSerializer;
-
-    @Inject
     private Logger logger;
 
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        List<String> watchedUsers = new ArrayList<>();
-        List<EntityReference> watchedLocations = new ArrayList<>();
-        fillWatchedEntities(watchedUsers, watchedLocations, user, format);
-
-        return (watchedUsers.isEmpty() || !watchedUsers.contains(defaultSerializer.serialize(event.getUser())))
-                && !doesDocumentMatchALocation(event.getDocument(), watchedLocations);
+        // We do not filter any event, because it may hide events that were valid for other filters
+        return false;
     }
 
     @Override
@@ -169,11 +161,6 @@ public class WatchedEntitiesNotificationFilter implements NotificationFilter
         } catch (NotificationException e) {
             logger.warn(ERROR, e);
         }
-    }
-
-    private boolean doesDocumentMatchALocation(DocumentReference document, Collection<EntityReference> locations)
-    {
-        return locations.stream().anyMatch(location -> location.equals(document) || document.hasParent(location));
     }
 
     private Collection<EntityReference> parseWikiReferences(List<String> values)

@@ -132,6 +132,12 @@
               <artifactId>xwiki-platform-watchlist-api</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <!-- Notification Filters Default module has a migrator to handle scope filter preferences -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-notifications-filters-default</artifactId>
+              <version>${project.version}</version>
+            </dependency>
             <!-- We need the Servlet API dep since it's used by the Packager and since it has
                  a provided scope in XWiki core it's not inherited as part of transitive deps -->
             <dependency>

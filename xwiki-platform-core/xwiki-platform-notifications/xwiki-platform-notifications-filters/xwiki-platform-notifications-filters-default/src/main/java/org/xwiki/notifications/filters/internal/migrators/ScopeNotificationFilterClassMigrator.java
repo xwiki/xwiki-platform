@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +37,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -70,11 +70,11 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
     private QueryManager queryManager;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private Provider<XWikiContext> contextProvider;
 
     @Inject
     @Named("current")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<String> resolver;
 
     @Inject
     private Logger logger;
@@ -95,42 +95,42 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        return (startupVersion.getVersion() < 98000);
+        XWikiContext context = contextProvider.get();
+
+        // There is something to migrate only if the old class exists!
+        return context.getWiki().exists(getOldClassReference(), context);
     }
 
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        XWikiContext xWikiContext = xcontextProvider.get();
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
 
         try {
             // Get every document having at least one NotificationPreferenceScopeClass XObject attached
             Query query = queryManager.createQuery(
                             "select distinct doc.fullName from Document doc, "
-                                + "doc.object(XWiki.Notifications.Code.NotificationPreferenceScopeClass) as document",
+                                + "doc.object(XWiki.Notifications.Code.NotificationPreferenceScopeClass) as obj",
                             Query.XWQL);
 
-            List<String> results = query.execute();
-
             // Migrate each document to use the new XObject
-            DocumentReference currentDocumentReference;
-            for (String result : results) {
-                currentDocumentReference = documentReferenceResolver.resolve(result);
-                XWikiDocument document = xWikiContext.getWiki().getDocument(currentDocumentReference, xWikiContext);
+            for (String result : query.<String>execute()) {
+                DocumentReference userReference = resolver.resolve(result);
+                XWikiDocument userDocument = xwiki.getDocument(userReference, context);
 
                 logger.debug("Migrating document [{}]...", result);
 
                 try {
-                    migrateDocument(document);
+                    migrateDocument(userDocument);
                 } catch (XWikiException e) {
-                    logger.warn("Failed to migrate document [{}] : [{}]", result,
-                            ExceptionUtils.getRootCauseMessage(e));
+                    logger.warn("Failed to migrate document [{}].", result, e);
                 }
             }
 
-            // When every document has been migrated, we can then delete the old XClass
-            xWikiContext.getWiki().deleteDocument(
-                    xWikiContext.getWiki().getDocument(OLD_XCLASS_REFERENCE, xWikiContext), xWikiContext);
+            // When every documents have been migrated, we can then delete the old XClass
+            XWikiDocument oldClass = xwiki.getDocument(getOldClassReference(), context);
+            xwiki.deleteDocument(oldClass, context);
 
         } catch (QueryException e) {
             logger.error("Failed to perform a query on the current wiki.", e);
@@ -144,17 +144,19 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
      */
     private void migrateDocument(XWikiDocument document) throws XWikiException
     {
-        List<BaseObject> oldXObjects = document.getXObjects(OLD_XCLASS_REFERENCE);
+        final DocumentReference oldClassReference = getOldClassReference();
+        List<BaseObject> oldXObjects = document.getXObjects(oldClassReference);
 
         for (BaseObject oldXObject : oldXObjects) {
             document.addXObject(generateNewXObject(oldXObject));
         }
 
-        document.removeXObjects(OLD_XCLASS_REFERENCE);
+        document.removeXObjects(oldClassReference);
 
-        xcontextProvider.get().getWiki().saveDocument(document,
+        XWikiContext context = contextProvider.get();
+        context.getWiki().saveDocument(document,
                 "[UPGRADE] XObject migration from ScopeNotificationFilterClass to NotificationPreferenceFilterClass.",
-                xcontextProvider.get());
+                context);
     }
 
     private BaseObject generateNewXObject(BaseObject oldXObject)
@@ -196,5 +198,10 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
         }
 
         return newXObject;
+    }
+
+    private DocumentReference getOldClassReference()
+    {
+        return new DocumentReference(OLD_XCLASS_REFERENCE, contextProvider.get().getWikiReference());
     }
 }

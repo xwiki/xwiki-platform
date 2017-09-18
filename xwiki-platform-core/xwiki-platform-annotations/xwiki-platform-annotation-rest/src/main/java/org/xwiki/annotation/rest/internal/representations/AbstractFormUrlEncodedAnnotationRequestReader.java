@@ -34,6 +34,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.ext.servlet.ServletUtils;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
@@ -78,22 +80,21 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
         ObjectFactory objectFactory = new ObjectFactory();
         T annotationRequest = getReadObjectInstance(objectFactory);
 
-        try {
-            // Try to parse a form from the content of this request
-            // FIXME should this method even try to read and consume the entity stream at all ?
-            // It seems it is already consumed upstream by the time this body reader is invoked.
-            Form form = new Form(org.restlet.Request.getCurrent().getEntity());
+        Representation representation =
+            new InputRepresentation(entityStream, org.restlet.data.MediaType.APPLICATION_WWW_FORM);
+        Form form = new Form(representation);
 
-            if (!form.getNames().isEmpty()) {
-                for (String paramName : form.getNames()) {
-                    for (String paramValue : form.getValuesArray(paramName)) {
-                        saveField(annotationRequest, paramName, paramValue, objectFactory);
-                    }
+        /*
+         * If the form is empty then it might have happened that some filter has invalidated the entity stream. Try to
+         * read data using getParameter()
+         */
+        if (!form.getNames().isEmpty()) {
+            for (String paramName : form.getNames()) {
+                for (String paramValue : form.getValuesArray(paramName)) {
+                    saveField(annotationRequest, paramName, paramValue, objectFactory);
                 }
             }
-        } catch (IllegalStateException e) {
-            // If the entity stream has been consumed already by a filter, Restlet will complain with an ISE
-            // Try to read data using the parameters
+        } else {
             HttpServletRequest httpServletRequest = ServletUtils.getRequest(Request.getCurrent());
 
             for (Map.Entry<String, String[]> entry : httpServletRequest.getParameterMap().entrySet()) {
@@ -102,6 +103,7 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
                 if ("method".equals(entry.getKey()) || "media".equals(entry.getKey())) {
                     continue;
                 }
+
                 // save all the values of this field, one by one
                 String[] paramValues = entry.getValue();
                 for (String value : paramValues) {

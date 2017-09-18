@@ -123,6 +123,11 @@ public final class Relations
     public static final String PROPERTY = "http://www.xwiki.org/rel/property";
 
     /**
+     * Relation for links pointing to the list of values of an object property.
+     */
+    public static final String PROPERTY_VALUES = "http://www.xwiki.org/rel/propertyValues";
+
+    /**
      * Relation for links pointing to the list of object properties.
      */
     public static final String PROPERTIES = "http://www.xwiki.org/rel/properties";

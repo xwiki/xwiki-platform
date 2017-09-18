@@ -148,25 +148,80 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
       <cache>long</cache>
     </property>
     <property>
-      <code>document.observe('xwiki:dom:loaded', function() {
-  $$('label.skin a, label.colorTheme a').each(function(button) {
-    button.__action = button.up('label').hasClassName('skin') ? 'view' : 'edit';
-    var input = button.up('dt').next('dd').down('input,select');
-    input.observe('change', function() {
-      var dotPosition = input.value.indexOf('.');
-      if (dotPosition &gt; 0) {
-        button.removeClassName('hidden');
-        button.href = new XWiki.Document(input.value.substring(dotPosition + 1), input.value.substring(0, dotPosition)).getURL(button.__action);
+      <code>require(['jquery'], function($) {
+  'use strict';
+
+  /**
+   * Customize Button class.
+   * @param button the "customize" button
+   * @param input the input field corresponding to the button
+   * @param action the action to use in the URL to go to the page linked by the input
+   */
+  var CustomizeButton = function(button, input, action) {
+    var self = this;
+    self.button = button;
+    self.input = input;
+    self.action = action;
+
+    /**
+     * Initialization
+     */
+    self.init = function () {
+      self.update();
+      // Update the button everytime the value of the input changes
+      self.input.change(function () {
+        self.update();
+      });
+      self.input.keyup(function () {
+        self.update();
+      });
+    };
+
+    /**
+     * Update the button
+     */
+    self.update = function () {
+      var inputValue = self.input.val();
+      // We consider a color theme or a skin must be written with an absolute reference, so if there is no "dot", the
+      // value is wrong.
+      if (inputValue.indexOf('.') &gt; 0) {
+        // TODO: verify that the page exists (?)
+        var pageReference = XWiki.Model.resolve(inputValue, XWiki.EntityType.DOCUMENT);
+        var url = new XWiki.Document(pageReference).getURL(self.action);
+        self.button.attr('href', url);
+        self.button.removeClass('hidden');
       } else {
-        button.href = '#';
-        button.addClassName('hidden');
+        self.button.attr('href', '#');
+        self.button.addClass('hidden');
       }
-    });
-  });
-});</code>
+    };
+
+    // Call initialization
+    self.init();
+  }
+
+  /**
+   * Handle customize color theme.
+   */
+  var customizeColorTheme = new CustomizeButton(
+    $('label.colorTheme a'),
+    $('select[name="XWiki.XWikiPreferences_0_colorTheme"]'),
+    'edit'
+  );
+
+  /**
+   * Handle customize skin.
+   */
+  var customizeSkin = new CustomizeButton(
+    $('label.skin a'),
+    $('input[name="XWiki.XWikiPreferences_0_skin"]'),
+    'view'
+  );
+});
+</code>
     </property>
     <property>
-      <name/>
+      <name>Handle "Customize" buttons</name>
     </property>
     <property>
       <parse>0</parse>

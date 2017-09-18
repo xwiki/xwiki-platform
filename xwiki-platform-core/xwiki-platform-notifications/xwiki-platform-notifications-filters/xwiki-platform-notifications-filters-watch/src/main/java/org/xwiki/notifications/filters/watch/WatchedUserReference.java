@@ -85,6 +85,7 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterName(WatchedEntitiesNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
+        filterPreference.setActive(true);
 
         // Properties
         Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();

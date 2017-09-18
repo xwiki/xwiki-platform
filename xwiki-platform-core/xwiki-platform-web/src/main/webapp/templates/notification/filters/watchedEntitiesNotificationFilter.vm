@@ -1,0 +1,10 @@
+## Renderer for the watchedEntitiesNotificationFilters
+## Parameters :
+## $filter : the filter to render
+## $filterPreference : the preference to use
+#if ($filterPreference.getProperties('USER'))
+  #template('notification/filters/usersNotificationFilter.vm')
+#end
+#if (!$filterPreference.getProperties('PAGE').isEmpty() || !$filterPreference.getProperties('SPACE').isEmpty() || !$filterPreference.getProperties('WIKI').isEmpty())
+  #template('notification/filters/scopeNotificationFilter.vm')
+#end

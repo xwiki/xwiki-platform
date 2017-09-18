@@ -104,8 +104,8 @@ public class DefaultClassPropertyValuesProviderTest
         try {
             this.mocker.getComponentUnderTest().getValues(propertyReference, 13);
             fail();
-        } catch (XWikiRestException e) {
-            assertEquals("No such property [status reference].", e.getMessage());
+        } catch (XWikiRestException expected) {
+            assertEquals("No such property [status reference].", expected.getMessage());
         }
     }
 
@@ -120,8 +120,8 @@ public class DefaultClassPropertyValuesProviderTest
         try {
             this.mocker.getComponentUnderTest().getValues(propertyReference, 13, "one");
             fail();
-        } catch (XWikiRestException e) {
-            assertEquals("There's no value provider registered for the [DBList] property type.", e.getMessage());
+        } catch (XWikiRestException expected) {
+            assertEquals("There's no value provider registered for the [DBList] property type.", expected.getMessage());
         }
     }
 }

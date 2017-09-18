@@ -117,8 +117,8 @@ public class ClassPropertyValuesResourceImplTest
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"));
             fail();
-        } catch (WebApplicationException e) {
-            assertEquals(Status.UNAUTHORIZED.getStatusCode(), e.getResponse().getStatus());
+        } catch (WebApplicationException expected) {
+            assertEquals(Status.UNAUTHORIZED.getStatusCode(), expected.getResponse().getStatus());
         }
     }
 
@@ -130,8 +130,8 @@ public class ClassPropertyValuesResourceImplTest
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"));
             fail();
-        } catch (WebApplicationException e) {
-            assertEquals(Status.NOT_FOUND.getStatusCode(), e.getResponse().getStatus());
+        } catch (WebApplicationException expected) {
+            assertEquals(Status.NOT_FOUND.getStatusCode(), expected.getResponse().getStatus());
         }
     }
 

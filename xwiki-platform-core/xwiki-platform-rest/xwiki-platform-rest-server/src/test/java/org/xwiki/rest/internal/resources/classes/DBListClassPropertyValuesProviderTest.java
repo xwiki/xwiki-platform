@@ -119,8 +119,8 @@ public class DBListClassPropertyValuesProviderTest
         try {
             this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
             fail();
-        } catch (XWikiRestException e) {
-            assertEquals("Property [status reference] not found.", e.getMessage());
+        } catch (XWikiRestException expected) {
+            assertEquals("Property [status reference] not found.", expected.getMessage());
         }
     }
 
@@ -132,8 +132,8 @@ public class DBListClassPropertyValuesProviderTest
         try {
             this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
             fail();
-        } catch (XWikiRestException e) {
-            assertEquals("This [status reference] is not a Database List property.", e.getMessage());
+        } catch (XWikiRestException expected) {
+            assertEquals("This [status reference] is not a Database List property.", expected.getMessage());
         }
     }
 

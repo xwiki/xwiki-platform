@@ -1592,9 +1592,10 @@ public class TestUtils
                 STATUS_CREATED);
         } else {
             // The object exist just set the property (faster than updating the whole object)
+            ObjectPropertyReference propertyReference = new ObjectPropertyReference(propertyName, objectReference);
 
             TestUtils.assertStatusCodes(
-                rest().executePut(ObjectPropertyResource.class, property, rest().toElements(objectReference)), true,
+                rest().executePut(ObjectPropertyResource.class, property, rest().toElements(propertyReference)), true,
                 STATUS_ACCEPTED);
         }
     }

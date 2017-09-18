@@ -832,7 +832,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.emails.live.graceTime = 10
 
-#-# [Since 9.8C1]
+#-# [Since 9.8RC1]
 #-# Indicate if the "watched entities" feature is enabled on the platform.
 #-# This feature mimics what the "Watchlist Application" does so it may not be a good idea to have both on the platform.
 #-#

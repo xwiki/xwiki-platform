@@ -57,7 +57,7 @@ public class PropertyValue
     /**
      * Sets the property value.
      * 
-     * @param the new property value
+     * @param value the new property value
      */
     public void setValue(java.lang.Object value)
     {
@@ -75,7 +75,7 @@ public class PropertyValue
     /**
      * Sets the meta data associated with the property value.
      * 
-     * @param the new meta data
+     * @param value the new meta data
      */
     public void setMetaData(java.util.Map<String, java.lang.Object> value)
     {

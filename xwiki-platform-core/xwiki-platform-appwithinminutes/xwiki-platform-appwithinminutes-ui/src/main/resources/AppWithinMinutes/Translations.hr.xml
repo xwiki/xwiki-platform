@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="AppWithinMinutes.Translations" locale="hr">
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1323097478000</creationDate>
+  <date>1445422650000</date>
+  <contentUpdateDate>1445422591000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+appWithinMinutes.classEditor.title=Struktura aplikacije {0}
+appWithinMinutes.codeSpace.description=Ovo je mjesto na kojem se nalazi kôd aplikacije.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Iako vaše trenutne postavke korisničkog profila to sprječavaju, izlistane su i skrivene stranice zato što u protivnome ne bi bila vidljiva nijedna stranica s aplikacijskim kôdom budući da su sve one pretpostavljeno skrivene.
+appWithinMinutes.codeSpace.title=Kôd
+appWithinMinutes.createApp.location.hint=Lokacija unutar hijerarhije stranica, na kojoj će aplikacija biti izrađena.
+appWithinMinutes.createApp.location.label=Lokacija
+appWithinMinutes.createApp.parent.hint=Roditelj nove aplikacije. Ostavite praznim ukoliko želite izraditi aplikaciju vršne razine.
+appWithinMinutes.createApp.parent.label=Roditelj
+appWithinMinutes.createApp.parent.placeholder=Putanja.Prema.Roditelju
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Ako nije odabrana nijedna lokacija, zapisi mogu biti izrađeni bilo gdje u wikiju.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Gdje izraditi zapise
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Koristite gore naznačene lokacije samo kao prijedloge, dozvoljavajući korisniku odabir drukčije lokacije prilikom izrade aplikacijskog zapisa.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Nemoj nametati lokaciju zapisa
+appWithinMinutes.templateProviderEditor.description.hint=Kratki opis aplikacijskog zapisa.
+appWithinMinutes.templateProviderEditor.hint=Aplikacijski zapisi su wiki stranice koje sadrže strukturirane podatke.
+appWithinMinutes.templateProviderEditor.icon.hint=Ikona pridružena aplikacijskom zapisu.
+appWithinMinutes.templateProviderEditor.terminal.hint=Bi li aplikacijski zapisi trebali biti terminalne stranice ili ne.
+appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Ako nije odabrana nijedna lokacija, zapisi mogu biti izrađeni s bilo koje stranice.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Odakle izraditi zapise
+appWithinMinutes.wizardStep.entries.description=Odaberite gdje će podatci biti pohranjivani
+appWithinMinutes.wizardStep.entries.name=Zapisi
+appWithinMinutes.wizardStep.entries.title=Odredite lokaciju vaših podataka
+appWithinMinutes.wizardStep.name.description=Odaberite ime aplikacije
+appWithinMinutes.wizardStep.name.name=Ime
+appWithinMinutes.wizardStep.name.title=Imenujte vašu aplikaciju
+appWithinMinutes.wizardStep.presentation.description=Prilagodite početnu stranicu aplikacije
+appWithinMinutes.wizardStep.presentation.name=Prezentacija
+appWithinMinutes.wizardStep.presentation.title=Prilagodite početnu stranicu vaše aplikacije
+appWithinMinutes.wizardStep.structure.description=Opišite podatke aplikacije
+appWithinMinutes.wizardStep.structure.name=Struktura
+appWithinMinutes.wizardStep.structure.title=Strukturirajte vaše podatke
+platform.appwithinminutes.appHomePageActionsHeading=Akcije
+platform.appwithinminutes.appHomePageAddEntryHint=Dodajte novi zapis
+platform.appwithinminutes.appHomePageAddEntryLabel=Dodaj
+platform.appwithinminutes.appHomePageDeleteAppLabel=Obriši aplikaciju
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Obriši sve zapise
+platform.appwithinminutes.appHomePageEditAppLabel=Uredi aplikaciju
+platform.appwithinminutes.appHomePageEntryNameLabel=Ime zapisa\:
+platform.appwithinminutes.appHomePageTranslateAppLabel=Prevedi aplikaciju
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Obriši
+platform.appwithinminutes.appLiveTableEditEntryActionName=Uredi
+platform.appwithinminutes.appLiveTableHeading=Zapisi
+platform.appwithinminutes.appNameEmptyError=Molim unesite ime aplikacije.
+platform.appwithinminutes.appNameHint=Ime aplikacije određuje URL početne stranice i lokaciju na kojoj će se pohranjivati aplikacijski kôd.
+platform.appwithinminutes.appNameIsUsedWarning=Ova aplikacija već postoji. Ako odete na sljedeći korak, uređivat ćete postojeću aplikaciju.
+platform.appwithinminutes.appNameLabel=Ime aplikacije
+platform.appwithinminutes.appNamePageTitle=Izradi aplikaciju
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Klasa aplikacije
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Lokacija aplikacijskog kôda
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Lokacija podataka aplikacije
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL početne stranice aplikacije
+platform.appwithinminutes.appPanelCreateEntry=Izradite vlastitu\!
+platform.appwithinminutes.appsLiveTable._actions=Akcije
+platform.appwithinminutes.appsLiveTable.doc.author=Posljednji autor
+platform.appwithinminutes.appsLiveTable.doc.date=Datum ažuriranja
+platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
+platform.appwithinminutes.appsLiveTableHeading=Aplikacije
+platform.appwithinminutes.classEditorAdvancedCategoryName=Napredno
+platform.appwithinminutes.classEditorBindSheetSaveComment=Poveži plahtu klase
+platform.appwithinminutes.classEditorBooleanFieldName=Boole vrijednost
+platform.appwithinminutes.classEditorCanvasHint=Povucite polja iz palete te ih ispustite u ovaj okvir.
+platform.appwithinminutes.classEditorConfigureFieldLabel=Podesi
+platform.appwithinminutes.classEditorContentFieldName=Sadržaj
+platform.appwithinminutes.classEditorDBListFieldName=Lista baza podataka
+platform.appwithinminutes.classEditorDateFieldName=Datum
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Očisti
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Danas
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Sada
+platform.appwithinminutes.classEditorDeleteFieldLabel=Obriši
+platform.appwithinminutes.classEditorDocumentCategoryName=Stranica
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasa ima dva polja s istim imenom\: {0}
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Pretpostavljena vrijednost
+platform.appwithinminutes.classEditorGroupsFieldName=Grupa
+platform.appwithinminutes.classEditorMoveFieldHint=Povucite i ispustite za promjenu poretka
+platform.appwithinminutes.classEditorMoveFieldLabel=Prebaci
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Ova klasa ima višestruke plahte.
+platform.appwithinminutes.classEditorNumberFieldName=Broj
+platform.appwithinminutes.classEditorPaletteHint=Povucite i ispustite polja iz palete kako biste izradili formu koja će biti korištena za unos vaših podataka.
+platform.appwithinminutes.classEditorPaletteTitle=Paleta polja
+platform.appwithinminutes.classEditorPickersCategoryName=Odabirači
+platform.appwithinminutes.classEditorPreviewFieldHint=Sakrij konfiguracijski panel i primijeni izmjene
+platform.appwithinminutes.classEditorPreviewFieldLabel=Pretpregledaj
+platform.appwithinminutes.classEditorSheetSaveComment=Ažuriraj plahtu klase
+platform.appwithinminutes.classEditorStandardCategoryName=Standardno
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Dodaj
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Obriši
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Identifikator
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Vrijednost
+platform.appwithinminutes.classEditorStaticListFieldName=Statička lista
+platform.appwithinminutes.classEditorStringFieldName=Kratki tekst
+platform.appwithinminutes.classEditorTemplateSaveComment=Ažuriraj pretpostavljene vrijednosti
+platform.appwithinminutes.classEditorTextAreaFieldName=Dugi tekst
+platform.appwithinminutes.classEditorTitleFieldName=Naslov
+platform.appwithinminutes.classEditorTranslationsSaveComment=Ažuriraj prijevode
+platform.appwithinminutes.classEditorUpdateSheetHint=Plahta ({0}) koristi se za prikaz i uređivanje strukturiranih podataka.
+platform.appwithinminutes.classEditorUpdateSheetLabel=Ažuriraj plahtu
+platform.appwithinminutes.classEditorUpdateTemplateHint=Predložak ({0}) pohranjuje pretpostavljene vrijednosti polja.
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Ažuriraj predložak
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Ažurirajte prijevod prikaznih imena polja i vrijednosti liste ({0}).
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Ažuriraj prijevod
+platform.appwithinminutes.classEditorUsersFieldName=Korisnik
+platform.appwithinminutes.createAppButtonLabel=Izradi aplikaciju
+platform.appwithinminutes.deleteAppConfirmation=Aplikacija {0} i SVI njeni zapisi bit će obrisani. Jeste li sigurni da želite nastaviti?
+platform.appwithinminutes.deleteAppDoesNotExistError=Naznačena aplikacija ne postoji.
+platform.appwithinminutes.deleteAppEntriesConfirmation=SVI zapisi aplikacije {0} bit će obrisani. Jeste li sigurni da želite nastaviti?
+platform.appwithinminutes.deleteAppInvalidAppError=Naznačeno ime nije valjana aplikacija u nekoliko minuta.
+platform.appwithinminutes.deleteAppNotSpecifiedError=Nije naznačeno nikakvo ime aplikacije.
+platform.appwithinminutes.description=U nekoliko minuta izradite kolaboracijske mrežne aplikacije temeljene na XWikijevom moćnom sustavu upravljanja strukturiranim podatcima.
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Odobri ovlasti za upravljanje prostorom.
+platform.appwithinminutes.homePageTitle=Aplikacija u nekoliko minuta
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Lista akcija koje mogu biti obavljene nad podacima aplikacije, poput uređivanja i brisanja
+platform.appwithinminutes.liveTableEditorActionsColumnName=Akcije
+platform.appwithinminutes.liveTableEditorAddColumnHint=Dodajte
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Poseban stupac za prikaz poveznica prema privitcima podatkovne stranice
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Privitci
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Poseban stupac za prikaz korisnikovog avatara. Radi samo za tablicu povezanu s klasom XWiki.XWikiUsers.
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Aplikacijska polja
+platform.appwithinminutes.liveTableEditorColumnsHint=Odaberite stupce koje biste željeli uključiti u tablicu koja se prikazuje na početnoj stranici aplikacije.
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Obrišite
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti? &lt;a href\=""&gt;Da&lt;/a&gt; / &lt;a href\=""&gt;Ne&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDescriptionHint=Sadržaj koji će biti prikazan na početnoj stranici iznad tablice s podacima aplikacije. Upotrijebite ga za opis aplikacije.
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Korisnik koji je posljednji uredio podatke aplikacije
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Posljednji autor
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Datum kada su izrađeni podatci aplikacije
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Datum izrade
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Korisnik koji je izradio podatke aplikacije
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Tvorac
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Datum kada su podatci aplikacije posljednji put uređivani
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Datum
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Ime stranice koja sadrži zapis aplikacije, s imenom prostora kao prefiksom
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Puno ime stranice
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=Lokacija stranice koja sadrži podatke aplikacije
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Lokacija
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Ime stranice koja sadrži podatke aplikacije
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Ime stranice
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Ime prostora koji sadrži zapis aplikacije
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Prostor
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Naslov stranice koja sadrži podatke aplikacije
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Naslov stranice
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generički stupci
+platform.appwithinminutes.liveTableEditorHelpDescription=Generički stupci tablice neovisni su o strukturi vaše aplikacije. Oni pružaju informacije o stranicama koje drže podatke vaše aplikacije.
+platform.appwithinminutes.liveTableEditorHelpTitle=Savjet
+platform.appwithinminutes.liveTableEditorIcon=Ikona
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=Ikona aplikacije. Možete odabrati ikonu iz odabirača ikona ili možete referencirati pridruženu sliku.
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Poseban stupac za prikaz slika pridruženih podatkovnoj stranici
+platform.appwithinminutes.liveTableEditorImagesColumnName=Slike
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Povucite i ispustite za promjenu poretka
+platform.appwithinminutes.liveTableEditorSaveComment=Ažuriraj tablicu
+platform.appwithinminutes.wizardStep1Description=Odaberite ime aplikacije
+platform.appwithinminutes.wizardStep1Name=Ime
+platform.appwithinminutes.wizardStep1Title=Imenujte vašu aplikaciju
+platform.appwithinminutes.wizardStep2Description=Opišite podatke aplikacije
+platform.appwithinminutes.wizardStep2Name=Struktura
+platform.appwithinminutes.wizardStep2Title=Strukturirajte vaše podatke
+platform.appwithinminutes.wizardStep3Description=Prilagodite početnu stranicu aplikacije
+platform.appwithinminutes.wizardStep3Name=Prezentacija
+platform.appwithinminutes.wizardStep3Title=Prilagodite početnu stranicu vaše aplikacije
+platform.appwithinminutes.wizardStepFinishButtonLabel=Dovrši
+platform.appwithinminutes.wizardStepFinishButtonTip=Idite na početnu stranicu aplikacije
+platform.appwithinminutes.wizardStepHeading=Korak {0} — {1}
+platform.appwithinminutes.wizardStepHelpDescription=Ovaj čarobnjak će vas voditi kroz proces izrade aplikacije. Ovo su koraci koje ćete poduzeti\:
+platform.appwithinminutes.wizardStepHelpTitle=Koraci
+platform.appwithinminutes.wizardStepNextButtonLabel=Idući korak
+platform.appwithinminutes.wizardStepNextButtonTip=Idite na idući korak
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Prethodni korak
+platform.appwithinminutes.wizardStepPreviousButtonTip=Idite na prethodni korak
+</content>
+</xwikidoc>

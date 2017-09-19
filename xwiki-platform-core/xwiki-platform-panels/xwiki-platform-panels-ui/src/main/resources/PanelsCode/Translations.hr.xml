@@ -43,15 +43,16 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-admin.panels.applications=Ploča aplikacija
-platform.panels.applications.ajax.csrf=CSRF validacija neuspješna. Pokušajte ponovo učitati stranicu.
-platform.panels.applications.ajax.error=Vaša promjena nije mogla biti spremljena.
-platform.panels.applications.ajax.noright=Nemate pravo izmjene PanelsCode.ApplicationsPanelConfiguration.
+admin.panels.applications=Panel aplikacija
+admin.panels.applications.description=Upravljajte s prikazom aplikacija u panelu aplikacija.
+platform.panels.applications.ajax.csrf=CSRF validacija nije uspjela. Pokušajte ponovo učitati stranicu.
+platform.panels.applications.ajax.error=Spremanje vaše izmjene nije uspjelo.
+platform.panels.applications.ajax.noright=Nemate ovlast za uređivanje PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.success=Konfiguracija je spremljena.
-platform.panels.applications.blacklistedapps=Aplikacije koje nisu u tabli
-platform.panels.applications.displayedapps=Aplikacije koje su u tabli
-platform.panels.applications.helper=Ovdje možete odabrati aplikacije su raspoložive u tabli s aplikacijama (pretpostavljeno na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako želite ukloniti neke od njih, morate jedino povući i ispustiti ikonu iz jedne kućice u drugu. Možete i preurediti poredak aplikacija po vašoj želji. Ne zaboravite spremiti vaše izmjene\!
-platform.panels.applications.revert=Vrati nazad
+platform.panels.applications.blacklistedapps=Aplikacije koje nisu u traci
+platform.panels.applications.displayedapps=Aplikacije u traci
+platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (pretpostavljeno na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene\!
+platform.panels.applications.revert=Ponovo postavi
 platform.panels.applications.save=Spremi
 </content>
 </xwikidoc>

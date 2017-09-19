@@ -20,22 +20,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="Panels.Translations" locale="hr">
-  <web>Panels</web>
-  <name>Translations</name>
+<xwikidoc reference="XWiki.TemplateProviderTranslations" locale="hr">
+  <web>XWiki</web>
+  <name>TemplateProviderTranslations</name>
   <language>hr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Panels.WebHome</parent>
+  <parent>XWiki.TemplateProviderClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1393442253000</creationDate>
-  <date>1464963428000</date>
-  <contentUpdateDate>1464963428000</contentUpdateDate>
+  <creationDate>1467626480000</creationDate>
+  <date>1467626545000</date>
+  <contentUpdateDate>1467626545000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
+  <title>TemplateProvider Translations</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -43,14 +43,14 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
-panels._actions=Akcije
-panels.available=Dostupni paneli
-panels.category=Kategorija
-panels.children.title=Stranice djeca
-panels.description=Opis
-panels.documentInformation.configureSyntaxes=Podesite još sintaksi
-panels.name=Ime
-panels.siblings.title=Stranice srodnici
-panels.type=Tip
+administration.templateProvider.creationRestrictions=Restrikcije izrade
+administration.templateProvider.creationRestrictions.hint=Lista lokacija (uključujući njihovu djecu) na kojima je ovom predlošku dozvoljeno izrađivati stranice
+administration.templateProvider.creationRestrictions.none=Ovaj predložak može izrađivati stranice bilo gdje
+administration.templateProvider.creationRestrictionsAreSuggestions=Restrikcije izrade kao prijedlozi
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Omogućava korisniku odabir bilo koje lokacije za izradu stranice s ovim predloškom, koristeći prvu restrikciju izrade kao predpopunjenu pretpostavljenu lokaciju kada se predložak odabere s liste.
+administration.templateProvider.description=Opis
+administration.templateProvider.description.hint=Informacije za prikaz za opskrbljivač predložaka kada se izradi nova stranica.
+administration.templateProvider.icon=Ikona
+administration.templateProvider.icon.hint=Ikona za prikaz za opskrbljivač predložaka kada se izradi nova stranica. Odaberite jednu iz {0}pune liste ikona{1}.
 </content>
 </xwikidoc>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="XWiki.Notifications.Code.Translations" locale="hr">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1488298319000</creationDate>
+  <date>1488301583000</date>
+  <contentUpdateDate>1488301583000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Dnevno
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Svaki sat
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Uživo
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Tjedno
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Isključivo
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Uključivo
+notifications.email.seeChanges=Izmjene\: {0}
+notifications.email.subject={0} događaj(a) u wikiju
+notifications.email.title=Događaj(i) u wikiju
+notifications.events.addComment.description={1} je komentirao/la dokument {0}.
+notifications.events.by=Korisnika {0}.
+notifications.events.lastChange=Posljednja izmjena\: {0}.
+notifications.events.lastComment=Posljednji komentar\: {0}.
+notifications.filters.advanced.modal.close=Zatvori
+notifications.filters.advanced.toggles.hint=Ovi filtri se pretpostavljeno aktiviraju, možete ih isključiti pomoću gumba uz pojedini filtar.
+notifications.filters.advanced.toggles.table.description=Opis
+notifications.filters.advanced.toggles.table.name=Ime filtra
+notifications.filters.advanced.toggles.table.toggle=Uključi/isključi
+notifications.filters.cancel=Otkaži
+notifications.filters.description.systemUserNotificationFilter=Sakrij obavijesti sistemskog korisnika
+notifications.filters.location.hint=Na koji dio wikija bi filtar trebao imati utjecaja?
+notifications.filters.location.label=Doseg filtra\:
+notifications.filters.name.systemUserNotificationFilter=Sistemski filter
+notifications.filters.submit=Spremi
+notifications.filters.type.hint=Kako bi se filtar trebao ponašati prema događaju na zadanoj lokaciji
+notifications.filters.type.label=Tip filtra\:
+notifications.menu.clear=Očisti sve
+notifications.menu.cleared=Obavijesti su očišćene
+notifications.menu.clearing=Čišćenje obavijesti
+notifications.menu.details=Detalji ({0})
+notifications.menu.header=Obavijesti
+notifications.menu.header.settings=Postavke
+notifications.menu.more=Učitaj starije obavijesti
+notifications.menu.nothing=Nema dostupnih obavijesti\!
+notifications.preferences.scope.table._actions=Akcije
+notifications.preferences.scope.table.location=Lokacija
+notifications.preferences.scope.table.scope=Doseg
+notifications.preferences.scope.table.scopeFilterType=Tip filtra
+notifications.rss.feedDescription=Ovaj RSS tijek možete prilagoditi na vašoj profilnoj stranici.
+notifications.rss.feedLink=RSS tijek
+notifications.rss.feedTitle=Obavijesti RSS tijeka
+notifications.rss.seeChanges=Izmjene\: ({0})
+notifications.settings.addFilter=Dodaj filtar
+notifications.settings.email=E-pošta
+notifications.settings.errorFilterWiki=Greška\: morate odabrati wiki, ne stranicu
+notifications.settings.filters=Filtri ({0})
+notifications.settings.filters.advanced=Napredne opcije filtriranja
+notifications.settings.menu=Izbornik obavijesti
+notifications.settings.saved=Spremljeno\!
+notifications.settings.saving=Vaše postavke se pohranjuju...
+notifications.settings.savingfailed=Spremanje vaših postavki nije uspjelo
+notifications.settings.title=Postavke obavijesti
+platform.core.profile.category.notifications=Obavijesti
+</content>
+</xwikidoc>

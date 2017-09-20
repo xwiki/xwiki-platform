@@ -113,19 +113,22 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
     @Override
     public List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException
     {
+        // Empty extension point id is invalid UIX
+        String extensionPointId = baseObject.getStringValue(EXTENSION_POINT_ID_PROPERTY);
+
+        if (StringUtils.isEmpty(extensionPointId)) {
+            // TODO: put back when we stop using this has as a feature
+            // throw new WikiComponentException("Invalid UI extension: non empty extension point id is required");
+
+            return Collections.emptyList();
+        }
+
         WikiComponentScope scope = WikiComponentScope.fromString(baseObject.getStringValue(SCOPE_PROPERTY));
 
         XWikiDocument ownerDocument = baseObject.getOwnerDocument();
 
         // Before going further we need to check the document author is authorized to register the extension
         checkRights(ownerDocument, scope);
-
-        // Empty extension point id is invalid UIX
-        String extensionPointId = baseObject.getStringValue(EXTENSION_POINT_ID_PROPERTY);
-
-        if (StringUtils.isEmpty(extensionPointId)) {
-            throw new WikiComponentException("Invalid UI extension: non empty extension point id is required");
-        }
 
         // Extract extension definition.
         String id = baseObject.getStringValue(ID_PROPERTY);

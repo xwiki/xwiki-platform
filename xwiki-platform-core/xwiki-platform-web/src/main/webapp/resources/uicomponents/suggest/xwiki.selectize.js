@@ -26,7 +26,7 @@ require.config({
   }
 });
 
-define('xwiki-selectize', ['jquery', 'selectize'], function($) {
+define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($) {
   'use strict';
 
   var optionTemplate = [
@@ -94,6 +94,12 @@ define('xwiki-selectize', ['jquery', 'selectize'], function($) {
   $.fn.xwikiSelectize = function(options) {
     return this.each(function() {
       $(this).selectize($.extend({}, defaultOptions, getSelectizeOptions($(this)), options));
+      $(this).on('change', function(event) {
+        // Update the live table if the widget is used as a live table filter.
+        var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
+          .closest('.xwiki-livetable').attr('id');
+        liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
+      });
     });
   };
 });

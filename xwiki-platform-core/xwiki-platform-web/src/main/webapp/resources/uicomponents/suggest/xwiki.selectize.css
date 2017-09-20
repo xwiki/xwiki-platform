@@ -22,3 +22,8 @@
   background-position: center right 36px;
   padding-right: 55px;
 }
+
+/* Live Table Filter */
+.xwiki-livetable-display-header-filter .selectize-input {
+  display: block;
+}

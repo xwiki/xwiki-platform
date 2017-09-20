@@ -259,77 +259,7 @@
               </th>
             #end
             </tr>
-            <tr class="xwiki-livetable-display-filters">
-            #foreach($colname in $collist)
-              #set($colprop = $colprops.get($colname))
-              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
-                #set($isFilterable = true)
-              #else
-                #set($isFilterable = false)
-              #end
-              #if(("$!colprop.type" == 'list' || "$!colprop.type" == 'multilist') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter">
-                #if($colprop.get('class'))
-                  #set($propClassName = $colprop.get('class'))
-                #else
-                  #set($propClassName = $classname)
-                #end
-                #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
-                #set($list = '')
-                #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'
-                #if("$!colprop.type" == 'multilist')
-                  #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetablemulti.js', true))
-                  #set($ok = $xwiki.linkx.use($services.webjars.url('bootstrap-select', 'css/bootstrap-select.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-                  class='xwiki-livetable-multilist' multiple='multiple'>
-                #else
-                  ><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
-                  <option disabled='disabled'>────</option>
-                #end
-                #set($map = $class.get($colname).getMapValues())
-                #foreach($listitem in $list)
-                  #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
-                  #set ($l10n_value = $services.localization.render($l10n_key))
-                  #if ($l10n_value == $l10n_key)
-                    #set ($l10n_value = $map.get($listitem).getValue())
-                  #end
-                  <option value="$listitem">$l10n_value</option>
-                #end
-                </select>
-                </td>
-              #elseif("$!colprop.type" == 'boolean' && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter">
-                  <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}">
-                    <option value=''>$services.localization.render('platform.livetable.selectAll')</option>
-                    <option disabled='disabled'>────</option>
-                    <option value='0'>$services.localization.render('no')</option></option>
-                    <option value='1'>$services.localization.render('yes')</option>
-                  </select>
-                </td>
-              #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter">
-                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text"
-                  #if("$!colprop.size" != '') size="${colprop.size}"
-                  title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-                  [$services.localization.render("${transprefix}${colname}")]))"#end />
-                </td>
-              #elseif("$!colprop.type" == 'date')
-                #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
-                #set($ok = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-                <td class="xwiki-livetable-display-header-filter">
-                  ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates
-                  <input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="hidden" />
-                  <input type="text" data-type="date" data-dateformat='$escapetool.html($xwiki.getXWikiPreference("dateformat",
-                  "yyyy/MM/dd HH:mm"))' #if("$!colprop.size" != '') size="${colprop.size}"
-                  title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-                  [$services.localization.render("${transprefix}${colname}")]))"#end />
-                </td>
-              #elseif("$!colprop.type" == 'hidden')
-              #elseif($colname != '_actions' || $hasAdmin)
-              <td class="xwiki-livetable-display-header-filter"></td>
-              #end
-            #end
-            </tr>
+            #livetable_filters($collist $colprops $classname)
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
                 <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
@@ -409,6 +339,105 @@
 #else{/pre}#end##
 #end## end-wrappers
 #end## end-livetable-macro
+
+#macro (livetable_filters $columns $columnsProperties $xclassName)
+  <tr class="xwiki-livetable-display-filters">
+    #foreach ($column in $columns)
+      #set ($columnProperties = $columnsProperties.get($column))
+      #if ($columnProperties.type != 'hidden')
+        <td class="xwiki-livetable-display-header-filter">
+          #if ($columnProperties.filterable != false)
+            #set ($columnXClassName = $columnProperties.get('class'))
+            #if (!$columnXClassName)
+              #set ($columnXClassName = $xclassName)
+            #end
+            #set ($xclass = $xwiki.getDocument($columnXClassName).getxWikiClass())
+            #set ($xproperty = $xclass.get($column))
+            #livetable_filter($column $columnProperties $xproperty)
+          #end
+        </td>
+      #end
+    #end
+  </tr>
+#end
+
+## The type of filter to use when the filter type is not specified.
+#set ($filterTypeByXPropertyType = {
+  'Boolean': 'boolean',
+  'DBList': 'suggest',
+  'DBTreeList': 'suggest',
+  'Date': 'date',
+  'Email': 'text',
+  'Number': 'number',
+  'Page': 'text',
+  'StaticList': 'list',
+  'String': 'text',
+  'TextArea': 'text'
+})
+
+#macro (livetable_filter $column $columnProperties $xproperty)
+  #set ($filterType = $columnProperties.type)
+  #if (!$filterType)
+    ## Determine the filter type from the xproperty type.
+    #set ($filterType = $filterTypeByXPropertyType.get($xproperty.classType))
+  #end
+  #if ($filterType == 'list' || $filterType == 'multilist')
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
+      #if ($filterType == 'multilist')
+        #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetablemulti.js', true))
+        #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-select', 'css/bootstrap-select.css'),
+          {'type': 'text/css', 'rel': 'stylesheet'}))
+        class="xwiki-livetable-multilist" multiple="multiple">
+      #else
+        ><option value="">$services.localization.render('platform.livetable.selectAll')</option>
+        <option disabled="disabled">────</option>
+      #end
+    #set ($storedValues = $xproperty.listValues)
+    #set ($displayedValues = $xproperty.mapValues)
+    #foreach ($storedValue in $storedValues)
+      #set ($l10nKey = "${xproperty.className}_${column}_$storedValue")
+      #set ($displayedValue = $services.localization.render($l10nKey))
+      #if ($displayedValue == $l10nKey)
+        #set ($displayedValue = $displayedValues.get($storedValue).value)
+      #end
+      <option value="$storedValue">$displayedValue</option>
+    #end
+    </select>
+  #elseif ($filterType == 'boolean')
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column">
+      <option value="">$services.localization.render('platform.livetable.selectAll')</option>
+      <option value="0">$services.localization.render('no')</option>
+      <option value="1">$services.localization.render('yes')</option>
+    </select>
+  #elseif ($filterType == 'text' || $filterType == 'number')
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
+      size="$!columnProperties.size" title="$escapetool.xml($services.localization.render(
+        'platform.livetable.filtersTitle', [$services.localization.render("${transprefix}$column")]))" />
+  #elseif ($filterType == 'date')
+    #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker',
+      'css/bootstrap-daterangepicker.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+    ## Hidden input for date fields allows us to send timestamps to the server while displaying pretty dates.
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="hidden" />
+    #set ($dateFormat = $xproperty.getValue('dateFormat'))
+    #if ("$!dateFormat" == '')
+      #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
+    #end
+    <input type="text" data-type="date" data-dateformat="$escapetool.xml($dateFormat)" size="$!columnProperties.size"
+      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+      [$services.localization.render("${transprefix}$column")]))" />
+  #elseif ($filterType == 'suggest')
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+      {'type': 'text/css', 'rel': 'stylesheet'}))
+    #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
+      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
+      class="suggest-propertyValues" multiple="multiple" size="1"
+      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($column)">
+    </select>
+  #end
+#end
 
 #**
  * Internal macro - Determine the name to be displayed in a livetable's column header. Strategy is as follows :

@@ -1036,7 +1036,9 @@ var LiveTableFilter = Class.create({
    */
   applyActiveFilterStyle: function(element) {
     if(element && element.tagName && ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
-      if ($F(element) != '') {
+      // The filter value can be a string, an array or null.
+      var filterValue = $F(element);
+      if (filterValue != null && filterValue.length) {
         element.addClassName('xwiki-livetable-filter-active');
       } else {
         element.removeClassName('xwiki-livetable-filter-active');

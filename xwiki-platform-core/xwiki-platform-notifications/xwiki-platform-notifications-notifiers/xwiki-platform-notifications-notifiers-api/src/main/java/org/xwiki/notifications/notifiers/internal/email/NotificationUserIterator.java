@@ -55,10 +55,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
     private static final int BATCH_SIZE = 50;
 
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
-            + "doc.object(XWiki.XWikiUsers) objUser, "
-            + "doc.object(XWiki.Notifications.Code.NotificationPreferenceClass) objNotifPref "
-            + "where objNotifPref.notificationEnabled <> 0 and objNotifPref.format = 'email' "
-            + "order by doc.fullName";
+            + "doc.object(XWiki.XWikiUsers) objUser where objUser.email <> '' order by doc.fullName";
 
     @Inject
     private QueryManager queryManager;

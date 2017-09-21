@@ -84,14 +84,18 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
     public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
+        // Accents seems to cause issues in some conditions
+        // See https://jira.xwiki.org/browse/XWIKI-14692
+        String cleanedOfficeFileName = StringUtils.stripAccents(officeFileName);
+
         // Invoke the office document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
-        inputStreams.put(officeFileName, officeFileStream);
+        inputStreams.put(cleanedOfficeFileName, officeFileStream);
         Map<String, byte[]> artifacts;
         // The office converter uses the output file name extension to determine the output format/syntax.
-        String outputFileName = StringUtils.substringBeforeLast(officeFileName, ".") + ".html";
+        String outputFileName = StringUtils.substringBeforeLast(cleanedOfficeFileName, ".") + ".html";
         try {
-            artifacts = this.officeServer.getConverter().convert(inputStreams, officeFileName, outputFileName);
+            artifacts = this.officeServer.getConverter().convert(inputStreams, cleanedOfficeFileName, outputFileName);
         } catch (OfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);

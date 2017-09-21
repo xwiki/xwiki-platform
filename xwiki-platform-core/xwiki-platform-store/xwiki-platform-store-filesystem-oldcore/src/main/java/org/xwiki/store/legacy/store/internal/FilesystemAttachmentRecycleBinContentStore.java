@@ -57,6 +57,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 
@@ -64,14 +65,12 @@ import com.xpn.xwiki.store.AttachmentVersioningStore;
  * Realization of {@link AttachmentRecycleBinStore} for filesystem storage.
  *
  * @version $Id$
- * @since 3.0M3
- * @deprecated since 9.9RC1, use 
+ * @since 9.9RC1
  */
 @Component
 @Named(FileSystemStoreUtils.HINT)
 @Singleton
-@Deprecated
-public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBinStore, Initializable
+public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRecycleBinContentStore, Initializable
 {
     /**
      * Some utilities for getting attachment files, locks, and backup files.

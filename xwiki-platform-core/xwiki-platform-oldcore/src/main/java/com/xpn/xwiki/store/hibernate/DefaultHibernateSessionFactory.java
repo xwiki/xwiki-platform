@@ -50,7 +50,6 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 2.0M1
  */
-// TODO: This was coded by Artem. Find out why we need this as a component.
 @Component
 @Singleton
 @DisposePriority(10000)

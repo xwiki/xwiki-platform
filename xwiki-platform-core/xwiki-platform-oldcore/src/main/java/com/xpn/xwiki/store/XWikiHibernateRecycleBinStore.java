@@ -45,6 +45,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.XWikiHibernateDeletedDocumentContent;
 
 /**
  * Realization of {@link XWikiRecycleBinStoreInterface} for Hibernate store.

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store;
+package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -27,34 +27,34 @@ import org.xwiki.filter.input.DefaultReaderInputSource;
 import org.xwiki.filter.output.DefaultWriterOutputTarget;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.DeletedAttachmentContent;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository;
 import com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository.TemporaryDeferredStringFile;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * The stored content of the deleted document.
+ * Hibernate based implementation of DeletedAttachmentContent.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 9.9RC1
  */
-public class XWikiHibernateDeletedDocumentContent implements XWikiDeletedDocumentContent
+public class HibernateDeletedAttachmentContent implements DeletedAttachmentContent
 {
     private final TemporaryDeferredStringFile content;
 
     /**
-     * @param document the deleted document
+     * @param attachment the deleted attachment
      * @throws XWikiException when failing to serialize document
      */
-    public XWikiHibernateDeletedDocumentContent(XWikiDocument document) throws XWikiException
+    public HibernateDeletedAttachmentContent(XWikiAttachment attachment) throws XWikiException
     {
         this.content = createTemporaryDeferredFile();
 
         try {
             // Don't format the XML to reduce the size
-            document.toXML(new DefaultWriterOutputTarget(this.content.getWriter(), true), true, false, true, true,
-                false, StandardCharsets.UTF_8.name());
+            attachment.toXML(new DefaultWriterOutputTarget(this.content.getWriter(), true), true, true, false,
+                StandardCharsets.UTF_8.name());
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error serializing document to xml", e, null);
@@ -65,7 +65,7 @@ public class XWikiHibernateDeletedDocumentContent implements XWikiDeletedDocumen
      * @param xml the serialized document as XML
      * @throws IOException when failing to store xml
      */
-    public XWikiHibernateDeletedDocumentContent(String xml) throws IOException
+    public HibernateDeletedAttachmentContent(String xml) throws IOException
     {
         this.content = createTemporaryDeferredFile();
 
@@ -75,7 +75,7 @@ public class XWikiHibernateDeletedDocumentContent implements XWikiDeletedDocumen
     private TemporaryDeferredStringFile createTemporaryDeferredFile()
     {
         return Utils.getComponent(TemporaryDeferredFileRepository.class)
-            .createTemporaryDeferredStringFile("deleted-documents-xml", StandardCharsets.UTF_8);
+            .createTemporaryDeferredStringFile("deleted-attachment-xml", StandardCharsets.UTF_8);
     }
 
     @Override
@@ -84,22 +84,16 @@ public class XWikiHibernateDeletedDocumentContent implements XWikiDeletedDocumen
         return this.content.getString();
     }
 
-    /**
-     * @param document the document to write to or null to create a new one
-     * @return restored document
-     * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
-     * @throws IOException when failing to read the content
-     */
     @Override
-    public XWikiDocument getXWikiDocument(XWikiDocument document) throws XWikiException, IOException
+    public XWikiAttachment getXWikiAttachment(XWikiAttachment attachment) throws XWikiException, IOException
     {
-        XWikiDocument result = document;
+        XWikiAttachment result = attachment;
         if (result == null) {
-            result = new XWikiDocument();
+            result = new XWikiAttachment();
         }
 
         try (Reader reader = this.content.getReader()) {
-            result.fromXML(new DefaultReaderInputSource(reader, true), true);
+            result.fromXML(new DefaultReaderInputSource(reader));
         }
 
         return result;

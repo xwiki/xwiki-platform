@@ -127,7 +127,6 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                     File temporaryFile;
                     try {
                         temporaryFile = File.createTempFile("xar/attachments/attachment", ".bin");
-                        temporaryFile.deleteOnExit();
                     } catch (IOException e) {
                         throw new FilterException(e);
                     }

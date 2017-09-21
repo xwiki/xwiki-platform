@@ -69,6 +69,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.file.TemporaryFile;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -268,7 +269,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         String name = attachment.getFilename();
         byte[] stream = attachment.getContent();
-        File temp = File.createTempFile("tmpfile", ".tmp");
+        File temp = new TemporaryFile(File.createTempFile("tmpfile", ".tmp"));
         FileOutputStream fos = new FileOutputStream(temp);
         fos.write(stream);
         fos.close();
@@ -281,8 +282,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         part.setFileName(name);
         part.setContentID("<" + name + ">");
         part.setDisposition("inline");
-
-        temp.deleteOnExit();
 
         return part;
     }

@@ -30,14 +30,21 @@ import java.io.File;
 public class TemporaryFile extends File
 {
     /**
+     * @param file the file to copy
+     * @since 9.9RC1
+     */
+    public TemporaryFile(File file)
+    {
+        super(file.getPath());
+    }
+
+    /**
      * @param parent The parent abstract pathname
      * @param child The child pathname string
      */
     public TemporaryFile(File parent, String child)
     {
         super(parent, child);
-
-        deleteOnExit();
     }
 
     @Override

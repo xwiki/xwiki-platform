@@ -30,7 +30,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateDeletedDocumentContent;
+import com.xpn.xwiki.internal.store.hibernate.XWikiHibernateDeletedDocumentContent;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
@@ -89,6 +89,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param deleter - user which delete document
      * @param deleteDate - date of delete action
      * @throws XWikiException if any error
+     * @since 9.0RC1
      */
     private XWikiDeletedDocument(String fullName, Locale locale, String storeType, String deleter, Date deleteDate)
         throws XWikiException
@@ -123,6 +124,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param deleteDate date of delete action
      * @param content the stored deleted document
      * @throws XWikiException if any error
+     * @since 9.0RC1
      */
     public XWikiDeletedDocument(String fullName, Locale locale, String storeType, String deleter, Date deleteDate,
         XWikiDeletedDocumentContent content) throws XWikiException
@@ -266,7 +268,8 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     }
 
     /**
-     * @return the type of the stored used for the content
+     * @return the type of the store used for the content
+     * @since 9.0RC1
      */
     public String getXmlStore()
     {
@@ -275,6 +278,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * @param xmlStore the type of store (supported values are null/"hibernate" and "file")
+     * @since 9.0RC1
      */
     protected void setXmlStore(String xmlStore)
     {
@@ -334,8 +338,8 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * @return restored document
-     * @param doc - restore to this document, if not null
-     * @param context - may be useful in future
+     * @param doc optional object where to put the document data, if not <code>null</code>
+     * @param context the current {@link XWikiContext context}
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
      */
     public XWikiDocument restoreDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
@@ -350,7 +354,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * @return restored document
-     * @param context - may be useful in future
+     * @param context the current {@link XWikiContext context}
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
      * @since 9.0RC1
      */

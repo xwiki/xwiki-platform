@@ -27,16 +27,16 @@ import org.apache.commons.io.FileUtils;
 import org.xwiki.filter.input.DefaultFileInputSource;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.DeletedAttachmentContent;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
- * Filesystem implementation of XWikiDeletedDocumentContent.
+ * Filesystem based implementation of DeletedAttachmentContent.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 9.9RC1
  */
-public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentContent
+public class FileDeletedAttachmentContent implements DeletedAttachmentContent
 {
     private final File content;
 
@@ -46,7 +46,7 @@ public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentCont
      * @param file the serialized document as XML
      * @param charset the charset of the file
      */
-    public XWikiFileDeletedDocumentContent(File file, Charset charset)
+    public FileDeletedAttachmentContent(File file, Charset charset)
     {
         this.content = file;
         this.charset = charset;
@@ -59,14 +59,14 @@ public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentCont
     }
 
     @Override
-    public XWikiDocument getXWikiDocument(XWikiDocument document) throws XWikiException, IOException
+    public XWikiAttachment getXWikiAttachment(XWikiAttachment attachment) throws XWikiException, IOException
     {
-        XWikiDocument result = document;
+        XWikiAttachment result = attachment;
         if (result == null) {
-            result = new XWikiDocument();
+            result = new XWikiAttachment();
         }
 
-        result.fromXML(new DefaultFileInputSource(this.content), true);
+        result.fromXML(new DefaultFileInputSource(this.content));
 
         return result;
     }

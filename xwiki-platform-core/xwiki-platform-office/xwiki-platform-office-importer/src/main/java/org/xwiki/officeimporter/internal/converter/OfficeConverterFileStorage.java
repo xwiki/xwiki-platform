@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Keeps track of file system storage used by {@link org.xwiki.officeimporter.converter.OfficeConverter} for a
  * particular conversion.
@@ -76,8 +78,8 @@ public class OfficeConverterFileStorage
             this.inputDir = new File(this.rootDir, "input");
             this.outputDir = new File(this.rootDir, "output");
             if (this.inputDir.mkdir() && this.outputDir.mkdir()) {
-                this.inputFile = new File(this.inputDir, inputFileName);
-                this.outputFile = new File(this.outputDir, outputFileName);
+                this.inputFile = new File(this.inputDir, StringUtils.stripAccents(inputFileName));
+                this.outputFile = new File(this.outputDir, StringUtils.stripAccents(outputFileName));
                 success = true;
             }
         }

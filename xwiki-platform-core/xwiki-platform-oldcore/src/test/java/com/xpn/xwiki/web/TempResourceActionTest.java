@@ -30,11 +30,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
-
 import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.file.TemporaryFile;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.web.includeservletasstring.BufferOutputStream;
 
@@ -82,10 +82,9 @@ public class TempResourceActionTest
      */
     private void createEmptyFile(String path) throws IOException
     {
-        File emptyFile = new File(base, path);
+        File emptyFile = new TemporaryFile(new File(base, path));
         emptyFile.getParentFile().mkdirs();
         emptyFile.createNewFile();
-        emptyFile.deleteOnExit();
     }
 
     /**
@@ -96,10 +95,9 @@ public class TempResourceActionTest
      */
     private void createFile(String path, String content) throws IOException
     {
-        File file = new File(base, path);
+        File file = new TemporaryFile(new File(base, path));
         file.getParentFile().mkdirs();
         file.createNewFile();
-        file.deleteOnExit();
         FileUtils.write(file, content);
     }
 

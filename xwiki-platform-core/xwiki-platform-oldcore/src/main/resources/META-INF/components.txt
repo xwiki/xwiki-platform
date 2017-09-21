@@ -150,6 +150,7 @@ com.xpn.xwiki.store.XWikiHibernateAttachmentStore
 com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateRecycleBinStore
+com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinContentStore
 com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass

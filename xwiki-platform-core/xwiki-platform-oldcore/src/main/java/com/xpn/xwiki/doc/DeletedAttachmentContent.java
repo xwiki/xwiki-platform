@@ -24,24 +24,24 @@ import java.io.IOException;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * The content of the stored deleted document.
+ * The content of the stored deleted attachment.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 9.9RC1
  */
-public interface XWikiDeletedDocumentContent
+public interface DeletedAttachmentContent
 {
     /**
-     * @return the serialized version of the document
+     * @return the serialized version of the attachment
      * @throws IOException when failing to get the {@link String} content
      */
     String getContentAsString() throws IOException;
 
     /**
-     * @param document the document to write to or null to create a new one
-     * @return restored document
+     * @param attachment the attachment to write to or null to create a new one
+     * @return restored attachment
      * @throws IOException when failing to read the content
      * @throws XWikiException when failing to read the content
      */
-    XWikiDocument getXWikiDocument(XWikiDocument document) throws IOException, XWikiException;
+    XWikiAttachment getXWikiAttachment(XWikiAttachment attachment) throws IOException, XWikiException;
 }

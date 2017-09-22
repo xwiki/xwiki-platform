@@ -361,24 +361,24 @@
   </tr>
 #end
 
-## The type of filter to use when the filter type is not specified.
-#set ($filterTypeByXPropertyType = {
-  'Boolean': 'boolean',
-  'DBList': 'suggest',
-  'DBTreeList': 'suggest',
-  'Date': 'date',
-  'Email': 'text',
-  'Number': 'number',
-  'Page': 'text',
-  'StaticList': 'list',
-  'String': 'text',
-  'TextArea': 'text'
-})
-
 #macro (livetable_filter $column $columnProperties $xproperty)
   #set ($filterType = $columnProperties.type)
-  #if (!$filterType)
+  #if ("$!filterType" == '')
     ## Determine the filter type from the xproperty type.
+    #set ($filterTypeByXPropertyType = {
+      'Boolean': 'boolean',
+      'DBList': 'suggest',
+      'DBTreeList': 'suggest',
+      'Date': 'date',
+      'Email': 'text',
+      'Groups': 'suggest',
+      'Number': 'number',
+      'Page': 'text',
+      'StaticList': 'list',
+      'String': 'text',
+      'TextArea': 'text',
+      'Users': 'suggest'
+    })
     #set ($filterType = $filterTypeByXPropertyType.get($xproperty.classType))
   #end
   #if ($filterType == 'list' || $filterType == 'multilist')

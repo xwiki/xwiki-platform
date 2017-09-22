@@ -948,19 +948,31 @@ var LiveTableFilter = Class.create({
       }
     }
 
-    for (var i = 0; i < this.selects.length; ++i) {
-      var filter = this.filters[this.selects[i].name];
-      if (filter) {
-        for (var j = 0; j < this.selects[i].options.length; ++j) {
-          if (Object.isArray(filter)) {
-            this.selects[i].options[j].selected = (filter.indexOf(this.selects[i].options[j].value) != -1);
-          } else {
-            this.selects[i].options[j].selected = (this.selects[i].options[j].value == filter);
-          }
-        }
+    this.selects.each(function(select) {
+      var values = this.filters[select.name];
+      if (!Object.isArray(values)) {
+        values = [values];
       }
-      this.applyActiveFilterStyle(this.selects[i]);
-    }
+      var selectedValues = [];
+      for (var i = 0; i < select.options.length; i++) {
+        var option = select.options[i];
+        option.selected = values.indexOf(option.value) >= 0;
+        if (option.selected) {
+          selectedValues.push(option.value);
+        }
+      };
+      values.each(function(value) {
+        // Add missing values.
+        if (typeof value === 'string' && selectedValues.indexOf(value) < 0) {
+          var option = document.createElement('option');
+          option.value = value;
+          option.selected = true;
+          option.update(value.escapeHTML());
+          select.insert(option);
+        }
+      }, this);
+      this.applyActiveFilterStyle(select);
+    }, this);
   },
 
   serializeFilters: function()
@@ -971,17 +983,24 @@ var LiveTableFilter = Class.create({
     // return Form.serializeElements(Form.getElements(this.domNodeName);
     var result = "";
     var filters = [this.inputs, this.selects].flatten();
-    for (var i=0;i<filters.length;i++) {
+    for (var i = 0; i < filters.length; i++) {
+      var filter = filters[i];
       // Ignore filters with blank value if are not used as filters yet
-      if (!filters[i].value.blank() || (this.filters[filters[i].name] && !this.filters[filters[i].name].blank())){
-        if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
-          result += ("&" + filters[i].serialize());
+      if (!this._isBlank(filter.getValue()) || !this._isBlank(this.filters[filter.name])) {
+        if ((filter.type != "radio" && filter.type != "checkbox") || filter.checked) {
+          result += ("&" + filter.serialize());
         }
       }
     }
     return result;
   },
 
+  _isBlank: function(value) {
+    var values = Object.isArray(value) ? value : [value];
+    return values.every(function(value) {
+      return typeof value !== 'string' || value.blank();
+    });
+  },
 
   attachEventHandlers: function()
   {

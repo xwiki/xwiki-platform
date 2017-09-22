@@ -50,14 +50,19 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         // The icon is specified by its CSS class.
         output.find('.xwiki-selectize-option-icon').addClass(icon);
       }
+    } else {
+      output.find('.xwiki-selectize-option-icon').remove();
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
     output.find('.xwiki-selectize-option-label').text(label);
     return output;
   };
 
-  var defaultOptions = {
+  var defaultSettings = {
+    // Disable the highlighting because it is buggy.
+    // See for instance https://github.com/selectize/selectize.js/issues/1149 .
     highlight: false,
+    labelField: 'label',
     loadThrottle: 500,
     persist: false,
     preload: 'focus',
@@ -75,31 +80,55 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     searchField: ['value', 'label']
   };
 
-  var getSelectizeOptions = function(element) {
-    return {
-      maxItems: element.prop('multiple') ? null : 1,
-      options: element.children('option').filter(function() {
-        return $(this).val() && !$(this).prop('disabled');
-      }).map(function() {
-        return {
-          value: $(this).val(),
-          label: $(this).text(),
-          icon: $(this).attr('data-icon')
-        };
-      }),
-      placeholder: element.attr('placeholder')
-    };
+  var loadSelectedValues = function() {
+    var values = $(this).val();
+    if (!$.isArray(values)) {
+      values = [values]
+    }
+    var selectize = this.selectize;
+    var wrapper = selectize.$wrapper;
+    wrapper.addClass(selectize.settings.loadingClass);
+    selectize.loading++;
+    values.reduce(function(deferred, value) {
+      return deferred.then(function() {
+        return loadSelectedValue(selectize, value);
+      });
+    }, $.Deferred().resolve()).always(function() {
+      selectize.loading = Math.max(selectize.loading - 1, 0);
+      if (!selectize.loading) {
+        wrapper.removeClass(selectize.settings.loadingClass);
+      }
+    });
   };
 
-  $.fn.xwikiSelectize = function(options) {
-    return this.each(function() {
-      $(this).selectize($.extend({}, defaultOptions, getSelectizeOptions($(this)), options));
-      $(this).on('change', function(event) {
+  var loadSelectedValue = function(selectize, value) {
+    var deferred = $.Deferred();
+    if (typeof selectize.settings.load === 'function') {
+      selectize.settings.load(value, function(options) {
+        $.isArray(options) && options.forEach(function(option) {
+          var value = option[selectize.settings.valueField];
+          if (selectize.options.hasOwnProperty(value)) {
+            selectize.updateOption(value, option);
+          } else {
+            selectize.addOption(option);
+          }
+        });
+        deferred.resolve();
+      });
+    } else {
+      deferred.resolve();
+    }
+    return deferred.promise();
+  };
+
+  $.fn.xwikiSelectize = function(settings) {
+    return this.selectize($.extend({}, defaultSettings, settings))
+      .each(loadSelectedValues)
+      .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.
         var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
           .closest('.xwiki-livetable').attr('id');
         liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
       });
-    });
   };
 });

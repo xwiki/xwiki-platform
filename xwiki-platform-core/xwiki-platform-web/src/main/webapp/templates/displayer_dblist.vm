@@ -18,13 +18,8 @@
     <select id="$!id" name="$!id" class="suggest-propertyValues"#if ($isMultiSelect) multiple="multiple"#end
         #if ($disabled)disabled="disabled" #{end}data-className="$!escapetool.xml($field.className)"
         data-propertyName="$!escapetool.xml($name)" size="1">
-      #set ($allowedValues = $field.mapValues)
       #foreach ($selectedValue in $values)
-        #set ($label = $allowedValues.get($selectedValue).value)
-        #if ("$!label" == '')
-          #set ($label = $selectedValue)
-        #end
-        <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($label)</option>
+        <option value="$!escapetool.xml($selectedValue)" selected="selected">$!escapetool.xml($selectedValue)</option>
       #end
     </select>
     #if ($isMultiSelect)

@@ -107,11 +107,15 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName,
         DocumentReference documentReference) throws OfficeImporterException
     {
+        // Accents seems to cause issues in some conditions
+        // See https://jira.xwiki.org/browse/XWIKI-14692
+        String cleanedOfficeFileName = StringUtils.stripAccents(officeFileName);
+
         // Invoke the office document converter.
-        Map<String, byte[]> artifacts = importPresentation(officeFileStream, officeFileName);
+        Map<String, byte[]> artifacts = importPresentation(officeFileStream, cleanedOfficeFileName);
 
         // Create presentation HTML.
-        String html = buildPresentationHTML(artifacts, StringUtils.substringBeforeLast(officeFileName, "."));
+        String html = buildPresentationHTML(artifacts, StringUtils.substringBeforeLast(cleanedOfficeFileName, "."));
 
         // Clear and adjust presentation HTML (slide image URLs are updated to point to the corresponding attachments).
         html = cleanPresentationHTML(html, documentReference);

@@ -1551,11 +1551,13 @@ $Msz MB##
       'DBTreeList': 'suggest',
       'Date': 'date',
       'Email': 'text',
+      'Groups': 'suggest',
       'Number': 'number',
       'Page': 'text',
       'StaticList': 'list',
       'String': 'text',
-      'TextArea': 'text'
+      'TextArea': 'text',
+      'Users': 'suggest'
     })
     #set ($filterType = $filterTypeByXPropertyType.get($xproperty.classType))
   #end
@@ -1588,7 +1590,7 @@ $Msz MB##
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
       size="$!columnProperties.size" title="$escapetool.xml($services.localization.render(
         'platform.livetable.filtersTitle', [$services.localization.render("${transprefix}$column")]))" />
-  #elseif ($filterType == 'suggest')
+  #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))

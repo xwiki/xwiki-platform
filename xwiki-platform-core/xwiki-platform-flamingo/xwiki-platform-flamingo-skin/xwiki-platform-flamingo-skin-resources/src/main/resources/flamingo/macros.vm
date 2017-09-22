@@ -426,7 +426,7 @@
     <input type="text" data-type="date" data-dateformat="$escapetool.xml($dateFormat)" size="$!columnProperties.size"
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
       [$services.localization.render("${transprefix}$column")]))" />
-  #elseif ($filterType == 'suggest')
+  #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))

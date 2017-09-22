@@ -711,7 +711,7 @@
   #end
   #set ($timestamps = $filterValue.split('-'))
   #if ($timestamps.size() == 2)
-    #set ($whereSql = "${whereSql} and $dateProperty >= ? and $dateProperty &lt;= ?")
+    #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
     #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
     #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
   #else
@@ -726,10 +726,6 @@
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterDBStringListProperty)
-  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
-  #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
-    #set ($joinOperator = 'AND')
-  #end
   #if ($matchType == 'partial' || $matchType == 'prefix')
     ## We need to join with the list of values in order to be able to use the LIKE operator.
     #set ($matchTarget = "${safe_tableAlias}_item")
@@ -741,9 +737,8 @@
     #set ($matchTarget = "${safe_tableAlias}.list")
   #end
   #set ($filterValues = $request.getParameterValues($colname))
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true)")
-  #set ($constraints = $stringtool.repeat($filterQuery.trim(), " $joinOperator ", $filterValues.size()))
-  #set ($whereSql = "$whereSql and ($constraints)")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size())")
+  #set ($whereSql = "$whereSql and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #livetable_addFilterParam($filterValue $matchType $whereParams)
   #end
@@ -755,13 +750,9 @@
  *#
 #macro (livetable_filterStringListProperty)
   #set ($filterValues = $request.getParameterValues($colname))
-  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
-  #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
-    #set ($joinOperator = 'AND')
-  #end
-  #set ($filterQuery = " concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) LIKE upper(?) ")
-  #set ($constraints = $stringtool.repeat($filterQuery, $joinOperator, $filterValues.size()))
-  #set ($whereSql = "${whereSql} and ( $constraints )")
+  #set ($matchTarget = "concat('|', concat(${safe_tableAlias}.textValue, '|'))")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size())")
+  #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #set ($discard = $whereParams.add("%|$filterValue|%"))
   #end
@@ -783,7 +774,7 @@
     #end
   #end
   #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount)")
-  #set ($whereSql = "${whereSql} and $filterQuery.trim()")
+  #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #livetable_addFilterParam($filterValue $matchType $whereParams)
   #end
@@ -791,14 +782,18 @@
 
 
 #macro (livetable_getFilterQuery $column $matchType $isList $valueCount)
+  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+  #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+    #set ($joinOperator = 'AND')
+  #end
   #if ($matchType == 'partial' || $matchType == 'prefix')
-    upper($column) like upper(?)
+    $stringtool.repeat("upper($column) like upper(?)", " $joinOperator ", $valueCount)
   #elseif ($isList)
-    ? in elements($column)
-  #elseif (($valueCount &gt; 1) &amp;&amp; ($matchType == 'exact'))
-    $column in ( $stringtool.repeat('?', ', ', $valueCount) )
+    $stringtool.repeat("? in elements($column)", " $joinOperator ", $valueCount)
+  #elseif ($valueCount &gt; 1 &amp;&amp; $joinOperator == 'OR')
+    $column in ($stringtool.repeat('?', ', ', $valueCount))
   #else
-    $column = ?
+    $stringtool.repeat("$column = ?", ' AND ', $valueCount)
   #end
 #end
 
@@ -837,5 +832,6 @@
   ## Remove non-word characters.
   #set ($safe_tableAlias = "$prefix$suffix.replaceAll('\W', '')")
 #end
-{{/velocity}}</content>
+{{/velocity}}
+</content>
 </xwikidoc>

@@ -59,6 +59,12 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   var defaultSettings = {
+    // Copying the CSS classes from the form field to the dropdown can have unexpected side effects if those classes are
+    // not meant to be applied on the dropdown (e.g. live table active filter).
+    copyClassesToDropdown: false,
+    // Append the drop down list to the BODY element as otherwise we may get scroll bars if the parent of the selectize
+    // widget has limited width or height (e.g. when you change the filter value on an empty live table).
+    dropdownParent: 'body',
     // Disable the highlighting because it is buggy.
     // See for instance https://github.com/selectize/selectize.js/issues/1149 .
     highlight: false,
@@ -121,9 +127,36 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     return deferred.promise();
   };
 
+  var handleDropdownWidth = function() {
+    if (getDropdownWidthSetting(this) === 'auto') {
+      var oldPositionDropdown = this.selectize.positionDropdown;
+      this.selectize.positionDropdown = function() {
+        oldPositionDropdown.call(this);
+        var dropdown = this.$dropdown;
+        dropdown.css({
+          width: '',
+          'min-width': dropdown.css('width')
+        });
+      };
+    }
+  };
+
+  /**
+   * @param input the form field that was enhanced with the Selectize widget
+   * @return 'auto' if the dropdown width should be variable based on its content, but no less than the width of the
+   *         specified form field, otherwise the dropdown should have the same width as the form field
+   */
+  var getDropdownWidthSetting = function(input) {
+    if (input.selectize.settings.hasOwnProperty('dropdownWidth')) {
+      return this.selectize.settings.dropdownWidth;
+    } else if ($(input).closest('.xform').length === 0) {
+      return 'auto';
+    }
+  };
+
   $.fn.xwikiSelectize = function(settings) {
     return this.selectize($.extend({}, defaultSettings, settings))
-      .each(loadSelectedValues)
+      .each(loadSelectedValues).each(handleDropdownWidth)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.
         var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')

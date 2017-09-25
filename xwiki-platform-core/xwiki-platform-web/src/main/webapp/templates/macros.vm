@@ -1599,8 +1599,9 @@ $Msz MB##
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
-      size="$!columnProperties.size" title="$escapetool.xml($services.localization.render(
-        'platform.livetable.filtersTitle', [$services.localization.render("${transprefix}$column")]))" />
+      #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
+      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+        [$services.localization.render("${transprefix}$column")]))" />
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))

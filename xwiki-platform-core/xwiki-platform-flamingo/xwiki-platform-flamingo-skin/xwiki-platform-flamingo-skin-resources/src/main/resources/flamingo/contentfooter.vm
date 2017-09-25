@@ -1,0 +1,14 @@
+##
+## Document footer: tags, creation date, modification date
+##
+<div id="xdocFooter">
+  #template("documentTags.vm")
+  <div id="xdocAuthors">
+    <div class="xdocCreation"> ## Creation
+      $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
+      #if($tdoc.realLocale != $doc.realLocale)
+        $services.localization.render('core.footer.translationCreation', [$tdoc.realLocale, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
+      #end
+    </div>
+  </div>
+</div>

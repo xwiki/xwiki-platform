@@ -500,6 +500,7 @@ public class InternalTemplateManager
      * @param templateName the template to parse
      * @return the result of the template parsing
      */
+    @Deprecated
     public XDOM getXDOMNoException(String templateName)
     {
         XDOM xdom;
@@ -520,6 +521,7 @@ public class InternalTemplateManager
      * @return the result of the template parsing
      * @since 8.3RC1
      */
+    @Deprecated
     public XDOM getXDOMNoException(Template template)
     {
         XDOM xdom;
@@ -535,6 +537,7 @@ public class InternalTemplateManager
         return xdom;
     }
 
+    @Deprecated
     public XDOM getXDOM(Template template) throws Exception
     {
         XDOM xdom;
@@ -562,6 +565,7 @@ public class InternalTemplateManager
         return xdom;
     }
 
+    @Deprecated
     public XDOM getXDOM(String templateName) throws Exception
     {
         Template template = getTemplate(templateName);

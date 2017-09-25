@@ -24,7 +24,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.xwiki.validator.ValidationError;
@@ -124,14 +126,16 @@ public class DefaultValidationTest extends AbstractValidationTest
         this.validator.setDocument(new ByteArrayInputStream(responseBody));
         List<ValidationError> errors = this.validator.validate();
 
+        Set<Integer> errorLines = new HashSet<>();
+
         StringBuffer message = new StringBuffer();
         message.append("Validation errors in " + this.target.getName());
         boolean hasError = false;
         for (ValidationError error : errors) {
             if (error.getType() == ValidationError.Type.WARNING) {
                 if (error.getLine() >= 0) {
-                    System.out.println("Warning at " + error.getLine() + ":" + error.getColumn() + " "
-                        + error.getMessage());
+                    System.out
+                        .println("Warning at " + error.getLine() + ":" + error.getColumn() + " " + error.getMessage());
                 } else {
                     System.out.println("Warning " + error.getMessage());
                 }
@@ -143,6 +147,12 @@ public class DefaultValidationTest extends AbstractValidationTest
                     message.append("\n" + error.toString());
                 }
 
+                errorLines.add(error.getLine() - 2);
+                errorLines.add(error.getLine() - 1);
+                errorLines.add(error.getLine());
+                errorLines.add(error.getLine() + 1);
+                errorLines.add(error.getLine() + 2);
+
                 hasError = true;
             }
         }
@@ -150,14 +160,31 @@ public class DefaultValidationTest extends AbstractValidationTest
         if (hasError) {
             System.err.println("");
             System.err.println("Validated content:");
+
+            message.append("\n\nExtracts of the invalid content:");
+
             BufferedReader reader = new BufferedReader(new StringReader(new String(responseBody)));
             int index = 1;
+            int lastErrorLine = -1;
             for (String line = reader.readLine(); line != null; line = reader.readLine(), ++index) {
-                System.err.println(index + "\t" + line);
-            }
-        }
+                StringBuilder lineMessage = new StringBuilder();
+                lineMessage.append(index + "\t" + line);
 
-        assertFalse(message.toString(), hasError);
+                System.err.println(lineMessage);
+
+                if (errorLines.contains(index)) {
+                    if (lastErrorLine != index - 1) {
+                        message.append('\n');
+                    }
+
+                    message.append("\n  " + lineMessage);
+
+                    lastErrorLine = index;
+                }
+            }
+
+            fail(message.toString());
+        }
     }
 
     protected boolean hasLogErrors(String output)

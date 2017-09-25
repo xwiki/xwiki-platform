@@ -141,6 +141,8 @@ public class AbstractValidationTest extends TestCase
     {
         TestSuite suite = new TestSuite();
 
+        suite.setName(validator.getName());
+
         HttpClient adminClient = new HttpClient();
         // The code that prevents circular redirects (HttpMethodDirector#processRedirectResponse) ignores the query
         // string when comparing the redirect location with the current location. The browser doesn't behave like this

@@ -49,7 +49,7 @@
   &lt;/ul&gt;
 {{/html}}
 
-#set ($docextras = [])
+#set ($displayDocExtra = false)
 {{/velocity}}
 </content>
   <object>

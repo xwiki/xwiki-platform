@@ -87,7 +87,7 @@
   $xwiki.get('ssx').use($config.get('commonPage'))
   ##
   ## Don't load comments, history, etc.
-  #set($docextras = [])
+  #set ($displayDocExtra = false)
   ##
   #doAction($request.getParameter('messageID'),
             $action,

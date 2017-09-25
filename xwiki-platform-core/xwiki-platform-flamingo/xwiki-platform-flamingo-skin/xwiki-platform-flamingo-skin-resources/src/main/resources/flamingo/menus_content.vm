@@ -354,13 +354,17 @@
       ## Display the shortcuts
       ## ----------------------------
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
-        ## Only display a separator if at least one menu entry has been displayed
-        #if ($needsSeparator)
-          #submenuseparator()
+        #set ($viewersContent = "#template('shortcuts.vm')")
+        ## Only show the Viewers section if it contains something to display.
+        #if ($stringtool.isNotBlank("$!viewersContent"))
+          ## Only display a separator if at least one menu entry has been displayed before
+          #if ($needsSeparator)
+            #submenuseparator()
+          #end
+          #submenuheader('core.menu.actions.viewers')
+          $viewersContent
+          #set ($needsSeparator = true)
         #end
-        #submenuheader('core.menu.actions.viewers')
-        #template("shortcuts.vm")
-        #set ($needsSeparator = true)
       #end
     #end
   #end

@@ -28,16 +28,17 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.store.FileDeleteTransactionRunnable;
@@ -55,6 +56,7 @@ import org.xwiki.store.serialization.Serializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.DeletedAttachmentContent;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
@@ -114,17 +116,70 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     @Named("path")
     private DocumentReferenceResolver<String> pathDocumentReferenceResolver;
 
-    /**
-     * This is required because deleted attachments may be looked up by a database id number So we are forced to
-     * simulate the database id numbering scheme even though they are and should be stored with their documents which
-     * are stored by name.
-     */
-    private final Map<Long, String> pathById = new ConcurrentHashMap<Long, String>();
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * The location to persist the pathById map.
      */
     private File pathByIdStore;
+
+    @Override
+    public String getHint()
+    {
+        return FileSystemStoreUtils.HINT;
+    }
+
+    @Override
+    public void delete(AttachmentReference reference, Date deleteDate, long index, boolean bTransaction)
+        throws XWikiException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public DeletedAttachmentContent get(AttachmentReference reference, Date deleteDate, long index,
+        boolean bTransaction) throws XWikiException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void save(XWikiAttachment attachment, Date deleteDate, long index, boolean bTransaction)
+        throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, deleteDate, xcontext);
+
+        // Need to add the ID to the map and persist the map
+        // otherwise the attachment will not be able to loaded by the ID.
+        // TODO standardize a deleted attachment entity reference and deprecate the use of a long integer
+        // as a key to load a deleted attachment with.
+        final String absolutePath =
+            this.fileTools.getDeletedAttachmentFileProvider(attachment.getReference(), deleteDate)
+                .getAttachmentContentFile().getParentFile().getAbsolutePath();
+        final String path = absolutePath.substring(absolutePath.indexOf(this.fileTools.getStorageLocationPath()));
+        final Long id = Long.valueOf(dfa.getId());
+        new StartableTransactionRunnable().runIn(tr);
+
+        // Need to save the updated map right away in case the power goes out or something.
+        new FileSaveTransactionRunnable(this.pathByIdStore, this.fileTools.getTempFile(this.pathByIdStore),
+            this.fileTools.getBackupFile(this.pathByIdStore), this.fileTools.getLockForFile(this.pathByIdStore),
+            new SerializationStreamProvider<Map<Long, String>>(this.attachmentIdMappingSerializer, this.pathById))
+                .runIn(tr);
+
+        try {
+            tr.start();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
+                "Failed to store deleted attachment " + attachment.getFilename() + " for document: "
+                    + attachment.getDoc().getDocumentReference(),
+                e);
+        }
+    }
 
     /**
      * Load the pathById mappings so that attachments can be loaded by database id.
@@ -197,18 +252,19 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     /**
      * Get a StartableTransactionRunnable to save an attachment in the recycle-bin.
      *
-     * @param deleted the FilesystemDeletedAttachment to save.
+     * @param deleted the attachment to save.
+     * @param deleteDate date of the delete
      * @param context the legacy XWikiContext which might be needed to get the content from the attachment, or to load
      *            the attachment versioning store.
      * @return a TransactionRunnable for storing the deleted attachment.
      * @throws XWikiException if one is thrown trying to get data from the attachment or loading the attachment archive
      *             in order to save it in the deleted section.
      */
-    public StartableTransactionRunnable getSaveTrashAttachmentRunnable(final DeletedFilesystemAttachment deleted,
+    public StartableTransactionRunnable getSaveTrashAttachmentRunnable(final XWikiAttachment deleted, Date deleteDate,
         final XWikiContext context) throws XWikiException
     {
         final DeletedAttachmentFileProvider provider =
-            this.fileTools.getDeletedAttachmentFileProvider(deleted.getAttachment(), deleted.getDate());
+            this.fileTools.getDeletedAttachmentFileProvider(deleted.getReference(), deleteDate);
 
         return new SaveTrashAttachmentRunnable(deleted, provider, this.fileTools, this.deletedAttachmentSerializer,
             this.versionSerializer, context);

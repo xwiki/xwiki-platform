@@ -33,7 +33,6 @@ import org.xwiki.store.serialization.Serializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
-import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
@@ -56,56 +55,41 @@ class SaveTrashAttachmentRunnable extends StartableTransactionRunnable
      * @param context the legacy XWikiContext which might be needed to get the attachment archive.
      * @throws XWikiException if loading the attachment content or archive fails.
      */
-    SaveTrashAttachmentRunnable(final DeletedFilesystemAttachment deleted,
-        final DeletedAttachmentFileProvider provider,
+    SaveTrashAttachmentRunnable(final XWikiAttachment deleted, final DeletedAttachmentFileProvider provider,
         final FilesystemStoreTools fileTools,
         final Serializer<DeletedAttachment, ? extends DeletedAttachment> deletedAttachmentSerializer,
-        final Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer,
-        final XWikiContext context)
+        final Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer, final XWikiContext context)
         throws XWikiException
     {
         // Save metadata about the deleted attachment.
         final StreamProvider metaProvider =
-            new SerializationStreamProvider<DeletedAttachment>(deletedAttachmentSerializer, deleted);
+            new SerializationStreamProvider<XWikiAttachment>(deletedAttachmentSerializer, deleted);
         this.addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaFile());
 
         final XWikiAttachment attachment = deleted.getAttachment();
         final XWikiAttachmentArchive archive = attachment.loadArchive(context);
         if (archive == null) {
-            throw new NullPointerException("Failed to load attachment archive, "
-                + "loadArchive() returned null");
+            throw new NullPointerException("Failed to load attachment archive, " + "loadArchive() returned null");
         }
 
         // Save the archive for the deleted attachment.
-        new AttachmentArchiveSaveRunnable(archive,
-            fileTools,
-            provider,
-            versionSerializer,
-            context).runIn(this);
+        new AttachmentArchiveSaveRunnable(archive, fileTools, provider, versionSerializer, context).runIn(this);
 
         // Save the attachment's content.
         final StreamProvider contentProvider = new AttachmentContentStreamProvider(attachment, context);
-        this.addSaver(contentProvider,
-            fileTools,
-            provider.getAttachmentContentFile());
+        this.addSaver(contentProvider, fileTools, provider.getAttachmentContentFile());
     }
 
     /**
-     * Save some content safely in this runnable.
-     * TODO This duplicates AttachmentArchiveSaveRunnable, fix.
+     * Save some content safely in this runnable. TODO This duplicates AttachmentArchiveSaveRunnable, fix.
      *
      * @param provider the means to get the content to save.
      * @param fileTools the means to get the backup file, temporary file, and lock.
      * @param saveHere the location to save the data.
      */
-    private void addSaver(final StreamProvider provider,
-        final FilesystemStoreTools fileTools,
-        final File saveHere)
+    private void addSaver(final StreamProvider provider, final FilesystemStoreTools fileTools, final File saveHere)
     {
-        new FileSaveTransactionRunnable(saveHere,
-            fileTools.getTempFile(saveHere),
-            fileTools.getBackupFile(saveHere),
-            fileTools.getLockForFile(saveHere),
-            provider).runIn(this);
+        new FileSaveTransactionRunnable(saveHere, fileTools.getTempFile(saveHere), fileTools.getBackupFile(saveHere),
+            fileTools.getLockForFile(saveHere), provider).runIn(this);
     }
 }

@@ -121,7 +121,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
                 // External store
                 if (contentStore != null) {
-                    contentStore.save(attachment, index, bTransaction);
+                    contentStore.save(attachment, date, index, bTransaction);
                 }
 
                 return null;
@@ -257,7 +257,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         return getAttachmentRecycleBinContentStore(storeType);
     }
 
-    private AttachmentRecycleBinContentStore getAttachmentRecycleBinContentStore(String storeType)
+    protected AttachmentRecycleBinContentStore getAttachmentRecycleBinContentStore(String storeType)
     {
         if (storeType != null && !storeType.equals(HINT)) {
             try {
@@ -278,7 +278,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
         if (contentStore != null) {
             AttachmentReference reference = deletedAttachment.getAttachmentReference();
-            DeletedAttachmentContent content = contentStore.get(reference, deletedAttachment.getId(), bTransaction);
+            DeletedAttachmentContent content =
+                contentStore.get(reference, deletedAttachment.getDate(), deletedAttachment.getId(), bTransaction);
 
             try {
                 FieldUtils.writeDeclaredField(deletedAttachment, "xml", content, true);
@@ -318,7 +319,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
             getAttachmentRecycleBinContentStore(deletedAttachment.getXmlStore());
 
         if (contentStore != null) {
-            contentStore.delete(deletedAttachment.getAttachmentReference(), deletedAttachment.getId(), bTransaction);
+            contentStore.delete(deletedAttachment.getAttachmentReference(), deletedAttachment.getDate(),
+                deletedAttachment.getId(), bTransaction);
         }
     }
 }

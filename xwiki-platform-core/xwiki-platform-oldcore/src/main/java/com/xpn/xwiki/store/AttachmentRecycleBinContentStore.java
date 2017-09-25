@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.Date;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 
@@ -44,28 +46,32 @@ public interface AttachmentRecycleBinContentStore
      * Save attachment to recycle bin.
      *
      * @param attachment the attachment to save
+     * @param deleteDate the date of the delete
      * @param index the index of the deleted attachment
      * @param bTransaction indicate if the store should use old transaction(false) or create new (true)
      * @throws XWikiException if error in saving
      */
-    void save(XWikiAttachment attachment, long index, boolean bTransaction) throws XWikiException;
+    void save(XWikiAttachment attachment, Date deleteDate, long index, boolean bTransaction) throws XWikiException;
 
     /**
      * @param reference the reference of the deleted attachment
+     * @param deleteDate the date of the delete
      * @param index the index of the deleted attachment
      * @param bTransaction indicate if the store should use old transaction(false) or create new (true)
      * @return specified deleted attachment from recycle bin. null if not found.
      * @throws XWikiException if error while loading
      */
-    DeletedAttachmentContent get(AttachmentReference reference, long index, boolean bTransaction) throws XWikiException;
+    DeletedAttachmentContent get(AttachmentReference reference, Date deleteDate, long index, boolean bTransaction)
+        throws XWikiException;
 
     /**
      * Permanently delete attachment content from recycle bin.
      *
      * @param reference the reference of the deleted attachment
+     * @param deleteDate the date of the delete
      * @param index the index of the deleted attachment
      * @param bTransaction indicate if the store should use old transaction(false) or create new (true)
      * @throws XWikiException if any error
      */
-    void delete(AttachmentReference reference, long index, boolean bTransaction) throws XWikiException;
+    void delete(AttachmentReference reference, Date deleteDate, long index, boolean bTransaction) throws XWikiException;
 }

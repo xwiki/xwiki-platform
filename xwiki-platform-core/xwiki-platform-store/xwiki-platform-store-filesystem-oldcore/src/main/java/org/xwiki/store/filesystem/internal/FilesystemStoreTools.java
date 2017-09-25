@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -70,11 +71,13 @@ public interface FilesystemStoreTools
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
      * location which is repeatable only with the same attachment name, containing document, and date of deletion.
      *
-     * @param attachment the attachment to get a tools for.
+     * @param attachmentReference the reference of the attachment
      * @param deleteDate the date the attachment was deleted.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
+     * @since 9.9RC1
      */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(XWikiAttachment attachment, Date deleteDate);
+    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(AttachmentReference attachmentReference,
+        Date deleteDate);
 
     /**
      * Get an instance of DeletedDocumentFileProvider which will save everything to do with an document in a separate

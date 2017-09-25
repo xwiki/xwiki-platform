@@ -51,7 +51,7 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     private static final String DESCRIPTION = "Insert a template.";
 
     @Inject
-    private TemplateManager renderer;
+    private TemplateManager templates;
 
     /**
      * Default constructor.
@@ -77,10 +77,10 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
         throws MacroExecutionException
     {
         if (parameters.isOutput()) {
-            return this.renderer.getXDOMNoException(parameters.getName()).getChildren();
+            return this.templates.getXDOMNoException(parameters.getName()).getChildren();
         } else {
             try {
-                this.renderer.execute(parameters.getName());
+                this.templates.execute(parameters.getName());
             } catch (Exception e) {
                 throw new MacroExecutionException("Failed to execute template [" + parameters.getName() + "]", e);
             }

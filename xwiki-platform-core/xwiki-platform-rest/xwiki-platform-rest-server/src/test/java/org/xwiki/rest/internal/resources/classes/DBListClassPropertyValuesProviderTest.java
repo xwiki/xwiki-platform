@@ -22,8 +22,6 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import javax.inject.Provider;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,12 +38,9 @@ import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -60,15 +55,11 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.8RC1
  */
-public class DBListClassPropertyValuesProviderTest
+public class DBListClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
     @Rule
     public MockitoComponentMockingRule<ClassPropertyValuesProvider> mocker =
         new MockitoComponentMockingRule<ClassPropertyValuesProvider>(DBListClassPropertyValuesProvider.class);
-
-    private Provider<XWikiContext> xcontextProvider;
-
-    private DocumentReference classReference = new DocumentReference("wiki", "Some", "Class");
 
     private DBListClass dbListClass = new DBListClass();
 
@@ -76,39 +67,27 @@ public class DBListClassPropertyValuesProviderTest
 
     private AuthorExecutor authorExecutor;
 
-    private QueryBuilder<ListClass> usedValuesQueryBuilder;
-
     @Before
     public void configure() throws Exception
     {
-        this.xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
-        XWikiContext xcontext = mock(XWikiContext.class);
-        XWiki xwiki = mock(XWiki.class);
-        XWikiDocument classDocument = mock(XWikiDocument.class);
-        BaseClass xclass = mock(BaseClass.class);
+        super.configure();
 
-        when(this.xcontextProvider.get()).thenReturn(xcontext);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getDocument(new ClassPropertyReference("status", this.classReference), xcontext))
-            .thenReturn(classDocument);
-        when(xwiki.getDocument(new ClassPropertyReference("date", this.classReference), xcontext))
-            .thenReturn(classDocument);
-        when(xwiki.getDocument(new ClassPropertyReference("category", this.classReference), xcontext))
-            .thenReturn(classDocument);
-        when(classDocument.getXClass()).thenReturn(xclass);
-        when(xclass.get("category")).thenReturn(dbListClass);
-        when(xclass.get("date")).thenReturn(new DateClass());
+        addProperty("category", this.dbListClass, true);
+        addProperty("date", new DateClass(), false);
 
-        XWikiDocument ownerDocument = mock(XWikiDocument.class);
-        DocumentReference authorReference = new DocumentReference("wiki", "Users", "alice");
-        dbListClass.setOwnerDocument(ownerDocument);
-        when(ownerDocument.getAuthorReference()).thenReturn(authorReference);
+        when(this.xcontext.getWiki().getDocument(new ClassPropertyReference("status", this.classReference),
+            this.xcontext)).thenReturn(this.classDocument);
 
         this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.authorExecutor = this.mocker.getInstance(AuthorExecutor.class);
         DefaultParameterizedType listQueryBuilderType =
             new DefaultParameterizedType(null, QueryBuilder.class, ListClass.class);
-        this.usedValuesQueryBuilder = this.mocker.getInstance(listQueryBuilderType, "usedValues");
+    }
+
+    @Override
+    protected MockitoComponentManagerRule getMocker()
+    {
+        return this.mocker;
     }
 
     @Test
@@ -133,7 +112,7 @@ public class DBListClassPropertyValuesProviderTest
             this.mocker.getComponentUnderTest().getValues(propertyReference, 0);
             fail();
         } catch (XWikiRestException expected) {
-            assertEquals("This [status reference] is not a Database List property.", expected.getMessage());
+            assertEquals("This [status reference] is not a [DBListClass] property.", expected.getMessage());
         }
     }
 

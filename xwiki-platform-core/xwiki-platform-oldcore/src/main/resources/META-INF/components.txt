@@ -86,6 +86,8 @@ com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.objects.classes.DefaultDBListQueryBuilder
+com.xpn.xwiki.internal.objects.classes.DefaultGroupsQueryBuilder
+com.xpn.xwiki.internal.objects.classes.DefaultUsersQueryBuilder
 com.xpn.xwiki.internal.objects.classes.ExplicitlyAllowedValuesDBListQueryBuilder
 com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesDBListQueryBuilder
 com.xpn.xwiki.internal.objects.classes.UsedValuesListQueryBuilder

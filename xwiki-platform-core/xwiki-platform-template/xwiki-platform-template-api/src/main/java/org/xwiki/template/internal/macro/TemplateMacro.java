@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -76,14 +77,16 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     public List<Block> execute(TemplateMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        XDOM result;
+        try {
+            result = this.templates.execute(parameters.getName());
+        } catch (Exception e) {
+            throw new MacroExecutionException("Failed to execute template [" + parameters.getName() + "]", e);
+        }
+
         if (parameters.isOutput()) {
-            return this.templates.getXDOMNoException(parameters.getName()).getChildren();
+            return result.getChildren();
         } else {
-            try {
-                this.templates.execute(parameters.getName());
-            } catch (Exception e) {
-                throw new MacroExecutionException("Failed to execute template [" + parameters.getName() + "]", e);
-            }
 
             return Collections.emptyList();
         }

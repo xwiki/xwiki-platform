@@ -348,11 +348,17 @@
         <td class="xwiki-livetable-display-header-filter">
           #if ($columnProperties.filterable != false)
             #set ($columnXClassName = $columnProperties.get('class'))
+            #set ($columnXPropertyName = $column)
             #if (!$columnXClassName)
-              #set ($columnXClassName = $xclassName)
+              #if ($column.startsWith('doc.'))
+                #set ($columnXClassName = 'XWiki.DocumentClass')
+                #set ($columnXPropertyName = $column.substring(4))
+              #else
+                #set ($columnXClassName = $xclassName)
+              #end
             #end
             #set ($xclass = $xwiki.getDocument($columnXClassName).getxWikiClass())
-            #set ($xproperty = $xclass.get($column))
+            #set ($xproperty = $xclass.get($columnXPropertyName))
             #livetable_filter($column $columnProperties $xproperty)
           #end
         </td>
@@ -380,6 +386,11 @@
       'Users': 'suggest'
     })
     #set ($filterType = $filterTypeByXPropertyType.get($xproperty.classType))
+    #if ("$!filterType" == '')
+      ## If we get here then it means the column is filterable but we could not determine the filter type. Use the text
+      ## filter in this case because it is the most generic.
+      #set ($filterType = 'text')
+    #end
   #end
   #if ($filterType == 'list' || $filterType == 'multilist')
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
@@ -434,7 +445,7 @@
       {'forceSkinAction' : true, 'language' : $xcontext.locale}))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($column)">
+      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
     </select>
   #end
 #end

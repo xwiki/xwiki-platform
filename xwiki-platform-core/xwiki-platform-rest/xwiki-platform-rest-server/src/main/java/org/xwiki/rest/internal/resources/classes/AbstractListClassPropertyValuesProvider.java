@@ -21,44 +21,31 @@ package org.xwiki.rest.internal.resources.classes;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryBuilder;
+import org.xwiki.query.QueryException;
 import org.xwiki.rest.model.jaxb.PropertyValues;
-import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 
-import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
- * Provides values for Database List properties.
+ * Base class for {@link ClassPropertyValuesProvider} implementations that work with list properties.
  * 
+ * @param <T> the concrete list property type
  * @version $Id$
- * @since 9.8RC1
+ * @since 9.8
  */
-@Component
-@Named("DBList")
-@Singleton
-public class DBListClassPropertyValuesProvider extends AbstractListClassPropertyValuesProvider<DBListClass>
+public abstract class AbstractListClassPropertyValuesProvider<T extends ListClass>
+    extends AbstractClassPropertyValuesProvider<T>
 {
     @Inject
-    private QueryBuilder<DBListClass> allowedValuesQueryBuilder;
-
-    @Inject
-    private AuthorExecutor authorExecutor;
+    @Named("usedValues")
+    protected QueryBuilder<ListClass> usedValuesQueryBuilder;
 
     @Override
-    protected Class<DBListClass> getPropertyType()
+    protected PropertyValues getUsedValues(T propertyDefinition, int limit, String filter) throws QueryException
     {
-        return DBListClass.class;
-    }
-
-    @Override
-    protected PropertyValues getAllowedValues(DBListClass dbListClass, int limit, String filter) throws Exception
-    {
-        // Execute the query with the rights of the class last author because the query may not be safe.
-        return this.authorExecutor.call(() -> {
-            return getValues(this.allowedValuesQueryBuilder.build(dbListClass), limit, filter, dbListClass);
-        }, dbListClass.getOwnerDocument().getAuthorReference());
+        return getValues(this.usedValuesQueryBuilder.build(propertyDefinition), limit, filter, propertyDefinition);
     }
 }

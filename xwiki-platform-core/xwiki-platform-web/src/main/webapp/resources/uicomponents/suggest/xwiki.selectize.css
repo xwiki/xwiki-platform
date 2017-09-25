@@ -23,6 +23,24 @@
   padding-right: 55px;
 }
 
+/* Option styles */
+.xwiki-selectize-option {
+  white-space: nowrap;
+}
+.xwiki-selectize-option-icon {
+  margin-right: .3em;
+}
+img.xwiki-selectize-option-icon {
+  border-radius: 3px;
+  max-height: 18px;
+  max-width: 18px;
+  vertical-align: text-top;
+}
+a.xwiki-selectize-option-label {
+  color: inherit;
+  text-decoration: none;
+}
+
 /* Live Table Filter */
 .xwiki-livetable-display-header-filter .selectize-input {
   display: block;

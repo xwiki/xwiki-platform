@@ -53,6 +53,14 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     } else {
       output.find('.xwiki-selectize-option-icon').remove();
     }
+    var url = option && option.url;
+    if (typeof url === 'string') {
+      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url).click(function(event) {
+        // Clicking on the label should select the option not follow the link.
+        event.preventDefault();
+      });
+      output.find('.xwiki-selectize-option-label').replaceWith(anchor);
+    }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
     output.find('.xwiki-selectize-option-label').text(label);
     return output;

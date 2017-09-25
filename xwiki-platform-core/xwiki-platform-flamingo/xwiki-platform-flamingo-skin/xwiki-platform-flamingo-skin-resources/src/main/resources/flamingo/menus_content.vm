@@ -389,9 +389,12 @@
         #end
       #end
     #end
-    #if ($canDelete)
+    #if ($canDelete && $displayAdminMenu)
       shortcut.add("$services.localization.render('core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
       shortcut.add("$services.localization.render('core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+    #end
+    #if ($canView && $displayMoreActionsMenu)
+      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() { location.href = $('tmViewSource').href; }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
     #end
   //]]>
   </script>

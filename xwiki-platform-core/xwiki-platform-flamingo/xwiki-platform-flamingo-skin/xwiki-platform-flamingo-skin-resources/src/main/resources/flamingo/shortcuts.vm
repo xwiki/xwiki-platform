@@ -69,16 +69,3 @@
   #end
   #submenuitem($url, $escapetool.xml($extraText), $idHref, '', $glyphIcon)
 #end
-
-###########################################
-##        ADD KEYBOARD SHORTCUTS
-###########################################
-#if ($keyboardShortcutsEnabled)
-  <script type="text/javascript">
-  //<![CDATA[
-    shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
-      location.href = $('tmViewSource').href;
-    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
-  //]]>
-  </script>
-#end

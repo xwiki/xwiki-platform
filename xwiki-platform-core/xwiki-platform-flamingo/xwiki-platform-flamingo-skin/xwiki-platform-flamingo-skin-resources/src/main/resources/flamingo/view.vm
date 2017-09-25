@@ -27,7 +27,7 @@
   #end
   <div class="clearfloats"></div>
   </div>## mainContentArea
-  #if($viewer == 'content' && $displayDocExtra)
+  #if($viewer == 'content')
     #template("docextra.vm")
   #end
   </div>## main

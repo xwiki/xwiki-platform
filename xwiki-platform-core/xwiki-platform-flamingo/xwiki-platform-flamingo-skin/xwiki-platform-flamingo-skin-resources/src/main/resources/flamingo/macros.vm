@@ -422,8 +422,9 @@
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
-      size="$!columnProperties.size" title="$escapetool.xml($services.localization.render(
-        'platform.livetable.filtersTitle', [$services.localization.render("${transprefix}$column")]))" />
+      #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
+      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+        [$services.localization.render("${transprefix}$column")]))" />
   #elseif ($filterType == 'date')
     #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker',
@@ -434,7 +435,8 @@
     #if ("$!dateFormat" == '')
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
-    <input type="text" data-type="date" data-dateformat="$escapetool.xml($dateFormat)" size="$!columnProperties.size"
+    <input type="text" data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
+      #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
       [$services.localization.render("${transprefix}$column")]))" />
   #elseif ($filterType == 'suggest' && $xproperty)

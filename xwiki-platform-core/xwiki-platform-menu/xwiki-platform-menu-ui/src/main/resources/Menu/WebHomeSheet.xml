@@ -42,6 +42,6 @@
   <content>{{include reference="AppWithinMinutes.LiveTableViewSheet"/}}
 
 {{velocity}}
-#set($docextras = [])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

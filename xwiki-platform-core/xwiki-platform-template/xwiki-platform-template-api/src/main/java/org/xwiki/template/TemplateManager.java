@@ -43,7 +43,10 @@ public interface TemplateManager
      * @param template the template
      * @return the XDOM source of the template
      * @since 8.3RC1
+     * @deprecated since 9.8 and 8.4.6. This API is dangerous and inconsistent, prefer
+     *             {@link #executeNoException(Template)}
      */
+    @Deprecated
     XDOM getXDOMNoException(Template template);
 
     /**
@@ -53,7 +56,10 @@ public interface TemplateManager
      * 
      * @param templateName the name of the template
      * @return the XDOM source of the template
+     * @deprecated since 9.8 and 8.4.6. This API is dangerous and inconsistent, prefer
+     *             {@link #executeNoException(String)}
      */
+    @Deprecated
     XDOM getXDOMNoException(String templateName);
 
     /**
@@ -63,7 +69,9 @@ public interface TemplateManager
      * @return the XDOM source of the template
      * @throws Exception when failing to parse the template
      * @since 8.3RC1
+     * @deprecated since 9.8 and 8.4.6. This API is dangerous and inconsistent, prefer {@link #execute(Template)}
      */
+    @Deprecated
     XDOM getXDOM(Template template) throws Exception;
 
     /**
@@ -72,7 +80,9 @@ public interface TemplateManager
      * @param templateName the name of the template
      * @return the XDOM source of the template
      * @throws Exception when failing to parse the template
+     * @deprecated since 9.8 and 8.4.6. This API is dangerous and inconsistent, prefer {@link #execute(String)}
      */
+    @Deprecated
     XDOM getXDOM(String templateName) throws Exception;
 
     /**
@@ -232,8 +242,7 @@ public interface TemplateManager
      */
     default Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
-        throw new UnsupportedOperationException(
-                "org.xwiki.template.TemplateManager#createStringTemplate() "
-                        + "has been called without being reimplemented.");
+        throw new UnsupportedOperationException("org.xwiki.template.TemplateManager#createStringTemplate() "
+            + "has been called without being reimplemented.");
     }
 }

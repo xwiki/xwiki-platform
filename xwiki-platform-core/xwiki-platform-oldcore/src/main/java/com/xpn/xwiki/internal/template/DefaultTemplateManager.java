@@ -43,24 +43,28 @@ public class DefaultTemplateManager implements TemplateManager
     private InternalTemplateManager templateManager;
 
     @Override
+    @Deprecated
     public XDOM getXDOMNoException(Template template)
     {
         return this.templateManager.getXDOMNoException(template);
     }
 
     @Override
+    @Deprecated
     public XDOM getXDOMNoException(String templateName)
     {
         return this.templateManager.getXDOMNoException(templateName);
     }
 
     @Override
+    @Deprecated
     public XDOM getXDOM(Template template) throws Exception
     {
         return this.templateManager.getXDOM(template);
     }
 
     @Override
+    @Deprecated
     public XDOM getXDOM(String templateName) throws Exception
     {
         return this.templateManager.getXDOM(templateName);

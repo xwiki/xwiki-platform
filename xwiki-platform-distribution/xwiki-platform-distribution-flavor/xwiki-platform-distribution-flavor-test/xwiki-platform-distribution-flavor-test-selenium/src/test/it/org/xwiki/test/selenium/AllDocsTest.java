@@ -25,7 +25,7 @@ import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 
 /**
  * Verify the table view for AllDocs wiki document.
- * 
+ *
  * @version $Id$
  */
 public class AllDocsTest extends AbstractXWikiTestCase
@@ -81,8 +81,11 @@ public class AllDocsTest extends AbstractXWikiTestCase
         // Validate input suggest for Last Author field.
         open("Main", "AllDocs");
         waitForTextContains("//span[@class='xwiki-livetable-pagination-content']", "1 2");
-        getSelenium().focus("doc.author");
-        getSelenium().typeKeys("doc.author", "SomeUnknownAuthor");
+        // "doc.author", but selecting the input element contained in the "selectized" suggest control.
+        getSelenium().focus("xwiki-livetable-alldocs-filter-4-selectized");
+        getSelenium().typeKeys("xwiki-livetable-alldocs-filter-4-selectized", "SomeUnknownAuthor");
+        waitForElement("//div[@class='selectize-dropdown-content']/div[contains(@class, 'create')]");
+        getSelenium().click("//div[@class='selectize-dropdown-content']/div[contains(@class, 'create')]");
         waitForTextPresent("//span[@class='xwiki-livetable-pagination-content']", "");
         assertElementNotPresent("//td[contains(@class, 'doc_location')]//a[text()='" + pageName + "']");
 

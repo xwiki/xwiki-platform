@@ -19,15 +19,20 @@
  */
 package org.xwiki.wysiwyg.script;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
@@ -35,6 +40,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
+import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -79,6 +85,13 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    @Named("office")
+    private AttachmentImporter officeAttachmentImporter;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -235,5 +248,25 @@ public class WysiwygEditorScriptService implements ScriptService
     private XWikiDocument setSecurityDocument(XWikiDocument document)
     {
         return (XWikiDocument) this.xcontextProvider.get().put(XWikiDocument.CKEY_SDOC, document);
+    }
+
+    /**
+     * Builds the annotated XHTML needed to import the specified office attachment in the WYSIWYG editor.
+     * 
+     * @param attachmentReference the office attachment to import
+     * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when importing
+     *            office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
+     *            instead of converting the content of the office file to wiki syntax
+     * @return the annotated XHTML needed to import the specified attachment into the content of the WYSIWYG editor
+     */
+    public String importOfficeAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
+    {
+        try {
+            return this.officeAttachmentImporter.toHTML(attachmentReference, parameters);
+        } catch (Exception e) {
+            this.logger.warn("Failed to import office attachment [{}]. Root cause is: {}",
+                this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
     }
 }

@@ -66,6 +66,21 @@ ckeditor.plugin.macro.buttonHint=XWiki Macro
 ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
 ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
 
+ckeditor.plugin.office.importer.title=Import Office File
+ckeditor.plugin.office.importer.filePath=File Path
+ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+ckeditor.plugin.office.importer.filterStyles=Filter Styles
+ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+ckeditor.plugin.office.importer.required=Required
+ckeditor.plugin.office.importer.import=Import
+ckeditor.plugin.office.importer.inProgress=Importing office file...
+ckeditor.plugin.office.importer.done=Office file successfully imported.
+ckeditor.plugin.office.importer.fail=Office import failed.
+ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
+ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
+
 ckeditor.plugin.resource.notSpecified=The {0} is not specified.
 ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.

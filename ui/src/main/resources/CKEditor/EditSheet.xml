@@ -299,7 +299,7 @@ define('xwiki-ckeditor', [
     if (sourceDocumentReference) {
       sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
     }
-    return {
+    var config = {
       allowedContent: allowedContentBySyntax[$(element).attr('data-sourceDocumentSyntax')],
       filebrowserUploadUrl: sourceDocument.getURL('get', $.param({
         sheet: 'CKEditor.FileUploader',
@@ -321,6 +321,12 @@ define('xwiki-ckeditor', [
         htmlConverter: sourceDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
       }
     };
+    if ($(element).attr('data-officeImporterSupported') === 'true') {
+      config['xwiki-office'] = {
+        importer: sourceDocument.getURL('get', 'sheet=CKEditor.OfficeImporter')
+      };
+    }
+    return config;
   };
 
   var oldReplace = ckeditor.replace;
@@ -1096,20 +1102,27 @@ td.cke_dialog_contents_body {
 }
 
 /**
- * Macro tool bar icon (Glyphicon)
+ * Custom tool bar icons (Glyphicon)
  */
-a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki-macro_icon {
+a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki-macro_icon,
+a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__officeimporter_icon {
   /* This is needed for XWiki versions older than 7.1M1 where we overwrite the icons path (see above). */
   background-image: none !important;
   font-family: 'Glyphicons Halflings';
   position: relative;
   top: 1px;
 }
-.cke_button_icon.cke_button__xwiki-macro_icon::before {
-  content: "\e019";
+.cke_button_icon.cke_button__xwiki-macro_icon::before,
+.cke_button_icon.cke_button__officeimporter_icon::before {
   display: inline-block;
   text-align: center;
   width: 16px;
+}
+.cke_button_icon.cke_button__xwiki-macro_icon::before {
+  content: "\e019";
+}
+.cke_button_icon.cke_button__officeimporter_icon::before {
+  content: "\e022";
 }</code>
     </property>
     <property>

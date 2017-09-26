@@ -123,10 +123,14 @@
     'content': $parameters.content
   })
   #set ($content = "#renderContentSheet")
+  #set ($emptyAttachmentReference = $services.model.resolveAttachment('CKEditor.OfficeImporter@empty.txt'))
+  #set ($officeImporterSupported = $services.officemanager.serverState == 'Connected' &amp;&amp;
+    $services.wysiwyg.importOfficeAttachment($emptyAttachmentReference, {}).equals(''))
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
     'spellcheck': false,
-    'data-sourceDocumentSyntax': $sourceDocument.syntax.toIdString()
+    'data-sourceDocumentSyntax': $sourceDocument.syntax.toIdString(),
+    'data-officeImporterSupported': $officeImporterSupported
   }))
   &lt;textarea
     #foreach ($entry in $parameters.attributes.entrySet())

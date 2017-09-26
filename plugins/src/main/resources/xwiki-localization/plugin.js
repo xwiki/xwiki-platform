@@ -48,9 +48,11 @@
 
   var getNestedProperty = function(object, path) {
     if (path && path.length > 0) {
-      var parts = path.split('.', 2);
-      if (object && object.hasOwnProperty(parts[0])) {
-        return getNestedProperty(object[parts[0]], parts[1]);
+      var dotIndex = path.indexOf('.');
+      var left = path.substr(0, dotIndex);
+      var right = path.substr(dotIndex + 1);
+      if (object && object.hasOwnProperty(left)) {
+        return getNestedProperty(object[left], right);
       } else if (object && object.hasOwnProperty(path)) {
         return object[path];
       } else {

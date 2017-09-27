@@ -67,7 +67,9 @@
       'content': $tdoc.content,
       'attributes': {
         'id': 'content',
-        'name': 'content'
+        'name': 'content',
+        'rows': 25,
+        'cols': 80
       }
     })
     #ckeditor($parameters)

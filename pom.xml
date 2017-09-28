@@ -475,10 +475,15 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
           </exclusion>
+          <!-- Restlet does not declare the right version of JAX-RS API... -->
           <exclusion>
-            <!-- Restlet does not declare the right version of JAX-RS API... -->
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
+          </exclusion>
+          <!-- Restlet does not use the right artifact for JAXB implementation -->
+          <exclusion>
+            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -511,6 +516,11 @@
           <exclusion>
             <artifactId>stax-api</artifactId>
             <groupId>javax.xml.stream</groupId>
+          </exclusion>
+          <!-- Restlet does not use the right artifact for JAXB implementation -->
+          <exclusion>
+            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -639,6 +649,16 @@
               <extensionOverride>
                 <id>org.dom4j:dom4j</id>
                 <features>dom4j:dom4j</features>
+              </extensionOverride>
+              <extensionOverride>
+                <!-- Right id of the JAXB reference implementation -->
+                <id>org.glassfish.jaxb:jaxb-runtime</id>
+                <features>com.sun.xml.bind:jaxb-impl</features>
+              </extensionOverride>
+              <extensionOverride>
+                <!-- Right id of the JAXB reference implementation -->
+                <id>org.glassfish.jaxb:jaxb-core</id>
+                <features>com.sun.xml.bind:jaxb-core</features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

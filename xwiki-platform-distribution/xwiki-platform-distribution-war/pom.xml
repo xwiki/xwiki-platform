@@ -127,8 +127,6 @@
                  log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
                - Exclude legacy modules if the legacy profile is not enabled so that we don't have both aspectified JAR
                  and non aspectified ones
-               - Exclude JavaBeans Activation Framework (activation-*.jar) since it's included in Java SE 6.
-               - Exclude JAXB since it's included in Java SE 6
                - Exclude STAX API since it's included in Java SE 6
                - Exclude all XAR files from being placed in WEB-INF/lib. This is done by the WAR plugin which supports
                  XAR files (not our format, some other format! See https://jira.codehaus.org/browse/MWAR-281). The
@@ -138,9 +136,6 @@
           <packagingExcludes>
             WEB-INF/lib/commons-logging-*.jar,
             %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
-            WEB-INF/lib/activation-*.jar,
-            WEB-INF/lib/jaxb-impl-*.jar,
-            WEB-INF/lib/jaxb-api-*.jar,
             WEB-INF/lib/stax-api-*.jar,
             WEB-INF/extensions/*.xar
           </packagingExcludes>

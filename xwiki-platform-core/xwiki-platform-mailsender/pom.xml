@@ -49,13 +49,6 @@
       <artifactId>mock-javamail</artifactId>
       <version>1.7</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- Already part of Java SE -->
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

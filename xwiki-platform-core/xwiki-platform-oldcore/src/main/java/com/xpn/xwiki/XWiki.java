@@ -6557,7 +6557,8 @@ public class XWiki implements EventListener
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
     {
-        LOGGER.debug("Rolling back [" + tdoc + "] to version " + rev);
+        LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
+
         // Let's clone rolledbackDoc since we might modify it
         XWikiDocument rolledbackDoc = getDocument(tdoc, rev, context).clone();
 
@@ -6592,7 +6593,7 @@ public class XWiki implements EventListener
                 XWikiAttachment equivalentAttachment = tdoc.getAttachment(filename);
                 if (equivalentAttachment == null) {
                     // Deleted attachment
-                    LOGGER.debug("Deleted attachment: " + filename);
+                    LOGGER.debug("Deleted attachment: [{}]", filename);
                     toRestore.add(oldAttachment);
                     continue;
                 }
@@ -6605,7 +6606,7 @@ public class XWiki implements EventListener
                 if (equivalentAttachmentRevision == null
                     || equivalentAttachmentRevision.getDate().getTime() != oldAttachment.getDate().getTime()) {
                     // Recreated attachment
-                    LOGGER.debug("Recreated attachment: " + filename);
+                    LOGGER.debug("Recreated attachment: [{}]", filename);
                     // If the attachment trash is not available, don't lose the existing attachment
                     if (getAttachmentRecycleBinStore() != null) {
                         getAttachmentRecycleBinStore().saveToRecycleBin(equivalentAttachment, context.getUser(),
@@ -6616,7 +6617,7 @@ public class XWiki implements EventListener
                 }
                 if (!StringUtils.equals(oldAttachment.getVersion(), equivalentAttachment.getVersion())) {
                     // Updated attachment
-                    LOGGER.debug("Updated attachment: " + filename);
+                    LOGGER.debug("Updated attachment: [{}]", filename);
                     toRevert.add(equivalentAttachment);
                 }
             }
@@ -6669,7 +6670,7 @@ public class XWiki implements EventListener
                         // Not found in the trash, nothing left to do
                         continue;
                     }
-                    XWikiAttachment restoredAttachment = correctVariant.restoreAttachment(null, context);
+                    XWikiAttachment restoredAttachment = correctVariant.restoreAttachment();
                     XWikiAttachment restoredAttachmentRevision =
                         restoredAttachment.getAttachmentRevision(attachmentToRestore.getVersion(), context);
 

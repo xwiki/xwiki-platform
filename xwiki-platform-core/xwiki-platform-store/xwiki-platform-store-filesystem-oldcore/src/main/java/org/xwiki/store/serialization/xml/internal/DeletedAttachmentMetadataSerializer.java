@@ -20,18 +20,17 @@
 package org.xwiki.store.serialization.xml.internal;
 
 import java.io.IOException;
-import java.util.Date;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
-import org.xwiki.store.legacy.doc.internal.MutableDeletedFilesystemAttachment;
 import org.xwiki.store.serialization.xml.XMLSerializer;
+
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A serializer for saving the metadata from a deleted XWikiAttachment.
@@ -42,8 +41,7 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
 @Component
 @Named("deleted-attachment-meta/1.0")
 @Singleton
-public class DeletedAttachmentMetadataSerializer
-    extends AbstractXMLSerializer<DeletedFilesystemAttachment, MutableDeletedFilesystemAttachment>
+public class DeletedAttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAttachment, XWikiAttachment>
 {
     /**
      * The root element for serialized element.
@@ -61,16 +59,6 @@ public class DeletedAttachmentMetadataSerializer
     private static final String THIS_SERIALIZER = "deletedattachment-meta/1.0";
 
     /**
-     * Interpret a node by this name as the document full name of the deleter's user document.
-     */
-    private static final String DELETER = "deleter";
-
-    /**
-     * Interpret this node as the date of deletion in seconds from the epoch.
-     */
-    private static final String DATE_DELETED = "datedeleted";
-
-    /**
      * Interpret this node as the an attachment to be parsed by the attachment-meta serializer.
      */
     private static final String ATTACHMENT = "attachment";
@@ -83,38 +71,29 @@ public class DeletedAttachmentMetadataSerializer
     private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
     @Override
-    public MutableDeletedFilesystemAttachment parse(final Element docel) throws IOException
+    public XWikiAttachment parse(final Element docel) throws IOException
     {
         if (!ROOT_ELEMENT_NAME.equals(docel.getName())) {
-            throw new IOException("XML not recognizable as deleted attachment metadata, "
-                + "expecting <deletedattachment> tag");
+            throw new IOException(
+                "XML not recognizable as deleted attachment metadata, expecting <deletedattachment> tag");
         }
         if (docel.attribute(SERIALIZER_PARAM) == null
-            || !THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue()))
-        {
-            throw new IOException("Cannot parse this deleted attachment metadata, "
-                + "it was saved with a different serializer.");
+            || !THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue())) {
+            throw new IOException(
+                "Cannot parse this deleted attachment metadata, it was saved with a different serializer.");
         }
-        final MutableDeletedFilesystemAttachment out = new MutableDeletedFilesystemAttachment();
 
-        out.setDeleter(docel.element(DELETER).getText());
-        out.setDate(new Date(Long.parseLong(docel.element(DATE_DELETED).getText())));
-        out.setAttachment(this.attachSerializer.parse(docel.element(ATTACHMENT)), null);
-
-        return out;
+        return this.attachSerializer.parse(docel.element(ATTACHMENT));
     }
 
     @Override
-    public void serialize(final DeletedFilesystemAttachment delAttach, final XMLWriter writer)
-        throws IOException
+    public void serialize(final XWikiAttachment delAttach, final XMLWriter writer) throws IOException
     {
         final Element docel = new DOMElement(ROOT_ELEMENT_NAME);
         docel.addAttribute(SERIALIZER_PARAM, THIS_SERIALIZER);
         writer.writeOpen(docel);
 
-        writer.write(new DOMElement(DELETER).addText(delAttach.getDeleter()));
-        writer.write(new DOMElement(DATE_DELETED).addText(delAttach.getDate().getTime() + ""));
-        this.attachSerializer.serialize(delAttach.getAttachment(), writer);
+        this.attachSerializer.serialize(delAttach, writer);
 
         writer.writeClose(docel);
     }

@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -512,8 +513,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * Retrieve an attachment as an XML string. You should prefer
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)} to avoid
-     * memory loads when appropriate.
+     * {@link #toXML(OutputTarget, boolean, boolean, boolean, XWikiContext)} to avoid memory loads when appropriate.
      *
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archived versions are also included
@@ -527,12 +527,30 @@ public class XWikiAttachment implements Cloneable
         try {
             StringWriter writer = new StringWriter();
             toXML(new DefaultWriterOutputTarget(writer), bWithAttachmentContent, bWithVersions, true, context);
+
             return writer.toString();
         } catch (IOException e) {
             LOGGER.error("Failed to write attachment XML", e);
 
             return "";
         }
+    }
+
+    /**
+     * Retrieve an attachment as an XML string. You should prefer
+     * {@link #toXML(OutputTarget, boolean, boolean, boolean, XWikiContext)} to avoid memory loads when appropriate.
+     *
+     * @param context current XWikiContext
+     * @return a string containing an XML representation of the attachment
+     * @throws XWikiException when an error occurs during wiki operations
+     * @since 9.9RC1
+     */
+    public String toXML() throws XWikiException
+    {
+        StringWriter writer = new StringWriter();
+        toXML(new DefaultWriterOutputTarget(writer), true, true, true, StandardCharsets.UTF_8.name());
+
+        return writer.toString();
     }
 
     /**
@@ -594,12 +612,11 @@ public class XWikiAttachment implements Cloneable
      * @param bWithVersions if true, all archive version is also included
      * @param format true if the XML should be formated
      * @param encoding the encoding to use when serializing XML
-     * @throws IOException when an error occurs during streaming operation
      * @throws XWikiException when an error occurs during xwiki operation
      * @since 9.9RC1
      */
     public void toXML(OutputTarget out, boolean bWithAttachmentContent, boolean bWithVersions, boolean format,
-        String encoding) throws IOException, XWikiException
+        String encoding) throws XWikiException
     {
         // Input
         DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();

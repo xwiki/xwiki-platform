@@ -122,7 +122,7 @@ public class DeletedAttachment extends Api
     {
         try {
             Document doc = this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
-            return new Attachment(doc, this.deletedAttachment.restoreAttachment(null, this.context), this.context);
+            return new Attachment(doc, this.deletedAttachment.restoreAttachment(), this.context);
         } catch (XWikiException ex) {
             LOGGER.warn("Failed to parse deleted attachment: " + ex.getMessage(), ex);
             return null;

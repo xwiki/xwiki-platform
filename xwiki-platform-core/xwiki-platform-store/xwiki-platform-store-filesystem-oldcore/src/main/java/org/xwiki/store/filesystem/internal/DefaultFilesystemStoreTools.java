@@ -35,6 +35,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.locks.LockProvider;
@@ -230,19 +231,11 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     @Override
-    public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final XWikiAttachment attachment,
+    public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final AttachmentReference attachment,
         final Date deleteDate)
     {
         return new DefaultDeletedAttachmentFileProvider(getDeletedAttachmentDir(attachment, deleteDate),
-            attachment.getFilename());
-    }
-
-    @Override
-    public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final String pathToDirectory)
-    {
-        final File attachDir = new File(this.storageDir, getStorageLocationPath());
-        return new DefaultDeletedAttachmentFileProvider(attachDir,
-            getFilenameFromDeletedAttachmentDirectory(attachDir));
+            attachment.getName());
     }
 
     @Override
@@ -337,30 +330,26 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     /**
-     * Get a directory for storing the contentes of a deleted attachment. The format is <document
-     * name>/~this/deleted-attachments/<attachment name>-<delete date>/ <delete date> is expressed in "unix time" so it
-     * might look like: WebHome/~this/deleted-attachments/file.txt-0123456789/
+     * Get a directory for storing the contents of a deleted attachment. The format is {@code <document
+     * name>/~this/deleted-attachments/<attachment name>-<delete date>/} {@code <delete date>} is expressed in "unix
+     * time" so it might look like: {@code WebHome/~this/deleted-attachments/file.txt-0123456789/}
      *
      * @param attachment the attachment to get the file for.
      * @param deleteDate the date the attachment was deleted.
      * @return a directory which will be repeatable only with the same inputs.
      */
-    private File getDeletedAttachmentDir(final XWikiAttachment attachment, final Date deleteDate)
+    private File getDeletedAttachmentDir(final AttachmentReference attachment, final Date deleteDate)
     {
-        final XWikiDocument doc = attachment.getDoc();
-        if (doc == null) {
-            throw new NullPointerException(
-                "Could not store deleted attachment because " + "it is not attached to any document.");
-        }
-        final File docDir = getDocumentDir(doc.getDocumentReference(), this.storageDir, this.pathSerializer);
+        final DocumentReference doc = attachment.getDocumentReference();
+        final File docDir = getDocumentDir(doc, this.storageDir, this.pathSerializer);
         final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);
-        final String fileName = attachment.getFilename() + DELETED_ATTACHMENT_NAME_SEPARATOR + deleteDate.getTime();
+        final String fileName = attachment.getName() + DELETED_ATTACHMENT_NAME_SEPARATOR + deleteDate.getTime();
         return new File(deletedAttachmentsDir, GenericFileUtils.getURLEncoded(fileName));
     }
 
     /**
-     * Get a directory for storing the content of a deleted document. The format is <document
-     * name>/~this/deleted-documents/<index>/content.xml.
+     * Get a directory for storing the content of a deleted document. The format is {@code <document
+     * name>/~this/deleted-documents/<index>/content.xml}.
      *
      * @param documentReference the document to get the file for.
      * @param index the index of the deleted document.

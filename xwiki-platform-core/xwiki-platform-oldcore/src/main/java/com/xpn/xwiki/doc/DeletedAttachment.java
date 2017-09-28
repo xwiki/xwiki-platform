@@ -62,7 +62,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     private String xmlStore;
 
-    private DeletedAttachmentContent xml;
+    private DeletedAttachmentContent content;
 
     /** Default constructor. Used only by hibernate when restoring objects from the database. */
     protected DeletedAttachment()
@@ -124,7 +124,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     {
         this(docId, docName, filename, storeType, deleter, deleteDate);
 
-        this.xml = content;
+        this.content = content;
     }
 
     /**
@@ -282,16 +282,16 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
-     * Getter for {@link #xml}.
+     * Getter for {@link #content}.
      *
      * @return XML serialization of {@link XWikiAttachment}
      */
     public String getXml()
     {
-        if (this.xml != null) {
+        if (this.content != null) {
             try {
-                return this.xml.getContentAsString();
-            } catch (IOException e) {
+                return this.content.getContentAsString();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -301,7 +301,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
-     * Setter for {@link #xml}.
+     * Setter for {@link #content}.
      *
      * @param xml XML serialization of {@link XWikiAttachment}. Used only by Hibernate.
      */
@@ -309,7 +309,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     {
         if (StringUtils.isNotEmpty(xml)) {
             try {
-                this.xml = new HibernateDeletedAttachmentContent(xml);
+                this.content = new HibernateDeletedAttachmentContent(xml);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -328,24 +328,41 @@ public class DeletedAttachment extends AbstractSimpleClass
     @Deprecated
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
-        this.xml = new HibernateDeletedAttachmentContent(attachment);
+        this.content = new HibernateDeletedAttachmentContent(attachment);
     }
 
     /**
      * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}. Note that this method does not actually
-     * restore the attachment to its owner document, it simply recomposes an {@link XWikiAttachment} object from the
+     * restore the attachment to its owner document, it simply re-composes an {@link XWikiAttachment} object from the
      * saved data.
      *
-     * @return restored attachment
      * @param attachment optional object where to put the attachment data, if not <code>null</code>
      * @param context the current {@link XWikiContext context}
+     * @return restored attachment
+     * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
+     *             {@link XWikiAttachment#fromXML(String)}.
+     * @deprecated since 9.9RC1, use {@link #restoreAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
+    public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    {
+        return restoreAttachment(attachment);
+    }
+
+    /**
+     * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}. Note that this method does not actually
+     * restore the attachment to its owner document, it simply re-composes an {@link XWikiAttachment} object from the
+     * saved data.
+     *
+     * @param attachment optional object where to put the attachment data, if not <code>null</code>
+     * @return restored attachment
      * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
      *             {@link XWikiAttachment#fromXML(String)}.
      */
-    public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    public XWikiAttachment restoreAttachment(XWikiAttachment attachment) throws XWikiException
     {
         try {
-            return this.xml.getXWikiAttachment(attachment);
+            return this.content.getXWikiAttachment(attachment);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error restoring document", e, null);
@@ -358,9 +375,9 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
      * @since 9.9RC1
      */
-    public XWikiAttachment restoreAttachment(XWikiContext context) throws XWikiException
+    public XWikiAttachment restoreAttachment() throws XWikiException
     {
-        return restoreAttachment(null, context);
+        return restoreAttachment(null);
     }
 
 }

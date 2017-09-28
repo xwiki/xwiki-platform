@@ -19,12 +19,7 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-
-import org.apache.commons.io.FileUtils;
-import org.xwiki.filter.input.DefaultFileInputSource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachmentContent;
@@ -38,36 +33,31 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  */
 public class FileDeletedAttachmentContent implements DeletedAttachmentContent
 {
-    private final File content;
-
-    private final Charset charset;
+    private XWikiAttachment attachment;
 
     /**
-     * @param file the serialized document as XML
-     * @param charset the charset of the file
+     * @param attachment the deleted attachment
      */
-    public FileDeletedAttachmentContent(File file, Charset charset)
+    public FileDeletedAttachmentContent(XWikiAttachment attachment)
     {
-        this.content = file;
-        this.charset = charset;
+        this.attachment = attachment;
     }
 
     @Override
-    public String getContentAsString() throws IOException
+    public String getContentAsString() throws IOException, XWikiException
     {
-        return FileUtils.readFileToString(this.content, this.charset);
+        return this.attachment.toXML();
     }
 
     @Override
-    public XWikiAttachment getXWikiAttachment(XWikiAttachment attachment) throws XWikiException, IOException
+    public XWikiAttachment getXWikiAttachment(XWikiAttachment returnAttachment) throws XWikiException, IOException
     {
-        XWikiAttachment result = attachment;
-        if (result == null) {
-            result = new XWikiAttachment();
+        if (returnAttachment != null) {
+            returnAttachment.apply(this.attachment);
+
+            return returnAttachment;
         }
 
-        result.fromXML(new DefaultFileInputSource(this.content));
-
-        return result;
+        return this.attachment;
     }
 }

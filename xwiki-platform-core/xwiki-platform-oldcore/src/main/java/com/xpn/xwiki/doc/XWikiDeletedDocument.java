@@ -71,7 +71,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     private String xmlStore;
 
-    private XWikiDeletedDocumentContent xml;
+    private XWikiDeletedDocumentContent content;
 
     private String batchId;
 
@@ -131,7 +131,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     {
         this(fullName, locale, storeType, deleter, deleteDate);
 
-        this.xml = content;
+        this.content = content;
     }
 
     /**
@@ -292,10 +292,10 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     public String getXml()
     {
-        if (this.xml != null) {
+        if (this.content != null) {
             try {
-                return this.xml.getContentAsString();
-            } catch (IOException e) {
+                return this.content.getContentAsString();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -313,7 +313,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     {
         if (StringUtils.isNotEmpty(xml)) {
             try {
-                this.xml = new XWikiHibernateDeletedDocumentContent(xml);
+                this.content = new XWikiHibernateDeletedDocumentContent(xml);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -333,7 +333,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     @Deprecated
     protected void setDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        this.xml = new XWikiHibernateDeletedDocumentContent(doc);
+        this.content = new XWikiHibernateDeletedDocumentContent(doc);
     }
 
     /**
@@ -345,7 +345,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     public XWikiDocument restoreDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
-            return this.xml.getXWikiDocument(doc);
+            return this.content.getXWikiDocument(doc);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error restoring document", e, null);

@@ -112,14 +112,6 @@ public interface FilesystemStoreTools
     File getGlobalFile(String name);
 
     /**
-     * Get a deleted attachment file provider from a path to the deleted attachment directory.
-     *
-     * @param pathToDirectory a relitive path to the directory where the deleted attachment is.
-     * @return a DeletedAttachmentFileProvider which will provide files for that deleted attachment.
-     */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(String pathToDirectory);
-
-    /**
      * Get a {@link java.util.concurrent.locks.ReadWriteLock} which is unique to the given file. This method will always
      * return the same lock for the path on the filesystem even if the {@link java.io.File} object is different.
      *

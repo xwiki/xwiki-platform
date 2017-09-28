@@ -21,6 +21,8 @@ package com.xpn.xwiki.doc;
 
 import java.io.IOException;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -29,13 +31,15 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 9.9RC1
  */
+@Unstable
 public interface DeletedAttachmentContent
 {
     /**
      * @return the serialized version of the attachment
      * @throws IOException when failing to get the {@link String} content
+     * @throws XWikiException when failing to get the {@link String} content
      */
-    String getContentAsString() throws IOException;
+    String getContentAsString() throws IOException, XWikiException;
 
     /**
      * @param attachment the attachment to write to or null to create a new one

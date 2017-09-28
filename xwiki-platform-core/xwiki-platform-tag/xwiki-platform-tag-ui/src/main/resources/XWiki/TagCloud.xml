@@ -431,7 +431,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
       #end
     #end
     &lt;li class="$liClass"&gt;
-      &lt;a class="tag" href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.Key)")" title="$services.localization.render('xe.tag.tooltip', ["$tagEntry.Value"])"&gt;$escapetool.xml($tagEntry.Key)&lt;/a&gt;
+      &lt;a class="tag" href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.Key)")" title="$services.localization.render('xe.tag.tooltip', [$tagEntry.Value])"&gt;$escapetool.xml($tagEntry.Key)&lt;/a&gt;
     &lt;/li&gt;
   #end
   &lt;/ol&gt;

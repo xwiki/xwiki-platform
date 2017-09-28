@@ -44,10 +44,12 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
-import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -65,7 +67,10 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-@ComponentList(LocationOperatorNodeGenerator.class)
+@ComponentList({
+    LocationOperatorNodeGenerator.class,
+    ScopeNotificationFilterExpressionGenerator.class
+})
 public class ScopeNotificationFilterTest
 {
     public static final WikiReference SCOPE_INCLUSIVE_REFERENCE_1 = new WikiReference("wiki1");
@@ -173,6 +178,7 @@ public class ScopeNotificationFilterTest
                         new StringValueNode("wiki1"));
 
         assertEquals(expectedResult1, test1);
+        assertEquals("WIKI = \"wiki1\"", test1.toString());
     }
 
     @Test
@@ -228,28 +234,31 @@ public class ScopeNotificationFilterTest
     }
 
     @Test
-    public void filterExpressionWithAllEvents() throws Exception
+    public void filterExpressionCase4() throws Exception
     {
         // Mocks
-        NotificationFilterPreference preference = mockNotificationFilterPreference("wiki1",
-                SCOPE_INCLUSIVE_REFERENCE_1, NotificationFilterType.INCLUSIVE, null);
+        createPreferenceScopeMocks();
+        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_3)).thenReturn("space3.page3");
 
-        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class),  any(NotificationFilter.class),
-                eq(NotificationFilterType.INCLUSIVE))).thenReturn(Sets.newSet(preference));
+        NotificationPreference pref3 = mock(NotificationPreference.class);
+        when(pref3.getFormat()).thenReturn(NotificationFormat.ALERT);
+        when(pref3.getProperties()).thenReturn(
+                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event3"));
 
-        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_1)).thenReturn("wiki1");
+        AbstractNode test3 = mocker.getComponentUnderTest().filterExpression(
+                new DocumentReference("xwiki", "XWiki", "User"), pref3);
 
-        AbstractNode test = mocker.getComponentUnderTest().filterExpression(
-                new DocumentReference("xwiki", "XWiki", "User"),
-                NotificationFilterType.INCLUSIVE);
+        AbstractNode expectedResult3 = new AndNode(
+                new EqualsNode(
+                        new PropertyValueNode(EventProperty.WIKI),
+                        new StringValueNode("wiki3")),
+                new EqualsNode(
+                        new PropertyValueNode(EventProperty.PAGE),
+                        new StringValueNode("space3.page3")));
 
-        AbstractNode expectedResult = new EqualsNode(
-                new PropertyValueNode(EventProperty.WIKI),
-                new StringValueNode("wiki1")
-        );
-
-        assertEquals(expectedResult, test);
+        assertEquals(expectedResult3, test3);
     }
+
 
 
     private void createPreferenceScopeMocks() throws NotificationException

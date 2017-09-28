@@ -99,4 +99,10 @@ public class UsersNotificationFilter extends AbstractScopeOrUserNotificationFilt
 
         return node;
     }
+
+    @Override
+    protected int getDeepLevel(NotificationFilterPreference pref)
+    {
+        return 0;
+    }
 }

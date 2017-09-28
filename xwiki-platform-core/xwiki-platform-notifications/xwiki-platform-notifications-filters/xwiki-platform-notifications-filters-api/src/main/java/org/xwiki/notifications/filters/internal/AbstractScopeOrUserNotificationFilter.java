@@ -38,6 +38,7 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -54,7 +55,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 public abstract class AbstractScopeOrUserNotificationFilter<T extends NotificationFilterPreference>
         extends AbstractNotificationFilter
 {
-    private static final String ERROR = "Failed to filter the notifications.";
+    protected static final String ERROR = "Failed to filter the notifications.";
 
     @Inject
     protected NotificationFilterManager notificationFilterManager;
@@ -79,26 +80,28 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
     {
         // Indicate if a restriction exist concerning this type of event
         boolean hasRestriction = false;
-        // Indicate if a restriction matches the document of the event
-        boolean matchRestriction = false;
+        // Indicate if we should keep the event when a restriction exists
+        boolean keepTheEvent = false;
 
         try {
+            int maxDeepLevel = 0;
             Iterator<NotificationFilterPreference> iterator = getFilterPreferences(user, format, filterType);
             while (iterator.hasNext()) {
 
                 T preference = convertPreferences(iterator.next());
 
-                if (preference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(event.getType())) {
+                List<String> concernedEventTypes = preference.getProperties(NotificationFilterProperty.EVENT_TYPE);
+                if (concernedEventTypes.isEmpty() || concernedEventTypes.contains(event.getType())) {
                     hasRestriction = true;
 
                     if (matchRestriction(event, preference)) {
-
-                        // If we have a match on an EXCLUSIVE filter, we don’t need to go any further
-                        if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
-                            return true;
+                        int deepLevel = getDeepLevel(preference);
+                        if (deepLevel > maxDeepLevel) {
+                            maxDeepLevel = deepLevel;
+                            keepTheEvent = filterType.equals(NotificationFilterType.INCLUSIVE);
+                        } else if (deepLevel == maxDeepLevel && filterType.equals(NotificationFilterType.EXCLUSIVE)) {
+                            keepTheEvent = false;
                         }
-
-                        matchRestriction = true;
                     }
                 }
             }
@@ -106,12 +109,7 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
             logger.warn(ERROR, e);
         }
 
-        //
-        // In case we have an INCLUSIVE filter, we check if we had a restriction that was not satisfied.
-        // In the case of an EXCLUSIVE filter, if a restriction has been found, then the function should have already
-        // returned true.
-        //
-        return (filterType.equals(NotificationFilterType.INCLUSIVE) && hasRestriction && !matchRestriction);
+        return !hasRestriction || keepTheEvent;
     }
 
     protected abstract T convertPreferences(NotificationFilterPreference pref);
@@ -153,7 +151,7 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
             NotificationPreference preference)
     {
         if (preference == null) {
-            return matchAllEvents(filterPreference);
+            return matchAllEvents(filterPreference) && filterPreference.isActive();
         } else {
             return matchEventType(filterPreference, preference);
         }
@@ -184,8 +182,9 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
         Object preferenceEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
 
         // There is a match of the preference event type is not blank (it should not...) and if the filter concerns it
+        // (or all events)
         return preferenceEventType != null && StringUtils.isNotBlank((String) preferenceEventType)
-                && filterEventTypes.contains(preferenceEventType);
+                && (filterEventTypes.contains(preferenceEventType) || filterEventTypes.isEmpty());
     }
 
     @Override
@@ -195,7 +194,7 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
     }
 
     @Override
-    public AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+    public AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference eventTypePref,
             NotificationFilterType filterType)
     {
         AbstractOperatorNode syntaxNode = null;
@@ -203,9 +202,9 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
         try {
             // Get every filterPreference linked to the current filter
             Set<NotificationFilterPreference> notificationFilterPreferences;
-            if (preference != null) {
+            if (eventTypePref != null) {
                 notificationFilterPreferences = notificationFilterManager.getFilterPreferences(
-                        user, this, filterType, preference.getFormat());
+                        user, this, filterType, eventTypePref.getFormat());
             } else {
                 notificationFilterPreferences = notificationFilterManager.getFilterPreferences(
                         user, this, filterType);
@@ -215,13 +214,13 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
                     = getFilterPreferencesIterator(notificationFilterPreferences);
             while (iterator.hasNext()) {
 
-                T pref = convertPreferences(iterator.next());
+                T filterPref = convertPreferences(iterator.next());
 
-                if (!preferencesMatchesFilteringContext(pref, preference)) {
+                if (!preferencesMatchesFilteringContext(filterPref, eventTypePref)) {
                     continue;
                 }
 
-                AbstractOperatorNode tmpNode = generateNode(pref);
+                AbstractOperatorNode tmpNode = generateNode(filterPref);
 
                 // If we have an EXCLUSIVE filter, negate the filter node
                 if (filterType.equals(NotificationFilterType.EXCLUSIVE)) {
@@ -259,4 +258,5 @@ public abstract class AbstractScopeOrUserNotificationFilter<T extends Notificati
                 && preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
     }
 
+    protected abstract int getDeepLevel(NotificationFilterPreference pref);
 }

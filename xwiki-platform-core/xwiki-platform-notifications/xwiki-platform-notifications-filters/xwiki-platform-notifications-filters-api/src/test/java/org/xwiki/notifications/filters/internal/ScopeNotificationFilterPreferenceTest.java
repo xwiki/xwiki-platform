@@ -36,6 +36,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

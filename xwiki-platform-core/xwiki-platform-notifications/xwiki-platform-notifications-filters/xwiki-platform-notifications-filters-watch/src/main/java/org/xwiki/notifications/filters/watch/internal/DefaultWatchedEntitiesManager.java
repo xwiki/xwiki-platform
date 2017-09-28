@@ -54,6 +54,11 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     @Override
     public void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
+        // If it is already watched, then we have nothing to do
+        if (isEntityWatched(entity, user)) {
+            return;
+        }
+
         Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
 
         // If a filter preference concerning this entity already exists, use it

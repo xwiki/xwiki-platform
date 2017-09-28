@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.List;
 import java.util.Set;
@@ -35,7 +35,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * This wraps a {@link NotificationFilterPreference} in order to extract its properties.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.9RC1
  */
 public class ScopeNotificationFilterPreference implements NotificationFilterPreference
 {
@@ -73,8 +73,6 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
      *
      * @param filterPreference the {@link NotificationFilterPreference} to wrap
      * @param scopeReference the reference of the location concerned by the scope notification filter
-     *
-     * @since 9.8RC1
      */
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReference scopeReference)

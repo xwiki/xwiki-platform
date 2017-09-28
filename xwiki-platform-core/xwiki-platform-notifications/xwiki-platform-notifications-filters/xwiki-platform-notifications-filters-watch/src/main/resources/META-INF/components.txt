@@ -3,5 +3,4 @@ org.xwiki.notifications.filters.watch.internal.AutomaticWatchModeListener
 org.xwiki.notifications.filters.watch.internal.DefaultWatchedEntitiesConfiguration
 org.xwiki.notifications.filters.watch.internal.DefaultWatchedEntitiesManager
 org.xwiki.notifications.filters.watch.internal.DefaultWatchedEntityFactory
-org.xwiki.notifications.filters.watch.internal.WatchedEntitiesNotificationFilter
 org.xwiki.notifications.filters.watch.script.NotificationWatchScriptService

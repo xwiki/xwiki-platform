@@ -33,6 +33,7 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.UsersNotificationFilter;
 import org.xwiki.notifications.filters.watch.internal.WatchedEntitiesNotificationFilter;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.stability.Unstable;
@@ -82,7 +83,7 @@ public class WatchedUserReference implements WatchedEntityReference
         // Fields
         filterPreference.setEnabled(true);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
-        filterPreference.setFilterName(WatchedEntitiesNotificationFilter.FILTER_NAME);
+        filterPreference.setFilterName(UsersNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(true);

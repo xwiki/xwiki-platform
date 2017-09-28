@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.scope;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,16 +25,22 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
+import org.xwiki.notifications.filters.internal.AbstractScopeOrUserNotificationFilter;
+import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
+import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
  * Define a notification filter based on a scope in the wiki.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.9RC1
  */
 @Component
 @Named(ScopeNotificationFilter.FILTER_NAME)
@@ -52,12 +58,30 @@ public class ScopeNotificationFilter extends AbstractScopeOrUserNotificationFilt
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
 
+    @Inject
+    private ScopeNotificationFilterExpressionGenerator scopeNotificationFilterExpressionGenerator;
+
     /**
      * Constructs a ScopeNotificationFilter.
      */
     public ScopeNotificationFilter()
     {
         super(FILTER_NAME);
+    }
+
+    @Override
+    public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
+    {
+        return scopeNotificationFilterExpressionGenerator.filterExpression(user, preference);
+    }
+
+    @Override
+    public AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
+            NotificationFilterType filterType)
+    {
+        // TODO: maybe stop using AbstractScopeOrUserNotificationFilter
+        // Not used
+        return null;
     }
 
     @Override
@@ -78,5 +102,12 @@ public class ScopeNotificationFilter extends AbstractScopeOrUserNotificationFilt
     protected AbstractOperatorNode generateNode(ScopeNotificationFilterPreference filterPreferenceScope)
     {
         return locationOperatorNodeGenerator.generateNode(filterPreferenceScope.getScopeReference());
+    }
+
+    @Override
+    protected int getDeepLevel(NotificationFilterPreference pref)
+    {
+        ScopeNotificationFilterPreference scopeNotificationFilterPreference = (ScopeNotificationFilterPreference) pref;
+        return scopeNotificationFilterPreference.getScopeReference().size();
     }
 }

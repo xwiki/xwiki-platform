@@ -1528,11 +1528,17 @@ $Msz MB##
         <td class="xwiki-livetable-display-header-filter">
           #if ($columnProperties.filterable != false)
             #set ($columnXClassName = $columnProperties.get('class'))
+            #set ($columnXPropertyName = $column)
             #if (!$columnXClassName)
-              #set ($columnXClassName = $xclassName)
+              #if ($column.startsWith('doc.'))
+                #set ($columnXClassName = 'XWiki.DocumentClass')
+                #set ($columnXPropertyName = $column.substring(4))
+              #else
+                #set ($columnXClassName = $xclassName)
+              #end
             #end
             #set ($xclass = $xwiki.getDocument($columnXClassName).getxWikiClass())
-            #set ($xproperty = $xclass.get($column))
+            #set ($xproperty = $xclass.get($columnXPropertyName))
             #livetable_filter($column $columnProperties $xproperty)
           #end
         </td>
@@ -1551,13 +1557,20 @@ $Msz MB##
       'DBTreeList': 'suggest',
       'Date': 'date',
       'Email': 'text',
+      'Groups': 'suggest',
       'Number': 'number',
       'Page': 'text',
       'StaticList': 'list',
       'String': 'text',
-      'TextArea': 'text'
+      'TextArea': 'text',
+      'Users': 'suggest'
     })
     #set ($filterType = $filterTypeByXPropertyType.get($xproperty.classType))
+    #if ("$!filterType" == '')
+      ## If we get here then it means the column is filterable but we could not determine the filter type. Use the text
+      ## filter in this case because it is the most generic.
+      #set ($filterType = 'text')
+    #end
   #end
   #if ($filterType == 'list' || $filterType == 'multilist')
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
@@ -1586,9 +1599,10 @@ $Msz MB##
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
-      size="$!columnProperties.size" title="$escapetool.xml($services.localization.render(
-        'platform.livetable.filtersTitle', [$services.localization.render("${transprefix}$column")]))" />
-  #elseif ($filterType == 'suggest')
+      #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
+      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+        [$services.localization.render("${transprefix}$column")]))" />
+  #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
@@ -1596,7 +1610,7 @@ $Msz MB##
       {'forceSkinAction' : true, 'language' : $xcontext.locale}))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($column)">
+      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
     </select>
   #end
 #end

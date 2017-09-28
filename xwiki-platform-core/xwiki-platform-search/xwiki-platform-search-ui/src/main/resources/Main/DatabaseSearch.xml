@@ -106,7 +106,7 @@
 #if (!$rssMode)
   #set ($discard = $xwiki.ssfx.use('uicomponents/search/search.css', true))
   ## Disable the document extra data: comments, attachments, history...
-  #set ($docextras = [])
+  #set ($displayDocExtra = false)
   #databaseSearchForm
 #end
 #set ($text = "$!request.text")

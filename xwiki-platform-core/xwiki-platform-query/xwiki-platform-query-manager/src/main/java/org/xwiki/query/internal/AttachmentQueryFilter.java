@@ -31,6 +31,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
+import org.xwiki.stability.Unstable;
 
 /**
  * This query filter is meant to be used with short HQL statements like this:
@@ -55,6 +56,7 @@ import org.xwiki.query.Query;
 @Component
 @Named("attachment")
 @Singleton
+@Unstable
 public class AttachmentQueryFilter extends AbstractWhereQueryFilter
 {
     private static final String FROM_DOC_TABLE = " XWikiDocument doc";

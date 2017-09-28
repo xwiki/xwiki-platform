@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.model.jaxb;
 
+import java.util.HashMap;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -44,7 +46,24 @@ public class PropertyValue
 
     @XmlElement(required = false)
     @XmlJavaTypeAdapter(MapAdapter.class)
-    protected java.util.Map<String, java.lang.Object> metaData;
+    protected java.util.Map<String, java.lang.Object> metaData = new HashMap<>();
+
+    /**
+     * Default constructor.
+     */
+    public PropertyValue()
+    {
+    }
+
+    /**
+     * Creates a new instance with the specified value.
+     * 
+     * @param value the actual property value
+     */
+    public PropertyValue(java.lang.Object value)
+    {
+        this.value = value;
+    }
 
     /**
      * @return the property value

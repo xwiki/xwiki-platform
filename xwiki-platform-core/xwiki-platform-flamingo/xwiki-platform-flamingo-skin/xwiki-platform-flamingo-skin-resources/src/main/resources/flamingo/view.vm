@@ -9,14 +9,14 @@
   #template("code.vm")
 #else
   #template("startpage.vm")
-  
+
   #if("$!viewer" == '')
     #set($viewer = $request.getParameter('viewer'))
   #end
   #if("$!viewer" == '')
     #set($viewer = 'content')
   #end
-  
+
   <div class="main">
   <div id="mainContentArea">
   #template("hierarchy.vm")
@@ -27,8 +27,13 @@
   #end
   <div class="clearfloats"></div>
   </div>## mainContentArea
-  #if($viewer == 'content' && $displayDocExtra)
-    #template("docextra.vm")
+  #if($viewer == 'content')
+    #if ($displayContentFooter)
+      #template('contentfooter.vm')
+    #end
+    #if ($displayDocExtra)
+      #template('docextra.vm')
+    #end
   #end
   </div>## main
   #template("endpage.vm")

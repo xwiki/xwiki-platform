@@ -107,7 +107,7 @@ public final class TagQueryUtils
         String from = "select elements(prop.list) from XWikiDocument as doc, BaseObject as tagobject, "
             + "DBStringListProperty as prop";
         String where = " where tagobject.name=doc.fullName and tagobject.className='XWiki.TagClass' and "
-            + "tagobject.id=prop.id.id and prop.id.name='tags'";
+            + "tagobject.id=prop.id.id and prop.id.name='tags' and doc.translation=0";
 
         // If at least one of the fragments is passed, the query should be matching XWiki documents
         if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {

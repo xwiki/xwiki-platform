@@ -57,7 +57,8 @@ require(['jquery', 'xwiki-selectize'], function($) {
     return {
       value: propertyValue.value,
       label: metaData.label,
-      icon: metaData.icon
+      icon: metaData.icon,
+      url: metaData.url
     };
   };
 

@@ -21,7 +21,6 @@ package org.xwiki.test.ui.appwithinminutes;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +43,7 @@ import org.xwiki.test.ui.po.PagesLiveTableElement;
 
 /**
  * Tests the App Within Minutes wizard.
- * 
+ *
  * @version $Id$
  * @since 3.3
  */
@@ -59,8 +58,8 @@ public class WizardTest extends AbstractTest
     public void setUp()
     {
         // Register a simple user, login and go to the App Within Minutes home page.
-        String userName = RandomStringUtils.randomAlphanumeric(5);
-        String password = RandomStringUtils.randomAlphanumeric(6);
+        String userName = "SimpleUser";
+        String password = "SimplePassword";
         getUtil().createUserAndLogin(userName, password);
         // Make sure the application location exists so that we can select it with the location picker.
         getUtil().createPage(Arrays.asList(getClass().getSimpleName(), this.testName.getMethodName()), "WebHome", null,
@@ -88,9 +87,9 @@ public class WizardTest extends AbstractTest
         appCreatePage.getLocationPicker().waitForLocation(
             Arrays.asList("", getClass().getSimpleName(), this.testName.getMethodName(), ""));
 
-        // Enter the application name (random name), making sure we also use some special chars.
+        // Enter the application name, making sure we also use some special chars.
         // See XWIKI-11747: Impossible to create new entry with an application having UTF8 chars in its name
-        String appName = RandomStringUtils.randomAscii(10) + "\u00E2";
+        String appName = "Cities âé";
         String[] appPath = new String[] {getClass().getSimpleName(), this.testName.getMethodName(), appName};
         appCreatePage.setApplicationName(appName);
 
@@ -144,7 +143,7 @@ public class WizardTest extends AbstractTest
         Assert.assertTrue(homePage.getContent().contains(appDescription));
 
         // Add a new entry.
-        String firstEntryName = RandomStringUtils.randomAscii(6);
+        String firstEntryName = "City 1 âé";
         EntryNamePane entryNamePane = homePage.clickAddNewEntry();
         entryNamePane.setName(firstEntryName);
         EntryEditPage entryEditPage = entryNamePane.clickAdd();
@@ -213,7 +212,7 @@ public class WizardTest extends AbstractTest
         homePage = homeEditPage.clickFinish();
 
         // Add a new entry.
-        String secondEntryName = RandomStringUtils.randomAscii(6);
+        String secondEntryName = "City 2 âé";
         entryNamePane = homePage.clickAddNewEntry();
         entryNamePane.setName(secondEntryName);
         entryEditPage = entryNamePane.clickAdd();
@@ -267,7 +266,7 @@ public class WizardTest extends AbstractTest
     public void testGoBackToFirstStep()
     {
         // Step 1
-        String appName = RandomStringUtils.randomAscii(6);
+        String appName = "Empty App âé";
         appCreatePage.setApplicationName(appName);
         appCreatePage.waitForApplicationNamePreview();
 

@@ -96,7 +96,7 @@
 $xwiki.get('ssx').use($config.get('commonPage'))
 ##
 ## Don't load comments, history, etc.
-#set($docextras = [])
+#set ($displayDocExtra = false)
 ##
 #displayInvitationHeader($request.getParameterMap(), $config)
 ##

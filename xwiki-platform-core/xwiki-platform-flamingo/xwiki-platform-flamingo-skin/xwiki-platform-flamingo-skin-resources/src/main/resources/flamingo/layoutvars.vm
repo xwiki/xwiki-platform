@@ -103,6 +103,7 @@
 #set($displayMoreActionsMenu = true) ## more actions menu
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
+#set($displayContentFooter = true) ## tags and document creation information, after the document content area
 #set($displayShortcuts = true)
 #set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
 #set ($displayQuickSearch = true)

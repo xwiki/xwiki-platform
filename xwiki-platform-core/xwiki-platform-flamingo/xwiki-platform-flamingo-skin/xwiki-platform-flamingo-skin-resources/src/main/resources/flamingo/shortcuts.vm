@@ -3,7 +3,7 @@
 ## Build the list of documents extras to display, if it does not exist (default).
 ## List format : ["ExtraAnchor",  "ExtraTabText", numberOfItems]
 ##
-#if (!$docextralinks && !$docextras)
+#if (!$docextralinks)
   #set($docextralinks = [])
   ## Children & Siblings (show it even if the document doesn't exist since there can be children or siblings)
   #if ($services.parentchild.isParentChildMechanismEnabled())
@@ -68,17 +68,4 @@
     #set ($url = $doc.getURL('view', "viewer=$escapetool.url($extraAnchor)"))
   #end
   #submenuitem($url, $escapetool.xml($extraText), $idHref, '', $glyphIcon)
-#end
-
-###########################################
-##        ADD KEYBOARD SHORTCUTS
-###########################################
-#if ($keyboardShortcutsEnabled)
-  <script type="text/javascript">
-  //<![CDATA[
-    shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
-      location.href = $('tmViewSource').href;
-    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
-  //]]>
-  </script>
 #end

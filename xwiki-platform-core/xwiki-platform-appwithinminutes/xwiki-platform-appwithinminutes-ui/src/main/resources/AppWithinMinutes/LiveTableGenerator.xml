@@ -62,22 +62,11 @@ $string.replace("'", "''")##
       #set ($discard = $columns.set($mathtool.sub($velocityCount, 1), $column))
     #end
     #if ($field)
-      ## Column type.
-      #set ($properties = {'type': 'text'})
-      #if ($field.classType.endsWith('List'))
-        #set ($discard = $properties.put('type', 'list'))
-      #elseif ($field.classType == 'Number')
-        #set ($discard = $properties.put('type', 'number'))
-      #elseif ($field.classType == 'Date')
-        #set ($discard = $properties.put('type', 'date'))
-      #end
+      #set ($properties = {})
       ## Sortable/Filterable columns.
       #if ($unsortableFieldTypes.contains($field.classType))
         #set ($discard = $properties.put('filterable', false))
         #set ($discard = $properties.put('sortable', false))
-      #else
-        ## The size of the filter input.
-        #set ($discard = $properties.put('size', 10))
       #end
       ## Columns with HTML display.
       ## Note that the check for custom display is too generic because you can have a custom displayer that generates
@@ -86,9 +75,8 @@ $string.replace("'", "''")##
         #set ($discard = $properties.put('html', true))
       #end
     #elseif ($genericColumns.contains($column))
-      #set ($properties = {'type': 'text', 'size': 10})
+      #set ($properties = {})
       #if ($column == 'doc.title')
-        #set ($discard = $properties.put('size', 20))
         #if ("$!titleDisplayNamePlaceHolder" != '')
           #set ($discard = $properties.put('displayName', $titleDisplayNamePlaceHolder))
           #set ($titleDisplayNamePlaceHolder = $NULL)
@@ -98,8 +86,6 @@ $string.replace("'", "''")##
         #set ($discard = $properties.put('html', true))
       #elseif ($column == 'doc.creator' || $column == 'doc.author')
         #set ($discard = $properties.put('link', 'author'))
-      #elseif ($column == 'doc.date' || $column == 'doc.creationDate')
-        #set ($discard = $properties.put('type', 'date'))
       #elseif ($column != 'doc.date' &amp;&amp; $column != 'doc.creationDate')
         #set ($discard = $properties.put('link', 'view'))
       #end

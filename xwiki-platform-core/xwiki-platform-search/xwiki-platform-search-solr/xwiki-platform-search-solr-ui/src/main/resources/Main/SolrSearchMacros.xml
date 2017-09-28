@@ -811,7 +811,7 @@ $value##
   #set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
   #set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
   ## Disable the document extra data: comments, attachments, history...
-  #set ($docextras = [])
+  #set ($displayDocExtra = false)
   #processRequestParameters()
   (% class="search-ui" %)(((
     #if ($xcontext.action == 'get')

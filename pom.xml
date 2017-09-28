@@ -52,7 +52,7 @@
     <hsqldb.version>2.4.0</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.16</ckeditor.version>
+    <ckeditor.version>1.17</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.9</batik.version>
     <restlet.version>2.3.10</restlet.version>
@@ -462,23 +462,8 @@
           </exclusion>
           <!-- Already part of Java SE 6 -->
           <exclusion>
-            <artifactId>jaxb-impl</artifactId>
-            <groupId>com.sun.xml.bind</groupId>
-          </exclusion>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>jaxb-api</artifactId>
-            <groupId>javax.xml.bind</groupId>
-          </exclusion>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
             <groupId>javax.xml.stream</groupId>
             <artifactId>stax-api</artifactId>
-          </exclusion>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
           </exclusion>
           <!-- We use a more accurate and up to date JSON framework version -->
           <exclusion>
@@ -522,16 +507,6 @@
         <version>${restlet.version}</version>
         <scope>runtime</scope>
         <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>jaxb-impl</artifactId>
-            <groupId>com.sun.xml.bind</groupId>
-          </exclusion>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>jaxb-api</artifactId>
-            <groupId>javax.xml.bind</groupId>
-          </exclusion>
           <!-- Already part of Java SE 6 -->
           <exclusion>
             <artifactId>stax-api</artifactId>

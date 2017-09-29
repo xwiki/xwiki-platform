@@ -53,7 +53,7 @@ $escapetool.h Class fields
 #set ($prefix = "${doc.fullName}_")
 #foreach ($property in $doc.getxWikiClass().properties)
 #map("$prefix$property.name" $property.prettyName)
-#if ($property.type.endsWith('ListClass'))
+#if ($property.type == 'StaticListClass')
 ## Generate translations for the list values.
 #foreach ($entry in $property.mapValues.entrySet())
 #map("$prefix${property.name}_$entry.key" $entry.value.value)

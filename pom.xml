@@ -157,7 +157,7 @@
               <configuration>
                 <executable>${ckeditor.builder.path}/build.sh</executable>
                 <arguments>
-                  <argument>-s --leave-js-unminified</argument>
+                  <argument>-s</argument>
                 </arguments>
               </configuration>
             </execution>

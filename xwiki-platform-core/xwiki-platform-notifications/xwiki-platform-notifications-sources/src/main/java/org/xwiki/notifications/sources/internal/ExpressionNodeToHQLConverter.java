@@ -194,6 +194,9 @@ public class ExpressionNodeToHQLConverter
             returnValue = String.format(VARIABLE_NAME, mapKey);
         } else if (value instanceof EntityReferenceNode) {
             String stringValue = serializer.serialize(((EntityReferenceNode) value).getContent());
+            if (escape) {
+                stringValue = escape(stringValue);
+            }
 
             String mapKey = String.format("entity_%s",  sha256Hex(stringValue));
 

@@ -1,5 +1,6 @@
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator
+org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreferencesGetter
 org.xwiki.notifications.filters.internal.CachedModelBridge
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterDisplayer

@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
@@ -54,16 +55,17 @@ public class ScopeNotificationFilterExpressionGenerator
      * preferences.
      * @param user user for who we display notifications
      * @param eventType type of the event on which we are filtering
+     * @param format the format of the notification
      * @return the expression node corresponding to the filter
      */
-    public AbstractOperatorNode filterExpression(DocumentReference user, String eventType)
+    public AbstractOperatorNode filterExpression(DocumentReference user, String eventType, NotificationFormat format)
     {
         // The node we construct
         AbstractOperatorNode topNode = null;
 
         // Get the filters to handle
         ScopeNotificationFilterPreferencesHierarchy preferences
-                = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(user, eventType);
+                = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(user, eventType, format);
 
         // The aim is to generate a black list with exceptions (handleExclusiveFilters) and a white
         // list (handleTopLevelInclusiveFilters).

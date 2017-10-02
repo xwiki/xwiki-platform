@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -59,11 +60,12 @@ public class ScopeNotificationFilterPreferencesGetter
     /**
      * Get all "ScopeNotificationFilterPreference(s)" and transform them to LocationFilter(s).
      * @param user the user for who we compute the notifications
-     * @param eventType the event type
+     * @param eventType the event type (could be null)
+     * @param format the notification format (could be null)
      * @return a hierarchy of scope notification filter preferences
      */
     public ScopeNotificationFilterPreferencesHierarchy getScopeFilterPreferences(DocumentReference user,
-            String eventType)
+            String eventType, NotificationFormat format)
     {
         List<ScopeNotificationFilterPreference> results = new ArrayList<>();
 
@@ -74,6 +76,7 @@ public class ScopeNotificationFilterPreferencesGetter
             // Filter them according to the event type and the filter name
             Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
                 pref -> ScopeNotificationFilter.FILTER_NAME.equals(pref.getFilterName())
+                        && matchFormat(pref, format)
                         && (matchAllEvents(pref) || matchEventType(pref, eventType))
             );
 
@@ -87,6 +90,11 @@ public class ScopeNotificationFilterPreferencesGetter
         }
 
         return new ScopeNotificationFilterPreferencesHierarchy(results);
+    }
+
+    private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)
+    {
+        return format == null || filterPreference.getFilterFormats().contains(format);
     }
 
     /**
@@ -107,6 +115,7 @@ public class ScopeNotificationFilterPreferencesGetter
      */
     private boolean matchEventType(NotificationFilterPreference filterPreference, String eventType)
     {
-        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(eventType);
+        return eventType == null
+                || filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).contains(eventType);
     }
 }

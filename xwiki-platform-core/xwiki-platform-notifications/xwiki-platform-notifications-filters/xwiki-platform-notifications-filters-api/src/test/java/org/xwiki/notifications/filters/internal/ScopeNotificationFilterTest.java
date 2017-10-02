@@ -50,6 +50,7 @@ import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreferencesGetter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
@@ -71,7 +72,8 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     LocationOperatorNodeGenerator.class,
     ScopeNotificationFilterExpressionGenerator.class,
-    ScopeNotificationFilterPreferencesGetter.class
+    ScopeNotificationFilterPreferencesGetter.class,
+    ScopeNotificationFilterLocationStateComputer.class
 })
 public class ScopeNotificationFilterTest
 {
@@ -280,6 +282,7 @@ public class ScopeNotificationFilterTest
         when(preference.getProperties(eq(NotificationFilterProperty.EVENT_TYPE))).thenReturn(
                 eventName != null ? Arrays.asList(eventName) : Collections.emptyList());
         when(preference.getFilterType()).thenReturn(filterType);
+        when(preference.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 

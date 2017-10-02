@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.Iterator;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -54,7 +52,7 @@ public class ScopeNotificationFilter implements NotificationFilter
     public static final String FILTER_NAME = "scopeNotificationFilter";
 
     @Inject
-    private ScopeNotificationFilterPreferencesGetter preferencesGetter;
+    private ScopeNotificationFilterLocationStateComputer stateComputer;
 
     @Inject
     private ScopeNotificationFilterExpressionGenerator expressionGenerator;
@@ -62,49 +60,14 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        ScopeNotificationFilterPreferencesHierarchy preferences
-                = preferencesGetter.getScopeFilterPreferences(user, event.getType());
-
-        if (preferences.isEmpty()) {
-            // We won't filter anything if we have no filter preference
-            return false;
-        }
-
         final EntityReference eventEntity = getEventEntity(event);
         if (eventEntity == null) {
             // We don't handle events that are not related to a particular location
             return false;
         }
 
-        Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
-        while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-
-            // If the exclusive filter match the event location...
-            if (eventEntity.equals(pref.getScopeReference()) || eventEntity.hasParent(pref.getScopeReference())) {
-
-                // then we dismiss the current event if there is no inclusive filter child matching the event
-                return !pref.getChildren().stream().anyMatch(
-                    child -> eventEntity.equals(child.getScopeReference())
-                        || eventEntity.hasParent(child.getScopeReference())
-                );
-            }
-        }
-
-        it = preferences.getInclusiveFiltersThatHasNoParents();
-        while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-
-            // If the inclusive filter match the event location...
-            if (eventEntity.equals(pref.getScopeReference()) || eventEntity.hasParent(pref.getScopeReference())) {
-                // Then we don't dismiss the event
-                return false;
-            }
-        }
-
-        // If we are here, we have filter preferences but no one is matching the current event location,
-        // so we dismiss this event
-        return true;
+        // We dismiss the event if the location is not watched
+        return !stateComputer.isLocationWatched(user, eventEntity, event.getType(), format);
     }
 
     @Override
@@ -118,7 +81,8 @@ public class ScopeNotificationFilter implements NotificationFilter
     public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
         return expressionGenerator.filterExpression(user,
-                (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE));
+                (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE),
+                preference.getFormat());
     }
 
     @Override

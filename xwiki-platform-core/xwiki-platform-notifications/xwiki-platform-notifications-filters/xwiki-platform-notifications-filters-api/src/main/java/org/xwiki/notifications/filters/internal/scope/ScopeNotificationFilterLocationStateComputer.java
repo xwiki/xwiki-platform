@@ -42,6 +42,12 @@ public class ScopeNotificationFilterLocationStateComputer
     @Inject
     private ScopeNotificationFilterPreferencesGetter preferencesGetter;
 
+    private enum WatchedState {
+        WATCHED,
+        NOT_WATCHED,
+        UNKNOW
+    }
+
     /**
      * @param user user for who we display notifications
      * @param location a location
@@ -62,6 +68,8 @@ public class ScopeNotificationFilterLocationStateComputer
     public boolean isLocationWatched(DocumentReference user, EntityReference location,
             String eventType, NotificationFormat format)
     {
+        // TODO: write a unit test with a complex set of preferences
+
         ScopeNotificationFilterPreferencesHierarchy preferences
                 = preferencesGetter.getScopeFilterPreferences(user, eventType, format);
 
@@ -70,22 +78,17 @@ public class ScopeNotificationFilterLocationStateComputer
             return true;
         }
 
-        Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
-        while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-
-            // If the exclusive filter match the event location...
-            if (location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference())) {
-
-                // then we watch the location if there is at least an inclusive filter child matching it
-                return pref.getChildren().stream().anyMatch(
-                    child -> location.equals(child.getScopeReference())
-                        || location.hasParent(child.getScopeReference())
-                );
-            }
+        WatchedState state = handleExclusiveFilters(location, preferences);
+        if (state != WatchedState.UNKNOW) {
+            return state == WatchedState.WATCHED;
         }
 
-        it = preferences.getInclusiveFiltersThatHasNoParents();
+        Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
+        if (!it.hasNext()) {
+            // No inclusive filters ==  we get everything, so the location is watched
+            return true;
+        }
+
         while (it.hasNext()) {
             ScopeNotificationFilterPreference pref = it.next();
 
@@ -99,5 +102,39 @@ public class ScopeNotificationFilterLocationStateComputer
         // If we are here, we have filter preferences but no one is matching the current event location,
         // so we don't watch this location
         return false;
+    }
+
+    private WatchedState handleExclusiveFilters(EntityReference location,
+            ScopeNotificationFilterPreferencesHierarchy preferences)
+    {
+        WatchedState state = WatchedState.UNKNOW;
+        int maxDeepLevel = 0;
+
+        Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
+        while (it.hasNext()) {
+            ScopeNotificationFilterPreference pref = it.next();
+
+            int deepLevel = pref.getScopeReference().size();
+
+            // If the exclusive filter match the event location...
+            if ((location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference()))
+                    && deepLevel > maxDeepLevel) {
+                state = WatchedState.NOT_WATCHED;
+                maxDeepLevel = deepLevel;
+
+                // then we watch the location if there is at least an inclusive filter child matching it
+                for (ScopeNotificationFilterPreference child : pref.getChildren()) {
+                    int childDeepLevel = child.getScopeReference().size();
+                    if ((location.equals(child.getScopeReference()) || location.hasParent(child.getScopeReference()))
+                            && childDeepLevel > maxDeepLevel)
+                    {
+                        state = WatchedState.WATCHED;
+                        maxDeepLevel = childDeepLevel;
+                    }
+                }
+            }
+        }
+
+        return state;
     }
 }

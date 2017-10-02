@@ -93,7 +93,7 @@ public class ScopeNotificationFilterLocationStateComputer
             ScopeNotificationFilterPreference pref = it.next();
 
             // If the inclusive filter match the event location...
-            if (location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference())) {
+            if (match(pref, location)) {
                 // Then it means we watch this location
                 return true;
             }
@@ -108,7 +108,7 @@ public class ScopeNotificationFilterLocationStateComputer
             ScopeNotificationFilterPreferencesHierarchy preferences)
     {
         WatchedState state = WatchedState.UNKNOW;
-        int maxDeepLevel = 0;
+        int deepestLevel = 0;
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
         while (it.hasNext()) {
@@ -117,24 +117,26 @@ public class ScopeNotificationFilterLocationStateComputer
             int deepLevel = pref.getScopeReference().size();
 
             // If the exclusive filter match the event location...
-            if ((location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference()))
-                    && deepLevel > maxDeepLevel) {
+            if (match(pref, location) && deepLevel > deepestLevel) {
                 state = WatchedState.NOT_WATCHED;
-                maxDeepLevel = deepLevel;
+                deepestLevel = deepLevel;
 
                 // then we watch the location if there is at least an inclusive filter child matching it
                 for (ScopeNotificationFilterPreference child : pref.getChildren()) {
                     int childDeepLevel = child.getScopeReference().size();
-                    if ((location.equals(child.getScopeReference()) || location.hasParent(child.getScopeReference()))
-                            && childDeepLevel > maxDeepLevel)
-                    {
+                    if (match(child, location) && childDeepLevel > deepestLevel) {
                         state = WatchedState.WATCHED;
-                        maxDeepLevel = childDeepLevel;
+                        deepestLevel = childDeepLevel;
                     }
                 }
             }
         }
 
         return state;
+    }
+
+    private boolean match(ScopeNotificationFilterPreference pref, EntityReference location)
+    {
+        return location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference());
     }
 }

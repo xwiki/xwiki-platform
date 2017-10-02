@@ -128,10 +128,11 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
                 }
             }
 
-            // When every documents have been migrated, we can then delete the old XClass
-            XWikiDocument oldClass = xwiki.getDocument(getOldClassReference(), context);
-            xwiki.deleteDocument(oldClass, context);
-
+            // When every documents have been migrated, we used to delete the old XClass,
+            // but it is not a good idea to delete a document in a migrator, when stores are not ready (such as
+            // recycle bin) and when other modules are not ready (like the SOLR server).
+            // See: https://jira.xwiki.org/browse/XWIKI-14749
+            // So we don't do anything.
         } catch (QueryException e) {
             logger.error("Failed to perform a query on the current wiki.", e);
         }

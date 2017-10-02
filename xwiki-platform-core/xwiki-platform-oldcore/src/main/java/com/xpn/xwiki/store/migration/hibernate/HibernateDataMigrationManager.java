@@ -58,7 +58,7 @@ import liquibase.exception.LiquibaseException;
  * @since 3.4M1
  */
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 {
@@ -75,7 +75,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     public XWikiHibernateBaseStore getStore() throws DataMigrationException
     {
         try {
-            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
+            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class,
+                XWikiHibernateBaseStore.HINT);
         } catch (ComponentLookupException e) {
             throw new DataMigrationException(
                 String.format("Unable to reach the store for database %s", getXWikiContext().getWikiId()), e);

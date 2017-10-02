@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface
 {

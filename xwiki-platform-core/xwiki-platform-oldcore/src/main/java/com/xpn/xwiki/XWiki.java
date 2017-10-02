@@ -212,6 +212,7 @@ import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -1140,7 +1141,7 @@ public class XWiki implements EventListener
             }
 
             XWikiStoreInterface mainStore = Utils.getComponent(XWikiStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.main.hint", "hibernate"));
+                getConfiguration().getProperty("xwiki.store.main.hint", XWikiHibernateBaseStore.HINT));
 
             // Check if we need to use the cache store..
             boolean nocache = "0".equals(getConfiguration().getProperty("xwiki.store.cache", "1"));
@@ -1156,25 +1157,25 @@ public class XWiki implements EventListener
 
             setDefaultAttachmentContentStore(
                 Utils.<XWikiAttachmentStoreInterface>getComponent(XWikiAttachmentStoreInterface.class,
-                    getConfiguration().getProperty("xwiki.store.attachment.hint", "hibernate")));
+                    getConfiguration().getProperty("xwiki.store.attachment.hint", XWikiHibernateBaseStore.HINT)));
 
             setVersioningStore(Utils.<XWikiVersioningStoreInterface>getComponent(XWikiVersioningStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.versioning.hint", "hibernate")));
+                getConfiguration().getProperty("xwiki.store.versioning.hint", XWikiHibernateBaseStore.HINT)));
 
             setAttachmentVersioningStore(Utils.<AttachmentVersioningStore>getComponent(AttachmentVersioningStore.class,
-                hasAttachmentVersioning(context)
-                    ? getConfiguration().getProperty("xwiki.store.attachment.versioning.hint", "hibernate") : "void"));
+                hasAttachmentVersioning(context) ? getConfiguration()
+                    .getProperty("xwiki.store.attachment.versioning.hint", XWikiHibernateBaseStore.HINT) : "void"));
 
             if (hasRecycleBin(context)) {
                 setRecycleBinStore(
                     Utils.<XWikiRecycleBinStoreInterface>getComponent(XWikiRecycleBinStoreInterface.class,
-                        getConfiguration().getProperty("xwiki.store.recyclebin.hint", "hibernate")));
+                        getConfiguration().getProperty("xwiki.store.recyclebin.hint", XWikiHibernateBaseStore.HINT)));
             }
 
             if (hasAttachmentRecycleBin(context)) {
                 setAttachmentRecycleBinStore(
-                    Utils.<AttachmentRecycleBinStore>getComponent(AttachmentRecycleBinStore.class,
-                        getConfiguration().getProperty("xwiki.store.attachment.recyclebin.hint", "hibernate")));
+                    Utils.<AttachmentRecycleBinStore>getComponent(AttachmentRecycleBinStore.class, getConfiguration()
+                        .getProperty("xwiki.store.attachment.recyclebin.hint", XWikiHibernateBaseStore.HINT)));
             }
 
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
@@ -1352,6 +1353,7 @@ public class XWiki implements EventListener
     /**
      * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
      *         list of all virtual wikis database names use {@link WikiDescriptorManager#getAllIds()}.
+     * @deprecated
      */
     @Deprecated
     public List<String> getVirtualWikiList()
@@ -1388,6 +1390,7 @@ public class XWiki implements EventListener
     /**
      * @return the cache containing the names of the wikis already initialized.
      * @since 1.5M2.
+     * @deprecated
      */
     @Deprecated
     public Cache<DocumentReference> getVirtualWikiCache()
@@ -5675,6 +5678,9 @@ public class XWiki implements EventListener
         return adclientid;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public XWikiPluginInterface getPlugin(String name, XWikiContext context)
     {
@@ -5689,6 +5695,9 @@ public class XWiki implements EventListener
         return null;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Api getPluginApi(String name, XWikiContext context)
     {

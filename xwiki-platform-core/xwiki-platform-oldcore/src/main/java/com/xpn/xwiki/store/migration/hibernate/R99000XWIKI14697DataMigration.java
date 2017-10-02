@@ -32,6 +32,7 @@ import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -66,7 +67,8 @@ public class R99000XWIKI14697DataMigration extends AbstractHibernateDataMigratio
     @Override
     public void hibernateMigrate() throws XWikiException, DataMigrationException
     {
-        final String defaultStoreHint = this.configuration.getProperty("xwiki.store.attachment.hint", "hibernate");
+        final String defaultStoreHint =
+            this.configuration.getProperty("xwiki.store.attachment.hint", XWikiHibernateBaseStore.HINT);
 
         getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
         {

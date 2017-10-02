@@ -49,6 +49,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.store.DatabaseProduct;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 
@@ -78,7 +79,7 @@ public class HibernateStore
     private HibernateSessionFactory sessionFactory;
 
     @Inject
-    @Named("hibernate")
+    @Named(XWikiHibernateBaseStore.HINT)
     private DataMigrationManager dataMigrationManager;
 
     @Inject

@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -59,7 +58,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @since 1.4M1
  */
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore implements AttachmentRecycleBinStore
 {
@@ -110,7 +109,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         executeWrite(context, new HibernateCallback<Object>()
         {
             @Override
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+            public Object doInHibernate(Session session) throws XWikiException
             {
                 AttachmentRecycleBinContentStore contentStore = getDefaultAttachmentRecycleBinContentStore();
 
@@ -136,23 +135,23 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         XWikiContext context = getXWikiContext(inputxcontext);
 
         DeletedAttachment deletedAttachment = getDeletedAttachment(index, context, bTransaction);
-        return deletedAttachment.restoreAttachment(context);
+        return deletedAttachment.restoreAttachment();
     }
 
     @Override
     public DeletedAttachment getDeletedAttachment(final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        return getDeletedAttachment(index, context, bTransaction);
+        return loadDeletedAttachment(index, context, true);
     }
 
-    private DeletedAttachment getDeletedAttachment(final long index, XWikiContext context, boolean resolve,
-        boolean bTransaction) throws XWikiException
+    private DeletedAttachment loadDeletedAttachment(final long index, XWikiContext context, boolean resolve)
+        throws XWikiException
     {
         return executeRead(context, new HibernateCallback<DeletedAttachment>()
         {
             @Override
-            public DeletedAttachment doInHibernate(Session session) throws HibernateException, XWikiException
+            public DeletedAttachment doInHibernate(Session session) throws XWikiException
             {
                 DeletedAttachment deletedAttachment =
                     (DeletedAttachment) session.get(DeletedAttachment.class, Long.valueOf(index));
@@ -175,7 +174,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
             {
                 @SuppressWarnings(ANOTATE_UNCHECKED)
                 @Override
-                public List<DeletedAttachment> doInHibernate(Session session) throws HibernateException, XWikiException
+                public List<DeletedAttachment> doInHibernate(Session session) throws XWikiException
                 {
                     Criteria c = session.createCriteria(DeletedAttachment.class);
                     if (attachment != null) {
@@ -201,7 +200,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
             {
                 @SuppressWarnings(ANOTATE_UNCHECKED)
                 @Override
-                public List<DeletedAttachment> doInHibernate(Session session) throws HibernateException, XWikiException
+                public List<DeletedAttachment> doInHibernate(Session session) throws XWikiException
                 {
                     assert doc != null;
                     return session.createCriteria(DeletedAttachment.class).add(Restrictions.eq(DOC_ID, doc.getId()))
@@ -231,9 +230,9 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         executeWrite(context, new HibernateCallback<Object>()
         {
             @Override
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+            public Object doInHibernate(Session session) throws XWikiException
             {
-                DeletedAttachment deletedDocument = getDeletedAttachment(index, context, false, bTransaction);
+                DeletedAttachment deletedDocument = loadDeletedAttachment(index, context, false);
 
                 try {
                     session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=?")

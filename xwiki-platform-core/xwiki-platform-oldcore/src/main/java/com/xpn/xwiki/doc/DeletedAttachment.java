@@ -116,15 +116,32 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param deleter the user who delete document
      * @param deleteDate date of delete action
      * @param content the stored deleted document
-     * @throws XWikiException if any error
-     * @since 9.0RC1
+     * @since 9.9RC1
      */
     public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
-        Date deleteDate, DeletedAttachmentContent content) throws XWikiException
+        Date deleteDate, DeletedAttachmentContent content)
     {
         this(docId, docName, filename, storeType, deleter, deleteDate);
 
         this.content = content;
+    }
+
+    /**
+     * @param fullName the local reference of the document
+     * @param locale the locale of the document
+     * @param storeType the way to store the document
+     * @param deleter the user who delete document
+     * @param deleteDate date of delete action
+     * @param content the stored deleted document
+     * @param id the synthetic id of this deleted attachment. Uniquely identifies an entry in the recycle bin.
+     * @since 9.9RC1
+     */
+    public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
+        Date deleteDate, DeletedAttachmentContent content, long id)
+    {
+        this(docId, docName, filename, storeType, deleter, deleteDate, content);
+
+        this.id = id;
     }
 
     /**

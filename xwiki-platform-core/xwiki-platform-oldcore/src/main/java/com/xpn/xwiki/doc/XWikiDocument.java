@@ -1568,8 +1568,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setFormat(String format)
     {
-        this.format = format;
         if (!format.equals(this.format)) {
+            this.format = format;
+
             setMetaDataDirty(true);
         }
     }

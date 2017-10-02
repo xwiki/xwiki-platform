@@ -78,7 +78,7 @@ public class XWikiHibernateBaseStore implements Initializable
     private HibernateSessionFactory sessionFactory;
 
     @Inject
-    @Named("hibernate")
+    @Named(HINT)
     private DataMigrationManager dataMigrationManager;
 
     /** Need to get the xcontext to get the path to the hibernate.cfg.xml. */
@@ -892,7 +892,7 @@ public class XWikiHibernateBaseStore implements Initializable
         try {
             // Start monitoring timer
             if (monitor != null) {
-                monitor.startTimer("hibernate");
+                monitor.startTimer(XWikiHibernateBaseStore.HINT);
             }
             checkHibernate(context);
             bTransaction = beginTransaction(context);
@@ -910,7 +910,7 @@ public class XWikiHibernateBaseStore implements Initializable
                     this.store.endTransaction(doCommit);
                 }
                 if (monitor != null) {
-                    monitor.endTimer("hibernate");
+                    monitor.endTimer(XWikiHibernateBaseStore.HINT);
                 }
             } catch (Exception e) {
                 if (LOGGER.isErrorEnabled()) {

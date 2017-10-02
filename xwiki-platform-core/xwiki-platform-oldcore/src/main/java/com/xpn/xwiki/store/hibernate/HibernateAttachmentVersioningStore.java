@@ -43,7 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @since 1.4M2
  */
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {

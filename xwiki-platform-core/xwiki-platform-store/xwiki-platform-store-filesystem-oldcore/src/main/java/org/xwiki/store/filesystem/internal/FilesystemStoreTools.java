@@ -21,7 +21,6 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
 import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.xwiki.component.annotation.Role;
@@ -91,17 +90,15 @@ public interface FilesystemStoreTools
     DeletedDocumentContentFileProvider getDeletedDocumentFileProvider(DocumentReference documentReference, long index);
 
     /**
-     * Get a map of dates of deletion by the document where the attachment was attached.
-     *
-     * @param docRef a reference to the document to get deleted attachments for.
-     * @return a map of maps which provide FileProviders by deletion dates and filenames.
-     */
-    Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(DocumentReference docRef);
-
-    /**
      * @return the absolute path to the directory where the files are stored.
      */
     String getStorageLocationPath();
+
+    /**
+     * @return the absolute path to the directory where the files are stored.
+     * @since 9.9RC1
+     */
+    File getStorageLocationFile();
 
     /**
      * Get a file which is global for the entire installation.

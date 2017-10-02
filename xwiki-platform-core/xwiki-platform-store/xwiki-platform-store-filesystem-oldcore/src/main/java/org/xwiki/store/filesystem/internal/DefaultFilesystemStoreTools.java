@@ -20,11 +20,8 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import javax.inject.Inject;
@@ -245,30 +242,6 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
         return new DefaultDeletedDocumentContentFileProvider(getDeletedDocumentContentDir(documentReference, index));
     }
 
-    @Override
-    public Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(
-        final DocumentReference docRef)
-    {
-        final File docDir = getDocumentDir(docRef, this.storageDir, this.pathSerializer);
-        final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);
-        final Map<String, Map<Date, DeletedAttachmentFileProvider>> out =
-            new HashMap<String, Map<Date, DeletedAttachmentFileProvider>>();
-
-        if (!deletedAttachmentsDir.exists()) {
-            return out;
-        }
-
-        for (File file : Arrays.asList(deletedAttachmentsDir.listFiles())) {
-            final String currentName = getFilenameFromDeletedAttachmentDirectory(file);
-            if (out.get(currentName) == null) {
-                out.put(currentName, new HashMap<Date, DeletedAttachmentFileProvider>());
-            }
-            out.get(currentName).put(getDeleteDateFromDeletedAttachmentDirectory(file),
-                new DefaultDeletedAttachmentFileProvider(file, getFilenameFromDeletedAttachmentDirectory(file)));
-        }
-        return out;
-    }
-
     /**
      * @param directory the location of the data for the deleted attachment.
      * @return the name of the attachment file as extracted from the directory name.
@@ -296,6 +269,12 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     public String getStorageLocationPath()
     {
         return this.storageDir.getAbsolutePath();
+    }
+
+    @Override
+    public File getStorageLocationFile()
+    {
+        return this.storageDir;
     }
 
     @Override

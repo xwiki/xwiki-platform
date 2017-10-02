@@ -72,10 +72,11 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     protected XWikiHibernateBaseStore getStore() throws DataMigrationException
     {
         try {
-            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
+            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class,
+                XWikiHibernateBaseStore.HINT);
         } catch (ComponentLookupException e) {
-            throw new DataMigrationException(String.format("Unable to reach the store for database %s",
-                getXWikiContext().getWikiId()), e);
+            throw new DataMigrationException(
+                String.format("Unable to reach the store for database %s", getXWikiContext().getWikiId()), e);
         }
     }
 

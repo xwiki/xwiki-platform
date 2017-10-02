@@ -28,8 +28,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -67,8 +65,6 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
-
     private String customMapping;
 
     private String customClass;

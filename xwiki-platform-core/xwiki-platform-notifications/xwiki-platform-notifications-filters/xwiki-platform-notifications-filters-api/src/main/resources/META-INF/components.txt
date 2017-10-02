@@ -1,10 +1,10 @@
-org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter
+org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator
+org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreferencesGetter
 org.xwiki.notifications.filters.internal.CachedModelBridge
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterDisplayer
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterManager
 org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
 org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider
-org.xwiki.notifications.filters.internal.UsersNotificationFilter
 org.xwiki.notifications.filters.script.NotificationFiltersScriptService

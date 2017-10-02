@@ -36,7 +36,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -44,12 +43,14 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
+import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreferencesGetter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -69,7 +70,8 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList({
     LocationOperatorNodeGenerator.class,
-    ScopeNotificationFilterExpressionGenerator.class
+    ScopeNotificationFilterExpressionGenerator.class,
+    ScopeNotificationFilterPreferencesGetter.class
 })
 public class ScopeNotificationFilterTest
 {
@@ -98,10 +100,12 @@ public class ScopeNotificationFilterTest
     @Before
     public void setUp() throws Exception
     {
-        notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
+        notificationFilterManager = mock(NotificationFilterManager.class);
+        mocker.registerComponent(NotificationFilterManager.class, notificationFilterManager);
         serializer = mock(EntityReferenceSerializer.class);
         mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, "local", serializer);
-        resolver = mocker.getInstance(EntityReferenceResolver.TYPE_STRING);
+        resolver = mock(EntityReferenceResolver.class);
+        mocker.registerComponent(EntityReferenceResolver.TYPE_STRING, resolver);
     }
 
     @Test
@@ -170,7 +174,7 @@ public class ScopeNotificationFilterTest
         when(prop1.getProperties()).thenReturn(
                 Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event1"));
 
-        AbstractNode test1 = mocker.getComponentUnderTest().filterExpression(
+        ExpressionNode test1 = mocker.getComponentUnderTest().filterExpression(
                 new DocumentReference("xwiki", "XWiki", "User"), prop1);
 
         AbstractNode expectedResult1 = new EqualsNode(
@@ -193,7 +197,7 @@ public class ScopeNotificationFilterTest
         when(pref2.getProperties()).thenReturn(
                 Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event2"));
 
-        AbstractNode test2 = mocker.getComponentUnderTest().filterExpression(
+        ExpressionNode test2 = mocker.getComponentUnderTest().filterExpression(
                 new DocumentReference("xwiki", "XWiki", "User"), pref2);
 
         AbstractNode expectedResult2 = new AndNode(
@@ -219,7 +223,7 @@ public class ScopeNotificationFilterTest
         when(pref3.getProperties()).thenReturn(
                 Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event3"));
 
-        AbstractNode test3 = mocker.getComponentUnderTest().filterExpression(
+        ExpressionNode test3 = mocker.getComponentUnderTest().filterExpression(
                 new DocumentReference("xwiki", "XWiki", "User"), pref3);
 
         AbstractNode expectedResult3 = new AndNode(
@@ -232,34 +236,6 @@ public class ScopeNotificationFilterTest
 
         assertEquals(expectedResult3, test3);
     }
-
-    @Test
-    public void filterExpressionCase4() throws Exception
-    {
-        // Mocks
-        createPreferenceScopeMocks();
-        when(serializer.serialize(SCOPE_INCLUSIVE_REFERENCE_3)).thenReturn("space3.page3");
-
-        NotificationPreference pref3 = mock(NotificationPreference.class);
-        when(pref3.getFormat()).thenReturn(NotificationFormat.ALERT);
-        when(pref3.getProperties()).thenReturn(
-                Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "event3"));
-
-        AbstractNode test3 = mocker.getComponentUnderTest().filterExpression(
-                new DocumentReference("xwiki", "XWiki", "User"), pref3);
-
-        AbstractNode expectedResult3 = new AndNode(
-                new EqualsNode(
-                        new PropertyValueNode(EventProperty.WIKI),
-                        new StringValueNode("wiki3")),
-                new EqualsNode(
-                        new PropertyValueNode(EventProperty.PAGE),
-                        new StringValueNode("space3.page3")));
-
-        assertEquals(expectedResult3, test3);
-    }
-
-
 
     private void createPreferenceScopeMocks() throws NotificationException
     {
@@ -281,17 +257,9 @@ public class ScopeNotificationFilterTest
                 "excludedWiki:space2.page2", SCOPE_EXCLUSIVE_REFERENCE_2,
                 NotificationFilterType.EXCLUSIVE, "exclusiveEvent2");
 
-        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class),  any(NotificationFilter.class)))
-                .thenReturn(Sets.newSet(preference1, preference2, preference3));
-        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class), any(NotificationFilter.class),
-                eq(NotificationFilterType.INCLUSIVE), any(NotificationFormat.class))).thenReturn(
-                        Sets.newSet(preference1, preference2, preference3)
-        );
-
-        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class), any(NotificationFilter.class),
-                eq(NotificationFilterType.EXCLUSIVE), any(NotificationFormat.class))).thenReturn(
-                        Sets.newSet(exclusivePreference1, exclusivePreference2)
-        );
+        when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class)))
+                .thenReturn(Sets.newSet(preference1, preference2, preference3, exclusivePreference1,
+                        exclusivePreference2));
     }
 
     private NotificationFilterPreference mockNotificationFilterPreference(String entityStringValue,

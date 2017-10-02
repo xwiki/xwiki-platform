@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.Iterator;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,15 +28,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
-import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
-import org.xwiki.notifications.filters.internal.AbstractScopeOrUserNotificationFilter;
-import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
+import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
 /**
  * Define a notification filter based on a scope in the wiki.
@@ -45,7 +46,7 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 @Component
 @Named(ScopeNotificationFilter.FILTER_NAME)
 @Singleton
-public class ScopeNotificationFilter extends AbstractScopeOrUserNotificationFilter<ScopeNotificationFilterPreference>
+public class ScopeNotificationFilter implements NotificationFilter
 {
     /**
      * Name of the filter.
@@ -53,61 +54,94 @@ public class ScopeNotificationFilter extends AbstractScopeOrUserNotificationFilt
     public static final String FILTER_NAME = "scopeNotificationFilter";
 
     @Inject
-    private LocationOperatorNodeGenerator locationOperatorNodeGenerator;
+    private ScopeNotificationFilterPreferencesGetter preferencesGetter;
 
     @Inject
-    private EntityReferenceResolver<String> entityReferenceResolver;
+    private ScopeNotificationFilterExpressionGenerator expressionGenerator;
 
-    @Inject
-    private ScopeNotificationFilterExpressionGenerator scopeNotificationFilterExpressionGenerator;
-
-    /**
-     * Constructs a ScopeNotificationFilter.
-     */
-    public ScopeNotificationFilter()
+    @Override
+    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        super(FILTER_NAME);
+        ScopeNotificationFilterPreferencesHierarchy preferences
+                = preferencesGetter.getScopeFilterPreferences(user, event.getType());
+
+        if (preferences.isEmpty()) {
+            // We won't filter anything if we have no filter preference
+            return false;
+        }
+
+        final EntityReference eventEntity = getEventEntity(event);
+        if (eventEntity == null) {
+            // We don't handle events that are not related to a particular location
+            return false;
+        }
+
+        Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
+        while (it.hasNext()) {
+            ScopeNotificationFilterPreference pref = it.next();
+
+            // If the exclusive filter match the event location...
+            if (eventEntity.equals(pref.getScopeReference()) || eventEntity.hasParent(pref.getScopeReference())) {
+
+                // then we dismiss the current event if there is no inclusive filter child matching the event
+                return !pref.getChildren().stream().anyMatch(
+                    child -> eventEntity.equals(child.getScopeReference())
+                        || eventEntity.hasParent(child.getScopeReference())
+                );
+            }
+        }
+
+        it = preferences.getInclusiveFiltersThatHasNoParents();
+        while (it.hasNext()) {
+            ScopeNotificationFilterPreference pref = it.next();
+
+            // If the inclusive filter match the event location...
+            if (eventEntity.equals(pref.getScopeReference()) || eventEntity.hasParent(pref.getScopeReference())) {
+                // Then we don't dismiss the event
+                return false;
+            }
+        }
+
+        // If we are here, we have filter preferences but no one is matching the current event location,
+        // so we dismiss this event
+        return true;
     }
 
     @Override
-    public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
+    public boolean matchesPreference(NotificationPreference preference)
     {
-        return scopeNotificationFilterExpressionGenerator.filterExpression(user, preference);
+        return preference.getCategory().equals(NotificationPreferenceCategory.DEFAULT)
+                && preference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE);
     }
 
     @Override
-    public AbstractOperatorNode generateFilterExpression(DocumentReference user, NotificationPreference preference,
-            NotificationFilterType filterType)
+    public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
-        // TODO: maybe stop using AbstractScopeOrUserNotificationFilter
-        // Not used
+        return expressionGenerator.filterExpression(user,
+                (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE));
+    }
+
+    @Override
+    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type)
+    {
+        // We don't handle this use-case anymore
         return null;
     }
 
     @Override
-    protected boolean matchRestriction(Event event, ScopeNotificationFilterPreference scopePreference)
-            throws NotificationException
+    public String getName()
     {
-        return event.getDocument().equals(scopePreference.getScopeReference())
-                || event.getDocument().hasParent(scopePreference.getScopeReference());
+        return FILTER_NAME;
     }
 
-    @Override
-    protected ScopeNotificationFilterPreference convertPreferences(NotificationFilterPreference pref)
+    private EntityReference getEventEntity(Event event)
     {
-        return new ScopeNotificationFilterPreference(pref, entityReferenceResolver);
-    }
-
-    @Override
-    protected AbstractOperatorNode generateNode(ScopeNotificationFilterPreference filterPreferenceScope)
-    {
-        return locationOperatorNodeGenerator.generateNode(filterPreferenceScope.getScopeReference());
-    }
-
-    @Override
-    protected int getDeepLevel(NotificationFilterPreference pref)
-    {
-        ScopeNotificationFilterPreference scopeNotificationFilterPreference = (ScopeNotificationFilterPreference) pref;
-        return scopeNotificationFilterPreference.getScopeReference().size();
+        if (event.getDocument() != null) {
+            return event.getDocument();
+        }
+        if (event.getSpace() != null) {
+            return event.getSpace();
+        }
+        return event.getWiki();
     }
 }

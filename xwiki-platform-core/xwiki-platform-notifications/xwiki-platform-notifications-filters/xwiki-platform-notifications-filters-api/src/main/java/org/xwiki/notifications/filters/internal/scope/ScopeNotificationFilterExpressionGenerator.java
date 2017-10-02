@@ -19,34 +19,23 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
-import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 
 /**
+ * Generate an {@link ExpressionNode} to handle Scope Notification Filters for a given pair of user / event type.
+ *
  * @version $Id$
  * @since 9.9RC1
  */
@@ -54,38 +43,80 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class ScopeNotificationFilterExpressionGenerator
 {
-    protected static final String ERROR = "Failed to filter the notifications.";
-
     @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
-    private EntityReferenceResolver<String> entityReferenceResolver;
+    private ScopeNotificationFilterPreferencesGetter scopeNotificationFilterPreferencesGetter;
 
     @Inject
     private LocationOperatorNodeGenerator locationOperatorNodeGenerator;
 
-    @Inject
-    protected Logger logger;
-
-    public AbstractNode filterExpression(DocumentReference user, NotificationPreference preference)
+    /**
+     * Generate a filter expression for the given user and event type according to the scope notification filter
+     * preferences.
+     * @param user user for who we display notifications
+     * @param eventType type of the event on which we are filtering
+     * @return the expression node corresponding to the filter
+     */
+    public AbstractOperatorNode filterExpression(DocumentReference user, String eventType)
     {
         // The node we construct
         AbstractOperatorNode topNode = null;
 
-        // The filters
-        Iterator<LocationFilter> it = getExclusiveFiltersThatHasNoParents(
-                computeParentFilters(generateLocationFilters(user, preference)));
+        // Get the filters to handle
+        ScopeNotificationFilterPreferencesHierarchy preferences
+                = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(user, eventType);
 
+        // The aim is to generate a black list with exceptions (handleExclusiveFilters) and a white
+        // list (handleTopLevelInclusiveFilters).
+        // It is a complex query, for more information see: https://jira.xwiki.org/browse/XWIKI-14713
+        topNode = handleExclusiveFilters(topNode, preferences);
+        topNode = handleTopLevelInclusiveFilters(topNode, preferences);
+
+        // At this point, topNode looks like:
+        //
+        // (NOT (event.location = A) OR (event.location = A.B) OR (event.location = A.C))
+        // AND
+        // (NOT (event.location = X) OR (event.location = X.Y) OR (event.location = X.Z))
+        // OR
+        // event.location = D
+        // OR
+        // event.location = E
+        // OR
+        // event.location = F
+        // etc...
+
+        return topNode;
+    }
+
+    private AbstractOperatorNode handleExclusiveFilters(AbstractOperatorNode node,
+            ScopeNotificationFilterPreferencesHierarchy preferences)
+    {
+        AbstractOperatorNode topNode = node;
+
+        Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
+
+        // Handle exclusive filters
         while (it.hasNext()) {
-            LocationFilter filter = it.next();
+            ScopeNotificationFilterPreference pref = it.next();
 
-            AbstractOperatorNode filterNode = filter.getNode();
-            // Add children
-            for (LocationFilter childFilter : filter.getChildren()) {
-                filterNode = filterNode.or(childFilter.getNode());
+            // For each exclusive filter, we want to generate a query to black list the location with a white list of
+            // sub locations.
+            // Ex:   "wiki1:Space1" is blacklisted but:
+            //     - "wiki1:Space1.Space2" is white listed
+            //     - "wiki1:Space1.Space3" is white listed too
+
+            // The filterNode is something like "NOT (event.location = A)".
+            AbstractOperatorNode filterNode = generateNode(pref);
+
+            // Children are a list of inclusive filters located under the current one.
+            for (ScopeNotificationFilterPreference childFilter : pref.getChildren()) {
+                // child filter is something like "event.location = A.B"
+                filterNode = filterNode.or(generateNode(childFilter));
             }
 
+            // At this point, filter node looks like:
+            // NOT (event.location = A) OR (event.location = A.B) or (event.location = A.C)
+
+            // Chain this filter to the previous one
             if (topNode == null) {
                 topNode = filterNode;
             } else {
@@ -93,99 +124,47 @@ public class ScopeNotificationFilterExpressionGenerator
             }
         }
 
+        // At this point, topNode looks like:
+        // (NOT (event.location = A) OR (event.location = A.B) OR (event.location = A.C))
+        // AND
+        // (NOT (event.location = X) OR (event.location = X.Y) OR (event.location = X.Z))
+        // AND ...
+
         return topNode;
     }
 
-    private Iterator<LocationFilter> getExclusiveFiltersThatHasNoParents(List<LocationFilter> filters)
+    private AbstractOperatorNode handleTopLevelInclusiveFilters(AbstractOperatorNode node,
+            ScopeNotificationFilterPreferencesHierarchy preferences)
     {
-        return filters.stream().filter(
-                filter -> !filter.hasParent() && filter.getType() == NotificationFilterType.EXCLUSIVE
-        ).iterator();
-    }
+        AbstractOperatorNode topNode = node;
 
-    private List<LocationFilter> computeParentFilters(List<LocationFilter> filters)
-    {
-        // Compare filters 2 by 2 to see if some are children of the other
-        for (LocationFilter filter : filters) {
-            for (LocationFilter otherFilter : filters) {
-                if (filter == otherFilter) {
-                    continue;
-                }
-                if (otherFilter.isParentOf(filter)) {
-                    otherFilter.getChildren().add(filter);
-                    filter.setHasParent(true);
-                }
+        Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
+        while (it.hasNext()) {
+            ScopeNotificationFilterPreference pref = it.next();
+
+            if (topNode == null) {
+                topNode = generateNode(pref);
+            } else {
+                topNode = topNode.or(generateNode(pref));
             }
         }
 
-        return filters;
+        // At this point, topNode looks like:
+        // topNode OR event.location = D or event.location = E or event.location = F OR...
+
+        return topNode;
     }
 
-    /**
-     * @param filterPreference a filter preference
-     * @return either or not the preference should be applied to all events
-     */
-    private boolean matchAllEvents(NotificationFilterPreference filterPreference)
+    private AbstractOperatorNode generateNode(ScopeNotificationFilterPreference scopeNotificationFilterPreference)
     {
-        // When the list of event types concerned by the filter is empty, we consider that the filter concerns
-        // all events.
-        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
-    }
+        AbstractOperatorNode filterNode
+                = locationOperatorNodeGenerator.generateNode(scopeNotificationFilterPreference.getScopeReference());
 
-    /**
-     * @param filterPreference a filter preference
-     * @param preference a notification preference
-     * @return if the filter preference concerns the event of the notification preference
-     */
-    private boolean matchEventType(NotificationFilterPreference filterPreference, NotificationPreference preference)
-    {
-        // The event types concerned by the filter
-        List<String> filterEventTypes = filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE);
-
-        // The event type concerned by the notification preference
-        Object preferenceEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-
-        // There is a match of the preference event type is not blank (it should not...) and if the filter concerns it
-        // (or all events)
-        return preferenceEventType != null && StringUtils.isNotBlank((String) preferenceEventType)
-                && (filterEventTypes.contains(preferenceEventType) || filterEventTypes.isEmpty());
-    }
-
-    private List<LocationFilter> generateLocationFilters(DocumentReference user, NotificationPreference eventTypePref)
-    {
-        List<LocationFilter> filters = new ArrayList<>();
-
-        try {
-            // Get every filterPreference linked to the current filter
-            Set<NotificationFilterPreference> filterPreferences = notificationFilterManager.getFilterPreferences(user);
-
-            Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
-                    pref -> ScopeNotificationFilter.FILTER_NAME.equals(pref.getFilterName())
-                    && ( matchAllEvents(pref) || matchEventType(pref, eventTypePref) )
-            );
-
-            Iterator<NotificationFilterPreference> iterator = filterPreferenceStream.iterator();
-            while (iterator.hasNext()) {
-
-                ScopeNotificationFilterPreference filterPref = new ScopeNotificationFilterPreference(iterator.next(),
-                        entityReferenceResolver);
-
-                AbstractOperatorNode filterNode
-                        = locationOperatorNodeGenerator.generateNode(filterPref.getScopeReference());
-
-                // If we have an EXCLUSIVE filter, negate the filter node
-                if (filterPref.getFilterType().equals(NotificationFilterType.EXCLUSIVE)) {
-                    filterNode = not(filterNode);
-                }
-
-                LocationFilter filter = new LocationFilter(filterNode, filterPref.getScopeReference(),
-                        filterPref.getFilterType());
-                filters.add(filter);
-            }
-        } catch (NotificationException e) {
-            logger.warn(ERROR, e);
+        // If we have an EXCLUSIVE filter, negate the filter node
+        if (scopeNotificationFilterPreference.getFilterType().equals(NotificationFilterType.EXCLUSIVE)) {
+            filterNode = not(filterNode);
         }
 
-        return filters;
+        return filterNode;
     }
 }

@@ -29,6 +29,7 @@ import org.xwiki.stability.Unstable;
  * Represent a preference set by a user concerning a given type of event.
  * A {@link NotificationPreference} should be self-sufficient, therefore, it should contain every information needed
  * about what it does.
+ *
  * A preference is defined for a category of event, since a specific date and in a given format.
  *
  * @version $Id$

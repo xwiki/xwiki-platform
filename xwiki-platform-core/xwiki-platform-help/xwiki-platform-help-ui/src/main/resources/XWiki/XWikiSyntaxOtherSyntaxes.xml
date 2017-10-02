@@ -126,15 +126,14 @@
 
 === 1.0 Other Syntaxes ===
 
-The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
-* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
-* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
-* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
-* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
-* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
-* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
-
-{{warning}}The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.{{/warning}}
-
+Other syntaxes are also available (bundled or through [[extensions>>http://extensions.xwiki.org/xwiki/bin/view/Main/WebHome#|t=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=syntax]]):
+* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]] (Bundled)
+* [[MediaWiki&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/MediaWiki/MediaWiki%20Syntax/]] (Extension)
+* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]] (Bundled)
+* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]] (Bundled)
+* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]] (Bundled)
+* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]] (Bundled)
+* [[Markdown&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Markdown%20Syntax%201.2]] (Extension)
+* [[DokuWiki&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/DokuWiki/DokuWiki%20Syntax%20Parser/]] (Extension)
 </content>
 </xwikidoc>

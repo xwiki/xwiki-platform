@@ -100,7 +100,7 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     /**
      * Helper that allows to create {@link GreaterThanNode} without having to instantiate new objects.
      *
-     * @param node the node that will be the second operand of the "&gt=" node
+     * @param node the node that will be the second operand of the "&gt;=" node
      * @return a {@link GreaterThanNode} where the current object is the first operand and the parameter is the second
      * operand
      *
@@ -114,7 +114,7 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     /**
      * Helper that allows to create {@link LesserThanNode} without having to instantiate new objects.
      *
-     * @param node the node that will be the second operand of the "&lt=" node
+     * @param node the node that will be the second operand of the "&lt;=" node
      * @return a {@link LesserThanNode} where the current object is the first operand and the parameter is the second
      * operand
      *

@@ -136,7 +136,7 @@ public class SOLRSearchSource extends AbstractSearchSource
         // Boost
         // FIXME: take it from configuration
         query.bindValue("qf",
-            "title^10.0 name^10.0 doccontent^2.0 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4 "
+            "title_^10.0 name^10.0 doccontent^2.0 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4 "
                 + "author_display^0.08 creator_display^0.08 " + "comment^0.016 attauthor_display^0.016 space^0.016");
 
         // Order
@@ -161,7 +161,6 @@ public class SOLRSearchSource extends AbstractSearchSource
 
                 DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(document);
                 searchResult.setPageFullName(this.localEntityReferenceSerializer.serialize(documentReference));
-                searchResult.setTitle((String) document.get(FieldUtils.TITLE));
                 searchResult.setWiki(documentReference.getWikiReference().getName());
                 searchResult.setSpace(this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
                 searchResult.setPageName(documentReference.getName());
@@ -181,20 +180,27 @@ public class SOLRSearchSource extends AbstractSearchSource
                     searchResult.setAuthorName((String) document.get(FieldUtils.AUTHOR_DISPLAY));
                 }
 
-                Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
+                Locale docLocale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
+                Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.LOCALE));
+
+                List<String> titles = (List<String>) document.get(FieldUtils.getFieldName(FieldUtils.TITLE, locale));
+
+                searchResult.setTitle(titles == null || titles.isEmpty() ?
+                    null :
+                    titles.get(0));
 
                 List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
 
                 String pageUri = null;
-                if (Locale.ROOT == locale) {
+                if (Locale.ROOT == docLocale) {
                     pageUri =
                         Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
                                 spaces, searchResult.getPageName()).toString();
                 } else {
-                    searchResult.setLanguage(locale.toString());
+                    searchResult.setLanguage(docLocale.toString());
                     pageUri =
                         Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, spaces,
-                                searchResult.getPageName(), locale).toString();
+                                searchResult.getPageName(), docLocale).toString();
                 }
 
                 Link pageLink = new Link();

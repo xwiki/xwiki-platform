@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.NotificationFormat;
@@ -36,6 +37,7 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
+import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.stability.Unstable;
@@ -58,18 +60,30 @@ public class WatchedLocationReference implements WatchedEntityReference
 
     private EntityReferenceResolver<String> resolver;
 
+    private ScopeNotificationFilterLocationStateComputer stateComputer;
+
     /**
      * Construct a WatchedLocationReference.
      * @param entityReference the reference of the location to watch
      * @param serializedReference the serialized reference of the location to watch
      * @param resolver the default entity reference resolver
+     * @param stateComputer the default ScopeNotificationFilterLocationStateComputer
+     * @since 9.9RC1
      */
     public WatchedLocationReference(EntityReference entityReference, String serializedReference,
-            EntityReferenceResolver<String> resolver)
+            EntityReferenceResolver<String> resolver,
+            ScopeNotificationFilterLocationStateComputer stateComputer)
     {
         this.entityReference = entityReference;
         this.serializedReference = serializedReference;
         this.resolver = resolver;
+        this.stateComputer = stateComputer;
+    }
+
+    @Override
+    public boolean isWatched(DocumentReference userReference)
+    {
+        return stateComputer.isLocationWatched(userReference, this.entityReference);
     }
 
     @Override
@@ -86,23 +100,21 @@ public class WatchedLocationReference implements WatchedEntityReference
     }
 
     @Override
-    public boolean match(NotificationFilterPreference notificationFilterPreference)
+    public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-                && notificationFilterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()) {
-            ScopeNotificationFilterPreference scope
-                    = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
-            EntityReference scopeReference = scope.getScopeReference();
-            if (scopeReference != null) {
-                return entityReference.equals(scopeReference) || entityReference.hasParent(scopeReference);
-            }
-        }
-
-        return false;
+        DefaultNotificationFilterPreference preference = createFilterPreference();
+        return new ScopeNotificationFilterPreference(preference, entityReference);
     }
 
     @Override
-    public NotificationFilterPreference createFilterPreference()
+    public NotificationFilterPreference createExclusiveFilterPreference()
+    {
+        DefaultNotificationFilterPreference preference = createFilterPreference();
+        preference.setFilterType(NotificationFilterType.EXCLUSIVE);
+        return new ScopeNotificationFilterPreference(preference, entityReference);
+    }
+
+    private DefaultNotificationFilterPreference createFilterPreference()
     {
         DefaultNotificationFilterPreference filterPreference
                 = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
@@ -113,7 +125,7 @@ public class WatchedLocationReference implements WatchedEntityReference
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
-        filterPreference.setActive(true);
+        filterPreference.setActive(false);
 
         // Properties
         Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
@@ -137,6 +149,12 @@ public class WatchedLocationReference implements WatchedEntityReference
                 break;
         }
 
-        return new ScopeNotificationFilterPreference(filterPreference, entityReference);
+        return filterPreference;
+    }
+
+    @Override
+    public String toString()
+    {
+        return serializedReference;
     }
 }

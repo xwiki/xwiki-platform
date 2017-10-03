@@ -907,7 +907,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       ##
       #if ($services.notification.watch.isEnabled())
         &lt;div class="col-xs-12 notifications-toggles"&gt;
-          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationDirectlyWatched($scope))checked="checked"#end#end
+          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
           &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
         &lt;/div&gt;
       #end

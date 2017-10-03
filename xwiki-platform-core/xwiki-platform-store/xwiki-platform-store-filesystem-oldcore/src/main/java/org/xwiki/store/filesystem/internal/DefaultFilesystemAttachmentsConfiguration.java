@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
@@ -42,8 +43,13 @@ public class DefaultFilesystemAttachmentsConfiguration implements FilesystemAtta
 
     /**
      * Configuration source from where to read configuration data from.
+     *
+     * This configuration is loaded when the FilesystemAttachment Store is initialized, so we cannot use the
+     * default implementation for ConfigurationSource because it looks at the main store which might be not initialized
+     * yet.
      */
     @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
     @Override

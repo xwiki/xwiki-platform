@@ -735,8 +735,11 @@ public class ModelFactory
 
             for (List<BaseObject> objects : xwikiDocument.getXObjects().values()) {
                 for (BaseObject object : objects) {
-                    page.getObjects().getObjectSummaries()
-                        .add(toRestObject(baseUri, doc, object, false, withPrettyNames));
+                    // Deleting an object leads to a null entry in the list of objects.
+                    if (object != null) {
+                        page.getObjects().getObjectSummaries()
+                            .add(toRestObject(baseUri, doc, object, false, withPrettyNames));
+                    }
                 }
             }
         }

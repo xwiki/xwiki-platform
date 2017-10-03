@@ -148,6 +148,11 @@
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxb</artifactId>
     </dependency>
+    <!-- Replace the version triggered by Restlet by a more accurate one -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>

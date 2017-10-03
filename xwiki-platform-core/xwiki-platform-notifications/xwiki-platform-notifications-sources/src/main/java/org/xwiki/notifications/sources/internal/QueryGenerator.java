@@ -39,6 +39,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
 import org.xwiki.notifications.filters.expression.DateValueNode;
 import org.xwiki.notifications.filters.expression.EntityReferenceNode;
@@ -61,6 +62,8 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
  * Generate a query to retrieve notifications events according to the preferences of the user.
@@ -235,10 +238,14 @@ public class QueryGenerator
         while (it.hasNext()) {
             NotificationPreference preference = it.next();
 
-            AbstractOperatorNode preferenceTypeNode = new EqualsNode(
-                    new PropertyValueNode(EventProperty.TYPE),
-                    new StringValueNode(
-                            (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)
+            AbstractOperatorNode preferenceTypeNode = new AndNode(
+                    new EqualsNode(
+                            value(EventProperty.TYPE),
+                            value((String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE))
+                    ),
+                    new GreaterThanNode(
+                            value(EventProperty.DATE),
+                            value(preference.getStartDate())
                     )
             );
 

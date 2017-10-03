@@ -71,7 +71,7 @@ notifications.filters.preferences.scopeNotificationFilter.page=Page only
 notifications.filters.preferences.scopeNotificationFilter.space=Page and children
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
-notifications.filters.preferences.allEvents=All events (even disabled)
+notifications.filters.preferences.allEvents=-
 
 notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
 notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive

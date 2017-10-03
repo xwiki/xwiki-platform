@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.stability.Unstable;
 
@@ -32,20 +33,29 @@ import org.xwiki.stability.Unstable;
 public interface WatchedEntityReference
 {
     /**
+     * @param userReference a user
+     * @return if the given user watch the current entity reference
+     * @since 9.9RC1
+     */
+    boolean isWatched(DocumentReference userReference);
+
+    /**
      * @param notificationFilterPreference a filter preference
      * @return either or not the filter preference concerns this exact entity
      */
     boolean matchExactly(NotificationFilterPreference notificationFilterPreference);
 
     /**
-     * @param notificationFilterPreference a filter preference
-     * @return either or not the filter preference concerns this entity, directly or transitively
+     * Create a notification filter preference to watch this entity.
+     * @return a NotificationFilterPreference to save in order to watch this entity
+     * @since 9.9RC1
      */
-    boolean match(NotificationFilterPreference notificationFilterPreference);
+    NotificationFilterPreference createInclusiveFilterPreference();
 
     /**
      * Create a notification filter preference to watch this entity.
      * @return a NotificationFilterPreference to save in order to watch this entity
+     * @since 9.9RC1
      */
-    NotificationFilterPreference createFilterPreference();
+    NotificationFilterPreference createExclusiveFilterPreference();
 }

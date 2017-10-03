@@ -19,9 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -35,6 +33,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 
@@ -54,53 +53,55 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     @Override
     public void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
-        Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
-
-        // If a filter preference concerning this entity already exists, use it
-        while (filterPreferences.hasNext()) {
-            NotificationFilterPreference notificationFilterPreference = filterPreferences.next();
-            if (entity.matchExactly(notificationFilterPreference)) {
-                // If the filter preference is not enabled, then enable it
-                if (!notificationFilterPreference.isEnabled()) {
-                    notificationFilterManager.setFilterPreferenceEnabled(notificationFilterPreference.getFilterName(),
-                            true);
-                }
-                // In any case, we have nothing else to do
-                return;
-            }
-        }
-
-        // If we reach this line, it means we need to create a new filter preference
-        notificationFilterManager.saveFilterPreferences(Sets.newHashSet(entity.createFilterPreference()));
+        handleEntity(entity, user, true);
     }
 
     @Override
     public void unwatchEntity(WatchedEntityReference entity, DocumentReference user)
             throws NotificationException
     {
-        Stream<NotificationFilterPreference> prefs = getAllEventsFilterPreferences(user);
-        Optional<NotificationFilterPreference> pref = prefs.filter(p -> entity.matchExactly(p)
-            && p.getFilterFormats().containsAll(Arrays.asList(NotificationFormat.values()))).findFirst();
-        if (!pref.isPresent()) {
-            throw new NotificationException("The entity is not watched.");
-        }
-
-        notificationFilterManager.deleteFilterPreference(pref.get().getFilterPreferenceName());
+        handleEntity(entity, user, false);
     }
 
-    @Override
-    public boolean isEntityWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException
-    {
-        return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.match(pref)
-                && pref.getFilterFormats().containsAll(Arrays.asList(NotificationFormat.values())));
-    }
-
-    @Override
-    public boolean isEntityDirectlyWatched(WatchedEntityReference entity, DocumentReference user)
+    private void handleEntity(WatchedEntityReference entity, DocumentReference user, boolean shouldBeWatched)
             throws NotificationException
     {
-        return getAllEventsFilterPreferences(user).anyMatch(pref -> entity.matchExactly(pref)
-            && pref.getFilterFormats().containsAll(Arrays.asList(NotificationFormat.values())));
+        // If the entity is already in the desired state, then we have nothing to do
+        if (entity.isWatched(user) == shouldBeWatched) {
+            return;
+        }
+
+        Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
+
+        boolean thereIsAMatch = false;
+
+        // Look if an existing filter match the entity
+        while (filterPreferences.hasNext()) {
+            NotificationFilterPreference notificationFilterPreference = filterPreferences.next();
+            if (entity.matchExactly(notificationFilterPreference)) {
+                thereIsAMatch = true;
+
+                if (notificationFilterPreference.getFilterType() == NotificationFilterType.INCLUSIVE
+                        && notificationFilterPreference.isEnabled() != shouldBeWatched)
+                {
+                    notificationFilterManager.setFilterPreferenceEnabled(
+                            notificationFilterPreference.getFilterPreferenceName(),
+                            shouldBeWatched);
+                } else if (notificationFilterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE
+                        && notificationFilterPreference.isEnabled() == shouldBeWatched)
+                {
+                    notificationFilterManager.setFilterPreferenceEnabled(
+                            notificationFilterPreference.getFilterPreferenceName(),
+                            !shouldBeWatched);
+                }
+            }
+        }
+
+        // But it might been still unwatched because of an other filter!
+        if (!thereIsAMatch || entity.isWatched(user) != shouldBeWatched) {
+            notificationFilterManager.saveFilterPreferences(
+                    Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
+        }
     }
 
     private Stream<NotificationFilterPreference> getAllEventsFilterPreferences(DocumentReference user)
@@ -112,5 +113,11 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             filterPreference -> filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty()
             && filterPreference.getFilterFormats().size() == NotificationFormat.values().length
         );
+    }
+
+    private NotificationFilterPreference createFilterPreference(WatchedEntityReference entity, boolean shouldBeWatched)
+    {
+        return shouldBeWatched ? entity.createInclusiveFilterPreference()
+                : entity.createExclusiveFilterPreference();
     }
 }

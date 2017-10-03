@@ -45,7 +45,7 @@ public class ScopeNotificationFilterLocationStateComputer
     private enum WatchedState {
         WATCHED,
         NOT_WATCHED,
-        UNKNOW
+        UNKNOWN
     }
 
     /**
@@ -79,7 +79,7 @@ public class ScopeNotificationFilterLocationStateComputer
         }
 
         WatchedState state = handleExclusiveFilters(location, preferences);
-        if (state != WatchedState.UNKNOW) {
+        if (state != WatchedState.UNKNOWN) {
             return state == WatchedState.WATCHED;
         }
 
@@ -107,7 +107,7 @@ public class ScopeNotificationFilterLocationStateComputer
     private WatchedState handleExclusiveFilters(EntityReference location,
             ScopeNotificationFilterPreferencesHierarchy preferences)
     {
-        WatchedState state = WatchedState.UNKNOW;
+        WatchedState state = WatchedState.UNKNOWN;
         int deepestLevel = 0;
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();

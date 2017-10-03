@@ -88,6 +88,9 @@ notifications.filters.preferences.setEnabled.inProgress=Saving...
 notifications.filters.preferences.setEnabled.done=Filter preference saved!
 notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
 
+## Notifications toggles
+notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
+
 ## Notifications formats
 notifications.format.alert=Alert
 notifications.format.email=Email

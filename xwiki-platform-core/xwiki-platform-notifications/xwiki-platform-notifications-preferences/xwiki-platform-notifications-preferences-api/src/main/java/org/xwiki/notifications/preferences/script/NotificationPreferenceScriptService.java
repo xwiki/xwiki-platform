@@ -150,4 +150,16 @@ public class NotificationPreferenceScriptService implements ScriptService
                     e);
         }
     }
+
+    /**
+     * @return if there is a least one preference enabled
+     * @throws NotificationException if an error occurs
+     * @since 9.9RC1
+     */
+    public boolean hasAnyEnabledNotificationPreferences() throws NotificationException
+    {
+        List<NotificationPreference> preferences
+                = notificationPreferenceManager.getAllPreferences(documentAccessBridge.getCurrentUserReference());
+        return preferences.stream().anyMatch(NotificationPreference::isNotificationEnabled);
+    }
 }

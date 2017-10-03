@@ -20,6 +20,8 @@
 package org.xwiki.notifications.filters.expression.generics;
 
 import org.xwiki.notifications.filters.expression.EqualsNode;
+import org.xwiki.notifications.filters.expression.GreaterThanNode;
+import org.xwiki.notifications.filters.expression.LesserThanNode;
 import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.stability.Unstable;
@@ -93,6 +95,34 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     public StartsWith startsWith(AbstractValueNode node)
     {
         return new StartsWith(this, node);
+    }
+
+    /**
+     * Helper that allows to create {@link GreaterThanNode} without having to instantiate new objects.
+     *
+     * @param node the node that will be the second operand of the "&gt=" node
+     * @return a {@link GreaterThanNode} where the current object is the first operand and the parameter is the second
+     * operand
+     *
+     * @since 9.9RC1
+     */
+    public GreaterThanNode greaterThan(AbstractValueNode node)
+    {
+        return new GreaterThanNode(this, node);
+    }
+
+    /**
+     * Helper that allows to create {@link LesserThanNode} without having to instantiate new objects.
+     *
+     * @param node the node that will be the second operand of the "&lt=" node
+     * @return a {@link LesserThanNode} where the current object is the first operand and the parameter is the second
+     * operand
+     *
+     * @since 9.9RC1
+     */
+    public LesserThanNode lesserThan(AbstractValueNode node)
+    {
+        return new LesserThanNode(this, node);
     }
 
     /**

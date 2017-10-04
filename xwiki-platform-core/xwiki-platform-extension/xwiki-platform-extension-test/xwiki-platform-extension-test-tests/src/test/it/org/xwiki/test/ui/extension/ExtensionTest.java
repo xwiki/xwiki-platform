@@ -338,8 +338,8 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         TestExtension extension = getRepositoryTestUtils().getTestExtension(extensionId, "xar");
         extension.setName("Alice Wiki Macro");
         extension.setSummary("A **useless** macro");
-        extension.addAuthor(new DefaultExtensionAuthor("Thomas", null));
-        extension.addAuthor(new DefaultExtensionAuthor("Marius", null));
+        extension.addAuthor(new DefaultExtensionAuthor("Thomas", (String) null));
+        extension.addAuthor(new DefaultExtensionAuthor("Marius", (String) null));
         extension.addFeature("alice-extension");
         extension.addLicense(new ExtensionLicense("My own license", null));
         extension.setWebsite("http://www.alice.com");

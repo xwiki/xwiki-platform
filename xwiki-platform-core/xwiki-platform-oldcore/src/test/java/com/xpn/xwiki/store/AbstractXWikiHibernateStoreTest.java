@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.store;
 
-import static org.mockito.Mockito.*;
-
 import javax.inject.Provider;
 
 import org.hibernate.SessionFactory;
@@ -34,7 +32,11 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Base class for Hibernate store unit tests.
@@ -47,7 +49,7 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
     /**
      * The mock XWiki context.
      */
-    protected XWikiContext context = mock(XWikiContext.class);
+    protected XWikiContext xcontext = mock(XWikiContext.class);
 
     /**
      * The Hibernate session.
@@ -59,22 +61,24 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
      */
     protected Transaction transaction = mock(Transaction.class);
 
+    protected HibernateStore hibernateStore;
+
     @Before
     public void setUp() throws Exception
     {
         // For XWikiHibernateBaseStore#initialize()
 
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(executionContext.getProperty("xwikicontext")).thenReturn(context);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
 
         Execution execution = getMocker().getInstance(Execution.class);
         when(execution.getContext()).thenReturn(executionContext);
 
         Provider<XWikiContext> xcontextProvider = getMocker().registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.context);
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
 
         XWiki wiki = mock(XWiki.class);
-        when(context.getWiki()).thenReturn(wiki);
+        when(this.xcontext.getWiki()).thenReturn(wiki);
 
         // For XWikiHibernateBaseStore#initHibernate()
 
@@ -88,9 +92,15 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         when(wrappedSessionFactory.openSession()).thenReturn(session);
         when(session.beginTransaction()).thenReturn(transaction);
 
+        // HibernateStore
+        this.hibernateStore = getMocker().registerMockComponent(HibernateStore.class);
+
         // Return null on first get to force the session/transaction creation.
-        when(context.get("hibsession")).thenReturn(null, session);
-        when(context.get("hibtransaction")).thenReturn(null, transaction);
+        when(this.hibernateStore.getCurrentSession()).thenReturn(session);
+        when(this.hibernateStore.getCurrentTransaction()).thenReturn(transaction);
+
+        // Default is schema mode
+        when(this.hibernateStore.isInSchemaMode()).thenReturn(true);
     }
 
     /**

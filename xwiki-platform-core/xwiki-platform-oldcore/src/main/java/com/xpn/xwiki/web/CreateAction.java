@@ -246,7 +246,7 @@ public class CreateAction extends XWikiAction
     }
 
     /**
-     * @param context
+     * @param xcontext
      * @param parent
      * @param title
      * @param template

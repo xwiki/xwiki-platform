@@ -388,7 +388,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * @return restored attachment
-     * @param context the current {@link XWikiContext context}
+     * @param xcontext the current {@link XWikiContext context}
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
      * @since 9.9RC1
      */

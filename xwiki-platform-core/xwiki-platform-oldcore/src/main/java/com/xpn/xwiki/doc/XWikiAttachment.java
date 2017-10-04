@@ -540,7 +540,7 @@ public class XWikiAttachment implements Cloneable
      * Retrieve an attachment as an XML string. You should prefer
      * {@link #toXML(OutputTarget, boolean, boolean, boolean, XWikiContext)} to avoid memory loads when appropriate.
      *
-     * @param context current XWikiContext
+     * @param xcontext current XWikiContext
      * @return a string containing an XML representation of the attachment
      * @throws XWikiException when an error occurs during wiki operations
      * @since 9.9RC1

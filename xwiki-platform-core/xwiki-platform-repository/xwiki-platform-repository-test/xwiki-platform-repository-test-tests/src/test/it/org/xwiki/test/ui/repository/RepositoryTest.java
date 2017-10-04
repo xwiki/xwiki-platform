@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.repository;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +90,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         this.baseExtension.addLicense(this.baseLicense);
 
         this.baseAuthor =
-            new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", USER_CREDENTIALS.getUserName())));
+            new DefaultExtensionAuthor("User Name", getUtil().getURL("XWiki", USER_CREDENTIALS.getUserName()));
         this.baseExtension.addAuthor(this.baseAuthor);
 
         this.baseExtension

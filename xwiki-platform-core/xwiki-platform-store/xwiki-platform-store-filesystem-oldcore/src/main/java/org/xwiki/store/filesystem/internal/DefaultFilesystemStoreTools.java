@@ -37,9 +37,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.locks.LockProvider;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 /**
  * Default tools for getting files to store data in the filesystem. This should be replaced by a module which provides a
  * secure extension of java.io.File.
@@ -242,29 +239,6 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
         return new DefaultDeletedDocumentContentFileProvider(getDeletedDocumentContentDir(documentReference, index));
     }
 
-    /**
-     * @param directory the location of the data for the deleted attachment.
-     * @return the name of the attachment file as extracted from the directory name.
-     */
-    private static String getFilenameFromDeletedAttachmentDirectory(final File directory)
-    {
-        final String name = directory.getName();
-        final String encodedOut = name.substring(0, name.lastIndexOf(DELETED_ATTACHMENT_NAME_SEPARATOR));
-        return GenericFileUtils.getURLDecoded(encodedOut);
-    }
-
-    /**
-     * @param directory the location of the data for the deleted attachment.
-     * @return the deletion date as extracted from the directory name.
-     */
-    private static Date getDeleteDateFromDeletedAttachmentDirectory(final File directory)
-    {
-        final String name = directory.getName();
-        // no need to url decode this since it should only contain numbers 0-9.
-        long time = Long.parseLong(name.substring(name.lastIndexOf(DELETED_ATTACHMENT_NAME_SEPARATOR) + 1));
-        return new Date(time);
-    }
-
     @Override
     public String getStorageLocationPath()
     {
@@ -284,28 +258,23 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     @Override
-    public AttachmentFileProvider getAttachmentFileProvider(final XWikiAttachment attachment)
+    public AttachmentFileProvider getAttachmentFileProvider(final AttachmentReference attachmentReference)
     {
-        return new DefaultAttachmentFileProvider(this.getAttachmentDir(attachment), attachment.getFilename());
+        return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName());
     }
 
-    /**
-     * Get the directory for storing files for an attachment. This will look like
-     * storage/xwiki/Main/WebHome/~this/attachments/file.name/
-     *
-     * @param attachment the attachment to get the directory for.
-     * @return a File representing the directory. Note: The directory may not exist.
-     */
-    private File getAttachmentDir(final XWikiAttachment attachment)
+    @Override
+    public boolean attachmentExist(AttachmentReference attachmentReference)
     {
-        final XWikiDocument doc = attachment.getDoc();
-        if (doc == null) {
-            throw new NullPointerException(
-                "Could not store attachment because it is not " + "associated with a document.");
-        }
-        final File docDir = getDocumentDir(doc.getDocumentReference(), this.storageDir, this.pathSerializer);
+        return getAttachmentDir(attachmentReference).exists();
+    }
+
+    private File getAttachmentDir(final AttachmentReference attachmentReference)
+    {
+        final File docDir =
+            getDocumentDir(attachmentReference.getDocumentReference(), this.storageDir, this.pathSerializer);
         final File attachmentsDir = new File(docDir, ATTACHMENT_DIR_NAME);
-        return new File(attachmentsDir, GenericFileUtils.getURLEncoded(attachment.getFilename()));
+        return new File(attachmentsDir, GenericFileUtils.getURLEncoded(attachmentReference.getName()));
     }
 
     /**

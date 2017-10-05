@@ -27,8 +27,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-
 /**
  * Tools for getting files to store data in the filesystem. These APIs are in flux and may change at any time without
  * warning. This should be replaced by a module which provides a secure extension of java.io.File.
@@ -61,10 +59,18 @@ public interface FilesystemStoreTools
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
      * location which is repeatable only with the same attachment name, and containing document.
      *
-     * @param attachment the attachment to get a tools for.
+     * @param attachmentReference the reference attachment to get a tools for.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
+     * @since 9.9RC1
      */
-    AttachmentFileProvider getAttachmentFileProvider(XWikiAttachment attachment);
+    AttachmentFileProvider getAttachmentFileProvider(AttachmentReference attachmentReference);
+
+    /**
+     * @param attachmentReference the reference of the attachment
+     * @return true if the attachment exist in the store
+     * @since 9.9RC1
+     */
+    boolean attachmentExist(AttachmentReference attachmentReference);
 
     /**
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate

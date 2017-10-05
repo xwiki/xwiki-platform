@@ -20,7 +20,7 @@
 package org.xwiki.search.solr.internal.job;
 
 import java.util.Comparator;
-import java.util.List;
+import java.util.Iterator;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -36,14 +36,23 @@ public class DocumentReferenceComparator implements Comparator<DocumentReference
     @Override
     public int compare(DocumentReference alice, DocumentReference bob)
     {
-        List<EntityReference> aliceChain = alice.getReversedReferenceChain();
-        List<EntityReference> bobChain = bob.getReversedReferenceChain();
-        for (int i = 0; i < aliceChain.size(); i++) {
-            int diff = aliceChain.get(i).getName().compareTo(bobChain.get(i).getName());
+        Iterator<EntityReference> aliceIterator = alice.getReversedReferenceChain().iterator();
+        Iterator<EntityReference> bobIterator = bob.getReversedReferenceChain().iterator();
+        // The number of components in a document reference can vary (e.g. for nested pages).
+        while (aliceIterator.hasNext() && bobIterator.hasNext()) {
+            int diff = aliceIterator.next().getName().compareTo(bobIterator.next().getName());
             if (diff != 0) {
                 return diff;
             }
         }
+        if (aliceIterator.hasNext()) {
+            // Alice's path is longer.
+            return 1;
+        } else if (bobIterator.hasNext()) {
+            // Bob's path is longer.
+            return -1;
+        }
+        // Both references have the same number of components and they all match. Use the locale as a tie-breaker.
         String aliceLocale = alice.getLocale() != null ? alice.getLocale().toString() : "";
         String bobLocale = bob.getLocale() != null ? bob.getLocale().toString() : "";
         return aliceLocale.compareTo(bobLocale);

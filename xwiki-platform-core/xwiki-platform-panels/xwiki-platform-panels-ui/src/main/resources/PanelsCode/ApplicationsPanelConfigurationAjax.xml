@@ -49,7 +49,7 @@
     ## Get the blacklist configuration
     #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
     ## Get the desired blacklist
-    #set($list = $jsontool.parse($request.blacklist))
+    #set($list = $jsontool.fromString($request.blacklist))
     #foreach($app in $list)
       #set($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $app))
       #if(!$blackListObj)
@@ -64,7 +64,7 @@
       #end
     #end
     ## Get the orderlist configuration
-    #set ($list = $jsontool.parse($request.orderlist))
+    #set ($list = $jsontool.fromString($request.orderlist))
     #foreach ($app in $list)
       #set ($orderObj = $configDoc.getObject('PanelsCode.ApplicationsPanelOrderClass', 'applicationId', $app))
       #if (!$orderObj)

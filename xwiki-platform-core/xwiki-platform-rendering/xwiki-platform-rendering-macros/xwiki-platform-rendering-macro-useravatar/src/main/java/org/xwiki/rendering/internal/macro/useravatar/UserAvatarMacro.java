@@ -40,7 +40,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -166,7 +165,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
-        ImageBlock imageBlock = new ImageBlock(imageReference, false);
+        ImageBlock imageBlock = new ImageBlock(imageReference, !context.isInline());
 
         imageBlock.setParameter("alt", "Picture of " + userReference.getName());
         imageBlock.setParameter("title", userReference.getName());
@@ -179,9 +178,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
             imageBlock.setParameter("height", String.valueOf(parameters.getHeight()));
         }
 
-        List<Block> result = Collections.singletonList(imageBlock);
-
-        return context.isInline() ? result : Collections.singletonList(new GroupBlock(result));
+        return Collections.singletonList(imageBlock);
     }
 
     @Override

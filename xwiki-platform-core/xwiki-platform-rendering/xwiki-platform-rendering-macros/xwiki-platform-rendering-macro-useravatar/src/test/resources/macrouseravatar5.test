@@ -9,8 +9,6 @@
 .#--------------------------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [useravatar] [username=XWiki.UserWithExceptionRetrievingAvatarFile]
-beginGroup
-onImage [Typed = [true] Type = [url] Reference = [/xwiki/resources/icons/xwiki/noavatar.png]] [false] [[alt]=[Picture of UserWithExceptionRetrievingAvatarFile][title]=[UserWithExceptionRetrievingAvatarFile]]
-endGroup
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/resources/icons/xwiki/noavatar.png]] [true] [[alt]=[Picture of UserWithExceptionRetrievingAvatarFile][title]=[UserWithExceptionRetrievingAvatarFile]]
 endMacroMarkerStandalone [useravatar] [username=XWiki.UserWithExceptionRetrievingAvatarFile]
 endDocument

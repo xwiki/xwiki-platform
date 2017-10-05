@@ -94,13 +94,13 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
             try {
                 BaseObject xobject = document.newXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS, xcontext);
 
-                xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, "Main wiki");
+                xobject.setLargeStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, "Main wiki");
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE, "Main.WebHome");
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_LANGUAGE, "en");
                 xobject.setIntValue(XWikiServerClassDocumentInitializer.FIELD_SECURE, 0);
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_STATE, "active");
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_VISIBILITY, "public");
-                xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER,
+                xobject.setLargeStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER,
                     XWikiRightService.SUPERADMIN_USER_FULLNAME);
                 xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, "Home");
 

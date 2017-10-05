@@ -316,22 +316,38 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public void setStringValue(String name, String value)
     {
         BaseStringProperty property = (BaseStringProperty) safeget(name);
-        if (property == null) {
+
+        if (!(property instanceof StringProperty)) {
+            if (property != null) {
+                // Make sure to delete the property if it's not the right type
+                removeField(name);
+            }
+
             property = new StringProperty();
         }
+
         property.setName(name);
         property.setValue(value);
+
         safeput(name, property);
     }
 
     public void setLargeStringValue(String name, String value)
     {
         BaseStringProperty property = (BaseStringProperty) safeget(name);
-        if (property == null) {
+
+        if (!(property instanceof LargeStringProperty)) {
+            if (property != null) {
+                // Make sure to delete the property if it's not the right type
+                removeField(name);
+            }
+
             property = new LargeStringProperty();
         }
+
         property.setName(name);
         property.setValue(value);
+
         safeput(name, property);
     }
 

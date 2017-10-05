@@ -54,7 +54,7 @@ public class WikiDescriptorListenerTest
 {
     @Rule
     public org.xwiki.test.mockito.MockitoComponentMockingRule<WikiDescriptorListener> mocker =
-            new MockitoComponentMockingRule(WikiDescriptorListener.class);
+        new MockitoComponentMockingRule(WikiDescriptorListener.class);
 
     private WikiDescriptorBuilder builder;
 
@@ -96,7 +96,7 @@ public class WikiDescriptorListenerTest
         mocker.getComponentUnderTest().onEvent(event, document, null);
 
         // Verify
-        verify(cache).remove(descriptor);
+        verify(cache).remove(descriptor.getId(), descriptor.getAliases());
         verify(cache, never()).add(any(DefaultWikiDescriptor.class));
     }
 
@@ -135,9 +135,8 @@ public class WikiDescriptorListenerTest
         mocker.getComponentUnderTest().onEvent(event, document, null);
 
         // Verify
-        verify(cache).remove(descriptor);
+        verify(cache).remove(descriptor.getId(), descriptor.getAliases());
         verify(cache).add(newDescriptor);
     }
-
 
 }

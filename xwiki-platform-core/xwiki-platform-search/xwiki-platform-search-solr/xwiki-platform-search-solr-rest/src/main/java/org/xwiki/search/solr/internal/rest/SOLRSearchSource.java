@@ -136,7 +136,7 @@ public class SOLRSearchSource extends AbstractSearchSource
         // Boost
         // FIXME: take it from configuration
         query.bindValue("qf",
-            "title_^10.0 name^10.0 doccontent^2.0 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4 "
+            "title^10.0 name^10.0 doccontent^2.0 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4 "
                 + "author_display^0.08 creator_display^0.08 " + "comment^0.016 attauthor_display^0.016 space^0.016");
 
         // Order

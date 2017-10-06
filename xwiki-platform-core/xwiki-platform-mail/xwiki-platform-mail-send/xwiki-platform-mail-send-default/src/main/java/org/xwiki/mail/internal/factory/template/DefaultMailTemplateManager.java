@@ -20,6 +20,7 @@
 package org.xwiki.mail.internal.factory.template;
 
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.ExternalServletURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -131,7 +133,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     }
 
     /**
-     * @return the number of the XWiki.Mail xobject with language xproperty is equal to the language parameter if not
+     * @return the number of the XWiki.Mail xobjects with language xproperty equal to the language parameter if not
      * exist return the XWiki.Mail xobject with language xproperty as default language if not exist return the first
      * XWiki.Mail xobject if there is only one XWiki.Mail xobject
      */
@@ -169,8 +171,13 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         XWikiContext context = this.xwikiContextProvider.get();
         int objectsCount;
         try {
-            objectsCount = context.getWiki().getDocument(templateReference, context).getXObjects(mailClassReference)
-                .size();
+            List<BaseObject> objects =
+                context.getWiki().getDocument(templateReference, context).getXObjects(mailClassReference);
+            if (objects != null) {
+                objectsCount = objects.size();
+            } else {
+                objectsCount = 0;
+            }
         } catch (XWikiException e) {
             throw new MessagingException(String.format(
                 "Failed to find number of [%s] objects in Document [%s]", mailClassReference, templateReference), e);

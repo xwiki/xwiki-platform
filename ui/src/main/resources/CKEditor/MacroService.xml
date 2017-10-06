@@ -102,11 +102,14 @@
 #macro (getMacroDescriptor $macroId)
   #set ($macro = $macroManager.getMacro($macroId))
   #set ($macroDescriptor = $macro.descriptor)
+  ## We need to translate the macro descriptor in the current locale and for this we need to modify its name,
+  ## description, etc. We don't have all the setters we need in the MacroDescriptor interface so we rely on a hack: we
+  ## serialize the macro descriptor to JSON and then parse it back. This way we obtain a clone that we can modify.
   #set ($macroDescriptorJSON = $jsontool.serialize($macroDescriptor))
   #set ($data = $jsontool.fromString($macroDescriptorJSON))
   #if ("$!data" == '' &amp;&amp; $data != '')
-    ## $jsontool.fromString() was added in XWiki 9.9RC1.
-    ## Some macro parameter names cause problems when parsing. We need to rename them.
+    ## $jsontool.fromString() was added in XWiki 9.9RC1. Fall-back on $jsontool.parse() on older versions.
+    ## Some macro parameter names cause problems when parsing with $jsontool.parse(). We need to rename them.
     ## See CKEDITOR-187: Error in console when adding a Gallery Macro
     #set ($badParameterNames = ['class'])
     #foreach ($badParameterName in $badParameterNames)
@@ -134,7 +137,7 @@
     #set ($data.contentDescriptor.description = "#maybeTranslate(""${macroTranslationKey}.content.description""
       $data.contentDescriptor.description)")
   #end
-  ## Make sure the keys in the parameter descriptor map are all lowercase.
+  ## Make sure the keys in the parameter descriptor map are all lowercase (for XWiki &lt;9.0).
   ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
   ## descriptor map keys
   #set ($originalParameterDescriptorMap = $data.parameterDescriptorMap)

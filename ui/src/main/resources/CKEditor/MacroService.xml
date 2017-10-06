@@ -39,28 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity wiki="false"}}
-#if ("$!request.data" != '')
-  #set ($data = $NULL)
-  #if ($request.data == 'list')
-    #getMacroList($request.syntaxId)
-  #elseif ($request.data == 'descriptor')
-    #maybeGetMacroDescriptor($request.macroId)
-  #end
-  #if ($data)
-    #set ($discard = $response.setContentType('application/json'))
-    ## When $jsontool.parse() is used to build the data (XWiki &lt; 9.9RC1) we can't use $jsontool.serialize().
-    ## We would have used getSimpleName() but it's not accessible before XWiki 6.4.3 (XWIKI-11916).
-    #if ($data.getClass().getName().endsWith('.JSONObject'))
-      $data
-    #else
-      $jsontool.serialize($data)
-    #end
-  #else
-    $response.sendError(404)
-  #end
-#end
-
+  <content>{{velocity output="false"}}
 ## ================================================================
 ## Returned JSON format:
 ##
@@ -200,6 +179,29 @@
     $services.localization.render($key)##
   #else
     $!defaultValue##
+  #end
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ("$!request.data" != '')
+  #set ($data = $NULL)
+  #if ($request.data == 'list')
+    #getMacroList($request.syntaxId)
+  #elseif ($request.data == 'descriptor')
+    #maybeGetMacroDescriptor($request.macroId)
+  #end
+  #if ($data)
+    #set ($discard = $response.setContentType('application/json'))
+    ## When $jsontool.parse() is used to build the data (XWiki &lt; 9.9RC1) we can't use $jsontool.serialize().
+    ## We would have used getSimpleName() but it's not accessible before XWiki 6.4.3 (XWIKI-11916).
+    #if ($data.getClass().getName().endsWith('.JSONObject'))
+      $data
+    #else
+      $jsontool.serialize($data)
+    #end
+  #else
+    $response.sendError(404)
   #end
 #end
 {{/velocity}}</content>

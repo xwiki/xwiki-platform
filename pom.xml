@@ -72,6 +72,9 @@
       org.xwiki.platform:.*/[${platform.version}]
     </xwiki.extension.recommendedVersions.platform>
     <xwiki.extension.recommendedVersions>${xwiki.extension.recommendedVersions.platform}</xwiki.extension.recommendedVersions>
+
+    <!-- Disable release staging and directly deploy on the configured distributionManagement -->
+    <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -735,4 +738,11 @@
       </properties>
     </profile>
   </profiles>
+  <distributionManagement>
+    <repository>
+      <id>nexus.xwiki.org</id>
+      <name>XWiki Maven Remote Repository for Releases</name>
+      <url>http://nexus.xwiki.org/nexus/content/repositories/releases/</url>
+    </repository>
+  </distributionManagement>
 </project>

@@ -161,7 +161,6 @@ public class SOLRSearchSource extends AbstractSearchSource
 
                 DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(document);
                 searchResult.setPageFullName(this.localEntityReferenceSerializer.serialize(documentReference));
-                searchResult.setTitle((String) document.get(FieldUtils.TITLE));
                 searchResult.setWiki(documentReference.getWikiReference().getName());
                 searchResult.setSpace(this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
                 searchResult.setPageName(documentReference.getName());
@@ -181,20 +180,23 @@ public class SOLRSearchSource extends AbstractSearchSource
                     searchResult.setAuthorName((String) document.get(FieldUtils.AUTHOR_DISPLAY));
                 }
 
-                Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
+                Locale docLocale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
+                Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.LOCALE));
+
+                searchResult.setTitle((String) document.getFirstValue(FieldUtils.getFieldName(FieldUtils.TITLE, locale)));
 
                 List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
 
                 String pageUri = null;
-                if (Locale.ROOT == locale) {
+                if (Locale.ROOT == docLocale) {
                     pageUri =
                         Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
                                 spaces, searchResult.getPageName()).toString();
                 } else {
-                    searchResult.setLanguage(locale.toString());
+                    searchResult.setLanguage(docLocale.toString());
                     pageUri =
                         Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, spaces,
-                                searchResult.getPageName(), locale).toString();
+                                searchResult.getPageName(), docLocale).toString();
                 }
 
                 Link pageLink = new Link();

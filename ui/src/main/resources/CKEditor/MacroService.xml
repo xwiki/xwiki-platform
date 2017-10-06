@@ -102,9 +102,9 @@
 #macro (getMacroDescriptor $macroId)
   #set ($macro = $macroManager.getMacro($macroId))
   #set ($macroDescriptor = $macro.descriptor)
-  ## We need to translate the macro descriptor in the current locale and for this we need to modify its name,
-  ## description, etc. We don't have all the setters we need in the MacroDescriptor interface so we rely on a hack: we
-  ## serialize the macro descriptor to JSON and then parse it back. This way we obtain a clone that we can modify.
+  ## We need to translate the macro descriptor in the current locale but we shouldn't modify it directly because it is
+  ## shared with everyone. Instead we need to create a clone that we can modify. We achieve this by serializing the
+  ## macro descriptor to JSON and then parsing it back.
   #set ($macroDescriptorJSON = $jsontool.serialize($macroDescriptor))
   #set ($data = $jsontool.fromString($macroDescriptorJSON))
   #if ("$!data" == '' &amp;&amp; $data != '')

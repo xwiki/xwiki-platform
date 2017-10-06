@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Dashboard.WebHome" locale="">
+<xwikidoc version="1.3" reference="Dashboard.WebHome" locale="">
   <web>Dashboard</web>
   <name>WebHome</name>
   <language/>
@@ -367,96 +367,6 @@
     </property>
     <property>
       <title>$services.localization.render('platform.dashboard.wiki.messageSender')</title>
-    </property>
-  </object>
-  <object>
-    <name>Dashboard.WebHome</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>6c560735-3e80-4a42-85e2-2dbe77ae9de6</guid>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <content>
-        <disabled>0</disabled>
-        <editor>Text</editor>
-        <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>1</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>parameters</name>
-        <number>4</number>
-        <prettyName>Extension Parameters</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>5</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <property>
-      <content/>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
-    </property>
-    <property>
-      <name>platform.panels.dashboardApplication</name>
-    </property>
-    <property>
-      <parameters>label=$services.localization.render('xe.panels.quicklinks.dashboard')
-target=Dashboard.WebHome
-icon=icon:application_view_tile</parameters>
-    </property>
-    <property>
-      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

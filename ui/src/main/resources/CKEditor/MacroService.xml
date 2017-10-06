@@ -49,6 +49,7 @@
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))
+    ## When $jsontool.parse() is used to build the data (XWiki &lt; 9.9RC1) we can't use $jsontool.serialize().
     ## We would have used getSimpleName() but it's not accessible before XWiki 6.4.3 (XWIKI-11916).
     #if ($data.getClass().getName().endsWith('.JSONObject'))
       $data
@@ -122,7 +123,26 @@
 #macro (getMacroDescriptor $macroId)
   #set ($macro = $macroManager.getMacro($macroId))
   #set ($macroDescriptor = $macro.descriptor)
-  #set ($data = $jsontool.parse($jsontool.serialize($macroDescriptor)))
+  #set ($macroDescriptorJSON = $jsontool.serialize($macroDescriptor))
+  #set ($data = $jsontool.fromString($macroDescriptorJSON))
+  #if ("$!data" == '' &amp;&amp; $data != '')
+    ## $jsontool.fromString() was added in XWiki 9.9RC1.
+    ## Some macro parameter names cause problems when parsing. We need to rename them.
+    ## See CKEDITOR-187: Error in console when adding a Gallery Macro
+    #set ($badParameterNames = ['class'])
+    #foreach ($badParameterName in $badParameterNames)
+      #set ($macroDescriptorJSON = $macroDescriptorJSON.replace("""$badParameterName"":",
+        """__${badParameterName}__"":"))
+    #end
+    #set ($data = $jsontool.parse($macroDescriptorJSON))
+    ## Restore the original parameter names.
+    #foreach ($badParameterName in $badParameterNames)
+      #set ($badParameterDescriptor = $data.parameterDescriptorMap.remove("__${badParameterName}__"))
+      #if ($badParameterDescriptor)
+        #set ($discard = $data.parameterDescriptorMap.put($badParameterName, $badParameterDescriptor))
+      #end
+    #end
+  #end
   ## Specify whether the macro can be inserted in-line or not.
   #set ($data.supportsInlineMode = $macro.supportsInlineMode())
   ## Translate the macro name and description.
@@ -138,10 +158,11 @@
   ## Make sure the keys in the parameter descriptor map are all lowercase.
   ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
   ## descriptor map keys
-  #set ($parameterDescriptorMap = $collectionstool.orderedMap)
+  #set ($originalParameterDescriptorMap = $data.parameterDescriptorMap)
+  #set ($data.parameterDescriptorMap = $collectionstool.orderedMap)
   #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
-    #set ($parameterDescriptor = $data.parameterDescriptorMap.get($entry.key))
-    #set ($discard = $parameterDescriptorMap.put($entry.key.toLowerCase(), $parameterDescriptor))
+    #set ($parameterDescriptor = $originalParameterDescriptorMap.get($entry.key))
+    #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $parameterDescriptor))
     ## Translate the parameter name and description.
     #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$parameterDescriptor.id")
     #set ($parameterDescriptor.name = "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)")
@@ -172,7 +193,6 @@
       #set ($parameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
     #end
   #end
-  #set ($data.parameterDescriptorMap = $parameterDescriptorMap)
 #end
 
 #macro (maybeTranslate $key $defaultValue)

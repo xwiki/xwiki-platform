@@ -1,0 +1,18 @@
+.runTransformations
+.#--------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify usage in inline mode
+.#--------------------------------------------------------------------
+inline {{useravatar username="XWiki.Admin"/}}
+.#--------------------------------------------------------------------
+.expect|event/1.0
+.#--------------------------------------------------------------------
+beginDocument
+beginParagraph
+onWord [inline]
+onSpace
+beginMacroMarkerInline [useravatar] [username=XWiki.Admin]
+onImage [Typed = [true] Type = [attach] Reference = [XWiki.Admin@mockAvatar.png]] [false] [[alt]=[Picture of Admin][title]=[Admin]]
+endMacroMarkerInline [useravatar] [username=XWiki.Admin]
+endParagraph
+endDocument

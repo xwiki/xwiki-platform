@@ -56,8 +56,8 @@ public class WikiDescriptorListener implements EventListener
     /**
      * Relative reference to the XWiki.XWikiServerClass containing wiki descriptor metadata.
      */
-    static final EntityReference SERVER_CLASS = new EntityReference("XWikiServerClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+    static final EntityReference SERVER_CLASS =
+        new EntityReference("XWikiServerClass", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     @Inject
     private WikiDescriptorBuilder builder;
@@ -77,8 +77,7 @@ public class WikiDescriptorListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Arrays
-            .<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
+        return Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
@@ -111,7 +110,7 @@ public class WikiDescriptorListener implements EventListener
                 this.wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(document.getDocumentReference());
             DefaultWikiDescriptor existingDescriptor = this.cache.getFromId(wikiId);
             if (existingDescriptor != null) {
-                this.cache.remove(existingDescriptor);
+                this.cache.remove(wikiId, existingDescriptor.getAliases());
                 this.cache.setWikiIds(null);
             }
         }

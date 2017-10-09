@@ -71,7 +71,7 @@ notifications.filters.preferences.scopeNotificationFilter.page=Page only
 notifications.filters.preferences.scopeNotificationFilter.space=Page and children
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
-notifications.filters.preferences.allEvents=All events (even disabled)
+notifications.filters.preferences.allEvents=-
 
 notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
 notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
@@ -87,6 +87,9 @@ notifications.filters.preferences.delete.error=Failed to delete the filter prefe
 notifications.filters.preferences.setEnabled.inProgress=Saving...
 notifications.filters.preferences.setEnabled.done=Filter preference saved!
 notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
+
+## Notifications toggles
+notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
 
 ## Notifications formats
 notifications.format.alert=Alert

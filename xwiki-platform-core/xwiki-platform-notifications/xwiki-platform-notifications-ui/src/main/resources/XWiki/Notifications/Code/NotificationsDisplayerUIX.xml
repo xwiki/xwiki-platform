@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity wiki="false"}}
 #********************************************************
     List the notifications of the current user as JSON
 ********************************************************#
@@ -542,27 +542,41 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     watchPageSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('page'))');
     watchSpaceSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))');
     watchWikiSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('wiki'))');
-
+    
     ///
-    /// Add a tooltip to each switch
+    /// Disabled switches if there is no enabled notification preferences
     ///
-    $('.bootstrap-switch-id-notificationPageOnly').tooltip({
-      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
-      placement: 'bottom'
-    });
-    var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
-    if (xm.documentReference.getName() != 'WebHome') {
-      // Adapt the tooltip when the current document is terminal
-      watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
+    if ($('.notifications-toggles').attr('data-enabled') == 'false') {
+      watchPageSwitch.bootstrapSwitch('disabled', true);
+      watchSpaceSwitch.bootstrapSwitch('disabled', true);
+      watchWikiSwitch.bootstrapSwitch('disabled', true);
+      
+      $('.notifications-toggles').tooltip({
+        title: '$escapetool.javascript($services.localization.render('notifications.toggle.disabled.hint'))',
+        placement: 'bottom'
+      });
+    } else {
+      ///
+      /// Add a tooltip to each switch
+      ///
+      $('.bootstrap-switch-id-notificationPageOnly').tooltip({
+        title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
+        placement: 'bottom'
+      });
+      var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
+      if (xm.documentReference.getName() != 'WebHome') {
+        // Adapt the tooltip when the current document is terminal
+        watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
+      }
+      $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
+        title: watchSpaceToolTip,
+        placement: 'bottom'
+      });
+      $('.bootstrap-switch-id-notificationWiki').tooltip({
+        title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.wiki'))',
+        placement: 'bottom'
+      });
     }
-    $('.bootstrap-switch-id-notificationPageAndChildren').tooltip({
-      title: watchSpaceToolTip,
-      placement: 'bottom'
-    });
-    $('.bootstrap-switch-id-notificationWiki').tooltip({
-      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.wiki'))',
-      placement: 'bottom'
-    });
 
     /**
      * Change the watchlist status of a document/space/wiki.
@@ -906,8 +920,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       ## Display the 3 toggle buttons
       ##
       #if ($services.notification.watch.isEnabled())
-        &lt;div class="col-xs-12 notifications-toggles"&gt;
-          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationDirectlyWatched($scope))checked="checked"#end#end
+        &lt;div class="col-xs-12 notifications-toggles" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
+          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
           &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
         &lt;/div&gt;
       #end

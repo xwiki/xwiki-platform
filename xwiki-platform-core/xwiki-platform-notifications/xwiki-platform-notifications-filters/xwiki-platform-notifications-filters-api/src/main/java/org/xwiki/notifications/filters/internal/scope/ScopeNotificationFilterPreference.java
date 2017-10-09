@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +36,17 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * This wraps a {@link NotificationFilterPreference} in order to extract its properties.
  *
  * @version $Id$
- * @since 9.5RC1
+ * @since 9.9RC1
  */
 public class ScopeNotificationFilterPreference implements NotificationFilterPreference
 {
     private NotificationFilterPreference filterPreference;
 
     private EntityReference scopeReference;
+
+    private boolean hasParent;
+
+    private List<ScopeNotificationFilterPreference> children = new ArrayList<>();
 
     /**
      * Construct a new ScopeNotificationFilterPreference.
@@ -73,14 +78,64 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
      *
      * @param filterPreference the {@link NotificationFilterPreference} to wrap
      * @param scopeReference the reference of the location concerned by the scope notification filter
-     *
-     * @since 9.8RC1
      */
     public ScopeNotificationFilterPreference(NotificationFilterPreference filterPreference,
             EntityReference scopeReference)
     {
         this.filterPreference = filterPreference;
         this.scopeReference = scopeReference;
+    }
+
+    /**
+     * @param hasParent either the preference has a parent preference
+     */
+    public void setHasParent(boolean hasParent)
+    {
+        this.hasParent = hasParent;
+    }
+
+    /**
+     * @return either the preference has a parent preference
+     */
+    public boolean hasParent()
+    {
+        return hasParent;
+    }
+
+    /**
+     * @return the list of children preferences
+     */
+    public List<ScopeNotificationFilterPreference> getChildren()
+    {
+        return children;
+    }
+
+    /**
+     * Add a child to the preference.
+     * @param child a preference that is a child of the current preference
+     */
+    public void addChild(ScopeNotificationFilterPreference child)
+    {
+        children.add(child);
+        child.setHasParent(true);
+    }
+
+    /**
+     * @param other an other preference
+     * @return either the current preference is a parent of the other preference
+     */
+    public boolean isParentOf(ScopeNotificationFilterPreference other)
+    {
+        // The aim is to generate a white list of locations that are located under a black listed location
+        // Ex:   "wiki1:Space1" is blacklisted but:
+        //     - "wiki1:Space1.Space2" is white listed
+        //     - "wiki1:Space1.Space3" is white listed too
+        //
+        // So a filter could be the parent of an other only if the other is an inclusive filter and if the current
+        // is a exclusive filter
+        return getFilterType() == NotificationFilterType.EXCLUSIVE
+                && other.getFilterType() == NotificationFilterType.INCLUSIVE
+                && other.getScopeReference().hasParent(this.getScopeReference());
     }
 
     /**

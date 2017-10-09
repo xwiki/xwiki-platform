@@ -10,7 +10,7 @@
     #set ($discard = $job.answered())
   #elseif ("$!request.selection" != '')
     ## Parse the selection
-    #set ($selection = $jsontool.parse($request.selection))
+    #set ($selection = $jsontool.fromString($request.selection))
     #set ($question = $job.question)
     #if ($selection.allExtensions)
       #set ($discard = $question.selectAllExtensions())

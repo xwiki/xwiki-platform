@@ -19,6 +19,9 @@
  */
 package org.xwiki.notifications.filters.expression.generics;
 
+import java.util.Date;
+
+import org.xwiki.notifications.filters.expression.DateValueNode;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
@@ -60,6 +63,17 @@ public final class ExpressionBuilder
     public static StringValueNode value(String value)
     {
         return new StringValueNode(value);
+    }
+
+    /**
+     * Instantiate a new {@link DateValueNode} using the given value.
+     *
+     * @param value the value of the node
+     * @return the generated {@link DateValueNode}
+     */
+    public static DateValueNode value(Date value)
+    {
+        return new DateValueNode(value);
     }
 
     /**

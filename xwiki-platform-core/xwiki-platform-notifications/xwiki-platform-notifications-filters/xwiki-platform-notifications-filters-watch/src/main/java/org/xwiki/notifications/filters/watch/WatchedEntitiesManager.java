@@ -52,20 +52,4 @@ public interface WatchedEntitiesManager
      * @throws NotificationException if an error happens
      */
     void unwatchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
-
-    /**
-     * @param entity the entity
-     * @param user a user
-     * @return either or not the entity is already watched by the given user
-     * @throws NotificationException if an error happens
-     */
-    boolean isEntityWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
-
-    /**
-     * @param entity the entity
-     * @param user a user
-     * @return either or not the location is directly watched by the user
-     * @throws NotificationException if an error happens
-     */
-    boolean isEntityDirectlyWatched(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 }

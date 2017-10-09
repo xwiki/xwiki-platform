@@ -19,11 +19,6 @@
  */
 package org.xwiki.wiki.internal.manager;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +28,11 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache}.
@@ -57,7 +57,7 @@ public class WikiDescriptorCacheTest
         wikiAliasCache = mock(Cache.class);
         wikiIdCache = mock(Cache.class);
         cacheManager = this.mocker.getInstance(CacheManager.class);
-        when(cacheManager.<WikiDescriptor> createNewCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+        when(cacheManager.<WikiDescriptor>createNewCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
             wikiIdCache);
     }
 
@@ -80,7 +80,7 @@ public class WikiDescriptorCacheTest
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
         descriptor.addAlias("alias2");
 
-        this.mocker.getComponentUnderTest().remove(descriptor);
+        this.mocker.getComponentUnderTest().remove(descriptor.getId(), descriptor.getAliases());
 
         verify(wikiIdCache).remove("wikiid");
         verify(wikiAliasCache).remove("wikialias");

@@ -20,6 +20,7 @@
 package org.xwiki.wiki.internal.manager;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -66,8 +67,9 @@ public class WikiDescriptorCache implements Initializable
         try {
             return this.cacheManager.createNewCache(configuration);
         } catch (CacheException e) {
-            throw new InitializationException(String.format("Failed to initialize wiki descriptor caches [%s]",
-                configuration.getConfigurationId()), e);
+            throw new InitializationException(
+                String.format("Failed to initialize wiki descriptor caches [%s]", configuration.getConfigurationId()),
+                e);
         }
     }
 
@@ -112,15 +114,18 @@ public class WikiDescriptorCache implements Initializable
     /**
      * Remove a descriptor from the cache.
      * 
-     * @param descriptor descriptor to remove
+     * @param wikiId the wiki id to remove
+     * @param aliases the wiki aliases to remove
+     * @since 8.4.6
+     * @since 9.9RC1
      */
-    public void remove(DefaultWikiDescriptor descriptor)
+    public void remove(String wikiId, List<String> aliases)
     {
         // Remove from the wiki name cache
-        this.wikiIdCache.remove(descriptor.getId());
+        this.wikiIdCache.remove(wikiId);
 
         // Remove from the wiki alias cache
-        for (String alias : descriptor.getAliases()) {
+        for (String alias : aliases) {
             this.wikiAliasCache.remove(alias);
         }
     }

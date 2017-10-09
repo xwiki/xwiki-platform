@@ -75,7 +75,7 @@ public class ScopeNotificationFilterPreferencesGetter
 
             // Filter them according to the event type and the filter name
             Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
-                pref -> ScopeNotificationFilter.FILTER_NAME.equals(pref.getFilterName())
+                pref -> matchFilter(pref)
                         && matchFormat(pref, format)
                         && (matchAllEvents(pref) || matchEventType(pref, eventType))
             );
@@ -90,6 +90,11 @@ public class ScopeNotificationFilterPreferencesGetter
         }
 
         return new ScopeNotificationFilterPreferencesHierarchy(results);
+    }
+
+    private boolean matchFilter(NotificationFilterPreference pref)
+    {
+        return pref.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(pref.getFilterName());
     }
 
     private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)

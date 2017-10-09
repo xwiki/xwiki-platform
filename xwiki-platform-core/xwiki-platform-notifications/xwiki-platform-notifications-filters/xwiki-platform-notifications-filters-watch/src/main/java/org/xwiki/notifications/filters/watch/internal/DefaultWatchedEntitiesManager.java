@@ -82,17 +82,11 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
                 thereIsAMatch = true;
 
                 if (notificationFilterPreference.getFilterType() == NotificationFilterType.INCLUSIVE
-                        && notificationFilterPreference.isEnabled() != shouldBeWatched)
-                {
-                    notificationFilterManager.setFilterPreferenceEnabled(
-                            notificationFilterPreference.getFilterPreferenceName(),
-                            shouldBeWatched);
+                        && notificationFilterPreference.isEnabled() != shouldBeWatched) {
+                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference);
                 } else if (notificationFilterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE
-                        && notificationFilterPreference.isEnabled() == shouldBeWatched)
-                {
-                    notificationFilterManager.setFilterPreferenceEnabled(
-                            notificationFilterPreference.getFilterPreferenceName(),
-                            !shouldBeWatched);
+                        && notificationFilterPreference.isEnabled() == shouldBeWatched) {
+                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference);
                 }
             }
         }
@@ -101,6 +95,21 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         if (!thereIsAMatch || entity.isWatched(user) != shouldBeWatched) {
             notificationFilterManager.saveFilterPreferences(
                     Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
+        }
+    }
+
+    private void enableOrDeleteFilter(boolean enable,
+            NotificationFilterPreference notificationFilterPreference) throws NotificationException
+    {
+        if (enable) {
+            notificationFilterManager.setFilterPreferenceEnabled(
+                    notificationFilterPreference.getFilterPreferenceName(),
+                    true);
+        } else  {
+            // Delete this filter instead of just disabling it, because we don't want to let remaining
+            // filters
+            notificationFilterManager.deleteFilterPreference(
+                    notificationFilterPreference.getFilterPreferenceName());
         }
     }
 

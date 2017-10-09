@@ -108,6 +108,7 @@ public class ScopeNotificationFilterTest
                 eventName != null ? Arrays.asList(eventName) : Collections.emptyList());
         when(preference.getFilterType()).thenReturn(filterType);
         when(preference.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
+        when(preference.isEnabled()).thenReturn(true);
 
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 

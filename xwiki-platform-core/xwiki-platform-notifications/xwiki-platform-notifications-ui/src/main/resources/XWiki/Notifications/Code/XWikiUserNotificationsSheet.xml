@@ -128,17 +128,7 @@
       &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        #set ($mode = 'MAJOR')
-        #set ($objAutoWatch = $doc.getObject('XWiki.Notifications.Code.AutomaticWatchModeClass'))
-        #if ("$!objAutoWatch" != '')
-          #set ($mode = $objAutoWatch.getValue('autoWatchMode'))
-        #else
-          #set ($watchListObj = $doc.getObject('XWiki.WatchListClass'))
-          #if ("$!watchListObj" != '')
-            #set ($mode = "$!watchListObj.getValue('automaticwatch')")
-            #set ($mode = $mode.toUpperCase())
-          #end
-        #end
+        #set ($mode = $services.notification.watch.automaticWatchMode)
         &lt;select class="notificationAutoWatchMode"&gt;
           &lt;option value="NONE" #if($mode == 'NONE')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE'))&lt;/option&gt;
           &lt;option value="ALL"  #if($mode == 'ALL')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL'))&lt;/option&gt;

@@ -27,6 +27,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.watch.AutomaticWatchMode;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
@@ -107,5 +108,15 @@ public class NotificationWatchScriptService implements ScriptService
         return watchedEntityFactory.createWatchedLocationReference(location).isWatched(
                 documentAccessBridge.getCurrentUserReference()
         );
+    }
+
+    /**
+     * @return the automatic watch mode configured for the current user
+     * @since 9.9RC1
+     * @since 9.8.2
+     */
+    public AutomaticWatchMode getAutomaticWatchMode()
+    {
+        return configuration.getAutomaticWatchMode(documentAccessBridge.getCurrentUserReference());
     }
 }

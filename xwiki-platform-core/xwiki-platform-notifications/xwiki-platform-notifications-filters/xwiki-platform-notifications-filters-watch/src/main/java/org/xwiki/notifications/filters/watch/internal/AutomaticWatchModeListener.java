@@ -119,7 +119,11 @@ public class AutomaticWatchModeListener extends AbstractEventListener
         DocumentReference userReference = currentDoc.getAuthorReference();
 
         // Avoid handling guests or the superadmin user.
-        if (userReference == null || !context.getWiki().exists(userReference, context)) {
+        // No automatic filter for the user page, because it causes an infinite loop
+        // user page updated -> filter created -> user page updated -> ...
+        // But the user can still manually mark its page as watched
+        if (userReference == null || !context.getWiki().exists(userReference, context)
+            || userReference.equals(currentDoc.getDocumentReference())) {
             return;
         }
 

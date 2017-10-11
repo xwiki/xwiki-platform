@@ -26,6 +26,7 @@ import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.script.ScriptExtensionRewriter;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
@@ -52,12 +53,13 @@ public abstract class AbstractExtensionDistributionStep extends AbstractDistribu
         super(stepId);
     }
 
-    protected void install(ExtensionId extensionId) throws JobException, InterruptedException
+    protected void install(ExtensionId extensionId, boolean jarOnRoot) throws JobException, InterruptedException
     {
-        install(extensionId, getNamespace().toString());
+        install(extensionId, getNamespace().toString(), jarOnRoot);
     }
 
-    protected void install(ExtensionId extensionId, String namespace) throws JobException, InterruptedException
+    protected void install(ExtensionId extensionId, String namespace, boolean jarOnRoot)
+        throws JobException, InterruptedException
     {
         // Install the default UI
         InstallRequest installRequest = new InstallRequest();
@@ -71,6 +73,15 @@ public abstract class AbstractExtensionDistributionStep extends AbstractDistribu
 
         // Make sure the job is no interactive
         installRequest.setInteractive(false);
+
+        if (jarOnRoot) {
+            // Make sure jars are installed on root
+            // TODO: use a less script oriented class
+            ScriptExtensionRewriter rewriter = new ScriptExtensionRewriter();
+            rewriter.installExtensionTypeOnRootNamespace("jar");
+            rewriter.installExtensionTypeOnRootNamespace("webjar");
+            installRequest.setRewriter(rewriter);
+        }
 
         // Set the author to use
         installRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,

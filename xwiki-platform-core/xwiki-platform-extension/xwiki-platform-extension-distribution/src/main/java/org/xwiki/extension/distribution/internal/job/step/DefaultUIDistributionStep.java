@@ -80,7 +80,7 @@ public class DefaultUIDistributionStep extends AbstractExtensionDistributionStep
         ExtensionId extensionUI = this.distributionJob.getStatus().getDistributionExtensionUI();
 
         // Install the default UI
-        install(extensionUI);
+        install(extensionUI, true);
 
         // Complete task
         setState(State.COMPLETED);

@@ -135,7 +135,7 @@ public class WikisDefaultUIDistributionStep extends AbstractExtensionDistributio
                         this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
                     if (installedExtension == null
                         || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
-                        install(wikiExtensionUI, namespace);
+                        install(wikiExtensionUI, namespace, false);
                     }
                 }
             }

@@ -171,7 +171,7 @@ public class OutdatedExtensionsDistributionStep extends AbstractExtensionDistrib
         // Install valid extension version
         if (plan.getTree().size() > 0) {
             ExtensionPlanAction action = plan.getTree().iterator().next().getAction();
-            install(action.getExtension().getId(), namespace);
+            install(action.getExtension().getId(), namespace, false);
         }
     }
 

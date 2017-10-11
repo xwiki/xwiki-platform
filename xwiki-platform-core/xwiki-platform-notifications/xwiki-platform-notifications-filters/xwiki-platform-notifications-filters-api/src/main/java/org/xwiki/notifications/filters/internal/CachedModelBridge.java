@@ -58,18 +58,14 @@ public class CachedModelBridge implements ModelBridge
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
-        final String contextEntry = USER_FILTER_PREFERENCES;
-
         ExecutionContext context = execution.getContext();
-        // TODO: Somehow, this cache doesn't work : the context returns null instead of a set.
-        /*
-        if (context.hasProperty(contextEntry)) {
-            return (Set<NotificationFilterPreference>) context.getProperty(contextEntry);
+        Object cachedPreferences = context.getProperty(USER_FILTER_PREFERENCES);
+        if (cachedPreferences != null && cachedPreferences instanceof Set) {
+            return (Set<NotificationFilterPreference>) cachedPreferences;
         }
-        */
 
         Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user);
-        context.setProperty(contextEntry, preferences);
+        context.setProperty(USER_FILTER_PREFERENCES, preferences);
 
         return preferences;
     }
@@ -95,6 +91,7 @@ public class CachedModelBridge implements ModelBridge
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
     {
         modelBridge.deleteFilterPreference(user, filterPreferenceName);
+        clearCache();
     }
 
     @Override
@@ -102,6 +99,7 @@ public class CachedModelBridge implements ModelBridge
             throws NotificationException
     {
         modelBridge.setFilterPreferenceEnabled(user, filterPreferenceName, enabled);
+        clearCache();
     }
 
     @Override
@@ -109,5 +107,13 @@ public class CachedModelBridge implements ModelBridge
             Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
         modelBridge.saveFilterPreferences(user, filterPreferences);
+        clearCache();
+    }
+
+    private void clearCache()
+    {
+        ExecutionContext context = execution.getContext();
+        context.removeProperty(USER_FILTER_PREFERENCES);
+        context.removeProperty(USER_TOGGLEABLE_FILTER_PREFERENCES);
     }
 }

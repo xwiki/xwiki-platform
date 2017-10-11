@@ -127,7 +127,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref1", false);
+        verify(notificationFilterManager).deleteFilterPreference("pref1");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -162,7 +162,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().watchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref2", false);
+        verify(notificationFilterManager).deleteFilterPreference("pref2");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -216,7 +216,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref1", false);
+        verify(notificationFilterManager).deleteFilterPreference("pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -279,7 +279,7 @@ public class DefaultWatchedEntitiesManagerTest
         mocker.getComponentUnderTest().unwatchEntity(watchedEntityReference, user);
 
         // Checks
-        verify(notificationFilterManager).setFilterPreferenceEnabled("pref1", false);
+        verify(notificationFilterManager).deleteFilterPreference("pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 

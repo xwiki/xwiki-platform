@@ -1651,7 +1651,7 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @return the store to use by default when saving a new attachment
+     * @return the store to use by default when saving a new attachment content
      * @since 9.9RC1
      */
     public XWikiAttachmentStoreInterface getDefaultAttachmentContentStore()
@@ -1659,7 +1659,20 @@ public class XWiki implements EventListener
         return this.defaultAttachmentContentStore;
     }
 
+    /**
+     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentVersioningStore()} instead
+     */
+    @Deprecated
     public AttachmentVersioningStore getAttachmentVersioningStore()
+    {
+        return getDefaultAttachmentVersioningStore();
+    }
+
+    /**
+     * @return the store to use by default when saving a new attachment archive
+     * @since 9.9RC1
+     */
+    public AttachmentVersioningStore getDefaultAttachmentVersioningStore()
     {
         return this.attachmentVersioningStore;
     }

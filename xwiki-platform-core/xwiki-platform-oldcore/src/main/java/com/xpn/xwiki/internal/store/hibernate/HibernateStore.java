@@ -94,8 +94,6 @@ public class HibernateStore
 
     private Dialect dialect;
 
-    private String currentStoreWikiCache;
-
     private DatabaseProduct databaseProductCache = DatabaseProduct.UNKNOWN;
 
     /**
@@ -294,30 +292,30 @@ public class HibernateStore
     }
 
     /**
-     * Switch database to current wiki.
+     * Set the current wiki in the passed session.
      * 
      * @param session the hibernate session
      * @throws XWikiException when failing to switch wiki
      */
-    public void switchWiki(Session session) throws XWikiException
+    public void setWiki(Session session) throws XWikiException
     {
-        switchWiki(session, this.wikis.getCurrentWikiId());
+        setWiki(session, this.wikis.getCurrentWikiId());
     }
 
     /**
-     * Virtual Wikis Allows to switch database connection.
+     * Set the passed wiki in the passed session
      *
      * @param session the hibernate session
      * @param wikiId the id of the wiki to switch to
      * @throws XWikiException when failing to switch wiki
      */
-    public void switchWiki(Session session, String wikiId) throws XWikiException
+    public void setWiki(Session session, String wikiId) throws XWikiException
     {
         try {
-            this.logger.debug("Switch database to [{}]", wikiId);
+            this.logger.debug("Set the right catalog/schema in teh session [{}]", wikiId);
 
             // Switch the database only if we did not switched on it last time
-            if (wikiId != null && !wikiId.equals(this.currentStoreWikiCache)) {
+            if (wikiId != null) {
                 String schemaName = getSchemaFromWikiName(wikiId);
                 String escapedSchemaName = escapeSchema(schemaName);
 
@@ -336,9 +334,6 @@ public class HibernateStore
                         session.connection().setCatalog(schemaName);
                     }
                 }
-
-                // Remember where we switched last time
-                this.currentStoreWikiCache = wikiId;
             }
 
             this.dataMigrationManager.checkDatabase();
@@ -474,7 +469,7 @@ public class HibernateStore
 
         // during #setDatabase, the transaction and the session will be closed if the database could not be
         // safely accessed due to version mismatch
-        switchWiki(session);
+        setWiki(session);
 
         return true;
     }

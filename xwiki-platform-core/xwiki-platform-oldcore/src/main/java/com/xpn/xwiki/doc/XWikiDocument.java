@@ -4793,6 +4793,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * @deprecated since 9.9RC1, use {@link XWikiAttachment#loadContent(XWikiContext)}
+     */
+    @Deprecated
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         String database = context.getWikiId();

@@ -369,8 +369,6 @@ public class XWikiAttachmentTest
             // Expected because the attachment content is not set. The attachment content is normally set by the
             // loadAttachmentContent call we verify below.
         }
-
-        verify(document).loadAttachmentContent(attachment, this.oldcore.getXWikiContext());
     }
 
     @Test

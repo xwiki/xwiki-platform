@@ -167,6 +167,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    @Named(HINT)
+    private XWikiAttachmentStoreInterface attachmentContentStore;
+
+    @Inject
+    @Named(HINT)
+    private AttachmentVersioningStore attachmentArchiveStore;
+
     private Map<String, String[]> validTypesMap = new HashMap<>();
 
     /**
@@ -544,10 +552,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             // Remove attachments planned for removal
             if (!doc.getAttachmentsToRemove().isEmpty()) {
-                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
-                    XWikiAttachmentStoreInterface store =
-                        resolveXWikiAttachmentStoreInterface(attachment.getAttachment().getContentStore(), context);
-                    store.deleteXWikiAttachment(attachment.getAttachment(), false, context, false);
+                for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
+                    XWikiAttachment attachment = attachmentToRemove.getAttachment();
+                    XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
+                    store.deleteXWikiAttachment(attachment, false, context, false);
                 }
                 doc.clearAttachmentsToRemove();
             }
@@ -1045,8 +1053,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             // Let's delete any attachment this document might have
             for (XWikiAttachment attachment : doc.getAttachmentList()) {
-                XWikiAttachmentStoreInterface store =
-                    resolveXWikiAttachmentStoreInterface(attachment.getContentStore(), context);
+                XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
                 store.deleteXWikiAttachment(attachment, false, context, false);
             }
 
@@ -1719,18 +1726,29 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             Query query = session.createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id");
             query.setLong("id", attachment.getId());
-            if (query.uniqueResult() == null) {
-                session.save(attachment);
-            } else {
+            boolean exist = query.uniqueResult() != null;
+
+            if (exist) {
                 session.update(attachment);
+            } else {
+                if (attachment.getContentStore() == null) {
+                    // Set content store
+                    attachment.setContentStore(getDefaultAttachmentContentStore(context));
+                }
+
+                if (attachment.getArchiveStore() == null) {
+                    // Set archive store
+                    attachment.setArchiveStore(getDefaultAttachmentArchiveStore(context));
+                }
+
+                session.save(attachment);
             }
 
             // Save the attachment content if it's marked as "dirty" (out of sync with the database).
             if (attachment.isContentDirty()) {
                 // updateParent and bTransaction must be false because the content should be saved in the same
                 // transaction as the attachment and if the parent doc needs to be updated, this function will do it.
-                XWikiAttachmentStoreInterface store =
-                    resolveXWikiAttachmentStoreInterface(attachment.getContentStore(), context);
+                XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
                 store.saveAttachmentContent(attachment, false, context, false);
             }
 
@@ -3090,27 +3108,37 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return StringUtils.replace(sql, "\\", "\\\\");
     }
 
-    private XWikiAttachmentStoreInterface resolveXWikiAttachmentStoreInterface(String storeType, XWikiContext xcontext)
+    private String getDefaultAttachmentContentStore(XWikiContext xcontext)
     {
-        XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(storeType);
+        XWikiAttachmentStoreInterface store = xcontext.getWiki().getDefaultAttachmentContentStore();
 
-        if (store != null) {
-            return store;
-        }
-
-        return xcontext.getWiki().getDefaultAttachmentContentStore();
-    }
-
-    private XWikiAttachmentStoreInterface getXWikiAttachmentStoreInterface(String storeType)
-    {
-        if (storeType != null && !storeType.equals(HINT)) {
-            try {
-                return this.componentManager.getInstance(XWikiAttachmentStoreInterface.class, storeType);
-            } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment content store for type [{}]", storeType, e);
-            }
+        if (store != null && store != this.attachmentContentStore) {
+            return store.getHint();
         }
 
         return null;
+    }
+
+    private String getDefaultAttachmentArchiveStore(XWikiContext xcontext)
+    {
+        AttachmentVersioningStore store = xcontext.getWiki().getDefaultAttachmentVersioningStore();
+
+        if (store != null && store != this.attachmentArchiveStore) {
+            return store.getHint();
+        }
+
+        return null;
+    }
+
+    private XWikiAttachmentStoreInterface getXWikiAttachmentStoreInterface(XWikiAttachment attachment)
+        throws ComponentLookupException
+    {
+        String storeHint = attachment.getContentStore();
+
+        if (storeHint != null && !storeHint.equals(HINT)) {
+            return this.componentManager.getInstance(XWikiAttachmentStoreInterface.class, storeHint);
+        }
+
+        return this.attachmentContentStore;
     }
 }

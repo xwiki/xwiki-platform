@@ -264,9 +264,15 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     @Override
-    public boolean attachmentExist(AttachmentReference attachmentReference)
+    public boolean attachmentContentExist(AttachmentReference attachmentReference)
     {
-        return getAttachmentDir(attachmentReference).exists();
+        return getAttachmentFileProvider(attachmentReference).getAttachmentContentFile().exists();
+    }
+
+    @Override
+    public boolean attachmentArchiveExist(AttachmentReference attachmentReference)
+    {
+        return getAttachmentFileProvider(attachmentReference).getAttachmentVersioningMetaFile().exists();
     }
 
     private File getAttachmentDir(final AttachmentReference attachmentReference)

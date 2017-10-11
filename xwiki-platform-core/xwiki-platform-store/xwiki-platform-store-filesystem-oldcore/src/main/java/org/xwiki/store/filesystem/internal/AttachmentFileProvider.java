@@ -35,15 +35,15 @@ public interface AttachmentFileProvider
     File getAttachmentContentFile();
 
     /**
-     * Get the meta file for the attachment.
-     * The meta file contains information about each version of the attachment such as who saved it.
+     * Get the meta file for the attachment. The meta file contains information about each version of the attachment
+     * such as who saved it.
      *
      * @return the File for storing meta data for each version of an attachment.
      */
     File getAttachmentVersioningMetaFile();
 
     /**
-     * Get a uniquely named file for storing a perticular version of the attachment.
+     * Get a uniquely named file for storing a particular version of the attachment.
      *
      * @param versionName the name of the version of the attachment eg: "1.1" or "1.2"
      * @return the File for storing the content of a particular version of the attachment.

@@ -128,6 +128,11 @@ public class XWikiHibernateBaseStore implements Initializable
     {
     }
 
+    public String getHint()
+    {
+        return HINT;
+    }
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -592,7 +597,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public void setDatabase(Session session, XWikiContext inputxcontext) throws XWikiException
     {
-        this.store.switchWiki(session);
+        this.store.setWiki(session);
     }
 
     /**

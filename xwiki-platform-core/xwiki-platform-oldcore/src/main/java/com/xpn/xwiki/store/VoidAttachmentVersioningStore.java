@@ -65,6 +65,12 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
     }
 
     @Override
+    public String getHint()
+    {
+        return "void";
+    }
+
+    @Override
     public void deleteArchive(XWikiAttachment attachment, XWikiContext context, boolean transaction)
         throws XWikiException
     {

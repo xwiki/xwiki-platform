@@ -39,7 +39,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
@@ -59,7 +58,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -72,9 +70,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @since 9.9RC1
  */
 @Component
-@Named("R99001XWIKI9065")
+@Named("R99010XWIKI9065")
 @Singleton
-public class R99001XWIKI9065DataMigration extends AbstractHibernateDataMigration
+public class R99010XWIKI9065DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
@@ -99,26 +97,12 @@ public class R99001XWIKI9065DataMigration extends AbstractHibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(99001);
+        return new XWikiDBVersion(99010);
     }
 
     @Override
     public void hibernateMigrate() throws XWikiException, DataMigrationException
     {
-        // Make sure all existing deleted attachment in the database have a store id
-        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
-        {
-            @Override
-            public Void doInHibernate(Session session) throws HibernateException
-            {
-                Query query = session.createQuery("UPDATE DeletedAttachment SET xmlStore = ?");
-                query.setString(0, XWikiHibernateBaseStore.HINT);
-                query.executeUpdate();
-
-                return null;
-            }
-        });
-
         // Move back metadata of deleted attachments located in the filesystem store
         getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
         {
@@ -222,7 +206,6 @@ public class R99001XWIKI9065DataMigration extends AbstractHibernateDataMigration
         } else {
             return new SpaceReference(name, getEntityReference(parent));
         }
-
     }
 
     private DeletedAttachment parseDeletedAttachMedatata(DocumentReference documentReference, long id, File directory)

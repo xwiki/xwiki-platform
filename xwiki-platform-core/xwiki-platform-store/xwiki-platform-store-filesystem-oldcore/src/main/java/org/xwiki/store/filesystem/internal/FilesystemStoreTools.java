@@ -67,10 +67,17 @@ public interface FilesystemStoreTools
 
     /**
      * @param attachmentReference the reference of the attachment
-     * @return true if the attachment exist in the store
+     * @return true if the attachment content exist in the store
      * @since 9.9RC1
      */
-    boolean attachmentExist(AttachmentReference attachmentReference);
+    boolean attachmentContentExist(AttachmentReference attachmentReference);
+
+    /**
+     * @param attachmentReference the reference of the attachment
+     * @return true if the attachment archive exist in the store
+     * @since 9.9RC1
+     */
+    boolean attachmentArchiveExist(AttachmentReference attachmentReference);
 
     /**
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate

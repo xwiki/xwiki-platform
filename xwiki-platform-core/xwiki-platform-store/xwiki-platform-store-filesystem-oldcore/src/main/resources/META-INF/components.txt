@@ -1,6 +1,8 @@
 org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools
 org.xwiki.store.filesystem.internal.DefaultFilesystemAttachmentsConfiguration
-org.xwiki.store.filesystem.internal.migration.R99001XWIKI9065DataMigration
+org.xwiki.store.filesystem.internal.migration.R99000XWIKI14697DataMigration
+org.xwiki.store.filesystem.internal.migration.R99001XWIKI14697DataMigration
+org.xwiki.store.filesystem.internal.migration.R99010XWIKI9065DataMigration
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinContentStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentVersioningStore

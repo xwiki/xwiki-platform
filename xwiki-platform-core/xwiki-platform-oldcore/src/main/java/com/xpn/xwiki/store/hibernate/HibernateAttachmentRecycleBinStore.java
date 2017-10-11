@@ -281,7 +281,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                 contentStore.get(reference, deletedAttachment.getDate(), deletedAttachment.getId(), bTransaction);
 
             try {
-                FieldUtils.writeDeclaredField(deletedAttachment, "xml", content, true);
+                FieldUtils.writeDeclaredField(deletedAttachment, "content", content, true);
             } catch (IllegalAccessException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Failed to set deleted document content", e);

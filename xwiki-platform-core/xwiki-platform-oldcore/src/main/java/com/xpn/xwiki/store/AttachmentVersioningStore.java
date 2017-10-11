@@ -36,6 +36,12 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 public interface AttachmentVersioningStore
 {
     /**
+     * @return the role hint of the component
+     * @since 9.9RC1
+     */
+    String getHint();
+
+    /**
      * Load attachment archive from store.
      *
      * @return attachment archive. not null. return empty archive if it is not exist in store.

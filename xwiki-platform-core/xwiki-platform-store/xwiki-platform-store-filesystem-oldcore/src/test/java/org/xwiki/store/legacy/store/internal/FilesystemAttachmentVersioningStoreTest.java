@@ -25,13 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.AttachmentVersioningStore;
-import com.xpn.xwiki.web.Utils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +40,13 @@ import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
 import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
 import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
 import org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer;
+
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Tests for FilesystemAttachmentVersioningStore.
@@ -65,6 +67,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
     private File storageLocation;
 
     @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -73,13 +76,13 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
-        this.fileTools =
-            new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(),
-                storageLocation,
-                new DummyLockProvider());
+        this.fileTools = new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(), storageLocation,
+            new DummyLockProvider());
         final AttachmentListMetadataSerializer serializer =
             new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
-        this.versionStore = new FilesystemAttachmentVersioningStore(this.fileTools, serializer);
+        this.versionStore = new FilesystemAttachmentVersioningStore();
+        FieldUtils.writeDeclaredField(this.versionStore, "fileTools", this.fileTools, true);
+        FieldUtils.writeDeclaredField(this.versionStore, "metaSerializer", serializer, true);
 
         final XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "Main", "WebHome"));
 
@@ -101,15 +104,19 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
         version3.setDoc(doc);
         version3.setAttachment_content(new StringAttachmentContent("I am version 1.3"));
 
-        this.provider = this.fileTools.getAttachmentFileProvider(version1);
-        this.archive = new ListAttachmentArchive(new ArrayList<XWikiAttachment>() {{
-            add(version1);
-            add(version2);
-            add(version3);
-        }});
+        this.provider = this.fileTools.getAttachmentFileProvider(version1.getReference());
+        this.archive = new ListAttachmentArchive(new ArrayList<XWikiAttachment>()
+        {
+            {
+                add(version1);
+                add(version2);
+                add(version3);
+            }
+        });
     }
 
     @After
+    @Override
     public void tearDown() throws IOException
     {
         resursiveDelete(this.storageLocation);
@@ -150,8 +157,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
     public void loadArchiveTest() throws Exception
     {
         this.versionStore.saveArchive(this.archive, null, false);
-        final XWikiAttachmentArchive newArch =
-            this.versionStore.loadArchive(archive.getAttachment(), null, false);
+        final XWikiAttachmentArchive newArch = this.versionStore.loadArchive(archive.getAttachment(), null, false);
         Assert.assertTrue(newArch.getVersions().length == 3);
         final XWikiAttachment version1 = newArch.getRevision(archive.getAttachment(), "1.1", null);
         final XWikiAttachment version2 = newArch.getRevision(archive.getAttachment(), "1.2", null);
@@ -216,16 +222,19 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
             this.content = content;
         }
 
+        @Override
         public InputStream getContentInputStream()
         {
             return new ByteArrayInputStream(this.content.getBytes());
         }
 
+        @Override
         public boolean isContentDirty()
         {
             return true;
         }
 
+        @Override
         public StringAttachmentContent clone()
         {
             return this;

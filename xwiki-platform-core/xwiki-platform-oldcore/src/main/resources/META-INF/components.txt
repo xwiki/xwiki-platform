@@ -166,7 +166,6 @@ com.xpn.xwiki.store.migration.hibernate.R72001XWIKI12228DataMigration
 com.xpn.xwiki.store.migration.hibernate.R73000XWIKI12277DataMigration
 com.xpn.xwiki.store.migration.hibernate.R7350XWIKI2079DataMigration
 com.xpn.xwiki.store.migration.hibernate.R90000XWIKI13474DataMigration
-com.xpn.xwiki.store.migration.hibernate.R99000XWIKI14697DataMigration
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore

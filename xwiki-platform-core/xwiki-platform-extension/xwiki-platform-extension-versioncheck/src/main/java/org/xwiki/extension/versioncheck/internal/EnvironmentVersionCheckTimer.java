@@ -93,7 +93,7 @@ public class EnvironmentVersionCheckTimer implements Initializable
 
             if (newVersionAvailable) {
                 observationManager.notify(
-                        new NewExtensionVersionAvailableEvent(environmentExtensionId, latestVersion), null, null);
+                        new NewExtensionVersionAvailableEvent(), environmentExtensionId, latestVersion);
             }
         }
 
@@ -115,7 +115,7 @@ public class EnvironmentVersionCheckTimer implements Initializable
 
             // If an allowed version preference is defined, try to apply it to the proposed version
             Pattern versionPattern = extensionVersionCheckConfiguration.allowedEnvironmentVersions();
-            if (!versionPattern.pattern().isEmpty() && !versionPattern.matcher(proposedVersion.getValue()).matches()) {
+            if (versionPattern != null && !versionPattern.matcher(proposedVersion.getValue()).matches()) {
                 return false;
             }
 

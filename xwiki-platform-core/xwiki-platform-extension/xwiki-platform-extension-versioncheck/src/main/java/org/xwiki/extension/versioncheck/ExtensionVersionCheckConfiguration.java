@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.version.Version;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide configuration options for the extension version checker.
@@ -31,6 +32,7 @@ import org.xwiki.extension.version.Version;
  * @since 9.9RC1
  */
 @Role
+@Unstable
 public interface ExtensionVersionCheckConfiguration
 {
     /**
@@ -45,7 +47,7 @@ public interface ExtensionVersionCheckConfiguration
 
     /**
      * @return A {@link Pattern} used on {@link Version#getValue()} to determine if a given {@link Version} should be
-     * considered as a new compatible version. If an empty string is returned, the pattern shouldn't be applied.
+     * considered as a new compatible version. Returns null if no pattern is defined.
      */
     Pattern allowedEnvironmentVersions();
 }

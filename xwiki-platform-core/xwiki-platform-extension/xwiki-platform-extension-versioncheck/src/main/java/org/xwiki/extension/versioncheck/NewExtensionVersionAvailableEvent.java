@@ -19,58 +19,37 @@
  */
 package org.xwiki.extension.versioncheck;
 
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.version.Version;
-import org.xwiki.observation.event.Event;
+import java.util.Collections;
+import java.util.Set;
+
+import org.xwiki.eventstream.TargetableEvent;
+import org.xwiki.stability.Unstable;
 
 /**
  * Event triggered when a new extension version is available.
+ * <p>
+ *     The event should also send the following parameters:
+ * </p>
+ * <ul>
+ *     <li>source: the {@link org.xwiki.extension.ExtensionId} that has a new version</li>
+ *     <li>data: the new {@link org.xwiki.extension.version.Version}</li>
+ * </ul>
  *
  * @since 9.9RC1
  * @version $Id$
  */
-public class NewExtensionVersionAvailableEvent implements Event
+@Unstable
+public class NewExtensionVersionAvailableEvent implements TargetableEvent
 {
-    private ExtensionId extensionId;
-
-    private Version version;
-
-    /**
-     * Constructs a new {@link NewExtensionVersionAvailableEvent}.
-     *
-     * @param extensionId the {@link ExtensionId} concerned by the event
-     * @param version the new available version
-     */
-    public NewExtensionVersionAvailableEvent(ExtensionId extensionId, Version version)
-    {
-        this.extensionId = extensionId;
-        this.version = version;
-    }
-
-    /**
-     * @return the ID of the extension concerned by the event
-     */
-    public ExtensionId getExtensionId()
-    {
-        return extensionId;
-    }
-
-    /**
-     * @return the new available version of the extension
-     */
-    public Version getVersion()
-    {
-        return version;
-    }
-
     @Override
     public boolean matches(Object otherEvent)
     {
-        if (otherEvent instanceof NewExtensionVersionAvailableEvent) {
-            NewExtensionVersionAvailableEvent event = (NewExtensionVersionAvailableEvent) otherEvent;
-            return (event.getExtensionId().matches(extensionId) && (event.getVersion().compareTo(version) == 0));
-        }
+        return (otherEvent instanceof NewExtensionVersionAvailableEvent);
+    }
 
-        return false;
+    @Override
+    public Set<String> getTarget()
+    {
+        return Collections.singleton("XWikiAdminGroup");
     }
 }

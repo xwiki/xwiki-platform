@@ -64,7 +64,8 @@ public class DefaultVersionCheckConfiguration implements ExtensionVersionCheckCo
     @Override
     public Pattern allowedEnvironmentVersions()
     {
-        return Pattern.compile(configurationSource.getProperty(ENVIRONMENT_CONFIGURATION_PREFIX + "allowedVersions",
-                StringUtils.EMPTY));
+        String allowedVersions = configurationSource.getProperty(ENVIRONMENT_CONFIGURATION_PREFIX + "allowedVersions",
+                StringUtils.EMPTY);
+        return (allowedVersions.isEmpty()) ? null : Pattern.compile(allowedVersions);
     }
 }

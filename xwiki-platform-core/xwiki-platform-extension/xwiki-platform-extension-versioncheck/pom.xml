@@ -21,32 +21,30 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>9.9-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-extension</artifactId>
-  <name>XWiki Platform - Extension - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Extension - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-extension-api</module>
-    <module>xwiki-platform-extension-cluster</module>
-    <module>xwiki-platform-extension-distribution</module>
-    <module>xwiki-platform-extension-handlers</module>
-    <module>xwiki-platform-extension-script</module>
-    <module>xwiki-platform-extension-ui</module>
-    <module>xwiki-platform-extension-versioncheck</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-extension-test</module>
-      </modules>
-    </profile>
-  </profiles>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-extension</artifactId>
+        <version>9.9-SNAPSHOT</version>
+    </parent>
+    <artifactId>xwiki-commons-extension-versioncheck</artifactId>
+    <name>XWiki Commons - Extension - Version Check</name>
+    <packaging>jar</packaging>
+    <description>XWiki Commons - Extension - Version Check</description>
+    <properties>
+        <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-component-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-extension-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
 

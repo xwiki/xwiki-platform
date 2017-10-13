@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -37,7 +38,6 @@ import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.versioncheck.ExtensionVersionCheckConfiguration;
 import org.xwiki.extension.versioncheck.NewExtensionVersionAvailableEvent;
-import org.xwiki.logging.Logger;
 import org.xwiki.observation.ObservationManager;
 
 /**

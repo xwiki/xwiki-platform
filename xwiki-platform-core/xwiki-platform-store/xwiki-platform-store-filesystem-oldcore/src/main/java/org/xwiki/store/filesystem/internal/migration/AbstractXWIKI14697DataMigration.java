@@ -76,7 +76,7 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractHibernateD
     public AbstractXWIKI14697DataMigration(String tableName, String fieldName)
     {
         this.tableName = tableName;
-        this.updateQuery = "UPDATE XWikiAttachment SET " + fieldName + " = ? WHERE id IN (?)";
+        this.updateQuery = "UPDATE XWikiAttachment SET " + fieldName + " = :store WHERE id IN (:ids)";
     }
 
     @Override
@@ -155,8 +155,8 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractHibernateD
     {
         if (!values.isEmpty()) {
             Query query = session.createQuery(this.updateQuery);
-            query.setString(0, store);
-            query.setParameter(1, values);
+            query.setParameter("store", store);
+            query.setParameterList("ids", values);
             query.executeUpdate();
         }
     }

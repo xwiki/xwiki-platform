@@ -52,7 +52,7 @@ public class DefaultVersionCheckConfiguration implements ExtensionVersionCheckCo
     @Override
     public boolean isEnvironmentCheckEnabled()
     {
-        return configurationSource.getProperty(ENVIRONMENT_CONFIGURATION_PREFIX + "enabled", true);
+        return configurationSource.getProperty(ENVIRONMENT_CONFIGURATION_PREFIX + "enabled", false);
     }
 
     @Override

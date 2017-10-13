@@ -47,11 +47,11 @@ public class DefaultVersionCheckConfigurationTest
     @Test
     public void testEnvironmentCheckEnabled() throws Exception
     {
-        when(configurationSource.getProperty("extension.versioncheck.environment.enabled", true))
+        when(configurationSource.getProperty("extension.versioncheck.environment.enabled", false))
                 .thenReturn(false);
         assertFalse(mocker.getComponentUnderTest().isEnvironmentCheckEnabled());
 
-        when(configurationSource.getProperty("extension.versioncheck.environment.enabled", true))
+        when(configurationSource.getProperty("extension.versioncheck.environment.enabled", false))
                 .thenReturn(true);
         assertTrue(mocker.getComponentUnderTest().isEnvironmentCheckEnabled());
     }

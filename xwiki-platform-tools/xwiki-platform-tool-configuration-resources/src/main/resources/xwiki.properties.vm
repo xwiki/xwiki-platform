@@ -488,8 +488,12 @@ extension.oldflavors=$oldFlavor.trim()
 #-# [Since 9.9]
 #-# Indicate whether the server should automatically check for new available environment versions.
 #-#
+#if ($xwikiPropertiesEnvironmentVersionCheck)
+extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionCheck
+#else
 #-# The default is:
-# extension.versioncheck.environment.enabled=true
+# extension.versioncheck.environment.enabled=false
+#end
 #-#
 #-# If the version check is enabled (through extension.versioncheck.environment.enabled), the following properties
 #-# can be used to customize how the version check is performed.

@@ -43,6 +43,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+office.config.serverPath.hint=Chemin vers l'installation d'Office
+office.config.serverPort.hint=Numéro de port pour se connecter au serveur Office
+office.config.serverType.hint=Type de serveur Office, cela peut-être interne (local) ou externe (distant).
 office.createForm.type.description=Importer des documents office dans des pages wiki
 office.createForm.type.name=Page provenant d'Office
 office.form.append.hint=Ce document existe déjà \! Ajouter à la page existante

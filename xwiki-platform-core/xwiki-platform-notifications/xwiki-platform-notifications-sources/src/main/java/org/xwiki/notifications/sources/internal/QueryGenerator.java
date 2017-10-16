@@ -180,7 +180,7 @@ public class QueryGenerator
         AbstractOperatorNode preferencesNode = handleEventPreferences(user, preferences);
 
         // Condition 4: handle exclusive global notification filters
-        AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(user);
+        AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(user, format);
         if (globalExclusiveFiltersNode != null) {
             if (preferencesNode == null) {
                 preferencesNode = globalExclusiveFiltersNode;
@@ -190,7 +190,7 @@ public class QueryGenerator
         }
 
         // Condition 5: handle inclusive global notification filters
-        AbstractOperatorNode globalInclusiveFiltersNode = handleInclusiveGlobalFilters(user);
+        AbstractOperatorNode globalInclusiveFiltersNode = handleInclusiveGlobalFilters(user, format);
         if (globalInclusiveFiltersNode != null) {
             if (preferencesNode == null) {
                 preferencesNode = globalInclusiveFiltersNode;
@@ -278,16 +278,17 @@ public class QueryGenerator
      * {@link NotificationPreference}.
      *
      * @param user the user used to retrieve the {@link NotificationFilter}
+     * @param format format of the notification
      * @return a list of maps of parameters that should be used for the query
      * @throws NotificationException
      */
-    private AbstractOperatorNode handleExclusiveGlobalFilters(DocumentReference user)
+    private AbstractOperatorNode handleExclusiveGlobalFilters(DocumentReference user, NotificationFormat format)
             throws NotificationException
     {
         AbstractOperatorNode globalFiltersNode = null;
 
         for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
-            ExpressionNode node = filter.filterExpression(user, NotificationFilterType.EXCLUSIVE);
+            ExpressionNode node = filter.filterExpression(user, NotificationFilterType.EXCLUSIVE, format);
             if (node != null && node instanceof AbstractOperatorNode) {
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;
@@ -302,13 +303,13 @@ public class QueryGenerator
         return globalFiltersNode;
     }
 
-    private AbstractOperatorNode handleInclusiveGlobalFilters(DocumentReference user)
+    private AbstractOperatorNode handleInclusiveGlobalFilters(DocumentReference user, NotificationFormat format
             throws NotificationException
     {
         AbstractOperatorNode globalFiltersNode = null;
 
         for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
-            ExpressionNode node = filter.filterExpression(user, NotificationFilterType.INCLUSIVE);
+            ExpressionNode node = filter.filterExpression(user, NotificationFilterType.INCLUSIVE, format);
             if (node != null && node instanceof AbstractOperatorNode) {
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;

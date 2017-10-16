@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.user;
+
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -35,42 +36,36 @@ import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
- * Define notification filters that are activated by default on every user and that filter the notifications
- * coming from the system user.
- *
- * This filter is not bound to any {@link NotificationPreference} and should be applied globally.
+ * Handle a black list only of user not to watch.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 9.10RC1
  */
 @Component
 @Singleton
-@Named(SystemUserNotificationFilter.FILTER_NAME)
-@ToggleableNotificationFilter
-public class SystemUserNotificationFilter implements NotificationFilter
+@Named(EventUserFilter.FILTER_NAME)
+public class EventUserFilter implements NotificationFilter
 {
     /**
-     * The name of the filter.
+     * Name of the filter.
      */
-    public static final String FILTER_NAME = "systemUserNotificationFilter";
+    public static final String FILTER_NAME = "eventUserNotificationFilter";
 
     @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> serializer;
+    private EventUserFilterPreferencesGetter preferencesGetter;
 
-    /**
-     * Local document reference to the system user.
-     */
-    private final LocalDocumentReference SYSTEM_USER =
-            new LocalDocumentReference("XWiki", "superadmin");
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return event.getUser().getLocalDocumentReference().equals(SYSTEM_USER);
+        Collection<String> excludedUsers = preferencesGetter.getExcludedUsers(user, format);
+        return !excludedUsers.isEmpty() && excludedUsers.contains(serializer.serialize(event.getUser()));
     }
 
     @Override
@@ -83,6 +78,7 @@ public class SystemUserNotificationFilter implements NotificationFilter
     @Override
     public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
+        // We don't handle this use-case
         return null;
     }
 
@@ -91,8 +87,12 @@ public class SystemUserNotificationFilter implements NotificationFilter
             NotificationFormat format)
     {
         if (type == NotificationFilterType.EXCLUSIVE) {
-            return value(EventProperty.USER).notEq(value(serializer.serialize(SYSTEM_USER)));
+            Collection<String> users = preferencesGetter.getExcludedUsers(user, format);
+            if (!users.isEmpty()) {
+                return not(value(EventProperty.USER).inStrings(users));
+            }
         }
+
         return null;
     }
 

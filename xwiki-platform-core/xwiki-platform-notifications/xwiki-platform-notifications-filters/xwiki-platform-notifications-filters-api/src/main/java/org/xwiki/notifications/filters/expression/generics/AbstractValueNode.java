@@ -19,11 +19,16 @@
  */
 package org.xwiki.notifications.filters.expression.generics;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
+import org.xwiki.notifications.filters.expression.InNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
-import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
+import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -123,6 +128,34 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     public LesserThanNode lesserThan(AbstractValueNode node)
     {
         return new LesserThanNode(this, node);
+    }
+
+    /**
+     * Helper that allows to create {@link InNode} without having to instantiate new objects.
+     *
+     * @param values a collection of nodes
+     * @return a {@link InNode} where the current object is the first operand and the parameter is the second
+     * operand
+     *
+     * @since 9.10RC1
+     */
+    public InNode in(Collection<AbstractValueNode> values)
+    {
+        return new InNode(this, values);
+    }
+
+    /**
+     * Helper that allows to create {@link InNode} without having to instantiate new objects.
+     *
+     * @param values a collection of string
+     * @return a {@link InNode} where the current object is the first operand and the parameter is the second
+     * operand
+     *
+     * @since 9.10RC1
+     */
+    public InNode inStrings(Collection<String> values)
+    {
+        return in(values.stream().map(s -> new StringValueNode(s)).collect(Collectors.toList()));
     }
 
     /**

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,7 +36,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

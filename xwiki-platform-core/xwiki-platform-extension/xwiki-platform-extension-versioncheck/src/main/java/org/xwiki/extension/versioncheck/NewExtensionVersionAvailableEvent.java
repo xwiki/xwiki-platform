@@ -22,6 +22,7 @@ package org.xwiki.extension.versioncheck;
 import java.util.Collections;
 import java.util.Set;
 
+import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.TargetableEvent;
 import org.xwiki.stability.Unstable;
 
@@ -39,7 +40,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Unstable
-public class NewExtensionVersionAvailableEvent implements TargetableEvent
+public class NewExtensionVersionAvailableEvent implements RecordableEvent, TargetableEvent
 {
     @Override
     public boolean matches(Object otherEvent)

@@ -41,8 +41,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,7 +55,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     EventUserFilterPreferencesGetter.class,
 })
-public class UserFilterTest
+public class EventUserFilterTest
 {
     @Rule
     public final MockitoComponentMockingRule<EventUserFilter> mocker = new MockitoComponentMockingRule<>(EventUserFilter.class);
@@ -76,7 +77,8 @@ public class UserFilterTest
     @Before
     public void setUp() throws Exception
     {
-        notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
+        notificationFilterManager = mock(NotificationFilterManager.class);
+        mocker.registerComponent(NotificationFilterManager.class, notificationFilterManager);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         when(serializer.serialize(USER_A)).thenReturn(SERIALIZED_USER_A);
         when(serializer.serialize(USER_B)).thenReturn(SERIALIZED_USER_B);
@@ -89,27 +91,35 @@ public class UserFilterTest
     {
         NotificationFilterPreference p1 = mock(NotificationFilterPreference.class);
         when(p1.isEnabled()).thenReturn(true);
+        when(p1.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
         when(p1.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_A,
                 SERIALIZED_USER_B));
         when(p1.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        when(p1.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         NotificationFilterPreference p2 = mock(NotificationFilterPreference.class);
         when(p2.isEnabled()).thenReturn(true);
+        when(p2.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
         when(p2.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_C));
-        when(p2.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
+        when(p2.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        when(p2.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
         NotificationFilterPreference p3 = mock(NotificationFilterPreference.class);
         when(p3.isEnabled()).thenReturn(false);
+        when(p3.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
         when(p3.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_D));
-        when(p3.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
+        when(p3.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        when(p3.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        when(notificationFilterManager.getFilterPreferences(eq(CURRENT_USER), any(EventUserFilter.class),
-                eq(NotificationFilterType.EXCLUSIVE), any(NotificationFormat.class))).thenReturn(
-                Sets.newSet(p1));
+        NotificationFilterPreference p4 = mock(NotificationFilterPreference.class);
+        when(p4.isEnabled()).thenReturn(true);
+        when(p4.getFilterName()).thenReturn(EventUserFilter.FILTER_NAME);
+        when(p4.getProperties(NotificationFilterProperty.USER)).thenReturn(Arrays.asList(SERIALIZED_USER_E));
+        when(p4.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
+        when(p4.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.EMAIL));
 
-        when(notificationFilterManager.getFilterPreferences(eq(CURRENT_USER), any(EventUserFilter.class),
-                eq(NotificationFilterType.INCLUSIVE), any(NotificationFormat.class))).thenReturn(
-                Sets.newSet(p2, p3));
+        when(notificationFilterManager.getFilterPreferences(eq(CURRENT_USER))).thenReturn(
+                Sets.newSet(p1, p2, p3, p4));
     }
 
     @Test
@@ -137,13 +147,13 @@ public class UserFilterTest
         // Test
         assertTrue(mocker.getComponentUnderTest().filterEvent(event1, CURRENT_USER, NotificationFormat.ALERT));
         assertTrue(mocker.getComponentUnderTest().filterEvent(event2, CURRENT_USER, NotificationFormat.ALERT));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event3, CURRENT_USER, NotificationFormat.ALERT));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event4, CURRENT_USER, NotificationFormat.ALERT));
+        assertTrue(mocker.getComponentUnderTest().filterEvent(event3, CURRENT_USER, NotificationFormat.ALERT));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(event4, CURRENT_USER, NotificationFormat.ALERT));
         assertFalse(mocker.getComponentUnderTest().filterEvent(event5, CURRENT_USER, NotificationFormat.ALERT));
     }
 
     @Test
-    public void generateFilterExpression() throws Exception
+    public void generateFilterExpressionWithPreferences() throws Exception
     {
         // Preferences
         mockPreferences();
@@ -152,12 +162,27 @@ public class UserFilterTest
         when(notificationPreference.getFormat()).thenReturn(NotificationFormat.ALERT);
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().filterExpression(CURRENT_USER, notificationPreference);
-
-        // Verify
-        assertEquals("(USER IN (\"userC\") AND NOT (USER IN (\"userA\", \"userB\", \"userD\")))",
-                node.toString());
+        assertNull(mocker.getComponentUnderTest().filterExpression(CURRENT_USER, notificationPreference));
     }
 
+    @Test
+    public void generateFilterExpression() throws Exception
+    {
+        // Preferences
+        mockPreferences();
 
+        // Test
+        ExpressionNode node = mocker.getComponentUnderTest().filterExpression(CURRENT_USER,
+                NotificationFilterType.EXCLUSIVE, NotificationFormat.ALERT);
+
+        // Verify
+        assertNotNull(node);
+        assertEquals("NOT (USER IN (\"userA\", \"userB\", \"userC\"))", node.toString());
+    }
+
+    @Test
+    public void getName() throws Exception
+    {
+        assertEquals("eventUserNotificationFilter", mocker.getComponentUnderTest().getName());
+    }
 }

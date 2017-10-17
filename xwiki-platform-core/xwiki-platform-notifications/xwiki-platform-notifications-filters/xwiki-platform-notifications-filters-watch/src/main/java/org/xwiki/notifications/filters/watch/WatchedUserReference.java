@@ -19,8 +19,22 @@
  */
 package org.xwiki.notifications.filters.watch;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.compress.utils.Sets;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.user.EventUserFilter;
+import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
+import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -34,36 +48,61 @@ public class WatchedUserReference implements WatchedEntityReference
 {
     private String userId;
 
+    private EventUserFilterPreferencesGetter preferencesGetter;
+
     /**
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
+     * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
      */
-    public WatchedUserReference(String userId)
+    public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter)
     {
         this.userId = userId;
+        this.preferencesGetter = preferencesGetter;
     }
 
     @Override
     public boolean isWatched(DocumentReference userReference)
     {
-        return false;
+        return preferencesGetter.isUserExcluded(userId, userReference, null);
     }
 
     @Override
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
-        return false;
+        return EventUserFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
+                && notificationFilterPreference.getProperties(NotificationFilterProperty.USER).contains(userId)
+                && notificationFilterPreference.getFilterFormats().containsAll(
+                        Sets.newHashSet(NotificationFormat.values()));
     }
 
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
+        // Not handled
         return null;
     }
 
     @Override
     public NotificationFilterPreference createExclusiveFilterPreference()
     {
-        return null;
+        DefaultNotificationFilterPreference filterPreference
+                = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
+
+        filterPreference.setEnabled(true);
+        filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
+        filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
+        filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
+        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
+        filterPreference.setActive(false);
+
+        // Properties
+        Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
+        filterPreference.setPreferenceProperties(preferenceProperties);
+
+        preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
+        preferenceProperties.put(NotificationFilterProperty.USER, Collections.singletonList(userId));
+
+        return filterPreference;
     }
 }

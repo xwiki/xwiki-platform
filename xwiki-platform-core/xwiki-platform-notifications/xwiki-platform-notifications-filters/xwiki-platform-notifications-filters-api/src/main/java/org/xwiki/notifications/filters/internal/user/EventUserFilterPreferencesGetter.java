@@ -36,6 +36,8 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
+ * Helper to get user preferences for the {@link EventUserFilter}.
+ *
  * @version $Id$
  * @since 9.10RC1
  */
@@ -49,35 +51,81 @@ public class EventUserFilterPreferencesGetter
     @Inject
     private Logger logger;
 
+    /**
+     * @param testUser user to test
+     * @param user the user for who we compute the notifications
+     * @param format the notification format (could be null)
+     * @return either or not the user to test is part of the excluded users of the given user
+     */
+    public boolean isUserExcluded(String testUser, DocumentReference user, NotificationFormat format)
+    {
+        return getPreferencesWithNoEventType(user, format).anyMatch(
+            pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
+        );
+    }
+
+    /**
+     * @param user the user for who we compute the notifications
+     * @param format the notification format (could be null)
+     * @return the collection of excluded users by the given user
+     */
     public Collection<String> getExcludedUsers(DocumentReference user, NotificationFormat format)
     {
-        return collect(getPreferencesWithNoEventType(user, format, NotificationFilterType.EXCLUSIVE));
+        return collect(getPreferencesWithNoEventType(user, format));
     }
 
     private Stream<NotificationFilterPreference> getPreferencesWithNoEventType(DocumentReference user,
-            NotificationFormat format, NotificationFilterType filterType)
+            NotificationFormat format)
     {
-        return getPreferences(user, format, filterType).filter(
-                pref -> pref.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty());
+        return getPreferences(user, format).filter(
+            pref -> pref.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty());
     }
 
     private Collection<String> collect(Stream<NotificationFilterPreference> stream)
     {
         return stream.map(fp -> fp.getProperties(NotificationFilterProperty.USER))
-                .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
+            .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
     }
 
     private Stream<NotificationFilterPreference> getPreferences(DocumentReference user,
-            NotificationFormat format, NotificationFilterType filterType)
+            NotificationFormat format)
     {
         try {
             return notificationFilterManager.getFilterPreferences(user).stream().filter(
-                    pref -> pref.isEnabled() && pref.getFilterFormats().contains(format)
-                            && EventUserFilter.FILTER_NAME.equals(pref.getFilterName())
-                            && pref.getFilterType() == filterType);
+                pref -> matchFilter(pref)
+                    && matchFormat(pref, format)
+                    && matchFilterType(pref)
+                    && matchAllEvents(pref)
+            );
         } catch (Exception e) {
             logger.warn("Failed to get the list of UserFilter notification preferences.", e);
             return Stream.empty();
         }
+    }
+
+    private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)
+    {
+        return format == null || filterPreference.getFilterFormats().contains(format);
+    }
+
+    private boolean matchFilter(NotificationFilterPreference pref)
+    {
+        return pref.isEnabled() && EventUserFilter.FILTER_NAME.equals(pref.getFilterName());
+    }
+
+    private boolean matchFilterType(NotificationFilterPreference pref)
+    {
+        return pref.getFilterType() == NotificationFilterType.EXCLUSIVE;
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @return either or not the preference concern all event types
+     */
+    private boolean matchAllEvents(NotificationFilterPreference filterPreference)
+    {
+        // When the list of event types concerned by the filter is empty, we consider that the filter concerns
+        // all events.
+        return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
     }
 }

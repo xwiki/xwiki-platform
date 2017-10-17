@@ -27,15 +27,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.EventProperty;
-import org.xwiki.notifications.filters.expression.NotEqualsNode;
-import org.xwiki.notifications.filters.expression.PropertyValueNode;
-import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -73,31 +70,23 @@ public class SystemUserNotificationFilterTest
     }
 
     @Test
-    public void filterEventByFilterType() throws Exception
+    public void filterEvent() throws Exception
     {
-        assertFalse(mocker.getComponentUnderTest().filterEventByFilterType(nonSystemEvent, randomUser,
-                NotificationFormat.ALERT, NotificationFilterType.EXCLUSIVE));
-        assertFalse(mocker.getComponentUnderTest().filterEventByFilterType(nonSystemEvent, randomUser,
-                NotificationFormat.ALERT, NotificationFilterType.INCLUSIVE));
-
-        assertFalse(mocker.getComponentUnderTest().filterEventByFilterType(systemEvent, randomUser,
-                NotificationFormat.ALERT, NotificationFilterType.INCLUSIVE));
-        assertTrue(mocker.getComponentUnderTest().filterEventByFilterType(systemEvent, randomUser,
-                NotificationFormat.ALERT, NotificationFilterType.EXCLUSIVE));
+        assertFalse(mocker.getComponentUnderTest().filterEvent(nonSystemEvent, randomUser,
+                NotificationFormat.ALERT));
+        assertTrue(mocker.getComponentUnderTest().filterEvent(systemEvent, randomUser,
+                NotificationFormat.ALERT));
     }
 
     @Test
-    public void generateFilterExpression() throws Exception
+    public void filterExpression() throws Exception
     {
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
-        assertEquals(null, mocker.getComponentUnderTest().generateFilterExpression(
-                        randomUser, fakePreference, NotificationFilterType.INCLUSIVE));
-        assertEquals(new NotEqualsNode(
-                new PropertyValueNode(EventProperty.USER),
-                new StringValueNode("serializedSystemUser")),
-                mocker.getComponentUnderTest().generateFilterExpression(
-                        randomUser, null, NotificationFilterType.EXCLUSIVE));
+        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, fakePreference));
+        assertEquals("USER <> \"serializedSystemUser\"",
+                mocker.getComponentUnderTest().filterExpression(randomUser, NotificationFilterType.EXCLUSIVE,
+                        null).toString());
     }
 
     @Test

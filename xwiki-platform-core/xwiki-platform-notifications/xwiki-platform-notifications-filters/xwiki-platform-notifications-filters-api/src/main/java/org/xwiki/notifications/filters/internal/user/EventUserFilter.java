@@ -40,7 +40,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
- * Handle a black list only of user not to watch.
+ * Handle a black list of user not to watch.
  *
  * @version $Id$
  * @since 9.10RC1
@@ -64,8 +64,7 @@ public class EventUserFilter implements NotificationFilter
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        Collection<String> excludedUsers = preferencesGetter.getExcludedUsers(user, format);
-        return !excludedUsers.isEmpty() && excludedUsers.contains(serializer.serialize(event.getUser()));
+        return preferencesGetter.isUserExcluded(serializer.serialize(event.getUser()), user, format);
     }
 
     @Override

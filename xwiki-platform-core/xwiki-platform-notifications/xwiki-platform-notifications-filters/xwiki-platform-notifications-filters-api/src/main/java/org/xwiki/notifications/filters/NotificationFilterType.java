@@ -19,10 +19,8 @@
  */
 package org.xwiki.notifications.filters;
 
-import org.xwiki.notifications.filters.internal.AbstractNotificationFilter;
-
 /**
- * Determine the filter type of an {@link AbstractNotificationFilter}.
+ * Determine the filter type of an {@link NotificationFilter}.
  * This type can be either inclusive or exclusive.
  *
  * @version $Id$

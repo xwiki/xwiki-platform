@@ -27,6 +27,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
+import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.notifications.filters.watch.WatchedLocationReference;
 import org.xwiki.notifications.filters.watch.WatchedUserReference;
@@ -50,6 +51,9 @@ public class DefaultWatchedEntityFactory implements WatchedEntityFactory
     @Inject
     private ScopeNotificationFilterLocationStateComputer stateComputer;
 
+    @Inject
+    private EventUserFilterPreferencesGetter eventUserFilterPreferencesGetter;
+
     @Override
     public WatchedLocationReference createWatchedLocationReference(EntityReference location)
     {
@@ -59,7 +63,6 @@ public class DefaultWatchedEntityFactory implements WatchedEntityFactory
     @Override
     public WatchedUserReference createWatchedUserReference(String userId)
     {
-        // TODO: implement this along with the UserFilter
-        return null;
+        return new WatchedUserReference(userId, eventUserFilterPreferencesGetter);
     }
 }

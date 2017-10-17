@@ -57,15 +57,15 @@ public class SystemUserNotificationFilter implements NotificationFilter
      */
     public static final String FILTER_NAME = "systemUserNotificationFilter";
 
-    @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> serializer;
-
     /**
      * Local document reference to the system user.
      */
-    private final LocalDocumentReference SYSTEM_USER =
+    private static final LocalDocumentReference SYSTEM_USER =
             new LocalDocumentReference("XWiki", "superadmin");
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> serializer;
 
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)

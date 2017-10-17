@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-wiki-ui</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>9.9-rc-2</version>
+    <version>9.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
   <packaging>xar</packaging>

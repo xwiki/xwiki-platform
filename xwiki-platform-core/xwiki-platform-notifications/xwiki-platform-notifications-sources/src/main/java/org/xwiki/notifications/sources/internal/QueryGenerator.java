@@ -303,7 +303,7 @@ public class QueryGenerator
         return globalFiltersNode;
     }
 
-    private AbstractOperatorNode handleInclusiveGlobalFilters(DocumentReference user, NotificationFormat format
+    private AbstractOperatorNode handleInclusiveGlobalFilters(DocumentReference user, NotificationFormat format)
             throws NotificationException
     {
         AbstractOperatorNode globalFiltersNode = null;

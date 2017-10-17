@@ -54,6 +54,7 @@ public class WatchedUserReference implements WatchedEntityReference
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
      * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
+     * @since 9.10RC1
      */
     public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter)
     {
@@ -64,7 +65,7 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public boolean isWatched(DocumentReference userReference)
     {
-        return preferencesGetter.isUserExcluded(userId, userReference, null);
+        return !preferencesGetter.isUserExcluded(userId, userReference, null);
     }
 
     @Override

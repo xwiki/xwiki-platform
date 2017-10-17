@@ -392,6 +392,8 @@ public class DefaultModelBridge implements ModelBridge
                 filterPreference.getProperties(NotificationFilterProperty.SPACE));
         obj.setDBStringListValue(FIELD_WIKIS,
                 filterPreference.getProperties(NotificationFilterProperty.WIKI));
+        obj.setDBStringListValue(FIELD_USERS,
+                filterPreference.getProperties(NotificationFilterProperty.USER));
     }
 
     private List<String> toCollectionOfStrings(Collection<NotificationFormat> formats)

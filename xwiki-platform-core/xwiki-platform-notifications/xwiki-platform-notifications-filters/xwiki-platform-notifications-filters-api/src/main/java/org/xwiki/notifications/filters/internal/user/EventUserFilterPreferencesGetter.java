@@ -59,7 +59,7 @@ public class EventUserFilterPreferencesGetter
      */
     public boolean isUserExcluded(String testUser, DocumentReference user, NotificationFormat format)
     {
-        return getPreferencesWithNoEventType(user, format).anyMatch(
+        return getPreferences(user, format).anyMatch(
             pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
         );
     }
@@ -71,14 +71,7 @@ public class EventUserFilterPreferencesGetter
      */
     public Collection<String> getExcludedUsers(DocumentReference user, NotificationFormat format)
     {
-        return collect(getPreferencesWithNoEventType(user, format));
-    }
-
-    private Stream<NotificationFilterPreference> getPreferencesWithNoEventType(DocumentReference user,
-            NotificationFormat format)
-    {
-        return getPreferences(user, format).filter(
-            pref -> pref.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty());
+        return collect(getPreferences(user, format));
     }
 
     private Collection<String> collect(Stream<NotificationFilterPreference> stream)

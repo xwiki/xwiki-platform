@@ -2283,8 +2283,13 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
+    @Programming
     public String getURLContent(String surl, String username, String password) throws IOException
     {
+        if (!hasProgrammingRights()) {
+            return "";
+        }
+
         try {
             return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
@@ -2300,8 +2305,13 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
+    @Programming
     public String getURLContent(String surl) throws IOException
     {
+        if (!hasProgrammingRights()) {
+            return "";
+        }
+
         try {
             return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
@@ -2320,8 +2330,13 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
+    @Programming
     public String getURLContent(String surl, String username, String password, int timeout) throws IOException
     {
+        if (!hasProgrammingRights()) {
+            return "";
+        }
+
         try {
             return this.xwiki.getURLContent(surl, username, password, timeout,
                 this.xwiki.getHttpUserAgent(this.context));
@@ -2338,8 +2353,13 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
+    @Programming
     public String getURLContent(String surl, int timeout) throws IOException
     {
+        if (!hasProgrammingRights()) {
+            return "";
+        }
+
         try {
             return this.xwiki.getURLContent(surl, timeout, this.xwiki.getHttpUserAgent(this.context));
         } catch (Exception e) {
@@ -2356,8 +2376,13 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
+    @Programming
     public byte[] getURLContentAsBytes(String surl, String username, String password) throws IOException
     {
+        if (!hasProgrammingRights()) {
+            return null;
+        }
+
         try {
             return this.xwiki.getURLContentAsBytes(surl, username, password, this.context);
         } catch (Exception e) {
@@ -2372,8 +2397,13 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
+    @Programming
     public byte[] getURLContentAsBytes(String surl) throws IOException
     {
+        if (!hasProgrammingRights()) {
+            return null;
+        }
+
         try {
             return this.xwiki.getURLContentAsBytes(surl, this.context);
         } catch (Exception e) {

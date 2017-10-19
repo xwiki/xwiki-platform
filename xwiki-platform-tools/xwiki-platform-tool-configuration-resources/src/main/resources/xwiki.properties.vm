@@ -485,6 +485,28 @@ extension.oldflavors=$oldFlavor.trim()
 # extension.recommendedVersions=org.xwiki.platform:.*/[9.6]
 # extension.recommendedVersions=com.mygroupid:.*/[1.9]
 
+#-# [Since 9.9]
+#-# Indicate whether the server should automatically check for new available environment versions.
+#-#
+#if ($xwikiPropertiesEnvironmentVersionCheck)
+extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionCheck
+#else
+#-# The default is:
+# extension.versioncheck.environment.enabled=false
+#end
+#-#
+#-# If the version check is enabled (through extension.versioncheck.environment.enabled), the following properties
+#-# can be used to customize how the version check is performed.
+#-#
+#-# Indicate the number of seconds between each check for a new version of the server.
+#-# The default is:
+# extension.versioncheck.environment.interval=3600
+#-#
+#-# Indiicate a pattern that will be used to filter which version should be considered as a new version.
+#-# By default, no pattern is given an the pattern is not applied.
+#-# Example:
+# extension.versioncheck.environment.allowedVersions=9.*
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

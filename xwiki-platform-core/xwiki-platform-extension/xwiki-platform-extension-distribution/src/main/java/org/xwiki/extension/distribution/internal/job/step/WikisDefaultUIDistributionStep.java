@@ -87,12 +87,12 @@ public class WikisDefaultUIDistributionStep extends AbstractExtensionDistributio
 
             ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
 
-            for (String wikiId : wikiIds) {
-                if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
-                    String namespace = "wiki:" + wikiId;
+            if (wikiExtensionUI != null) {
+                for (String wikiId : wikiIds) {
+                    if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
+                        String namespace = "wiki:" + wikiId;
 
-                    // Only if the UI is not already installed
-                    if (wikiExtensionUI != null) {
+                        // Only if the UI is not already installed
                         InstalledExtension installedExtension =
                             this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
                         if (installedExtension == null

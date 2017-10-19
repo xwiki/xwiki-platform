@@ -1,0 +1,3 @@
+org.xwiki.extension.versioncheck.internal.DefaultVersionCheckConfiguration
+org.xwiki.extension.versioncheck.internal.EnvironmentVersionCheckTimer
+org.xwiki.extension.versioncheck.internal.VersionCheckInitializer

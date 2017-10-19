@@ -48,7 +48,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migrations for XWIKI-14697. Make sure all attachments have the right content and archive store id.
  *
  * @version $Id$
- * @since 9.9RC1
+ * @since 9.10RC1
  */
 public abstract class AbstractXWIKI14697DataMigration extends AbstractHibernateDataMigration
 {

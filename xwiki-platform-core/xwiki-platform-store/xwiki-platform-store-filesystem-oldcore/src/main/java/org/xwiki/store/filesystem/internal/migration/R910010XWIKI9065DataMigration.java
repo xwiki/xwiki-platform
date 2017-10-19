@@ -38,6 +38,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.GenericFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.XWikiException;
@@ -70,9 +72,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @since 9.9RC1
  */
 @Component
-@Named("R99010XWIKI9065")
+@Named("R910010XWIKI9065")
 @Singleton
-public class R99010XWIKI9065DataMigration extends AbstractHibernateDataMigration
+public class R910010XWIKI9065DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
@@ -97,7 +99,7 @@ public class R99010XWIKI9065DataMigration extends AbstractHibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(99010);
+        return new XWikiDBVersion(910010);
     }
 
     @Override
@@ -179,6 +181,12 @@ public class R99010XWIKI9065DataMigration extends AbstractHibernateDataMigration
 
         // Save deleted attachment in the DB
         session.save(dbAttachment);
+
+        // Refactor file storage to be based on id instead of date
+        File newDirectory = new File(directory.getParentFile(),
+            GenericFileUtils.getURLEncoded(dbAttachment.getFilename() + "-id" + dbAttachment.getId()));
+        FileUtils.moveDirectory(directory, newDirectory);
+
     }
 
     private String decode(String name) throws UnsupportedEncodingException

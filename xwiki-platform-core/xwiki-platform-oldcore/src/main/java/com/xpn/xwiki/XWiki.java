@@ -1652,7 +1652,7 @@ public class XWiki implements EventListener
 
     /**
      * @return the store to use by default when saving a new attachment content
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public XWikiAttachmentStoreInterface getDefaultAttachmentContentStore()
     {
@@ -1670,7 +1670,7 @@ public class XWiki implements EventListener
 
     /**
      * @return the store to use by default when saving a new attachment archive
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public AttachmentVersioningStore getDefaultAttachmentVersioningStore()
     {
@@ -3181,7 +3181,7 @@ public class XWiki implements EventListener
 
     /**
      * @param attachmentContentStore the store to use by default when saving a new attachment
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public void setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface attachmentContentStore)
     {

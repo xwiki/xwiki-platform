@@ -57,7 +57,7 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
  * Instance shared by all hibernate based stores.
  * 
  * @version $Id$
- * @since 9.9RC1
+ * @since 9.10RC1
  */
 @Component(roles = HibernateStore.class)
 @Singleton

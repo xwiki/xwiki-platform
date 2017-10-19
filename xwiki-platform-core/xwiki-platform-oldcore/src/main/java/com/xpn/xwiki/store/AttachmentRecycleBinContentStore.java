@@ -32,7 +32,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * Store the content of a deleted attachment.
  * 
  * @version $Id$
- * @since 9.9RC1
+ * @since 9.10RC1
  */
 @Role
 public interface AttachmentRecycleBinContentStore

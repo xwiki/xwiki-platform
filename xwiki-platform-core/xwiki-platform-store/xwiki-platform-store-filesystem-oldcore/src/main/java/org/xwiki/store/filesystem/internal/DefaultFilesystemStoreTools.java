@@ -20,7 +20,6 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -81,7 +80,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      * The part of the deleted attachment directory name after this is the date of deletion, The part before this is the
      * URL encoded attachment filename.
      */
-    private static final String DELETED_ATTACHMENT_NAME_SEPARATOR = "-";
+    private static final String DELETED_ATTACHMENT_NAME_SEPARATOR = "-id";
 
     /**
      * The directory within each document's directory for documents which have been deleted.
@@ -226,9 +225,9 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
 
     @Override
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final AttachmentReference attachment,
-        final Date deleteDate)
+        final long index)
     {
-        return new DefaultDeletedAttachmentFileProvider(getDeletedAttachmentDir(attachment, deleteDate),
+        return new DefaultDeletedAttachmentFileProvider(getDeletedAttachmentDir(attachment, index),
             attachment.getName());
     }
 
@@ -289,15 +288,15 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
      * time" so it might look like: {@code WebHome/~this/deleted-attachments/file.txt-0123456789/}
      *
      * @param attachment the attachment to get the file for.
-     * @param deleteDate the date the attachment was deleted.
+     * @param index the index of the deleted attachment.
      * @return a directory which will be repeatable only with the same inputs.
      */
-    private File getDeletedAttachmentDir(final AttachmentReference attachment, final Date deleteDate)
+    private File getDeletedAttachmentDir(final AttachmentReference attachment, final long index)
     {
         final DocumentReference doc = attachment.getDocumentReference();
         final File docDir = getDocumentDir(doc, this.storageDir, this.pathSerializer);
         final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);
-        final String fileName = attachment.getName() + DELETED_ATTACHMENT_NAME_SEPARATOR + deleteDate.getTime();
+        final String fileName = attachment.getName() + DELETED_ATTACHMENT_NAME_SEPARATOR + index;
         return new File(deletedAttachmentsDir, GenericFileUtils.getURLEncoded(fileName));
     }
 

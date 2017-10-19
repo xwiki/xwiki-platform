@@ -123,7 +123,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     public void delete(AttachmentReference reference, Date deleteDate, long index, boolean bTransaction)
         throws XWikiException
     {
-        DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, deleteDate);
+        DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
 
         StartableTransactionRunnable tr = getDeletedAttachmentPurgeRunnable(provider);
 
@@ -163,7 +163,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     public DeletedAttachmentContent get(AttachmentReference reference, Date deleteDate, long index,
         boolean bTransaction) throws XWikiException
     {
-        DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, deleteDate);
+        DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
 
         try {
             return deletedAttachmentContentFromProvider(provider);
@@ -218,7 +218,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, deleteDate, xcontext);
+        final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, index, xcontext);
 
         new StartableTransactionRunnable().runIn(tr);
 
@@ -234,18 +234,18 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * Get a StartableTransactionRunnable to save an attachment in the recycle-bin.
      *
      * @param deleted the attachment to save.
-     * @param deleteDate date of the delete
+     * @param index the index of the deleted attachment
      * @param context the legacy XWikiContext which might be needed to get the content from the attachment, or to load
      *            the attachment versioning store.
      * @return a TransactionRunnable for storing the deleted attachment.
      * @throws XWikiException if one is thrown trying to get data from the attachment or loading the attachment archive
      *             in order to save it in the deleted section.
      */
-    public StartableTransactionRunnable getSaveTrashAttachmentRunnable(final XWikiAttachment deleted, Date deleteDate,
+    private StartableTransactionRunnable getSaveTrashAttachmentRunnable(final XWikiAttachment deleted, long index,
         final XWikiContext context) throws XWikiException
     {
         final DeletedAttachmentFileProvider provider =
-            this.fileTools.getDeletedAttachmentFileProvider(deleted.getReference(), deleteDate);
+            this.fileTools.getDeletedAttachmentFileProvider(deleted.getReference(), index);
 
         return new SaveDeletedAttachmentContentRunnable(deleted, provider, this.fileTools, this.metaSerializer,
             this.versionSerializer, context);

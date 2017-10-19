@@ -273,7 +273,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         throws XWikiException
     {
         AttachmentRecycleBinContentStore contentStore =
-            getAttachmentRecycleBinContentStore(deletedAttachment.getXmlStore());
+            getAttachmentRecycleBinContentStore(deletedAttachment.getContentStore());
 
         if (contentStore != null) {
             AttachmentReference reference = deletedAttachment.getAttachmentReference();
@@ -315,7 +315,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         throws XWikiException
     {
         AttachmentRecycleBinContentStore contentStore =
-            getAttachmentRecycleBinContentStore(deletedAttachment.getXmlStore());
+            getAttachmentRecycleBinContentStore(deletedAttachment.getContentStore());
 
         if (contentStore != null) {
             contentStore.delete(deletedAttachment.getAttachmentReference(), deletedAttachment.getDate(),

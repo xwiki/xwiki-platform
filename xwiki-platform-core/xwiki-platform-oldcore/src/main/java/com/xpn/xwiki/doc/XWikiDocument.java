@@ -3955,6 +3955,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private XWikiDocument cloneInternal(DocumentReference newDocumentReference, boolean keepsIdentity)
     {
         XWikiDocument doc = null;
+
         try {
             Constructor<? extends XWikiDocument> constructor = getClass().getConstructor(DocumentReference.class);
             doc = constructor.newInstance(newDocumentReference);

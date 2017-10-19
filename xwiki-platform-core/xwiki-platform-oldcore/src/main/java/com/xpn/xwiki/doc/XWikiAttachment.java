@@ -203,33 +203,32 @@ public class XWikiAttachment implements Cloneable
     public XWikiAttachment clone()
     {
         XWikiAttachment attachment = null;
+
         try {
-            attachment = getClass().newInstance();
-        } catch (Exception e) {
+            attachment = (XWikiAttachment) super.clone();
+
+            attachment.setComment(getComment());
+            attachment.setDate(getDate());
+            attachment.setFilename(getFilename());
+            attachment.setMimeType(getMimeType());
+            attachment.setLongSize(getLongSize());
+            attachment.setRCSVersion(getRCSVersion());
+            attachment.setMetaDataDirty(isMetaDataDirty());
+            attachment.setContentStore(getContentStore());
+            if (getAttachment_content() != null) {
+                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
+                attachment.getAttachment_content().setAttachment(attachment);
+            }
+            if (getAttachment_archive() != null) {
+                attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
+                attachment.getAttachment_archive().setAttachment(attachment);
+            }
+
+            attachment.setDoc(getDoc());
+        } catch (CloneNotSupportedException e) {
             // This should not happen
             LOGGER.error("exception while attach.clone", e);
         }
-
-        attachment.author = this.author;
-        attachment.authorReference = this.authorReference;
-
-        attachment.setComment(getComment());
-        attachment.setDate(getDate());
-        attachment.setFilename(getFilename());
-        attachment.setMimeType(getMimeType());
-        attachment.setLongSize(getLongSize());
-        attachment.setRCSVersion(getRCSVersion());
-        attachment.setMetaDataDirty(isMetaDataDirty());
-        if (getAttachment_content() != null) {
-            attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
-            attachment.getAttachment_content().setAttachment(attachment);
-        }
-        if (getAttachment_archive() != null) {
-            attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
-            attachment.getAttachment_archive().setAttachment(attachment);
-        }
-
-        attachment.setDoc(getDoc());
 
         return attachment;
     }
@@ -543,7 +542,7 @@ public class XWikiAttachment implements Cloneable
      * @param xcontext current XWikiContext
      * @return a string containing an XML representation of the attachment
      * @throws XWikiException when an error occurs during wiki operations
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public String toXML() throws XWikiException
     {
@@ -613,7 +612,7 @@ public class XWikiAttachment implements Cloneable
      * @param format true if the XML should be formated
      * @param encoding the encoding to use when serializing XML
      * @throws XWikiException when an error occurs during xwiki operation
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public void toXML(OutputTarget out, boolean bWithAttachmentContent, boolean bWithVersions, boolean format,
         String encoding) throws XWikiException
@@ -711,7 +710,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @return the type of the store used for the content
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public String getContentStore()
     {
@@ -720,7 +719,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @param contentStore the type of the store used for the content
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public void setContentStore(String contentStore)
     {
@@ -742,7 +741,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @return the type of the store used for the archive
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public String getArchiveStore()
     {
@@ -751,7 +750,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @param archiveStore the type of the store used for the archive
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public void setArchiveStore(String archiveStore)
     {
@@ -981,11 +980,10 @@ public class XWikiAttachment implements Cloneable
 
                     store.loadAttachmentContent(this, context, true);
                 } catch (Exception e) {
-                    LOGGER.warn(
+                    LOGGER.error(
                         "Failed to load content for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it. Internal error: {}",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(),
-                        ExceptionUtils.getRootCauseMessage(e));
+                            + "This attachment is broken, please consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
                 if (currentWiki != null) {
@@ -1015,9 +1013,8 @@ public class XWikiAttachment implements Cloneable
                 } catch (Exception e) {
                     LOGGER.warn(
                         "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it. Internal error: {}",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(),
-                        ExceptionUtils.getRootCauseMessage(e));
+                            + "This attachment is broken, please consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
                 if (currentWiki != null) {

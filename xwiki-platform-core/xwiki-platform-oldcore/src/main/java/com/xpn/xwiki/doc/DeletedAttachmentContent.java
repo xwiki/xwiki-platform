@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiException;
  * The content of the stored deleted attachment.
  *
  * @version $Id$
- * @since 9.9RC1
+ * @since 9.10RC1
  */
 @Unstable
 public interface DeletedAttachmentContent

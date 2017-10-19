@@ -38,7 +38,7 @@ public interface XWikiAttachmentStoreInterface
 {
     /**
      * @return the role hint of the component
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     String getHint();
 

@@ -60,7 +60,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /** The user who deleted the attachment, in the <tt>XWiki.UserName</tt> format. */
     private String deleter;
 
-    private String xmlStore;
+    private String contentStore;
 
     private DeletedAttachmentContent content;
 
@@ -88,7 +88,7 @@ public class DeletedAttachment extends AbstractSimpleClass
         this.filename = filename;
         this.deleter = deleter;
         this.date = deleteDate;
-        this.xmlStore = storeType;
+        this.contentStore = storeType;
     }
 
     /**
@@ -116,7 +116,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param deleter the user who delete document
      * @param deleteDate date of delete action
      * @param content the stored deleted document
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
         Date deleteDate, DeletedAttachmentContent content)
@@ -134,7 +134,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param deleteDate date of delete action
      * @param content the stored deleted document
      * @param id the synthetic id of this deleted attachment. Uniquely identifies an entry in the recycle bin.
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
         Date deleteDate, DeletedAttachmentContent content, long id)
@@ -282,20 +282,20 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * @return the type of the store used for the content
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
-    public String getXmlStore()
+    public String getContentStore()
     {
-        return this.xmlStore;
+        return this.contentStore;
     }
 
     /**
      * @param xmlStore the type of store (supported values are null/"hibernate" and "file")
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
-    protected void setXmlStore(String xmlStore)
+    protected void setContentStore(String xmlStore)
     {
-        this.xmlStore = xmlStore;
+        this.contentStore = xmlStore;
     }
 
     /**
@@ -390,7 +390,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @return restored attachment
      * @param xcontext the current {@link XWikiContext context}
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     public XWikiAttachment restoreAttachment() throws XWikiException
     {

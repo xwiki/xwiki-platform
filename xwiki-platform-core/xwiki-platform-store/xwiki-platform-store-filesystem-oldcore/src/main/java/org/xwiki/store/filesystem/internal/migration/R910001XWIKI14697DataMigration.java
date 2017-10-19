@@ -29,39 +29,39 @@ import org.xwiki.model.reference.AttachmentReference;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI-14697. Make sure all attachments have the right content and archive store id.
+ * Migration for XWIKI-14697. Make sure all attachments have the right archive store id.
  *
  * @version $Id$
  * @since 9.9RC1
  */
 @Component
-@Named("R99000XWIKI14697")
+@Named("R910001XWIKI14697")
 @Singleton
-public class R99000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigration
+public class R910001XWIKI14697DataMigration extends AbstractXWIKI14697DataMigration
 {
     /**
      * The default constructor.
      */
-    public R99000XWIKI14697DataMigration()
+    public R910001XWIKI14697DataMigration()
     {
-        super("XWikiAttachmentContent", "contentStore");
+        super("XWikiAttachmentArchive", "archiveStore");
     }
 
     @Override
     public String getDescription()
     {
-        return "Make sure all attachments have the right content store id.";
+        return "Make sure all attachments have the right archive store id.";
     }
 
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(99000);
+        return new XWikiDBVersion(910001);
     }
 
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        return this.fstools.attachmentContentExist(attachmentReference);
+        return this.fstools.attachmentArchiveExist(attachmentReference);
     }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.util.Date;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.xwiki.component.annotation.Role;
@@ -61,21 +60,21 @@ public interface FilesystemStoreTools
      *
      * @param attachmentReference the reference attachment to get a tools for.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     AttachmentFileProvider getAttachmentFileProvider(AttachmentReference attachmentReference);
 
     /**
      * @param attachmentReference the reference of the attachment
      * @return true if the attachment content exist in the store
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     boolean attachmentContentExist(AttachmentReference attachmentReference);
 
     /**
      * @param attachmentReference the reference of the attachment
      * @return true if the attachment archive exist in the store
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     boolean attachmentArchiveExist(AttachmentReference attachmentReference);
 
@@ -84,12 +83,11 @@ public interface FilesystemStoreTools
      * location which is repeatable only with the same attachment name, containing document, and date of deletion.
      *
      * @param attachmentReference the reference of the attachment
-     * @param deleteDate the date the attachment was deleted.
+     * @param index the index of the deleted attachment.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(AttachmentReference attachmentReference,
-        Date deleteDate);
+    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(AttachmentReference attachmentReference, long index);
 
     /**
      * Get an instance of DeletedDocumentFileProvider which will save everything to do with an document in a separate
@@ -109,7 +107,7 @@ public interface FilesystemStoreTools
 
     /**
      * @return the absolute path to the directory where the files are stored.
-     * @since 9.9RC1
+     * @since 9.10RC1
      */
     File getStorageLocationFile();
 

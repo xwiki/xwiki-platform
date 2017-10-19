@@ -38,7 +38,7 @@ public class FilesystemAttachmentStorageProfile implements Profile
 
         conf.setProperty("xwiki.store.attachment.hint", "file");
         conf.setProperty("xwiki.store.attachment.versioning.hint", "file");
-        conf.setProperty("xwiki.store.attachment.recyclebin.hint", "file");
+        conf.setProperty("xwiki.store.attachment.recyclebin.content.hint", "file");
 
         executor.saveXWikiCfg(conf);
     }

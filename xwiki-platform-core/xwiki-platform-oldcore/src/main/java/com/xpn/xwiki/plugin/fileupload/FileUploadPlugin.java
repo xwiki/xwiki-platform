@@ -211,6 +211,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         // Make sure the factory only ever creates file items which will be deleted when the jvm is stopped.
         DiskFileItemFactory factory = new DiskFileItemFactory()
         {
+            @Override
             public FileItem createItem(String fieldName, String contentType, boolean isFormField, String fileName)
             {
                 try {
@@ -218,7 +219,6 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
                         (DiskFileItem) super.createItem(fieldName, contentType, isFormField, fileName);
                     // Needed to make sure the File object is created.
                     item.getOutputStream();
-                    item.getStoreLocation().deleteOnExit();
                     return item;
                 } catch (IOException e) {
                     String path = System.getProperty("java.io.tmpdir");

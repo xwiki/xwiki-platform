@@ -92,19 +92,27 @@ xwiki.tags=1
 #-# one of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint
 #-# other than 'default') and put its hint here.
 #
-#-# The main (documents) storage. [Since 3.4M1] default is hibernate.
-# xwiki.store.main.hint=hibernate
-#-# The attachment storage. [Since 3.4M1] default is hibernate.
-# xwiki.store.attachment.hint=hibernate
-#-# The document versioning storage. [Since 3.4M1] default is hibernate.
-# xwiki.store.versioning.hint=hibernate
-#-# The attachment versioning storage. Use 'void' to disable attachment versioning. [Since 3.4M1] default is hibernate.
-# xwiki.store.attachment.versioning.hint=hibernate
-#-# The document recycle bin storage. [Since 3.4M1] default is hibernate.
-# xwiki.store.recyclebin.hint=hibernate
+#-# Stores with both "hibernate" and "file" support by default.
+#-# 
 #-# [Since 9.0RC1] The default document content recycle bin storage. Default is hibernate.
 #-# This property is only taken into account when deleting a document and has no effect on already deleted documents.
 # xwiki.store.recyclebin.content.hint=hibernate
+#-# The attachment storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.attachment.hint=hibernate
+#-# The attachment versioning storage. Use 'void' to disable attachment versioning. [Since 3.4M1] default is hibernate.
+# xwiki.store.attachment.versioning.hint=hibernate
+#-# [Since 9.9RC1] The default attachment content recycle bin storage. Default is hibernate.
+#-# This property is only taken into account when deleting an attachment and has no effect on already deleted documents.
+# xwiki.store.attachment.recyclebin.content.hint=hibernate
+#-# 
+#-# Stores with only "hibernate" support by default
+#-# 
+#-# The main (documents) storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.main.hint=hibernate
+#-# The document versioning storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.versioning.hint=hibernate
+#-# The document recycle bin storage. [Since 3.4M1] default is hibernate.
+# xwiki.store.recyclebin.hint=hibernate
 #-# The attachment recycle bin storage. [Since 3.4M1] default is hibernate.
 # xwiki.store.attachment.recyclebin.hint=hibernate
 #-# [Since 3.4M1] The Migration manager.

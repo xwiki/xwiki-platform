@@ -17,43 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.file;
+package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
+import java.io.IOException;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DeletedAttachmentContent;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
- * Helper to create file that are automatically deleted when not needed anymore.
- * 
+ * Filesystem based implementation of DeletedAttachmentContent.
+ *
  * @version $Id$
- * @since 9.0RC1
+ * @since 9.9RC1
  */
-public class TemporaryFile extends File
+public class FileDeletedAttachmentContent implements DeletedAttachmentContent
 {
-    /**
-     * @param file the file to copy
-     * @since 9.10RC1
-     */
-    public TemporaryFile(File file)
-    {
-        super(file.getPath());
-    }
+    private XWikiAttachment attachment;
 
     /**
-     * @param parent The parent abstract pathname
-     * @param child The child pathname string
+     * @param attachment the deleted attachment
      */
-    public TemporaryFile(File parent, String child)
+    public FileDeletedAttachmentContent(XWikiAttachment attachment)
     {
-        super(parent, child);
+        this.attachment = attachment;
     }
 
     @Override
-    protected void finalize() throws Throwable
+    public String getContentAsString() throws IOException, XWikiException
     {
-        if (exists()) {
-            delete();
+        return this.attachment.toXML();
+    }
+
+    @Override
+    public XWikiAttachment getXWikiAttachment(XWikiAttachment returnAttachment) throws XWikiException, IOException
+    {
+        if (returnAttachment != null) {
+            returnAttachment.apply(this.attachment);
+
+            return returnAttachment;
         }
 
-        super.finalize();
+        return this.attachment;
     }
 }

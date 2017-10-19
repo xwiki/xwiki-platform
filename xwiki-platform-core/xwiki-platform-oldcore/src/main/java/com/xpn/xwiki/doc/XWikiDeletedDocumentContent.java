@@ -21,21 +21,25 @@ package com.xpn.xwiki.doc;
 
 import java.io.IOException;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiException;
 
 /**
- * The stored deleted document.
+ * The content of the stored deleted document.
  *
  * @version $Id$
  * @since 9.0RC1
  */
+@Unstable
 public interface XWikiDeletedDocumentContent
 {
     /**
      * @return the serialized version of the document
      * @throws IOException when failing to get the {@link String} content
+     * @throws XWikiException when failing to get the {@link String} content
      */
-    String getContentAsString() throws IOException;
+    String getContentAsString() throws IOException, XWikiException;
 
     /**
      * @param document the document to write to or null to create a new one

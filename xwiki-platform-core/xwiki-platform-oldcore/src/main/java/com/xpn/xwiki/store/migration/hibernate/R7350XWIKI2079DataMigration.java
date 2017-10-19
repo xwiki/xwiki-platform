@@ -65,7 +65,7 @@ public class R7350XWIKI2079DataMigration extends AbstractHibernateDataMigration
     @Override
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException

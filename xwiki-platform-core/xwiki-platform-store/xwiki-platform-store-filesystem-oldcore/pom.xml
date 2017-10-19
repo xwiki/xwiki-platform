@@ -38,6 +38,10 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
@@ -129,7 +133,8 @@
             <configuration>
               <excludes>
                 <!-- Fan-out violation in an implementation of a legacy interface. -->
-                **/legacy/store/internal/FilesystemAttachmentRecycleBinStore.java
+                org/xwiki/store/legacy/store/internal/FilesystemAttachmentRecycleBinContentStore.java,
+                org/xwiki/store/filesystem/internal/migration/R910010XWIKI9065DataMigration.java
               </excludes>
             </configuration>
           </execution>

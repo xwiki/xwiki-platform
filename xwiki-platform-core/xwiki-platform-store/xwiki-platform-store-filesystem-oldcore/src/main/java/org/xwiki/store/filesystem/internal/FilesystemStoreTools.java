@@ -20,14 +20,11 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-
-import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Tools for getting files to store data in the filesystem. These APIs are in flux and may change at any time without
@@ -61,20 +58,36 @@ public interface FilesystemStoreTools
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
      * location which is repeatable only with the same attachment name, and containing document.
      *
-     * @param attachment the attachment to get a tools for.
+     * @param attachmentReference the reference attachment to get a tools for.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
+     * @since 9.10RC1
      */
-    AttachmentFileProvider getAttachmentFileProvider(XWikiAttachment attachment);
+    AttachmentFileProvider getAttachmentFileProvider(AttachmentReference attachmentReference);
+
+    /**
+     * @param attachmentReference the reference of the attachment
+     * @return true if the attachment content exist in the store
+     * @since 9.10RC1
+     */
+    boolean attachmentContentExist(AttachmentReference attachmentReference);
+
+    /**
+     * @param attachmentReference the reference of the attachment
+     * @return true if the attachment archive exist in the store
+     * @since 9.10RC1
+     */
+    boolean attachmentArchiveExist(AttachmentReference attachmentReference);
 
     /**
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
      * location which is repeatable only with the same attachment name, containing document, and date of deletion.
      *
-     * @param attachment the attachment to get a tools for.
-     * @param deleteDate the date the attachment was deleted.
+     * @param attachmentReference the reference of the attachment
+     * @param index the index of the deleted attachment.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
+     * @since 9.10RC1
      */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(XWikiAttachment attachment, Date deleteDate);
+    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(AttachmentReference attachmentReference, long index);
 
     /**
      * Get an instance of DeletedDocumentFileProvider which will save everything to do with an document in a separate
@@ -88,17 +101,15 @@ public interface FilesystemStoreTools
     DeletedDocumentContentFileProvider getDeletedDocumentFileProvider(DocumentReference documentReference, long index);
 
     /**
-     * Get a map of dates of deletion by the document where the attachment was attached.
-     *
-     * @param docRef a reference to the document to get deleted attachments for.
-     * @return a map of maps which provide FileProviders by deletion dates and filenames.
-     */
-    Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(DocumentReference docRef);
-
-    /**
      * @return the absolute path to the directory where the files are stored.
      */
     String getStorageLocationPath();
+
+    /**
+     * @return the absolute path to the directory where the files are stored.
+     * @since 9.10RC1
+     */
+    File getStorageLocationFile();
 
     /**
      * Get a file which is global for the entire installation.
@@ -107,14 +118,6 @@ public interface FilesystemStoreTools
      * @return a file unique to the given name.
      */
     File getGlobalFile(String name);
-
-    /**
-     * Get a deleted attachment file provider from a path to the deleted attachment directory.
-     *
-     * @param pathToDirectory a relitive path to the directory where the deleted attachment is.
-     * @return a DeletedAttachmentFileProvider which will provide files for that deleted attachment.
-     */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(String pathToDirectory);
 
     /**
      * Get a {@link java.util.concurrent.locks.ReadWriteLock} which is unique to the given file. This method will always

@@ -28,6 +28,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.SimpleExpression;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -75,7 +76,7 @@ public class XWikiHibernateRecycleBinStoreTest extends AbstractXWikiHibernateSto
         when(session.createCriteria(XWikiDeletedDocument.class)).thenReturn(criteria);
 
         assertArrayEquals(deletedVersions.toArray(new XWikiDeletedDocument[2]), mocker.getComponentUnderTest()
-            .getAllDeletedDocuments(document, context, true));
+            .getAllDeletedDocuments(document, xcontext, true));
 
         // Too bad the restrictions don't implement equals..
         verify(criteria).add(argThat(new HasToString<SimpleExpression>(equalTo("fullName=Space.Page"))));
@@ -89,7 +90,7 @@ public class XWikiHibernateRecycleBinStoreTest extends AbstractXWikiHibernateSto
         Criteria criteria = mock(Criteria.class);
         when(session.createCriteria(XWikiDeletedDocument.class)).thenReturn(criteria);
 
-        mocker.getComponentUnderTest().getAllDeletedDocuments(mock(XWikiDocument.class), context, true);
+        mocker.getComponentUnderTest().getAllDeletedDocuments(mock(XWikiDocument.class), xcontext, true);
 
         // Too bad the restrictions don't implement equals..
         verify(criteria).add(argThat(new HasToString<SimpleExpression>(equalTo("fullName=null"))));

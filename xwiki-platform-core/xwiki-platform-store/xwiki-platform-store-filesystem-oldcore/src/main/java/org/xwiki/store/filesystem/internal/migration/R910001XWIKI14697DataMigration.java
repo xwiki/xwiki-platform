@@ -17,38 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.legacy.store.internal;
 
-import javax.inject.Inject;
+package org.xwiki.store.filesystem.internal.migration;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.internal.FileSystemStoreUtils;
+import org.xwiki.model.reference.AttachmentReference;
 
-import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
-import com.xpn.xwiki.store.AttachmentRecycleBinStore;
-import com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Realization of {@link AttachmentRecycleBinStore} for filesystem storage.
+ * Migration for XWIKI-14697. Make sure all attachments have the right archive store id.
  *
  * @version $Id$
- * @since 3.0M3
- * @deprecated since 9.9RC1, use {@link FilesystemAttachmentRecycleBinContentStore} instead
+ * @since 9.9RC1
  */
 @Component
-@Named(FileSystemStoreUtils.HINT)
+@Named("R910001XWIKI14697")
 @Singleton
-@Deprecated
-public class FilesystemAttachmentRecycleBinStore extends HibernateAttachmentRecycleBinStore
+public class R910001XWIKI14697DataMigration extends AbstractXWIKI14697DataMigration
 {
-    @Inject
-    private AttachmentRecycleBinContentStore contentStore;
+    /**
+     * The default constructor.
+     */
+    public R910001XWIKI14697DataMigration()
+    {
+        super("XWikiAttachmentArchive", "archiveStore");
+    }
 
     @Override
-    protected AttachmentRecycleBinContentStore getAttachmentRecycleBinContentStore(String storeType)
+    public String getDescription()
     {
-        return this.contentStore;
+        return "Make sure all attachments have the right archive store id.";
+    }
+
+    @Override
+    public XWikiDBVersion getVersion()
+    {
+        return new XWikiDBVersion(910001);
+    }
+
+    @Override
+    protected boolean isFile(AttachmentReference attachmentReference)
+    {
+        return this.fstools.attachmentArchiveExist(attachmentReference);
     }
 }

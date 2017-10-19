@@ -426,7 +426,7 @@ public interface DocumentAccessBridge
      * @param attachmentFilename the name of the attachment
      * @param attachmentData Attachment content.
      * @throws Exception If the storage cannot be accessed.
-     * @deprecated replaced by {@link #getAttachmentContent(AttachmentReference)} since 2.2.1
+     * @deprecated replaced by {@link #setAttachmentContent(AttachmentReference, byte[])} since 2.2.1
      */
     @Deprecated
     void setAttachmentContent(String documentReference, String attachmentFilename, byte[] attachmentData)

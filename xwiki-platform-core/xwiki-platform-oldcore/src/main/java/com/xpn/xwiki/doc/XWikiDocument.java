@@ -76,6 +76,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextException;
@@ -178,6 +179,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateAttachmentStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -752,6 +754,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return context.getWiki().getStore();
     }
 
+    /**
+     * @deprecated since 9.9RC1, use {@link XWiki#getDefaultAttachmentContentStore()} instead
+     */
+    @Deprecated
     public XWikiAttachmentStoreInterface getAttachmentStore(XWikiContext context)
     {
         return context.getWiki().getAttachmentStore();
@@ -1309,8 +1315,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             // We don't let displayer take care of the context isolation because we don't want the fake document to be
             // context document
-            return fakeDocument.display(Syntax.valueOf(targetSyntaxId), false, true,
-                restrictedTransformationContext, false);
+            return fakeDocument.display(Syntax.valueOf(targetSyntaxId), false, true, restrictedTransformationContext,
+                false);
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
@@ -1562,8 +1568,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setFormat(String format)
     {
-        this.format = format;
         if (!format.equals(this.format)) {
+            this.format = format;
+
             setMetaDataDirty(true);
         }
     }
@@ -3948,6 +3955,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private XWikiDocument cloneInternal(DocumentReference newDocumentReference, boolean keepsIdentity)
     {
         XWikiDocument doc = null;
+
         try {
             Constructor<? extends XWikiDocument> constructor = getClass().getConstructor(DocumentReference.class);
             doc = constructor.newInstance(newDocumentReference);
@@ -4703,11 +4711,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return this.attachmentList;
     }
 
+    /**
+     * @deprecated should not be used, save the document instead
+     */
+    @Deprecated
     public void saveAllAttachments(XWikiContext context) throws XWikiException
     {
         saveAllAttachments(true, true, context);
     }
 
+    /**
+     * @deprecated should not be used, save the document instead
+     */
+    @Deprecated
     public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context)
         throws XWikiException
     {
@@ -4721,31 +4737,30 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * @deprecated should not be used, save the document instead
+     */
+    @Deprecated
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiContext context) throws XWikiException
     {
-        String database = context.getWikiId();
-        try {
-            // We might need to switch database to get the translated content
-            if (getDatabase() != null) {
-                context.setWikiId(getDatabase());
-            }
-
-            context.getWiki().getAttachmentStore().saveAttachmentsContent(attachments, this, true, context, true);
-        } catch (OutOfMemoryError e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
-                "Out Of Memory Exception");
-        } finally {
-            if (database != null) {
-                context.setWikiId(database);
-            }
+        for (XWikiAttachment attachment : attachments) {
+            saveAttachmentContent(attachment, context);
         }
     }
 
+    /**
+     * @deprecated should not be used, save the document instead
+     */
+    @Deprecated
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         saveAttachmentContent(attachment, true, true, context);
     }
 
+    /**
+     * @deprecated should not be used, save the document instead
+     */
+    @Deprecated
     public void saveAttachmentContent(XWikiAttachment attachment, boolean updateParent, boolean transaction,
         XWikiContext context) throws XWikiException
     {
@@ -4758,7 +4773,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
 
             // Save the attachment
-            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, false, context, transaction);
+            XWikiAttachmentStoreInterface store =
+                resolveXWikiAttachmentStoreInterface(attachment.getContentStore(), context);
+            store.saveAttachmentContent(attachment, false, context, transaction);
 
             // We need to make sure there is a version upgrade
             setMetaDataDirty(true);
@@ -4777,6 +4794,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * @deprecated since 9.9RC1, use {@link XWikiAttachment#loadContent(XWikiContext)}
+     */
+    @Deprecated
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         String database = context.getWikiId();
@@ -4787,7 +4808,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 context.setWikiId(getDatabase());
             }
 
-            context.getWiki().getAttachmentStore().loadAttachmentContent(attachment, context, true);
+            attachment.loadContent(context);
         } finally {
             if (database != null) {
                 context.setWikiId(database);
@@ -8834,5 +8855,29 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return modified;
+    }
+
+    private XWikiAttachmentStoreInterface resolveXWikiAttachmentStoreInterface(String storeType, XWikiContext xcontext)
+    {
+        XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(storeType);
+
+        if (store != null) {
+            return store;
+        }
+
+        return xcontext.getWiki().getDefaultAttachmentContentStore();
+    }
+
+    private XWikiAttachmentStoreInterface getXWikiAttachmentStoreInterface(String storeType)
+    {
+        if (storeType != null && !storeType.equals(XWikiHibernateAttachmentStore.HINT)) {
+            try {
+                return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, storeType);
+            } catch (ComponentLookupException e) {
+                LOGGER.warn("Can't find attachment content store for type [{}]", storeType, e);
+            }
+        }
+
+        return null;
     }
 }

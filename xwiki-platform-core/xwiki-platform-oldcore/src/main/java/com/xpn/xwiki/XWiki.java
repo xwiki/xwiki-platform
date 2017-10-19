@@ -146,7 +146,6 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
-
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -213,6 +212,7 @@ import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -273,7 +273,7 @@ public class XWiki implements EventListener
     private XWikiStoreInterface store;
 
     /** The attachment storage (excluding attachment history). */
-    private XWikiAttachmentStoreInterface attachmentStore;
+    private XWikiAttachmentStoreInterface defaultAttachmentContentStore;
 
     /** Store for attachment archives. */
     private AttachmentVersioningStore attachmentVersioningStore;
@@ -1141,7 +1141,7 @@ public class XWiki implements EventListener
             }
 
             XWikiStoreInterface mainStore = Utils.getComponent(XWikiStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.main.hint", "hibernate"));
+                getConfiguration().getProperty("xwiki.store.main.hint", XWikiHibernateBaseStore.HINT));
 
             // Check if we need to use the cache store..
             boolean nocache = "0".equals(getConfiguration().getProperty("xwiki.store.cache", "1"));
@@ -1155,26 +1155,27 @@ public class XWiki implements EventListener
             setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
                 "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-            setAttachmentStore(Utils.<XWikiAttachmentStoreInterface>getComponent(XWikiAttachmentStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.attachment.hint", "hibernate")));
+            setDefaultAttachmentContentStore(
+                Utils.<XWikiAttachmentStoreInterface>getComponent(XWikiAttachmentStoreInterface.class,
+                    getConfiguration().getProperty("xwiki.store.attachment.hint", XWikiHibernateBaseStore.HINT)));
 
             setVersioningStore(Utils.<XWikiVersioningStoreInterface>getComponent(XWikiVersioningStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.versioning.hint", "hibernate")));
+                getConfiguration().getProperty("xwiki.store.versioning.hint", XWikiHibernateBaseStore.HINT)));
 
             setAttachmentVersioningStore(Utils.<AttachmentVersioningStore>getComponent(AttachmentVersioningStore.class,
-                hasAttachmentVersioning(context)
-                    ? getConfiguration().getProperty("xwiki.store.attachment.versioning.hint", "hibernate") : "void"));
+                hasAttachmentVersioning(context) ? getConfiguration()
+                    .getProperty("xwiki.store.attachment.versioning.hint", XWikiHibernateBaseStore.HINT) : "void"));
 
             if (hasRecycleBin(context)) {
                 setRecycleBinStore(
                     Utils.<XWikiRecycleBinStoreInterface>getComponent(XWikiRecycleBinStoreInterface.class,
-                        getConfiguration().getProperty("xwiki.store.recyclebin.hint", "hibernate")));
+                        getConfiguration().getProperty("xwiki.store.recyclebin.hint", XWikiHibernateBaseStore.HINT)));
             }
 
             if (hasAttachmentRecycleBin(context)) {
                 setAttachmentRecycleBinStore(
-                    Utils.<AttachmentRecycleBinStore>getComponent(AttachmentRecycleBinStore.class,
-                        getConfiguration().getProperty("xwiki.store.attachment.recyclebin.hint", "hibernate")));
+                    Utils.<AttachmentRecycleBinStore>getComponent(AttachmentRecycleBinStore.class, getConfiguration()
+                        .getProperty("xwiki.store.attachment.recyclebin.hint", XWikiHibernateBaseStore.HINT)));
             }
 
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
@@ -1352,6 +1353,7 @@ public class XWiki implements EventListener
     /**
      * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
      *         list of all virtual wikis database names use {@link WikiDescriptorManager#getAllIds()}.
+     * @deprecated
      */
     @Deprecated
     public List<String> getVirtualWikiList()
@@ -1388,6 +1390,7 @@ public class XWiki implements EventListener
     /**
      * @return the cache containing the names of the wikis already initialized.
      * @since 1.5M2.
+     * @deprecated
      */
     @Deprecated
     public Cache<DocumentReference> getVirtualWikiCache()
@@ -1638,12 +1641,38 @@ public class XWiki implements EventListener
         return this.store;
     }
 
+    /**
+     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentContentStore()} instead
+     */
+    @Deprecated
     public XWikiAttachmentStoreInterface getAttachmentStore()
     {
-        return this.attachmentStore;
+        return getDefaultAttachmentContentStore();
     }
 
+    /**
+     * @return the store to use by default when saving a new attachment content
+     * @since 9.10RC1
+     */
+    public XWikiAttachmentStoreInterface getDefaultAttachmentContentStore()
+    {
+        return this.defaultAttachmentContentStore;
+    }
+
+    /**
+     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentVersioningStore()} instead
+     */
+    @Deprecated
     public AttachmentVersioningStore getAttachmentVersioningStore()
+    {
+        return getDefaultAttachmentVersioningStore();
+    }
+
+    /**
+     * @return the store to use by default when saving a new attachment archive
+     * @since 9.10RC1
+     */
+    public AttachmentVersioningStore getDefaultAttachmentVersioningStore()
     {
         return this.attachmentVersioningStore;
     }
@@ -3141,9 +3170,22 @@ public class XWiki implements EventListener
         this.store = store;
     }
 
+    /**
+     * @deprecated since 9.9RC1, use {@link #setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface)} instead
+     */
+    @Deprecated
     public void setAttachmentStore(XWikiAttachmentStoreInterface attachmentStore)
     {
-        this.attachmentStore = attachmentStore;
+        this.defaultAttachmentContentStore = attachmentStore;
+    }
+
+    /**
+     * @param attachmentContentStore the store to use by default when saving a new attachment
+     * @since 9.10RC1
+     */
+    public void setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface attachmentContentStore)
+    {
+        this.defaultAttachmentContentStore = attachmentContentStore;
     }
 
     public void setAttachmentVersioningStore(AttachmentVersioningStore avStore)
@@ -5649,6 +5691,9 @@ public class XWiki implements EventListener
         return adclientid;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public XWikiPluginInterface getPlugin(String name, XWikiContext context)
     {
@@ -5663,6 +5708,9 @@ public class XWiki implements EventListener
         return null;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Api getPluginApi(String name, XWikiContext context)
     {
@@ -6531,7 +6579,8 @@ public class XWiki implements EventListener
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
     {
-        LOGGER.debug("Rolling back [" + tdoc + "] to version " + rev);
+        LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
+
         // Let's clone rolledbackDoc since we might modify it
         XWikiDocument rolledbackDoc = getDocument(tdoc, rev, context).clone();
 
@@ -6566,7 +6615,7 @@ public class XWiki implements EventListener
                 XWikiAttachment equivalentAttachment = tdoc.getAttachment(filename);
                 if (equivalentAttachment == null) {
                     // Deleted attachment
-                    LOGGER.debug("Deleted attachment: " + filename);
+                    LOGGER.debug("Deleted attachment: [{}]", filename);
                     toRestore.add(oldAttachment);
                     continue;
                 }
@@ -6579,7 +6628,7 @@ public class XWiki implements EventListener
                 if (equivalentAttachmentRevision == null
                     || equivalentAttachmentRevision.getDate().getTime() != oldAttachment.getDate().getTime()) {
                     // Recreated attachment
-                    LOGGER.debug("Recreated attachment: " + filename);
+                    LOGGER.debug("Recreated attachment: [{}]", filename);
                     // If the attachment trash is not available, don't lose the existing attachment
                     if (getAttachmentRecycleBinStore() != null) {
                         getAttachmentRecycleBinStore().saveToRecycleBin(equivalentAttachment, context.getUser(),
@@ -6590,7 +6639,7 @@ public class XWiki implements EventListener
                 }
                 if (!StringUtils.equals(oldAttachment.getVersion(), equivalentAttachment.getVersion())) {
                     // Updated attachment
-                    LOGGER.debug("Updated attachment: " + filename);
+                    LOGGER.debug("Updated attachment: [{}]", filename);
                     toRevert.add(equivalentAttachment);
                 }
             }
@@ -6643,7 +6692,7 @@ public class XWiki implements EventListener
                         // Not found in the trash, nothing left to do
                         continue;
                     }
-                    XWikiAttachment restoredAttachment = correctVariant.restoreAttachment(null, context);
+                    XWikiAttachment restoredAttachment = correctVariant.restoreAttachment();
                     XWikiAttachment restoredAttachmentRevision =
                         restoredAttachment.getAttachmentRevision(attachmentToRestore.getVersion(), context);
 

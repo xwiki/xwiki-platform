@@ -63,18 +63,18 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
             // Make sure the parent folders exist.
             temporaryFile.getParentFile().mkdirs();
             fos = new FileOutputStream(temporaryFile);
-            temporaryFile.deleteOnExit();
             IOUtils.copy(content, fos);
         } finally {
             IOUtils.closeQuietly(fos);
         }
+
         return temporaryFile;
     }
 
     @Override
     public File getTemporaryFile(TemporaryResourceReference reference) throws IOException
     {
-        List<String> segments = new ArrayList<String>();
+        List<String> segments = new ArrayList<>();
         segments.add("tmp");
         segments.add(reference.getModuleId());
         int safePathLength = 2;
@@ -106,7 +106,7 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
 
     private List<String> encode(List<String> path)
     {
-        List<String> encodedPath = new ArrayList<String>(path.size());
+        List<String> encodedPath = new ArrayList<>(path.size());
         for (String segment : path) {
             try {
                 encodedPath.add(URLEncoder.encode(segment, "UTF-8"));
@@ -114,6 +114,7 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore
                 // Should never happen.
             }
         }
+
         return encodedPath;
     }
 }

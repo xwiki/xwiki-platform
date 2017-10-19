@@ -550,23 +550,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
-        XWikiAttachment attachment = doc.getAttachment(attachmentReference.getName());
-        if (attachment == null) {
-            attachment = new XWikiAttachment();
-            doc.getAttachmentList().add(attachment);
-            doc.setComment("Add new attachment " + attachmentReference.getName());
-        } else {
-            doc.setComment("Update attachment " + attachmentReference.getName());
-        }
-        attachment.setContent(attachmentData);
-        attachment.setFilename(attachmentReference.getName());
-        attachment.setAuthor(getCurrentUser());
-        attachment.setDoc(doc);
-        doc.setAuthorReference(getContext().getUserReference());
-        if (doc.isNew()) {
-            doc.setCreatorReference(getContext().getUserReference());
-        }
-        doc.saveAttachmentContent(attachment, xcontext);
+
+        setAttachmentContent(doc, attachmentReference.getName(), attachmentData, xcontext);
     }
 
     @Override
@@ -576,23 +561,31 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        setAttachmentContent(doc, attachmentFilename, attachmentData, xcontext);
+    }
+
+    private void setAttachmentContent(XWikiDocument doc, String attachmentFilename, byte[] attachmentData,
+        XWikiContext xcontext) throws Exception
+    {
         XWikiAttachment attachment = doc.getAttachment(attachmentFilename);
         if (attachment == null) {
             attachment = new XWikiAttachment();
             doc.getAttachmentList().add(attachment);
             doc.setComment("Add new attachment " + attachmentFilename);
+            doc.addAttachment(attachment);
         } else {
             doc.setComment("Update attachment " + attachmentFilename);
         }
         attachment.setContent(attachmentData);
         attachment.setFilename(attachmentFilename);
-        attachment.setAuthor(getCurrentUser());
+        attachment.setAuthorReference(getCurrentUserReference());
         attachment.setDoc(doc);
-        doc.setAuthor(getCurrentUser());
+        doc.setAuthorReference(getCurrentUserReference());
         if (doc.isNew()) {
-            doc.setCreator(getCurrentUser());
+            doc.setCreatorReference(getCurrentUserReference());
         }
-        doc.saveAttachmentContent(attachment, xcontext);
+        xcontext.getWiki().saveDocument(doc, xcontext);
     }
 
     @Override

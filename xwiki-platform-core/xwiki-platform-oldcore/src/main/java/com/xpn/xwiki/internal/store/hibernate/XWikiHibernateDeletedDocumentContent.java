@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.Utils;
  * Hibernate based implementation of XWikiDeletedDocumentContent.
  *
  * @version $Id$
- * @since 9.9RC1
+ * @since 9.10RC1
  */
 public class XWikiHibernateDeletedDocumentContent implements XWikiDeletedDocumentContent
 {

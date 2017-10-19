@@ -23,12 +23,11 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -42,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
@@ -57,6 +57,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -64,6 +65,8 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.xml.XMLWriter;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -124,7 +127,11 @@ public class XWikiAttachment implements Cloneable
 
     private Date date;
 
-    private XWikiAttachmentContent attachment_content;
+    private String contentStore;
+
+    private String archiveStore;
+
+    private XWikiAttachmentContent content;
 
     private XWikiAttachmentArchive attachment_archive;
 
@@ -196,33 +203,32 @@ public class XWikiAttachment implements Cloneable
     public XWikiAttachment clone()
     {
         XWikiAttachment attachment = null;
+
         try {
-            attachment = getClass().newInstance();
-        } catch (Exception e) {
+            attachment = (XWikiAttachment) super.clone();
+
+            attachment.setComment(getComment());
+            attachment.setDate(getDate());
+            attachment.setFilename(getFilename());
+            attachment.setMimeType(getMimeType());
+            attachment.setLongSize(getLongSize());
+            attachment.setRCSVersion(getRCSVersion());
+            attachment.setMetaDataDirty(isMetaDataDirty());
+            attachment.setContentStore(getContentStore());
+            if (getAttachment_content() != null) {
+                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
+                attachment.getAttachment_content().setAttachment(attachment);
+            }
+            if (getAttachment_archive() != null) {
+                attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
+                attachment.getAttachment_archive().setAttachment(attachment);
+            }
+
+            attachment.setDoc(getDoc());
+        } catch (CloneNotSupportedException e) {
             // This should not happen
             LOGGER.error("exception while attach.clone", e);
         }
-
-        attachment.author = this.author;
-        attachment.authorReference = this.authorReference;
-
-        attachment.setComment(getComment());
-        attachment.setDate(getDate());
-        attachment.setFilename(getFilename());
-        attachment.setMimeType(getMimeType());
-        attachment.setLongSize(getLongSize());
-        attachment.setRCSVersion(getRCSVersion());
-        attachment.setMetaDataDirty(isMetaDataDirty());
-        if (getAttachment_content() != null) {
-            attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
-            attachment.getAttachment_content().setAttachment(attachment);
-        }
-        if (getAttachment_archive() != null) {
-            attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
-            attachment.getAttachment_archive().setAttachment(attachment);
-        }
-
-        attachment.setDoc(getDoc());
 
         return attachment;
     }
@@ -303,11 +309,11 @@ public class XWikiAttachment implements Cloneable
      */
     public long getContentLongSize(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null && context != null) {
-            this.doc.loadAttachmentContent(this, context);
+        if (this.content == null && context != null) {
+            loadContent(context);
         }
 
-        return this.attachment_content.getLongSize();
+        return this.content.getLongSize();
     }
 
     public String getFilename()
@@ -475,10 +481,10 @@ public class XWikiAttachment implements Cloneable
 
     public boolean isContentDirty()
     {
-        if (this.attachment_content == null) {
+        if (this.content == null) {
             return false;
         } else {
-            return this.attachment_content.isContentDirty();
+            return this.content.isContentDirty();
         }
     }
 
@@ -506,8 +512,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * Retrieve an attachment as an XML string. You should prefer
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext)} to avoid
-     * memory loads when appropriate.
+     * {@link #toXML(OutputTarget, boolean, boolean, boolean, XWikiContext)} to avoid memory loads when appropriate.
      *
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archived versions are also included
@@ -521,12 +526,30 @@ public class XWikiAttachment implements Cloneable
         try {
             StringWriter writer = new StringWriter();
             toXML(new DefaultWriterOutputTarget(writer), bWithAttachmentContent, bWithVersions, true, context);
+
             return writer.toString();
         } catch (IOException e) {
             LOGGER.error("Failed to write attachment XML", e);
 
             return "";
         }
+    }
+
+    /**
+     * Retrieve an attachment as an XML string. You should prefer
+     * {@link #toXML(OutputTarget, boolean, boolean, boolean, XWikiContext)} to avoid memory loads when appropriate.
+     *
+     * @param xcontext current XWikiContext
+     * @return a string containing an XML representation of the attachment
+     * @throws XWikiException when an error occurs during wiki operations
+     * @since 9.10RC1
+     */
+    public String toXML() throws XWikiException
+    {
+        StringWriter writer = new StringWriter();
+        toXML(new DefaultWriterOutputTarget(writer), true, true, true, StandardCharsets.UTF_8.name());
+
+        return writer.toString();
     }
 
     /**
@@ -577,6 +600,23 @@ public class XWikiAttachment implements Cloneable
     public void toXML(OutputTarget out, boolean bWithAttachmentContent, boolean bWithVersions, boolean format,
         XWikiContext context) throws IOException, XWikiException
     {
+        toXML(out, bWithAttachmentContent, bWithVersions, format, context.getWiki().getEncoding());
+    }
+
+    /**
+     * Write an XML representation of the attachment into an {@link com.xpn.xwiki.internal.xml.XMLWriter}
+     *
+     * @param out the output where to write the XML
+     * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
+     * @param bWithVersions if true, all archive version is also included
+     * @param format true if the XML should be formated
+     * @param encoding the encoding to use when serializing XML
+     * @throws XWikiException when an error occurs during xwiki operation
+     * @since 9.10RC1
+     */
+    public void toXML(OutputTarget out, boolean bWithAttachmentContent, boolean bWithVersions, boolean format,
+        String encoding) throws XWikiException
+    {
         // Input
         DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
         documentProperties.setWithWikiAttachmentsContent(bWithAttachmentContent);
@@ -586,7 +626,7 @@ public class XWikiAttachment implements Cloneable
         // Output
         XAROutputProperties xarProperties = new XAROutputProperties();
         xarProperties.setPreserveVersion(bWithVersions);
-        xarProperties.setEncoding(context.getWiki().getEncoding());
+        xarProperties.setEncoding(encoding);
         xarProperties.setFormat(format);
 
         try {
@@ -668,17 +708,53 @@ public class XWikiAttachment implements Cloneable
         fromXML(writer.toString());
     }
 
+    /**
+     * @return the type of the store used for the content
+     * @since 9.10RC1
+     */
+    public String getContentStore()
+    {
+        return this.contentStore;
+    }
+
+    /**
+     * @param contentStore the type of the store used for the content
+     * @since 9.10RC1
+     */
+    public void setContentStore(String contentStore)
+    {
+        this.contentStore = contentStore;
+    }
+
     public XWikiAttachmentContent getAttachment_content()
     {
-        return this.attachment_content;
+        return this.content;
     }
 
     public void setAttachment_content(XWikiAttachmentContent attachment_content)
     {
-        this.attachment_content = attachment_content;
+        this.content = attachment_content;
         if (attachment_content != null) {
             attachment_content.setOwnerDocument(this.doc);
         }
+    }
+
+    /**
+     * @return the type of the store used for the archive
+     * @since 9.10RC1
+     */
+    public String getArchiveStore()
+    {
+        return this.archiveStore;
+    }
+
+    /**
+     * @param archiveStore the type of the store used for the archive
+     * @since 9.10RC1
+     */
+    public void setArchiveStore(String archiveStore)
+    {
+        this.archiveStore = archiveStore;
     }
 
     public XWikiAttachmentArchive getAttachment_archive()
@@ -692,7 +768,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Retrive the content of this attachment as a byte array.
+     * Retrieve the content of this attachment as a byte array.
      *
      * @param context current XWikiContext
      * @return a byte array containing the binary data content of the attachment
@@ -702,11 +778,11 @@ public class XWikiAttachment implements Cloneable
     @Deprecated
     public byte[] getContent(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null && context != null) {
-            this.doc.loadAttachmentContent(this, context);
+        if (this.content == null && context != null) {
+            loadContent(context);
         }
 
-        return this.attachment_content.getContent();
+        return this.content.getContent();
     }
 
     /**
@@ -719,28 +795,27 @@ public class XWikiAttachment implements Cloneable
      */
     public InputStream getContentInputStream(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null && context != null) {
-            if (Objects.equals(this.getVersion(), this.getLatestStoredVersion(context))) {
+        if (this.content == null && context != null) {
+            if (Objects.equals(getVersion(), getLatestStoredVersion(context))) {
                 // Load the attachment content from the xwikiattachment_content table.
-                this.doc.loadAttachmentContent(this, context);
+                loadContent(context);
             } else {
                 // Load the attachment content from the xwikiattachment_archive table.
                 // We don't use #getAttachmentRevision() because it checks if the requested version equals the version
                 // of the target attachment (XWIKI-1938).
-                XWikiAttachment archivedVersion =
-                    this.loadArchive(context).getRevision(this, this.getVersion(), context);
-                XWikiAttachmentContent content =
+                XWikiAttachment archivedVersion = loadArchive(context).getRevision(this, getVersion(), context);
+                XWikiAttachmentContent archivedContent =
                     archivedVersion != null ? archivedVersion.getAttachment_content() : null;
-                if (content != null) {
-                    this.setAttachment_content(content);
+                if (archivedContent != null) {
+                    setAttachment_content(archivedContent);
                 } else {
                     // Fall back on the version of the content stored in the xwikiattachment_content table.
-                    this.doc.loadAttachmentContent(this, context);
+                    loadContent(context);
                 }
             }
         }
 
-        return this.attachment_content.getContentInputStream();
+        return this.content.getContentInputStream();
     }
 
     /**
@@ -758,6 +833,7 @@ public class XWikiAttachment implements Cloneable
             XWikiDocument ownerDocumentLastestVersion =
                 context.getWiki().getDocument(this.doc.getDocumentReference(), context);
             XWikiAttachment latestStoredVersion = ownerDocumentLastestVersion.getAttachment(this.filename);
+
             return latestStoredVersion != null ? latestStoredVersion.getVersion() : null;
         } catch (XWikiException e) {
             LOGGER.warn(ExceptionUtils.getRootCauseMessage(e));
@@ -845,12 +921,12 @@ public class XWikiAttachment implements Cloneable
     @Deprecated
     public void setContent(byte[] data)
     {
-        if (this.attachment_content == null) {
-            this.attachment_content = new XWikiAttachmentContent();
-            this.attachment_content.setAttachment(this);
+        if (this.content == null) {
+            this.content = new XWikiAttachmentContent();
+            this.content.setAttachment(this);
         }
 
-        this.attachment_content.setContent(data);
+        this.content.setContent(data);
     }
 
     /**
@@ -863,12 +939,12 @@ public class XWikiAttachment implements Cloneable
      */
     public void setContent(InputStream is, int length) throws IOException
     {
-        if (this.attachment_content == null) {
-            this.attachment_content = new XWikiAttachmentContent();
-            this.attachment_content.setAttachment(this);
+        if (this.content == null) {
+            this.content = new XWikiAttachmentContent();
+            this.content.setAttachment(this);
         }
 
-        this.attachment_content.setContent(is, length);
+        this.content.setContent(is, length);
     }
 
     /**
@@ -880,40 +956,70 @@ public class XWikiAttachment implements Cloneable
      */
     public void setContent(InputStream is) throws IOException
     {
-        if (this.attachment_content == null) {
-            this.attachment_content = new XWikiAttachmentContent(this);
+        if (this.content == null) {
+            this.content = new XWikiAttachmentContent(this);
         }
 
-        this.attachment_content.setContent(is);
+        this.content.setContent(is);
     }
 
-    public void loadContent(XWikiContext context) throws XWikiException
+    public void loadContent(XWikiContext context)
     {
-        if (this.attachment_content == null) {
+        if (this.content == null) {
+            WikiReference currentWiki = context.getWikiReference();
+
             try {
-                context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
-            } catch (Exception ex) {
-                LOGGER.warn(
-                    "Failed to load content for attachment [{}@{}]. "
-                        + "This attachment is broken, please consider re-uploading it. Internal error: {}",
-                    new Object[] { getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>",
-                    ex.getMessage() });
+                // Make sure we work on the attachment's wiki
+                WikiReference attachmentWiki = getReference().getDocumentReference().getWikiReference();
+                if (attachmentWiki != null) {
+                    context.setWikiReference(attachmentWiki);
+                }
+
+                try {
+                    XWikiAttachmentStoreInterface store = getAttachmentContentStore();
+
+                    store.loadAttachmentContent(this, context, true);
+                } catch (Exception e) {
+                    LOGGER.error(
+                        "Failed to load content for attachment [{}@{}]. "
+                            + "This attachment is broken, please consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
+                }
+            } finally {
+                if (currentWiki != null) {
+                    context.setWikiReference(currentWiki);
+                }
             }
         }
+
     }
 
-    public XWikiAttachmentArchive loadArchive(XWikiContext context) throws XWikiException
+    public XWikiAttachmentArchive loadArchive(XWikiContext context)
     {
         if (this.attachment_archive == null) {
+            WikiReference currentWiki = context.getWikiReference();
+
             try {
-                this.attachment_archive =
-                    context.getWiki().getAttachmentVersioningStore().loadArchive(this, context, true);
-            } catch (Exception ex) {
-                LOGGER.warn(
-                    "Failed to load archive for attachment [{}@{}]. "
-                        + "This attachment is broken, please consider re-uploading it. Internal error: {}",
-                    new Object[] { getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>",
-                    ex.getMessage() });
+                // Make sure we work on the attachment's wiki
+                WikiReference attachmentWiki = getReference().getDocumentReference().getWikiReference();
+                if (attachmentWiki != null) {
+                    context.setWikiReference(attachmentWiki);
+                }
+
+                try {
+                    AttachmentVersioningStore store = getAttachmentVersioningStore();
+
+                    this.attachment_archive = store.loadArchive(this, context, true);
+                } catch (Exception e) {
+                    LOGGER.warn(
+                        "Failed to load archive for attachment [{}@{}]. "
+                            + "This attachment is broken, please consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
+                }
+            } finally {
+                if (currentWiki != null) {
+                    context.setWikiReference(currentWiki);
+                }
             }
         }
 
@@ -922,7 +1028,7 @@ public class XWikiAttachment implements Cloneable
 
     public void updateContentArchive(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null) {
+        if (this.content == null) {
             return;
         }
 
@@ -1142,14 +1248,25 @@ public class XWikiAttachment implements Cloneable
         return userReference;
     }
 
-    private XWikiContext getXWikiContext()
+    private XWikiAttachmentStoreInterface getAttachmentContentStore() throws ComponentLookupException
     {
-        Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+        String hint = getContentStore();
 
-        if (xcontextProvider != null) {
-            return xcontextProvider.get();
+        if (hint != null) {
+            return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, hint);
         }
 
-        return null;
+        return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, "hibernate");
+    }
+
+    private AttachmentVersioningStore getAttachmentVersioningStore() throws ComponentLookupException
+    {
+        String hint = getContentStore();
+
+        if (hint != null) {
+            return Utils.getContextComponentManager().getInstance(AttachmentVersioningStore.class, hint);
+        }
+
+        return Utils.getContextComponentManager().getInstance(AttachmentVersioningStore.class, "hibernate");
     }
 }

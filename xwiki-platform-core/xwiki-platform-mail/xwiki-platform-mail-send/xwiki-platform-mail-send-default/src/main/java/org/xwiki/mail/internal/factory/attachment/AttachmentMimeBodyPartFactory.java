@@ -42,6 +42,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.mail.internal.factory.AbstractMimeBodyPartFactory;
 
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.internal.file.TemporaryFile;
 
 /**
  * Creates an attachment Body Part from an {@link Attachment} object. This will be added to a Multi Part message.
@@ -104,8 +105,8 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
         File temporaryAttachmentFile;
         FileOutputStream fos = null;
         try {
-            temporaryAttachmentFile = File.createTempFile("attachment", ".tmp", this.temporaryDirectory);
-            temporaryAttachmentFile.deleteOnExit();
+            temporaryAttachmentFile =
+                new TemporaryFile(File.createTempFile("attachment", ".tmp", this.temporaryDirectory));
             fos = new FileOutputStream(temporaryAttachmentFile);
             fos.write(attachment.getContent());
         } catch (Exception e) {
@@ -122,6 +123,7 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
                     + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
             }
         }
+
         return new FileDataSource(temporaryAttachmentFile);
     }
 }

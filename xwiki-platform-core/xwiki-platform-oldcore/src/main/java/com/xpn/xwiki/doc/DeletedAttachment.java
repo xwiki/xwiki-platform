@@ -20,16 +20,16 @@
 package com.xpn.xwiki.doc;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import org.xwiki.filter.input.DefaultReaderInputSource;
-import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository;
-import com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository.TemporaryDeferredStringFile;
+import com.xpn.xwiki.internal.store.hibernate.HibernateDeletedAttachmentContent;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -48,7 +48,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /** The ID of the document this attachment belonged to. */
     private long docId;
 
-    /** The name of the document this attachment belonged to. */
+    /** The reference of the document this attachment belonged to. */
     private String docName;
 
     /** The name of the attachment. */
@@ -60,12 +60,35 @@ public class DeletedAttachment extends AbstractSimpleClass
     /** The user who deleted the attachment, in the <tt>XWiki.UserName</tt> format. */
     private String deleter;
 
-    private TemporaryDeferredStringFile xml = Utils.getComponent(TemporaryDeferredFileRepository.class)
-        .createTemporaryDeferredStringFile("deleted-attachments-xml", StandardCharsets.UTF_8);
+    private String contentStore;
+
+    private DeletedAttachmentContent content;
 
     /** Default constructor. Used only by hibernate when restoring objects from the database. */
     protected DeletedAttachment()
     {
+    }
+
+    /**
+     * A constructor with all the information about the deleted attachment.
+     *
+     * @param docId the ID of the document this attachment belonged to
+     * @param docName the reference of the document this attachment belonged to
+     * @param filename the name of the attachment
+     * @param storeType the way to store the document
+     * @param attachment Deleted attachment.
+     * @param deleter User which deleted the attachment.
+     * @param deleteDate Date of delete action.
+     */
+    private DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
+        Date deleteDate)
+    {
+        this.docId = docId;
+        this.docName = docName;
+        this.filename = filename;
+        this.deleter = deleter;
+        this.date = deleteDate;
+        this.contentStore = storeType;
     }
 
     /**
@@ -80,12 +103,45 @@ public class DeletedAttachment extends AbstractSimpleClass
     public DeletedAttachment(XWikiAttachment attachment, String deleter, Date deleteDate, XWikiContext context)
         throws XWikiException
     {
-        this.docId = attachment.getDocId();
-        this.docName = attachment.getDoc().getFullName();
-        this.filename = attachment.getFilename();
-        this.deleter = deleter;
-        this.date = deleteDate;
+        this(attachment.getDocId(), attachment.getDoc().getFullName(), attachment.getFilename(), null, deleter,
+            deleteDate);
+
         setAttachment(attachment, context);
+    }
+
+    /**
+     * @param fullName the local reference of the document
+     * @param locale the locale of the document
+     * @param storeType the way to store the document
+     * @param deleter the user who delete document
+     * @param deleteDate date of delete action
+     * @param content the stored deleted document
+     * @since 9.10RC1
+     */
+    public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
+        Date deleteDate, DeletedAttachmentContent content)
+    {
+        this(docId, docName, filename, storeType, deleter, deleteDate);
+
+        this.content = content;
+    }
+
+    /**
+     * @param fullName the local reference of the document
+     * @param locale the locale of the document
+     * @param storeType the way to store the document
+     * @param deleter the user who delete document
+     * @param deleteDate date of delete action
+     * @param content the stored deleted document
+     * @param id the synthetic id of this deleted attachment. Uniquely identifies an entry in the recycle bin.
+     * @since 9.10RC1
+     */
+    public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
+        Date deleteDate, DeletedAttachmentContent content, long id)
+    {
+        this(docId, docName, filename, storeType, deleter, deleteDate, content);
+
+        this.id = id;
     }
 
     /**
@@ -169,6 +225,22 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
+     * @return the attachment reference for the deleted attachment
+     * @since 9.9RCA
+     */
+    public AttachmentReference getAttachmentReference()
+    {
+        DocumentReference documentReference = getDocumentReferenceResolver().resolve(getDocName());
+
+        return new AttachmentReference(getFilename(), documentReference);
+    }
+
+    private static DocumentReferenceResolver<String> getDocumentReferenceResolver()
+    {
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    }
+
+    /**
      * Getter for {@link #date}.
      *
      * @return The date of the delete action.
@@ -209,30 +281,55 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
-     * Getter for {@link #xml}.
+     * @return the type of the store used for the content
+     * @since 9.10RC1
+     */
+    public String getContentStore()
+    {
+        return this.contentStore;
+    }
+
+    /**
+     * @param xmlStore the type of store (supported values are null/"hibernate" and "file")
+     * @since 9.10RC1
+     */
+    protected void setContentStore(String xmlStore)
+    {
+        this.contentStore = xmlStore;
+    }
+
+    /**
+     * Getter for {@link #content}.
      *
      * @return XML serialization of {@link XWikiAttachment}
      */
     public String getXml()
     {
-        try {
-            return this.xml.getString();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read XML", e);
+        if (this.content != null) {
+            try {
+                return this.content.getContentAsString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        // Return empty String instead of null because this field is configured as not null at database level
+        return "";
     }
 
     /**
-     * Setter for {@link #xml}.
+     * Setter for {@link #content}.
      *
      * @param xml XML serialization of {@link XWikiAttachment}. Used only by Hibernate.
      */
     protected void setXml(String xml)
     {
-        try {
-            this.xml.setString(xml);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write xml", e);
+        if (StringUtils.isNotEmpty(xml)) {
+            try {
+                this.content = new HibernateDeletedAttachmentContent(xml);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -242,46 +339,62 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param attachment the deleted attachment
      * @param context the current context, used in the XML export
      * @throws XWikiException if an exception occurs during the XML export
+     * @deprecated since 9.9RC1, use
+     *             {@link #DeletedAttachment(long, String, String, String, Date, DeletedAttachmentContent)} instead
      */
+    @Deprecated
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
-        try {
-            attachment.toXML(new DefaultWriterOutputTarget(this.xml.getWriter(), true), true, true, false, context);
-        } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error serializing attachment to xml", e, null);
-        }
+        this.content = new HibernateDeletedAttachmentContent(attachment);
     }
 
     /**
      * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}. Note that this method does not actually
-     * restore the attachment to its owner document, it simply recomposes an {@link XWikiAttachment} object from the
+     * restore the attachment to its owner document, it simply re-composes an {@link XWikiAttachment} object from the
      * saved data.
      *
-     * @return restored attachment
      * @param attachment optional object where to put the attachment data, if not <code>null</code>
      * @param context the current {@link XWikiContext context}
+     * @return restored attachment
+     * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
+     *             {@link XWikiAttachment#fromXML(String)}.
+     * @deprecated since 9.9RC1, use {@link #restoreAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
+    public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    {
+        return restoreAttachment(attachment);
+    }
+
+    /**
+     * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}. Note that this method does not actually
+     * restore the attachment to its owner document, it simply re-composes an {@link XWikiAttachment} object from the
+     * saved data.
+     *
+     * @param attachment optional object where to put the attachment data, if not <code>null</code>
+     * @return restored attachment
      * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
      *             {@link XWikiAttachment#fromXML(String)}.
      */
-    public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    public XWikiAttachment restoreAttachment(XWikiAttachment attachment) throws XWikiException
     {
-        XWikiAttachment result = attachment;
-        if (result == null) {
-            result = new XWikiAttachment();
-        }
-
         try {
-            result.fromXML(new DefaultReaderInputSource(this.xml.getReader(), true));
+            return this.content.getXWikiAttachment(attachment);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
-                "Error restoring attachment from xml", e, null);
+                "Error restoring document", e, null);
         }
-
-        if (result.getDoc() == null || !(this.getDocName().equals(result.getDoc().getFullName()))) {
-            result.setDoc(context.getWiki().getDocument(this.getDocName(), context));
-        }
-
-        return result;
     }
+
+    /**
+     * @return restored attachment
+     * @param xcontext the current {@link XWikiContext context}
+     * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
+     * @since 9.10RC1
+     */
+    public XWikiAttachment restoreAttachment() throws XWikiException
+    {
+        return restoreAttachment(null);
+    }
+
 }

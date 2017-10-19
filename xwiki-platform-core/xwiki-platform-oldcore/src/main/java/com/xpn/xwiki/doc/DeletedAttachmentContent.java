@@ -17,43 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.file;
+package com.xpn.xwiki.doc;
 
-import java.io.File;
+import java.io.IOException;
+
+import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWikiException;
 
 /**
- * Helper to create file that are automatically deleted when not needed anymore.
- * 
+ * The content of the stored deleted attachment.
+ *
  * @version $Id$
- * @since 9.0RC1
+ * @since 9.10RC1
  */
-public class TemporaryFile extends File
+@Unstable
+public interface DeletedAttachmentContent
 {
     /**
-     * @param file the file to copy
-     * @since 9.10RC1
+     * @return the serialized version of the attachment
+     * @throws IOException when failing to get the {@link String} content
+     * @throws XWikiException when failing to get the {@link String} content
      */
-    public TemporaryFile(File file)
-    {
-        super(file.getPath());
-    }
+    String getContentAsString() throws IOException, XWikiException;
 
     /**
-     * @param parent The parent abstract pathname
-     * @param child The child pathname string
+     * @param attachment the attachment to write to or null to create a new one
+     * @return restored attachment
+     * @throws IOException when failing to read the content
+     * @throws XWikiException when failing to read the content
      */
-    public TemporaryFile(File parent, String child)
-    {
-        super(parent, child);
-    }
-
-    @Override
-    protected void finalize() throws Throwable
-    {
-        if (exists()) {
-            delete();
-        }
-
-        super.finalize();
-    }
+    XWikiAttachment getXWikiAttachment(XWikiAttachment attachment) throws IOException, XWikiException;
 }

@@ -36,6 +36,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Role
 public interface XWikiAttachmentStoreInterface
 {
+    /**
+     * @return the role hint of the component
+     * @since 9.10RC1
+     */
+    String getHint();
+
     void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 

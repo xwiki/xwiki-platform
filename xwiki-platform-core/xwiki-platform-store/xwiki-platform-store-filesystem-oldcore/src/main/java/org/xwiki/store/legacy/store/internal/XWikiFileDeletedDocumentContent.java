@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * The stored content of the deleted document.
+ * Filesystem implementation of XWikiDeletedDocumentContent.
  *
  * @version $Id$
  * @since 9.0RC1
@@ -58,12 +58,6 @@ public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentCont
         return FileUtils.readFileToString(this.content, this.charset);
     }
 
-    /**
-     * @param document the document to write to or null to create a new one
-     * @return restored document
-     * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
-     * @throws IOException when failing to read the content
-     */
     @Override
     public XWikiDocument getXWikiDocument(XWikiDocument document) throws XWikiException, IOException
     {

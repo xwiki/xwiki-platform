@@ -22,14 +22,16 @@ package com.xpn.xwiki.store;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,11 +41,19 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateAttachmentStore.class);
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    @Named(HINT)
+    private AttachmentVersioningStore attachmentVersioningStore;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -109,9 +119,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             try {
                 // Switch context wiki to attachment wiki
-                String attachmentWiki =
-                    (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
-                        .getWikiReference().getName();
+                String attachmentWiki = (attachment.getReference() == null) ? null
+                    : attachment.getReference().getDocumentReference().getWikiReference().getName();
                 if (attachmentWiki != null) {
                     context.setWikiId(attachmentWiki);
                 }
@@ -125,18 +134,23 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 Query query =
                     session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
                 query.setLong("id", content.getId());
-                if (query.uniqueResult() == null) {
-                    session.save(content);
-                } else {
+                boolean exist = query.uniqueResult() != null;
+
+                AttachmentVersioningStore store =
+                    resolveAttachmentVersioningStore(attachment.getArchiveStore(), exist, context);
+
+                if (exist) {
                     session.update(content);
+                } else {
+                    session.save(content);
                 }
 
                 if (attachment.getAttachment_archive() == null) {
                     attachment.loadArchive(context);
                 }
+
                 // The archive has been updated in XWikiHibernateStore.saveAttachment()
-                context.getWiki().getAttachmentVersioningStore()
-                    .saveArchive(attachment.getAttachment_archive(), context, false);
+                store.saveArchive(attachment.getAttachment_archive(), context, false);
 
                 if (parentUpdate) {
                     context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
@@ -162,7 +176,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 context.setWikiId(currentWiki);
             }
         } else {
-            LOGGER.warn("Failed to save the Attachment content for [{}] at [{}] since no content could be found!",
+            this.logger.warn("Failed to save the Attachment content for [{}] at [{}] since no content could be found!",
                 attachment.getFilename(), attachment.getDoc());
         }
     }
@@ -213,9 +227,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
         try {
             // Switch context wiki to attachment wiki
-            String attachmentWiki =
-                (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
-                    .getWikiReference().getName();
+            String attachmentWiki = (attachment.getReference() == null) ? null
+                : attachment.getReference().getDocumentReference().getWikiReference().getName();
             if (attachmentWiki != null) {
                 context.setWikiId(attachmentWiki);
             }
@@ -272,9 +285,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
         try {
             // Switch context wiki to attachment wiki
-            String attachmentWiki =
-                (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
-                    .getWikiReference().getName();
+            String attachmentWiki = (attachment.getReference() == null) ? null
+                : attachment.getReference().getDocumentReference().getWikiReference().getName();
             if (attachmentWiki != null) {
                 context.setWikiId(attachmentWiki);
             }
@@ -290,16 +302,18 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             try {
                 session.delete(new XWikiAttachmentContent(attachment));
             } catch (Exception e) {
-                LOGGER.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
+                this.logger.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
                     attachment.getDoc().getDocumentReference());
             }
 
-            context.getWiki().getAttachmentVersioningStore().deleteArchive(attachment, context, false);
+            AttachmentVersioningStore store =
+                resolveAttachmentVersioningStore(attachment.getArchiveStore(), true, context);
+            store.deleteArchive(attachment, context, false);
 
             try {
                 session.delete(attachment);
             } catch (Exception e) {
-                LOGGER.warn("Error deleting attachment meta data [{}] of document [{}]", attachment.getFilename(),
+                this.logger.warn("Error deleting attachment meta data [{}] of document [{}]", attachment.getFilename(),
                     attachment.getDoc().getDocumentReference());
             }
 
@@ -316,7 +330,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Error updating document when deleting attachment [{}] of document [{}]",
+                this.logger.warn("Error updating document when deleting attachment [{}] of document [{}]",
                     attachment.getFilename(), attachment.getDoc().getDocumentReference());
             }
 
@@ -339,5 +353,30 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             // Restore context wiki
             context.setWikiId(currentWiki);
         }
+    }
+
+    private AttachmentVersioningStore resolveAttachmentVersioningStore(String storeType, boolean exist,
+        XWikiContext xcontext)
+    {
+        AttachmentVersioningStore store = getAttachmentVersioningStore(storeType);
+
+        if (store != null) {
+            return store;
+        }
+
+        return exist ? this.attachmentVersioningStore : xcontext.getWiki().getDefaultAttachmentVersioningStore();
+    }
+
+    private AttachmentVersioningStore getAttachmentVersioningStore(String storeType)
+    {
+        if (storeType != null && !storeType.equals(HINT)) {
+            try {
+                return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Can't find attachment versionning store for type [{}]", storeType, e);
+            }
+        }
+
+        return null;
     }
 }

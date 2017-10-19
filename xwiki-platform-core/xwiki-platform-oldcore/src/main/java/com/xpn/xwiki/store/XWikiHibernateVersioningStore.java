@@ -50,7 +50,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * @version $Id$
  */
 @Component
-@Named("hibernate")
+@Named(XWikiHibernateBaseStore.HINT)
 @Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {

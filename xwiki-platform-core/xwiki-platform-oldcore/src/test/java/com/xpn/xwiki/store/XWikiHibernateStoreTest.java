@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.store;
 
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -51,12 +49,18 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
@@ -84,6 +88,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     }
 
     @Before
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();
@@ -117,35 +122,8 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     }
 
     @Test
-    public void testEndTransactionWhenSQLBatchUpdateExceptionThrown() throws Exception
-    {
-        SQLException sqlException2 = new SQLException("sqlexception2");
-        sqlException2.setNextException(new SQLException("nextexception2"));
-
-        SQLException sqlException1 = new SQLException("sqlexception1");
-        sqlException1.initCause(sqlException2);
-        sqlException1.setNextException(new SQLException("nextexception1"));
-
-        // Assume the transaction is already created.
-        when(context.get("hibtransaction")).thenReturn(transaction);
-        doThrow(new HibernateException("exception1", sqlException1)).when(transaction).commit();
-
-        try {
-            store.endTransaction(context, true);
-            fail("Should have thrown an exception here");
-        } catch (HibernateException e) {
-            assertEquals("Failed to commit or rollback transaction. Root cause [\n"
-                + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
-                + "SQL next exception = [java.sql.SQLException: nextexception2]]", e.getMessage());
-        }
-    }
-
-    @Test
     public void executeDeleteWikiStatementForPostgreSQLWhenInSchemaMode() throws Exception
     {
-        HibernateSessionFactory sessionFactory = mocker.getInstance(HibernateSessionFactory.class);
-        when(sessionFactory.getConfiguration().getProperty("xwiki.virtual_mode")).thenReturn("schema");
-
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
 
@@ -157,8 +135,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     @Test
     public void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
-        HibernateSessionFactory sessionFactory = mocker.getInstance(HibernateSessionFactory.class);
-        when(sessionFactory.getConfiguration().getProperty("xwiki.virtual_mode")).thenReturn("database");
+        when(this.hibernateStore.isInSchemaMode()).thenReturn(false);
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
@@ -180,21 +157,16 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         Query query = mock(Query.class);
         when(session.createQuery("delete from XWikiLock as lock where lock.userName=:userName")).thenReturn(query);
-        when(context.getUserReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "LoggerOutter"));
-        when(context.getUser()).thenReturn("XWiki.LoggerOutter");
+        when(xcontext.getUserReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "LoggerOutter"));
+        when(xcontext.getUser()).thenReturn("XWiki.LoggerOutter");
 
         // Fire the logout event.
-        eventListenerCaptor.getValue().onEvent(new ActionExecutingEvent("logout"), null, context);
+        eventListenerCaptor.getValue().onEvent(new ActionExecutingEvent("logout"), null, xcontext);
 
-        verify(session, times(2)).setFlushMode(FlushMode.COMMIT);
         verify(query).setString("userName", "XWiki.LoggerOutter");
         verify(query).executeUpdate();
-        verify(transaction).commit();
-        verify(session).close();
-
-        // setDatabase() is called for each transaction and that calls checkDatabase().
-        DataMigrationManager dataMigrationManager = mocker.getInstance(DataMigrationManager.class, "hibernate");
-        verify(dataMigrationManager).checkDatabase();
+        verify(this.hibernateStore).beginTransaction();
+        verify(this.hibernateStore).endTransaction(true);
     }
 
     @Test
@@ -249,12 +221,12 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     {
         // The class must be local.
         DocumentReference classReference = new DocumentReference("myWiki", "mySpace", "myClass");
-        when(context.getWikiId()).thenReturn(classReference.getWikiReference().getName());
+        when(xcontext.getWikiId()).thenReturn(classReference.getWikiReference().getName());
         BaseObject object = mock(BaseObject.class);
         when(object.getXClassReference()).thenReturn(classReference);
 
         // Query to check if the object exists already (save versus update).
-        when(context.get("hibsession")).thenReturn(session);
+        when(xcontext.get("hibsession")).thenReturn(session);
         when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id")).thenReturn(
             mock(Query.class));
 
@@ -283,7 +255,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         BaseProperty oldProperty = mock(BaseProperty.class);
         when(oldPropertyQuery.uniqueResult()).thenReturn(oldProperty);
 
-        store.saveXWikiCollection(object, context, false);
+        store.saveXWikiCollection(object, xcontext, false);
 
         verify(oldClassTypeQuery).setLong("id", propertyId);
         verify(oldClassTypeQuery).setString("name", propertyName);
@@ -309,7 +281,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
             .thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
-        assertTrue(store.exists(doc, context));
+        assertTrue(store.exists(doc, xcontext));
 
         verify(query).setString("fullName", fullName);
     }
@@ -328,7 +300,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         when(session.createQuery(statement)).thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
-        assertTrue(store.exists(doc, context));
+        assertTrue(store.exists(doc, xcontext));
 
         verify(query).setString("fullName", fullName);
         verify(query).setString("language", Locale.ENGLISH.toString());
@@ -352,7 +324,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerialzier.serialize(documentReference.getParent())).thenReturn("Path.To");
 
-        assertEquals(translationList, store.getTranslationList(doc, context));
+        assertEquals(translationList, store.getTranslationList(doc, xcontext));
 
         verify(query).setWiki(documentReference.getWikiReference().getName());
         verify(query).bindValue("space", "Path.To");

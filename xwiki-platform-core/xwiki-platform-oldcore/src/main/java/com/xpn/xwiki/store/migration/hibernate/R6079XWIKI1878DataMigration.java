@@ -48,8 +48,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 /**
  * Migration for XWIKI1878: Fix xwikircs table isdiff data not matching RCS state of some revisions (when the state says
  * "full" the isdiff column in the database should be false). Note: This data migration should only be executed if the
- * R4359XWIKI1459 one has already been executed (i.e. if the database is in version &gt;= 4360). This is because it fixes a
- * bug in R4359XWIKI1459 which has now been fixed.
+ * R4359XWIKI1459 one has already been executed (i.e. if the database is in version &gt;= 4360). This is because it
+ * fixes a bug in R4359XWIKI1459 which has now been fixed.
  *
  * @version $Id$
  */
@@ -90,10 +90,9 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
     {
         try {
             return (XWikiHibernateVersioningStore) this.componentManager
-                .getInstance(XWikiVersioningStoreInterface.class, "hibernate");
+                .getInstance(XWikiVersioningStoreInterface.class, XWikiHibernateBaseStore.HINT);
         } catch (ComponentLookupException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                 String.format("Unable to reach the versioning store for database %s", getXWikiContext().getWikiId()),
                 e);
         }
@@ -103,48 +102,47 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         // migrate data
-        getStore().executeWrite(getXWikiContext(), true,
-            new XWikiHibernateBaseStore.HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), true, new XWikiHibernateBaseStore.HibernateCallback<Object>()
+        {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                @Override
-                public Object doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    try {
-                        Query query = session.createQuery("select rcs.id, rcs.patch, doc.fullName "
-                            + "from XWikiDocument as doc, XWikiRCSNodeContent as rcs where "
-                            + "doc.id = rcs.id.docId and rcs.patch.diff = true and rcs.patch.content like '<?xml%'");
-                        Iterator it = query.list().iterator();
+                try {
+                    Query query = session.createQuery("select rcs.id, rcs.patch, doc.fullName "
+                        + "from XWikiDocument as doc, XWikiRCSNodeContent as rcs where "
+                        + "doc.id = rcs.id.docId and rcs.patch.diff = true and rcs.patch.content like '<?xml%'");
+                    Iterator it = query.list().iterator();
 
-                        XWikiContext context = getXWikiContext();
-                        XWikiHibernateVersioningStore versioningStore = getVersioningStore();
-                        Transaction originalTransaction = versioningStore.getTransaction(context);
-                        versioningStore.setSession(null, context);
-                        versioningStore.setTransaction(null, context);
+                    XWikiContext context = getXWikiContext();
+                    XWikiHibernateVersioningStore versioningStore = getVersioningStore();
+                    Transaction originalTransaction = versioningStore.getTransaction(context);
+                    versioningStore.setSession(null, context);
+                    versioningStore.setTransaction(null, context);
 
-                        while (it.hasNext()) {
-                            Object[] result = (Object[]) it.next();
-                            if (R6079XWIKI1878DataMigration.this.logger.isInfoEnabled()) {
-                                R6079XWIKI1878DataMigration.this.logger.info("Fixing document [{}]...", result[2]);
-                            }
-
-                            // Reconstruct a XWikiRCSNodeContent object with isDiff set to false and update it.
-                            XWikiRCSNodeId nodeId = (XWikiRCSNodeId) result[0];
-                            XWikiRCSNodeContent fixedNodeContent = new XWikiRCSNodeContent(nodeId);
-                            XWikiPatch patch = (XWikiPatch) result[1];
-                            patch.setDiff(false);
-                            fixedNodeContent.setPatch(patch);
-
-                            session.update(fixedNodeContent);
+                    while (it.hasNext()) {
+                        Object[] result = (Object[]) it.next();
+                        if (R6079XWIKI1878DataMigration.this.logger.isInfoEnabled()) {
+                            R6079XWIKI1878DataMigration.this.logger.info("Fixing document [{}]...", result[2]);
                         }
 
-                        versioningStore.setSession(session, context);
-                        versioningStore.setTransaction(originalTransaction, context);
-                    } catch (Exception e) {
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
+                        // Reconstruct a XWikiRCSNodeContent object with isDiff set to false and update it.
+                        XWikiRCSNodeId nodeId = (XWikiRCSNodeId) result[0];
+                        XWikiRCSNodeContent fixedNodeContent = new XWikiRCSNodeContent(nodeId);
+                        XWikiPatch patch = (XWikiPatch) result[1];
+                        patch.setDiff(false);
+                        fixedNodeContent.setPatch(patch);
+
+                        session.update(fixedNodeContent);
                     }
-                    return Boolean.TRUE;
+
+                    versioningStore.setSession(session, context);
+                    versioningStore.setTransaction(originalTransaction, context);
+                } catch (Exception e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                 }
-            });
+                return Boolean.TRUE;
+            }
+        });
     }
 }

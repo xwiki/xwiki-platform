@@ -74,48 +74,28 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
     @Named("attachment-list-meta/1.0")
     private Serializer<List<XWikiAttachment>, List<XWikiAttachment>> metaSerializer;
 
-    /**
-     * Testing Constructor.
-     *
-     * @param fileTools the means of getting files and locks.
-     * @param metaSerializer a serializer for attachment versioning metadata.
-     */
-    public FilesystemAttachmentVersioningStore(final FilesystemStoreTools fileTools,
-        final Serializer<List<XWikiAttachment>,
-            List<XWikiAttachment>> metaSerializer)
+    @Override
+    public String getHint()
     {
-        this.fileTools = fileTools;
-        this.metaSerializer = metaSerializer;
-    }
-
-    /**
-     * Constructor for dependency injection.
-     */
-    public FilesystemAttachmentVersioningStore()
-    {
+        return FileSystemStoreUtils.HINT;
     }
 
     @Override
-    public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, final XWikiContext context,
+        final boolean bTransaction) throws XWikiException
     {
-
         try {
-            return this.loadArchive(attachment, this.fileTools.getAttachmentFileProvider(attachment));
+            return this.loadArchive(attachment, this.fileTools.getAttachmentFileProvider(attachment.getReference()));
         } catch (Exception e) {
             if (e instanceof XWikiException) {
                 throw (XWikiException) e;
             }
-            final Object[] args = {attachment.getFilename(), UNKNOWN_NAME};
+            final Object[] args = { attachment.getFilename(), UNKNOWN_NAME };
             if (attachment.getDoc() != null) {
                 args[1] = attachment.getDoc().getFullName();
             }
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Exception while loading attachment archive {0} for document {1}",
-                e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Exception while loading attachment archive {0} for document {1}", e, args);
         }
     }
 
@@ -127,8 +107,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @return an XWikiAttachmentArchive for the given attachment.
      * @throws IOException if the metadata cannot be found or there is a failure while parsing it.
      */
-    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment,
-        final AttachmentFileProvider provider)
+    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, final AttachmentFileProvider provider)
         throws IOException
     {
         final File metaFile = provider.getAttachmentVersioningMetaFile();
@@ -165,17 +144,15 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
     /**
      * {@inheritDoc}
      * <p>
-     * bTransaction cannot be used in this case, in order to have transaction atomicity,
-     * please use getArchiveSaveRunnable() instead.
+     * bTransaction cannot be used in this case, in order to have transaction atomicity, please use
+     * getArchiveSaveRunnable() instead.
      * </p>
      *
      * @see AttachmentVersioningStore#saveArchive(XWikiAttachmentArchive, XWikiContext, boolean)
      */
     @Override
-    public void saveArchive(final XWikiAttachmentArchive archive,
-        final XWikiContext context,
-        final boolean bTransaction)
-        throws XWikiException
+    public void saveArchive(final XWikiAttachmentArchive archive, final XWikiContext context,
+        final boolean bTransaction) throws XWikiException
     {
         try {
             this.getArchiveSaveRunnable(archive, context).start();
@@ -183,53 +160,47 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
             if (e instanceof XWikiException) {
                 throw (XWikiException) e;
             }
-            final Object[] args = {UNKNOWN_NAME, UNKNOWN_NAME};
+            final Object[] args = { UNKNOWN_NAME, UNKNOWN_NAME };
             if (archive.getAttachment() != null) {
                 args[0] = archive.getAttachment().getFilename();
                 if (archive.getAttachment().getDoc() != null) {
                     args[1] = archive.getAttachment().getDoc().getFullName();
                 }
             }
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Exception while saving attachment archive {0} of document {1}",
-                e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Exception while saving attachment archive {0} of document {1}", e, args);
         }
     }
 
     /**
-     * Get a TransactionRunnable for saving or updating the current attachment.
-     * this runnable can be run with any transaction including a VoidTransaction.
+     * Get a TransactionRunnable for saving or updating the current attachment. this runnable can be run with any
+     * transaction including a VoidTransaction.
      *
      * @param archive The attachment archive to save.
-     * @param context An XWikiContext used for getting the attachments from the archive with getRevision()
-     * and for getting the content from the attachments with getContentInputStream().
+     * @param context An XWikiContext used for getting the attachments from the archive with getRevision() and for
+     *            getting the content from the attachments with getContentInputStream().
      * @return a new StartableTransactionRunnable for saving this attachment archive.
-     * @throws XWikiException if versions of the arrachment cannot be loaded form the archive.
+     * @throws XWikiException if versions of the attachment cannot be loaded form the archive.
      */
     public StartableTransactionRunnable getArchiveSaveRunnable(final XWikiAttachmentArchive archive,
-        final XWikiContext context)
-        throws XWikiException
+        final XWikiContext context) throws XWikiException
     {
-        return new AttachmentArchiveSaveRunnable(
-            archive, this.fileTools, this.fileTools.getAttachmentFileProvider(archive.getAttachment()),
-            this.metaSerializer, context);
+        return new AttachmentArchiveSaveRunnable(archive, this.fileTools,
+            this.fileTools.getAttachmentFileProvider(archive.getAttachment().getReference()), this.metaSerializer,
+            context);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * bTransaction is ignored by this implementation.
-     * If you need to delete an archive inside of a larger transaction,
+     * bTransaction is ignored by this implementation. If you need to delete an archive inside of a larger transaction,
      * please use getArchiveDeleteRunnable()
      * </p>
      *
      * @see AttachmentVersioningStore#deleteArchive(XWikiAttachment, XWikiContext, boolean)
      */
     @Override
-    public void deleteArchive(final XWikiAttachment attachment,
-        final XWikiContext context,
-        final boolean bTransaction)
+    public void deleteArchive(final XWikiAttachment attachment, final XWikiContext context, final boolean bTransaction)
         throws XWikiException
     {
         if (attachment == null) {
@@ -242,20 +213,18 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
             if (e instanceof XWikiException) {
                 throw (XWikiException) e;
             }
-            final Object[] args = {attachment.getFilename(), UNKNOWN_NAME};
+            final Object[] args = { attachment.getFilename(), UNKNOWN_NAME };
             if (attachment.getDoc() != null) {
                 args[1] = attachment.getDoc().getFullName();
             }
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Exception while deleting attachment archive {0} from document {1}",
-                e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Exception while deleting attachment archive {0} from document {1}", e, args);
         }
     }
 
     /**
-     * Get a TransactionRunnable for deleting an attachment archive.
-     * this runnable can be run with any transaction including a VoidTransaction.
+     * Get a TransactionRunnable for deleting an attachment archive. this runnable can be run with any transaction
+     * including a VoidTransaction.
      *
      * @param archive The attachment archive to delete.
      * @return a StartableTransactionRunnable for deleting the attachment archive.
@@ -266,10 +235,9 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
             throw new NullPointerException("The archive to delete cannot be null.");
         }
         if (archive.getAttachment() == null) {
-            throw new IllegalArgumentException(
-                "Cannot delete an archive unless it is associated with an attachment.");
+            throw new IllegalArgumentException("Cannot delete an archive unless it is associated with an attachment.");
         }
-        return new AttachmentArchiveDeleteRunnable(
-            archive, this.fileTools, this.fileTools.getAttachmentFileProvider(archive.getAttachment()));
+        return new AttachmentArchiveDeleteRunnable(archive, this.fileTools,
+            this.fileTools.getAttachmentFileProvider(archive.getAttachment().getReference()));
     }
 }

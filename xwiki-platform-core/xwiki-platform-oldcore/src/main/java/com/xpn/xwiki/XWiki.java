@@ -207,6 +207,7 @@ import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
+import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
@@ -214,6 +215,7 @@ import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiRecycleBinContentStoreInterface;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
@@ -272,11 +274,11 @@ public class XWiki implements EventListener
     /** The main document storage. */
     private XWikiStoreInterface store;
 
-    /** The attachment storage (excluding attachment history). */
+    /** The attachment content storage. */
     private XWikiAttachmentStoreInterface defaultAttachmentContentStore;
 
-    /** Store for attachment archives. */
-    private AttachmentVersioningStore attachmentVersioningStore;
+    /** The attachment archive storage. */
+    private AttachmentVersioningStore defaultAttachmentArchiveStore;
 
     /** Document versioning storage. */
     private XWikiVersioningStoreInterface versioningStore;
@@ -284,11 +286,6 @@ public class XWiki implements EventListener
     /** Deleted documents storage. */
     private XWikiRecycleBinStoreInterface recycleBinStore;
 
-    /**
-     * Storage for deleted attachment.
-     *
-     * @since 1.4M1
-     */
     private AttachmentRecycleBinStore attachmentRecycleBinStore;
 
     private XWikiPluginManager pluginManager;
@@ -1162,8 +1159,8 @@ public class XWiki implements EventListener
             setVersioningStore(Utils.<XWikiVersioningStoreInterface>getComponent(XWikiVersioningStoreInterface.class,
                 getConfiguration().getProperty("xwiki.store.versioning.hint", XWikiHibernateBaseStore.HINT)));
 
-            setAttachmentVersioningStore(Utils.<AttachmentVersioningStore>getComponent(AttachmentVersioningStore.class,
-                hasAttachmentVersioning(context) ? getConfiguration()
+            setDefaultAttachmentArchiveStore(Utils.<AttachmentVersioningStore>getComponent(
+                AttachmentVersioningStore.class, hasAttachmentVersioning(context) ? getConfiguration()
                     .getProperty("xwiki.store.attachment.versioning.hint", XWikiHibernateBaseStore.HINT) : "void"));
 
             if (hasRecycleBin(context)) {
@@ -1660,21 +1657,21 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentVersioningStore()} instead
+     * @return the store to use by default when saving a new attachment archive
+     * @since 9.10RC1
+     */
+    public AttachmentVersioningStore getDefaultAttachmentArchiveStore()
+    {
+        return this.defaultAttachmentArchiveStore;
+    }
+
+    /**
+     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentArchiveStore()} instead
      */
     @Deprecated
     public AttachmentVersioningStore getAttachmentVersioningStore()
     {
-        return getDefaultAttachmentVersioningStore();
-    }
-
-    /**
-     * @return the store to use by default when saving a new attachment archive
-     * @since 9.10RC1
-     */
-    public AttachmentVersioningStore getDefaultAttachmentVersioningStore()
-    {
-        return this.attachmentVersioningStore;
+        return getDefaultAttachmentArchiveStore();
     }
 
     public XWikiVersioningStoreInterface getVersioningStore()
@@ -3171,6 +3168,15 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param attachmentContentStore the store to use by default when saving a new attachment content
+     * @since 9.10RC1
+     */
+    public void setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface attachmentContentStore)
+    {
+        this.defaultAttachmentContentStore = attachmentContentStore;
+    }
+
+    /**
      * @deprecated since 9.9RC1, use {@link #setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface)} instead
      */
     @Deprecated
@@ -3180,17 +3186,21 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @param attachmentContentStore the store to use by default when saving a new attachment
+     * @param attachmentArchiveStore the store to use by default when saving a new attachment archive
      * @since 9.10RC1
      */
-    public void setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface attachmentContentStore)
+    public void setDefaultAttachmentArchiveStore(AttachmentVersioningStore attachmentArchiveStore)
     {
-        this.defaultAttachmentContentStore = attachmentContentStore;
+        this.defaultAttachmentArchiveStore = attachmentArchiveStore;
     }
 
-    public void setAttachmentVersioningStore(AttachmentVersioningStore avStore)
+    /**
+     * @deprecated since 9.10RC1, use {@link #setDefaultAttachmentArchiveStore(AttachmentVersioningStore)} instead
+     */
+    @Deprecated
+    public void setAttachmentVersioningStore(AttachmentVersioningStore attachmentArchiveStore)
     {
-        this.attachmentVersioningStore = avStore;
+        setDefaultAttachmentArchiveStore(attachmentArchiveStore);
     }
 
     public void setVersioningStore(XWikiVersioningStoreInterface versioningStore)

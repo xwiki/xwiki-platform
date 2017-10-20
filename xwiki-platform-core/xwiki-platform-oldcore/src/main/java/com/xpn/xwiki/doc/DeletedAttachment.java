@@ -295,7 +295,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param xmlStore the type of store (supported values are null/"hibernate" and "file")
      * @since 9.10RC1
      */
-    protected void setContentStore(String xmlStore)
+    public void setContentStore(String xmlStore)
     {
         this.contentStore = xmlStore;
     }

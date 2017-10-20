@@ -67,6 +67,7 @@ import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -129,7 +130,15 @@ public class XWikiAttachment implements Cloneable
 
     private String contentStore;
 
+    private boolean contentStoreSet;
+
+    private XWikiAttachmentStoreInterface contentStoreInstance;
+
     private String archiveStore;
+
+    private boolean archiveStoreSet;
+
+    private AttachmentVersioningStore archiveStoreInstance;
 
     private XWikiAttachmentContent content;
 
@@ -214,7 +223,6 @@ public class XWikiAttachment implements Cloneable
             attachment.setLongSize(getLongSize());
             attachment.setRCSVersion(getRCSVersion());
             attachment.setMetaDataDirty(isMetaDataDirty());
-            attachment.setContentStore(getContentStore());
             if (getAttachment_content() != null) {
                 attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
                 attachment.getAttachment_content().setAttachment(attachment);
@@ -717,12 +725,22 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
+     * @return true if the content store of this attachment has been explicitly set
+     * @since 9.10RC1
+     */
+    public boolean isContentStoreSet()
+    {
+        return this.contentStoreSet;
+    }
+
+    /**
      * @param contentStore the type of the store used for the content
      * @since 9.10RC1
      */
     public void setContentStore(String contentStore)
     {
         this.contentStore = contentStore;
+        this.contentStoreSet = true;
     }
 
     public XWikiAttachmentContent getAttachment_content()
@@ -748,12 +766,22 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
+     * @return true if the archive store of this attachment has been explicitly set
+     * @since 9.10RC1
+     */
+    public boolean isArchiveStoreSet()
+    {
+        return this.archiveStoreSet;
+    }
+
+    /**
      * @param archiveStore the type of the store used for the archive
      * @since 9.10RC1
      */
     public void setArchiveStore(String archiveStore)
     {
         this.archiveStore = archiveStore;
+        this.archiveStoreSet = true;
     }
 
     public XWikiAttachmentArchive getAttachment_archive()
@@ -962,22 +990,22 @@ public class XWikiAttachment implements Cloneable
         this.content.setContent(is);
     }
 
-    public void loadContent(XWikiContext context)
+    public void loadContent(XWikiContext xcontext)
     {
         if (this.content == null) {
-            WikiReference currentWiki = context.getWikiReference();
+            WikiReference currentWiki = xcontext.getWikiReference();
 
             try {
                 // Make sure we work on the attachment's wiki
                 WikiReference attachmentWiki = getReference().getDocumentReference().getWikiReference();
                 if (attachmentWiki != null) {
-                    context.setWikiReference(attachmentWiki);
+                    xcontext.setWikiReference(attachmentWiki);
                 }
 
                 try {
-                    XWikiAttachmentStoreInterface store = getAttachmentContentStore();
+                    XWikiAttachmentStoreInterface store = getAttachmentContentStore(xcontext);
 
-                    store.loadAttachmentContent(this, context, true);
+                    store.loadAttachmentContent(this, xcontext, true);
                 } catch (Exception e) {
                     LOGGER.error(
                         "Failed to load content for attachment [{}@{}]. "
@@ -986,29 +1014,29 @@ public class XWikiAttachment implements Cloneable
                 }
             } finally {
                 if (currentWiki != null) {
-                    context.setWikiReference(currentWiki);
+                    xcontext.setWikiReference(currentWiki);
                 }
             }
         }
 
     }
 
-    public XWikiAttachmentArchive loadArchive(XWikiContext context)
+    public XWikiAttachmentArchive loadArchive(XWikiContext xcontext)
     {
         if (this.attachment_archive == null) {
-            WikiReference currentWiki = context.getWikiReference();
+            WikiReference currentWiki = xcontext.getWikiReference();
 
             try {
                 // Make sure we work on the attachment's wiki
                 WikiReference attachmentWiki = getReference().getDocumentReference().getWikiReference();
                 if (attachmentWiki != null) {
-                    context.setWikiReference(attachmentWiki);
+                    xcontext.setWikiReference(attachmentWiki);
                 }
 
                 try {
-                    AttachmentVersioningStore store = getAttachmentVersioningStore();
+                    AttachmentVersioningStore store = getAttachmentVersioningStore(xcontext);
 
-                    this.attachment_archive = store.loadArchive(this, context, true);
+                    this.attachment_archive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
                     LOGGER.warn(
                         "Failed to load archive for attachment [{}@{}]. "
@@ -1017,7 +1045,7 @@ public class XWikiAttachment implements Cloneable
                 }
             } finally {
                 if (currentWiki != null) {
-                    context.setWikiReference(currentWiki);
+                    xcontext.setWikiReference(currentWiki);
                 }
             }
         }
@@ -1247,25 +1275,51 @@ public class XWikiAttachment implements Cloneable
         return userReference;
     }
 
-    private XWikiAttachmentStoreInterface getAttachmentContentStore() throws ComponentLookupException
+    private XWikiAttachmentStoreInterface getAttachmentContentStore(XWikiContext xcontext)
+        throws ComponentLookupException
     {
-        String hint = getContentStore();
+        if (this.contentStoreInstance == null) {
+            if (!this.contentStoreSet) {
+                this.contentStoreInstance = xcontext.getWiki().getDefaultAttachmentContentStore();
 
-        if (hint != null) {
-            return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, hint);
+                setContentStore(this.contentStoreInstance.getHint());
+            } else {
+                String hint = getContentStore();
+
+                if (hint != null) {
+                    this.contentStoreInstance =
+                        Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, hint);
+                } else {
+                    return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class,
+                        XWikiHibernateBaseStore.HINT);
+                }
+            }
         }
 
-        return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, "hibernate");
+        return this.contentStoreInstance;
     }
 
-    private AttachmentVersioningStore getAttachmentVersioningStore() throws ComponentLookupException
+    private AttachmentVersioningStore getAttachmentVersioningStore(XWikiContext xcontext)
+        throws ComponentLookupException
     {
-        String hint = getContentStore();
+        if (this.archiveStoreInstance == null) {
+            if (!this.archiveStoreSet) {
+                this.archiveStoreInstance = xcontext.getWiki().getDefaultAttachmentArchiveStore();
 
-        if (hint != null) {
-            return Utils.getContextComponentManager().getInstance(AttachmentVersioningStore.class, hint);
+                setContentStore(this.archiveStoreInstance.getHint());
+            } else {
+                String hint = getArchiveStore();
+
+                if (hint != null) {
+                    this.archiveStoreInstance =
+                        Utils.getContextComponentManager().getInstance(AttachmentVersioningStore.class, hint);
+                } else {
+                    this.archiveStoreInstance = Utils.getContextComponentManager()
+                        .getInstance(AttachmentVersioningStore.class, XWikiHibernateBaseStore.HINT);
+                }
+            }
         }
 
-        return Utils.getContextComponentManager().getInstance(AttachmentVersioningStore.class, "hibernate");
+        return this.archiveStoreInstance;
     }
 }

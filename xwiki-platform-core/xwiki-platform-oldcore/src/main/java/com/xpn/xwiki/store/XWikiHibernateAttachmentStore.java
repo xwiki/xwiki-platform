@@ -136,8 +136,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 query.setLong("id", content.getId());
                 boolean exist = query.uniqueResult() != null;
 
-                AttachmentVersioningStore store =
-                    resolveAttachmentVersioningStore(attachment.getArchiveStore(), exist, context);
+                AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
 
                 if (exist) {
                     session.update(content);
@@ -306,8 +305,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     attachment.getDoc().getDocumentReference());
             }
 
-            AttachmentVersioningStore store =
-                resolveAttachmentVersioningStore(attachment.getArchiveStore(), true, context);
+            AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
             store.deleteArchive(attachment, context, false);
 
             try {
@@ -355,16 +353,16 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    private AttachmentVersioningStore resolveAttachmentVersioningStore(String storeType, boolean exist,
+    private AttachmentVersioningStore resolveAttachmentVersioningStore(XWikiAttachment attachment,
         XWikiContext xcontext)
     {
-        AttachmentVersioningStore store = getAttachmentVersioningStore(storeType);
-
-        if (store != null) {
-            return store;
+        if (!attachment.isArchiveStoreSet()) {
+            return xcontext.getWiki().getDefaultAttachmentArchiveStore();
         }
 
-        return exist ? this.attachmentVersioningStore : xcontext.getWiki().getDefaultAttachmentVersioningStore();
+        AttachmentVersioningStore store = getAttachmentVersioningStore(attachment.getArchiveStore());
+
+        return store != null ? store : this.attachmentVersioningStore;
     }
 
     private AttachmentVersioningStore getAttachmentVersioningStore(String storeType)

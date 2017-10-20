@@ -399,7 +399,7 @@ public class XWikiAttachmentTest
             archivedAttachment);
 
         AttachmentVersioningStore store = mock(AttachmentVersioningStore.class);
-        when(this.oldcore.getXWikiContext().getWiki().getAttachmentVersioningStore()).thenReturn(store);
+        when(this.oldcore.getXWikiContext().getWiki().getDefaultAttachmentArchiveStore()).thenReturn(store);
         when(store.loadArchive(attachment, this.oldcore.getXWikiContext(), true)).thenReturn(archive);
 
         assertSame(content.getContentInputStream(), attachment.getContentInputStream(this.oldcore.getXWikiContext()));

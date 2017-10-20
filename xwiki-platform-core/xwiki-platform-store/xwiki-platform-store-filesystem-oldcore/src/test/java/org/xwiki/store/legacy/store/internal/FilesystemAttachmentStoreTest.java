@@ -149,7 +149,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
                 allowing(mockHibernate).getSession(mockContext);
                 will(returnValue(mockHibernateSession));
 
-                allowing(mockXWiki).getAttachmentVersioningStore();
+                allowing(mockXWiki).getDefaultAttachmentArchiveStore();
                 will(returnValue(mockAttachVersionStore));
                 allowing(mockAttachVersionStore).saveArchive(mockArchive, mockContext, false);
 
@@ -164,8 +164,16 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
                 allowing(mockAttach).updateContentArchive(mockContext);
                 allowing(mockAttach).getAttachment_archive();
                 will(returnValue(mockArchive));
+                allowing(mockAttach).isArchiveStoreSet();
+                will(returnValue(false));
+                allowing(mockAttach).getArchiveStore();
+                will(returnValue("file"));
                 allowing(mockAttach).getAttachment_content();
                 will(returnValue(mockDirtyContent));
+                allowing(mockAttach).isContentStoreSet();
+                will(returnValue(false));
+                allowing(mockAttach).getContentStore();
+                will(returnValue("file"));
                 allowing(mockAttach).isContentDirty();
                 will(returnValue(true));
                 allowing(mockDirtyContent).isContentDirty();

@@ -3121,7 +3121,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private String getDefaultAttachmentArchiveStore(XWikiContext xcontext)
     {
-        AttachmentVersioningStore store = xcontext.getWiki().getDefaultAttachmentVersioningStore();
+        AttachmentVersioningStore store = xcontext.getWiki().getDefaultAttachmentArchiveStore();
 
         if (store != null && store != this.attachmentArchiveStore) {
             return store.getHint();

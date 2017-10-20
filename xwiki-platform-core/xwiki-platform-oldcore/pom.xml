@@ -606,16 +606,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- Required to run TestCase based unit tests -->
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-launcher</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

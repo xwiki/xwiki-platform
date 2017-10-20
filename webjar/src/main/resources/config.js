@@ -34,10 +34,6 @@ CKEDITOR.editorConfig = function(config) {
     // Enable the native (in-browser) spell checker because we don't bundle any spell checker plugin. Most of the spell
     // checker plugins are relying on an external service which leads to security and privacy concerns.
     disableNativeSpellChecker: false,
-    // Don't convert Latin characters to the corresponding named HTML entities in the HTML output because the HTML
-    // cleaner used on the server side doesn't recognize some of them (XCOMMONS-929).
-    // See CKEDITOR-38: CKEditor converts Umlaute to HTML equivalents
-    entities_latin: false,
     // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
     fullPage: true,
     // The maximum image width is limited from the skin to 100% of the available page width (responsive images).

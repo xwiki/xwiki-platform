@@ -111,8 +111,8 @@ define('macroEditor', ['jquery', 'modal', 'l10n!macroEditor'], function($, $moda
       var aliceHasValue = alice.hasOwnProperty('value');
       var bobHasValue = bob.hasOwnProperty('value');
       if (aliceHasValue === bobHasValue) {
-        // Alphabetical order.
-        return alice.name.localeCompare(bob.name);
+        // Macro descriptor order.
+        return alice.index - bob.index;
       } else {
         // Parameters with value first.
         return bobHasValue - aliceHasValue;

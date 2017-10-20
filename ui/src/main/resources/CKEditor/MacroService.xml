@@ -102,78 +102,68 @@
 #macro (getMacroDescriptor $macroId)
   #set ($macro = $macroManager.getMacro($macroId))
   #set ($macroDescriptor = $macro.descriptor)
-  ## We need to translate the macro descriptor in the current locale but we shouldn't modify it directly because it is
-  ## shared with everyone. Instead we need to create a clone that we can modify. We achieve this by serializing the
-  ## macro descriptor to JSON and then parsing it back.
-  #set ($macroDescriptorJSON = $jsontool.serialize($macroDescriptor))
-  #set ($data = $jsontool.fromString($macroDescriptorJSON))
-  #if ("$!data" == '' &amp;&amp; $data != '')
-    ## $jsontool.fromString() was added in XWiki 9.9RC1. Fall-back on $jsontool.parse() on older versions.
-    ## Some macro parameter names cause problems when parsing with $jsontool.parse(). We need to rename them.
-    ## See CKEDITOR-187: Error in console when adding a Gallery Macro
-    #set ($badParameterNames = ['class'])
-    #foreach ($badParameterName in $badParameterNames)
-      #set ($macroDescriptorJSON = $macroDescriptorJSON.replace("""$badParameterName"":",
-        """__${badParameterName}__"":"))
-    #end
-    #set ($data = $jsontool.parse($macroDescriptorJSON))
-    ## Restore the original parameter names.
-    #foreach ($badParameterName in $badParameterNames)
-      #set ($badParameterDescriptor = $data.parameterDescriptorMap.remove("__${badParameterName}__"))
-      #if ($badParameterDescriptor)
-        #set ($discard = $data.parameterDescriptorMap.put($badParameterName, $badParameterDescriptor))
-      #end
-    #end
-  #end
-  ## Specify whether the macro can be inserted in-line or not.
-  #set ($data.supportsInlineMode = $macro.supportsInlineMode())
   ## Translate the macro name and description.
   #set ($macroTranslationKey = "rendering.macro.$macroId")
-  #set ($data.name = "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)")
-  #set ($data.description = "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)")
-  #if ($data.contentDescriptor)
+  #set ($data = {
+    'id': $macroDescriptor.id,
+    'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
+    'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
+    'defaultCategory': $macroDescriptor.defaultCategory,
+    'supportsInlineMode': $macro.supportsInlineMode(),
+    'parameterDescriptorMap': {}
+  })
+  #if ($macroDescriptor.contentDescriptor)
     ## Translate the content label and description.
-    #set ($data.contentDescriptor.name = "#maybeTranslate('rendering.macroContent' 'Content')")
-    #set ($data.contentDescriptor.description = "#maybeTranslate(""${macroTranslationKey}.content.description""
-      $data.contentDescriptor.description)")
+    ## Treat the macro content as if it is the last macro parameter.
+    #set ($data.contentDescriptor = {
+      'name': "#maybeTranslate('rendering.macroContent' 'Content')",
+      'description': "#maybeTranslate(""${macroTranslationKey}.content.description""
+        $macroDescriptor.contentDescriptor.description)",
+      'mandatory': $macroDescriptor.contentDescriptor.mandatory,
+      'index': $macroDescriptor.parameterDescriptorMap.size()
+    })
   #end
-  ## Make sure the keys in the parameter descriptor map are all lowercase (for XWiki &lt;9.0).
-  ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
-  ## descriptor map keys
-  #set ($originalParameterDescriptorMap = $data.parameterDescriptorMap)
-  #set ($data.parameterDescriptorMap = $collectionstool.orderedMap)
   #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
-    #set ($parameterDescriptor = $originalParameterDescriptorMap.get($entry.key))
-    #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $parameterDescriptor))
+    #set ($parameterDescriptor = $entry.value)
     ## Translate the parameter name and description.
     #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$parameterDescriptor.id")
-    #set ($parameterDescriptor.name = "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)")
-    #set ($parameterDescriptor.description = "#maybeTranslate(""${parameterTranslationKey}.description"" $parameterDescriptor.description)")
-    #set ($parameterType = $entry.value.parameterType)
-    #if ($parameterType.isEnum())
+    #set ($translatedParameterDescriptor = {
+      'id': $parameterDescriptor.id,
+      'name': "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)",
+      'description': "#maybeTranslate(""${parameterTranslationKey}.description"" $parameterDescriptor.description)",
+      'mandatory': $parameterDescriptor.mandatory,
+      'defaultValue': $parameterDescriptor.defaultValue,
+      'type': $parameterDescriptor.parameterType,
+      'index': $foreach.index
+    })
+    #if ($parameterDescriptor.parameterType.isEnum())
       ## Collect the allowed parameter values.
-      #set ($parameterDescriptor.type = 'enum')
-      #if ($entry.value.defaultValue)
-        #set ($parameterValues = $entry.value.defaultValue.values())
+      #set ($translatedParameterDescriptor.type = 'enum')
+      #if ($parameterDescriptor.defaultValue)
+        #set ($parameterValues = $parameterDescriptor.defaultValue.values())
       #else
         ## A parameter of type enum that doesn't have a default value is very unlikely. We attempt to read the list of
         ## possible values from the enum type in this case, which is currently forbidden, but at least it will generate
         ## a warning in the logs that will help us investigate the problem.
-        #set ($parameterValues = $parameterType.getEnumConstants())
+        #set ($parameterValues = $parameterDescriptor.parameterType.getEnumConstants())
       #end
-      #set ($parameterDescriptor.values = [])
+      #set ($translatedParameterDescriptor.values = [])
       ## Translate the allowed parameter values.
       #foreach ($parameterValue in $parameterValues)
-        #set ($discard = $parameterDescriptor.values.add({
+        #set ($discard = $translatedParameterDescriptor.values.add({
           'id': $parameterValue,
           'label': "#maybeTranslate(""${parameterTranslationKey}.value.$parameterValue"" $parameterValue)"
         }))
       #end
     #elseif (($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
-        &amp;&amp; $data.parametersBeanClass.endsWith('.WikiMacroParameters'))
-      #set ($parameterDescriptor.type = 'boolean')
-      #set ($parameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
+        &amp;&amp; $macroDescriptor.parametersBeanClass.getSimpleName() == 'WikiMacroParameters')
+      #set ($translatedParameterDescriptor.type = 'boolean')
+      #set ($translatedParameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
     #end
+    ## Make sure the key is lowercase (for XWiki &lt;9.0).
+    ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
+    ## descriptor map keys
+    #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $translatedParameterDescriptor))
   #end
 #end
 
@@ -196,13 +186,7 @@
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))
-    ## When $jsontool.parse() is used to build the data (XWiki &lt; 9.9RC1) we can't use $jsontool.serialize().
-    ## We would have used getSimpleName() but it's not accessible before XWiki 6.4.3 (XWIKI-11916).
-    #if ($data.getClass().getName().endsWith('.JSONObject'))
-      $data
-    #else
-      $jsontool.serialize($data)
-    #end
+    $jsontool.serialize($data)
   #else
     $response.sendError(404)
   #end

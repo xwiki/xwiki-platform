@@ -127,8 +127,8 @@
     </class>
     <property>
       <advanced>// Define changes to default configuration here. For example:
-// config.language = 'fr';
-// config.uiColor = '#AADC6E';</advanced>
+// config.uiColor = '#AADC6E';
+// config.linkShowTargetTab = true;</advanced>
     </property>
     <property>
       <linkShowAdvancedTab>0</linkShowAdvancedTab>

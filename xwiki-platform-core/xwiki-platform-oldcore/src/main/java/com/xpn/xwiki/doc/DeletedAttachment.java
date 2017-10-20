@@ -110,8 +110,9 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
-     * @param fullName the local reference of the document
-     * @param locale the locale of the document
+     * @param docId the ID of the document this attachment belonged to
+     * @param docName the reference of the document this attachment belonged to
+     * @param filename the name of the attachment
      * @param storeType the way to store the document
      * @param deleter the user who delete document
      * @param deleteDate date of delete action
@@ -127,8 +128,9 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
-     * @param fullName the local reference of the document
-     * @param locale the locale of the document
+     * @param docId the ID of the document this attachment belonged to
+     * @param docName the reference of the document this attachment belonged to
+     * @param filename the name of the attachment
      * @param storeType the way to store the document
      * @param deleter the user who delete document
      * @param deleteDate date of delete action
@@ -340,7 +342,8 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param context the current context, used in the XML export
      * @throws XWikiException if an exception occurs during the XML export
      * @deprecated since 9.9RC1, use
-     *             {@link #DeletedAttachment(long, String, String, String, Date, DeletedAttachmentContent)} instead
+     *             {@link #DeletedAttachment(long, String, String, String, String, Date, DeletedAttachmentContent)}
+     *             instead
      */
     @Deprecated
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
@@ -388,7 +391,6 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * @return restored attachment
-     * @param xcontext the current {@link XWikiContext context}
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
      * @since 9.10RC1
      */

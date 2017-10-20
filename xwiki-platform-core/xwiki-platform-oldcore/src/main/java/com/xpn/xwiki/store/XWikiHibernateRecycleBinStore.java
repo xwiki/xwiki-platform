@@ -199,7 +199,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             XWikiDeletedDocumentContent content = contentStore.get(reference, deletedDocument.getId(), bTransaction);
 
             try {
-                FieldUtils.writeDeclaredField(deletedDocument, "xml", content, true);
+                FieldUtils.writeDeclaredField(deletedDocument, "content", content, true);
             } catch (IllegalAccessException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Failed to set deleted document content", e);

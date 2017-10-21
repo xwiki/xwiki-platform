@@ -34,6 +34,7 @@
   <modules>
     <!-- Sorted alphabetically -->
     <module>xwiki-platform-distribution-debian</module>
+    <module>xwiki-platform-distribution-fedora</module>
     <module>xwiki-platform-distribution-flavor</module>
     <module>xwiki-platform-distribution-jetty-hsqldb</module>
     <module>xwiki-platform-distribution-resources</module>

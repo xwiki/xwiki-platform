@@ -75,10 +75,12 @@ public class SolrIndexAvailableLocalesListener implements EventListener
     /**
      * The events to listen to that trigger the index update.
      */
-    private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new DocumentUpdatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)),
-            new DocumentCreatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)), new ApplicationReadyEvent(),
-            new WikiReadyEvent(), new ApplicationReadyEvent());
+    private static final List<Event> EVENTS = Arrays.asList(
+        new DocumentUpdatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)),
+        new DocumentCreatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)),
+        new ApplicationReadyEvent(),
+        new WikiReadyEvent()
+    );
 
     /**
      * The currently available locales for each running wiki.

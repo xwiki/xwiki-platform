@@ -97,7 +97,6 @@ public class NotificationPreferenceScriptService implements ScriptService
                 targetableNotificationPreferenceBuilder.setProperties(
                         Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
                 targetableNotificationPreferenceBuilder.setTarget(userReference);
-                targetableNotificationPreferenceBuilder.setStartDate(new Date());
 
                 toSave.add(targetableNotificationPreferenceBuilder.build());
             }

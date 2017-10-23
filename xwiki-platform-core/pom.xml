@@ -258,6 +258,26 @@
                     "methodName": "isLocationDirectlyWatched",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilterType)",
+                    "new": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "filterExpression",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method void org.xwiki.notifications.filters.watch.WatchedUserReference::<init>(java.lang.String)",
+                    "new": "method void org.xwiki.notifications.filters.watch.WatchedUserReference::<init>(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter)",
+                    "package": "org.xwiki.notifications.filters.watch",
+                    "classSimpleName": "WatchedUserReference",
+                    "methodName": "<init>",
+                    "elementKind": "constructor",
+                    "justification": "Young API"
                   }
                 ]
               }

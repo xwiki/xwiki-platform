@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,10 +41,7 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreferencesGetter;
+import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;

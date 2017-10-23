@@ -83,11 +83,12 @@ public interface NotificationFilter
 
      * @param user the user interested in the notifications
      * @param type of the expected notification filter
+     * @param format format of the notification
      * @return a filtering expression or null
      *
-     * @since 9.8RC1
+     * @since 9.10RC1
      */
-    ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type);
+    ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type, NotificationFormat format);
 
     /**
      * Get the name of the filter. This is useful as {@link NotificationFilterPreference} will be able to be linked to

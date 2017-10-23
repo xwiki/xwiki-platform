@@ -100,12 +100,53 @@ public class NotificationWatchScriptService implements ScriptService
 
     /**
      * @param location the location
-     * @return either or not the location is already watched by the given user
+     * @return either or not the location is already watched by the current user
      * @throws NotificationException if an error happens
      */
     public boolean isLocationWatched(EntityReference location) throws NotificationException
     {
         return watchedEntityFactory.createWatchedLocationReference(location).isWatched(
+                documentAccessBridge.getCurrentUserReference()
+        );
+    }
+
+    /**
+     * @param userId id of the user
+     * @return either or not the user is already watched by the current user
+     * @throws NotificationException if an error happens
+     * @since 9.10RC1
+     */
+    public boolean isUserWatched(String userId) throws NotificationException
+    {
+        return watchedEntityFactory.createWatchedUserReference(userId).isWatched(
+                documentAccessBridge.getCurrentUserReference()
+        );
+    }
+
+    /**
+     * Add a filter to watch the specified user.
+     *
+     * @param userId the user to watch
+     * @throws NotificationException if an error happens
+     * @since 9.10RC1
+     */
+    public void watchUser(String userId) throws NotificationException
+    {
+        watchedEntitiesManager.watchEntity(watchedEntityFactory.createWatchedUserReference(userId),
+                documentAccessBridge.getCurrentUserReference()
+        );
+    }
+
+    /**
+     * Remove a filter to stop watching the specified user.
+     *
+     * @param userId the user to unwatch
+     * @throws NotificationException if an error happens
+     * @since 9.10RC1
+     */
+    public void unwatchUser(String userId) throws NotificationException
+    {
+        watchedEntitiesManager.unwatchEntity(watchedEntityFactory.createWatchedUserReference(userId),
                 documentAccessBridge.getCurrentUserReference()
         );
     }

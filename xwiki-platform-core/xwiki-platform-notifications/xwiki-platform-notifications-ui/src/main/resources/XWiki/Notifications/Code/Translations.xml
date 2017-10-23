@@ -163,7 +163,16 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclus
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Never
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Every time I make a modification
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Every time I make a major modification
-XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page</content>
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page
+
+## User profile
+notifications.userprofile.following=Following
+notifications.userprofile.notfollowing=Not following
+notifications.userprofile.follow=Start following
+notifications.userprofile.unfollow=Stop following
+notifications.userprofile.done=Done
+notifications.userprofile.saving=Saving...
+notifications.userprofile.error=Error saving the notification setting</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

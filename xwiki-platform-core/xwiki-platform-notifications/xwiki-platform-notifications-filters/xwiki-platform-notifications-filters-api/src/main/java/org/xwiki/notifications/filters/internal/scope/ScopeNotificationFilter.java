@@ -86,7 +86,8 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type)
+    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
+            NotificationFormat format)
     {
         // We don't handle this use-case anymore
         return null;

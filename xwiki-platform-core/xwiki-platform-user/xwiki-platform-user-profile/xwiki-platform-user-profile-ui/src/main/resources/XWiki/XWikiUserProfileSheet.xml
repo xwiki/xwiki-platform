@@ -141,6 +141,34 @@
           #end
         &lt;/div&gt;
         #end
+        &lt;div class="activity-follow"&gt;
+        #if("$!services.notification.watch" != '' &amp;&amp; $services.notification.watch.isEnabled())
+          ## TODO: replace it, somehow, by a UIX or a custom user sheet
+          #set ($discard = $xwiki.ssx.use('XWiki.XWikiUserProfileSheet'))
+          #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserProfileSheet'))
+          &lt;div class="notificationWatchUser"&gt;
+            &lt;p&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/p&gt;
+            #set ($userId = $services.model.serialize($doc.documentReference, 'default'))
+            #set ($isUserWatched = $services.notification.watch.isUserWatched($userId))
+            &lt;div class="notificationWatchUserFollowing #if(!$isUserWatched)hidden#end"&gt;
+              &lt;button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
+                $services.icon.renderHTML('check') $escapetool.xml($services.localization.render('notifications.userprofile.following')) &lt;span class="caret"&gt;&lt;/span&gt;
+              &lt;/button&gt;
+              &lt;ul class="dropdown-menu"&gt;
+                &lt;li&gt;&lt;a href="#" class="notificationWatchUserRemove"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('notifications.userprofile.unfollow'))&lt;/a&gt;&lt;/li&gt;
+              &lt;/ul&gt;
+            &lt;/div&gt;
+            &lt;div class="notificationWatchUserNotFollowing  #if($isUserWatched)hidden#end"&gt;
+              &lt;button type="button" class="btn btn-danger dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
+                $escapetool.xml($services.localization.render('notifications.userprofile.notfollowing')) &lt;span class="caret"&gt;&lt;/span&gt;
+              &lt;/button&gt;
+              &lt;ul class="dropdown-menu"&gt;
+                &lt;li&gt;&lt;a href="#" class="notificationWatchUserAdd"&gt;$services.icon.renderHTML('eye') $escapetool.xml($services.localization.render('notifications.userprofile.follow'))&lt;/a&gt;&lt;/li&gt;
+              &lt;/ul&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        #end
+        &lt;/div&gt;
       #end
 {{/html}}
 
@@ -158,6 +186,140 @@
 {{/html}}##
 #end
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.XWikiUserProfileSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>bbea39b8-1682-4af2-91fd-8ac0b2b2e9d2</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+  'use strict';
+  $(document).ready(function() {
+    
+    /**
+     * Save the new user status.
+     */
+    var changeUserStatus = function (action) {
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.userprofile.saving'))", 'inprogress');
+      var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      $.post(url, {
+        'action': action,
+        'csrf': xm.form_token,
+        'userId': XWiki.Model.serialize(xm.documentReference)
+      }).done(function() {
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.userprofile.done'))", 'done');
+        if (action == 'watchUser') {
+          $('.notificationWatchUserNotFollowing').addClass('hidden');
+          $('.notificationWatchUserFollowing').removeClass('hidden')
+        } else {
+          $('.notificationWatchUserFollowing').addClass('hidden');
+          $('.notificationWatchUserNotFollowing').removeClass('hidden');
+        }
+      }).fail(function() {
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.userprofile.error'))", 'error');
+      });
+    };
+
+    /**
+     * DOM events
+     */
+    $('.notificationWatchUserAdd').click(function (event) {
+      changeUserStatus('watchUser');
+    });
+    $('.notificationWatchUserRemove').click(function (event) {
+      changeUserStatus('unwatchUser');
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name>Notifications Watch/Unwatch user</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
   <object>
     <name>XWiki.XWikiUserProfileSheet</name>
     <number>0</number>
@@ -291,7 +453,21 @@
 }
 .activity-follow .follow {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
+}
+
+.notificationWatchUser {
+  position: relative;
+}
+
+.notificationWatchUser &gt; p {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-bottom: 0.3em;
+  text-transform: uppercase;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>'Follow' css</name>

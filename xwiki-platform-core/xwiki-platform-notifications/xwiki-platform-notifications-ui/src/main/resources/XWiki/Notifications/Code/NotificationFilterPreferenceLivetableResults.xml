@@ -42,6 +42,20 @@
   <content>{{velocity wiki="false"}}
 #if ($xcontext.action == 'get')
 ##
+## Offset = item # at which to start displaying data
+##
+#set ($offset = $util.parseInt($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set ($offset = $offset - 1)
+#if ($offset &lt; 0)
+  #set ($offset = 0)
+#end
+##
+## Limit = # of items to display
+##
+#set ($limit = $util.parseInt($request.get('limit')))
+#set ($limitOffset = $offset + $limit)
+##
 ## Build the list of NotificationFilterPreference related to the given user.
 ##
 #set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
@@ -49,52 +63,63 @@
 #set ($elements = [])
 
 ## Get a list of available filters for the user
-#foreach ($filter in $services.notification.filters.getFilters())
-  #foreach ($preference in $services.notification.filters.getFilterPreferences($filter))
-    #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
+#set ($index = 0)
+#set ($filters = $collectionstool.arrayList)
+#set ($discard = $filters.addAll($services.notification.filters.filters))
+#set ($filters = $sorttool.sort($filters, ['name']))
+#foreach ($filter in $filters)
+  #set ($filtersPreferences = $collectionstool.arrayList)
+  #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter)))
+  #set ($filtersPreferences = $sorttool.sort($filtersPreferences, ['filterPreferenceName']))
+  #foreach ($preference in $filtersPreferences)
+    #set ($index = $index + 1)
+    ## Optimization to render only displayed rows (between $offset and $limitOffset)
+    #if ($index &gt; $offset and $index &lt;= $limitOffset)
+      #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
 
-    ## Compute the list of event types
-    #set($eventTypeList = '&lt;ul class="list-unstyled"&gt;')
-    #if ($preference.getProperties('EVENT_TYPE').isEmpty())
-      #set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
-    #else
-      #set ($types = {})
-      #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-        #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
+      ## Compute the list of event types
+      #set($eventTypeList = '&lt;ul class="list-unstyled"&gt;')
+      #if ($preference.getProperties('EVENT_TYPE').isEmpty())
+        #set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
+      #else
+        #set ($types = {})
+        #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+          #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
+        #end
+        #foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
+          #set ($eventTypeList = $eventTypeList + '&lt;li&gt;' + $types.get($eventType) + '&lt;/li&gt;')
+        #end
       #end
-      #foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
-        #set ($eventTypeList = $eventTypeList + '&lt;li&gt;' + $types.get($eventType) + '&lt;/li&gt;')
+      #set($eventTypeList = $eventTypeList + '&lt;/ul&gt;')
+
+      ## Compute the list of notification formats
+      #set($notificationFormatsList = '&lt;ul class="list-unstyled"&gt;')
+      #foreach ($notificationFormat in $preference.getFilterFormats())
+        #set ($notificationFormatsList = $notificationFormatsList + '&lt;li&gt;' + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;/li&gt;')
       #end
-    #end
-    #set($eventTypeList = $eventTypeList + '&lt;/ul&gt;')
+      #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
 
-    ## Compute the list of notification formats
-    #set($notificationFormatsList = '&lt;ul class="list-unstyled"&gt;')
-    #foreach ($notificationFormat in $preference.getFilterFormats())
-      #set ($notificationFormatsList = $notificationFormatsList + '&lt;li&gt;' + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;/li&gt;')
-    #end
-    #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
+      #set ($isEnabled = '')
+      #set ($isDisabled = '')
+      #if ($preference.filterPreferenceName.startsWith('watchlist_'))
+        #set ($isDisabled = 'disabled = "disabled"')
+      #end
+      #if ($preference.isEnabled())
+        #set ($isEnabled = 'checked = "checked"')
+      #end
+      #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled $isDisabled /&gt;")
 
-    #set ($isEnabled = '')
-    #set ($isDisabled = '')
-    #if ($preference.filterPreferenceName.startsWith('watchlist_'))
-      #set ($isDisabled = 'disabled = "disabled"')
+      #set ($element = {
+        'filterPreferenceName': $preference.filterPreferenceName,
+        'name'                : $display,
+        'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
+        'eventTypes'          : $eventTypeList,
+        'notificationFormats' : $notificationFormatsList,
+        'isEnabled'           : $isEnabled,
+        'doc_viewable'        : true
+      })
+      #set ($discard = $elements.add($element))
     #end
-    #if ($preference.isEnabled())
-      #set ($isEnabled = 'checked = "checked"')
-    #end
-    #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled $isDisabled /&gt;")
-
-    #set ($element = {
-      'filterPreferenceName': $preference.filterPreferenceName,
-      'name'                : $display,
-      'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-      'eventTypes'          : $eventTypeList,
-      'notificationFormats' : $notificationFormatsList,
-      'isEnabled'           : $isEnabled,
-      'doc_viewable'        : true
-    })
-    #set ($discard = $elements.add($element))
   #end
 #end
 
@@ -107,7 +132,7 @@
   #set ($offset = 1)
 #end
 $jsontool.serialize({
-  'totalrows'   : $elements.size(),
+  'totalrows'   : $index,
   'reqNo'       : $request.reqNo,
   'returnedrows': $elements.size(),
   'offset'      : $offset,

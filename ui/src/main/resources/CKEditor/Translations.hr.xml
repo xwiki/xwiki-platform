@@ -44,7 +44,7 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
 CKEditor.ConfigClass_advanced=Napredna konfiguracija
-CKEditor.ConfigClass_advanced.hint=Možete napisati odlomak JavaScript kôda za izravnu izmjenu konfiguracijskog objekta. Provjerite {0}CKEditor dokumentaciju{1} za listu dostupnih konfiguracijskih svojstava.
+CKEditor.ConfigClass_advanced.hint=Možete napisati isječak JavaScript kôda za izravnu izmjenu konfiguracijskog objekta. Provjerite {0}CKEditor dokumentaciju{1} za listu dostupnih konfiguracijskih svojstava.
 CKEditor.ConfigClass_linkShowAdvancedTab=Poveznica\: Prikaži karticu Napredno
 CKEditor.ConfigClass_linkShowAdvancedTab.hint=Omogućava postavljanje atributa poveznica poput identifikatora, imena, klase ilil stila.
 CKEditor.ConfigClass_linkShowTargetTab=Poveznica\: Prikaži karticu Odredište
@@ -57,7 +57,7 @@ ckeditor.admin.reset=Ponovo postavi
 ckeditor.admin.reset.confirmation=Jeste li sigurni da želite obnoviti pretpostavljenu konfiguraciju? Sve vaše izmjene bit će izgubljene.
 ckeditor.admin.reset.hint=Obnovi pretpostavljenu konfiguraciju
 ckeditor.admin.saveComment=CKEditor konfiguracija ažurirana iz Upravljanja
-ckeditor.plugin.link.anchor=Kotva
+ckeditor.plugin.link.anchor=Sidro
 ckeditor.plugin.link.defaultLabel=unesite labelu poveznice
 ckeditor.plugin.link.openInNewTab=Otvori poveznicu u novoj kartici
 ckeditor.plugin.link.options=Opcije
@@ -70,13 +70,13 @@ ckeditor.plugin.resource.notSpecified={0} nije naznačeno.
 ckeditor.plugin.save.leaveConfirmationMessage=Ima nespremljenih izmjena. Želite li ih zanemariti?
 ckeditor.plugin.source.conversionFailed=Konverzija nije uspjela.
 entityResourcePicker.attach.title=Odaberi privitak
-entityResourcePicker.doc.title=Odaberi stranicu
+entityResourcePicker.doc.title=Odaberite stranicu
 entityResourcePicker.select=Odaberi
 entityResourceSuggester.attach.placeholder=Pronađi privitak...
 entityResourceSuggester.doc.placeholder=Pronađi stranicu...
 macroEditor.changeMacro=Promijeni makro
 macroEditor.content=Sadržaj
-macroEditor.descriptorRequestFailed=Dohvat macro deskriptora {0} nije uspio.
+macroEditor.descriptorRequestFailed=Dohvat macro opisnika {0} nije uspio.
 macroEditor.more=Još
 macroEditor.noParameters=Ovaj makro nema parametara.
 macroEditor.submit=Podnesi

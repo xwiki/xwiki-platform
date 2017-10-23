@@ -103,168 +103,125 @@
         <configuration>
           <defaultDirmode>644</defaultDirmode>
           <defaultFilemode>644</defaultFilemode>
-          <!--<mappings>
+          <mappings>
             <mapping>
               <directory>/usr/lib/xwiki</directory>
+              <sources>
+                <source>
+                  <location>${war.path}</location>
+                  <excludes>
+                    <exclude>WEB-INF</exclude>
+                    <exclude>WEB-INF/**/*</exclude>
+                    <exclude>META-INF/extension.xed</exclude>
+                  </excludes>
+                </source>
+              </sources>
             </mapping>
-          </mappings>-->
+            <mapping>
+              <directory>/usr/lib/xwiki/WEB-INF/lib</directory>
+              <sources>
+                <source>
+                  <location>${war.path}/WEB-INF/lib</location>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
+              <directory>/usr/lib/xwiki/META-INF</directory>
+              <sources>
+                <source>
+                  <location>${project.build.outputDirectory}/META-INF</location>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- Configuration files -->
+            <mapping>
+              <directory>/etc/xwiki</directory>
+              <configuration>true</configuration>
+              <sources>
+                <source>
+                  <location>${war.path}/WEB-INF</location>
+                  <excludes>
+                    <exclude>**/lib</exclude>
+                    <exclude>**/lib/*</exclude>
+                    <exclude>**/hibernate.cfg.xml</exclude>
+                    <exclude>**/web.xml</exclude>
+                    <exclude>**/xwiki.cfg</exclude>
+                    <exclude>**/xwiki.properties</exclude>
+                  </excludes>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- Default configuration files -->
+            <mapping>
+              <directory>/usr/share/xwiki/default</directory>
+              <sources>
+                <source>
+                  <location>${war.path}/WEB-INF</location>
+                  <includes>
+                    <include>web.xml</include>
+                  </includes>
+                </source>
+                <source>
+                  <location>${project.build.directory}/maven-shared-archive-resources</location>
+                  <includes>
+                    <include>xwiki.cfg</include>
+                    <include>xwiki.properties</include>
+                  </includes>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- Links to /usr/lib/xwiki/WEB-INF files/folders -->
+            <mapping>
+              <directory>/etc/xwiki</directory>
+              <sources>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/cache</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/classes</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/fonts</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/observation</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/hibernate.cfg.xml</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/jboss-deployment-structure.xml</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/portlet.xml</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/struts-config.xml</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/sun-web.xml</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/version.properties</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/web.xml</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/xwiki.cfg</location>
+                </softlinkSource>
+                <softlinkSource>
+                  <location>/usr/lib/xwiki/WEB-INF/xwiki.properties</location>
+                </softlinkSource>
+              </sources>
+            </mapping>
+          </mappings>
         </configuration>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!-- Produce the RPM package -->
-
-
-
-        <!-- Produce deb package -->
-        <!--<plugin>
-          <artifactId>jdeb</artifactId>
-          <groupId>org.vafer</groupId>
-          <configuration>
-            <dataSet>
-              <data>
-                <src>${war.path}</src>
-                <type>directory</type>
-                <excludes>WEB-INF,WEB-INF/**/*,META-INF/extension.xed</excludes>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/usr/lib/xwiki</prefix>
-                </mapper>
-              </data>
-              <data>
-                <src>${war.path}/WEB-INF/lib</src>
-                <type>directory</type>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/usr/lib/xwiki/WEB-INF/lib</prefix>
-                </mapper>
-              </data>
-              <data>
-                <src>${project.build.outputDirectory}/META-INF</src>
-                <type>directory</type>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/usr/lib/xwiki/META-INF</prefix>
-                </mapper>
-              </data>
-
-              --><!-- Configuration files --><!--
-              <data>
-                <src>${war.path}/WEB-INF</src>
-                <type>directory</type>
-                <excludes>**/lib,**/lib/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/etc/xwiki</prefix>
-                </mapper>
-                <conffile>true</conffile>
-              </data>
-
-              --><!-- Configuration files managed by UCF --><!--
-              <data>
-                <src>${war.path}/WEB-INF</src>
-                <type>directory</type>
-                <includes>web.xml</includes>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/usr/share/xwiki/default</prefix>
-                </mapper>
-              </data>
-              <data>
-                <src>${project.build.directory}/maven-shared-archive-resources</src>
-                <type>directory</type>
-                <includes>xwiki.cfg,xwiki.properties</includes>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/usr/share/xwiki/default</prefix>
-                </mapper>
-              </data>
-
-              --><!-- Links to /usr/lib/xwiki/WEB-INF files/folders --><!--
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/cache</linkName>
-                <linkTarget>/etc/xwiki/cache</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/classes</linkName>
-                <linkTarget>/etc/xwiki/classes</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/fonts</linkName>
-                <linkTarget>/etc/xwiki/fonts</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/observation</linkName>
-                <linkTarget>/etc/xwiki/observation</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/hibernate.cfg.xml</linkName>
-                <linkTarget>/etc/xwiki/hibernate.cfg.xml</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/jboss-deployment-structure.xml</linkName>
-                <linkTarget>/etc/xwiki/jboss-deployment-structure.xml</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/portlet.xml</linkName>
-                <linkTarget>/etc/xwiki/portlet.xml</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/struts-config.xml</linkName>
-                <linkTarget>/etc/xwiki/struts-config.xml</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/sun-web.xml</linkName>
-                <linkTarget>/etc/xwiki/sun-web.xml</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/version.properties</linkName>
-                <linkTarget>/etc/xwiki/version.properties</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/web.xml</linkName>
-                <linkTarget>/etc/xwiki/web.xml</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/xwiki.cfg</linkName>
-                <linkTarget>/etc/xwiki/xwiki.cfg</linkTarget>
-              </data>
-              <data>
-                <type>link</type>
-                <symlink>true</symlink>
-                <linkName>/usr/lib/xwiki/WEB-INF/xwiki.properties</linkName>
-                <linkTarget>/etc/xwiki/xwiki.properties</linkTarget>
-              </data>
-            </dataSet>
-          </configuration>
-        </plugin>-->
-      </plugins>
-    </pluginManagement>
   </build>
   <profiles>
     <profile>

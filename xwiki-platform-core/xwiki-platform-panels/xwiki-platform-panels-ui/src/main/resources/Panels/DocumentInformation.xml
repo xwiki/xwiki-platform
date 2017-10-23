@@ -462,7 +462,14 @@ XWiki.SyntaxConverter = Class.create({
    */
   successfulConversion : function(response) {
     this.storeNewSyntax();
-    this.contentField.value = response.responseText.substring(3);
+    var contentField = this.contentField;
+    contentField.value = response.responseText.substring(3);
+    // Trigger the 'change' event so that the editor can display changes on the content field.
+    // Note: The only way apparently possible for this triggering to work in 2017 is to trigger it with jQuery.
+    //       Neither PrototypeJS nor standard JavaScript events triggering works from this location (even if it works from the browser's console).
+    require(['jquery'], function ($) {
+      $(contentField).trigger('change');
+    })
   },
 
   /**

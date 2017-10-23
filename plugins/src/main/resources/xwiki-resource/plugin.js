@@ -144,7 +144,11 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           return true;
         },
         getValue: function() {
-          var serializedResourceReference = this.getResourcePickerInput().getValue();
+          var resourcePickerInput = this.getResourcePickerInput();
+          // Make sure the resource picker has updated the resource picker input. This is needed in Internet Explorer
+          // where the dialog buttons are not selectable and so the change event is not fired before the click event.
+          $(resourcePickerInput.$).trigger('beforeGetValue');
+          var serializedResourceReference = resourcePickerInput.getValue();
           var separatorIndex = serializedResourceReference.indexOf(':');
           var resourceReference = {
             type: serializedResourceReference.substr(0, separatorIndex),

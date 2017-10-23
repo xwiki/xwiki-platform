@@ -128,6 +128,10 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
         $(event.target).change();
       }
     });
+    // Make sure the original resource reference input is updated before its value is retrieved.
+    resourcePicker.prev('input').on('beforeGetValue', function() {
+      resourceReferenceInput.change();
+    });
   };
 
   var maybeChangeResourceType = function(event) {

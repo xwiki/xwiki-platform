@@ -44,7 +44,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -207,7 +206,6 @@ import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
-import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
@@ -215,7 +213,6 @@ import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiRecycleBinContentStoreInterface;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
@@ -6671,7 +6668,8 @@ public class XWiki implements EventListener
                     attachmentToRevert.getAttachmentRevision(oldAttachmentVersion, context);
                 if (oldAttachmentRevision == null) {
                     // Previous version is lost, just leave the current version in place
-                    replaceAttachmentInPlace(rolledbackDoc, attachmentToRevert);
+                    rolledbackDoc.setAttachment(attachmentToRevert);
+
                     continue;
                 }
                 // We can't just leave the old version in place, since it will break the revision history, given the
@@ -6682,7 +6680,8 @@ public class XWiki implements EventListener
                 oldAttachmentRevision.setVersion(attachmentToRevert.getVersion());
                 oldAttachmentRevision.setMetaDataDirty(true);
                 oldAttachmentRevision.getAttachment_content().setContentDirty(true);
-                replaceAttachmentInPlace(rolledbackDoc, oldAttachmentRevision);
+
+                rolledbackDoc.setAttachment(oldAttachmentRevision);
             }
 
             // Restore deleted attachments from the trash
@@ -6712,10 +6711,11 @@ public class XWiki implements EventListener
                         restoredAttachmentRevision.setVersion(restoredAttachment.getVersion());
                         restoredAttachmentRevision.setMetaDataDirty(true);
                         restoredAttachmentRevision.getAttachment_content().setContentDirty(true);
-                        replaceAttachmentInPlace(rolledbackDoc, restoredAttachmentRevision);
+
+                        rolledbackDoc.setAttachment(restoredAttachmentRevision);
                     } else {
                         // This particular version is lost, update to the one available
-                        replaceAttachmentInPlace(rolledbackDoc, restoredAttachment);
+                        rolledbackDoc.setAttachment(restoredAttachment);
                     }
                 }
             } else {
@@ -6763,17 +6763,6 @@ public class XWiki implements EventListener
         }
 
         return rolledbackDoc;
-    }
-
-    private void replaceAttachmentInPlace(XWikiDocument doc, XWikiAttachment attachment)
-    {
-        for (ListIterator<XWikiAttachment> it = doc.getAttachmentList().listIterator(); it.hasNext();) {
-            if (StringUtils.equals(it.next().getFilename(), attachment.getFilename())) {
-                it.remove();
-                it.add(attachment);
-                break;
-            }
-        }
     }
 
     /**

@@ -1763,10 +1763,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
         } catch (Exception e) {
-            Object[] args = { attachment.getFilename(), attachment.getDoc().getDocumentReference() };
+            Object[] args = { attachment.getReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
-                "Exception while saving attachments for attachment {0} of document {1}", e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT, "Exception while saving attachment [{0}]",
+                e, args);
         }
     }
 

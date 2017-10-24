@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -498,6 +499,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             public void onUpdate()
             {
                 setMetaDataDirty(true);
+            }
+
+            @Override
+            protected void added(XWikiAttachment element)
+            {
+                element.setDoc(XWikiDocument.this);
             }
         };
 
@@ -5420,11 +5427,39 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @param attachment the attachment to add
      * @since 5.3M2
+     * @deprecated since 9.10RC1, use {@link #setAttachment(XWikiAttachment)} instead
      */
+    @Deprecated
     public void addAttachment(XWikiAttachment attachment)
     {
+        setAttachment(attachment);
+    }
+
+    /**
+     * Insert passed attachment in the document and return any pre-existing attachment with the same name.
+     * 
+     * @param attachment the attachment to insert in the document
+     * @return the attachment replaced by the passed attachment
+     * @since 9.10RC1
+     */
+    public XWikiAttachment setAttachment(XWikiAttachment attachment)
+    {
         attachment.setDoc(this);
+
+        for (ListIterator<XWikiAttachment> it = getAttachmentList().listIterator(); it.hasNext();) {
+            XWikiAttachment currentAttachment = it.next();
+
+            if (StringUtils.equals(currentAttachment.getFilename(), attachment.getFilename())) {
+                it.remove();
+                it.add(attachment);
+
+                return currentAttachment;
+            }
+        }
+
         getAttachmentList().add(attachment);
+
+        return null;
     }
 
     /**

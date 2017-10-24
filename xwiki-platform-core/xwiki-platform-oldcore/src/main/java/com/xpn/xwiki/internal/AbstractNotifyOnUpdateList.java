@@ -49,12 +49,22 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     /** Called when the list is updated. The method will be called at least once, but may be called several times. */
     protected abstract void onUpdate();
 
+    /**
+     * @param element the element that just been added to the list
+     * @since 9.10RC1
+     */
+    protected void added(E element)
+    {
+        // Should be overwritten by extending classes that need to know about new elements
+    }
+
     @Override
     public boolean add(E e)
     {
         boolean ret = this.list.add(e);
         if (ret) {
             onUpdate();
+            added(e);
         }
         return ret;
     }
@@ -64,6 +74,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     {
         this.list.add(index, element);
         onUpdate();
+        added(element);
     }
 
     @Override
@@ -72,6 +83,9 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         boolean ret = this.list.addAll(c);
         if (ret) {
             onUpdate();
+            for (E e : c) {
+                added(e);
+            }
         }
         return ret;
     }
@@ -82,6 +96,9 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         boolean ret = this.list.addAll(index, c);
         if (ret) {
             onUpdate();
+            for (E e : c) {
+                added(e);
+            }
         }
         return ret;
     }
@@ -202,6 +219,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     {
         E ret = this.list.set(index, element);
         onUpdate();
+        added(element);
         return ret;
     }
 
@@ -314,6 +332,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         {
             this.iterator.add(e);
             onUpdate();
+            added(e);
         }
 
         @Override
@@ -345,6 +364,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         {
             this.iterator.set(e);
             onUpdate();
+            added(e);
         }
     }
 }

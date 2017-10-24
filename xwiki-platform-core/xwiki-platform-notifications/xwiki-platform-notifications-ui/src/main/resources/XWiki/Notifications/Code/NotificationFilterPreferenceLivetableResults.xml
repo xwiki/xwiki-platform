@@ -44,7 +44,7 @@
 ##
 ## Offset = item # at which to start displaying data
 ##
-#set ($offset = $util.parseInt($request.get('offset')))
+#set ($offset = $numbertool.toNumber($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set ($offset = $offset - 1)
 #if ($offset &lt; 0)
@@ -53,7 +53,7 @@
 ##
 ## Limit = # of items to display
 ##
-#set ($limit = $util.parseInt($request.get('limit')))
+#set ($limit = $numbertool.toNumber($request.get('limit')))
 #set ($limitOffset = $offset + $limit)
 ##
 ## Build the list of NotificationFilterPreference related to the given user.

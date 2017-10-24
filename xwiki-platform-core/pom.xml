@@ -138,6 +138,7 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
+<<<<<<< Updated upstream
                   {
                     "code": "java.method.removed",
                     "old": "method boolean org.xwiki.notifications.filters.watch.WatchedEntitiesManager::isEntityDirectlyWatched(org.xwiki.notifications.filters.watch.WatchedEntityReference, org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
@@ -279,6 +280,8 @@
                     "elementKind": "constructor",
                     "justification": "Young API"
                   }
+=======
+>>>>>>> Stashed changes
                 ]
               }
             }

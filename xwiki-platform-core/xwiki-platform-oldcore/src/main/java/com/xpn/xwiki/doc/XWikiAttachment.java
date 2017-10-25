@@ -459,27 +459,15 @@ public class XWikiAttachment implements Cloneable
 
     public void setDoc(XWikiDocument doc)
     {
-        setDoc(doc, true);
-    }
-
-    /**
-     * @param doc the document to associate to the attachment
-     * @param updateDirty false if the document metadata dirty flag should not be modified
-     * @since 9.10RC1
-     */
-    public void setDoc(XWikiDocument doc, boolean updateDirty)
-    {
         if (this.doc != doc) {
             this.doc = doc;
             this.reference = null;
 
-            if (updateDirty) {
-                if (isMetaDataDirty() && doc != null) {
-                    doc.setMetaDataDirty(true);
-                }
-                if (getAttachment_content() != null) {
-                    getAttachment_content().setOwnerDocument(doc);
-                }
+            if (isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
+            }
+            if (getAttachment_content() != null) {
+                getAttachment_content().setOwnerDocument(doc);
             }
         }
     }

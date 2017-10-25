@@ -155,6 +155,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
                 allowing(mockAttach).getContentInputStream(mockContext);
                 will(returnValue(HELLO_STREAM));
+                allowing(mockAttach).setDoc(doc);
                 allowing(mockAttach).getDoc();
                 will(returnValue(doc));
                 allowing(mockAttach).getFilename();

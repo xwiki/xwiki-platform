@@ -205,9 +205,11 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
 
         final File contentFile = provider.getAttachmentContentFile();
         attachment.setAttachment_content(new FilesystemAttachmentContent(contentFile, attachment));
+        attachment.setContentStore(FileSystemStoreUtils.HINT);
 
         attachment.setAttachment_archive(
             ((FilesystemAttachmentVersioningStore) this.attachmentVersionStore).loadArchive(attachment, provider));
+        attachment.setArchiveStore(FileSystemStoreUtils.HINT);
 
         return new FileDeletedAttachmentContent(attachment);
     }

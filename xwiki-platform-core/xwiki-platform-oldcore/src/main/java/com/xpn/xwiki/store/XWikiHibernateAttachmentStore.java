@@ -159,10 +159,10 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     endTransaction(context, true);
                 }
             } catch (Exception e) {
-                Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+                Object[] args = { attachment.getReference() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
-                    "Exception while saving attachment {0} of document {1}", e, args);
+                    "Exception while saving attachment {0}", e, args);
             } finally {
                 try {
                     if (bTransaction) {
@@ -245,15 +245,16 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             content.setContentDirty(false);
 
             attachment.setAttachment_content(content);
+            attachment.setContentStore(null);
 
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+            Object[] args = { attachment.getReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
-                "Exception while loading attachment {0} of document {1}", e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT, "Exception while loading attachment {0}",
+                e, args);
         } finally {
             try {
                 if (bTransaction) {
@@ -336,10 +337,10 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+            Object[] args = { attachment.getReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT,
-                "Exception while deleting attachment {0} of document {1}", e, args);
+                "Exception while deleting attachment {0}", e, args);
         } finally {
             try {
                 if (bTransaction) {

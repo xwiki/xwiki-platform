@@ -271,6 +271,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
                         }
                     }
                 });
+                oneOf(mockAttach).setContentStore("file");
             }
         });
 

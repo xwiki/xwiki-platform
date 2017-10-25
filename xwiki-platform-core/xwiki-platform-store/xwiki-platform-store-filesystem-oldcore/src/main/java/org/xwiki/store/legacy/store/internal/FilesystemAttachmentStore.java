@@ -213,6 +213,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
             content.setContentDirty(false);
             attachment.setAttachment_content(content);
+            attachment.setContentStore(FileSystemStoreUtils.HINT);
             return;
         }
 

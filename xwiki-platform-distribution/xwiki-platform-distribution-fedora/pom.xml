@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>9.9-SNAPSHOT</version>
+    <version>9.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-fedora</artifactId>
   <name>XWiki Platform - Distribution - Fedora</name>
@@ -40,23 +40,19 @@
   <properties>
     <fedora.maintainer>XWiki Team (devs@xwiki.org)</fedora.maintainer>
     <fedora.license>LGPL 2.1</fedora.license>
-    <rpm.maven.plugin.version>2.1.5</rpm.maven.plugin.version>
+    <fedora.group>Applications/Productivity</fedora.group>
+    <fedora.description>
+      XWiki is a free wiki software platform written in Java with a design emphasis
+      on extensibility
+
+      XWiki is an easily installed wiki and collaboration platform with features such as
+      WYSIWYG editing, OpenOffice based document import/export, semantic annotations
+      and tagging, and advanced permissions management.
+
+      XWiki is designed to help teams collaborate more efficiently. It
+      runs in a Java servlet container such as Tomcat.
+    </fedora.description>
+
+    <redline.plugin.version>1.2.5</redline.plugin.version>
   </properties>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>rpm-maven-plugin</artifactId>
-          <groupId>org.codehaus.mojo</groupId>
-          <version>${rpm.maven.plugin.version}</version>
-          <extensions>true</extensions>
-          <configuration>
-            <license>${fedora.license}</license>
-            <group>Applications/Productivity</group>
-            <targetVendor>Fedora</targetVendor>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

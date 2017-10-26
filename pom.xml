@@ -132,16 +132,6 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging-api</artifactId>
           </exclusion>
-          <!-- Exclude so that we control our own version of it. Note that Tika uses it for reading encrypted PDFs  -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-          </exclusion>
-          <!-- Exclude so that we control our own version of it. Note that Tika uses it for reading encrypted PDFs  -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
-          </exclusion>
           <!-- Tika depends on junrar for handling RAR files and junrar itself depends on Commons VFS2 which depends on
                org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.4. AFAIK we shouldn't require this dependency and
                we can safely exclude it. The other reason for excluding it is that it itself depends on
@@ -662,6 +652,53 @@
                 <!-- Right id of the JAXB reference implementation -->
                 <id>org.glassfish.jaxb:jaxb-core</id>
                 <features>com.sun.xml.bind:jaxb-core</features>
+              </extensionOverride>
+
+              <!-- Right id of the The Bouncy Castle Crypto packages -->
+              <extensionOverride>
+                <id>org.bouncycastle:bcprov-jdk15on</id>
+                <features>
+                  bouncycastle:bcprov-jdk16
+                  bouncycastle:bcprov-jdk15
+                  bouncycastle:bcprov-jdk14
+                  bouncycastle:bcprov-jdk13
+                  bouncycastle:bcprov-jdk12
+                  org.bouncycastle:bcprov-jdk16
+                  org.bouncycastle:bcprov-jdk15
+                  org.bouncycastle:bcprov-jdk14
+                  org.bouncycastle:bcprov-jdk13
+                  org.bouncycastle:bcprov-jdk12
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcpkix-jdk15on</id>
+                <features>
+                  bouncycastle:bcpkix-jdk16
+                  bouncycastle:bcpkix-jdk15
+                  bouncycastle:bcpkix-jdk14
+                  bouncycastle:bcpkix-jdk13
+                  bouncycastle:bcpkix-jdk12
+                  org.bouncycastle:bcpkix-jdk16
+                  org.bouncycastle:bcpkix-jdk15
+                  org.bouncycastle:bcpkix-jdk14
+                  org.bouncycastle:bcpkix-jdk13
+                  org.bouncycastle:bcpkix-jdk12
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcmail-jdk15on</id>
+                <features>
+                  bouncycastle:bcmail-jdk16
+                  bouncycastle:bcmail-jdk15
+                  bouncycastle:bcmail-jdk14
+                  bouncycastle:bcmail-jdk13
+                  bouncycastle:bcmail-jdk12
+                  org.bouncycastle:bcmail-jdk16
+                  org.bouncycastle:bcmail-jdk15
+                  org.bouncycastle:bcmail-jdk14
+                  org.bouncycastle:bcmail-jdk13
+                  org.bouncycastle:bcmail-jdk12
+                </features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

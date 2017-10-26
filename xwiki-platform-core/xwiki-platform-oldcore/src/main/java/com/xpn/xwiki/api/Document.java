@@ -2760,10 +2760,8 @@ public class Document extends Api
     public Attachment addAttachment(String fileName, InputStream iStream)
     {
         try {
-            return new Attachment(this, this.getDoc().addAttachment(fileName, iStream, getXWikiContext()),
+            return new Attachment(this, this.getDoc().setAttachment(fileName, iStream, getXWikiContext()),
                 getXWikiContext());
-        } catch (XWikiException e) {
-            // TODO Log the error and let the user know about it
         } catch (IOException e) {
             // TODO Log the error and let the user know about it
         } finally {

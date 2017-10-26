@@ -36,6 +36,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -175,12 +176,12 @@ public class UploadAction extends XWikiAction
         XWikiContext context) throws XWikiException
     {
         XWikiResponse response = context.getResponse();
-        String username = context.getUser();
+        DocumentReference usernameReference = context.getUserReference();
 
         XWikiAttachment attachment;
         try {
             InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context);
-            attachment = doc.addAttachment(filename, contentInputStream, context);
+            attachment = doc.setAttachment(filename, contentInputStream, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",
@@ -188,9 +189,9 @@ public class UploadAction extends XWikiAction
         }
 
         // Set the document author
-        doc.setAuthor(username);
+        doc.setAuthorReference(usernameReference);
         if (doc.isNew()) {
-            doc.setCreator(username);
+            doc.setCreatorReference(usernameReference);
         }
 
         // Calculate and store mime type
@@ -202,7 +203,7 @@ public class UploadAction extends XWikiAction
 
         // Add a comment to the document history. Include the attachment name, revision and comment.
         String documentComment;
-        ArrayList<String> params = new ArrayList<String>();
+        ArrayList<String> params = new ArrayList<>();
         params.add(filename);
         String nextRev = attachment.getNextVersion();
         if (StringUtils.isBlank(attachmentComment)) {

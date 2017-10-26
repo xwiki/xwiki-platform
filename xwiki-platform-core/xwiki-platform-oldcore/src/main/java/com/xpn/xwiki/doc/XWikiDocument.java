@@ -492,6 +492,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
+    // TODO: use a Map instead of a List to store attachment in XWikiDocument
     private final List<XWikiAttachment> attachmentList =
         new AbstractNotifyOnUpdateList<XWikiAttachment>(new ArrayList<XWikiAttachment>())
         {
@@ -4037,11 +4038,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment attach : sourceDocument.getAttachmentList()) {
             XWikiAttachment newAttach = (XWikiAttachment) attach.clone();
 
-            // Document is set to this because if this document is renamed then the attachment will have a new id
-            // and be saved somewhere different.
-            newAttach.setDoc(this);
-
-            this.getAttachmentList().add(newAttach);
+            setAttachment(newAttach);
         }
     }
 
@@ -4075,7 +4072,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment attachment : sourceDocument.getAttachmentList()) {
             if (overwrite || this.getAttachment(attachment.getFilename()) == null) {
                 XWikiAttachment newAttachment = attachment.clone();
-                newAttachment.setDoc(this);
 
                 // We need to set the content of the attachment to be dirty because the dirty bit
                 // is used to signal that there is a reason to save the copied attachment, otherwise
@@ -4085,7 +4081,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     newAttachment.getAttachment_content().setContentDirty(true);
                 }
 
-                getAttachmentList().add(newAttachment);
+                setAttachment(newAttachment);
             }
         }
     }
@@ -5446,6 +5442,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         attachment.setDoc(this);
 
+        // Replace any attachment with the same name
+        // TODO: use a Map instead of a List to store attachment in XWikiDocument
         for (ListIterator<XWikiAttachment> it = getAttachmentList().listIterator(); it.hasNext();) {
             XWikiAttachment currentAttachment = it.next();
 
@@ -5463,21 +5461,46 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated use {@link #addAttachment(String, InputStream, XWikiContext)} instead
+     * @deprecated use {@link #setAttachment(String, InputStream, XWikiContext)} instead
      */
     @Deprecated
     public XWikiAttachment addAttachment(String fileName, byte[] content, XWikiContext context) throws XWikiException
     {
         try {
-            return addAttachment(fileName, new ByteArrayInputStream(content != null ? content : new byte[0]), context);
+            return setAttachment(fileName, new ByteArrayInputStream(content != null ? content : new byte[0]), context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to set Attachment content", e);
         }
     }
 
+    /**
+     * @param fileName the name of the attachment
+     * @param content the content of the attachment
+     * @param context the XWiki context
+     * @return the new attachment
+     * @throws XWikiException never sent
+     * @throws IOException when failing to read the passed content
+     * @deprecated since 9.10RC1, use {@link #setAttachment(String, InputStream, XWikiContext)} instead
+     */
+    @Deprecated
     public XWikiAttachment addAttachment(String fileName, InputStream content, XWikiContext context)
         throws XWikiException, IOException
+    {
+        return setAttachment(fileName, content, context);
+    }
+
+    /**
+     * Create or update attachment with the passed name with the passed content.
+     * 
+     * @param fileName the name of the attachment
+     * @param content the content of the attachment
+     * @param context the XWiki context
+     * @return the new attachment
+     * @throws IOException when failing to read the passed content
+     * @since 9.10rc1
+     */
+    public XWikiAttachment setAttachment(String fileName, InputStream content, XWikiContext context) throws IOException
     {
         int i = fileName.indexOf('\\');
         if (i == -1) {
@@ -5491,7 +5514,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             attachment = new XWikiAttachment(this, filename);
 
             // Add the attachment in the current doc
-            getAttachmentList().add(attachment);
+            setAttachment(attachment);
         }
 
         attachment.setContent(content);

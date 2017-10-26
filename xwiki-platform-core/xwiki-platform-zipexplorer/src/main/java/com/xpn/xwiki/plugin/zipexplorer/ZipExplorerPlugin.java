@@ -123,8 +123,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
         // Create the new attachment pointing to the file inside the ZIP
         XWikiAttachment newAttachment = new XWikiAttachment();
-        newAttachment.setDoc(attachment.getDoc());
-        newAttachment.setAuthor(attachment.getAuthor());
+        newAttachment.setDoc(attachment.getDoc(), false);
+        newAttachment.setAuthorReference(attachment.getAuthorReference());
         newAttachment.setDate(attachment.getDate());
 
         InputStream stream = null;

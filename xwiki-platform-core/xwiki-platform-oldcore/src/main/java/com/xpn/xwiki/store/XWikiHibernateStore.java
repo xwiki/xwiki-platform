@@ -1662,10 +1662,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             @SuppressWarnings("unchecked")
             List<XWikiAttachment> list = query.list();
             for (XWikiAttachment attachment : list) {
-                attachment.setDoc(doc);
-                attachment.setMetaDataDirty(false);
+                doc.setAttachment(attachment);
             }
-            doc.setAttachmentList(list);
         } catch (Exception e) {
             this.logger.error("Failed to load attachments of document [{}]", doc.getDocumentReference(), e);
 

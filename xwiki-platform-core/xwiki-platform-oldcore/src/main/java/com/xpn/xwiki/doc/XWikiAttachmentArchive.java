@@ -342,7 +342,7 @@ public class XWikiAttachmentArchive implements Cloneable
             final String scontent = content.toString();
             final XWikiAttachment revattach = new XWikiAttachment();
             revattach.fromXML(scontent);
-            revattach.setDoc(attachment.getDoc());
+            revattach.setDoc(attachment.getDoc(), false);
             revattach.setVersion(rev);
             return revattach;
         } catch (Exception e) {

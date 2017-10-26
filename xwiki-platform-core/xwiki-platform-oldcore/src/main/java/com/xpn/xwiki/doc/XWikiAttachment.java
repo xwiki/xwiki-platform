@@ -231,8 +231,6 @@ public class XWikiAttachment implements Cloneable
                 attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
                 attachment.getAttachment_archive().setAttachment(attachment);
             }
-
-            attachment.setDoc(getDoc());
         } catch (CloneNotSupportedException e) {
             // This should not happen
             LOGGER.error("exception while attach.clone", e);
@@ -459,15 +457,27 @@ public class XWikiAttachment implements Cloneable
 
     public void setDoc(XWikiDocument doc)
     {
+        setDoc(doc, true);
+    }
+
+    /**
+     * @param doc the document to associate to the attachment
+     * @param updateDirty false if the document metadata dirty flag should not be modified
+     * @since 9.10RC1
+     */
+    public void setDoc(XWikiDocument doc, boolean updateDirty)
+    {
         if (this.doc != doc) {
             this.doc = doc;
             this.reference = null;
 
-            if (isMetaDataDirty() && doc != null) {
-                doc.setMetaDataDirty(true);
-            }
-            if (getAttachment_content() != null) {
-                getAttachment_content().setOwnerDocument(doc);
+            if (updateDirty) {
+                if (isMetaDataDirty() && doc != null) {
+                    doc.setMetaDataDirty(true);
+                }
+                if (getAttachment_content() != null) {
+                    getAttachment_content().setOwnerDocument(doc);
+                }
             }
         }
     }

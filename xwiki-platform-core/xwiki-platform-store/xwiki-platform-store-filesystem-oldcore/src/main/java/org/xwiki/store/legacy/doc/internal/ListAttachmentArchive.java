@@ -204,7 +204,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
             }
             final XWikiAttachment rev = new XWikiAttachment();
             rev.fromXML(content.toString());
-            rev.setDoc(this.getAttachment().getDoc());
+            rev.setDoc(getAttachment().getDoc());
             rev.setAttachment_archive(this);
 
             // this should not be necessary, keeping to maintain behavior.
@@ -328,7 +328,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
 
                 // This is silly, we set the attachment document and passed value.
                 // Keeping to maintain current behavior.
-                out.setDoc(attachment.getDoc());
+                out.setDoc(attachment.getDoc(), false);
 
                 return out;
             }

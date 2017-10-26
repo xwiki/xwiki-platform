@@ -115,7 +115,7 @@ public class RemoteSolrInstance extends AbstractSolrInstance
             // Create the zip file to attach.
             try (InputStream inputStream = this.configuration.getHomeDirectoryConfiguration()) {
                 // Attach the file.
-                configurationDocument.addAttachment(CONFIGURATION_ZIP_FILE_NAME, inputStream, context);
+                configurationDocument.setAttachment(CONFIGURATION_ZIP_FILE_NAME, inputStream, context);
                 xwiki.saveDocument(configurationDocument, "Attach default SOLR configuration", context);
             }
         }

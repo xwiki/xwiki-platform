@@ -624,11 +624,11 @@ XWiki.Annotation = Class.create({
   // whether the annotations should be displayed as highlighted or only the icons
   displayHighlight : true,
   // add annotation shortcuts
-  addAnnotationShortcuts : ['Ctrl+M', 'Meta+M', 'Ctrl+I', 'Meta+I'],
+  addAnnotationShortcuts : ['ctrl m', 'meta m', 'ctrl i', 'meta i'],
   // show annotations shortcuts
-  toggleAnnotationsShortcuts : ['Alt+A'],
+  toggleAnnotationsShortcuts : ['alt a'],
   // shortcuts for closing the open dialog, be it create, edit or display
-  closeDialogShortcuts : ['Esc'],
+  closeDialogShortcuts : ['esc'],
   // the selection service used to detect and handle selection related functions on the document
   selectionService : false,
   // the stack of bubbles, so that we can close them one by one if needed
@@ -1429,12 +1429,8 @@ XWiki.Annotation = Class.create({
   },
 
   registerShortcuts : function(annotationShorcuts, method) {
-    var eventType = 'keypress';
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
-      eventType = 'keyup';
-    }
     for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
-      shortcut.add(annotationShorcuts[i], method.bindAsEventListener(this), {type: eventType});
+      shortcut.add(annotationShorcuts[i], method.bindAsEventListener(this));
     }
   },
   unregisterShortcuts : function(annotationShorcuts) {

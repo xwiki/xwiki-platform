@@ -1078,9 +1078,11 @@ shortcut = new Object({
 
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input or textarea field
-                jQuery('input, textarea')
-                    .bind('focus', function() { newListener.stop_listening(); })
-                    .bind('blur', function() { newListener.listen(); });
+                jQuery(document)
+                    .on('focus', 'input, textarea',
+                        function() { newListener.stop_listening(); })
+                    .on('blur', 'input, textarea',
+                        function() { newListener.listen(); });
             }
 
             group[target] = newListener;

@@ -989,7 +989,7 @@ shortcut = new Object({
      */
     add: function(shortcut_combination, callback, opt) {
         // Require Keypress JS to be fully loaded before registering the shortcut.
-        require(["$services.webjars.url('org.webjars.bower:Keypress', 'keypress.js')"], function(keypress) {
+        require(["$services.webjars.url('org.webjars.bower:Keypress', 'keypress.js')", 'jquery'], function(keypress) {
 
             // If no options are defined, create a blank array
             opt = (opt) ? opt : [];
@@ -1018,8 +1018,21 @@ shortcut = new Object({
                         break;
                 }
             } else {
+                if ('type' in opt) {
+                    console.warn('The parameter [' + opt['type'] + '] for the shortcut [' + combination
+                                 + '] type deprecated.');
+                }
+
                 listener.simple_combo(combination, callback);
             }
+
+            // Log deprecation warnings for opt parameters
+            var allowedOptParameters = ['target', 'disable_in_input', 'type'];
+            Object.keys(opt).forEach(function (key) {
+                if (allowedOptParameters.indexOf(key) === -1) {
+                    console.warn('The parameter [' + key + '] for the shortcut [' + combination + '] is deprecated.');
+                }
+            });
         });
     },
 
@@ -1083,7 +1096,13 @@ shortcut = new Object({
      * @private
      */
     _format_shortcut_combination: function(combination) {
-        return combination.toLowerCase().replace(/\+/g, ' ');
+        var formattedCombination = combination.toLowerCase().replace(/\+/g, ' ');
+
+        if (formattedCombination !== combination) {
+            console.warn('The shortcut [' + combination + '] is using the deprecated OpenJS Keyboard syntax.');
+        }
+
+        return formattedCombination;
     }
 });
 

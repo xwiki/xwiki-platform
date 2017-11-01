@@ -239,6 +239,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
         mockAttachment.stubs().method("getFilename").will(returnValue(filename));
         mockAttachment.stubs().method("getDoc").will(returnValue(document));
         mockAttachment.stubs().method("getAuthor").will(returnValue("Vincent"));
+        mockAttachment.stubs().method("getAuthorReference").will(returnValue(new DocumentReference("wiki", "XWiki", "Vincent")));
         mockAttachment.stubs().method("getDate").will(returnValue(new Date()));
         mockAttachment.stubs().method("getFilesize").will(returnValue((content == null) ? 0 : content.length));
         mockAttachment.stubs().method("getContentSize").will(returnValue((content == null) ? 0 : content.length));

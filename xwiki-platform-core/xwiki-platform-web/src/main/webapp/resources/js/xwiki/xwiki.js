@@ -946,7 +946,7 @@ function checkAdvancedContent(message) {
  * Manage the keyboards shortcuts.
  * This object interfaces with the bundled Keypress JS library.
  */
-shortcut = {
+shortcut = new Object({
 
     /**
      * @returns {Array} of registered shortcuts
@@ -966,11 +966,11 @@ shortcut = {
     /**
      * Type of shortcut that can be registered.
      */
-    type: {
+    type: new Object({
         SIMPLE: 'simple',
         COUNTING: 'counting',
         SEQUENCE: 'sequence'
-    },
+    }),
 
     /**
      * Add a new shortcut.
@@ -988,35 +988,39 @@ shortcut = {
      * @param opt optional associative array defining parameters for registering the shortcut
      */
     add: function(shortcut_combination, callback, opt) {
-        // If no options are defined, create a blank array
-        opt = (opt) ? opt : [];
+        // Require Keypress JS to be fully loaded before registering the shortcut.
+        require(["$services.webjars.url('org.webjars.bower:Keypress', 'keypress.js')"], function(keypress) {
 
-        var combination = shortcut._format_shortcut_combination(shortcut_combination);
+            // If no options are defined, create a blank array
+            opt = (opt) ? opt : [];
 
-        // CSS selector that should be used by the listener holding the shortcut
-        var listener_target = ('target' in opt) ? opt['target'] : document;
+            var combination = shortcut._format_shortcut_combination(shortcut_combination);
 
-        // Get the group in which we should store the listener
-        var listener_group = ('disable_in_input' in opt && opt['disable_in_input'])
-            ? this._listeners.disabled_in_inputs : this._listeners.enabled_in_inputs;
+            // CSS selector that should be used by the listener holding the shortcut
+            var listener_target = ('target' in opt) ? opt['target'] : document;
 
-        var listener = this._get_or_create_listener(listener_target, listener_group);
+            // Get the group in which we should store the listener
+            var listener_group = ('disable_in_input' in opt && opt['disable_in_input'])
+                ? shortcut._listeners.disabled_in_inputs : shortcut._listeners.enabled_in_inputs;
 
-        if ('type' in opt && opt['type'] in this.type) {
-            switch (opt['type']) {
-                case this.type.SIMPLE:
-                    listener.simple_combo(combination, callback);
-                    break;
-                case this.type.COUNTING:
-                    listener.counting_combo(combination, callback);
-                    break;
-                case this.type.SEQUENCE:
-                    listener.sequence_combo(combination, callback);
-                    break;
+            var listener = shortcut._get_or_create_listener(listener_target, listener_group, keypress);
+
+            if ('type' in opt && Object.values(shortcut.type).indexOf(opt['type']) > -1) {
+                switch (opt['type']) {
+                    case shortcut.type.SIMPLE:
+                        listener.simple_combo(combination, callback);
+                        break;
+                    case shortcut.type.COUNTING:
+                        listener.counting_combo(combination, callback);
+                        break;
+                    case shortcut.type.SEQUENCE:
+                        listener.sequence_combo(combination, callback);
+                        break;
+                }
+            } else {
+                listener.simple_combo(combination, callback);
             }
-        } else {
-            listener.simple_combo(combination, callback);
-        }
+        });
     },
 
     /**
@@ -1049,20 +1053,21 @@ shortcut = {
      *
      * @param target the DOM element that should be targeted by the listener
      * @param group the group (either disabled_in_inputs or enabled_in_inputs) in which the listener belongs
+     * @param keypress a reference to the Keypress JS API
      * @returns {*} The Keypress JS listener
      * @private
      */
-    _get_or_create_listener: function(target, group) {
+    _get_or_create_listener: function(target, group, keypress) {
         if (target in group) {
             return group[target];
         } else {
-            var newListener = new window.keypress.Listener(target);
+            var newListener = new keypress.Listener(target);
 
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input or textarea field
-                $('input, textarea')
-                    .bind("focus", function() { newListener.stop_listening(); })
-                    .bind("blur", function() { newListener.listen(); });
+                jQuery('input, textarea')
+                    .bind('focus', function() { newListener.stop_listening(); })
+                    .bind('blur', function() { newListener.listen(); });
             }
 
             group[target] = newListener;
@@ -1080,7 +1085,7 @@ shortcut = {
     _format_shortcut_combination: function(combination) {
         return combination.toLowerCase().replace(/\+/g, ' ');
     }
-}
+});
 
 /**
  * Browser Detect

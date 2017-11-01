@@ -51,6 +51,11 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>Keypress</artifactId>
+      <version>2.1.3</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>
@@ -98,9 +103,8 @@
               <inputDir>${project.build.directory}/minimized</inputDir>
               <output>${project.build.directory}/minimized/resources/js/xwiki/xwiki-min.js</output>
               <includes>
-                <!-- entityReference.js and keypress.js are added first because they are used by xwiki.js -->
+                <!-- entityReference.js is added first because it is used by xwiki.js -->
                 <include>**/entityReference.js</include>
-                <include>**/keypress.js</include>
                 <include>**/xwiki.js</include>
                 <include>**/modalPopup.js</include>
                 <include>**/jumpToPage.js</include>

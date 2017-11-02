@@ -65,10 +65,10 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
-    <!-- Needed to have the notifications menu. -->
+    <!-- Needed to have the alerts menu. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-ui</artifactId>
+      <artifactId>xwiki-platform-alerts-ui</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>

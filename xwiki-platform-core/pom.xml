@@ -171,6 +171,7 @@
     <module>xwiki-platform-activeinstalls</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
+    <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>

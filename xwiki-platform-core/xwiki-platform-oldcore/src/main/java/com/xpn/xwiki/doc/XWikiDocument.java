@@ -2076,7 +2076,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // We are using a SoftReference which will allow the archive to be
             // discarded by the Garbage collector as long as the context is closed (usually during
             // the request)
-            this.archive = new SoftReference<XWikiDocumentArchive>(arch);
+            this.archive = new SoftReference<>(arch);
         }
     }
 

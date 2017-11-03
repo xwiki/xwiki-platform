@@ -46,10 +46,10 @@ $xwiki.ssx.use('XWiki.DeletedAttachments')##
 $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
 ##
 #set($columns = ['datt.filename', 'datt.docName', 'datt.date', 'datt.deleter', 'actions'])
-#set($columnProperties = {
+#set($columnsProperties = {
     'datt.filename'  : { 'type' : 'text', 'size' : 10 },
     'datt.docName'   : { 'type' : 'text', 'size' : 10 },
-    'datt.date'      : { 'type' : 'date', 'filterable' : false },
+    'datt.date'      : { 'type' : 'date'},
     'datt.deleter'   : { 'type' : 'text', 'size' : 10 },
     'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
   })##
@@ -63,7 +63,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
 ##
 {{html wiki="true" clean="false"}}
 &lt;div class="hidden"&gt;
-#livetable('attachmentTrash' $columns $columnProperties $options)
+#livetable('attachmentTrash' $columns $columnsProperties $options)
 &lt;/div&gt;
 {{/html}}
 

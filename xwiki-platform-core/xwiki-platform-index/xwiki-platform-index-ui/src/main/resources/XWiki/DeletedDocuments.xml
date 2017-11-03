@@ -45,10 +45,10 @@ $xwiki.ssx.use('XWiki.DeletedDocuments')##
 $xwiki.jsx.use('XWiki.DeletedDocuments')##
 ##
 #set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'ddoc.batchId', 'actions'])
-#set($columnProperties = {
+#set($columnsProperties = {
     'ddoc.fullName'  : { 'type' : 'text', 'size' : 10 },
     'ddoc.title'     : { 'type' : 'text', 'filterable' : false, 'sortable' : false },
-    'ddoc.date'      : { 'type' : 'date', 'filterable' : false },
+    'ddoc.date'      : { 'type' : 'date'},
     'ddoc.deleter'   : { 'type' : 'text', 'size' : 10 },
     'ddoc.batchId'   : { 'type' : 'text' },
     'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
@@ -63,7 +63,7 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
 ##
 {{html wiki="true" clean="false"}}
 &lt;div class="hidden"&gt;
-#livetable('documentsTrash' $columns $columnProperties $options)
+#livetable('documentsTrash' $columns $columnsProperties $options)
 &lt;/div&gt;
 {{/html}}
 ##

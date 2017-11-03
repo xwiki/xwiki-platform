@@ -51,11 +51,6 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>Keypress</artifactId>
-      <version>2.1.3</version>
-    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>

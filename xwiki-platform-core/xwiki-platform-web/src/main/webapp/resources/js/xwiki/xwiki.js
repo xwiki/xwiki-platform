@@ -956,7 +956,7 @@ shortcut = new Object({
 
         Object.values(this._listeners).forEach(function(group, index) {
             Object.values(group).forEach(function(listener, index2) {
-                shortcuts.push(listener.get_registered_combos());
+                shortcuts = shortcuts.concat(listener.get_registered_combos());
             })
         });
 

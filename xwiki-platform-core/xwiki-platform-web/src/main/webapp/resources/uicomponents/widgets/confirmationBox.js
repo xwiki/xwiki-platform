@@ -37,14 +37,14 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
       this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
       var buttons = {
         "show"  : { method : this.showDialog,  keys : [] },
-        "yes"   : { method : this.onYes,       keys : ['Enter', 'Space', 'y'] },
+        "yes"   : { method : this.onYes,       keys : ['enter', 'space', 'y'] },
         "no"    : { method : this.onNo,        keys : ['n'] },
         "close" : { method : this.closeDialog, keys : ['c'] }
       };
       if (this.interactionParameters.showCancelButton) {
-        buttons.close.keys.push('Esc');
+        buttons.close.keys.push('esc');
       } else {
-        buttons.no.keys.push('Esc');
+        buttons.no.keys.push('esc');
       }
       $super(
         this.createContent(this.interactionParameters),

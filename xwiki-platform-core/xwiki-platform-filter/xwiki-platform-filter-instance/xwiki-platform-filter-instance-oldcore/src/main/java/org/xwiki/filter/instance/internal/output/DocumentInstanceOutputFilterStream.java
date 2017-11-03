@@ -48,6 +48,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
  * @version $Id$
@@ -187,7 +188,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
             boolean isNew = document.isNew();
 
-            if (document.isNew()) {
+            if (isNew) {
                 document = inputDocument;
             } else {
                 if (this.properties.isPreviousDeleted() && !this.documentDeleted) {
@@ -237,30 +238,45 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                     setAuthorReference(document, xcontext.getUserReference());
                 }
                 document.setContentAuthorReference(document.getAuthorReference());
-                if (document.isNew()) {
+                if (isNew) {
                     document.setCreatorReference(document.getAuthorReference());
                 }
-            }
-
-            // Save history
-            if (document.isNew() && document.getDocumentArchive() != null) {
-                // we need to force the saving the document archive
-                if (document.getDocumentArchive() != null) {
-                    xcontext.getWiki().getVersioningStore().saveXWikiDocArchive(document.getDocumentArchive(xcontext),
-                        true, xcontext);
+            } else {
+                // Make sure to use metadata coming from the input document
+                document.setAuthorReference(inputDocument.getAuthorReference());
+                document.setContentAuthorReference(inputDocument.getContentAuthorReference());
+                document.setCreatorReference(inputDocument.getCreatorReference());
+                for (XWikiAttachment attachment : document.getAttachmentList()) {
+                    attachment
+                        .setAuthorReference(inputDocument.getAttachment(attachment.getFilename()).getAuthorReference());
                 }
             }
 
-            // Don't preserve version or history if we don't delete the previous document
-            if (document.isNew() && (this.properties.isAuthorPreserved() || this.properties.isVersionPreserved())) {
-                // Make sure version is set
-                document.setVersion(document.getVersion());
+            // Version related information and save
 
+            // Save the document as it is when version is preserved
+            if (this.properties.isVersionPreserved()) {
+                // Make sure to use metadata coming from the input document
+                document.setVersion(inputDocument.getVersion());
+                document.setDate(inputDocument.getDate());
+                document.setContentUpdateDate(inputDocument.getContentUpdateDate());
+                for (XWikiAttachment attachment : document.getAttachmentList()) {
+                    attachment.setVersion(inputDocument.getAttachment(attachment.getFilename()).getVersion());
+                }
+                // Make sure the document won't be modified by the store
                 document.setMetaDataDirty(false);
                 document.setContentDirty(false);
 
-                xcontext.getWiki().saveDocument(document, document.getComment(), document.isMinorEdit(), xcontext);
+                xcontext.getWiki().saveDocument(document, inputDocument.getComment(), inputDocument.isMinorEdit(),
+                    xcontext);
             } else {
+                // Forget the input history to let the store do its standard job
+                document.setDocumentArchive((XWikiDocumentArchive) null);
+                // Reset the version
+                if (isNew) {
+                    document.setVersion("1.1");
+                }
+
                 xcontext.getWiki().saveDocument(document, this.properties.getSaveComment(), xcontext);
             }
 

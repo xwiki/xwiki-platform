@@ -100,7 +100,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         Assert.assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
         Assert.assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate());
-        Assert.assertEquals("1.1", attachment.getVersion());
+        Assert.assertEquals("15.1", attachment.getVersion());
         Assert.assertEquals("attachment comment", attachment.getComment());
 
         // XClass

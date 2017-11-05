@@ -74,13 +74,8 @@
 ###########################################
 ##        ADD KEYBOARD SHORTCUTS
 ###########################################
-#if ($keyboardShortcutsEnabled)
 <script type="text/javascript">
     //<![CDATA[
-    shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
-        location.href = $('tmViewSource').href;
-    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
-
     /**
      * Perform a PUT on the given REST API. If the request is successful, reload the page.
      *
@@ -115,12 +110,11 @@
     shortcut.add("$services.localization.render('core.shortcuts.developer.user.type')", function() {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");
-    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+    }, {'type': shortcut.type.SEQUENCE, 'disable_in_input': true });
 
     shortcut.add("$services.localization.render('core.shortcuts.developer.user.displayHiddenDocs')", function () {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/displayHiddenDocuments/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
-    }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+    }, {'type': shortcut.type.SEQUENCE, 'disable_in_input': true });
     //]]>
 </script>
-#end

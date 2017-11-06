@@ -333,7 +333,7 @@
     // Add the "mark as read" button if the notif is not already read
     if (!entry.read) {
       // Style the read button
-      readButton.addClass('notification-event-read-button').addClass('btn btn-default btn-xs');
+      readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
       // Insert the cross icon
       readButton.html('$services.icon.renderHTML("check")');
       // On click
@@ -587,6 +587,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         placement: 'bottom'
       });
     }
+    
+    allWatchSwitches.bootstrapSwitch('size', 'small');
 
     /**
      * Change the watchlist status of a document/space/wiki.
@@ -748,48 +750,9 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     </property>
     <property>
       <code>#template('colorThemeInit.vm')
-
-.notifications-area {
-  margin-top: 10px;
-  min-height: 20px;
-  /* 320px is the width of the smallest smartphones right now, so we don't use a larger width */
-  min-width: 320px;
-  overflow: hidden;
-}
-
-.notification-icon {
-  font-size: 2em;
-  text-align: center;
-}
-
-.notification-event {
-  border: 1px dashed $theme.borderColor;
-}
-
-.notification-event-unread {
-  background-color: $theme.panelBackgroundColor;
-}
-
-.notifications-load-more {
-  min-height: 2em;
-  cursor: pointer;
-}
-
-.notifications-load-more:hover {
-  background-color: $theme.highlightColor;
-}
-
-.notifications-load-more p {
-  margin: 0;
-  padding: 0.7em;
-}
-
-.notification-event-read-button {
-  position: absolute;
-  right: 5px;
-  z-index: 1;
-}
-
+/***********************************************
+ * Notifications Header
+ ***********************************************/
 .notifications-count {
   background-color: red;
   opacity: 0.9;
@@ -808,25 +771,135 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
   text-align: right;
 }
 
-.notification-event-details {
-  font-size: 0.8em;
+/***********************************************
+ * Notification Toggles
+ ***********************************************/
+.notifications-toggles {
+  text-align: center;
+  max-width: 320px;
 }
 
-.notification-event-details td {
-  text-overflow: ellipsis;
-  width: 33%;
-  max-width: 47px;
-  overflow: hidden;
-}
-
-.notification-event-user &gt; img {
-  max-height: 15px;
-  max-width: 15px;
+.notifications-toggles .bootstrap-switch {
+  margin: 0 3px 0 3px;
 }
 
 .notifications-toggles .bootstrap-switch .bootstrap-switch-label {
   background-image: linear-gradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor 50%);
   color: $theme.buttonSecondaryTextColor;
+}
+
+/***********************************************
+ * Notification Area
+ ***********************************************/
+.notifications-area {
+  margin-top: 10px;
+  min-height: 20px;
+  overflow: hidden;
+  /* 320px is the width of the smallest smartphones right now, so we don't use a larger width */
+  width: 320px;
+}
+
+.notification-event {
+  border: 1px dashed $theme.borderColor;
+  padding: 1em;
+}
+
+.notification-event-unread {
+  background-color: $theme.panelBackgroundColor;
+}
+
+/***********************************************
+ * Notification Icons
+ ***********************************************/
+.notification-icon {
+  padding-right: 0;
+  position: relative;
+}
+
+.notification-icon .img-thumbnail {
+  background-color: $theme.pageContentBackgroundColor;
+  font-size: 2em;
+  height: 2em;
+  text-align: center;
+  width: 2em;
+}
+
+.notification-icon .img-thumbnail.small{
+  font-size: 1em;
+  height: 2em;
+  left: -0.6em;
+  padding: 0.1em;
+  position: relative;
+  top: -1.2em;
+  width: 2em;
+}
+
+/***********************************************
+ * Notification Content
+ ***********************************************/
+.notification-content {
+  padding: 0 2.6em 0 0.5em;
+}
+
+.notification-event-user &gt; img {
+  height: 16px;
+  width: 16px;
+  /* Don't work for Internet Explorer nor Edge 15 */
+  object-fit: cover;
+  object-position: center;
+}
+
+/***********************************************
+ * Notification Buttons
+ ***********************************************/
+.notification-event-read-button, .toggle-notification-event-details {
+  background-color: $theme.pageContentBackgroundColor;
+  border: 1px solid #ddd;
+  position: absolute;
+  right: 15px;
+  width: 2em;
+  z-index: 1;
+}
+
+.toggle-notification-event-details {
+  bottom: 2px;
+}
+
+/***********************************************
+ * Notification Details
+ ***********************************************/
+.notification-event-details {
+  font-size: 0.8em;
+  margin: 1em 0 0 0;
+}
+
+.notification-event-details td {
+  border: 0;
+  overflow: hidden;
+  padding: 2px;
+  text-overflow: ellipsis;
+  width: 33%;
+}
+
+.notification-event-details td.description {
+  width: 45%;
+}
+
+/***********************************************
+ * Notifications Footer
+ ***********************************************/
+.notifications-load-more {
+  cursor: pointer;
+  min-height: 2em;
+}
+
+.notifications-load-more:hover {
+  background-color: $theme.highlightColor;
+}
+
+.notifications-load-more p {
+  margin: 0;
+  padding: 0.7em;
 }</code>
     </property>
     <property>

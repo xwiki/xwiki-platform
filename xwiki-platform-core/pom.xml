@@ -157,6 +157,15 @@
                     "methodName": "<init>",
                     "elementKind": "constructor",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.eventstream.RecordableEventDescriptor org.xwiki.eventstream.RecordableEventDescriptorManager::getDescriptorForEventType(java.lang.String, boolean) throws org.xwiki.eventstream.EventStreamException",
+                    "package": "org.xwiki.eventstream",
+                    "classSimpleName": "RecordableEventDescriptorManager",
+                    "methodName": "getDescriptorForEventType",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

@@ -156,6 +156,13 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, x
     watchPageSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('page'))');
     watchSpaceSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))');
     watchWikiSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('wiki'))');
+
+    ///
+    /// Set the correct size
+    ///
+    watchPageSwitch.bootstrapSwitch('size', 'small');
+    watchSpaceSwitch.bootstrapSwitch('size', 'small');
+    watchWikiSwitch.bootstrapSwitch('size', 'small');
     
     ///
     /// Add a tooltip to each switch
@@ -332,6 +339,10 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, x
 
 .notifications-watchlist-item pre {
   margin: 0;
+}
+
+.notifications-watchlist-item .bootstrap-switch {
+  margin: 0 3px 0 3px;
 }
 
 .notifications-watchlist-item .bootstrap-switch .bootstrap-switch-label {

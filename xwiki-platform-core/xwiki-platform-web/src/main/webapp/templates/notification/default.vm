@@ -3,10 +3,4 @@
 ## The variable "$event" contains the event to display.
 ## See: org.xwiki.notifications.CompositeEvent
 #template('notification/macros.vm')
-#set ($app  = "$!event.events.get(0).application")
-#set ($icon = 'bell')
-#if ($app == 'xwiki')
-  #set ($app = $services.localization.render('core.events.appName'))
-  #set ($icon = 'file')
-#end
-#displayNotificationEvent($icon, $app, $event)
+#displayNotificationEvent($event)

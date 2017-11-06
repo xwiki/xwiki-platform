@@ -87,6 +87,14 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
         }
     }
 
+    @Override
+    public RecordableEventDescriptor getDescriptorForEventType(String eventType, boolean allWikis)
+            throws EventStreamException
+    {
+        return getRecordableEventDescriptors(allWikis).stream().filter(descriptor
+            -> eventType.equals(descriptor.getEventType())).findAny().orElse(null);
+    }
+
     private List<RecordableEventDescriptor> getDescriptorsFromWiki(String wikiId)
             throws ComponentLookupException
     {

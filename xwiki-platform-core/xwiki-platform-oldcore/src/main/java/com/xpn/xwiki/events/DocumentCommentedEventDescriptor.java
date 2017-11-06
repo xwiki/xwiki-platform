@@ -62,4 +62,10 @@ public class DocumentCommentedEventDescriptor extends AbstractXWikiRecordableEve
     public EventFilter getFilter() {
         return EventFilter.WIKI_SPACE_AND_DOCUMENT_FILTER;
     }
+
+    @Override
+    public String getEventTypeIcon()
+    {
+        return "comments";
+    }
 }

@@ -42,4 +42,14 @@ public interface RecordableEventDescriptorManager
      * @since 9.6RC1
      */
     List<RecordableEventDescriptor> getRecordableEventDescriptors(boolean allWikis) throws EventStreamException;
+
+    /**
+     * @param eventType the type of the event
+     * @param allWikis load the descriptors from all the wikis of the farm if true
+     * @return the corresponding RecordableEventDescriptor or null if no one matches
+     * @throws EventStreamException if an error happens
+     * @since 9.10RC1
+     */
+    RecordableEventDescriptor getDescriptorForEventType(String eventType, boolean allWikis)
+            throws EventStreamException;
 }

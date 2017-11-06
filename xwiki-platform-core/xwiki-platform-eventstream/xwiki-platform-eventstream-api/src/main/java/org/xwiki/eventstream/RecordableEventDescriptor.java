@@ -86,4 +86,13 @@ public interface RecordableEventDescriptor
     default EventFilter getFilter() {
         return EventFilter.NO_FILTER;
     }
+
+    /**
+     * @return the id of the application that provide this event
+     * @since 9.10RC1
+     */
+    default String getEventTypeIcon() {
+        // Should be reimplemented
+        return getApplicationIcon();
+    }
 }

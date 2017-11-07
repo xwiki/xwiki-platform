@@ -20,11 +20,14 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,6 +44,8 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.api.Attachment;
 
 /**
  * Abstract iterator for sending MIME notification messages (usually emails).
@@ -84,6 +89,12 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     @Inject
     private MailSenderConfiguration mailSenderConfiguration;
+
+    @Inject
+    private UserAvatarAttachmentExtractor userAvatarAttachmentExtractor;
+
+    @Inject
+    private LogoAttachmentExtractor logoAttachmentExtractor;
 
     private NotificationUserIterator userIterator;
 
@@ -176,6 +187,23 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         velocityVariables.put(EVENTS, currentEvents);
         velocityVariables.put(HTML_EVENTS, htmlEvents);
         velocityVariables.put(PLAIN_TEXT_EVENTS, plainTextEvents);
+
+        Set<DocumentReference> userAvatars = new HashSet<>();
+        for (CompositeEvent event : currentEvents) {
+            userAvatars.addAll(event.getUsers());
+        }
+        Collection<Attachment> attachments = new ArrayList<>();
+        for (DocumentReference userAvatar : userAvatars) {
+            attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32, 32,
+                    userAvatar.getName()));
+        }
+        try {
+            attachments.add(logoAttachmentExtractor.getLogo());
+        } catch (Exception e) {
+            logger.warn("Failed to get the logo.", e);
+        }
+
+        factoryParameters.put("attachments", attachments);
     }
 
     private Map<String, Object> getVelocityVariables()

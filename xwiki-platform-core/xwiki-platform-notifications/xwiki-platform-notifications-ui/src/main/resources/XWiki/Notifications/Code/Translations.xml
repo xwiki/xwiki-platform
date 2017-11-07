@@ -141,7 +141,6 @@ notifications.settings.watch.autowatchmode.hint=Decide if you wish to watch a pa
 notifications.events.by=edited by {0}.
 notifications.events.lastChange=Last change: {0}.
 notifications.events.lastComment=Last comment: {0}.
-notifications.events.addComment.description=The document {0} has been commented by {1}.
 notifications.preferences.scope.table.scope=Scope
 notifications.preferences.scope.table.location=Location
 notifications.preferences.scope.table.scopeFilterType=Filter Type

@@ -1098,13 +1098,7 @@ shortcut = new Object({
      * @private
      */
     _format_shortcut_combination: function(combination) {
-        var formattedCombination = combination.toLowerCase().replace(/\+/g, ' ');
-
-        if (formattedCombination !== combination) {
-            console.warn('The shortcut [' + combination + '] is using the deprecated OpenJS Keyboard syntax.');
-        }
-
-        return formattedCombination;
+        return combination.toLowerCase().replace(/\+/g, ' ');
     }
 });
 

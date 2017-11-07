@@ -453,12 +453,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public BaseClass clone()
     {
         BaseClass bclass = (BaseClass) super.clone();
+
         bclass.setCustomClass(getCustomClass());
         bclass.setCustomMapping(getCustomMapping());
         bclass.setDefaultWeb(getDefaultWeb());
         bclass.setDefaultViewSheet(getDefaultViewSheet());
         bclass.setDefaultEditSheet(getDefaultEditSheet());
+        bclass.setValidationScript(getValidationScript());
         bclass.setNameField(getNameField());
+
         bclass.setDirty(this.isDirty);
         bclass.setOwnerDocument(this.ownerDocument);
 
@@ -1411,6 +1414,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
             getDefaultEditSheet(), mergeResult));
 
+        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
+            getValidationScript(), mergeResult));
+
         setNameField(
             MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(), mergeResult));
 
@@ -1448,6 +1454,11 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         if (!StringUtils.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
             setDefaultEditSheet(newBaseClass.getDefaultEditSheet());
+            modified = true;
+        }
+
+        if (!StringUtils.equals(getValidationScript(), newBaseClass.getValidationScript())) {
+            setValidationScript(newBaseClass.getValidationScript());
             modified = true;
         }
 

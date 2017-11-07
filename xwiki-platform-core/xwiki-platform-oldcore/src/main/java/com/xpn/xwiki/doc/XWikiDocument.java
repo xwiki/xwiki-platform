@@ -9001,11 +9001,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), document.getValidationScript())) {
-            setValidationScript(document.getValidationScript());
-            modified = true;
-        }
-
         // /////////////////////////////////
         // XObjects
 

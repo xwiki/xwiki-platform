@@ -44,9 +44,7 @@
   ### Details
   ###
   #define($details)
-    #if ($compositeEvent.events.size() > 1)
-      #displayNotificationEventDetails($compositeEvent.events)
-    #end
+    #displayNotificationEventDetails($compositeEvent.events)
   #end
   ###
   ### Display
@@ -93,6 +91,8 @@
 #macro(displayNotificationEventDetails $events)
   #define($rows)
     #foreach($event in $events)
+      ## Diff URL
+      #set ($diffUrl = $xwiki.getURL($event.document, 'view', "viewer=changes&toRev=${event.documentVersion}"))
       <tr>
         #set ($description = $services.localization.render("notifications.events.${event.type}.description"))
         #if ("$!description" == '')
@@ -101,7 +101,7 @@
         #set ($eventDescriptor = $services.eventstream.getDescriptorForEventType($compositeEvent.type, $xcontext.isMainWiki()))
         <td>#displayNotificationEventUser($event.user)</td>
         <td class="description">$services.icon.renderHTML($eventDescriptor.eventTypeIcon) $escapetool.xml($description)</td>
-        <td class="text-right text-muted">$escapetool.xml($xwiki.formatDate($event.date))</td>
+        <td class="text-right text-muted">#if($diffUrl!='')<a href="$escapetool.xml($diffUrl)">#end$escapetool.xml($xwiki.formatDate($event.date))#if($diffUrl!='')</a>#end</td>
       </tr>
     #end
   #end

@@ -261,6 +261,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 for (XWikiAttachment attachment : document.getAttachmentList()) {
                     attachment.setVersion(inputDocument.getAttachment(attachment.getFilename()).getVersion());
                 }
+                if (document.isNew()) {
+                    document.setCreationDate(inputDocument.getCreationDate());
+                }
 
                 // Make sure the document won't be modified by the store
                 document.setMetaDataDirty(false);

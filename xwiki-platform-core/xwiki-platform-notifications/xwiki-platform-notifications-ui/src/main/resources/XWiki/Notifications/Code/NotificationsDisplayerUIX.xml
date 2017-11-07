@@ -313,14 +313,15 @@
     }
     // Create the container
     var notif = $('&lt;div&gt;').addClass('notification-event');
+    // Put the content
+    notif.append(entry.html);
+    // Create the "read" button
     var readButton = $('&lt;button&gt;');
     if (!entry.read) {
       notif.addClass('notification-event-unread');
       // Add the "mark as read" button
-      notif.append(readButton);
+      notif.find('.notification-content').prepend(readButton);
     }
-    // Put the content
-    notif.append(entry.html);
     if (entry.exception) {
       var exceptionBox = $('&lt;div&gt;').addClass('box errormessage');
       exceptionBox.text(entry.exception);
@@ -793,8 +794,10 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
  ***********************************************/
 .notifications-area {
   margin-top: 10px;
+  max-height: 600px;
   min-height: 20px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
   /* 320px is the width of the smallest smartphones right now, so we don't use a larger width */
   width: 320px;
 }
@@ -856,13 +859,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
   background-color: $theme.pageContentBackgroundColor;
   border: 1px solid #ddd;
   position: absolute;
-  right: 15px;
+  right: 10px;
   width: 2em;
   z-index: 1;
 }
 
+.notification-event-read-button {
+  top: -6px;
+}
+
 .toggle-notification-event-details {
-  bottom: 2px;
+  bottom: -6px;
 }
 
 /***********************************************

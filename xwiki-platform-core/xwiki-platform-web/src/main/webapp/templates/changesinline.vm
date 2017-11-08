@@ -2,12 +2,6 @@
 <div id="changescontent" class="xwikiintracontent">
 #set($rev1 = "$!request.get('rev1')")
 #set($rev2 = "$!request.get('rev2')")
-#set($toRev = "$!request.get('toRev')")
-#if ("$!toRev" != '')
-  #set ($rev2 = $toRev)
-  #set ($newdoc = $xwiki.getDocument($tdoc.documentReferenceWithLocale, $rev2))
-  #set ($rev1 = $newdoc.previousVersion)
-#end
 ## Load document instances
 #if ($tdoc.version == $rev1)
   #set($origdoc = $tdoc)

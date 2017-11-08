@@ -257,6 +257,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 }
                 if (document.isNew()) {
                     document.setCreationDate(inputDocument.getCreationDate());
+                    document.setDocumentArchive(inputDocument.getDocumentArchive());
                 }
 
                 // Make sure the document won't be modified by the store

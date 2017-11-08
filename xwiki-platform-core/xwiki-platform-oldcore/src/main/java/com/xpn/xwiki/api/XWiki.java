@@ -44,9 +44,12 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
@@ -93,6 +96,10 @@ public class XWiki extends Api
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
+
+    private DocumentRevisionProvider documentRevisionProvider;
+
+    private ContextualAuthorizationManager authorizationManager;
 
     /**
      * XWiki API Constructor
@@ -145,6 +152,24 @@ public class XWiki extends Api
         }
 
         return this.defaultStringEntityReferenceSerializer;
+    }
+
+    private DocumentRevisionProvider getDocumentRevisionProvider()
+    {
+        if (this.documentRevisionProvider == null) {
+            this.documentRevisionProvider = Utils.getComponent(DocumentRevisionProvider.class);
+        }
+
+        return this.documentRevisionProvider;
+    }
+
+    private ContextualAuthorizationManager getAuthorizationManager()
+    {
+        if (this.authorizationManager == null) {
+            this.authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        }
+
+        return this.authorizationManager;
     }
 
     /**
@@ -575,29 +600,20 @@ public class XWiki extends Api
      * @param doc Document for which to load a specific revision
      * @param rev Revision number
      * @return Specific revision of a document
-     * @throws XWikiException
+     * @throws XWikiException is never thrown
      */
     public Document getDocument(Document doc, String rev) throws XWikiException
     {
-        if ((doc == null) || (doc.getDoc() == null)) {
+        if (doc == null || doc.getDoc() == null) {
             return null;
         }
 
-        if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
+        if (!getAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
             // Finally we return null, otherwise showing search result is a real pain
             return null;
         }
 
-        try {
-            XWikiDocument revdoc = this.xwiki.getDocument(doc.getDoc(), rev, getXWikiContext());
-            return revdoc.newDocument(getXWikiContext());
-        } catch (Exception e) {
-            // Can't read versioned document
-            LOGGER.error("Failed to read versioned document", e);
-
-            return null;
-        }
+        return doc.getDocumentRevision(rev);
     }
 
     /**
@@ -606,24 +622,24 @@ public class XWiki extends Api
      * @param reference Document for which to load a specific revision
      * @param revision Revision number
      * @return Specific revision of a document
-     * @throws XWikiException
-     * @since 9.3RC1
+     * @throws XWikiException is never thrown
+     * @since 9.4RC1
      */
     public Document getDocument(DocumentReference reference, String revision) throws XWikiException
     {
         try {
-            XWikiDocument doc = this.xwiki.getDocument(reference, revision, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
-                doc.getPrefixedFullName(), getXWikiContext()) == false) {
-                return null;
+            if (reference != null && getAuthorizationManager().hasAccess(Right.VIEW, reference)) {
+                XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(reference, revision);
+
+                if (documentRevision != null) {
+                    return new Document(documentRevision, this.context);
+                }
             }
-
-            return doc.newDocument(getXWikiContext());
         } catch (Exception e) {
-            LOGGER.warn("Failed to access document {}: {}", reference, ExceptionUtils.getRootCauseMessage(e));
-
-            return null;
+            LOGGER.error("Failed to access revision [{}] of document {}", revision, reference, e);
         }
+
+        return null;
     }
 
     /**

@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -49,6 +50,10 @@ public class DatabaseDocumentRevisionProvider implements DocumentRevisionProvide
     @Override
     public XWikiDocument getRevision(DocumentReference reference, String revision) throws XWikiException
     {
+        if (StringUtils.isEmpty(revision)) {
+            return null;
+        }
+
         XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
@@ -59,33 +64,44 @@ public class DatabaseDocumentRevisionProvider implements DocumentRevisionProvide
     @Override
     public XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException
     {
+        if (StringUtils.isEmpty(revision)) {
+            return null;
+        }
+
         XWikiContext xcontext = this.xcontextProvider.get();
 
         XWikiDocument newdoc;
 
+        if (revision.equals(document.getVersion())) {
+            newdoc = document;
+        } else if (xcontext.getWiki().hasVersioning(xcontext)) {
+            newdoc = loadRevision(document, revision, xcontext);
+        } else {
+            newdoc = null;
+        }
+
+        return newdoc;
+    }
+
+    private XWikiDocument loadRevision(XWikiDocument document, String revision, XWikiContext xcontext)
+        throws XWikiException
+    {
         String database = xcontext.getWikiId();
         try {
             if (document.getDocumentReference().getWikiReference().getName() != null) {
                 xcontext.setWikiId(document.getDocumentReference().getWikiReference().getName());
             }
 
-            if ((revision == null) || revision.equals("")) {
-                newdoc = new XWikiDocument(document.getDocumentReference());
-            } else if (revision.equals(document.getVersion())) {
-                newdoc = document;
-            } else {
-                newdoc = xcontext.getWiki().getVersioningStore().loadXWikiDoc(document, revision, xcontext);
-            }
+            return xcontext.getWiki().getVersioningStore().loadXWikiDoc(document, revision, xcontext);
         } catch (XWikiException e) {
-            if (revision.equals("1.1") || revision.equals("1.0")) {
-                newdoc = new XWikiDocument(document.getDocumentReference());
-            } else {
+            // If the errot is that the version does not exist return null
+            if (e.getCode() != XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
                 throw e;
             }
         } finally {
             xcontext.setWikiId(database);
         }
 
-        return newdoc;
+        return null;
     }
 }

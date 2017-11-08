@@ -59,6 +59,7 @@ import com.xpn.xwiki.criteria.impl.RangeFactory;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.criteria.impl.ScopeFactory;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -126,6 +127,8 @@ public class Document extends Api
      */
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
+    private DocumentRevisionProvider documentRevisionProvider;
+
     /**
      * Authorization manager used to check rights.
      */
@@ -167,6 +170,15 @@ public class Document extends Api
         }
 
         return this.compactWikiEntityReferenceSerializer;
+    }
+
+    private DocumentRevisionProvider getDocumentRevisionProvider()
+    {
+        if (this.documentRevisionProvider == null) {
+            this.documentRevisionProvider = Utils.getComponent(DocumentRevisionProvider.class);
+        }
+
+        return this.documentRevisionProvider;
     }
 
     /**
@@ -2948,16 +2960,18 @@ public class Document extends Api
      * Allow to easily access any revision of a document
      *
      * @param revision the version to access
-     * @return the document coresponding to the requested revision or {@code null} if the revision does not exist.
+     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist.
      */
     public Document getDocumentRevision(String revision)
     {
         try {
-            XWikiDocument documentRevision = this.context.getWiki().getDocument(this.doc, revision, this.context);
-            Document result = new Document(documentRevision, this.context);
+            XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(this.doc, revision);
 
-            return result;
+            return documentRevision != null ? new Document(documentRevision, this.context) : null;
         } catch (Exception e) {
+            LOGGER.error("Failed to load revision [{}] of document [{}]", revision, getDocumentReferenceWithLocale(),
+                e);
+
             return null;
         }
     }

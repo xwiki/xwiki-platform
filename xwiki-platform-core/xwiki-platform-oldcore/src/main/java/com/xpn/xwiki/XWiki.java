@@ -1846,26 +1846,45 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @param reference the reference of the document
-     * @param revision the version of the document as defined by {@link DocumentRevisionProvider}
+     * @param reference the reference of the document to load
+     * @param revision the revision of the document to load
+     * @param context the XWiki context
+     * @return the document corresponding to the passed revision or a new XWikiDocument instance if none can be found
+     * @throws XWikiException when failing to load the document revision
      * @since 9.4RC1
-     * @see DocumentRevisionProvider
+     * @deprecated sine 9.10RC1, use {@link DocumentRevisionProvider#getRevision(DocumentReference, String)} instead
      */
+    @Deprecated
     public XWikiDocument getDocument(DocumentReference reference, String revision, XWikiContext context)
         throws XWikiException
     {
-        return getDocumentRevisionProvider().getRevision(reference, revision);
+        XWikiDocument revisionDocument = getDocumentRevisionProvider().getRevision(reference, revision);
+
+        if (revisionDocument == null && (revision.equals("1.1") || revision.equals("1.0"))) {
+            revisionDocument = new XWikiDocument(reference);
+        }
+
+        return revisionDocument;
     }
 
     /**
-     * @param doc the document
-     * @param revision the version of the document as defined by {@link DocumentRevisionProvider}
-     * @param context see {@link XWikiContext}
-     * @see DocumentRevisionProvider
+     * @param document the reference document
+     * @param revision the revision of the document to load
+     * @param context the XWiki context
+     * @return the document corresponding to the passed revision or a new XWikiDocument instance if none can be found
+     * @throws XWikiException when failing to load the document revision
+     * @deprecated sine 9.10RC1, use {@link DocumentRevisionProvider#getRevision(XWikidocument, String)} instead
      */
-    public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException
+    @Deprecated
+    public XWikiDocument getDocument(XWikiDocument document, String revision, XWikiContext context) throws XWikiException
     {
-        return getDocumentRevisionProvider().getRevision(doc, revision);
+        XWikiDocument revisionDocument = getDocumentRevisionProvider().getRevision(document, revision);
+
+        if (revisionDocument == null && (revision.equals("1.1") || revision.equals("1.0"))) {
+            revisionDocument = new XWikiDocument(document.getDocumentReference());
+        }
+
+        return revisionDocument;
     }
 
     /**

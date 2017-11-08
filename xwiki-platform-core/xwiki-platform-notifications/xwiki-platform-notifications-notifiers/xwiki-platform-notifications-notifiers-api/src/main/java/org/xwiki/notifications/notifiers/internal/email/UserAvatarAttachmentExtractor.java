@@ -19,12 +19,12 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
-import java.awt.*;
-import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -34,17 +34,15 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.image.ImageProcessor;
-import com.xpn.xwiki.user.api.XWikiRightService;
+
+import net.coobird.thumbnailator.Thumbnails;
 
 /**
  * @version $Id$
@@ -55,137 +53,83 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class UserAvatarAttachmentExtractor
 {
     /**
-     * Logging framework.
-     */
-    @Inject
-    private Logger logger;
-
-    /**
      * Used to get file resources.
      */
     @Inject
     private Environment environment;
 
-    /**
-     * Used to resize user avatars.
-     */
     @Inject
-    private ImageProcessor imageProcessor;
+    private Logger logger;
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
 
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    public Attachment getUserAvatar(DocumentReference userReference)
+    public Attachment getUserAvatar(DocumentReference userReference, int size) throws Exception
     {
-        String fileName = getFileName(userReference);
-        return getUserAvatar(userReference, 50, 50, fileName);
-    }
-
-    private String getFileName(DocumentReference userReference)
-    {
-        String fileName;
-        if (userReference == null) {
-            fileName = XWikiRightService.GUEST_USER_FULLNAME;
-        } else {
-            fileName = serializer.serialize(userReference);
-        }
-        fileName = String.format("%s.png", fileName);
-        return fileName;
-    }
-
-    public Attachment getUserAvatar(DocumentReference userReference, int width, int height, String fileName)
-    {
-        // FIXME: Unfortunately, the ImagePlugin is too much request-oriented and not generic enough to be reused
-        // without rewriting. In the end, that might be the right way to go and rewriting it might be inevitable.
-
-        Attachment result = null;
-
-        InputStream sourceImageInputStream = null;
+        InputStream imageStream = null;
         try {
-            XWikiContext context = xwikiContextProvider.get();
-            XWiki wiki = context.getWiki();
+            imageStream = getUserAvatarStream(userReference);
 
-            XWikiAttachment realAvatarAttachment;
-            XWikiAttachment fakeAvatarAttachment = null;
+            XWikiAttachment fakeAttachment = new XWikiAttachment();
+            XWikiAttachmentContent content = new XWikiAttachmentContent(fakeAttachment);
 
-            // Use a second variable to be able to reassign it on the else branch below.
-            DocumentReference actualUserReference = userReference;
-            if (actualUserReference != null) {
-                // Registered user.
+            resizeImage(imageStream, size, content.getContentOutputStream());
 
-                XWikiDocument userProfileDocument = wiki.getDocument(userReference, context);
+            fakeAttachment.setAttachment_content(content);
+            fakeAttachment.setFilename(
+                    String.format("%s.jpg", userReference != null ? userReference.getName() : "XWikiGuest")
+            );
 
-                DocumentReference usersClassReference = wiki.getUserClass(context).getDocumentReference();
-                String avatarFileName = userProfileDocument.getStringValue(usersClassReference, "avatar");
+            return new Attachment(null, fakeAttachment, xwikiContextProvider.get());
 
-                realAvatarAttachment = userProfileDocument.getAttachment(avatarFileName);
-
-                if (realAvatarAttachment != null && realAvatarAttachment.isImage(context)) {
-                    // Valid avatar, use the real attachment (and image), but make sure to use a clone as to not impact
-                    // the
-                    // real document.
-                    fakeAvatarAttachment = (XWikiAttachment) realAvatarAttachment.clone();
-                    sourceImageInputStream = realAvatarAttachment.getContentInputStream(context);
-
-                    result = new Attachment(new Document(userProfileDocument, context), fakeAvatarAttachment, context);
-                } else {
-                    // No or invalid avatar, treat the user reference as it did not exist (guest user) so it can be
-                    // handled below for both cases.
-                    actualUserReference = null;
-                }
-            }
-
-            if (actualUserReference == null) {
-                // Guest user.
-
-                // No avatar. Return a fake attachment with the "noavatar.png" standard image.
-                fakeAvatarAttachment = new XWikiAttachment();
-                sourceImageInputStream = environment.getResourceAsStream("/resources/icons/xwiki/noavatar.png");
-
-                result = new Attachment(null, fakeAvatarAttachment, context);
-            }
-
-            // In both cases, set an empty attachment content that will be filled with the resized image. This way we
-            // also avoid a request to the DB for the attachment content, since it will already be available.
-            fakeAvatarAttachment.setAttachment_content(new XWikiAttachmentContent(fakeAvatarAttachment));
-
-            // Resize the image and write it to the fake attachment.
-            resizeImageToAttachment(sourceImageInputStream, width, height, fakeAvatarAttachment);
-
-            // Set a fixed name for the user avatar file so that it is easy to work with in a template, for example.
-            fakeAvatarAttachment.setFilename(fileName);
         } catch (Exception e) {
-            logger.error("Failed to retrieve the avatar for the user {}", userReference, e);
-            return null;
+            throw new Exception(String.format("Failed to resize the avatar of [%s].", userReference), e);
         } finally {
-            // Close the source image input stream since we are done reading from it.
-            if (sourceImageInputStream != null) {
-                IOUtils.closeQuietly(sourceImageInputStream);
-            }
+            IOUtils.closeQuietly(imageStream);
         }
-
-        return result;
     }
 
-    private void resizeImageToAttachment(InputStream imageFileInputStream, int width, int height,
-        XWikiAttachment outputAttachment) throws IOException
+    private InputStream getUserAvatarStream(DocumentReference userReference)
     {
-        OutputStream attachmentOutputStream = null;
-        try {
-            Image originalImage = imageProcessor.readImage(imageFileInputStream);
+        if (userReference != null) {
+            try {
 
-            RenderedImage resizedImage = imageProcessor.scaleImage(originalImage, width, height);
+                XWikiContext context = xwikiContextProvider.get();
+                XWiki xwiki = context.getWiki();
 
-            attachmentOutputStream = outputAttachment.getAttachment_content().getContentOutputStream();
-            imageProcessor.writeImage(resizedImage, "image/png", 1.0f, attachmentOutputStream);
-        } finally {
-            // Close the attachment output stream since we are done writing to it.
-            if (attachmentOutputStream != null) {
-                IOUtils.closeQuietly(attachmentOutputStream);
+                XWikiDocument userProfileDocument = xwiki.getDocument(userReference, context);
+                DocumentReference usersClassReference = xwiki.getUserClass(context).getDocumentReference();
+                String avatarFileName = userProfileDocument.getStringValue(usersClassReference, "avatar");
+                XWikiAttachment attachment = userProfileDocument.getAttachment(avatarFileName);
+
+                if (attachment != null && attachment.isImage(context)) {
+                    return attachment.getContentInputStream(context);
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to get the avatar of [{}]. Fallback to default one.", userReference, e);
             }
         }
+
+        return getDefaultAvatarStream();
+    }
+
+    private InputStream getDefaultAvatarStream()
+    {
+        return environment.getResourceAsStream("/resources/icons/xwiki/noavatar.png");
+    }
+
+    private void resizeImage(InputStream imageFileInputStream, int size, OutputStream outputStream) throws IOException
+    {
+        BufferedImage bufferedImage = ImageIO.read(imageFileInputStream);
+        int sourceWidth = bufferedImage.getWidth();
+        int sourceHeight = bufferedImage.getHeight();
+
+        int smallestDimension = Math.min(sourceWidth, sourceHeight);
+
+        Thumbnails.of(bufferedImage).sourceRegion(sourceWidth / 2 - smallestDimension / 2,
+                sourceHeight / 2 - smallestDimension / 2, smallestDimension, smallestDimension)
+                .forceSize(size, size).outputFormat("jpg").toOutputStream(outputStream);
+
+        IOUtils.closeQuietly(outputStream);
     }
 }

@@ -1873,7 +1873,7 @@ public class XWiki implements EventListener
      * @param context the XWiki context
      * @return the document corresponding to the passed revision or a new XWikiDocument instance if none can be found
      * @throws XWikiException when failing to load the document revision
-     * @deprecated sine 9.10RC1, use {@link DocumentRevisionProvider#getRevision(XWikidocument, String)} instead
+     * @deprecated sine 9.10RC1, use {@link DocumentRevisionProvider#getRevision(XWikiDocument, String)} instead
      */
     @Deprecated
     public XWikiDocument getDocument(XWikiDocument document, String revision, XWikiContext context) throws XWikiException

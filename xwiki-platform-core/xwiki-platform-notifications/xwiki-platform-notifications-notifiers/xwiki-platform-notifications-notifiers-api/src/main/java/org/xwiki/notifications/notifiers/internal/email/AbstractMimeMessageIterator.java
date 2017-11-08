@@ -71,6 +71,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private static final String ERROR_MESSAGE = "Failed to generate an email for the user [{}].";
 
+    private static final String ATTACHMENTS = "attachments";
+
     @Inject
     protected Logger logger;
 
@@ -162,6 +164,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private void updateFactoryParameters() throws NotificationException, AddressException
     {
         handleEvents();
+        handleWikiLogo();
 
         try {
             factoryParameters.put(FROM, new InternetAddress(mailSenderConfiguration.getFromAddress()));
@@ -188,22 +191,44 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         velocityVariables.put(HTML_EVENTS, htmlEvents);
         velocityVariables.put(PLAIN_TEXT_EVENTS, plainTextEvents);
 
+        handleAvatars();
+    }
+
+    private void handleWikiLogo()
+    {
+        try {
+            getAttachments().add(logoAttachmentExtractor.getLogo());
+        } catch (Exception e) {
+            logger.warn("Failed to get the logo.", e);
+        }
+    }
+
+    private Collection<Attachment> getAttachments()
+    {
+        Object attachments = factoryParameters.get(ATTACHMENTS);
+        if (attachments != null) {
+            return (Collection<Attachment>) attachments;
+        }
+
+        Collection<Attachment> newList = new ArrayList<>();
+        factoryParameters.put(ATTACHMENTS, newList);
+        return newList;
+    }
+
+    private void handleAvatars()
+    {
         Set<DocumentReference> userAvatars = new HashSet<>();
         for (CompositeEvent event : currentEvents) {
             userAvatars.addAll(event.getUsers());
         }
-        Collection<Attachment> attachments = new ArrayList<>();
+        Collection<Attachment> attachments = getAttachments();
         for (DocumentReference userAvatar : userAvatars) {
-            attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32, 32,
-                    userAvatar.getName()));
+            try {
+                attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32));
+            } catch (Exception e) {
+                logger.warn("Failed to add the avatar of [{}] in the email.", userAvatar, e);
+            }
         }
-        try {
-            attachments.add(logoAttachmentExtractor.getLogo());
-        } catch (Exception e) {
-            logger.warn("Failed to get the logo.", e);
-        }
-
-        factoryParameters.put("attachments", attachments);
     }
 
     private Map<String, Object> getVelocityVariables()

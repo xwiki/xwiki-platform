@@ -122,7 +122,7 @@
         ##
         #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
           shortcut.remove("$extraShortcut");
-          shortcut.add("$extraShortcut", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
+          shortcut.add("$extraShortcut", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         #end
       #end
       document.observe("dom:loaded", extraInit, false);

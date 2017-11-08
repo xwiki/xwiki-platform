@@ -943,164 +943,235 @@ function checkAdvancedContent(message) {
 }
 
 /**
- * Manage the keyboards shortcuts.
- * This object interfaces with the bundled Keypress JS library.
+ * Keyboard Shortcuts.
+ * Version: 2.01.A
+ * URL: http://www.openjs.com/scripts/events/keyboard_shortcuts/
+ * Author: Binny VA
+ * License : BSD
  */
-shortcut = new Object({
-
-    /**
-     * @returns {Array} of registered shortcuts
-     */
-    all_shortcuts: function() {
-        var shortcuts = [];
-
-        Object.values(this._listeners).forEach(function(group, index) {
-            Object.values(group).forEach(function(listener, index2) {
-                shortcuts = shortcuts.concat(listener.get_registered_combos());
-            })
-        });
-
-        return shortcuts;
-    },
-
-    /**
-     * Type of shortcut that can be registered.
-     */
-    type: new Object({
-        SIMPLE: 'simple',
-        COUNTING: 'counting',
-        SEQUENCE: 'sequence'
-    }),
-
-    /**
-     * Add a new shortcut.
-     *
-     * The opt parameter should be a map of optional parameters used while registering the shortcut.
-     * <ul>
-     *     <li>target: A DOM element in which the shortcut should be listened (defaults to the whole document)</li>
-     *     <li>disable_in_input: If true, the shortcut will not be listened when an input
-     *     or textarea field is selected (default: false)</li>
-     *     <li>type: The type (shortcut.type) that should be used (default: SIMPLE)</li>
-     * </ul>
-     *
-     * @param shortcut_combination {string} the shortcut that should trigger the callback
-     * @param callback the function triggered by the shortcut
-     * @param opt optional associative array defining parameters for registering the shortcut
-     */
-    add: function(shortcut_combination, callback, opt) {
-        // Require Keypress JS to be fully loaded before registering the shortcut.
-        require(["$services.webjars.url('org.webjars.bower:Keypress', 'keypress.js')", 'jquery'], function(keypress) {
-
-            // If no options are defined, create a blank array
-            opt = (opt) ? opt : [];
-
-            var combination = shortcut._format_shortcut_combination(shortcut_combination);
-
-            // CSS selector that should be used by the listener holding the shortcut
-            var listener_target = ('target' in opt) ? opt['target'] : document;
-
-            // Get the group in which we should store the listener
-            var listener_group = ('disable_in_input' in opt && opt['disable_in_input'])
-                ? shortcut._listeners.disabled_in_inputs : shortcut._listeners.enabled_in_inputs;
-
-            var listener = shortcut._get_or_create_listener(listener_target, listener_group, keypress);
-
-            if ('type' in opt && Object.values(shortcut.type).indexOf(opt['type']) > -1) {
-                switch (opt['type']) {
-                    case shortcut.type.SIMPLE:
-                        listener.simple_combo(combination, callback);
-                        break;
-                    case shortcut.type.COUNTING:
-                        listener.counting_combo(combination, callback);
-                        break;
-                    case shortcut.type.SEQUENCE:
-                        listener.sequence_combo(combination, callback);
-                        break;
+shortcut = {
+        'all_shortcuts':{},//All the shortcuts are stored in this array
+        'add': function(shortcut_combination,callback,opt) {
+            //Provide a set of default options
+            var default_options = {
+                    'type':'keydown',
+                    'propagate':false,
+                    'disable_in_input':false,
+                    'target':document,
+                    'keycode':false
+            }
+            if(!opt) opt = default_options;
+            else {
+                for(var dfo in default_options) {
+                    if(typeof opt[dfo] == 'undefined') opt[dfo] = default_options[dfo];
                 }
-            } else {
-                if ('type' in opt) {
-                    console.warn('The parameter [' + opt['type'] + '] for the shortcut [' + combination
-                                 + '] type deprecated.');
-                }
-
-                listener.simple_combo(combination, callback);
             }
 
-            // Log deprecation warnings for opt parameters
-            var allowedOptParameters = ['target', 'disable_in_input', 'type'];
-            Object.keys(opt).forEach(function (key) {
-                if (allowedOptParameters.indexOf(key) === -1) {
-                    console.warn('The parameter [' + key + '] for the shortcut [' + combination + '] is deprecated.');
+            var ele = opt.target
+            if(typeof opt.target == 'string') ele = document.getElementById(opt.target);
+            var ths = this;
+            shortcut_combination = shortcut_combination.toLowerCase();
+
+            //The function to be called at keypress
+            var func = function(e) {
+                e = e || window.event;
+
+                if(opt['disable_in_input']) { //Don't enable shortcut keys in Input, Textarea fields
+                    var element;
+                    if(e.target) element=e.target;
+                    else if(e.srcElement) element=e.srcElement;
+                    if(element.nodeType==3) element=element.parentNode;
+                    if(element.tagName == 'INPUT' || element.tagName == 'TEXTAREA' || element.tagName == 'SELECT') {
+                        return;
+                    }
                 }
-            });
-        });
-    },
 
-    /**
-     * Remove the given shortcut combination from every known listener.
-     *
-     * @param shortcut_combination a string representing the shortcut combination to remove
-     */
-    remove: function(shortcut_combination) {
-        var combination = shortcut._format_shortcut_combination(shortcut_combination);
+                //Find Which key is pressed
+                var code = 0;
+                if (e.keyCode) code = e.keyCode;
+                else if (e.which) code = e.which;
+                var character = String.fromCharCode(code).toLowerCase();
 
-        Object.values(this._listeners).forEach(function(group, index) {
-            Object.values(group).forEach(function(listener, index2) {
-                listener.unregister_combo(combination);
-            });
-        });
-    },
+                if(code == 188) character=","; //If the user presses , when the type is onkeydown
+                if(code == 190) character="."; //If the user presses , when the type is onkeydown
 
-    /**
-     * Map of every Keypress JS shortcut listeners.
-     *
-     * @private
-     */
-    _listeners: {
-        disabled_in_inputs: {},
-        enabled_in_inputs: {}
-    },
+                var keys = shortcut_combination.split("+");
+                //Key Pressed - counts the number of valid keypresses - if it is same as the number of keys, the shortcut function is invoked
+                var kp = 0;
 
-    /**
-     * Check if a Keypress JS listener exists for the given target in the given group, if not, create it.
-     *
-     * @param target the DOM element that should be targeted by the listener
-     * @param group the group (either disabled_in_inputs or enabled_in_inputs) in which the listener belongs
-     * @param keypress a reference to the Keypress JS API
-     * @returns {*} The Keypress JS listener
-     * @private
-     */
-    _get_or_create_listener: function(target, group, keypress) {
-        if (target in group) {
-            return group[target];
-        } else {
-            var newListener = new keypress.Listener(target);
+                //Work around for stupid Shift key bug created by using lowercase - as a result the shift+num combination was broken
+                var shift_nums = {
+                        "`":"~",
+                        "1":"!",
+                        "2":"@",
+                        "3":"#",
+                        "4":"$",
+                        "5":"%",
+                        "6":"^",
+                        "7":"&",
+                        "8":"*",
+                        "9":"(",
+                        "0":")",
+                        "-":"_",
+                        "=":"+",
+                        ";":":",
+                        "'":"\"",
+                        ",":"<",
+                        ".":">",
+                        "/":"?",
+                        "\\":"|"
+                }
+                //Special Keys - and their codes
+                var special_keys = {
+                        'esc':27,
+                        'escape':27,
+                        'tab':9,
+                        'space':32,
+                        'return':13,
+                        'enter':13,
+                        'backspace':8,
 
-            if (group === this._listeners.disabled_in_inputs) {
-                // Disable the created listener when focus goes on an input or textarea field
-                jQuery(document)
-                    .on('focus', 'input, textarea',
-                        function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea',
-                        function() { newListener.listen(); });
+                        'scrolllock':145,
+                        'scroll_lock':145,
+                        'scroll':145,
+                        'capslock':20,
+                        'caps_lock':20,
+                        'caps':20,
+                        'numlock':144,
+                        'num_lock':144,
+                        'num':144,
+
+                        'pause':19,
+                        'break':19,
+
+                        'insert':45,
+                        'home':36,
+                        'delete':46,
+                        'end':35,
+
+                        'pageup':33,
+                        'page_up':33,
+                        'pu':33,
+
+                        'pagedown':34,
+                        'page_down':34,
+                        'pd':34,
+
+                        'left':37,
+                        'up':38,
+                        'right':39,
+                        'down':40,
+
+                        'f1':112,
+                        'f2':113,
+                        'f3':114,
+                        'f4':115,
+                        'f5':116,
+                        'f6':117,
+                        'f7':118,
+                        'f8':119,
+                        'f9':120,
+                        'f10':121,
+                        'f11':122,
+                        'f12':123
+                }
+
+                var modifiers = {
+                        shift: { wanted:false, pressed:false},
+                        ctrl : { wanted:false, pressed:false},
+                        alt  : { wanted:false, pressed:false},
+                        meta : { wanted:false, pressed:false}   //Meta is Mac specific
+                };
+                if(e.ctrlKey)   modifiers.ctrl.pressed = true;
+                if(e.shiftKey)  modifiers.shift.pressed = true;
+                if(e.altKey)    modifiers.alt.pressed = true;
+                if(e.metaKey)   modifiers.meta.pressed = true;
+
+                for(var i=0; k=keys[i],i<keys.length; i++) {
+                    //Modifiers
+                    if(k == 'ctrl' || k == 'control') {
+                        kp++;
+                        modifiers.ctrl.wanted = true;
+
+                    } else if(k == 'shift') {
+                        kp++;
+                        modifiers.shift.wanted = true;
+
+                    } else if(k == 'alt') {
+                        kp++;
+                        modifiers.alt.wanted = true;
+                    } else if(k == 'meta') {
+                        kp++;
+                        modifiers.meta.wanted = true;
+                    } else if(k.length > 1) { //If it is a special key
+                        if(special_keys[k] == code) kp++;
+
+                    } else if(opt['keycode']) {
+                        if(opt['keycode'] == code) kp++;
+
+                    } else { //The special keys did not match
+                        if(character == k) kp++;
+                        else {
+                            if(shift_nums[character] && e.shiftKey) { //Stupid Shift key bug created by using lowercase
+                                character = shift_nums[character];
+                                if(character == k) kp++;
+                            }
+                        }
+                    }
+                }
+
+                if(kp == keys.length &&
+                        modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
+                        modifiers.shift.pressed == modifiers.shift.wanted &&
+                        modifiers.alt.pressed == modifiers.alt.wanted &&
+                        modifiers.meta.pressed == modifiers.meta.wanted) {
+                    callback(e);
+
+                    if(!opt['propagate']) { //Stop the event
+                        //e.cancelBubble is supported by IE - this will kill the bubbling process.
+                        e.cancelBubble = true;
+                        e.returnValue = false;
+
+                        // XWIKI : added to force Alt+key events not to be propagated to IE7
+                        if (document.all && !window.opera && window.XMLHttpRequest) {
+                            e.keyCode = 0;
+                        }
+
+                        //e.stopPropagation works in Firefox.
+                        if (e.stopPropagation) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }
+                        return false;
+                    }
+                }
             }
+            this.all_shortcuts[shortcut_combination] = {
+                    'callback':func,
+                    'target':ele,
+                    'event': opt['type']
+            };
+            //Attach the function with the event
+            if(ele.addEventListener) ele.addEventListener(opt['type'], func, false);
+            else if(ele.attachEvent) ele.attachEvent('on'+opt['type'], func);
+            else ele['on'+opt['type']] = func;
+        },
 
-            group[target] = newListener;
-            return newListener;
+        //Remove the shortcut - just specify the shortcut and I will remove the binding
+        'remove':function(shortcut_combination) {
+            shortcut_combination = shortcut_combination.toLowerCase();
+            var binding = this.all_shortcuts[shortcut_combination];
+            delete(this.all_shortcuts[shortcut_combination])
+            if(!binding) return;
+            var type = binding['event'];
+            var ele = binding['target'];
+            var callback = binding['callback'];
+
+            if(ele.detachEvent) ele.detachEvent('on'+type, callback);
+            else if(ele.removeEventListener) ele.removeEventListener(type, callback, false);
+            else ele['on'+type] = false;
         }
-    },
-
-    /**
-     * Format the given combination to match the format accepted by Keypress JS while allowing backward compatibility
-     * with the previous OpenJS shortcut syntax.
-     *
-     * @returns {string} the formatted combination
-     * @private
-     */
-    _format_shortcut_combination: function(combination) {
-        return combination.toLowerCase().replace(/\+/g, ' ');
-    }
-});
+}
 
 /**
  * Browser Detect

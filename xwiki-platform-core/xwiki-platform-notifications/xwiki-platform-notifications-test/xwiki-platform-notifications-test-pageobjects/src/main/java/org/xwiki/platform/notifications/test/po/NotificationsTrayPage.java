@@ -162,8 +162,7 @@ public class NotificationsTrayPage extends ViewPage
             throw new IndexOutOfBoundsException();
         }
 
-        return this.getNotifications().get(notificationNumber).findElement(By.cssSelector("p:nth-child(2) strong"))
-            .getText();
+        return this.getNotifications().get(notificationNumber).getAttribute("data-eventtype");
     }
 
     /**
@@ -179,7 +178,39 @@ public class NotificationsTrayPage extends ViewPage
         }
 
         return this.getNotifications().get(notificationNumber).findElement(
-                By.cssSelector("p:nth-child(2)")).getText();
+                By.cssSelector(".notification-content")).getText();
+    }
+
+    /**
+     * Get the page concerned by a notification (if any).
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification page
+     */
+    public String getNotificationPage(int notificationNumber)
+    {
+        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return this.getNotifications().get(notificationNumber).findElement(
+                By.cssSelector(".notification-page")).getText();
+    }
+
+    /**
+     * Get the description of a notification.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @return notification description
+     */
+    public String getNotificationDescription(int notificationNumber)
+    {
+        if (notificationNumber < 0 || notificationNumber >= this.getNotificationsCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return this.getNotifications().get(notificationNumber).findElement(
+                By.cssSelector(".notification-description")).getText();
     }
 
     /**

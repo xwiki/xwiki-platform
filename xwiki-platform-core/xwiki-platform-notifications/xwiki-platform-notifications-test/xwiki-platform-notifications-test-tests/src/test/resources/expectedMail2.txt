@@ -1,5 +1,4 @@
 Pages:
   [create] [Title 2](http://localhost:8080/xwiki/bin/view/NotificationsTest/Page2).
-  By user1.
-  2017/06/27 15:49
+  edited by user1.
   Changes: http://localhost:8080/xwiki/bin/view/NotificationsTest/Page2?viewer=changes&rev1=1.1&rev2=1.1

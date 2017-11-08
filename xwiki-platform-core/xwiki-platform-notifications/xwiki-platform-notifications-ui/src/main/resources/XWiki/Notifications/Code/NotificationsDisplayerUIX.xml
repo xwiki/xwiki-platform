@@ -313,6 +313,7 @@
     }
     // Create the container
     var notif = $('&lt;div&gt;').addClass('notification-event');
+    notif.attr('data-eventtype', entry.type);
     // Put the content
     notif.append(entry.html);
     // Create the "read" button
@@ -339,7 +340,7 @@
       readButton.html('$services.icon.renderHTML("check")');
       // On click
       readButton.click(function() {
-        var notif = $(this).parent();
+        var notif = $(this).parents('div.notification-event');
         notif.removeClass('notification-event-unread');
         $.post(url, {
           action: 'read',

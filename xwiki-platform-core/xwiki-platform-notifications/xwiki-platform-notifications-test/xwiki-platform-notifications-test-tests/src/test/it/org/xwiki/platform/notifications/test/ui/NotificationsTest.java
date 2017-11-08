@@ -299,7 +299,7 @@ public class NotificationsTest extends AbstractTest
         assertEquals(1, tray.getReadNotificationsCount());
 
         // Ensure that a notification has a correct type
-        assertEquals("[create]", tray.getNotificationType(0));
+        assertEquals("create", tray.getNotificationType(0));
 
         // Reset the notifications count of the user 2
         tray.clearAllNotifications();
@@ -432,10 +432,11 @@ public class NotificationsTest extends AbstractTest
         getUtil().gotoPage(getTestClassName(), "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
-        assertEquals("The document Linux as a title has been commented by user1.",
-                tray.getNotificationContent(0));
-        assertEquals("[update]", tray.getNotificationType(1));
-        assertEquals("[update] Linux as a title", tray.getNotificationContent(1));
+        assertEquals("Linux as a title", tray.getNotificationPage(0));
+        assertTrue(tray.getNotificationDescription(0).startsWith("commented by user1"));
+        assertEquals("Linux as a title", tray.getNotificationPage(1));
+        assertEquals("update", tray.getNotificationType(1));
+        assertTrue(tray.getNotificationDescription(1).startsWith("edited by user1"));
         tray.clearAllNotifications();
     }
 

@@ -23,10 +23,10 @@
   ###
   #define($content)
     #set ($document = $xwiki.getDocument($compositeEvent.document))
-    <div>
+    <div class="notification-page">
       <a href="$!escapetool.xml($document.getURL())">$!escapetool.xml($document.getRenderedTitle('html/5.0'))</a>
     </div>
-    <div class="notification-content-type">
+    <div class="notification-description">
       #if ($compositeEvent.users.size() == 1)
         $services.localization.render("notifications.events.${compositeEvent.type}.description.by.1user", ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
       #else

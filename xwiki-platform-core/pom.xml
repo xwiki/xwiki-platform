@@ -166,6 +166,36 @@
                     "methodName": "getDescriptorForEventType",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::generateEmailSubject(org.xwiki.notifications.CompositeEvent) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::generateEmailSubject(org.xwiki.notifications.CompositeEvent, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.notifiers.email",
+                    "classSimpleName": "NotificationEmailRenderer",
+                    "methodName": "generateEmailSubject",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderHTML(org.xwiki.notifications.CompositeEvent) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderHTML(org.xwiki.notifications.CompositeEvent, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.notifiers.email",
+                    "classSimpleName": "NotificationEmailRenderer",
+                    "methodName": "renderHTML",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderPlainText(org.xwiki.notifications.CompositeEvent) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderPlainText(org.xwiki.notifications.CompositeEvent, java.lang.String) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.notifiers.email",
+                    "classSimpleName": "NotificationEmailRenderer",
+                    "methodName": "renderPlainText",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

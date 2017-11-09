@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.email;
+package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +31,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.notifiers.email.NotificationEmailInterval;
-import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;

@@ -53,39 +53,39 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
     }
 
     @Override
-    public String renderHTML(CompositeEvent event) throws NotificationException
+    public String renderHTML(CompositeEvent event, String userId) throws NotificationException
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.renderHTML(event);
+            return renderer.renderHTML(event, userId);
         }
 
-        return renderHTML(executeTemplate(event, "notification/email/%s.html.vm",
+        return renderHTML(executeTemplate(event, userId, "notification/email/%s.html.vm",
                 Syntax.XHTML_1_0));
     }
 
 
     @Override
-    public String renderPlainText(CompositeEvent event) throws NotificationException
+    public String renderPlainText(CompositeEvent event, String userId) throws NotificationException
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.renderPlainText(event);
+            return renderer.renderPlainText(event, userId);
         }
 
-        return renderPlainText(executeTemplate(event, "notification/email/%s.plain.vm",
+        return renderPlainText(executeTemplate(event, userId, "notification/email/%s.plain.vm",
                 Syntax.PLAIN_1_0));
     }
 
     @Override
-    public String generateEmailSubject(CompositeEvent event) throws NotificationException
+    public String generateEmailSubject(CompositeEvent event, String userId) throws NotificationException
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.generateEmailSubject(event);
+            return renderer.generateEmailSubject(event, userId);
         }
 
-        return renderPlainText(executeTemplate(event, "notification/email/%s.subject.vm",
+        return renderPlainText(executeTemplate(event, userId, "notification/email/%s.subject.vm",
                 Syntax.PLAIN_1_0));
     }
 }

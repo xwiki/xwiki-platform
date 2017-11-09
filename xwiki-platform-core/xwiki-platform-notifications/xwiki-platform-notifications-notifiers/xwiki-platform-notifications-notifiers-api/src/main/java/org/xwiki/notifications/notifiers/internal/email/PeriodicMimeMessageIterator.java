@@ -19,42 +19,24 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.sources.NotificationManager;
 
 /**
  * Iterator used to generate emails for notifications. Generate MimeMessages.
  *
  * @version $Id$
- * @since 9.6RC1
+ * @since 9.10RC1
  */
-@Component(roles = PeriodicMimeMessageIterator.class)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class PeriodicMimeMessageIterator extends AbstractMimeMessageIterator
+@Role
+public interface PeriodicMimeMessageIterator extends Iterator<MimeMessage>, Iterable<MimeMessage>
 {
-
-    @Inject
-    private NotificationManager notificationManager;
-
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    private Date lastTrigger;
-
     /**
      * Initialize the iterator.
      *
@@ -63,17 +45,6 @@ public class PeriodicMimeMessageIterator extends AbstractMimeMessageIterator
      * @param lastTrigger time of the last email sent
      * @param templateReference reference to the mail template
      */
-    public void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
-            Date lastTrigger, DocumentReference templateReference)
-    {
-        this.lastTrigger = lastTrigger;
-        super.initialize(userIterator, factoryParameters, templateReference);
-    }
-
-    protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
-    {
-        return notificationManager.getEvents(serializer.serialize(user),
-                NotificationFormat.EMAIL, false, Integer.MAX_VALUE / 4, null,
-                lastTrigger, Collections.emptyList());
-    }
+    void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
+            Date lastTrigger, DocumentReference templateReference);
 }

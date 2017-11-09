@@ -36,22 +36,28 @@ public interface NotificationEmailRenderer
 {
     /**
      * @param compositeEvent the event to render
+     * @param userId id of the user who will receive the email
      * @return the HTML rendered version of the event
      * @throws NotificationException of error occurs
+     * @since 9.10RC1
      */
-    String renderHTML(CompositeEvent compositeEvent) throws NotificationException;
+    String renderHTML(CompositeEvent compositeEvent, String userId) throws NotificationException;
 
     /**
      * @param compositeEvent the event to render
+     * @param userId id of the user who will receive the email
      * @return the plain text rendered version of the event
      * @throws NotificationException of error occurs
+     * @since 9.10RC1
      */
-    String renderPlainText(CompositeEvent compositeEvent) throws NotificationException;
+    String renderPlainText(CompositeEvent compositeEvent, String userId) throws NotificationException;
 
     /**
      * @param compositeEvent the event to render
+     * @param userId id of the user who will receive the email
      * @return the plain text subject for the email
      * @throws NotificationException of error occurs
+     * @since 9.10RC1
      */
-    String generateEmailSubject(CompositeEvent compositeEvent) throws NotificationException;
+    String generateEmailSubject(CompositeEvent compositeEvent, String userId) throws NotificationException;
 }

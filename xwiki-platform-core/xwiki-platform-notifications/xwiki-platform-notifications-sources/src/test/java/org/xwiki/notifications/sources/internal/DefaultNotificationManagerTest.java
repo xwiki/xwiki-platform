@@ -106,12 +106,12 @@ public class DefaultNotificationManagerTest
     public void getEventsWith2Queries() throws Exception
     {
         // Mocks
-        Event event1 = mock(Event.class);
-        Event event2 = mock(Event.class);
-        Event event3 = mock(Event.class);
-        Event event4 = mock(Event.class);
-        Event event5 = mock(Event.class);
-        Event event6 = mock(Event.class);
+        Event event1 = createMockedEvent();
+        Event event2 = createMockedEvent();
+        Event event3 = createMockedEvent();
+        Event event4 = createMockedEvent();
+        Event event5 = createMockedEvent();
+        Event event6 = createMockedEvent();
 
         DocumentReference doc1 = new DocumentReference("xwiki", "Main", "WebHome");
         when(event1.getDocument()).thenReturn(doc1);
@@ -141,6 +141,13 @@ public class DefaultNotificationManagerTest
         assertEquals(2, results.size());
         assertEquals(event1, results.get(0).getEvents().get(0));
         assertEquals(event5, results.get(1).getEvents().get(0));
+    }
+
+    private Event createMockedEvent()
+    {
+        Event event = mock(Event.class);
+        when(event.getDate()).thenReturn(new Date(1L));
+        return event;
     }
 
     @Test
@@ -187,9 +194,9 @@ public class DefaultNotificationManagerTest
     public void getEventsCount() throws Exception
     {
         // Mocks
-        Event event1 = mock(Event.class);
-        Event event2 = mock(Event.class);
-        Event event3 = mock(Event.class);
+        Event event1 = createMockedEvent();
+        Event event2 = createMockedEvent();
+        Event event3 = createMockedEvent();
 
         when(eventStream.searchEvents(query)).thenReturn(
                 Arrays.asList(event1, event2, event1, event2, event2, event2, event1, event2, event2, event2),
@@ -217,8 +224,8 @@ public class DefaultNotificationManagerTest
         // Note: the 2 events have been combined
 
         // Mocks
-        Event eventAlice = mock(Event.class);
-        Event eventBob = mock(Event.class);
+        Event eventAlice = createMockedEvent();
+        Event eventBob = createMockedEvent();
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(eventAlice.getDocument()).thenReturn(doc);
@@ -256,8 +263,8 @@ public class DefaultNotificationManagerTest
         // implementation of the "comment" feature.
 
         // Mocks
-        Event eventComment = mock(Event.class);
-        Event eventUpdate = mock(Event.class);
+        Event eventComment = createMockedEvent();
+        Event eventUpdate = createMockedEvent();
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(eventComment.getDocument()).thenReturn(doc);
@@ -300,9 +307,9 @@ public class DefaultNotificationManagerTest
         // because we don't care of the event' user in our tests.
 
         // Mocks
-        Event event1 = mock(Event.class);
-        Event event2 = mock(Event.class);
-        Event event3 = mock(Event.class);
+        Event event1 = createMockedEvent();
+        Event event2 = createMockedEvent();
+        Event event3 = createMockedEvent();
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(event1.getDocument()).thenReturn(doc);
@@ -345,8 +352,8 @@ public class DefaultNotificationManagerTest
         // Comment: we don't show 2 events, only one is interesting
 
         // Mocks
-        Event event1 = mock(Event.class);
-        Event event2 = mock(Event.class);
+        Event event1 = createMockedEvent();
+        Event event2 = createMockedEvent();
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(event1.getDocument()).thenReturn(doc);
@@ -401,23 +408,23 @@ public class DefaultNotificationManagerTest
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(true);
 
         // * Bob updates the page "Bike" (E1)
-        Event event1 = mock(Event.class); when(event1.toString()).thenReturn("event1");
+        Event event1 = createMockedEvent(); when(event1.toString()).thenReturn("event1");
         when(event1.getDocument()).thenReturn(doc1);
         when(event1.getType()).thenReturn("update");
         when(event1.getGroupId()).thenReturn("g1");
 
         // * Alice updates the page "Bike" (E2)
-        Event event2 = mock(Event.class); when(event2.toString()).thenReturn("event2");
+        Event event2 = createMockedEvent(); when(event2.toString()).thenReturn("event2");
         when(event2.getDocument()).thenReturn(doc1);
         when(event2.getType()).thenReturn("update");
         when(event2.getGroupId()).thenReturn("g2");
 
         // * Bob comments the page "Bike" (E3 & E4)
-        Event event3 = mock(Event.class); when(event3.toString()).thenReturn("event3");
+        Event event3 = createMockedEvent(); when(event3.toString()).thenReturn("event3");
         when(event3.getDocument()).thenReturn(doc1);
         when(event3.getType()).thenReturn("addComment");
         when(event3.getGroupId()).thenReturn("g3");
-        Event event4 = mock(Event.class); when(event4.toString()).thenReturn("event4");
+        Event event4 = createMockedEvent(); when(event4.toString()).thenReturn("event4");
         when(event4.getDocument()).thenReturn(doc1);
         when(event4.getType()).thenReturn("update");
         when(event4.getGroupId()).thenReturn("g3");
@@ -425,51 +432,51 @@ public class DefaultNotificationManagerTest
         // * Carol comments the page "Bike" (E5 & E6)
         // (note: we put the "update" event before the "addComment", because we can not guarantee the order so
         // it's good to test both)
-        Event event5 = mock(Event.class); when(event5.toString()).thenReturn("event5");
+        Event event5 = createMockedEvent(); when(event5.toString()).thenReturn("event5");
         when(event5.getDocument()).thenReturn(doc1);
         when(event5.getType()).thenReturn("update");
         when(event5.getGroupId()).thenReturn("g5");
-        Event event6 = mock(Event.class); when(event6.toString()).thenReturn("event6");
+        Event event6 = createMockedEvent(); when(event6.toString()).thenReturn("event6");
         when(event6.getDocument()).thenReturn(doc1);
         when(event6.getType()).thenReturn("addComment");
         when(event6.getGroupId()).thenReturn("g5");
 
         // * Dave comments the page "Guitar" (E7 & E8)
-        Event event7 = mock(Event.class); when(event7.toString()).thenReturn("event7");
+        Event event7 = createMockedEvent(); when(event7.toString()).thenReturn("event7");
         when(event7.getDocument()).thenReturn(doc2);
         when(event7.getType()).thenReturn("update");
         when(event7.getGroupId()).thenReturn("g7");
-        Event event8 = mock(Event.class); when(event8.toString()).thenReturn("event8");
+        Event event8 = createMockedEvent(); when(event8.toString()).thenReturn("event8");
         when(event8.getDocument()).thenReturn(doc2);
         when(event8.getType()).thenReturn("addComment");
         when(event8.getGroupId()).thenReturn("g7");
 
         // * Bob adds an annotation on page "Bike" (E9 & E10)
-        Event event9 = mock(Event.class); when(event8.toString()).thenReturn("event9");
+        Event event9 = createMockedEvent(); when(event8.toString()).thenReturn("event9");
         when(event9.getDocument()).thenReturn(doc1);
         when(event9.getType()).thenReturn("update");
         when(event9.getGroupId()).thenReturn("g9");
-        Event event10 = mock(Event.class); when(event8.toString()).thenReturn("event10");
+        Event event10 = createMockedEvent(); when(event8.toString()).thenReturn("event10");
         when(event10.getDocument()).thenReturn(doc1);
         when(event10.getType()).thenReturn("addAnnotation");
         when(event10.getGroupId()).thenReturn("g9");
 
         // * Alice adds an annotation on page "Bike" (E11 & E12)
-        Event event11 = mock(Event.class); when(event8.toString()).thenReturn("event11");
+        Event event11 = createMockedEvent(); when(event8.toString()).thenReturn("event11");
         when(event11.getDocument()).thenReturn(doc1);
         when(event11.getType()).thenReturn("update");
         when(event11.getGroupId()).thenReturn("g11");
-        Event event12 = mock(Event.class); when(event8.toString()).thenReturn("event12");
+        Event event12 = createMockedEvent(); when(event8.toString()).thenReturn("event12");
         when(event12.getDocument()).thenReturn(doc1);
         when(event12.getType()).thenReturn("addAnnotation");
         when(event12.getGroupId()).thenReturn("g11");
 
         // * Alice adds an other annotation on page "Bike" (E12 & E13)
-        Event event13 = mock(Event.class); when(event8.toString()).thenReturn("event11");
+        Event event13 = createMockedEvent(); when(event8.toString()).thenReturn("event11");
         when(event13.getDocument()).thenReturn(doc1);
         when(event13.getType()).thenReturn("addAnnotation");
         when(event13.getGroupId()).thenReturn("g13");
-        Event event14 = mock(Event.class); when(event8.toString()).thenReturn("event12");
+        Event event14 = createMockedEvent(); when(event8.toString()).thenReturn("event12");
         when(event14.getDocument()).thenReturn(doc1);
         when(event14.getType()).thenReturn("update");
         when(event14.getGroupId()).thenReturn("g13");
@@ -518,9 +525,9 @@ public class DefaultNotificationManagerTest
         // * Bob has annotated the page "Bike"
 
         // Mocks
-        Event event1 = mock(Event.class); when(event1.toString()).thenReturn("event1");
-        Event event2 = mock(Event.class); when(event1.toString()).thenReturn("event2");
-        Event event3 = mock(Event.class); when(event1.toString()).thenReturn("event3");
+        Event event1 = createMockedEvent(); when(event1.toString()).thenReturn("event1");
+        Event event2 = createMockedEvent(); when(event1.toString()).thenReturn("event2");
+        Event event3 = createMockedEvent(); when(event1.toString()).thenReturn("event3");
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(event1.getDocument()).thenReturn(doc);
@@ -563,10 +570,10 @@ public class DefaultNotificationManagerTest
         // * Bob has updated the page "Bike"
 
         // Mocks
-        Event eventUpdate1          = mock(Event.class);
-        Event eventUpdate2          = mock(Event.class);
-        Event eventAddComment       = mock(Event.class);
-        Event eventAddCommentUpdate = mock(Event.class);
+        Event eventUpdate1          = createMockedEvent();
+        Event eventUpdate2          = createMockedEvent();
+        Event eventAddComment       = createMockedEvent();
+        Event eventAddCommentUpdate = createMockedEvent();
 
         DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
         when(eventUpdate1.getDocument()).thenReturn(doc); when(eventUpdate1.toString()).thenReturn("update1");

@@ -192,7 +192,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             XWikiDocument document =
                 xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
 
-            if (!document.isNew() && this.properties.isPreviousDeleted() && !this.documentDeleted) {
+            if (!this.documentDeleted && !document.isNew() && this.properties.isPreviousDeleted()) {
                 XWikiDocument originalDocument = document;
 
                 // Save current context wiki
@@ -220,6 +220,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 // Remember deleted document as the actual previous version of the document (to simulate an update
                 // instead of a creation)
                 document.setOriginalDocument(originalDocument);
+            } else {
+                // Make sure to remember that the document should not be deleted anymore
+                this.documentDeleted = true;
             }
 
             // Remember if it's a creation or an update

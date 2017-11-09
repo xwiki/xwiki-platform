@@ -765,7 +765,6 @@
         <module>xwiki-platform-distribution</module>
       </modules>
     </profile>
-
     <profile>
       <id>clover</id>
       <properties>
@@ -773,6 +772,38 @@
              messages such as "Updating existing database at '...'." during tests! -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
       </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- Add the Clover JAR to the Packager plugin runtime classpath since the Packager plugin uses java classes
+                 that have been instrumented with Clover (XWiki oldcore for example) -->
+            <plugin>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>com.atlassian.clover</groupId>
+                  <artifactId>clover</artifactId>
+                  <version>${clover.version}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+            <!-- Add the Clover JAR to the Extension plugin runtime classpath since the Extension plugin uses java
+                 classes that have been instrumented with Clover -->
+            <plugin>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>com.atlassian.clover</groupId>
+                  <artifactId>clover</artifactId>
+                  <version>${clover.version}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
   <distributionManagement>

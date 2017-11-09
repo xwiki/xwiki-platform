@@ -24,9 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
@@ -35,12 +37,12 @@ import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -363,7 +365,11 @@ public class NotificationsTest extends AbstractTest
         Multipart multipart1 = (Multipart) mimeBodyPart1.getContent();
         assertEquals(2, multipart1.getCount());
         assertEquals("text/plain; charset=UTF-8", multipart1.getBodyPart(0).getContentType());
-        assertEquals("text/html; charset=UTF-8", multipart1.getBodyPart(1).getContentType());
+        assertTrue(String.format("Content-type is [%s].", multipart1.getBodyPart(1).getContentType()),
+                multipart1.getBodyPart(1).getContentType().startsWith("multipart/related;"));
+        MimeMultipart mimeMultipart = (MimeMultipart) multipart1.getBodyPart(1).getContent();
+        BodyPart bodyPart2 = mimeMultipart.getBodyPart(0);
+        assertEquals("text/html; charset=UTF-8", bodyPart2.getContentType());
 
         // Events inside an email comes in random order, so we just verify that all the expected content is there
         String email = prepareMail(multipart1.getBodyPart(0).getContent().toString());

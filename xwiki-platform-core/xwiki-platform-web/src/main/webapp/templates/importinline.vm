@@ -50,7 +50,7 @@
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" /></div>
             <div class="package-upload">
                <label for="xwikiuploadfile" class="hidden">$services.localization.render('core.viewers.attachments.upload.file')</label>
-               <input id="xwikiuploadfile" type="file" name="filepath" class="uploadFileInput noitems"/>
+               <input id="xwikiuploadfile" type="file" name="filepath" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
                </span>

@@ -119,7 +119,8 @@ viewers.Attachments = Class.create({
       input.multiple = true;
       return new XWiki.FileUploader(input, {
         'responseContainer' : $('_attachments'),
-        'responseURL' : XWiki.currentDocument.getURL('get', 'xpage=attachmentslist&forceTestRights=1')
+        'responseURL' : XWiki.currentDocument.getURL('get', 'xpage=attachmentslist&forceTestRights=1'),
+        'maxFilesize' : parseInt(input.readAttribute('data-max-file-size'))
       });
     }
     return false;

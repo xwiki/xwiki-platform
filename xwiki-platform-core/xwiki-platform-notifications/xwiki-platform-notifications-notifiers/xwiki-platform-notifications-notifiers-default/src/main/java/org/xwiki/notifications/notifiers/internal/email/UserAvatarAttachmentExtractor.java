@@ -64,6 +64,12 @@ public class UserAvatarAttachmentExtractor
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
 
+    /**
+     * @param userReference reference of the user
+     * @param size the wanted size for the image
+     * @return a fake attachment holding a resized and square-cropped version of the avatar of the given user
+     * @throws Exception if an error happens
+     */
     public Attachment getUserAvatar(DocumentReference userReference, int size) throws Exception
     {
         InputStream imageStream = null;

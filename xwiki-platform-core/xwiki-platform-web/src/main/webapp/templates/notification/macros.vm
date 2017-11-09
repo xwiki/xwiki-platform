@@ -92,7 +92,7 @@
   #define($rows)
     #foreach($event in $events)
       ## Diff URL
-      #set ($diffUrl = $xwiki.getURL($event.document, 'view', "viewer=changes&toRev=${event.documentVersion}"))
+      #set ($diffUrl = $xwiki.getURL($event.document, 'view', "viewer=changes&rev2=${event.documentVersion}"))
       <tr>
         #set ($description = $services.localization.render("notifications.events.${event.type}.description"))
         #if ("$!description" == '')

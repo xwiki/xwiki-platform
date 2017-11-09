@@ -26,7 +26,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
@@ -52,11 +51,9 @@ import com.xpn.xwiki.internal.skin.InternalSkinManager;
 @Singleton
 public class LogoAttachmentExtractor
 {
-    /**
-     * Logging framework.
-     */
-    @Inject
-    private Logger logger;
+    private static final String LOGO = "logo";
+
+    private static final String SVG_EXTENSION = ".svg";
 
     /**
      * Used to get file resources.
@@ -78,6 +75,10 @@ public class LogoAttachmentExtractor
     @Inject
     private InternalSkinManager internalSkinManager;
 
+    /**
+     * @return an attachment holding the logo of the wiki
+     * @throws Exception if an error happens
+     */
     public Attachment getLogo() throws Exception
     {
         XWikiContext context = xwikiContextProvider.get();
@@ -87,13 +88,13 @@ public class LogoAttachmentExtractor
             DocumentReference colorThemeRef = documentReferenceResolver.resolve(colorTheme);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(colorThemeRef, context);
-            String logo = doc.getStringValue("logo");
+            String logo = doc.getStringValue(LOGO);
             if (StringUtils.isBlank(logo)) {
                 logo = doc.getStringValue("logoImage");
             }
-            if (StringUtils.isNotBlank(logo) && !logo.endsWith(".svg") && doc.getAttachment(logo) != null) {
+            if (isLogoAttachementValid(doc, logo)) {
                 XWikiAttachment attachment = doc.getAttachment(logo);
-                attachment.setFilename("logo");
+                attachment.setFilename(LOGO);
                 return new Attachment(new Document(doc, context), attachment, context);
             }
         }
@@ -103,10 +104,10 @@ public class LogoAttachmentExtractor
             DocumentReference skinRef = documentReferenceResolver.resolve(skin);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(skinRef, context);
-            String logo = doc.getStringValue("logo");
-            if (StringUtils.isNotBlank(logo) && !logo.endsWith(".svg") && doc.getAttachment(logo) != null) {
+            String logo = doc.getStringValue(LOGO);
+            if (isLogoAttachementValid(doc, logo)) {
                 XWikiAttachment attachment = doc.getAttachment(logo);
-                attachment.setFilename("logo");
+                attachment.setFilename(LOGO);
                 return new Attachment(new Document(doc, context), attachment, context);
             }
         }
@@ -116,8 +117,12 @@ public class LogoAttachmentExtractor
         InputStream inputStream = environment.getResourceAsStream(sourceImageIS.getPath());
         fakeAttachment.setAttachment_content(new XWikiAttachmentContent());
         fakeAttachment.getAttachment_content().setContent(inputStream);
-        fakeAttachment.setFilename("logo");
+        fakeAttachment.setFilename(LOGO);
         return new Attachment(null, fakeAttachment, context);
+    }
 
+    private boolean isLogoAttachementValid(XWikiDocument doc, String logo)
+    {
+        return StringUtils.isNotBlank(logo) && !logo.endsWith(SVG_EXTENSION) && doc.getAttachment(logo) != null;
     }
 }

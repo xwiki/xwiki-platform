@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.email;
+package org.xwiki.notifications.notifiers.internal.email;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -40,10 +40,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
-import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
-import org.xwiki.notifications.notifiers.internal.email.PeriodicMimeMessageIterator;
+import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -51,6 +49,8 @@ import static org.jgroups.util.Util.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -59,11 +59,11 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class PeriodicMimeMessageIteratorTest
+public class DefaultPeriodicMimeMessageIteratorTest
 {
     @Rule
-    public final MockitoComponentMockingRule<PeriodicMimeMessageIterator> mocker =
-            new MockitoComponentMockingRule<>(PeriodicMimeMessageIterator.class);
+    public final MockitoComponentMockingRule<DefaultPeriodicMimeMessageIterator> mocker =
+            new MockitoComponentMockingRule<>(DefaultPeriodicMimeMessageIterator.class);
 
     private NotificationManager notificationManager;
     private MimeMessageFactory<MimeMessage> factory;
@@ -125,10 +125,10 @@ public class PeriodicMimeMessageIteratorTest
         MimeMessage message = mock(MimeMessage.class);
         when(factory.createMessage(templateReference, factoryParameters)).thenReturn(message, message);
 
-        when(defaultNotificationEmailRenderer.renderHTML(event1)).thenReturn("eventHTML1");
-        when(defaultNotificationEmailRenderer.renderPlainText(event1)).thenReturn("event1");
-        when(defaultNotificationEmailRenderer.renderHTML(event2)).thenReturn("eventHTML2");
-        when(defaultNotificationEmailRenderer.renderPlainText(event2)).thenReturn("event2");
+        when(defaultNotificationEmailRenderer.renderHTML(eq(event1), anyString())).thenReturn("eventHTML1");
+        when(defaultNotificationEmailRenderer.renderPlainText(eq(event1), anyString())).thenReturn("event1");
+        when(defaultNotificationEmailRenderer.renderHTML(eq(event2), anyString())).thenReturn("eventHTML2");
+        when(defaultNotificationEmailRenderer.renderPlainText(eq(event2), anyString())).thenReturn("event2");
 
         // Test
         PeriodicMimeMessageIterator iterator = mocker.getComponentUnderTest();

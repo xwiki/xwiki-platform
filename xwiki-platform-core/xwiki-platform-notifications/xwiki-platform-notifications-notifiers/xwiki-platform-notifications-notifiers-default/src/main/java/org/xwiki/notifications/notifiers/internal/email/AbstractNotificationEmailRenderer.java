@@ -51,6 +51,8 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
 {
     protected static final String EVENT_BINDING_NAME = "event";
 
+    protected static final String USER_BINDING_NAME = "emailUser";
+
     @Inject
     // In 2017, it's safer to use XHTML 1.0 for emails because the emails clients have a very unequal HTML support
     @Named("xhtml/1.0")
@@ -76,12 +78,13 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
      * Execute a template.
      *
      * @param event composite event to render
+     * @param userId id of the user who will receive the email
      * @param templatePath path of the template to use (with a %s that the method will replace by the event type)
      * @param syntax syntax of the template and of the output
      * @return the rendered template
      * @throws NotificationException if something wrong happens
      */
-    protected Block executeTemplate(CompositeEvent event, String templatePath, Syntax syntax)
+    protected Block executeTemplate(CompositeEvent event, String userId, String templatePath, Syntax syntax)
             throws NotificationException
     {
         XWikiContext context = contextProvider.get();
@@ -89,6 +92,7 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
         try {
             // Bind the event to some variable in the velocity context
             velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, event);
+            velocityManager.getCurrentVelocityContext().put(USER_BINDING_NAME, userId);
             // Use the external URL factory to generate full URLs
             context.setURLFactory(new ExternalServletURLFactory(context));
             // Set the given syntax in the rendering context
@@ -114,6 +118,7 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
             context.setURLFactory(originalURLFactory);
             // Cleaning the velocity context
             velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
+            velocityManager.getCurrentVelocityContext().remove(USER_BINDING_NAME);
         }
     }
 

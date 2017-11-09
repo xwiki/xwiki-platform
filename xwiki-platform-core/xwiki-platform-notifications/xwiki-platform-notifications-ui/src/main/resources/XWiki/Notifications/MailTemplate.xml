@@ -98,16 +98,35 @@
       </text>
     </class>
     <property>
-      <html>&lt;h1&gt;$escapetool.xml($services.localization.render('notifications.email.title'))&lt;/h1&gt;
+      <html>## Main Div
+&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color:#F5F5F5; padding:15px; margin:0 auto; color: #1d1f24; "&gt;
+  ## Main centered table
+  &lt;table style="max-width: 570px; margin:0 auto" cellspacing="0" cellpadding="0" width="100%" align="center"&gt;&lt;tr&gt;&lt;td&gt;
+    ## Logo table
+    &lt;table width="100%" border="0"&gt;&lt;tr height="55px"&gt;
+      ## Logo
+      &lt;td align="left"&gt;&lt;a href="$xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)"&gt;&lt;img src="cid:logo" alt="XWiki" /&gt;&lt;/a&gt;&lt;/td&gt;
+      ## Notification settings
+      &lt;td align="right"&gt;&lt;a href="$xwiki.getURL($emailUser, 'view', 'category=notifications')" style="color: #0088CC; text-decoration: none;"&gt;$escapetool.xml($services.localization.render('notifications.settings.title'))&lt;/a&gt;&lt;/td&gt;
+    ## End of the logo table
+    &lt;/tr&gt;&lt;/table&gt;
 
-#foreach ($event in $htmlEvents)
-  #if ($velocityCount &gt; 1)
-    &lt;hr /&gt;
-  #end
-  &lt;div class="notification"&gt;
-    $event
-  &lt;/div&gt;
-#end</html>
+    ## Events div
+    &lt;div style="background:white;padding:1em; border-left: 1px solid #eaeaea;border-right: 1px solid #eaeaea;border-bottom: 1px solid #ddd;border-top: 1px solid #f0f0f0;"&gt;
+      &lt;h1 style="font-size:30px;font-style:normal;font-weight:500;line-height:42px;letter-spacing:normal; margin-top: 0;font-size:21px;"&gt;$escapetool.xml($services.localization.render('notifications.email.title'))&lt;/h1&gt;
+      ## Display Events
+      #foreach ($event in $htmlEvents)
+        &lt;div class="notification" style="border-top: 1px dashed #E8E8E8;"&gt;
+          $event
+        &lt;/div&gt;
+      #end
+    ## End of the events div
+    &lt;/div&gt;
+  ## End of the main table
+  &lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+## End of the main div
+&lt;/div&gt;
+</html>
     </property>
     <property>
       <language>en</language>

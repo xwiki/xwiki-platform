@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.email.live;
+package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -33,8 +33,6 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
-import org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailListener;
-import org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.Mockito.mock;

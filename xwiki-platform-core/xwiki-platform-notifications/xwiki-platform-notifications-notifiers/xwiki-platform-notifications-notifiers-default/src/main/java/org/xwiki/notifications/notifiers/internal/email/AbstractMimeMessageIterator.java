@@ -40,6 +40,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
@@ -75,6 +76,9 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     @Inject
     protected Logger logger;
+
+    @Inject
+    protected EntityReferenceSerializer<String> serializer;
 
     @Inject
     @Named("template")
@@ -177,12 +181,13 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private void handleEvents() throws NotificationException
     {
+        String usedId = serializer.serialize(this.currentUser);
         // Render all the events both in HTML and Plain Text
         List<String> htmlEvents = new ArrayList<>();
         List<String> plainTextEvents = new ArrayList<>();
         for (CompositeEvent event : currentEvents) {
-            htmlEvents.add(defaultNotificationEmailRenderer.renderHTML(event));
-            plainTextEvents.add(defaultNotificationEmailRenderer.renderPlainText(event));
+            htmlEvents.add(defaultNotificationEmailRenderer.renderHTML(event, usedId));
+            plainTextEvents.add(defaultNotificationEmailRenderer.renderPlainText(event, usedId));
         }
 
         // Put in the velocity parameters all the events and their rendered version

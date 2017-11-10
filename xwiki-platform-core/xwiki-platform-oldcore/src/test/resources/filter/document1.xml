@@ -246,6 +246,10 @@
                     <string>revision</string>
                     <string>15.1</string>
                   </entry>
+                  <entry>
+                    <string>mimetype</string>
+                    <string>text/plain</string>
+                  </entry>
                 </parameters>
               </p>
             </wikiAttachment>

@@ -30,6 +30,7 @@
   <attachment>
     <filename>attachment.txt</filename>
     <versions>jrcsrevisions</versions>
+    <mimetype>text/plain</mimetype>
     <author>XWiki.author</author>
     <date>947030400000</date>
     <version>1.1</version>
@@ -227,6 +228,10 @@
               <entry>
                 <string>xwiki_jrcsrevisions</string>
                 <string>jrcsrevisions</string>
+              </entry>
+              <entry>
+                <string>mimetype</string>
+                <string>text/plain</string>
               </entry>
               <entry>
                 <string>revision_author</string>

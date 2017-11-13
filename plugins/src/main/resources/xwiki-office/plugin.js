@@ -54,9 +54,33 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
 
     init : function(editor) {
       var officeImporterURL = (editor.config['xwiki-office'] || {}).importer;
-      if (!officeImporterURL) {
-        return;
+      if (officeImporterURL) {
+        this.enableOfficeImporter(editor, officeImporterURL);
       }
+
+      if (editor.config.applyPasteFilterAfterPasteFromWord) {
+        this.applyPasteFilterAfterPasteFromWord(editor);
+      }
+    },
+
+    // The paste filter is not applied by default for content pasted from Word.
+    // https://dev.ckeditor.com/ticket/13093
+    // https://stackoverflow.com/questions/45501341/ckeditor-pastefromword-ignores-pastefilter
+    applyPasteFilterAfterPasteFromWord: function(editor) {
+      editor.on('afterPasteFromWord', function(event) {
+        var filter = editor.pasteFilter;
+        if (!filter) {
+          return;
+        }
+        var fragment = CKEDITOR.htmlParser.fragment.fromHtml(event.data.dataValue),
+          writer = new CKEDITOR.htmlParser.basicWriter();
+        filter.applyTo(fragment);
+        fragment.writeHtml(writer);
+        event.data.dataValue = writer.getHtml();
+      });
+    },
+
+    enableOfficeImporter: function(editor, officeImporterURL) {
       var thisPlugin = this;
 
       editor.ui.addButton('officeImporter', {

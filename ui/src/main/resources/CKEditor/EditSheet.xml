@@ -268,7 +268,8 @@ define('xwiki-ckeditor', [
           // Formatting
           span: true, strong: true, em: true, ins: true, del: true, sub: true, sup: true, tt: true, pre: true,
           // Others
-          div: true, hr: true, p: true, a: true, img: true, blockquote: true},
+          div: true, hr: true, p: true, a: true, img: true, blockquote: true
+        },
         // The elements above can have any attribute, through the parameter (%%) syntax.
         attributes: '*',
         styles: '*',

@@ -19,6 +19,9 @@
  */
 CKEDITOR.editorConfig = function(config) {
   CKEDITOR.tools.extend(config, {
+    // It's not the case by default.
+    // https://dev.ckeditor.com/ticket/13093
+    applyPasteFilterAfterPasteFromWord: true,
     // Modify the strike and underline core styles to match what the XWiki Rendering is generating and expecting.
     // See CKEDITOR-52: Unable to un-strike or un-underline saved content
     coreStyles_strike: {
@@ -44,6 +47,49 @@ CKEDITOR.editorConfig = function(config) {
     // Simplify the link dialog.
     linkShowAdvancedTab: false,
     linkShowTargetTab: false,
+    pasteFilter: {
+      a: {
+        propertiesOnly: true,
+        attributes: {
+          href: true
+        }
+      },
+      img: {
+        propertiesOnly: true,
+        attributes: {
+          alt: true,
+          height: true,
+          src: true,
+          width: true
+        }
+      },
+      'th td': {
+        propertiesOnly: true,
+        attributes: {
+          colspan: true,
+          rowspan: true
+        }
+      },
+      $1: {
+        // Allow all elements except DIV and SPAN which are generally used for styling.
+        match: function(element) {
+          var name = element.name.toLowerCase();
+          return name !== 'div' && name !== 'span';
+        }
+      },
+      $2: {
+        // Replace lone paragraphs with their children in order to simplify the wiki syntax.
+        match: function(element) {
+          var targetParentNames = ['li', 'td', 'th', 'dd', 'blockquote'];
+          if (element.name.toLowerCase() === 'p' && element.parent && element.parent.name &&
+              targetParentNames.indexOf(element.parent.name.toLowerCase()) >= 0 &&
+              element.parent.children.length === 1) {
+            element.replaceWithChildren();
+            return true;
+          }
+        }
+      }
+    },
     // Disable the features that are not well integrated or that are focused more on the presentation than the content.
     removeButtons: 'Find,Anchor',
     removePlugins: 'bidi,colorbutton,font,justify,save,specialchar',

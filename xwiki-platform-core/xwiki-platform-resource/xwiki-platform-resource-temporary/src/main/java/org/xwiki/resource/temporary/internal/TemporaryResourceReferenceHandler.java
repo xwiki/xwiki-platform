@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.annotations.Authenticate;
 import org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
@@ -47,6 +48,7 @@ import org.xwiki.security.authorization.Right;
 @Component
 @Named("tmp")
 @Singleton
+@Authenticate
 public class TemporaryResourceReferenceHandler
     extends AbstractServletResourceReferenceHandler<TemporaryResourceReference>
 {

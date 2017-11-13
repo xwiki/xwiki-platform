@@ -17,29 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.resource.internal;
+package org.xwiki.resource.annotations;
 
-import java.util.Collections;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import org.junit.Test;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceHandler;
+import org.xwiki.stability.Unstable;
 
-import static org.mockito.Mockito.mock;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Unit tests for {@link DefaultResourceReferenceHandlerChain}.
+ * Indicate that a {@link org.xwiki.resource.ResourceReferenceHandler} should be executed in an authenticated context.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 9.11RC1
  */
-public class DefaultResourceReferenceHandlerChainTest
+@Documented
+@Retention(RUNTIME)
+@Target(TYPE)
+@Inherited
+@Unstable
+public @interface Authenticate
 {
-    @Test
-    public void executeNextWhenNoMoreAction() throws Exception
-    {
-        DefaultResourceReferenceHandlerChain chain = DefaultResourceReferenceHandlerChain.EMPTY;
 
-        chain.handleNext(mock(ResourceReference.class));
-    }
 }

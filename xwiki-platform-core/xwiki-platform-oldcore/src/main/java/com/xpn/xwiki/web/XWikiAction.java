@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,8 +30,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -418,7 +417,7 @@ public abstract class XWikiAction extends Action
                     Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 try {
                     entityResourceReferenceHandler.handle(resourceReference,
-                        new DefaultResourceReferenceHandlerChain(Collections.<ResourceReferenceHandler>emptyList()));
+                        DefaultResourceReferenceHandlerChain.EMPTY);
                     // Don't let the old actions kick in!
                     return null;
                 } catch (NotFoundResourceHandlerException e) {

@@ -17,29 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.resource.internal;
+package org.xwiki.resource.events;
 
-import java.util.Collections;
-
-import org.junit.Test;
+import org.xwiki.observation.event.Event;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceHandler;
-
-import static org.mockito.Mockito.mock;
+import org.xwiki.stability.Unstable;
 
 /**
- * Unit tests for {@link DefaultResourceReferenceHandlerChain}.
- *
+ * Common interface for all event related to {@link org.xwiki.resource.ResourceReferenceHandler}.
+ * 
  * @version $Id$
- * @since 6.1M2
+ * @since 9.11RC1
  */
-public class DefaultResourceReferenceHandlerChainTest
+@Unstable
+public interface ResourceReferenceHandlerEvent extends Event
 {
-    @Test
-    public void executeNextWhenNoMoreAction() throws Exception
-    {
-        DefaultResourceReferenceHandlerChain chain = DefaultResourceReferenceHandlerChain.EMPTY;
-
-        chain.handleNext(mock(ResourceReference.class));
-    }
+    /**
+     * @return the reference
+     */
+    ResourceReference getResourceReference();
 }

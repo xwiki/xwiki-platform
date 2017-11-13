@@ -5,10 +5,13 @@ com.xpn.xwiki.internal.XWikiInitializerJob
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.internal.DefaultMandatoryDocumentInitializerManager
+com.xpn.xwiki.internal.DefaultXWikiContextInitializer
 com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
 com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider
+com.xpn.xwiki.internal.WikiInitializerJob
 com.xpn.xwiki.internal.XWikiCfgConfigurationSource
 com.xpn.xwiki.internal.XWikiContextProvider
+com.xpn.xwiki.internal.XWikiInitializerJob
 com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
@@ -64,6 +67,7 @@ com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
 com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
+com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
 com.xpn.xwiki.internal.skin.DefaultSkinManager
 com.xpn.xwiki.internal.skin.InternalSkinConfiguration

@@ -40,6 +40,7 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.resource.annotations.Authenticate;
 import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.VfsResourceReference;
 
@@ -56,6 +57,7 @@ import net.java.truevfs.access.TPath;
 @Component
 @Named("vfs")
 @Singleton
+@Authenticate
 public class VfsResourceReferenceHandler extends AbstractContentResourceReferenceHandler
 {
     @Inject

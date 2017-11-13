@@ -20,14 +20,17 @@
 package org.xwiki.vfs.internal;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.VfsResourceReference;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Generic Permission checked used when there's no scheme-specific Permission Checker and that verifies that the current
@@ -41,17 +44,22 @@ import org.xwiki.vfs.VfsResourceReference;
 public class DefaultVfsPermissionChecker implements VfsPermissionChecker
 {
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public void checkPermission(VfsResourceReference resourceReference) throws VfsException
     {
+        XWikiContext xcontext = xcontextProvider.get();
+
         // By default we only allow VFS access when the current user has Programming Rights, for security reason.
         // Without this a wiki user could access the local filesystem for example by using the File URI scheme.
-        if (!this.authorizationManager.hasAccess(Right.PROGRAM)) {
-            throw new VfsException(String.format(
-                "Current logged-in user needs to have Programming Rights to use the [%s] VFS",
-                resourceReference.getURI().getScheme()));
+        if (!this.authorizationManager.hasAccess(Right.PROGRAM, xcontext.getUserReference(), null)) {
+            throw new VfsException(
+                String.format("Current logged-in user ([%s]) needs to have Programming Rights to use the [%s] VFS",
+                    xcontext.getUserReference(), resourceReference.getURI().getScheme()));
         }
     }
 }

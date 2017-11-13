@@ -24,8 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.vfs.VfsException;
@@ -60,11 +60,11 @@ public class AttachVfsPermissionChecker implements VfsPermissionChecker
         // Use a default resolver (and not a current one) since we don't have any context, we're in a new
         // request.
 
-        DocumentReference documentReference = this.defaultAttachmentReferenceresolver.resolve(
-            resourceReference.getURI().getSchemeSpecificPart()).getDocumentReference();
+        AttachmentReference attachmentReference =
+            this.defaultAttachmentReferenceresolver.resolve(resourceReference.getURI().getSchemeSpecificPart());
 
-        if (!this.authorizationManager.hasAccess(Right.VIEW, documentReference)) {
-            throw new VfsException(String.format("No View permission for document [%s]", documentReference));
+        if (!this.authorizationManager.hasAccess(Right.VIEW, attachmentReference)) {
+            throw new VfsException(String.format("No View permission for attachment [%s]", attachmentReference));
         }
     }
 }

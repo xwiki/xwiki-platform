@@ -21,21 +21,29 @@ package org.xwiki.vfs.internal;
 
 import java.net.URI;
 
+import javax.inject.Provider;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsResourceReference;
 import org.xwiki.vfs.internal.attach.AttachVfsPermissionChecker;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import com.xpn.xwiki.XWikiContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link CascadingVfsPermissionChecker}.
@@ -43,15 +51,23 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 7.4M2
  */
-@ComponentList({
-    DefaultVfsPermissionChecker.class,
-    AttachVfsPermissionChecker.class
-})
+@ComponentList({ DefaultVfsPermissionChecker.class, AttachVfsPermissionChecker.class })
 public class CascadingVfsPermissionCheckerTest
 {
     @Rule
     public MockitoComponentMockingRule<CascadingVfsPermissionChecker> mocker =
         new MockitoComponentMockingRule<>(CascadingVfsPermissionChecker.class);
+
+    private DocumentReference contextUser = new DocumentReference("wiki", "space", "page");
+
+    @BeforeComponent
+    public void beforeComponent() throws Exception
+    {
+        Provider<XWikiContext> provider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(provider.get()).thenReturn(xcontext);
+        when(xcontext.getUserReference()).thenReturn(contextUser);
+    }
 
     @Test
     public void checkPermissionWhenReservedScheme() throws Exception
@@ -74,11 +90,12 @@ public class CascadingVfsPermissionCheckerTest
         AttachmentReferenceResolver<String> resolver =
             this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING);
         DocumentReference attachmentDocumentReference = new DocumentReference("wiki", "space", "page");
-        when(resolver.resolve("whatever")).thenReturn(new AttachmentReference("file", attachmentDocumentReference));
+        AttachmentReference attachmentReference = new AttachmentReference("file", attachmentDocumentReference);
+        when(resolver.resolve("whatever")).thenReturn(attachmentReference);
 
         ContextualAuthorizationManager authorizationManager =
             this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
-        when(authorizationManager.hasAccess(Right.VIEW, attachmentDocumentReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.VIEW, attachmentReference)).thenReturn(true);
 
         this.mocker.getComponentUnderTest().checkPermission(reference);
     }
@@ -88,9 +105,8 @@ public class CascadingVfsPermissionCheckerTest
     {
         VfsResourceReference reference = new VfsResourceReference(URI.create("customscheme:whatever"), "whatever");
 
-        ContextualAuthorizationManager authorizationManager =
-            this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
-        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        AuthorizationManager authorizationManager = this.mocker.registerMockComponent(AuthorizationManager.class);
+        when(authorizationManager.hasAccess(Right.PROGRAM, this.contextUser, null)).thenReturn(true);
 
         this.mocker.getComponentUnderTest().checkPermission(reference);
     }
@@ -100,16 +116,15 @@ public class CascadingVfsPermissionCheckerTest
     {
         VfsResourceReference reference = new VfsResourceReference(URI.create("customscheme:whatever"), "whatever");
 
-        ContextualAuthorizationManager authorizationManager =
-            this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
-        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
+        AuthorizationManager authorizationManager = this.mocker.registerMockComponent(AuthorizationManager.class);
+        when(authorizationManager.hasAccess(Right.PROGRAM, this.contextUser, null)).thenReturn(false);
 
         try {
             this.mocker.getComponentUnderTest().checkPermission(reference);
             fail("Should have raised exception");
         } catch (VfsException expected) {
-            assertEquals("Current logged-in user needs to have Programming Rights to use the [customscheme] VFS",
-                expected.getMessage());
+            assertEquals("Current logged-in user ([" + this.contextUser
+                + "]) needs to have Programming Rights to use the [customscheme] VFS", expected.getMessage());
         }
     }
 }

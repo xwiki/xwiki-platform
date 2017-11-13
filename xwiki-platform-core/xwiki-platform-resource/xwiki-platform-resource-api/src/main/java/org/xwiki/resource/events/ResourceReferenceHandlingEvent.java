@@ -17,29 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.resource.internal;
+package org.xwiki.resource.events;
 
-import java.util.Collections;
-
-import org.junit.Test;
+import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceHandler;
-
-import static org.mockito.Mockito.mock;
+import org.xwiki.stability.Unstable;
 
 /**
- * Unit tests for {@link DefaultResourceReferenceHandlerChain}.
- *
+ * Event sent before starting the execution of a {@link org.xwiki.resource.ResourceReferenceHandler}.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the instance of the executed {@link org.xwiki.resource.ResourceReferenceHandler}</li>
+ * <li>data: null</li>
+ * </ul>
+ * 
  * @version $Id$
- * @since 6.1M2
+ * @since 9.11RC1
  */
-public class DefaultResourceReferenceHandlerChainTest
+@Unstable
+public class ResourceReferenceHandlingEvent extends AbstractResourceReferenceHandlerEvent implements BeginEvent
 {
-    @Test
-    public void executeNextWhenNoMoreAction() throws Exception
+    /**
+     * Match any {@link ActionExecutingEvent}.
+     */
+    public ResourceReferenceHandlingEvent()
     {
-        DefaultResourceReferenceHandlerChain chain = DefaultResourceReferenceHandlerChain.EMPTY;
 
-        chain.handleNext(mock(ResourceReference.class));
+    }
+
+    /**
+     * Constructor initializing the reference of the event.
+     * 
+     * @param reference the reference handled
+     */
+    public ResourceReferenceHandlingEvent(ResourceReference reference)
+    {
+        super(reference);
     }
 }

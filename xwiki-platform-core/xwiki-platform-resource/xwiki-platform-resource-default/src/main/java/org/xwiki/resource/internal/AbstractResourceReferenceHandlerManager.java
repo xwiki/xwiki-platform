@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.resource.NotFoundResourceHandlerException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
@@ -56,6 +57,9 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
     private ComponentManager contextComponentManager;
 
     @Inject
+    private ObservationManager observation;
+
+    @Inject
     private Logger logger;
 
     protected abstract boolean matches(ResourceReferenceHandler handler, T resourceReferenceQualifier);
@@ -71,7 +75,8 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
 
         if (!orderedHandlers.isEmpty()) {
             // Create the Handler chain
-            ResourceReferenceHandlerChain chain = new DefaultResourceReferenceHandlerChain(orderedHandlers);
+            ResourceReferenceHandlerChain chain =
+                new DefaultResourceReferenceHandlerChain(orderedHandlers, this.observation);
 
             // Call the first Handler
             chain.handleNext(reference);
@@ -113,8 +118,8 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
     private List<ResourceReferenceHandler> getHandlers(Class typeClass) throws ResourceReferenceHandlerException
     {
         try {
-            return this.contextComponentManager.getInstanceList(
-                new DefaultParameterizedType(null, ResourceReferenceHandler.class, typeClass));
+            return this.contextComponentManager
+                .getInstanceList(new DefaultParameterizedType(null, ResourceReferenceHandler.class, typeClass));
         } catch (ComponentLookupException e) {
             throw new ResourceReferenceHandlerException("Failed to locate Resource Reference Handler components", e);
         }

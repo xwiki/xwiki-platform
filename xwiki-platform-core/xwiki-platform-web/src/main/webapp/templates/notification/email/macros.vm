@@ -154,7 +154,7 @@
   ### Get the 2 document versions
   ###
   #set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
-  #if ($event.events.size == 1)
+  #if ($event.events.size() == 1)
     #set ($origdoc = $newdoc.previousDocument)
   #else
     #set ($lastIndex = $event.events.size() - 1)

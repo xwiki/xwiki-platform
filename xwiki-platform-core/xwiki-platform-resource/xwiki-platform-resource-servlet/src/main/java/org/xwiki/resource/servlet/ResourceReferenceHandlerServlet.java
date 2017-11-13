@@ -71,8 +71,8 @@ public class ResourceReferenceHandlerServlet extends HttpServlet
     }
 
     @Override
-    protected void service(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException,
-        IOException
+    protected void service(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
+        throws ServletException, IOException
     {
         try {
             // Before handling the Resource Reference we need to setup the Request/Response so that it's available to

@@ -17,29 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.resource.internal;
+package com.xpn.xwiki;
 
-import java.util.Collections;
-
-import org.junit.Test;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceHandler;
-
-import static org.mockito.Mockito.mock;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.stability.Unstable;
 
 /**
- * Unit tests for {@link DefaultResourceReferenceHandlerChain}.
- *
+ * Initialize a {@link XWikiContext} with various properties.
+ * 
  * @version $Id$
- * @since 6.1M2
+ * @since 9.11RC1
  */
-public class DefaultResourceReferenceHandlerChainTest
+@Role
+@Unstable
+public interface XWikiContextInitializer
 {
-    @Test
-    public void executeNextWhenNoMoreAction() throws Exception
-    {
-        DefaultResourceReferenceHandlerChain chain = DefaultResourceReferenceHandlerChain.EMPTY;
+    /**
+     * Indicate that the current user should be authenticated.
+     * 
+     * @return this
+     */
+    XWikiContextInitializer authenticate();
 
-        chain.handleNext(mock(ResourceReference.class));
-    }
+    /**
+     * Fallback on a stub XWikiContext if there is any issue.
+     * 
+     * @return this
+     */
+    XWikiContextInitializer fallbackOnStub();
+    
+    /**
+     * @param econtext the {@link ExecutionContext} to inject the {@link XWikiContext} in, or null
+     * @return an initialized {@link XWikiContext}
+     * @throws XWikiException when failing to initialize the XWiki context
+     */
+    XWikiContext initialize(ExecutionContext econtext) throws XWikiException;
 }

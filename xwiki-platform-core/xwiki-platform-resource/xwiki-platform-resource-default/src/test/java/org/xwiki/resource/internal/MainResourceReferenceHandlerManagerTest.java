@@ -59,7 +59,7 @@ public class MainResourceReferenceHandlerManagerTest
         ResourceReferenceHandler beforeTestHandler = mock(ResourceReferenceHandler.class, "handler2");
         when(beforeTestHandler.getSupportedResourceReferences()).thenReturn(Arrays.asList(new ResourceType("test")));
         // We return 1 to mean that the second Handler has a higher priority than the first Handler
-        when(beforeTestHandler.compareTo(testHandler)).thenReturn(1);
+        when(beforeTestHandler.compareTo(testHandler)).thenReturn(-1);
 
         ComponentManager contextComponentManager = this.componentManager.getInstance(ComponentManager.class, "context");
         when(contextComponentManager.<ResourceReferenceHandler>getInstanceList(

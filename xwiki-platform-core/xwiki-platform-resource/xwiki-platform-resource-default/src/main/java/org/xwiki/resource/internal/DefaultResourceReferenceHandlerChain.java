@@ -20,15 +20,17 @@
 package org.xwiki.resource.internal;
 
 import java.util.Collection;
-import java.util.Stack;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
+import org.xwiki.resource.events.ResourceReferenceHandledEvent;
+import org.xwiki.resource.events.ResourceReferenceHandlingEvent;
 
 /**
  * Default chain implementation using a Stack.
@@ -36,29 +38,52 @@ import org.xwiki.resource.ResourceReferenceHandlerException;
  * @version $Id$
  * @since 6.1M2
  */
-@Component
-@Singleton
 public class DefaultResourceReferenceHandlerChain implements ResourceReferenceHandlerChain
 {
     /**
+     * Empty chain.
+     */
+    public static final DefaultResourceReferenceHandlerChain EMPTY =
+        new DefaultResourceReferenceHandlerChain(Collections.emptyList(), null);
+
+    /**
      * Contains all remaining Handlers to execute with Handlers on top executing first.
      */
-    private Stack<ResourceReferenceHandler> handlerStack;
+    private final Queue<ResourceReferenceHandler> handlerStack;
+
+    private final ObservationManager observation;
 
     /**
      * @param orderedHandlers the sorted list of Handlers to execute
+     * @param observation used to send event around executed handlers
      */
-    public DefaultResourceReferenceHandlerChain(Collection<ResourceReferenceHandler> orderedHandlers)
+    public DefaultResourceReferenceHandlerChain(Collection<ResourceReferenceHandler> orderedHandlers,
+        ObservationManager observation)
     {
-        this.handlerStack = new Stack<>();
-        this.handlerStack.addAll(orderedHandlers);
+        this.handlerStack = new LinkedList<>(orderedHandlers);
+        this.observation = observation;
     }
 
     @Override
     public void handleNext(ResourceReference reference) throws ResourceReferenceHandlerException
     {
         if (!this.handlerStack.isEmpty()) {
-            this.handlerStack.pop().handle(reference, this);
+            ResourceReferenceHandler<?> handler = this.handlerStack.poll();
+
+            if (this.observation != null) {
+                this.observation.notify(new ResourceReferenceHandlingEvent(reference), handler);
+            }
+
+            Exception exception = null;
+            try {
+                handler.handle(reference, this);
+            } catch (ResourceReferenceHandlerException e) {
+                exception = e;
+            } finally {
+                if (this.observation != null) {
+                    this.observation.notify(new ResourceReferenceHandledEvent(reference), handler, exception);
+                }
+            }
         }
     }
 }

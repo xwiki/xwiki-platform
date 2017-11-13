@@ -28,8 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.resource.AbstractResourceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.entity.EntityResourceAction;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -38,7 +40,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 7.4M2
  */
-public class VfsResourceReference extends AbstractResourceReference
+public class VfsResourceReference extends EntityResourceReference
 {
     /**
      * Represents a VFS Resource Type.
@@ -58,6 +60,9 @@ public class VfsResourceReference extends AbstractResourceReference
      */
     public VfsResourceReference(URI uri, List<String> pathSegments)
     {
+        // FIXME: we don't know the wiki of the resource yet, putting main one
+        super(new WikiReference("xwiki"), EntityResourceAction.fromString(""));
+
         setType(TYPE);
         this.uri = uri;
         this.pathSegments = new ArrayList<>(pathSegments);

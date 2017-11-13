@@ -209,19 +209,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         final File attachFile =
             this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
-        if (attachFile.exists()) {
-            FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
-            content.setContentDirty(false);
-            attachment.setAttachment_content(content);
-            attachment.setContentStore(FileSystemStoreUtils.HINT);
-            return;
+        if (!attachFile.exists()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
+                "The attachment could not be found in the filesystem attachment store (" + attachFile + ").\n");
         }
 
-        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
-            "The attachment could not be found in the filesystem attachment store.\n"
-                + "This can happen if attachment storage is switched from database to "
-                + "filesystem without first moving all of the database attachments over "
-                + "to the filesystem using a script.");
+        FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
+        content.setContentDirty(false);
+        attachment.setAttachment_content(content);
+        attachment.setContentStore(FileSystemStoreUtils.HINT);
     }
 
     @Override
@@ -284,9 +280,9 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * time. @param context the XWikiContext for the request. @param attachFile the File to store the attachment
          * in. @param tempFile the File to put the attachment content in until the transaction is complete. @param
          * backupFile the File to backup the content of the existing attachment in. @param lock this Lock will be locked
-         * while the attachment file is being written to. @throws XWikiException if thrown by {@link
-         * XWikiAttachment#updateContentArchive(XWikiContext)} or {@link FilesystemAttachmentVersioningStore#
-         * getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
+         * while the attachment file is being written to. @throws XWikiException if thrown by
+         * {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
+         * {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
          */
         AttachmentSaveTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
             final XWikiContext context, final File attachFile, final File tempFile, final File backupFile,

@@ -58,7 +58,7 @@ public class SimilarityCalculatorTest
         when(event1.getGroupId()).thenReturn(group);
         when(event2.getGroupId()).thenReturn(group);
 
-        assertEquals(SimilarityCalculator.SAME_GROUP_ID, this.sq.computeSimilarity(event1, event2));
+        assertEquals(SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES, this.sq.computeSimilarity(event1, event2));
 
         when(event2.getGroupId()).thenReturn("somethingElse");
 
@@ -67,6 +67,10 @@ public class SimilarityCalculatorTest
         when(event1.getType()).thenReturn(type);
         when(event2.getType()).thenReturn(type);
 
+        assertEquals(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE, this.sq.computeSimilarity(event1, event2));
+
+        // Even if the group is the same, if they share the same type, we consider not as the same groupid
+        when(event2.getGroupId()).thenReturn(group);
         assertEquals(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE, this.sq.computeSimilarity(event1, event2));
     }
 }

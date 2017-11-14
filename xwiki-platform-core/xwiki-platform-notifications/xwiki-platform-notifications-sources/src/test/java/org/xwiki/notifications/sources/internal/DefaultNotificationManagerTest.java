@@ -27,7 +27,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
@@ -36,10 +35,10 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.internal.SimilarityCalculator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -51,6 +50,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
@@ -172,8 +172,8 @@ public class DefaultNotificationManagerTest
     {
         // Mocks
         NotificationException exception = new NotificationException("Error");
-        when(queryGenerator.generateQuery(ArgumentMatchers.eq(userReference), any(NotificationFormat.class), ArgumentMatchers
-                        .eq(true), isNull(),
+        when(queryGenerator.generateQuery(eq(userReference), any(NotificationFormat.class),
+                eq(true), isNull(),
                 isNull(), any(List.class))).thenThrow(exception);
 
         // Test
@@ -603,5 +603,61 @@ public class DefaultNotificationManagerTest
 
         // Verify
         assertEquals(2, results.size());
+    }
+
+    private Event createMockedEvent(String type, DocumentReference user, DocumentReference doc, Date date,
+            String groupId)
+    {
+        Event event = mock(Event.class);
+        when(event.getDate()).thenReturn(date);
+        when(event.getDocument()).thenReturn(doc);
+        when(event.getUser()).thenReturn(user);
+        when(event.getType()).thenReturn(type);
+        when(event.getGroupId()).thenReturn(groupId);
+
+        when(event.toString()).thenReturn(String.format("[%s] Event [%s] on document [%s] by [%s] on [%s]",
+                groupId, type, doc, user, date.toString()));
+
+        return event;
+    }
+
+    @Test
+    public void getEventsXWIKI14719() throws Exception
+    {
+        DocumentReference userA = new DocumentReference("xwiki", "XWiki", "UserA");
+
+        // Example taken from a real case
+        Event event0 = createMockedEvent("update", userA, userA, new Date(1510567729000L),
+                "1997830249-1510567729000-Puhs4MSa");
+        Event event1 = createMockedEvent("update", userA, userA, new Date(1510567724000L),
+                "1997830249-1510567724000-aCjmsmSh");
+        Event event2 = createMockedEvent("update", userA, userA, new Date(1510567718000L),
+                "1997830249-1510567718000-hEErMBp9");
+        Event event3 = createMockedEvent("update", userA, userA, new Date(1510567717000L),
+                "1997830249-1510567718000-hEErMBp9");
+        Event event4 = createMockedEvent("update", userA, userA, new Date(1510567715000L),
+                "1997830249-1510567715000-B723WWBC");
+        Event event5 = createMockedEvent("update", userA, userA, new Date(1510567715000L),
+                "1997830249-1510567715000-B723WWBC");
+        Event event6 = createMockedEvent("update", userA, userA, new Date(1510567714000L),
+                "1997830249-1510567714000-SHPmruCG");
+        Event event7 = createMockedEvent("update", userA, userA, new Date(1510567712000L),
+                "1997830249-1510567712000-Fy19J0v1");
+        Event event8 = createMockedEvent("update", userA, userA, new Date(1510567711000L),
+                "1997830249-1510567711000-zDfFnZbD");
+        Event event9 = createMockedEvent("update", userA, userA, new Date(1510567711000L),
+                "1997830249-1510567711000-zDfFnZbD");
+
+        when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
+                .thenReturn(true);
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event0, event1, event2, event3,
+                event4, event5, event6, event7, event8, event9), Collections.emptyList());
+
+        // Test
+        List<CompositeEvent> results
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+
+        assertEquals(1, results.size());
+
     }
 }

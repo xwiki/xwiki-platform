@@ -44,7 +44,7 @@
   ### Details
   ###
   #define($details)
-    #displayNotificationEventDetails($compositeEvent.events)
+    #displayNotificationEventDetails($compositeEvent)
   #end
   ###
   ### Display
@@ -86,23 +86,29 @@
 #end
 #**
  * Default displayer for the notification details
- * @param $events the events that composte the details of the notification
+ * @param $compositeEvent the event
  *#
-#macro(displayNotificationEventDetails $events)
+#macro(displayNotificationEventDetails $compositeEvent)
+  #set ($basicTypes = ['update', 'create'])
+  #set ($compositeEventType = $compositeEvent.type)
   #define($rows)
-    #foreach($event in $events)
-      ## Diff URL
-      #set ($diffUrl = $xwiki.getURL($event.document, 'view', "viewer=changes&rev2=${event.documentVersion}"))
-      <tr>
-        #set ($description = $services.localization.render("notifications.events.${event.type}.description"))
-        #if ("$!description" == '')
-          #set ($description = $event.type)
-        #end
-        #set ($eventDescriptor = $services.eventstream.getDescriptorForEventType($compositeEvent.type, $xcontext.isMainWiki()))
-        <td>#displayNotificationEventUser($event.user)</td>
-        <td class="description">$services.icon.renderHTML($eventDescriptor.eventTypeIcon) $escapetool.xml($description)</td>
-        <td class="text-right text-muted">#if($diffUrl!='')<a href="$escapetool.xml($diffUrl)">#end$escapetool.xml($xwiki.formatDate($event.date))#if($diffUrl!='')</a>#end</td>
-      </tr>
+    #foreach($event in $compositeEvent.events)
+      ## Display the event only on some conditions.
+      ## See: https://jira.xwiki.org/browse/XWIKI-14846
+      #if (!$basicTypes.contains($event.type) or $event.type == $compositeEventType)
+        ## Diff URL
+        #set ($diffUrl = $xwiki.getURL($event.document, 'view', "viewer=changes&rev2=${event.documentVersion}"))
+        <tr>
+          #set ($description = $services.localization.render("notifications.events.${event.type}.description"))
+          #if ("$!description" == '')
+            #set ($description = $event.type)
+          #end
+          #set ($eventDescriptor = $services.eventstream.getDescriptorForEventType($compositeEvent.type, $xcontext.isMainWiki()))
+          <td>#displayNotificationEventUser($event.user)</td>
+          <td class="description">$services.icon.renderHTML($eventDescriptor.eventTypeIcon) $escapetool.xml($description)</td>
+          <td class="text-right text-muted">#if($diffUrl!='')<a href="$escapetool.xml($diffUrl)">#end$escapetool.xml($xwiki.formatDate($event.date))#if($diffUrl!='')</a>#end</td>
+        </tr>
+      #end
     #end
   #end
   #displayNotificationEventDetailsSkeletons($events.size(), $rows)

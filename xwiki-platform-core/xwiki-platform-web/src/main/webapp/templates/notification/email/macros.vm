@@ -125,24 +125,30 @@
 #end
 
 #macro(displayNotificationDetails $event)
+  #set ($basicTypes = ['update', 'create'])
+  #set ($compositeEventType = $event.type)
   <table width="100%" style="margin: 5px 0; font-size: 0.8em; border-top: 1px dashed #e8e8e8">
     #foreach ($ev in $event.events)
-      #set ($diffUrl = $xwiki.getURL($ev.document, 'view', "viewer=changes&rev2=${ev.documentVersion}"))
-      #set ($description = $services.localization.render("notifications.events.${ev.type}.description"))
-      #if ("$!description" == '')
-        #set ($description = $ev.type)
+      ## Display the event only on some conditions.
+      ## See: https://jira.xwiki.org/browse/XWIKI-14846
+      #if (!$basicTypes.contains($ev.type) or $ev.type == $compositeEventType)
+        #set ($diffUrl = $xwiki.getURL($ev.document, 'view', "viewer=changes&rev2=${ev.documentVersion}"))
+        #set ($description = $services.localization.render("notifications.events.${ev.type}.description"))
+        #if ("$!description" == '')
+          #set ($description = $ev.type)
+        #end
+        <tr style="vertical-align: top;">
+          <td width="33%" style="overflow: hidden;">#displayEmailNotificationEventUser($ev.user)</td>
+          <td width="45%">$escapetool.xml($description)</td>
+          <td>
+            #if ($diffUrl!='')
+              #link($diffUrl, $escapetool.xml($xwiki.formatDate($ev.date)))
+            #else
+              $escapetool.xml($xwiki.formatDate($ev.date))
+            #end
+          </td>
+        </tr>
       #end
-      <tr style="vertical-align: top;">
-        <td width="33%" style="overflow: hidden;">#displayEmailNotificationEventUser($ev.user)</td>
-        <td width="45%">$escapetool.xml($description)</td>
-        <td>
-          #if ($diffUrl!='')
-            #link($diffUrl, $escapetool.xml($xwiki.formatDate($ev.date)))
-          #else
-            $escapetool.xml($xwiki.formatDate($ev.date))
-          #end
-        </td>
-      </tr>
     #end
   </table>
 #end

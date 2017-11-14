@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -260,11 +261,7 @@ public class DefaultNotificationManager implements NotificationManager
 
     private List<String> getEventsIds(List<Event> events)
     {
-        List<String> list = new ArrayList<>();
-        for (Event event : events) {
-            list.add(event.getId());
-        }
-        return list;
+        return events.stream().map(Event::getId).collect(Collectors.toList());
     }
 
     private class BestSimilarity
@@ -282,7 +279,8 @@ public class DefaultNotificationManager implements NotificationManager
             // (or vice versa)
             // It means the "update" event A has been triggered for technical reason, but the interesting event is
             // B, which we can group with the event E even if it lowers the similarity between the events.
-            return compositeEvent.getSimilarityBetweenEvents() >= SimilarityCalculator.SAME_GROUP_ID
+            return compositeEvent.getSimilarityBetweenEvents()
+                    >= SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES
                     && compositeEvent.getType().equals(event.getType());
         }
     }

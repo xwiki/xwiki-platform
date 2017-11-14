@@ -40,7 +40,7 @@ import org.xwiki.stability.Unstable;
 public class ResourceReferenceHandlingEvent extends AbstractResourceReferenceHandlerEvent implements BeginEvent
 {
     /**
-     * Match any {@link ActionExecutingEvent}.
+     * Match any {@link ResourceReferenceHandlingEvent}.
      */
     public ResourceReferenceHandlingEvent()
     {

@@ -309,7 +309,7 @@
   var displayEntry = function (entry) {
     // Add the id of the entry to the blacklist
     for (var i = 0; i &lt; entry.ids.length; ++i) {
-      blackList.push(entry.ids[i].id);
+      blackList.push(entry.ids[i]);
     }
     // Create the container
     var notif = $('&lt;div&gt;').addClass('notification-event');

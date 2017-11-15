@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>9.3-rc-1</version>
+    <version>9.9</version>
     <!-- By using an empty value we force Maven to resolve the parent from the Maven repositories,
       see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent -->
     <relativePath />
@@ -54,9 +54,9 @@
   </issueManagement>
   <properties>
     <!-- Use a more recent version of Selenium. -->
-    <selenium.version>3.4.0</selenium.version>
+    <selenium.version>3.5.3</selenium.version>
     <!-- Selenium 3+ communicates with Firefox through the Gecko Driver. -->
-    <geckodriver.version>0.16.0</geckodriver.version>
+    <geckodriver.version>0.19.1</geckodriver.version>
     <!-- Skip the ValidateDependencyVersion enforcer rule because we can't use ${project.version} for platform
       dependencies) -->
     <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
@@ -72,7 +72,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>21.0</version>
+        <version>22.0</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>

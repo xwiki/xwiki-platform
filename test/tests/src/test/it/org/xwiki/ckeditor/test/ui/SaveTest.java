@@ -21,8 +21,8 @@ package org.xwiki.ckeditor.test.ui;
 
 import org.junit.Test;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
-import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 import static org.junit.Assert.*;
 

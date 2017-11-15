@@ -25,7 +25,6 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
-import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
  * Models a CKEditor instance.
@@ -103,7 +102,7 @@ public class CKEditor extends BaseElement
     public RichTextAreaElement getRichTextArea()
     {
         // The in-line frame element is renewed while editing so we can't cache it.
-        return new org.xwiki.ckeditor.test.po.internal.RichTextAreaElement((WebElement) getDriver().executeScript(
+        return new RichTextAreaElement((WebElement) getDriver().executeScript(
             "return CKEDITOR.instances[arguments[0]].ui.contentsElement.find('iframe').getItem(0).$;", this.name));
     }
 }

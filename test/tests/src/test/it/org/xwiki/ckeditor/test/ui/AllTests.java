@@ -21,7 +21,7 @@ package org.xwiki.ckeditor.test.ui;
 
 import java.util.List;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +52,6 @@ public class AllTests
         properties.setProperty("edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg", "ckeditor");
         properties.setProperty("edit.defaultEditor.org.xwiki.rendering.block.XDOM", "wysiwyg");
         properties.setProperty("edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg", "ckeditor");
-        executor.saveXWikiProperties(properties);
+        executor.saveXWikiProperties();
     }
 }

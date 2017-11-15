@@ -17,18 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ckeditor.test.po.internal;
+package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.xwiki.stability.Unstable;
+import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Overrides {@link org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement} in order to make it work with Selenium 3+.
- * 
+ * Represents the editing area of a WYSIWYG editor.
+ *
  * @version $Id$
- * @since 1.13
+ * @since 1.19
  */
-public class RichTextAreaElement extends org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement
+@Unstable
+public class RichTextAreaElement extends BaseElement
 {
     /**
      * The in-line frame element.
@@ -42,7 +45,6 @@ public class RichTextAreaElement extends org.xwiki.test.ui.po.editor.wysiwyg.Ric
      */
     public RichTextAreaElement(WebElement iframe)
     {
-        super(iframe);
         this.iframe = iframe;
     }
 

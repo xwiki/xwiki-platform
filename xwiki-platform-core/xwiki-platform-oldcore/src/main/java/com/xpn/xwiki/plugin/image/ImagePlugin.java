@@ -334,7 +334,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         // Create an image attachment for the shrunk image.
         XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
-        thumbnail.loadContent(context);
+        thumbnail.loadAttachmentContent(context);
 
         OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
         this.imageProcessor.writeImage(shrunkImage,

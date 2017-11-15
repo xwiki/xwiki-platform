@@ -4096,14 +4096,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void loadAttachmentsContent(XWikiContext context) throws XWikiException
     {
         for (XWikiAttachment attachment : getAttachmentList()) {
-            attachment.loadContent(context);
+            attachment.loadAttachmentContent(context);
         }
     }
 
     public void loadAttachments(XWikiContext context) throws XWikiException
     {
         for (XWikiAttachment attachment : getAttachmentList()) {
-            attachment.loadContent(context);
+            attachment.loadAttachmentContent(context);
             attachment.loadArchive(context);
         }
     }
@@ -4811,7 +4811,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 context.setWikiId(getDatabase());
             }
 
-            attachment.loadContent(context);
+            attachment.loadAttachmentContent(context);
         } finally {
             if (database != null) {
                 context.setWikiId(database);

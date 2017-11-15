@@ -316,7 +316,7 @@ public class XWikiAttachment implements Cloneable
     public long getContentLongSize(XWikiContext context) throws XWikiException
     {
         if (this.content == null && context != null) {
-            loadContent(context);
+            loadAttachmentContent(context);
         }
 
         return this.content.getLongSize();
@@ -816,7 +816,7 @@ public class XWikiAttachment implements Cloneable
     public byte[] getContent(XWikiContext context) throws XWikiException
     {
         if (this.content == null && context != null) {
-            loadContent(context);
+            loadAttachmentContent(context);
         }
 
         return this.content.getContent();
@@ -835,7 +835,7 @@ public class XWikiAttachment implements Cloneable
         if (this.content == null && context != null) {
             if (Objects.equals(getVersion(), getLatestStoredVersion(context))) {
                 // Load the attachment content from the xwikiattachment_content table.
-                loadContent(context);
+                loadAttachmentContent(context);
             } else {
                 // Load the attachment content from the xwikiattachment_archive table.
                 // We don't use #getAttachmentRevision() because it checks if the requested version equals the version
@@ -847,7 +847,7 @@ public class XWikiAttachment implements Cloneable
                     setAttachment_content(archivedContent);
                 } else {
                     // Fall back on the version of the content stored in the xwikiattachment_content table.
-                    loadContent(context);
+                    loadAttachmentContent(context);
                 }
             }
         }
@@ -1000,7 +1000,7 @@ public class XWikiAttachment implements Cloneable
         this.content.setContent(is);
     }
 
-    public void loadContent(XWikiContext xcontext)
+    public void loadAttachmentContent(XWikiContext xcontext) throws XWikiException
     {
         if (this.content == null) {
             WikiReference currentWiki = xcontext.getWikiReference();
@@ -1016,11 +1016,8 @@ public class XWikiAttachment implements Cloneable
                     XWikiAttachmentStoreInterface store = getAttachmentContentStore(xcontext);
 
                     store.loadAttachmentContent(this, xcontext, true);
-                } catch (Exception e) {
-                    LOGGER.error(
-                        "Failed to load content for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
+                } catch (ComponentLookupException e) {
+                    throw new XWikiException("Failed to find store for attachment [" + getReference() + "]", e);
                 }
             } finally {
                 if (currentWiki != null) {
@@ -1028,7 +1025,22 @@ public class XWikiAttachment implements Cloneable
                 }
             }
         }
+    }
 
+    /**
+     * @deprecated since 9.11RC1, use {@link #loadAttachmentContent(XWikiContext)} instead
+     */
+    @Deprecated
+    public void loadContent(XWikiContext xcontext)
+    {
+        try {
+            loadAttachmentContent(xcontext);
+        } catch (Exception e) {
+            LOGGER.error(
+                "Failed to load content for attachment [{}@{}]. "
+                    + "This attachment is broken, please consider re-uploading it",
+                this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
+        }
     }
 
     public XWikiAttachmentArchive loadArchive(XWikiContext xcontext)

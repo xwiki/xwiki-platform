@@ -417,9 +417,9 @@
     return;
   }
 
-  var editorNameBySectionPageName = {
-    'XWiki.WysiwygEditorConfig': 'GWT',
-    'CKEditor.AdminSection': 'CKEditor'
+  var formIdToEditorName = {
+    'wysiwyg_XWiki.WysiwygEditorConfig': 'GWT',
+    'ckeditorConfig': 'CKEditor'
   };
 
   // Use tabs to configure each of the available editors.
@@ -430,8 +430,8 @@
     // it (the Tab plugin expects a valid id string and so it doesn't perform any escaping).
     var tabId = $(this).attr('id').replace('.', '_') + '_tab';
     // Add the tab name.
-    var sectionPageName = $(this).attr('id').substr('wysiwyg_'.length);
-    var tabName = editorNameBySectionPageName[sectionPageName] || sectionPageName;
+    var formId = $(this).attr('id');
+    var tabName = formIdToEditorName[formId] || formId;
     $('&lt;li role="presentation"&gt;&lt;a role="tab" data-toggle="tab"&gt;&lt;/a&gt;&lt;/li&gt;').appendTo(editorTabList)
       .find('a').attr({
         'href': '#' + tabId,

@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -143,9 +144,9 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         // We support only the syntaxes for which there is an available renderer.
         if (!this.contextComponentManagerProvider.get().hasComponent(BlockRenderer.class,
             document.getSyntax().toIdString())) {
-            this.logger.warn("We can't rename the links from [{}] "
-                + "because there is no renderer available for its syntax [{}].", currentDocumentReference,
-                document.getSyntax());
+            this.logger.warn(
+                "We can't rename the links from [{}] " + "because there is no renderer available for its syntax [{}].",
+                currentDocumentReference, document.getSyntax());
             return;
         }
 
@@ -244,9 +245,10 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         // We support only the syntaxes for which there is an available renderer.
         if (!this.contextComponentManagerProvider.get().hasComponent(BlockRenderer.class,
             document.getSyntax().toIdString())) {
-            this.logger.warn("We can't update the relative links from [{}]"
-                + " because there is no renderer available for its syntax [{}].", document.getDocumentReference(),
-                document.getSyntax());
+            this.logger.warn(
+                "We can't update the relative links from [{}]"
+                    + " because there is no renderer available for its syntax [{}].",
+                document.getDocumentReference(), document.getSyntax());
             return;
         }
 
@@ -258,7 +260,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         boolean modified = false;
         for (Block block : blocks) {
             ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
-            if (resourceReference == null) {
+            if (resourceReference == null || StringUtils.isEmpty(resourceReference.getReference())) {
                 // Skip invalid blocks.
                 continue;
             }

@@ -6,9 +6,9 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
 
   // Fix the regular expression used by jsTree to escape special characters in CSS selectors. It is mainly used to be
   // able to find a tree node by its id using Element#querySelector. We overwrite the default value used by jsTree in
-  // order to add the following special characters: ?`.
-  // TODO: Drop this after https://github.com/vakata/jstree/pull/914/ is merged.
-  $.jstree.idregex = /[\\:&!^|()\[\]<>@*'+~#";.,=\- \/${}%?`]/g;
+  // order to add the following special characters:
+  // * \s (any white space character, such as non breaking space, not just the plain space)
+  $.jstree.idregex = /[\\:&!^|()\[\]<>@*'+~#";.,=\-\s\/${}%?`]/g;
 
   var formToken = $('meta[name=form_token]').attr('content');
 

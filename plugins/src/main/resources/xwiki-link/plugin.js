@@ -269,12 +269,7 @@
       },
       setup: function(data) {
         // Create a link to a new page if the resource reference is not provided.
-        var resourceReference = data.resourceReference || {
-          type: this.resourceTypes[0],
-          reference: this.getDialog().getParentEditor().getSelection().getSelectedText(),
-          // Make sure the picker doesn't try to resolve the link label as a resource reference.
-          isNew: true
-        };
+        var resourceReference = data.resourceReference || this.getDefaultResourceReference();
         if (resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
             this.resourceTypes.indexOf('doc') >= 0) {
           // Convert the space resource reference to a document resource reference.
@@ -323,6 +318,18 @@
         });
         dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
+      },
+      getDefaultResourceReference: function() {
+        // Compute the default reference by cleaning up the link label.
+        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText();
+        // Normalize the white space.
+        var defaultReference = linkLabel.trim().replace(/\s+/g, ' ');
+        return {
+          type: this.resourceTypes[0],
+          reference: defaultReference,
+          // Make sure the picker doesn't try to resolve the link label as a resource reference.
+          isNew: true
+        };
       }
     });
   };

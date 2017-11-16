@@ -362,8 +362,8 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
             || ("https".equals(request.getScheme()) && request.getServerPort() != 443)) {
             port = ":" + request.getServerPort();
         }
-        url = request.getScheme() + "://" + request.getServerName() + port + url;
-        String link = "http://" + request.getServerName();
+        String link = request.getScheme() + "://" + request.getServerName() + port;
+        url = link + url;
         return getFeedImage(url, link, "XWiki Logo", "XWiki Logo");
     }
 

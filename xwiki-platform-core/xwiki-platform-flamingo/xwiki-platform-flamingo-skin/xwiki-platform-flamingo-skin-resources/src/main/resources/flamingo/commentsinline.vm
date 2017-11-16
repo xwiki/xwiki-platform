@@ -154,12 +154,12 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #if($xwiki.hasAccessLevel('comment'))
         <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.icon.renderHTML('comment')</a></span>
         #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
-          <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
+          <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
         #end
       #end
       <a class="permalink btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
       #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
-        <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
+        <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.delete')">$services.icon.renderHTML('cross')</a>
       #end
       </div>## btn-group
     </div>## commentheader

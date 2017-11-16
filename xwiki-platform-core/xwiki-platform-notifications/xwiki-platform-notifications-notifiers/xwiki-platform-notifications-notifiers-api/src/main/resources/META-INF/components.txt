@@ -5,7 +5,6 @@ org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailManag
 org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailSender
 org.xwiki.notifications.notifiers.internal.email.NotificationEmailSender
 org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator
-org.xwiki.notifications.notifiers.internal.email.UserAvatarAttachmentExtractor
 org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSManager
 org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSRenderer
 org.xwiki.notifications.notifiers.script.NotificationNotifiersScriptService

@@ -60,12 +60,15 @@ public class DefaultGroupsQueryBuilder implements QueryBuilder<GroupsClass>
         // objects, one for each group member. We order by document full name because the group document title is often
         // empty. We could use coalesce and nullif functions to fall back on the document name when the title is empty
         // but it complicates too much the query (and we can have a lot of XWiki.XWikiGroups objects, more than the
-        // number of users).
-        String statement = new StringBuilder("select distinct doc.fullName as groupReference, doc.title as groupName ")
+        // number of users). We have to select the lower case version of the group reference in order to be able to use
+        // it in the order by clause (otherwise we get "PSQLException: ERROR: for SELECT DISTINCT, ORDER BY expressions
+        // must appear in select list").
+        String statement = new StringBuilder("select distinct doc.fullName as groupReference, doc.title as groupName,")
+            .append(" lower(doc.fullName) as lowerGroupReference ")
             .append("from XWikiDocument doc, BaseObject obj ")
             .append("where doc.fullName = obj.name and obj.className = 'XWiki.XWikiGroups'")
             .append(" and doc.space = 'XWiki' and doc.name <> 'XWikiGroupTemplate' ")
-            .append("order by lower(doc.fullName), doc.fullName").toString();
+            .append("order by lowerGroupReference, groupReference").toString();
         Query query = this.queryManager.createQuery(statement, Query.HQL);
         // Resolve the document full name from the first column into a DocumentReference (the group profile reference).
         query.addFilter(this.documentFilter);

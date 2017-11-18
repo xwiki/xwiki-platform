@@ -1020,6 +1020,7 @@ shortcut = new Object({
                         break;
                 }
 
+                shortcut_descriptor["on_keydown"] = shortcut._wrap_shortcut_call(callback, opt['type']);
                 listener.register_combo(shortcut_descriptor);
             } else {
                 if ('type' in opt) {
@@ -1027,6 +1028,7 @@ shortcut = new Object({
                         + '] type deprecated.');
                 }
 
+                shortcut_descriptor["on_keydown"] = shortcut._wrap_shortcut_call(callback, shortcut.type.SIMPLE);
                 listener.register_combo(shortcut_descriptor);
             }
 
@@ -1063,6 +1065,42 @@ shortcut = new Object({
     _listeners: {
         disabled_in_inputs: {},
         enabled_in_inputs: {}
+    },
+
+    /**
+     * Determine if a sequence shortcut is being triggered.
+     *
+     * @private
+     */
+    _is_sequence_shortcut_triggered: false,
+
+    /**
+     * When a sequence shortcut is called and when a combo shortcut is defined with a single key as the last key of
+     * the previous sequence, the two shortcuts are triggered.
+     *
+     * This method wraps the shortcut callback in order to prevent the combo shortcut from being triggered.
+     * Please note that, in order to do so, we are assuming that no other combo shortcut should be triggered during
+     * the next 500ms after having triggered the sequence shortcut.
+     *
+     * @param callback the callback used for the shortcut
+     * @param shortcut_type the shortcut type
+     * @retun {*} The new callback to be used for defining the shortcut against Keypress JS libray
+     * @private
+     */
+    _wrap_shortcut_call: function(callback, shortcut_type) {
+        if (shortcut_type === shortcut.type.SEQUENCE) {
+            return function(args) {
+                shortcut._is_sequence_shortcut_triggered = true;
+                setTimeout(function(){ shortcut._is_sequence_shortcut_triggered = false; }, 500);
+                callback.apply(this, args);
+            };
+        } else {
+            return function(args) {
+                if (!shortcut._is_sequence_shortcut_triggered) {
+                    callback.apply(this, args);
+                }
+            };
+        }
     },
 
     /**

@@ -994,7 +994,10 @@ shortcut = new Object({
             // If no options are defined, create a blank array
             opt = (opt) ? opt : [];
 
-            var combination = shortcut._format_shortcut_combination(shortcut_combination);
+            var shortcut_descriptor = {
+                "keys": shortcut._format_shortcut_combination(shortcut_combination),
+                "is_solitary": true
+            };
 
             // CSS selector that should be used by the listener holding the shortcut
             var listener_target = ('target' in opt) ? opt['target'] : document;
@@ -1007,23 +1010,24 @@ shortcut = new Object({
 
             if ('type' in opt && Object.values(shortcut.type).indexOf(opt['type']) > -1) {
                 switch (opt['type']) {
-                    case shortcut.type.SIMPLE:
-                        listener.simple_combo(combination, callback);
-                        break;
                     case shortcut.type.COUNTING:
-                        listener.counting_combo(combination, callback);
+                        shortcut_descriptor["is_counting"] = true;
+                        shortcut_descriptor["is_unordered"] = false;
                         break;
                     case shortcut.type.SEQUENCE:
-                        listener.sequence_combo(combination, callback);
+                        shortcut_descriptor["is_sequence"] = true;
+                        shortcut_descriptor["is_exclusive"] = true;
                         break;
                 }
+
+                listener.register_combo(shortcut_descriptor);
             } else {
                 if ('type' in opt) {
                     console.warn('The parameter [' + opt['type'] + '] for the shortcut [' + combination
-                                 + '] type deprecated.');
+                        + '] type deprecated.');
                 }
 
-                listener.simple_combo(combination, callback);
+                listener.register_combo(shortcut_descriptor);
             }
 
             // Log deprecation warnings for opt parameters

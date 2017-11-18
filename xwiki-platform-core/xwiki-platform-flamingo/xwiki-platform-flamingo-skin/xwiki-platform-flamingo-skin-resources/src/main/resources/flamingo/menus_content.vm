@@ -381,24 +381,24 @@
   <script type="text/javascript">
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'disable_in_input':true });
       #if($isAdvancedUser)
-        shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$services.localization.render('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$services.localization.render('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'disable_in_input':true });
         #if($hasAdmin)
-          shortcut.add("$services.localization.render('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+          shortcut.add("$services.localization.render('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'disable_in_input':true });
         #end
       #end
     #end
     #if ($canDelete && $displayAdminMenu)
-      shortcut.add("$services.localization.render('core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$services.localization.render('core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'disable_in_input':true });
     #end
     #if ($canView && $displayMoreActionsMenu)
-      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() { location.href = $('tmViewSource').href; }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() { location.href = $('tmViewSource').href; }, { 'disable_in_input': true });
     #end
   //]]>
   </script>

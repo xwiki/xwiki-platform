@@ -44,6 +44,7 @@ import com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore;
 public class FilesystemAttachmentRecycleBinStore extends HibernateAttachmentRecycleBinStore
 {
     @Inject
+    @Named(FileSystemStoreUtils.HINT)
     private AttachmentRecycleBinContentStore contentStore;
 
     @Override

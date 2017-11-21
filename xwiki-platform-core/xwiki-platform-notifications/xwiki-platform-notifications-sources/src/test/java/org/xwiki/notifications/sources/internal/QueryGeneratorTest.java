@@ -133,7 +133,7 @@ public class QueryGeneratorTest
                 true, null, startDate, null);
 
         // Verify
-        assertEquals("((((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+        assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) AND HIDDEN <> true) " +
                 "AND NOT (LIST_OF_READ_EVENTS)) ORDER BY DATE DESC",
                 node.toString());
@@ -146,9 +146,8 @@ public class QueryGeneratorTest
 
 
         verify(queryManager).createQuery(
-                "where ((((" +
-                        "event.user <> :entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead) " +
-                        "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
+                "where (((" +
+                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
                         "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
                         "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
                         "AND (event.hidden <> true)) " +
@@ -156,8 +155,6 @@ public class QueryGeneratorTest
                         "where status.activityEvent = event and status.entityId = :userStatusRead " +
                         "and status.read = true))) " +
                         "ORDER BY event.date DESC", Query.HQL);
-        verify(query).bindValue("entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead",
-                "xwiki:XWiki.UserA");
         verify(query).bindValue("date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357", startDate);
         verify(query).bindValue("date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a", pref1StartDate);
         verify(query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
@@ -179,7 +176,7 @@ public class QueryGeneratorTest
                 true, null, startDate, null);
 
         // Verify
-        assertEquals("(((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+        assertEquals("((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
                 "AND NOT (LIST_OF_READ_EVENTS)) ORDER BY DATE DESC", node.toString());
 
@@ -191,9 +188,8 @@ public class QueryGeneratorTest
 
 
         verify(queryManager).createQuery(
-                "where (((" +
-                        "event.user <> :entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead) " +
-                        "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
+                "where ((" +
+                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
                         "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
                         "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
                         "AND ( NOT (event IN (" +
@@ -201,8 +197,6 @@ public class QueryGeneratorTest
                         "where status.activityEvent = event " +
                         "and status.entityId = :userStatusRead and status.read = true))) " +
                         "ORDER BY event.date DESC", Query.HQL);
-        verify(query).bindValue("entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead",
-                "xwiki:XWiki.UserA");
         verify(query).bindValue(eq("date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357"),
                 eq(startDate));
         verify(query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
@@ -221,7 +215,7 @@ public class QueryGeneratorTest
                 false, null, startDate, null);
 
         // Verify
-        assertEquals("(((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+        assertEquals("((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) AND HIDDEN <> true) " +
                 "ORDER BY DATE DESC", node.toString());
 
@@ -232,9 +226,8 @@ public class QueryGeneratorTest
                 false, null, startDate, null);
 
         verify(queryManager).createQuery(
-                "where (((" +
-                        "event.user <> :entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead) " +
-                        "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
+                "where ((" +
+                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
                         "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
                         "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
                         "AND (event.hidden <> true) " +
@@ -254,7 +247,7 @@ public class QueryGeneratorTest
                 true, untilDate, startDate, Collections.emptyList());
 
         // Verify
-        assertEquals("(((((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+        assertEquals("((((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
                 "AND DATE <= \"Sun Sep 09 03:46:40 CEST 2001\") AND HIDDEN <> true) " +
                 "AND NOT (LIST_OF_READ_EVENTS)) ORDER BY DATE DESC", node.toString());
@@ -267,9 +260,8 @@ public class QueryGeneratorTest
 
 
         verify(queryManager).createQuery(
-                "where (((((" +
-                        "event.user <> :entity_6359f003e05a9113eed5375aa7e68e2edc0eb97787056f6514681e9ae7bdaead) " +
-                        "AND (event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357)) " +
+                "where ((((" +
+                        "event.date >= :date_688218ea2b05763819a1e155109e4bf1e8921dd72e8b43d4c89c89133d4a5357) " +
                         "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) " +
                         "AND (event.date >= :date_25db83d7521312b07fa98ca0023df696d1b94ee4fb7c49578c807f5aeb634f7a))) " +
                         "AND (event.date <= :date_582ce8e50c9ad1782bdd021604912ed119e6ab2ff58a094f23b3be0ce6105306)) " +
@@ -297,8 +289,8 @@ public class QueryGeneratorTest
                 true, untilDate, null, Arrays.asList("event1", "event2"));
 
         // Verify
-        assertEquals("(((((USER <> \"xwiki:XWiki.UserA\" AND (TYPE = \"create\" " +
-                "AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
+        assertEquals("(((((TYPE = \"create\" " +
+                "AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\") " +
                 "AND NOT (ID IN (\"event1\", \"event2\"))) " +
                 "AND DATE <= \"Sun Sep 09 03:46:40 CEST 2001\") " +
                 "AND HIDDEN <> true) " +
@@ -319,7 +311,7 @@ public class QueryGeneratorTest
                 true, null, startDate, null);
 
         // Verify
-        assertEquals("(((((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") "
+        assertEquals("((((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" "
                 + "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) AND HIDDEN <> true) "
                 + "AND NOT (LIST_OF_READ_EVENTS)) "
                 + "AND WIKI = \"Wiki xwiki\") "
@@ -366,7 +358,7 @@ public class QueryGeneratorTest
                 NotificationFormat.ALERT,
                 true, null, startDate, Arrays.asList("event1", "event2"));
 
-        assertEquals("(((((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+        assertEquals("((((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (((TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\") " +
                 "AND (PAGE = \"someValue1\" AND \"1\" = \"1\")) " +
                 "AND (TYPE = \"someValue2\" AND \"2\" = \"2\"))) " +
@@ -396,7 +388,7 @@ public class QueryGeneratorTest
                 NotificationFormat.ALERT,
                 true, null, startDate, Arrays.asList("event1", "event2"));
 
-        assertEquals("(((((USER <> \"xwiki:XWiki.UserA\" AND DATE >= \"Thu Jan 01 01:00:00 CET 1970\") " +
+        assertEquals("((((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +
                 "AND NOT (ID IN (\"event1\", \"event2\"))) " +
                 "AND HIDDEN <> true) " +

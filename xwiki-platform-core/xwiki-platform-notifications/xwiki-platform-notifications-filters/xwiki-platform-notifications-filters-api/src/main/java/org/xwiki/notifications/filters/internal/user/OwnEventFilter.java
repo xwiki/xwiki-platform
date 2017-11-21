@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.user;
 
-import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -34,29 +32,27 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
+import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
-import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
- * Handle a black list of users not to watch.
+ * Filter used to hide events sent by the current user.
  *
  * @version $Id$
- * @since 9.10RC1
+ * @since 9.11RC1
  */
 @Component
 @Singleton
-@Named(EventUserFilter.FILTER_NAME)
-public class EventUserFilter implements NotificationFilter
+@Named(OwnEventFilter.FILTER_NAME)
+@ToggleableNotificationFilter
+public class OwnEventFilter implements NotificationFilter
 {
     /**
      * Name of the filter.
      */
-    public static final String FILTER_NAME = "eventUserNotificationFilter";
-
-    @Inject
-    private EventUserFilterPreferencesGetter preferencesGetter;
+    public static final String FILTER_NAME = "ownEventsNotificationFilter";
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -64,7 +60,7 @@ public class EventUserFilter implements NotificationFilter
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return preferencesGetter.isUserExcluded(serializer.serialize(event.getUser()), user, format);
+        return user.equals(event.getUser());
     }
 
     @Override
@@ -77,7 +73,6 @@ public class EventUserFilter implements NotificationFilter
     @Override
     public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
     {
-        // We don't handle this use-case
         return null;
     }
 
@@ -86,12 +81,8 @@ public class EventUserFilter implements NotificationFilter
             NotificationFormat format)
     {
         if (type == NotificationFilterType.EXCLUSIVE) {
-            Collection<String> users = preferencesGetter.getExcludedUsers(user, format);
-            if (!users.isEmpty()) {
-                return not(value(EventProperty.USER).inStrings(users));
-            }
+            return value(EventProperty.USER).notEq(value(serializer.serialize(user)));
         }
-
         return null;
     }
 

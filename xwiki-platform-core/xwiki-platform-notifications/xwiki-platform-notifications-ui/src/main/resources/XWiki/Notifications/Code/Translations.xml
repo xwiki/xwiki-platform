@@ -60,6 +60,8 @@ notifications.filters.advanced.modal.close=Close
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=System Filter
 notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
+notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
+notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
 
 ## Filter Types
 notifications.filters.type.inclusive=Inclusive

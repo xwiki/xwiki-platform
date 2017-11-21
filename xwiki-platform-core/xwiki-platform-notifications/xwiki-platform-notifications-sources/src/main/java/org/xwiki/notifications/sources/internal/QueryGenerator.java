@@ -160,26 +160,20 @@ public class QueryGenerator
             return null;
         }
 
-        // Condition 1: user is different from the passed one
-        AbstractOperatorNode topNode = new NotEqualsNode(
-                new PropertyValueNode(EventProperty.USER),
-                new EntityReferenceNode(user)
-        );
+        AbstractOperatorNode topNode = null;
 
-        // Condition 2: (maybe) events have happened after the given start date
+        // Condition 1: (maybe) events have happened after the given start date
         if (startDate != null) {
-            topNode = topNode.and(
-                    new GreaterThanNode(
+            topNode = new GreaterThanNode(
                             new PropertyValueNode(EventProperty.DATE),
                             new DateValueNode(startDate)
-                    )
             );
         }
 
-        // Condition 3: handle other preferences
+        // Condition 2: handle other preferences
         AbstractOperatorNode preferencesNode = handleEventPreferences(user, preferences);
 
-        // Condition 4: handle exclusive global notification filters
+        // Condition 3: handle exclusive global notification filters
         AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(user, format);
         if (globalExclusiveFiltersNode != null) {
             if (preferencesNode == null) {
@@ -189,7 +183,7 @@ public class QueryGenerator
             }
         }
 
-        // Condition 5: handle inclusive global notification filters
+        // Condition 4: handle inclusive global notification filters
         AbstractOperatorNode globalInclusiveFiltersNode = handleInclusiveGlobalFilters(user, format);
         if (globalInclusiveFiltersNode != null) {
             if (preferencesNode == null) {
@@ -199,9 +193,13 @@ public class QueryGenerator
             }
         }
 
-        // Handle Condition 3, 4 & 5
+        // Mix all these conditions
         if (preferencesNode != null) {
-            topNode = topNode.and(preferencesNode);
+            if (topNode != null) {
+                topNode = topNode.and(preferencesNode);
+            } else  {
+                topNode = preferencesNode;
+            }
         }
 
         // Other basic filters

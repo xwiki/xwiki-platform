@@ -51,6 +51,13 @@
     'OBJECT': 'objcontent',
     'OBJECT_PROPERTY': 'propertyvalue'
   },
+  'phraseFields': 'title_en^200.0 title__^200.0
+                   filename^45.0 
+                   doccontent_en^40.0 doccontent__^40.0
+                   attcontent_en^35.0 attcontent__^35.0 
+                   comment^25.0
+                   author_display^20.0 creator_display^20.0  attauthor_display^20.0'
+  ,
   'sortFields': {
     'DOCUMENT': {
       'score': 'desc',

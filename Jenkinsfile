@@ -25,4 +25,5 @@
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
 xwikiModule {
+  mavenOpts = '-Xmx2500m -XX:MaxPermSize=768m -Xms512m -XX:ThreadStackSize=2048'
 }

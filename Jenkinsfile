@@ -69,7 +69,7 @@ parallel(
   "quality": {
     node {
       // Run the quality checks
-      wikiBuild {
+      xwikiBuild {
         mavenOpts = globalMavenOpts
         goals = 'clean install jacoco:report'
         profiles = 'quality,legacy'

@@ -61,7 +61,7 @@ actionButtons.EditActions = Class.create({
       if (targetButtons.size() > 0) {
         shortcut.add(shortcuts[key], function() {
           this.click();
-        }.bind(targetButtons.first()), {'propagate' : false} );
+        }.bind(targetButtons.first()));
       }
     }
   },

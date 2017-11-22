@@ -125,6 +125,9 @@ public class R910010XWIKI9065DataMigration extends AbstractHibernateDataMigratio
     private void migrateMetadatas(Session session)
         throws IOException, XMLStreamException, FactoryConfigurationError, ParserConfigurationException, SAXException
     {
+        this.logger.info("Migrating filesystem attachment metadatas storded in [{}]",
+            this.fstools.getStorageLocationFile());
+
         File pathByIdStore = this.fstools.getGlobalFile("DELETED_ATTACHMENT_ID_MAPPINGS.xml");
         if (pathByIdStore.exists()) {
             try (FileInputStream stream = new FileInputStream(pathByIdStore)) {
@@ -173,6 +176,8 @@ public class R910010XWIKI9065DataMigration extends AbstractHibernateDataMigratio
     private void storeDeletedAttachment(File directory, long id, Session session)
         throws ParserConfigurationException, SAXException, IOException
     {
+        this.logger.info("Storing attachment metadata [{}] in the database", directory);
+
         // Find attachment reference
         DocumentReference documentReference = getDocumentReference(directory);
 

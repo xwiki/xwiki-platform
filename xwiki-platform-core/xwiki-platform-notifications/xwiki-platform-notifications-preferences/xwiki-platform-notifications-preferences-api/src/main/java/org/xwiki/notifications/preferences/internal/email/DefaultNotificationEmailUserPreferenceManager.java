@@ -48,12 +48,16 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
 {
     private static final String WIKI_SPACE = "XWiki";
 
+    private static final String NOTIFICATIONS = "Notifications";
+
+    private static final String CODE = "Code";
+
     private static final LocalDocumentReference EMAIL_PREFERENCES_CLASS = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, "Notifications", "Code"), "NotificationEmailPreferenceClass"
+            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationEmailPreferenceClass"
     );
 
-    private static final LocalDocumentReference XWIKI_PREFERENCES = new LocalDocumentReference(
-            WIKI_SPACE, "XWikiPreferences"
+    private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
+            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
     );
 
     private static final String DIFF_TYPE = "diffType";
@@ -95,7 +99,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             }
 
             // Get the config of the wiki
-            DocumentReference xwikiPref = new DocumentReference(XWIKI_PREFERENCES, user.getWikiReference());
+            DocumentReference xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, user.getWikiReference());
             diffType = documentAccessBridge.getProperty(xwikiPref, emailClassReference, DIFF_TYPE);
             if (diffType != null && StringUtils.isNotBlank((String) diffType)) {
                 return NotificationEmailDiffType.valueOf((String) diffType);
@@ -104,7 +108,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             // Get the config of the main wiki
             WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
             if (!user.getWikiReference().equals(mainWiki)) {
-                xwikiPref = new DocumentReference(XWIKI_PREFERENCES, mainWiki);
+                xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
                 emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
                 diffType = documentAccessBridge.getProperty(xwikiPref, emailClassReference, DIFF_TYPE);
                 if (diffType != null && StringUtils.isNotBlank((String) diffType)) {

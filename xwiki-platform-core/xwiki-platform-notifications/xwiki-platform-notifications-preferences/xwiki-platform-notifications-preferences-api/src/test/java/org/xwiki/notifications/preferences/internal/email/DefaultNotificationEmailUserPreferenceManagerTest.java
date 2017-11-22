@@ -20,6 +20,7 @@
 package org.xwiki.notifications.preferences.internal.email;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,6 +65,11 @@ public class DefaultNotificationEmailUserPreferenceManagerTest
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(currentUser);
     }
 
+    private List<String> getCodeSpace()
+    {
+        return Arrays.asList("XWiki", "Notifications", "Code");
+    }
+
     @Test
     public void getDiffType() throws Exception
     {
@@ -81,16 +87,16 @@ public class DefaultNotificationEmailUserPreferenceManagerTest
         DocumentReference user2 = new DocumentReference("someWiki", "XWiki", "User2");
         String user2Id = "someWiki:XWiki.User2";
         when(referenceResolver.resolve(user2Id)).thenReturn(user2);
-        when(documentAccessBridge.getProperty(new DocumentReference("mainWiki", "XWiki",
-                "XWikiPreferences"), new DocumentReference("mainWiki",
-                Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass"),
+        when(documentAccessBridge.getProperty(new DocumentReference("mainWiki", getCodeSpace(),
+                "NotificationAdministration"), new DocumentReference("mainWiki",
+                getCodeSpace(), "NotificationEmailPreferenceClass"),
                 "diffType")).thenReturn("NOTHING");
         assertEquals(NotificationEmailDiffType.NOTHING, mocker.getComponentUnderTest().getDiffType(user2Id));
 
         // Value from the user's wiki config
-        when(documentAccessBridge.getProperty(new DocumentReference("someWiki", "XWiki",
-                        "XWikiPreferences"), new DocumentReference("mainWiki",
-                        Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass"),
+        when(documentAccessBridge.getProperty(new DocumentReference("someWiki", getCodeSpace(),
+                        "NotificationAdministration"), new DocumentReference("mainWiki",
+                        getCodeSpace(), "NotificationEmailPreferenceClass"),
                 "diffType")).thenReturn("NOTHING");
 
         assertEquals(NotificationEmailDiffType.NOTHING, mocker.getComponentUnderTest().getDiffType(user2Id));

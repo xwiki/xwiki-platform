@@ -25,14 +25,54 @@
 
 def globalMavenOpts = '-Xmx2500m -XX:MaxPermSize=768m -Xms512m -XX:ThreadStackSize=2048'
 
-node {
-  // Platform build skipping checkstyle & revapi
-  // Configures the snapshot extension repository in XWiki in the generated distributions to make it easy for
-  // developers to install snapshot extensions when they do manual tests.
-  xwikiBuild {
-    mavenOpts = globalMavenOpts
-    goals = 'clean deploy'
-    profiles = 'legacy,integration-tests,office-tests,snapshotModules'
-    properties = '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+parallel(
+  "main": {
+    node {
+      // Platform build skipping checkstyle & revapi so that the result of the build can be sent as fast as possible
+      // to the dev. However note that in // we start a platform build with the quality profile that checks checkstyle
+      //revapi and more.
+      // Configures the snapshot extension repository in XWiki in the generated distributions to make it easy for
+      // developers to install snapshot extensions when they do manual tests.
+      xwikiBuild {
+        mavenOpts = globalMavenOpts
+        goals = 'clean deploy'
+        profiles = 'legacy,integration-tests,office-tests,snapshotModules'
+        properties = '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+      }
+    }
+
+    // We shouldn't build the distribution if the main build for platform failed.
+    if (currentBuild.result != 'UNSTABLE') {
+      node {
+        // Build the distributions
+        xwikiBuild {
+          mavenOpts = globalMavenOpts
+          goals = 'clean deploy'
+          profiles = 'legacy,integration-tests,office-tests,snapshotModules'
+          pom = 'xwiki-platform-distribution/pom.xml'
+        }
+      }
+    }
+  },
+  "testrelease": {
+    node {
+      // Simulate a release and verify all is fine.
+      xwikiBuild {
+        mavenOpts = globalMavenOpts
+        goals = 'clean install'
+        profiles = 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution'
+        properties = '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+      }
+    }
+  },
+  "quality": {
+    node {
+      // Run the quality checks
+      wikiBuild {
+        mavenOpts = globalMavenOpts
+        goals = 'clean install jacoco:report'
+        profiles = 'quality,legacy'
+      }
+    }
   }
-}
+)

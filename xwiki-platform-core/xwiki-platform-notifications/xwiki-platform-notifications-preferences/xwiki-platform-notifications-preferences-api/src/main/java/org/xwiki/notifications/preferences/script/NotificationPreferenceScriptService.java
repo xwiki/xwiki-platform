@@ -39,6 +39,8 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
+import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
+import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -60,7 +62,6 @@ public class NotificationPreferenceScriptService implements ScriptService
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-
     @Inject
     private ContextualAuthorizationManager authorizationManager;
 
@@ -72,6 +73,9 @@ public class NotificationPreferenceScriptService implements ScriptService
 
     @Inject
     private TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder;
+
+    @Inject
+    private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
 
     /**
      * Save preferences given as JSON.
@@ -160,5 +164,24 @@ public class NotificationPreferenceScriptService implements ScriptService
         List<NotificationPreference> preferences
                 = notificationPreferenceManager.getAllPreferences(documentAccessBridge.getCurrentUserReference());
         return preferences.stream().anyMatch(NotificationPreference::isNotificationEnabled);
+    }
+
+    /**
+     * @return the diff type for emails configured for the current user
+     * @since 9.11RC1
+     */
+    public NotificationEmailDiffType getDiffType()
+    {
+        return emailUserPreferenceManager.getDiffType();
+    }
+
+    /**
+     * @param userId id of a user
+     * @return the diff type for emails configured for the given user
+     * @since 9.11RC1
+     */
+    public NotificationEmailDiffType getDiffType(String userId)
+    {
+        return emailUserPreferenceManager.getDiffType(userId);
     }
 }

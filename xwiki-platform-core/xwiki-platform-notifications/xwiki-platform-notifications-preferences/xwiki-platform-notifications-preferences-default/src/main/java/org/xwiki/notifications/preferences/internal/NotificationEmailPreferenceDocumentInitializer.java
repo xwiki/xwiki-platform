@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -47,6 +48,10 @@ public class NotificationEmailPreferenceDocumentInitializer  extends AbstractMan
      */
     private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
+    private static final String SELECT = "select";
+
+    private static final String SEPARATORS = "|, ";
+
     /**
      * Default constructor.
      */
@@ -58,8 +63,14 @@ public class NotificationEmailPreferenceDocumentInitializer  extends AbstractMan
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addStaticListField("interval", "Notification interval", 64,
+        xclass.addStaticListField("interval", "Notification interval", 1,
                 false, "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live",
-                "select", "|, ");
+                SELECT, SEPARATORS);
+
+        String values = Arrays.stream(NotificationEmailDiffType.values()).map(v -> v.name())
+            .reduce((v1, v2) -> String.format("%s|%s", v1, v2)).get();
+
+        xclass.addStaticListField("diffType", "Diff Type", 1,
+                false, values, SELECT, SEPARATORS);
     }
 }

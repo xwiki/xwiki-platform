@@ -386,7 +386,7 @@
     #end
     #set($fieldUrl = '')
     ## Only retrieve an URL for a DBListClass item
-    #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
+    #if(($propType == 'DBListClass' || $propType == 'PageClass') &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
       #set($fieldUrl = $xwiki.getURL($fieldValue))
       #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
         #set($fieldUrl = '')

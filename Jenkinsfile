@@ -30,7 +30,7 @@ parallel(
     node {
       // Platform build skipping checkstyle & revapi so that the result of the build can be sent as fast as possible
       // to the dev. However note that in // we start a platform build with the quality profile that checks checkstyle
-      //revapi and more.
+      // revapi and more.
       // Configures the snapshot extension repository in XWiki in the generated distributions to make it easy for
       // developers to install snapshot extensions when they do manual tests.
       xwikiBuild {
@@ -41,16 +41,17 @@ parallel(
       }
     }
 
-    // We shouldn't build the distribution if the main build for platform failed.
-    if (currentBuild.result != 'UNSTABLE') {
-      node {
-        // Build the distributions
-        xwikiBuild {
-          mavenOpts = globalMavenOpts
-          goals = 'clean deploy'
-          profiles = 'legacy,integration-tests,office-tests,snapshotModules'
-          pom = 'xwiki-platform-distribution/pom.xml'
-        }
+    // Note: if an error occurs in the first build above, then an exception will be raised and this job will not
+    // execute which is what we want since failures can be test flickers for ex, and it could still be interesting to
+    // get a distribution to test xwiki manually.
+
+    node {
+      // Build the distributions
+      xwikiBuild {
+        mavenOpts = globalMavenOpts
+        goals = 'clean deploy'
+        profiles = 'legacy,integration-tests,office-tests,snapshotModules'
+        pom = 'xwiki-platform-distribution/pom.xml'
       }
     }
   },

@@ -35,7 +35,7 @@ import com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore;
  *
  * @version $Id$
  * @since 3.0M3
- * @deprecated since 9.9RC1, use {@link FilesystemAttachmentRecycleBinContentStore} instead
+ * @deprecated since 9.10RC1, use {@link FilesystemAttachmentRecycleBinContentStore} instead
  */
 @Component
 @Named(FileSystemStoreUtils.HINT)

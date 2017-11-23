@@ -985,14 +985,14 @@ shortcut = new Object({
      *
      * @param shortcut_combination {string} the shortcut that should trigger the callback
      * @param callback the function triggered by the shortcut
-     * @param opt optional associative array defining parameters for registering the shortcut
+     * @param opt optional map defining parameters for registering the shortcut
      */
     add: function(shortcut_combination, callback, opt) {
         // Require Keypress JS to be fully loaded before registering the shortcut.
         require(["$services.webjars.url('org.webjars.bower:Keypress', 'keypress.js')", 'jquery'], function(keypress) {
 
-            // If no options are defined, create a blank array
-            opt = (opt) ? opt : [];
+            // If no options are defined, create a blank map
+            opt = (opt) ? opt : {};
 
             var shortcut_descriptor = {
                 "keys": shortcut._format_shortcut_combination(shortcut_combination),

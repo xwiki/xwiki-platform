@@ -23,7 +23,10 @@
 // @Library("XWiki@<branch, tag, sha1>") _
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
+// Allow 2 platform builds at the same time to leave some agent space for other jobs
 def globalMavenOpts = '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
+
+stage name: 'Platform Builds', concurrency: 2
 
 parallel(
   "main": {

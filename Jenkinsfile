@@ -33,7 +33,6 @@ parallel(
       // revapi and more.
       // Configures the snapshot extension repository in XWiki in the generated distributions to make it easy for
       // developers to install snapshot extensions when they do manual tests.
-      stage("Main Build")
       xwikiBuild {
         mavenOpts = globalMavenOpts
         goals = 'clean deploy'
@@ -48,7 +47,6 @@ parallel(
 
     node {
       // Build the distributions
-      stage("Distribution Build")
       xwikiBuild {
         mavenOpts = globalMavenOpts
         goals = 'clean deploy'
@@ -60,7 +58,6 @@ parallel(
   "testrelease": {
     node {
       // Simulate a release and verify all is fine.
-      stage("Test Release Build")
       xwikiBuild {
         mavenOpts = globalMavenOpts
         goals = 'clean install'
@@ -72,7 +69,6 @@ parallel(
   "quality": {
     node {
       // Run the quality checks
-      stage("Quality Build")
       xwikiBuild {
         mavenOpts = globalMavenOpts
         goals = 'clean install jacoco:report'

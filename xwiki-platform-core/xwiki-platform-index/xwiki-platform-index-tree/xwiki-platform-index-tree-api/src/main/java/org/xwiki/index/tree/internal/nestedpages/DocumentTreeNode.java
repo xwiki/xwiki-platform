@@ -127,23 +127,45 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
     protected List<String> getChildren(DocumentReference documentReference, int offset, int limit) throws Exception
     {
         List<String> children = new ArrayList<String>();
+        List<String> pseudoChildren = getPseudoChildren(documentReference);
+
+        // Add the pseudo child nodes first.
+        if (offset < pseudoChildren.size()) {
+            // The start must be between 0 and the number of pseudo children.
+            int start = Math.min(Math.max(offset, 0), pseudoChildren.size());
+
+            // The end must be between start and the number of pseudo children.
+            int end = Math.max(Math.min(start + limit, pseudoChildren.size()), start);
+
+            children.addAll(pseudoChildren.subList(start, end));
+        }
+
+        // Add child documents if the limit has not been exceeded.
+        int childDocumentsLimit = limit - children.size();
+        if (childDocumentsLimit > 0) {
+            int childDocumentsOffset = Math.max(offset - pseudoChildren.size(), 0);
+            children.addAll(serialize(getChildDocuments(documentReference, childDocumentsOffset, childDocumentsLimit)));
+        }
+
+        return children;
+    }
+
+    private List<String> getPseudoChildren(DocumentReference documentReference)
+    {
+        List<String> pseudoChildren = new ArrayList<String>();
         String serializedDocRef = this.defaultEntityReferenceSerializer.serialize(documentReference);
 
-        if (offset == 0) {
-            for (Map.Entry<String, TreeNode> entry : this.nonLeafChildNodes.entrySet()) {
-                if (hasChild(entry.getKey(), entry.getValue(), documentReference)) {
-                    children.add(entry.getKey() + ':' + serializedDocRef);
-                }
-            }
-
-            if (showAddDocument(documentReference)) {
-                children.add("addDocument:" + serializedDocRef);
+        for (Map.Entry<String, TreeNode> entry : this.nonLeafChildNodes.entrySet()) {
+            if (hasChild(entry.getKey(), entry.getValue(), documentReference)) {
+                pseudoChildren.add(entry.getKey() + ':' + serializedDocRef);
             }
         }
 
-        children.addAll(serialize(getChildDocuments(documentReference, offset, limit)));
+        if (showAddDocument(documentReference)) {
+            pseudoChildren.add("addDocument:" + serializedDocRef);
+        }
 
-        return children;
+        return pseudoChildren;
     }
 
     protected List<DocumentReference> getChildDocuments(DocumentReference documentReference, int offset, int limit)
@@ -190,6 +212,11 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
     @Override
     protected int getChildCount(DocumentReference documentReference) throws Exception
     {
+        return getPseudoChildCount(documentReference) + getChildDocumentsCount(documentReference);
+    }
+
+    private int getPseudoChildCount(DocumentReference documentReference)
+    {
         int count = 0;
         for (Map.Entry<String, TreeNode> entry : this.nonLeafChildNodes.entrySet()) {
             if (hasChild(entry.getKey(), entry.getValue(), documentReference)) {
@@ -201,7 +228,7 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
             count++;
         }
 
-        return count + getChildDocumentsCount(documentReference);
+        return count;
     }
 
     protected int getChildDocumentsCount(DocumentReference documentReference) throws QueryException

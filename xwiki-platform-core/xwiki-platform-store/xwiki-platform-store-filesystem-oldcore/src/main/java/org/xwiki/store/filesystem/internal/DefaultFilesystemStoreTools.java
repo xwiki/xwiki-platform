@@ -20,6 +20,7 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -30,6 +31,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -167,9 +169,14 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     @Override
-    public void initialize()
+    public void initialize() throws InitializationException
     {
-        this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME);
+        try {
+            this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME).getCanonicalFile();
+        } catch (IOException e) {
+            throw new InitializationException("Invalid permanent directory", e);
+        }
+
         if (config.cleanOnStartup()) {
             final File dir = this.storageDir;
             new Thread(new Runnable()
@@ -241,7 +248,7 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Override
     public String getStorageLocationPath()
     {
-        return this.storageDir.getAbsolutePath();
+        return this.storageDir.getPath();
     }
 
     @Override

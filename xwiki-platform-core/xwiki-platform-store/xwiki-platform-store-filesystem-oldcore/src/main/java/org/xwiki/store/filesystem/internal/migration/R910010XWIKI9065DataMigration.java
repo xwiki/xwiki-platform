@@ -178,8 +178,9 @@ public class R910010XWIKI9065DataMigration extends AbstractHibernateDataMigratio
     {
         this.logger.info("Storing attachment metadata [{}] in the database", directory);
 
-        // Find attachment reference
-        DocumentReference documentReference = getDocumentReference(directory);
+        // Find document reference
+        File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
+        DocumentReference documentReference = getDocumentReference(documentDirectory);
 
         // Parse ~DELETED_ATTACH_METADATA.xml
         DeletedAttachment dbAttachment = parseDeletedAttachMedatata(documentReference, id, directory);

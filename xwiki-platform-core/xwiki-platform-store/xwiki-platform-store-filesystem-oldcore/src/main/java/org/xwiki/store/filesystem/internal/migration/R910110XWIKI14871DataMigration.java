@@ -69,12 +69,13 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migration for XWIKI-9065. Make sure to generate database entry for attachment deleted on filesystem.
  *
  * @version $Id$
- * @since 9.9RC1
+ * @since 9.10.1
+ * @since 9.11RC1
  */
 @Component
-@Named("R910010XWIKI9065")
+@Named("R910110XWIKI14871")
 @Singleton
-public class R910010XWIKI9065DataMigration extends AbstractHibernateDataMigration
+public class R910110XWIKI14871DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
@@ -186,7 +187,7 @@ public class R910010XWIKI9065DataMigration extends AbstractHibernateDataMigratio
         DeletedAttachment dbAttachment = parseDeletedAttachMedatata(documentReference, id, directory);
 
         // Save deleted attachment in the DB
-        session.save(dbAttachment);
+        session.saveOrUpdate(dbAttachment);
 
         // Refactor file storage to be based on id instead of date
         File newDirectory = new File(directory.getParentFile(),

@@ -134,7 +134,7 @@
               <excludes>
                 <!-- Fan-out violation in an implementation of a legacy interface. -->
                 org/xwiki/store/legacy/store/internal/FilesystemAttachmentRecycleBinContentStore.java,
-                org/xwiki/store/filesystem/internal/migration/R910010XWIKI9065DataMigration.java
+                org/xwiki/store/filesystem/internal/migration/R910110XWIKI14871DataMigration.java
               </excludes>
             </configuration>
           </execution>

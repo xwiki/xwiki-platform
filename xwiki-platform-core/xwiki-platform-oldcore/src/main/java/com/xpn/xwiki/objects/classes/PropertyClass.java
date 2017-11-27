@@ -427,12 +427,17 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Get the localized hint. A hint is a text displayed in the object editor to help the user filling some content.
      *
      * @return the localized hint.
+     * @since 9.11RC1
      */
     public String getHint()
     {
         return getLocalizedPropertyValue("hint");
     }
 
+    /**
+     * Set the text displayed in the object editor to help the user filling some content.
+     * @since 9.11RC1
+     */
     public void setHint(String hint)
     {
         setLargeStringValue("hint", hint);

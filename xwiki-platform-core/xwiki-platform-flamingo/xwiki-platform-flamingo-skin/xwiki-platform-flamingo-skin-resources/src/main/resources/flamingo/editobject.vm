@@ -36,7 +36,7 @@
     #end
     #foreach ($prop in $properties)
       <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.translatedPrettyName)}</label></dt>
-      <dd#if ($prop.isDisabled()) class="disabled"#end>#if ("$!prop.hint" != '')<p><span class="xHint">$prop.hint</span></p>#end$doc.display($prop.name, "edit", $obj)</dd>
+      <dd#if ($prop.isDisabled()) class="disabled"#end>#if ("$!prop.hint" != '')<p><span class="xHint">$escapetool.xml($prop.hint)</span></p>#end$doc.display($prop.name, "edit", $obj)</dd>
     #end
     </dl>
     #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))

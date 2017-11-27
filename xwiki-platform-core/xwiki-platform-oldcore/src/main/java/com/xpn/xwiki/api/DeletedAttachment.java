@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Programming;
 
@@ -121,12 +122,18 @@ public class DeletedAttachment extends Api
     public Attachment getAttachment()
     {
         try {
-            Document doc = this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
-            return new Attachment(doc, this.deletedAttachment.restoreAttachment(), this.context);
+            XWikiAttachment attachment = this.deletedAttachment.restoreAttachment();
+
+            if (attachment != null) {
+                Document doc = this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
+
+                return new Attachment(doc, attachment, this.context);
+            }
         } catch (XWikiException ex) {
-            LOGGER.warn("Failed to parse deleted attachment: " + ex.getMessage(), ex);
-            return null;
+            LOGGER.warn("Failed to parse deleted attachment", ex);
         }
+
+        return null;
     }
 
     /**

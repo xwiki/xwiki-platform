@@ -157,6 +157,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * definition.
      *
      * @return the hint string
+     * @since 9.11RC1
      */
     public String getHint()
     {

@@ -1877,6 +1877,10 @@ public class XWiki extends Api
      */
     public String getAttachmentURL(String fullname, String filename) throws XWikiException
     {
+        if (StringUtils.isAnyEmpty(fullname, filename)) {
+            return "";
+        }
+
         return this.xwiki.getAttachmentURL(fullname, filename, getXWikiContext());
     }
 

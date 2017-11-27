@@ -157,7 +157,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                     (DeletedAttachment) session.get(DeletedAttachment.class, Long.valueOf(index));
 
                 if (deletedAttachment != null && resolve) {
-                    deletedAttachment = resolveDeletedAttachmentContent(deletedAttachment, false);
+                    deletedAttachment = resolveDeletedAttachmentContent(deletedAttachment, false, false);
                 }
 
                 return deletedAttachment;
@@ -218,7 +218,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
         // Resolve deleted attachment content if needed
         for (DeletedAttachment deletedAttachment : deletedAttachments) {
-            resolvedAttachments.add(resolveDeletedAttachmentContent(deletedAttachment, bTransaction));
+            resolvedAttachments.add(resolveDeletedAttachmentContent(deletedAttachment, bTransaction, false));
         }
 
         return resolvedAttachments;
@@ -269,8 +269,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         return null;
     }
 
-    private DeletedAttachment resolveDeletedAttachmentContent(DeletedAttachment deletedAttachment, boolean bTransaction)
-        throws XWikiException
+    private DeletedAttachment resolveDeletedAttachmentContent(DeletedAttachment deletedAttachment, boolean bTransaction,
+        boolean failIfNoContent) throws XWikiException
     {
         AttachmentRecycleBinContentStore contentStore =
             getAttachmentRecycleBinContentStore(deletedAttachment.getContentStore());
@@ -279,6 +279,17 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
             AttachmentReference reference = deletedAttachment.getAttachmentReference();
             DeletedAttachmentContent content =
                 contentStore.get(reference, deletedAttachment.getDate(), deletedAttachment.getId(), bTransaction);
+
+            if (content == null) {
+                if (failIfNoContent) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                        "Can't find any content for deleted attachment [" + reference + "] with id ["
+                            + deletedAttachment.getId() + "]");
+                } else {
+                    this.logger.warn("Can't find any content for deleted attachment [{}] with id [{}]", reference,
+                        deletedAttachment.getId());
+                }
+            }
 
             try {
                 FieldUtils.writeDeclaredField(deletedAttachment, "content", content, true);

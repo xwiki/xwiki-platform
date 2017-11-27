@@ -96,6 +96,12 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         prettyNameClass.setSize(40);
         safeput(prettyNameClass.getName(), prettyNameClass);
 
+        StringClass hintClass = new StringClass(this);
+        hintClass.setName("hint");
+        hintClass.setPrettyName("Hint");
+        hintClass.setSize(40);
+        safeput(hintClass.getName(), hintClass);
+
         TextAreaClass toolTipClass = new TextAreaClass(this);
         toolTipClass.setName("tooltip");
         toolTipClass.setPrettyName("Tooltip");

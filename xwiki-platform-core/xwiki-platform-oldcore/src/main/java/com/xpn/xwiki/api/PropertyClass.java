@@ -153,6 +153,18 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     }
 
     /**
+     * Get the translated hint string that should be displayed for input fields for instances of this property
+     * definition.
+     *
+     * @return the hint string
+     * @since 9.11RC1
+     */
+    public String getHint()
+    {
+        return getBasePropertyClass().getHint();
+    }
+
+    /**
      * Get the message that should be displayed when a value for an instance of this property definition fails the
      * validation. For example, {@code Please enter a valid IP address}.
      *

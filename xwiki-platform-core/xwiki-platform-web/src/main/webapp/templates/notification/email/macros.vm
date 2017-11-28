@@ -71,6 +71,10 @@
 
 #macro(displayNotificationPage $event)
   <div>
+    <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 4px; font-size: 8px;">
+      #template('hierarchy_macros.vm')
+      #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
+    </div>
     #set ($document = $xwiki.getDocument($event.document))
     #link($document.getURL(), $!escapetool.xml($document.getRenderedTitle('xhtml/1.0')))
   </div>

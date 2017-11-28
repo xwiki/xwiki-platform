@@ -75,6 +75,10 @@ stage ('Platform Builds') {
         'flavor-test-selenium': {
           // Run the Flavor Selenium tests
           buildFunctionalTest('xwiki-platform-distribution-flavor-test-selenium/pom.xml')
+        },
+        'flavor-test-webstandards': {
+          // Run the Flavor Webstandards tests
+          buildFunctionalTest('xwiki-platform-distribution-flavor-test-webstandards/pom.xml')
         }
       )
     },

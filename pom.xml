@@ -57,7 +57,7 @@
     <batik.version>1.9</batik.version>
     <restlet.version>2.3.10</restlet.version>
     <tika.version>1.14</tika.version>
-    <pdfbox.version>2.0.7</pdfbox.version>
+    <pdfbox.version>2.0.8</pdfbox.version>
     <keypress.version>2.1.3</keypress.version>
 
     <!-- By default check that unit tests don't output anything to the console -->

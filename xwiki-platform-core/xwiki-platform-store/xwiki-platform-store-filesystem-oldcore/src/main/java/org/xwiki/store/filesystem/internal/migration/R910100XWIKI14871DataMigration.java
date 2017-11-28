@@ -73,9 +73,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @since 9.11RC1
  */
 @Component
-@Named("R910110XWIKI14871")
+@Named("R910100XWIKI14871")
 @Singleton
-public class R910110XWIKI14871DataMigration extends AbstractHibernateDataMigration
+public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
@@ -100,7 +100,7 @@ public class R910110XWIKI14871DataMigration extends AbstractHibernateDataMigrati
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(910010);
+        return new XWikiDBVersion(910100);
     }
 
     @Override

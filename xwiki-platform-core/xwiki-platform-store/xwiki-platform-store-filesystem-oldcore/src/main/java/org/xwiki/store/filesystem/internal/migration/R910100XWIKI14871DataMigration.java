@@ -155,6 +155,9 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
                         path = value1;
                     }
 
+                    // </entry>
+                    xmlReader.nextTag();
+
                     File directory = new File(path);
                     if (!directory.exists()) {
                         this.logger.warn("[{}] does not exist", directory);
@@ -183,17 +186,18 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
         File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
         DocumentReference documentReference = getDocumentReference(documentDirectory);
 
-        // Parse ~DELETED_ATTACH_METADATA.xml
-        DeletedAttachment dbAttachment = parseDeletedAttachMedatata(documentReference, id, directory);
+        if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
+            // Parse ~DELETED_ATTACH_METADATA.xml
+            DeletedAttachment dbAttachment = parseDeletedAttachMedatata(documentReference, id, directory);
 
-        // Save deleted attachment in the DB
-        session.saveOrUpdate(dbAttachment);
+            // Save deleted attachment in the DB
+            session.saveOrUpdate(dbAttachment);
 
-        // Refactor file storage to be based on id instead of date
-        File newDirectory = new File(directory.getParentFile(),
-            GenericFileUtils.getURLEncoded(dbAttachment.getFilename() + "-id" + dbAttachment.getId()));
-        FileUtils.moveDirectory(directory, newDirectory);
-
+            // Refactor file storage to be based on id instead of date
+            File newDirectory = new File(directory.getParentFile(),
+                GenericFileUtils.getURLEncoded(dbAttachment.getFilename() + "-id" + dbAttachment.getId()));
+            FileUtils.moveDirectory(directory, newDirectory);
+        }
     }
 
     private String decode(String name) throws UnsupportedEncodingException

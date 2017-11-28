@@ -44,6 +44,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
+import org.xwiki.notifications.notifiers.internal.EventsSorter;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.api.Attachment;
@@ -61,6 +62,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private static final String HTML_EVENTS = "htmlEvents";
 
     private static final String PLAIN_TEXT_EVENTS = "plainTextEvents";
+
+    private static final String SORTED_EVENTS = "sortedEvents";
 
     private static final String EMAIL_PROPERTY = "email";
 
@@ -185,9 +188,13 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         // Render all the events both in HTML and Plain Text
         List<String> htmlEvents = new ArrayList<>();
         List<String> plainTextEvents = new ArrayList<>();
+        EventsSorter eventsSorter = new EventsSorter();
         for (CompositeEvent event : currentEvents) {
-            htmlEvents.add(defaultNotificationEmailRenderer.renderHTML(event, usedId));
-            plainTextEvents.add(defaultNotificationEmailRenderer.renderPlainText(event, usedId));
+            String html = defaultNotificationEmailRenderer.renderHTML(event, usedId);
+            String plainText = defaultNotificationEmailRenderer.renderPlainText(event, usedId);
+            htmlEvents.add(html);
+            plainTextEvents.add(plainText);
+            eventsSorter.add(event, html, plainText);
         }
 
         // Put in the velocity parameters all the events and their rendered version
@@ -195,6 +202,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         velocityVariables.put(EVENTS, currentEvents);
         velocityVariables.put(HTML_EVENTS, htmlEvents);
         velocityVariables.put(PLAIN_TEXT_EVENTS, plainTextEvents);
+        velocityVariables.put(SORTED_EVENTS, eventsSorter.sort());
 
         handleAvatars();
     }

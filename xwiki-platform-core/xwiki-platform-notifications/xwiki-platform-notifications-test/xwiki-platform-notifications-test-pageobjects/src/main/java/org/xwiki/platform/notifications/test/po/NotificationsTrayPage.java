@@ -22,7 +22,6 @@ package org.xwiki.platform.notifications.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.stability.Unstable;
@@ -98,7 +97,12 @@ public class NotificationsTrayPage extends ViewPage
         } else {
             this.showNotificationTray();
             this.clearAllLink.click();
-            this.sendKeys(Keys.ENTER);
+            // Wait for the confirm box to be visible
+            getDriver().waitUntilElementIsVisible(By.className("xdialog-content"));
+            // Enter is like clicking on "yes"
+            WebElement yesButton = getDriver().findElement(
+                    By.cssSelector(".xdialog-content input.button[value='Yes']"));
+            yesButton.click();
             this.waitForNotificationSuccessMessage("Notifications have been cleared");
         }
     }

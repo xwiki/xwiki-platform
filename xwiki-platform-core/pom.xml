@@ -138,65 +138,6 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilterType)",
-                    "new": "method org.xwiki.notifications.filters.expression.ExpressionNode org.xwiki.notifications.filters.NotificationFilter::filterExpression(org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.filters.NotificationFilterType, org.xwiki.notifications.NotificationFormat)",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterExpression",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method void org.xwiki.notifications.filters.watch.WatchedUserReference::<init>(java.lang.String)",
-                    "new": "method void org.xwiki.notifications.filters.watch.WatchedUserReference::<init>(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter)",
-                    "package": "org.xwiki.notifications.filters.watch",
-                    "classSimpleName": "WatchedUserReference",
-                    "methodName": "<init>",
-                    "elementKind": "constructor",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.eventstream.RecordableEventDescriptor org.xwiki.eventstream.RecordableEventDescriptorManager::getDescriptorForEventType(java.lang.String, boolean) throws org.xwiki.eventstream.EventStreamException",
-                    "package": "org.xwiki.eventstream",
-                    "classSimpleName": "RecordableEventDescriptorManager",
-                    "methodName": "getDescriptorForEventType",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::generateEmailSubject(org.xwiki.notifications.CompositeEvent) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::generateEmailSubject(org.xwiki.notifications.CompositeEvent, java.lang.String) throws org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.notifiers.email",
-                    "classSimpleName": "NotificationEmailRenderer",
-                    "methodName": "generateEmailSubject",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderHTML(org.xwiki.notifications.CompositeEvent) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderHTML(org.xwiki.notifications.CompositeEvent, java.lang.String) throws org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.notifiers.email",
-                    "classSimpleName": "NotificationEmailRenderer",
-                    "methodName": "renderHTML",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.numberOfParametersChanged",
-                    "old": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderPlainText(org.xwiki.notifications.CompositeEvent) throws org.xwiki.notifications.NotificationException",
-                    "new": "method java.lang.String org.xwiki.notifications.notifiers.email.NotificationEmailRenderer::renderPlainText(org.xwiki.notifications.CompositeEvent, java.lang.String) throws org.xwiki.notifications.NotificationException",
-                    "package": "org.xwiki.notifications.notifiers.email",
-                    "classSimpleName": "NotificationEmailRenderer",
-                    "methodName": "renderPlainText",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  }
                 ]
               }
             }

@@ -35,7 +35,8 @@ stage ('Platform Builds') {
         name: 'Main',
         goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
-        properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true')
+        properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+      )
 
       // Note: if an error occurs in the first build above, then an exception will be raised and this job will not
       // execute which is what we want since failures can be test flickers for ex, and it could still be interesting to
@@ -46,7 +47,8 @@ stage ('Platform Builds') {
         name: 'Distribution',
         goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
-        pom: 'xwiki-platform-distribution/pom.xml')
+        pom: 'xwiki-platform-distribution/pom.xml'
+      )
 
       // Building the various functional tests, after the distribution has been built successfully.
 
@@ -117,14 +119,16 @@ stage ('Platform Builds') {
         name: 'TestRelease',
         goals: 'clean install',
         profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
-        properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true')
+        properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+      )
     },
     'quality': {
       // Run the quality checks
       build(
         name: 'Quality',
         goals: 'clean install jacoco:report',
-        profiles: 'quality,legacy')
+        profiles: 'quality,legacy'
+      )
     }
   )
 }
@@ -167,16 +171,14 @@ def computeMavenOpts(mavenOpts)
 
 def buildFunctionalTest(map)
 {
-  def newMap = [
-    goals: 'clean deploy',
-    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
-  ]
-  newMap.putAll(map)
-
-  // Recompute pom to add a common prefix
   def sharedPOMPrefix =
     'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
-  newMap.pom = "${sharedPOMPrefix}/${map.pom}"
 
-  build(newMap)
+  build(
+    name: map.name,
+    goals: 'clean deploy',
+    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
+    mavenOpts: map.mavenOpts,
+    pom: "${sharedPOMPrefix}/${map.pom}"
+  )
 }

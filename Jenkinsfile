@@ -139,7 +139,7 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: commonMavenOpts
+      mavenOpts = map.mavenOpts == null ? commonMavenOpts : map.mavenOpts
       if (map.goals) {
         goals = map.goals
       }

@@ -2,6 +2,7 @@ org.xwiki.notifications.notifiers.internal.email.live.DefaultLiveMimeMessageIter
 org.xwiki.notifications.notifiers.internal.email.DefaultNotificationEmailRenderer
 org.xwiki.notifications.notifiers.internal.email.DefaultPeriodicMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.LogoAttachmentExtractor
+org.xwiki.notifications.notifiers.internal.email.MailTemplateImageAttachmentsExtractor
 org.xwiki.notifications.notifiers.internal.email.UserAvatarAttachmentExtractor
 org.xwiki.notifications.notifiers.internal.DefaultModelBridge
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerComponentBuilder

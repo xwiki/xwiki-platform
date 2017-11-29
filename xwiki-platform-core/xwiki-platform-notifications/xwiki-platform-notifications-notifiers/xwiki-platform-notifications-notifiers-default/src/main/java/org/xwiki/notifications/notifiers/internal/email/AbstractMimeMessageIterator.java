@@ -105,6 +105,9 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     @Inject
     private LogoAttachmentExtractor logoAttachmentExtractor;
 
+    @Inject
+    private MailTemplateImageAttachmentsExtractor mailTemplateImageAttachmentsExtractor;
+
     private NotificationUserIterator userIterator;
 
     private Map<String, Object> factoryParameters = new HashMap<>();
@@ -172,6 +175,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     {
         handleEvents();
         handleWikiLogo();
+        handleImageAttachmentsFromTemplate();
 
         try {
             factoryParameters.put(FROM, new InternetAddress(mailSenderConfiguration.getFromAddress()));
@@ -180,6 +184,18 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         }
 
         factoryParameters.put(TO, this.currentUserEmail);
+    }
+
+    private void handleImageAttachmentsFromTemplate() throws NotificationException
+    {
+        Collection<Attachment> attachments = getAttachments();
+
+        try {
+            attachments.addAll(mailTemplateImageAttachmentsExtractor.getImages(templateReference));
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to get the attachments of the template [%s].", templateReference), e);
+        }
     }
 
     private void handleEvents() throws NotificationException

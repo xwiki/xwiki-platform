@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -40,6 +41,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
@@ -188,14 +190,48 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
 
         if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
             // Parse ~DELETED_ATTACH_METADATA.xml
-            DeletedAttachment dbAttachment = parseDeletedAttachMedatata(documentReference, id, directory);
+            File file = new File(directory, "~DELETED_ATTACH_METADATA.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(file);
 
-            // Save deleted attachment in the DB
-            session.saveOrUpdate(dbAttachment);
+            String filename = getElementText(doc, "filename", null);
+            String deleter = getElementText(doc, "deleter", null);
+            Date deleteDate = new Date(Long.valueOf(getElementText(doc, "datedeleted", null)));
 
-            // Refactor file storage to be based on id instead of date
+            long docId = new XWikiDocument(documentReference).getId();
+
+            // We need to make sure the deleted attachment is not already in the database with a different id (left
+            // there by the attachment porter script for example)
+            Query selectQuery =
+                session.createQuery("SELECT id FROM DeletedAttachment WHERE docId=? AND filename=? AND date=?");
+            selectQuery.setLong(0, docId);
+            selectQuery.setString(1, filename);
+            selectQuery.setTimestamp(2, new java.sql.Timestamp(deleteDate.getTime()));
+            Long databaseId = (Long) selectQuery.uniqueResult();
+
+            if (databaseId == null) {
+                // Try without the milliseconds since most versions of MySQL don't support them
+                selectQuery.setTimestamp(2, new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
+                databaseId = (Long) selectQuery.uniqueResult();
+            }
+
+            DeletedAttachment dbAttachment;
+            if (databaseId != null) {
+                // Update the database metadata (probably left there by the attachment porter script)
+                dbAttachment = new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
+                    FileSystemStoreUtils.HINT, deleter, deleteDate, null, databaseId);
+                session.update(dbAttachment);
+            } else {
+                // Insert new deleted attachment metadata in the DB
+                dbAttachment = new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
+                    FileSystemStoreUtils.HINT, deleter, deleteDate, null);
+                databaseId = (Long) session.save(dbAttachment);
+            }
+
+            // Refactor file storage to be based on database id instead of date
             File newDirectory = new File(directory.getParentFile(),
-                GenericFileUtils.getURLEncoded(dbAttachment.getFilename() + "-id" + dbAttachment.getId()));
+                GenericFileUtils.getURLEncoded(dbAttachment.getFilename() + "-id" + databaseId));
             FileUtils.moveDirectory(directory, newDirectory);
         }
     }
@@ -225,24 +261,6 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
         } else {
             return new SpaceReference(name, getEntityReference(parent));
         }
-    }
-
-    private DeletedAttachment parseDeletedAttachMedatata(DocumentReference documentReference, long id, File directory)
-        throws ParserConfigurationException, SAXException, IOException
-    {
-        File file = new File(directory, "~DELETED_ATTACH_METADATA.xml");
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(file);
-
-        String filename = getElementText(doc, "filename", null);
-        String deleter = getElementText(doc, "deleter", null);
-        Date deleteDate = new Date(Long.valueOf(getElementText(doc, "datedeleted", null)));
-
-        long docId = new XWikiDocument(documentReference).getId();
-
-        return new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
-            FileSystemStoreUtils.HINT, deleter, deleteDate, null, id);
     }
 
     private String getElementText(Document doc, String elementName, String def)

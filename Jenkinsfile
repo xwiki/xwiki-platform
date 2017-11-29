@@ -23,7 +23,7 @@
 // @Library("XWiki@<branch, tag, sha1>") _
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
-def commonMavenOpts = "-Xmx2500m -Xms512m"
+commonMavenOpts = "-Xmx2500m -Xms512m"
 
 stage ('Platform Builds') {
   parallel(
@@ -139,7 +139,7 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts == null ? commonMavenOpts : map.mavenOpts
+      mavenOpts = map.mavenOpts ?: commonMavenOpts
       if (map.goals) {
         goals = map.goals
       }

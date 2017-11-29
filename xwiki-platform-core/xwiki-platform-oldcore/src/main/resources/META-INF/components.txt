@@ -99,6 +99,7 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
+com.xpn.xwiki.internal.render.velocity.DefaultVelocityRenderer
 com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor

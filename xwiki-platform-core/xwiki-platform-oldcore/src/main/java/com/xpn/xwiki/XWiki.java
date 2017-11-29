@@ -203,6 +203,7 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
+import com.xpn.xwiki.render.velocity.VelocityRenderer;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
@@ -381,6 +382,8 @@ public class XWiki implements EventListener
 
     private RenderingContext renderingContext;
 
+    private VelocityRenderer velocityRenderer;
+
     /**
      * Whether backlinks are enabled or not (cached for performance).
      *
@@ -502,6 +505,15 @@ public class XWiki implements EventListener
     {
         return getRenderingContext() instanceof MutableRenderingContext
             ? (MutableRenderingContext) getRenderingContext() : null;
+    }
+
+    private VelocityRenderer getVelocityRenderer()
+    {
+        if (this.velocityRenderer == null) {
+            this.velocityRenderer = Utils.getComponent(VelocityRenderer.class);
+        }
+
+        return this.velocityRenderer;
     }
 
     private ObservationManager getObservationManager()
@@ -5476,40 +5488,12 @@ public class XWiki implements EventListener
      */
     public String evaluateVelocity(String content, String namespace, VelocityContext vcontext)
     {
-        StringWriter writer = new StringWriter();
-
-        boolean renderingContextPushed = false;
         try {
-            // Switch current namespace if needed
-            String currentNamespace = getRenderingContext().getTransformationId();
-            if (namespace != null && !StringUtils.equals(namespace, currentNamespace)) {
-                if (getRenderingContext() instanceof MutableRenderingContext) {
-                    // Make the current velocity template id available
-                    ((MutableRenderingContext) getRenderingContext()).push(getRenderingContext().getTransformation(),
-                        getRenderingContext().getXDOM(), getRenderingContext().getDefaultSyntax(), namespace,
-                        getRenderingContext().isRestricted(), getRenderingContext().getTargetSyntax());
-
-                    renderingContextPushed = true;
-                }
-            }
-
-            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-            velocityManager.getVelocityEngine().evaluate(vcontext, writer, namespace, content);
-
-            return writer.toString();
-        } catch (Exception e) {
+            return getVelocityRenderer().evaluateVelocity(content, namespace, vcontext);
+        } catch (XWikiException xe) {
             LOGGER.error("Error while parsing velocity template namespace [{}] with content:\n[{}]", namespace, content,
-                e);
-            Object[] args = { namespace };
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
-                args);
+                    xe.getCause());
             return Util.getHTMLExceptionMessage(xe, null);
-        } finally {
-            // Get rid of temporary rendering context
-            if (renderingContextPushed) {
-                ((MutableRenderingContext) this.renderingContext).pop();
-            }
         }
     }
 

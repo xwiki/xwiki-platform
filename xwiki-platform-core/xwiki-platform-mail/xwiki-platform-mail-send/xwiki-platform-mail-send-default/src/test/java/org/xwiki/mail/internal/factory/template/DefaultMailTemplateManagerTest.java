@@ -44,7 +44,9 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -75,6 +77,8 @@ public class DefaultMailTemplateManagerTest
 
     private XWikiContext xwikiContext;
 
+    private VelocityEvaluator velocityEvaluator;
+
     @Before
     public void setUp() throws Exception
     {
@@ -97,6 +101,8 @@ public class DefaultMailTemplateManagerTest
         // though we don't want this line to have any behavior.
         when(this.xwikiContext.getURL()).thenReturn(new URL("http://localhost:8080/dummy"));
         when(this.xwikiContext.getRequest()).thenReturn(mock(XWikiRequest.class));
+
+        velocityEvaluator = mocker.getInstance(VelocityEvaluator.class);
     }
 
     @Test
@@ -111,18 +117,8 @@ public class DefaultMailTemplateManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                ((Writer) args[1]).write("Hello <b>John Doe</b> <br />john@doe.com");
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            any(), eq("Hello <b>${name}</b> <br />${email}"));
+        when(velocityEvaluator.evaluateVelocity(eq("Hello <b>${name}</b> <br />${email}"), any(),
+                any(VelocityContext.class))).thenReturn("Hello <b>John Doe</b> <br />john@doe.com");
 
         String result =
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap());
@@ -143,18 +139,9 @@ public class DefaultMailTemplateManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
+        when(velocityEvaluator.evaluateVelocity(eq("Salut <b>${name}</b> <br />${email}"), any(),
+                any(VelocityContext.class))).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
 
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            any(), eq("Salut <b>${name}</b> <br />${email}"));
 
         // Set the default Locale to be different from the locale we pass to verify we restore it properly
         when(this.xwikiContext.getLocale()).thenReturn(Locale.ITALIAN);
@@ -189,17 +176,8 @@ public class DefaultMailTemplateManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(), any(), any(), eq("Salut <b>${name}</b> <br />${email}"));
+        when(velocityEvaluator.evaluateVelocity(eq("Salut <b>${name}</b> <br />${email}"), any(),
+                any(VelocityContext.class))).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
 
         String result = this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
             Locale.FRENCH);
@@ -228,17 +206,8 @@ public class DefaultMailTemplateManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(), any(), any(), eq("Salut <b>${name}</b> <br />${email}"));
+        when(velocityEvaluator.evaluateVelocity(eq("Salut <b>${name}</b> <br />${email}"), any(),
+                any(VelocityContext.class))).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
 
         String result = this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.emptyMap(),
             Locale.FRENCH);
@@ -296,8 +265,8 @@ public class DefaultMailTemplateManagerTest
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
-        when(velocityEngine.evaluate(any(VelocityContext.class), any(Writer.class),
-            any(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
+        when(velocityEvaluator.evaluateVelocity(eq("Hello <b>${name}</b> <br />${email}"), any(),
+                any(VelocityContext.class))).thenThrow(new XWikiException(0, 0, "Error"));
 
         try {
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html",

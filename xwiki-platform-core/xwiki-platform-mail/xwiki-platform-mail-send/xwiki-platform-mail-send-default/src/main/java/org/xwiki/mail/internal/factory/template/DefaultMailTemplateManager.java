@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.template;
 
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,10 +39,10 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.ExternalServletURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -76,6 +75,9 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
     @Inject
     private VelocityManager velocityManager;
+
+    @Inject
+    private VelocityEvaluator velocityEvaluator;
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
@@ -112,10 +114,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
             // language (in case there are translations used).
             xcontext.setLocale(locale);
 
-            StringWriter writer = new StringWriter();
-            velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
-            return writer.toString();
-        } catch (XWikiVelocityException e) {
+            return velocityEvaluator.evaluateVelocity(content, templateFullName, velocityContext);
+        } catch (XWikiException e) {
             throw new MessagingException(String.format(
                 "Failed to evaluate property [%s] for Document [%s] and locale [%s]",
                     property, templateReference, localeValue), e);

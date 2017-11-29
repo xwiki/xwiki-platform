@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.render.velocity;
+package com.xpn.xwiki.internal.velocity;
 
 import java.io.StringWriter;
 
@@ -32,17 +32,16 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.velocity.VelocityRenderer;
 
 /**
- * Default implementation of {@link VelocityRenderer}.
+ * Default implementation of {@link VelocityEvaluator}.
  * 
  * @version $Id$
  * @since 9.11RC1
  */
 @Component
 @Singleton
-public class DefaultVelocityRenderer implements VelocityRenderer
+public class DefaultVelocityEvaluator implements VelocityEvaluator
 {
     @Inject
     private RenderingContext renderingContext;

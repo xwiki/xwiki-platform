@@ -193,6 +193,7 @@ import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
+import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -203,7 +204,6 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
-import com.xpn.xwiki.render.velocity.VelocityRenderer;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
@@ -382,7 +382,7 @@ public class XWiki implements EventListener
 
     private RenderingContext renderingContext;
 
-    private VelocityRenderer velocityRenderer;
+    private VelocityEvaluator velocityEvaluator;
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -507,13 +507,13 @@ public class XWiki implements EventListener
             ? (MutableRenderingContext) getRenderingContext() : null;
     }
 
-    private VelocityRenderer getVelocityRenderer()
+    private VelocityEvaluator getVelocityEvaluator()
     {
-        if (this.velocityRenderer == null) {
-            this.velocityRenderer = Utils.getComponent(VelocityRenderer.class);
+        if (this.velocityEvaluator == null) {
+            this.velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
         }
 
-        return this.velocityRenderer;
+        return this.velocityEvaluator;
     }
 
     private ObservationManager getObservationManager()
@@ -5489,7 +5489,7 @@ public class XWiki implements EventListener
     public String evaluateVelocity(String content, String namespace, VelocityContext vcontext)
     {
         try {
-            return getVelocityRenderer().evaluateVelocity(content, namespace, vcontext);
+            return getVelocityEvaluator().evaluateVelocity(content, namespace, vcontext);
         } catch (XWikiException xe) {
             LOGGER.error("Error while parsing velocity template namespace [{}] with content:\n[{}]", namespace, content,
                     xe.getCause());

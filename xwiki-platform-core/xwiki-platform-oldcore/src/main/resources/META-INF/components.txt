@@ -99,7 +99,6 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
-com.xpn.xwiki.internal.render.velocity.DefaultVelocityRenderer
 com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
@@ -125,6 +124,7 @@ com.xpn.xwiki.internal.store.PropertyConverter
 com.xpn.xwiki.internal.render.DefaultOldRendering
 com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
+com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass
 com.xpn.xwiki.objects.meta.DateMetaClass

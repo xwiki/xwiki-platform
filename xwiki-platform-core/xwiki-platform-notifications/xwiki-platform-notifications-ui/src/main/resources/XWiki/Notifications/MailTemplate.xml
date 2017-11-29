@@ -40,6 +40,36 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content/>
+  <attachment>
+    <filename>NECog.png</filename>
+    <mimetype>image/png</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1511956908000</date>
+    <version>1.2</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAABUAAAAYCAYAAAAVibZIAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QsdDAEqD9XdJwAAAlNJREFUOMu1lU9IFHEUxz9vdv1TBCWEQZfaog5iUdhmmkVJERhhJwk7BEHioYsg4i6BU6Rbh/IQBB6CDh1s6RCEEhEVUsa2G2GdIory0AaBIiTt6M68Dgvuzuy40ZoP5vB78/195/d9731/A6sQ8lfEUOI8RuDO0lqdK0T2D5TaYhRleuLVboQ0es7R4Fr2PllbmnTwTSu1oTRDyXtLYJWQm1N2ANA1EiSWus7GmlliyQ5/+bHEUSQwDuROqvoBmAbaEPGW6RWoAdKUw2KDdhIJx/OkPfFqakNpRDaU3x5dIGNtxWxJ5+QPd2QQHqyo5cpzePrDXdPM/EXQt+UR6jQ614lpqpvUPGKhpH12fEWds9hWPY59GtUpH9p5osdm8o26mmgkaDSgWgdGN0KgQNIMVqYesyX/sb6X66ipmkRkl4vW0dtAErHfC7FU1kXkBvYSDd8oyg8m2ggExpYf/uUIARwmffNzixP/5qj/EAaqiyXeNvvm11ccLk2ateuwnQ5UB4Csx/cRzBebirxuGEM+czqKo33Y9gm3/WLJh4i0e+BfsO1L2DJFULZjyGVgr2dOPxEJ7yz2vhmvoCo0gciBMob/O9bCHsyDP92Nqtx2syzC3M21marK+3SNBPOkpimInlnZdS+HCO3eUkiqaLYd9FdB4T+CjqOqPnpfozpRIF9x9AKRps9u+dGmSRw9jjKDMspsZh/94ZMgjz31+0Z/uBlrrBUYRtVCnHNEw3eXl2E+WuP+R6VucS2lS08s+awk3tdR5qnf7oT9zoNIlMavUvwBcdTe02VqHlAAAAAASUVORK5CYII=</content>
+    <filesize>710</filesize>
+  </attachment>
+  <attachment>
+    <filename>NEPage.png</filename>
+    <mimetype>image/png</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1511957252000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAABIAAAAVCAYAAABLy77vAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QsdDAcYkVgrIQAAALJJREFUOMvt1D0OAWEQxvHfimK5glbhDCKioBCJIziBuA0XcAMKBTqFG+wZ1BIqobHJZuNjdzWKfZIp3szkn3dm8kyAEA0EvuuE87tkhHvGuGGJehoSPAsWWH/5zQY7dHDECJdkwR3TDG3FdQNcsUctTlbk1xZjtLGKYUVASVgHc6jmBHRT7wMmmOWZ0e7DNpt5Wus/t5yM4S/DfqkSVIL+ChSbtlfAwNBK3KqPZswSEcIHXqY555k2NpEAAAAASUVORK5CYII=</content>
+    <filesize>293</filesize>
+  </attachment>
+  <attachment>
+    <filename>NEWiki.png</filename>
+    <mimetype>image/png</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1511957576000</date>
+    <version>1.4</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QsdDAwnxMrf1wAAAPdJREFUOMvN1L1KA0EQB/Bfwgn6Agl4WFkpqRSs7GyCFiLY2FlYCMEujZ2SF/AlfAjFwsbGN9BK7exM4wd+xGaE4zB4e1jkD8vMzvx3dmd2dpk0NErzOSz+Yi9ihDvcjCNs4D2IVUZv3ImuMI0dfP2RySHWkZe5s2HoVSzJUpxqtew4wAdaCfW9xUnZeImzxIsa4KFYnhY+sZsYqBPprUCGLTTRxn5isCG2cd3AOdbi6lOR4R7z8IJ+zYbejPTyZvTOa4VFpzgO/gW6eAvfTJaw+0LsPhV6G4/FHCU04Q/ykN1ioGG8szpYDvkEe6GMaoxnHP3rf/QN9DdAOQ5Pv6wAAAAASUVORK5CYII=</content>
+    <filesize>362</filesize>
+  </attachment>
   <object>
     <name>XWiki.Notifications.MailTemplate</name>
     <number>0</number>
@@ -98,7 +128,7 @@
       </text>
     </class>
     <property>
-      <html>## TODO: fix org.xwiki.mail.internal.factory.template.DefaultMailTemplateManager so we wan use macros and move most of 
+      <html>## TODO: fix org.xwiki.mail.internal.factory.template.DefaultMailTemplateManager so we wan use macros and move most of
 ## the code in a new template.
 ###template('notification/email/macros.vm')
 #macro(link $url $linkText)
@@ -116,9 +146,9 @@
     #if (!$displayedDocuments.contains($ev.event.document) || $ev.hasChildren())
       #set ($discard = $displayedDocuments.add($ev.event.document))
       #set ($document = $xwiki.getDocument($ev.event.document))
-      &lt;li&gt;#link("#${escapetool.xml($ev.event.events.get(0).id)}", $escapetool.xml($document.displayTitle))
+      &lt;li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"&gt;&lt;span style="color: #ccc;"&gt;---&lt;/span&gt; &lt;img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/&gt; #link("#${escapetool.xml($ev.event.events.get(0).id)}", $escapetool.xml($document.displayTitle))
         #if ($ev.hasChildren())
-          &lt;ul&gt;
+          &lt;ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;"&gt;
           #foreach ($child in $ev.children)
             #displaySortedEventTOC($child)
           #end
@@ -135,8 +165,8 @@
     #set ($sortedEventList = $element.value)
     #if ($wiki != '')
       #set ($wikiDescriptor = $services.wiki.getById($wiki))
-      &lt;li&gt;$wikiDescriptor.prettyName
-        &lt;ul&gt;
+      &lt;li style="margin: 10px 0;"&gt;&lt;img src="cid:NEWiki.png" alt="•" style="width: 10px;"/&gt; $escapetool.xml($wikiDescriptor.prettyName)
+        &lt;ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 5px;"&gt;
           #foreach ($ev in $sortedEventList)
             #displaySortedEventTOC($ev)
           #end
@@ -150,7 +180,7 @@
       #end
     #end
   #end
-  &lt;ul&gt;
+  &lt;ul style="list-style-type: none; font-size: 12px; padding: 0;"&gt;
     #foreach ($element in $sortedEvents.entrySet())
       #displayWikiTOC($element)
     #end
@@ -158,7 +188,7 @@
 #end
 
 ## Main Div
-&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color:#F5F5F5; padding:15px; margin:0 auto; color: #1d1f24; "&gt;
+&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; background-color:#F5F5F5; padding:15px; margin:0 auto; color: #1d1f24; "&gt;
   ## Main centered table
   &lt;table style="max-width: 570px; margin:0 auto" cellspacing="0" cellpadding="0" width="100%" align="center"&gt;&lt;tr&gt;&lt;td&gt;
     ## Logo table
@@ -166,7 +196,7 @@
       ## Logo
       &lt;td align="left"&gt;&lt;a href="$xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)"&gt;&lt;img src="cid:logo" alt="XWiki" /&gt;&lt;/a&gt;&lt;/td&gt;
       ## Notification settings
-      &lt;td align="right"&gt;&lt;a href="$xwiki.getURL($emailUser, 'view', 'category=notifications')" style="color: #0088CC; text-decoration: none;"&gt;$escapetool.xml($services.localization.render('notifications.settings.title'))&lt;/a&gt;&lt;/td&gt;
+      &lt;td align="right"&gt;&lt;a href="$xwiki.getURL($emailUser, 'view', 'category=notifications')" style="color: #0088CC; text-decoration: none; font-size: 14px;"&gt;&lt;img src="cid:NECog.png" alt="" height="12" style="height: 12px"/&gt; $escapetool.xml($services.localization.render('notifications.settings.title'))&lt;/a&gt;&lt;/td&gt;
     ## End of the logo table
     &lt;/tr&gt;&lt;/table&gt;
 

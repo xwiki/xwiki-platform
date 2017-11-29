@@ -51,10 +51,16 @@ stage ('Platform Builds') {
       // Building the various functional tests, after the distribution has been built successfully.
 
       // Build the Flavor Test POM, required for the pageobjects module below.
-      buildFunctionalTest('pom.xml')
+      buildFunctionalTest(
+        name: 'Flavor Test - POM',
+        pom: 'pom.xml'
+      )
 
-      // Build the Flavor Test Pageobjects required by the functional test below that need an XWiki UI
-      buildFunctionalTest('xwiki-platform-distribution-flavor-test-pageobjects/pom.xml')
+      // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
+      buildFunctionalTest(
+        name: 'Flavor Test - PageObjects',
+        pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml'
+      )
 
       // Now run all tests in parallel
       parallel(

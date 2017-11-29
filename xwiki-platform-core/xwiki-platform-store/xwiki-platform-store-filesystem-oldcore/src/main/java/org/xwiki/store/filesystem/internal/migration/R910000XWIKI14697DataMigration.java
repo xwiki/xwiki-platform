@@ -29,7 +29,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI-14697. Make sure all attachments have the right content and archive store id.
+ * Migration for XWIKI-14697. Make sure all attachments have the right content store id.
  *
  * @version $Id$
  * @since 9.10RC1

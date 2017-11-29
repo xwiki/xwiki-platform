@@ -23,6 +23,8 @@
 // @Library("XWiki@<branch, tag, sha1>") _
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
+def commonMavenOpts = "-Xmx2500m -Xms512m"
+
 stage ('Platform Builds') {
   parallel(
     'main': {
@@ -108,7 +110,7 @@ stage ('Platform Builds') {
           buildFunctionalTest(
             name: 'Flavor Test - Webstandards',
             pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
-            mavenOpts: '-XX:ThreadStackSize=2048'
+            mavenOpts: "${commonMavenOpts} -XX:ThreadStackSize=2048"
           )
         }
       )
@@ -137,7 +139,7 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
-      mavenOpts = computeMavenOpts(map.mavenOpts)
+      mavenOpts = map.mavenOpts ?: commonMavenOpts
       if (map.goals) {
         goals = map.goals
       }
@@ -152,21 +154,6 @@ def build(map)
       }
     }
   }
-}
-
-def computeMavenOpts(mavenOpts)
-{
-  def computedMavenOpts = ''
-  if (mavenOpts) {
-    computedMavenOpts = mavenOpts
-  }
-  if (!computedMavenOpts.contains('-Xmx')) {
-    computedMavenOpts = "${computedMavenOpts} -Xmx2500m"
-  }
-  if (!computedMavenOpts.contains('-Xms')) {
-    computedMavenOpts = "${computedMavenOpts} -Xms512m"
-  }
-  return computedMavenOpts
 }
 
 def buildFunctionalTest(map)

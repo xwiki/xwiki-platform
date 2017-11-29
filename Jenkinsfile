@@ -139,7 +139,9 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
+      echoXWiki "[Debug] ${map.mavenOpts} - ${commonMavenOpts}"
       mavenOpts = map.mavenOpts ?: commonMavenOpts
+      echoXWiki "[Debug] ${mavenOpts}"
       if (map.goals) {
         goals = map.goals
       }

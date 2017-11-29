@@ -32,6 +32,7 @@ stage ('Platform Builds') {
       // Configures the snapshot extension repository in XWiki in the generated distributions to make it easy for
       // developers to install snapshot extensions when they do manual tests.
       build(
+        name: 'Main',
         goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
         properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true')
@@ -42,6 +43,7 @@ stage ('Platform Builds') {
 
       // Build the distributions
       build(
+        name: 'Distribution',
         goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
         pom: 'xwiki-platform-distribution/pom.xml')
@@ -58,33 +60,35 @@ stage ('Platform Builds') {
       parallel(
         'flavor-test-ui': {
           // Run the Flavor UI tests
-          buildFunctionalTest('xwiki-platform-distribution-flavor-test-ui/pom.xml')
+          buildFunctionalTest('Flavor Test - UI', 'xwiki-platform-distribution-flavor-test-ui/pom.xml')
         },
         'flavor-test-misc': {
           // Run the Flavor Misc tests
-          buildFunctionalTest('xwiki-platform-distribution-flavor-test-misc/pom.xml')
+          buildFunctionalTest('Flavor Test - Misc', 'xwiki-platform-distribution-flavor-test-misc/pom.xml')
         },
         'flavor-test-storage': {
           // Run the Flavor Storage tests
-          buildFunctionalTest('xwiki-platform-distribution-flavor-test-storage/pom.xml')
+          buildFunctionalTest('Flavor Test - Storage', 'xwiki-platform-distribution-flavor-test-storage/pom.xml')
         },
         'flavor-test-escaping': {
           // Run the Flavor Escaping tests
-          buildFunctionalTest('xwiki-platform-distribution-flavor-test-escaping/pom.xml')
+          buildFunctionalTest('Flavor Test - Escaping', 'xwiki-platform-distribution-flavor-test-escaping/pom.xml')
         },
         'flavor-test-selenium': {
           // Run the Flavor Selenium tests
-          buildFunctionalTest('xwiki-platform-distribution-flavor-test-selenium/pom.xml')
+          buildFunctionalTest('Flavor Test - Selenium', 'xwiki-platform-distribution-flavor-test-selenium/pom.xml')
         },
         'flavor-test-webstandards': {
           // Run the Flavor Webstandards tests
-          buildFunctionalTest('xwiki-platform-distribution-flavor-test-webstandards/pom.xml')
+          buildFunctionalTest('Flavor Test - Webstandards',
+            'xwiki-platform-distribution-flavor-test-webstandards/pom.xml')
         }
       )
     },
     'testrelease': {
       // Simulate a release and verify all is fine.
       build(
+        name: 'TestRelease',
         goals: 'clean install',
         profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
         properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true')
@@ -92,6 +96,7 @@ stage ('Platform Builds') {
     'quality': {
       // Run the quality checks
       build(
+        name: 'Quality',
         goals: 'clean install jacoco:report',
         profiles: 'quality,legacy')
     }
@@ -101,7 +106,7 @@ stage ('Platform Builds') {
 def build(map)
 {
   node {
-    xwikiBuild {
+    xwikiBuild(map.name) {
       mavenOpts = '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
       if (map.goals) {
         goals = map.goals
@@ -119,11 +124,11 @@ def build(map)
   }
 }
 
-def buildFunctionalTest(pPom)
+def buildFunctionalTest(name, pom)
 {
   def sharedGoals = 'clean deploy'
   def sharedProfiles = 'legacy,integration-tests,jetty,hsqldb,firefox'
   def sharedPOMPrefix =
     'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
-  build(goals: sharedGoals, profiles: sharedProfiles, pom: "${sharedPOMPrefix}/${pPom}")
+  build(name: name, goals: sharedGoals, profiles: sharedProfiles, pom: "${sharedPOMPrefix}/${pom}")
 }

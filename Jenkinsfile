@@ -169,9 +169,9 @@ def buildFunctionalTest(map)
 {
   def newMap = [
     goals: 'clean deploy',
-    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox'
+    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
   ]
-  newMap << map
+  newMap.putAll(map)
 
   // Recompute pom to add a common prefix
   def sharedPOMPrefix =

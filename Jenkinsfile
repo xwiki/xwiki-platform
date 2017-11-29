@@ -107,6 +107,8 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
+      // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu Validator
+      // (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
       mavenOpts = '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
       if (map.goals) {
         goals = map.goals

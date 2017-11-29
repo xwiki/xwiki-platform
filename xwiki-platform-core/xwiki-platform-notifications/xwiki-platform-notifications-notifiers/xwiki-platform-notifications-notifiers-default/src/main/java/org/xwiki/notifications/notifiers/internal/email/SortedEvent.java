@@ -22,8 +22,10 @@ package org.xwiki.notifications.notifiers.internal.email;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 
 /**
@@ -40,6 +42,8 @@ public class SortedEvent
     private String html;
 
     private String plainText;
+
+    private List<SortedEvent> eventsWithTheSameDocument = new ArrayList<>();
 
     private List<SortedEvent> children = new ArrayList<>();
 
@@ -105,9 +109,11 @@ public class SortedEvent
      */
     public boolean isParent(SortedEvent sortedEvent)
     {
-        return !event.getDocument().equals(sortedEvent.getEvent().getDocument())
-                && event.getDocument().getName().equals("WebHome")
-                && sortedEvent.getEvent().getDocument().hasParent(event.getDocument().getLastSpaceReference());
+        DocumentReference document = getDocument();
+        return document != null
+                && !document.equals(sortedEvent.getDocument())
+                && document.getName().equals("WebHome")
+                && sortedEvent.getDocument().hasParent(document.getLastSpaceReference());
     }
 
     /**
@@ -116,5 +122,42 @@ public class SortedEvent
     public boolean hasChildren()
     {
         return !children.isEmpty();
+    }
+
+    /**
+     * @return a list of sorted events that concern the same document
+     */
+    public List<SortedEvent> getEventsWithTheSameDocument()
+    {
+        return eventsWithTheSameDocument;
+    }
+
+    /**
+     * Add a sorted event in the list of events that concern the same document.
+     * @param event event to add
+     */
+    public void addEventWithTheSameDocument(SortedEvent event)
+    {
+        eventsWithTheSameDocument.add(event);
+        if (event.hasChildren()) {
+            children.addAll(event.children);
+            event.children.clear();
+        }
+    }
+
+    /**
+     * @return document concerned by the event (can be null)
+     */
+    public DocumentReference getDocument()
+    {
+        return event.getDocument();
+    }
+
+    /**
+     * @return the date of the most recent event
+     */
+    public Date getDate()
+    {
+        return event.getDate();
     }
 }

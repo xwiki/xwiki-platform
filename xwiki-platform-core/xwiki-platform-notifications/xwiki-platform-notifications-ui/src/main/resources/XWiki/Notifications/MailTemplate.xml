@@ -128,65 +128,7 @@
       </text>
     </class>
     <property>
-      <html>## TODO: fix org.xwiki.mail.internal.factory.template.DefaultMailTemplateManager so we wan use macros and move most of
-## the code in a new template.
-###template('notification/email/macros.vm')
-#macro(link $url $linkText)
-  &lt;a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="$escapetool.xml($url)"&gt;$linkText&lt;/a&gt;
-#end
-#**
- * Display the table of content
- *#
-#macro(displayTOC $sortedEvents)
-  #set ($displayedDocuments = [])
-  #**
-   * Display a line of the table of content and its children if any
-   *#
-  #macro(displaySortedEventTOC $ev)
-    #if (!$displayedDocuments.contains($ev.event.document) || $ev.hasChildren())
-      #set ($discard = $displayedDocuments.add($ev.event.document))
-      #set ($document = $xwiki.getDocument($ev.event.document))
-      &lt;li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"&gt;&lt;span style="color: #ccc;"&gt;---&lt;/span&gt; &lt;img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/&gt; #link("#${escapetool.xml($ev.event.events.get(0).id)}", $escapetool.xml($document.displayTitle))
-        #if ($ev.hasChildren())
-          &lt;ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;"&gt;
-          #foreach ($child in $ev.children)
-            #displaySortedEventTOC($child)
-          #end
-          &lt;/ul&gt;
-        #end
-      &lt;/li&gt;
-      #end
-  #end
-  #**
-   * Display a line of the table of content for a wiki and its children if any
-   *#
-  #macro(displayWikiTOC $element)
-    #set ($wiki = $element.key)
-    #set ($sortedEventList = $element.value)
-    #if ($wiki != '')
-      #set ($wikiDescriptor = $services.wiki.getById($wiki))
-      &lt;li style="margin: 10px 0;"&gt;&lt;img src="cid:NEWiki.png" alt="•" style="width: 10px;"/&gt; $escapetool.xml($wikiDescriptor.prettyName)
-        &lt;ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 5px;"&gt;
-          #foreach ($ev in $sortedEventList)
-            #displaySortedEventTOC($ev)
-          #end
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    #else
-      ## If wiki == "", it means we have event that are not bound to any document
-      ## TODO: it should be displayed last or first, but not between 2 wikis
-      #foreach ($ev in $sortedEventList)
-        #displaySortedEventTOC($ev)
-      #end
-    #end
-  #end
-  &lt;ul style="list-style-type: none; font-size: 12px; padding: 0;"&gt;
-    #foreach ($element in $sortedEvents.entrySet())
-      #displayWikiTOC($element)
-    #end
-  &lt;/ul&gt;
-#end
-
+      <html>#template('notification/email/macros.vm')
 ## Main Div
 &lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; background-color:#F5F5F5; padding:15px; margin:0 auto; color: #1d1f24; "&gt;
   ## Main centered table
@@ -206,16 +148,6 @@
       ## Display a table of content
       #displayTOC($sortedEvents)
       ## Display Events
-      #macro(displaySortedEvent $sortedEvent)
-        #set ($id = $escapetool.xml($sortedEvent.event.events.get(0).id))
-        &lt;div class="notification" style="border-top: 1px dashed #E8E8E8;" id="$id"&gt;
-          &lt;a name="$id"&gt;&lt;/a&gt;
-          $sortedEvent.html
-        &lt;/div&gt;
-        #foreach ($ev in $sortedEvent.children)
-          #displaySortedEvent($ev)
-        #end
-      #end
       #foreach ($list in $sortedEvents.values())
         #foreach ($sortedEvent in $list)
           #displaySortedEvent($sortedEvent)

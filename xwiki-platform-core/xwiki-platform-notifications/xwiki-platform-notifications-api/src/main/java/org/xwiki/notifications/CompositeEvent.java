@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -153,6 +154,23 @@ public class CompositeEvent
             users.add(event.getUser());
         }
         return users;
+    }
+
+    /**
+     * @return the date of the most recent event
+     * @since 9.11RC1
+     */
+    public Date getDate()
+    {
+        Iterator<Event> it = events.iterator();
+        Event chosenEvent = it.next();
+        while (it.hasNext()) {
+            Event event = it.next();
+            if (event.getDate().compareTo(chosenEvent.getDate()) > 0) {
+                chosenEvent = event;
+            }
+        }
+        return chosenEvent.getDate();
     }
 
     /**

@@ -217,3 +217,70 @@
     </div>
   #end
 #end
+
+#**
+ * Display the table of content
+ *#
+#macro(displayTOC $sortedEvents)
+  #**
+   * Display a line of the table of content and its children if any
+   *#
+  #macro(displaySortedEventTOC $ev)
+    #set ($discard = $displayedDocuments.add($ev.event.document))
+    #set ($document = $xwiki.getDocument($ev.event.document))
+    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $escapetool.xml($document.displayTitle))
+      #if ($ev.hasChildren())
+        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;">
+        #foreach ($child in $ev.children)
+          #displaySortedEventTOC($child)
+        #end
+        </ul>
+      #end
+    </li>
+  #end
+  #**
+   * Display a line of the table of content for a wiki and its children if any
+   *#
+  #macro(displayWikiTOC $element)
+    #set ($wiki = $element.key)
+    #set ($sortedEventList = $element.value)
+    #if ($wiki != '')
+      #set ($wikiDescriptor = $services.wiki.getById($wiki))
+      <li style="margin: 10px 0;"><img src="cid:NEWiki.png" alt="•" style="width: 10px;"/> $escapetool.xml($wikiDescriptor.prettyName)
+        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 5px;">
+          #foreach ($ev in $sortedEventList)
+            #displaySortedEventTOC($ev)
+          #end
+        </ul>
+      </li>
+    #else
+      ## If wiki == "", it means we have event that are not bound to any document
+      ## TODO: it should be displayed last or first, but not between 2 wikis
+      #foreach ($ev in $sortedEventList)
+        #displaySortedEventTOC($ev)
+      #end
+    #end
+  #end
+  <ul style="list-style-type: none; font-size: 12px; padding: 0;">
+    #foreach ($element in $sortedEvents.entrySet())
+      #displayWikiTOC($element)
+    #end
+  </ul>
+#end
+
+#**
+ * Display a sorted event
+ *#
+#macro(displaySortedEvent $sortedEvent)
+  #set ($id = $escapetool.xml($sortedEvent.event.events.get(0).id))
+  <div class="notification" style="border-top: 1px dashed #E8E8E8;" id="$id">
+    <a name="$id"></a>
+    $sortedEvent.html
+  </div>
+  #foreach ($ev in $sortedEvent.eventsWithTheSameDocument)
+    #displaySortedEvent($ev)
+  #end
+  #foreach ($ev in $sortedEvent.children)
+    #displaySortedEvent($ev)
+  #end
+#end

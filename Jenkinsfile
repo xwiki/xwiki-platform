@@ -60,28 +60,48 @@ stage ('Platform Builds') {
       parallel(
         'flavor-test-ui': {
           // Run the Flavor UI tests
-          buildFunctionalTest('Flavor Test - UI', 'xwiki-platform-distribution-flavor-test-ui/pom.xml')
+          buildFunctionalTest(
+            name: 'Flavor Test - UI',
+            pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml'
+          )
         },
         'flavor-test-misc': {
           // Run the Flavor Misc tests
-          buildFunctionalTest('Flavor Test - Misc', 'xwiki-platform-distribution-flavor-test-misc/pom.xml')
+          buildFunctionalTest(
+            name: 'Flavor Test - Misc',
+            pom: 'xwiki-platform-distribution-flavor-test-misc/pom.xml'
+          )
         },
         'flavor-test-storage': {
           // Run the Flavor Storage tests
-          buildFunctionalTest('Flavor Test - Storage', 'xwiki-platform-distribution-flavor-test-storage/pom.xml')
+          buildFunctionalTest(
+            name: 'Flavor Test - Storage',
+            pom: 'xwiki-platform-distribution-flavor-test-storage/pom.xml'
+          )
         },
         'flavor-test-escaping': {
           // Run the Flavor Escaping tests
-          buildFunctionalTest('Flavor Test - Escaping', 'xwiki-platform-distribution-flavor-test-escaping/pom.xml')
+          buildFunctionalTest(
+            name: 'Flavor Test - Escaping',
+            pom: 'xwiki-platform-distribution-flavor-test-escaping/pom.xml'
+          )
         },
         'flavor-test-selenium': {
           // Run the Flavor Selenium tests
-          buildFunctionalTest('Flavor Test - Selenium', 'xwiki-platform-distribution-flavor-test-selenium/pom.xml')
+          buildFunctionalTest(
+            name: 'Flavor Test - Selenium',
+            pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml'
+          )
         },
         'flavor-test-webstandards': {
           // Run the Flavor Webstandards tests
-          buildFunctionalTest('Flavor Test - Webstandards',
-            'xwiki-platform-distribution-flavor-test-webstandards/pom.xml')
+          // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
+          // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
+          buildFunctionalTest(
+            name: 'Flavor Test - Webstandards',
+            pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
+            mavenOpts: '-XX:ThreadStackSize=2048'
+          )
         }
       )
     },
@@ -107,9 +127,7 @@ def build(map)
 {
   node {
     xwikiBuild(map.name) {
-      // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu Validator
-      // (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
-      mavenOpts = '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
+      mavenOpts = computeMavenOpts(map.mavenOpts)
       if (map.goals) {
         goals = map.goals
       }
@@ -126,11 +144,33 @@ def build(map)
   }
 }
 
-def buildFunctionalTest(name, pom)
+def computeMavenOpts(mavenOpts)
 {
-  def sharedGoals = 'clean deploy'
-  def sharedProfiles = 'legacy,integration-tests,jetty,hsqldb,firefox'
+  def computedMavenOpts = ''
+  if (mavenOpts) {
+    computedMavenOpts = mavenOpts
+  }
+  if (!computedMavenOpts.contains('-Xmx')) {
+    computedMavenOpts = "${computedMavenOpts} -Xmx2500m"
+  }
+  if (!computedMavenOpts.contains('-Xms')) {
+    computedMavenOpts = "${computedMavenOpts} -Xms512m"
+  }
+  return computedMavenOpts
+}
+
+def buildFunctionalTest(map)
+{
+  def newMap = [
+    goals: 'clean deploy',
+    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox'
+  ]
+  newMap << map
+
+  // Recompute pom to add a common prefix
   def sharedPOMPrefix =
     'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
-  build(name: name, goals: sharedGoals, profiles: sharedProfiles, pom: "${sharedPOMPrefix}/${pom}")
+  newMap.pom = "${sharedPOMPrefix}/${map.pom}"
+
+  build(newMap)
 }

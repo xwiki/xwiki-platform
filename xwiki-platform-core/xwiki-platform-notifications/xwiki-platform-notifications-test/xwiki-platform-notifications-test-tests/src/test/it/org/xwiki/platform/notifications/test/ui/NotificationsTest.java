@@ -26,9 +26,7 @@ import java.util.Scanner;
 
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
@@ -59,7 +57,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Perform tests on the notifications module.
- * 
+ *
  * @version $Id$
  * @since 9.4RC1
  */
@@ -293,11 +291,11 @@ public class NotificationsTest extends AbstractTest
         assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
 
         // Ensure that the notification list is displaying the correct amount of unread notifications
-        // (max 5 notifications by default)
-        assertEquals(5, tray.getUnreadNotificationsCount());
+        // (max 10 notifications by default)
+        assertEquals(10, tray.getUnreadNotificationsCount());
         assertEquals(0, tray.getReadNotificationsCount());
         tray.markAsRead(0);
-        assertEquals(4, tray.getUnreadNotificationsCount());
+        assertEquals(9, tray.getUnreadNotificationsCount());
         assertEquals(1, tray.getReadNotificationsCount());
 
         // Ensure that a notification has a correct type

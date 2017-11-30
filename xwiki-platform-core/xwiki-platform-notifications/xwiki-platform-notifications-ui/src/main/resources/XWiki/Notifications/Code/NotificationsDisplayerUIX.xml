@@ -43,8 +43,8 @@
 #********************************************************
     List the notifications of the current user as JSON
 ********************************************************#
-#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method)
-  #set ($batchSize = 5)
+#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; '' == "$!request.action")
+  #set ($batchSize = 10)
   #set ($notifications = [])
   #if ("$!request.untilDate" != '' &amp;&amp; "$!request.blackList" != '')
     #set ($untilDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.untilDate).longValue()).toDate())
@@ -73,7 +73,12 @@
     #set ($discard = $notifications.add($notification))
   #end
   #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'notifications': $notifications, 'unread': $services.notification.sources.getEventsCount(true, 21)})
+  $jsontool.serialize({'notifications': $notifications})
+#********************************************************
+    Get the number of unread notifications as JSON
+********************************************************#
+#elseif ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
+  $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(true, 21)})
 #********************************************************
              Mark a notification as read
 ********************************************************#
@@ -214,7 +219,7 @@
   /**
    * The notification batch' size
    */
-  var notificationsLimit = 5;
+  var notificationsLimit = 10;
 
   /**
    * Maximum number of events to count
@@ -362,6 +367,15 @@
       arrow.text(arrow.text() == '▸' ? '▾' : '▸');
     });
   };
+  
+  /**
+   * Get the number of unread notifications.
+   */
+  var getUnreadNotificationsCount = function () {
+    $.getJSON(url, {action: 'getUnreadCount'}).done(function (data) {
+      updateNotificationCount(data.unread);
+    });
+  };
 
   /**
    * Load the notifications.
@@ -377,7 +391,6 @@
       params.blackList = blackList.join(',');
     }
     $.getJSON(url, params).done(function (data) {
-      updateNotificationCount(data.unread);
       // Display notifications
       var area = $('.notifications-area');
       // Remove loading items
@@ -417,7 +430,7 @@
    * Initialize the widget.
    */
   $(document).ready(function () {
-    loadNotifications(0);
+    getUnreadNotificationsCount();
 
     /**
      * Prevent the dropdown menu for being closed when the user clicks on the notifications area.
@@ -426,6 +439,16 @@
       event.stopPropagation();
     });
 
+    /**
+     * Load the notifications content when the user open the notification menu (lazy loading to have better scalability).
+     */
+    var notificationsMenusHasBeenOpened = false;
+    $('#tmNotifications').on('show.bs.dropdown', function () {
+      if (!notificationsMenusHasBeenOpened) {
+        loadNotifications(0);
+      }
+      notificationsMenusHasBeenOpened = true;
+    });
   });
 
 });

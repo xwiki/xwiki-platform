@@ -56,7 +56,6 @@ public class NotificationsTrayPage extends ViewPage
      */
     public NotificationsTrayPage()
     {
-        getDriver().waitUntilCondition(d -> !notificationsArea.getAttribute("class").contains("loading"));
     }
 
     /**
@@ -114,7 +113,13 @@ public class NotificationsTrayPage extends ViewPage
     {
         if (!this.notificationsHeader.isDisplayed()) {
             this.watchListButton.click();
+            waitUntilNotificationsAreLoaded();
         }
+    }
+
+    private void waitUntilNotificationsAreLoaded()
+    {
+        getDriver().waitUntilCondition(webDriver -> !notificationsArea.getAttribute("class").contains("loading"));
     }
 
     private List<WebElement> getNotifications()

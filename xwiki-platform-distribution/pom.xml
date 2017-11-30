@@ -129,8 +129,8 @@
     <!-- Version of JDBC connectors we want to use in our distribution and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <mysql.version>5.1.44</mysql.version>
-    <derby.version>10.13.1.1</derby.version>
+    <mysql.version>5.1.45</mysql.version>
+    <derby.version>10.14.1.0</derby.version>
     <pgsql.version>42.1.4</pgsql.version>
 
     <!-- Set HSQLDB by default -->

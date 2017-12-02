@@ -43,11 +43,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language pl generated from http://www.l10n.xwiki.org
-dashboard.gadgetEditor.changeGadget.label=Zmień gadżet
-dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w górnej części panelu gadżetów.
-dashboard.gadgetEditor.gadgetTitle.label=Tytuł gadżetu
-dashboard.gadgetEditor.title=Edytuj gadżet
-dashboard.gadgetSelector.title=Wybierz gadżet
-dashboard.templateProvider.description=Gadżety konfigurowalne
+dashboard.gadgetEditor.changeGadget.label=change gadget
+dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel.
+dashboard.gadgetEditor.gadgetTitle.label=title gadget
+dashboard.gadgetEditor.title=Edit the gadget
+dashboard.gadgetSelector.title=Choose a gadget
+dashboard.templateProvider.description=gadget configerable
 </content>
 </xwikidoc>

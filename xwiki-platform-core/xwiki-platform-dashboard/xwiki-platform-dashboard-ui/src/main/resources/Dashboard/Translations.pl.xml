@@ -48,6 +48,6 @@ dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w gór
 dashboard.gadgetEditor.gadgetTitle.label=Tytuł gadżetu
 dashboard.gadgetEditor.title=Edytuj gadżet
 dashboard.gadgetSelector.title=Wybierz gadżet
-dashboard.templateProvider.description=Gadżety konfigurowalne
+dashboard.templateProvider.description=gadget configurable
 </content>
 </xwikidoc>

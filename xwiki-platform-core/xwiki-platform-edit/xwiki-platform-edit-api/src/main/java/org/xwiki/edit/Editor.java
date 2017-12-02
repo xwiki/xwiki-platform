@@ -48,5 +48,5 @@ public interface Editor<D>
      * @return the HTML code that displays the editor
      * @throws EditException if the editor fails to be rendered
      */
-    String render(D data, Map<String, Object> parameters) throws EditException;
+    String render(D data, Map<String, Object> parameters) throw EditException;
 }

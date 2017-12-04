@@ -1359,7 +1359,7 @@ $services.localization.render('tour.homepageTour.header.contentB', [" $services.
 $services.localization.render('tour.homepageTour.tourComplete.contentA')
 
 
-$services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', '&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/Main/Features]]'])
+$services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', '&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/]]'])
 {{/velocity}}</content>
     </property>
     <property>

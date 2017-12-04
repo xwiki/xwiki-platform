@@ -382,11 +382,13 @@ public class DeletedAttachment extends AbstractSimpleClass
     public XWikiAttachment restoreAttachment(XWikiAttachment attachment) throws XWikiException
     {
         try {
-            return this.content != null ? this.content.getXWikiAttachment(attachment) : null;
+            if(this.content != null) 
+            	return this.content.getXWikiAttachment(attachment);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error restoring document", e, null);
         }
+        return null;
     }
 
     /**

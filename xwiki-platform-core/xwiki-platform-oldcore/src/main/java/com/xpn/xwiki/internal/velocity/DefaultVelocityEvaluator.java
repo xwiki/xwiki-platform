@@ -43,45 +43,44 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class DefaultVelocityEvaluator implements VelocityEvaluator
 {
-    @Inject
-    private RenderingContext renderingContext;
+	@Inject
+	private RenderingContext renderingContext;
 
-    @Inject
-    private VelocityManager velocityManager;
-    
-    @Override
-    public String evaluateVelocity(String content, String namespace, VelocityContext vcontext) throws XWikiException
-    {
-        StringWriter writer = new StringWriter();
+	@Inject
+	private VelocityManager velocityManager;
 
-        boolean renderingContextPushed = false;
-        try {
-            // Switch current namespace if needed
-            String currentNamespace = renderingContext.getTransformationId();
-            if (namespace != null && !StringUtils.equals(namespace, currentNamespace)) {
-                if (renderingContext instanceof MutableRenderingContext) {
-                    // Make the current velocity template id available
-                    ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
-                            renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
-                            renderingContext.isRestricted(), renderingContext.getTargetSyntax());
+	@Override
+	public String evaluateVelocity(String content, String namespace, VelocityContext vcontext) throws XWikiException
+	{
+		StringWriter writer = new StringWriter();
 
-                    renderingContextPushed = true;
-                }
-            }
+		boolean renderingContextPushed = false;
+		try {
+			// Switch current namespace if needed
+			String currentNamespace = renderingContext.getTransformationId();
+			if (namespace != null && !StringUtils.equals(namespace, currentNamespace)
+					&& renderingContext instanceof MutableRenderingContext){
+				// Make the current velocity template id available
+				((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
+						renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
+						renderingContext.isRestricted(), renderingContext.getTargetSyntax());
 
-            velocityManager.getVelocityEngine().evaluate(vcontext, writer, namespace, content);
+				renderingContextPushed = true;
+			}
 
-            return writer.toString();
-        } catch (Exception e) {
-            Object[] args = { namespace };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
-                    args);
-        } finally {
-            // Get rid of temporary rendering context
-            if (renderingContextPushed) {
-                ((MutableRenderingContext) this.renderingContext).pop();
-            }
-        }
-    }
+			velocityManager.getVelocityEngine().evaluate(vcontext, writer, namespace, content);
+
+			return writer.toString();
+		} catch (Exception e) {
+			Object[] args = { namespace };
+			throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+					XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
+					args);
+		} finally {
+			// Get rid of temporary rendering context
+			if (renderingContextPushed) {
+				((MutableRenderingContext) this.renderingContext).pop();
+			}
+		}
+	}
 }

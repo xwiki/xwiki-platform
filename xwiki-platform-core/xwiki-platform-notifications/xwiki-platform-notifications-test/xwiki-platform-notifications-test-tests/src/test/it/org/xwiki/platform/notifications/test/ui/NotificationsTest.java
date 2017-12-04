@@ -26,7 +26,9 @@ import java.util.Scanner;
 
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;

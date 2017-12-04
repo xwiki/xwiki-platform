@@ -140,7 +140,7 @@
             <property name="date" type="timestamp" column="XDD_DATE" index="XDD_DATE" />
         </natural-id>
         <property name="deleter" type="string" column="XDD_DELETER" index="XDD_DELETER" />
-        <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
+        <property name="xmlStore" type="string" column="XDD_XMLSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDD_XML" not-null="true" length="1000000000" />
         <property name="batchId" type="string" column="XDD_BATCH_ID" index="XDD_BATCH_ID" />
     </class>
@@ -157,7 +157,7 @@
         </natural-id>
         <property name="docName" column="XDA_DOC_NAME" type="string" length="255" index="XDA_DOC_NAME" />
         <property name="deleter" type="string" column="XDA_DELETER" index="XDA_DELETER" />
-        <property name="xmlStore" type="string" column="XDD_XMLSTORE" length="50" />
+        <property name="contentStore" type="string" column="XDD_CONTENTSTORE" length="50" />
         <property name="xml" type="materialized_clob" column="XDA_XML" not-null="true" length="1000000000" />
     </class>
 

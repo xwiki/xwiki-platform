@@ -48,7 +48,7 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
 
     @Inject
     private VelocityManager velocityManager;
-    
+
     @Override
     public String evaluateVelocity(String content, String namespace, VelocityContext vcontext) throws XWikiException
     {
@@ -58,15 +58,13 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
         try {
             // Switch current namespace if needed
             String currentNamespace = renderingContext.getTransformationId();
-            if (namespace != null && !StringUtils.equals(namespace, currentNamespace)) {
-                if (renderingContext instanceof MutableRenderingContext) {
-                    // Make the current velocity template id available
-                    ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
-                            renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
-                            renderingContext.isRestricted(), renderingContext.getTargetSyntax());
-
-                    renderingContextPushed = true;
-                }
+            if (namespace != null && !StringUtils.equals(namespace, currentNamespace)
+                && renderingContext instanceof MutableRenderingContext) {
+                // Make the current velocity template id available
+                ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
+                    renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
+                    renderingContext.isRestricted(), renderingContext.getTargetSyntax());
+                renderingContextPushed = true;
             }
 
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, namespace, content);
@@ -75,8 +73,8 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
         } catch (Exception e) {
             Object[] args = { namespace };
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
-                    args);
+                XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}", e,
+                args);
         } finally {
             // Get rid of temporary rendering context
             if (renderingContextPushed) {

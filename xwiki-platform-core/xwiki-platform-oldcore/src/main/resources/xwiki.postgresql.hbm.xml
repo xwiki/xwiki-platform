@@ -172,7 +172,7 @@
         <property name="docId" type="long" column="XWA_DOC_ID" index="ATT_DOC_ID" />
         <property name="filename" type="string" column="XWA_FILENAME" length="255" not-null="true" />
         <property name="longSize" type="long" column="XWA_LONGSIZE"/>
-        <!-- Kept for retro compatibility, so that existing queries using att.filesize will still work -->
+        <!-- Kept for retro compatibility, so that existing queries using att.filesize will still work. -->
         <property name="filesize" type="integer" column="XWA_SIZE"/>
         <property name="mimeType" type="string" column="XWA_MIMETYPE" length="255"/>
         <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />

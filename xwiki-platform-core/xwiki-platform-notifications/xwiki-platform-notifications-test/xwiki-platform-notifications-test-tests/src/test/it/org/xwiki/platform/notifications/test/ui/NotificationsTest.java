@@ -24,16 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import javax.mail.BodyPart;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.simplejavamail.converter.EmailConverter;
+import org.simplejavamail.email.Email;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,6 +53,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -135,6 +134,7 @@ public class NotificationsTest extends AbstractTest
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("localhost");
         sendMailPage.setPort(String.valueOf(ServerSetupTest.SMTP.getPort()));
+        sendMailPage.setEmailAddressToSendFrom("test@xwiki.org");
 
         // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
         // we wait to receive the mails)
@@ -357,31 +357,28 @@ public class NotificationsTest extends AbstractTest
 
         assertEquals(1, this.mail.getReceivedMessages().length);
         MimeMessage message = this.mail.getReceivedMessages()[0];
-        assertTrue(message.getSubject().endsWith("event(s) on the wiki"));
-        Multipart content = (Multipart) message.getContent();
-        assertTrue(content.getContentType().startsWith("multipart/mixed;"));
-        assertEquals(1, content.getCount());
-        MimeBodyPart mimeBodyPart1 = (MimeBodyPart) content.getBodyPart(0);
-        Multipart multipart1 = (Multipart) mimeBodyPart1.getContent();
-        assertEquals(2, multipart1.getCount());
-        assertEquals("text/plain; charset=UTF-8", multipart1.getBodyPart(0).getContentType());
-        assertTrue(String.format("Content-type is [%s].", multipart1.getBodyPart(1).getContentType()),
-                multipart1.getBodyPart(1).getContentType().startsWith("multipart/related;"));
-        MimeMultipart mimeMultipart = (MimeMultipart) multipart1.getBodyPart(1).getContent();
-        BodyPart bodyPart2 = mimeMultipart.getBodyPart(0);
-        assertEquals("text/html; charset=UTF-8", bodyPart2.getContentType());
+
+        // Convert to org.simplejavamail.email because it is more simple to read
+        Email email = EmailConverter.mimeMessageToEmail(message);
+        assertTrue(email.getSubject().endsWith("event(s) on the wiki"));
+        assertEquals("test@xwiki.org", email.getFromRecipient().getAddress());
+
+        assertNotNull(email.getText());
+        assertNotNull(email.getTextHTML());
+        assertNotNull(email.getAttachments());
+        assertFalse(email.getAttachments().isEmpty());
 
         // Events inside an email comes in random order, so we just verify that all the expected content is there
-        String email = prepareMail(multipart1.getBodyPart(0).getContent().toString());
+        String plainTextContent = prepareMail(email.getText());
         String expectedContent;
         expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail1.txt")));
         assertTrue(String.format("Email is supposed to contain: [\n%s\n], but all we have is [\n%s\n].",
-                expectedContent, email),
-                email.contains(expectedContent));
+                expectedContent, plainTextContent),
+                plainTextContent.contains(expectedContent));
         expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail2.txt")));
         assertTrue(String.format("Email is supposed to contain: [\n%s\n], but all we we have is [\n%s\n].",
-                expectedContent, email),
-                email.contains(expectedContent));
+                expectedContent, plainTextContent),
+                plainTextContent.contains(expectedContent));
 
         getUtil().rest().delete(page1);
         getUtil().rest().delete(page2);

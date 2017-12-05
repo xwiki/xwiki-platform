@@ -546,6 +546,10 @@
                    -->
                   <ignoredResourcePattern>builddef.lst</ignoredResourcePattern>
                 </ignoredResourcePatterns>
+                <ignoredClassPatterns>
+                  <!-- Java 9 modules descriptor (should probably be fixed in the plugin) -->
+                  <ignoredClassPattern>module-info</ignoredClassPattern>
+                </ignoredClassPatterns>
               </configuration>
             </execution>
           </executions>

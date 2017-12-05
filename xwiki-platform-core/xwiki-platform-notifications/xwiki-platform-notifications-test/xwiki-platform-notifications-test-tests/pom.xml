@@ -101,6 +101,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- A wrapper to javax.mail much easier to use -->
+    <dependency>
+      <groupId>org.simplejavamail</groupId>
+      <artifactId>simple-java-mail</artifactId>
+      <version>4.4.5</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-profile-test-pageobjects</artifactId>

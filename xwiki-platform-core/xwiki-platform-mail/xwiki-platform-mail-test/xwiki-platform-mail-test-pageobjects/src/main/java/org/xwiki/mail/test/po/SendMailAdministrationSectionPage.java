@@ -44,6 +44,9 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
     @FindBy(id = "Mail.SendMailConfigClass_0_discardSuccessStatuses")
     private WebElement discardSuccessStatuses;
 
+    @FindBy(id = "Mail.SendMailConfigClass_0_from")
+    private WebElement emailAddressToSendFrom;
+
     public SendMailAdministrationSectionPage()
     {
         super("Mail Sending");
@@ -69,6 +72,17 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
     {
         this.port.clear();
         this.port.sendKeys(port);
+    }
+
+    public String getEmailAddressToSendFrom()
+    {
+        return this.emailAddressToSendFrom.getAttribute("value");
+    }
+
+    public void setEmailAddressToSendFrom(String address)
+    {
+        this.emailAddressToSendFrom.clear();
+        this.emailAddressToSendFrom.sendKeys(address);
     }
 
     public String getSendWaitTime()

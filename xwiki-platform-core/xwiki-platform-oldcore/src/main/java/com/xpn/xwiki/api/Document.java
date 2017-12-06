@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -2161,7 +2162,22 @@ public class Document extends Api
         Document d = (Document) arg0;
         return d.getXWikiContext().equals(getXWikiContext()) && this.doc.equals(d.doc);
     }
-
+    
+    @Override 
+    public int hashCode() 
+    {
+        return new HashCodeBuilder(3,17)
+            .append(this.initialDoc)
+            .append(this.doc)
+            .append(this.currentObj)
+            .append(this.currentMixedDocumentReferenceResolver)
+            .append(this.defaultEntityReferenceSerializer)
+            .append(this.localEntityReferenceSerializer)
+            .append(this.compactWikiEntityReferenceSerializer)
+            .append(this.documentRevisionProvider)
+            .append(this.authorizationManager)
+            .toHashCode();
+    }
     /**
      * Check if the passed one is the one wrapped by this {@link Document}.
      * 

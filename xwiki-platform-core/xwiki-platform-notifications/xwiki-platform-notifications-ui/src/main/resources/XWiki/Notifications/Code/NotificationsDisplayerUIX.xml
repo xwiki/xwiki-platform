@@ -794,6 +794,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
 
 .notifications-header-uix {
   text-align: right;
+  padding-bottom: 0.8em;
 }
 
 /***********************************************
@@ -1026,26 +1027,28 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-    &lt;div class="notifications-header clearfix"&gt;
-      &lt;div class="col-xs-4"&gt;
-        &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
-      &lt;/div&gt;
-      &lt;div class="col-xs-8 text-right"&gt;
-        &lt;p&gt;
-          &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;
-            $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
-          &lt;/a&gt;
-          &amp;nbsp;
-          &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
-            $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
-          &lt;/a&gt;
-        &lt;/p&gt;
+    &lt;div class="notifications-header"&gt;
+      &lt;div class="clearfix"&gt;
+        &lt;div class="col-xs-4"&gt;
+          &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="col-xs-8 text-right"&gt;
+          &lt;p&gt;
+            &lt;a target="_blank" href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"&gt;
+              $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
+            &lt;/a&gt;
+            &amp;nbsp;
+             &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings"&gt;
+              $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
+            &lt;/a&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
       ##
       ## Display the 3 toggle buttons
       ##
       #if ($services.notification.watch.isEnabled())
-        &lt;div class="col-xs-12 notifications-toggles" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
+        &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
           &lt;pre&gt;&lt;input type="checkbox" id="notificationPageOnly" #displayCheckedIfWatched($doc.documentReference)/&gt; &lt;input type="checkbox" id="notificationPageAndChildren" #displayCheckedIfWatched($doc.documentReference.lastSpaceReference)/&gt; &lt;input type="checkbox" id="notificationWiki" #displayCheckedIfWatched($doc.documentReference.wikiReference)/&gt;&lt;/pre&gt;
         &lt;/div&gt;

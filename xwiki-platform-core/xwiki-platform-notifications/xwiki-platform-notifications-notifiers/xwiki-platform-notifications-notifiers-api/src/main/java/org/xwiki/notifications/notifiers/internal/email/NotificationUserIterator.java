@@ -149,10 +149,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
     public DocumentReference next()
     {
         DocumentReference userReference = this.nextUser;
-        try {
-            getNext();
-        } finally {
-            return userReference;
-        }
+        getNext();
+        return userReference;
     }
 }

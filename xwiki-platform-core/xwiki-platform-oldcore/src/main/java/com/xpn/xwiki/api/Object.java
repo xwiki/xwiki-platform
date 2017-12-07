@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.api;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -101,6 +103,15 @@ public class Object extends Collection
         }
         Object o = (Object) arg0;
         return o.getXWikiContext().equals(getXWikiContext()) && this.element.equals(o.element);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(3, 17)
+            .append(getXWikiContext())
+            .append(element)
+            .toHashCode();
     }
 
     public void set(String fieldname, java.lang.Object value)

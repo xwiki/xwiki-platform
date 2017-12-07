@@ -142,7 +142,7 @@
         &lt;/div&gt;
         #end
         &lt;div class="activity-follow"&gt;
-        #if("$!services.notification.watch" != '' &amp;&amp; $services.notification.watch.isEnabled())
+        #if("$!services.notification.watch" != '' &amp;&amp; $services.notification.watch.isEnabled() &amp;&amp; !$isGuest &amp;&amp; !$isSuperAdmin)
           ## TODO: replace it, somehow, by a UIX or a custom user sheet
           #set ($discard = $xwiki.ssx.use('XWiki.XWikiUserProfileSheet'))
           #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserProfileSheet'))

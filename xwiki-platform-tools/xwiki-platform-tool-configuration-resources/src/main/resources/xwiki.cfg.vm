@@ -370,7 +370,8 @@ xwiki.authentication.unauthorized_code=200
 #-# Must be set to "empty".
 # xwiki.authentication.createuser=empty
 
-#-# If set to true(the default value), cookies of users are blocked from being used except by the same IP address which got them.  
+#-# If set to true(the default value), cookies of users are blocked from being used except by the same IP address 
+#-# which got them.  
 # xwiki.authentication.useip=true
 
 #---------------------------------------

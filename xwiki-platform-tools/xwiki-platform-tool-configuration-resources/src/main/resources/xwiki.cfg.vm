@@ -363,7 +363,7 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 # xwiki.hidelogin=false
 
 #-# HTTP status code to sent when the authentication failed.
-xwiki.authentication.unauthorized_code=200
+xwiki.authentication.unauthorized_code=403
 
 #-# Used by some authenticators (like com.xpn.xwiki.user.impl.xwiki.AppServerTrustedAuthServiceImpl)
 #-# to indicate that the users should be created. In this kind of authenticator the user are not created by default.

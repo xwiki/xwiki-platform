@@ -86,4 +86,17 @@ describe('XWiki Filter Plugin for CKEditor', function() {
     expect(data).toContain('<style');
     expect(data).toContain('<script');
   });
+
+  it('converts font to span', function(done) {
+    testUtils.createEditor(function(event) {
+      testUtils.assertSnapshot(event.editor,
+        '<p><font color="red" face="Verdana" size="-2" class="foo">test</font></p>',
+        '<p><span style="color:red; font-family:Verdana" class="foo">test</span></p>'
+      ).then(done);
+    }, {
+      // Enable the Advanced Content Filter.
+      allowedContent: 'p;span{*}(*)',
+      extraPlugins: 'xwiki-filter'
+    });
+  });
 });

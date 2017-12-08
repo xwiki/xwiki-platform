@@ -127,6 +127,35 @@
         htmlFilter.addRules(replaceEmptyParagraphsWithEmptyLines, {priority: 14, applyToAll: true});
         htmlFilter.addRules(submitOnlySignificantContent, {priority: 5, applyToAll: true});
       }
+
+      // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.
+      // See https://ckeditor.com/old//comment/125305#comment-125305
+      editor.filter.addTransformations([
+        [
+          {
+            element: 'font',
+            left: function(element) {
+              return element.attributes.color || element.attributes.face;
+            },
+            right: function(element) {
+              element.styles = element.styles || {};
+              if (element.attributes.color) {
+                element.styles.color = element.attributes.color;
+                delete element.attributes.color;
+              }
+              if (element.attributes.face) {
+                element.styles['font-family'] = element.attributes.face;
+                delete element.attributes.face;
+              }
+              // Drop the size attribute because it's to complex to convert to CSS.
+              // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/font
+              delete element.attributes.size;
+              element.name = 'span';
+              return element;
+            }
+          }
+        ]
+      ]);
     }
   });
 })();

@@ -12,9 +12,8 @@
         </entry>
       </parameters>
     </p>
-    <wikiDocumentLocale>
+    <wikiDocumentLocale locale="en">
       <p>
-        <locale>en</locale>
         <parameters>
           <entry>
             <string>creation_author</string>
@@ -116,9 +115,8 @@
         </entry>
       </parameters>
     </p>
-    <wikiDocumentLocale>
+    <wikiDocumentLocale locale="en">
       <p>
-        <locale>en</locale>
         <parameters>
           <entry>
             <string>creation_author</string>
@@ -220,9 +218,8 @@
         </entry>
       </parameters>
     </p>
-    <wikiDocumentLocale>
+    <wikiDocumentLocale locale="en">
       <p>
-        <locale>en</locale>
         <parameters>
           <entry>
             <string>creation_author</string>

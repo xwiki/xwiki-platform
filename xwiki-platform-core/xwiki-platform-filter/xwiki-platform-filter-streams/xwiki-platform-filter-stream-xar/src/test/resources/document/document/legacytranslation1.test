@@ -130,9 +130,8 @@
         </entry>
       </parameters>
     </p>
-    <wikiDocumentLocale>
+    <wikiDocumentLocale locale="fr">
       <p>
-        <locale>fr</locale>
         <parameters>
           <entry>
             <string>creation_author</string>

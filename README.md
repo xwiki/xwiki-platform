@@ -1,4 +1,4 @@
-# Templates Application
+# Templates Application
 
 A collection of templates that can be used in the Creation step. They will be content templates that provide a certain structure for pages, depending on the use case, making it faster for users to follow a certain layout standard.
 

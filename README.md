@@ -7,7 +7,7 @@ Starting with XWiki 8.2 this is the default WYSIWYG content editor. On older ver
 * Project Lead: [Marius Dumitru Florea](http://www.xwiki.org/xwiki/bin/view/XWiki/mflorea)
 * [Documentation & Download](http://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration)
 * [Issue Tracker](http://jira.xwiki.org/browse/CKEDITOR)
-* Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists>), [IRC]( http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
+* Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists), [IRC]( http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
 * [Development Practices](http://dev.xwiki.org)
 * Minimal XWiki version supported: XWiki 6.2.5
 * License: LGPL 2.1+

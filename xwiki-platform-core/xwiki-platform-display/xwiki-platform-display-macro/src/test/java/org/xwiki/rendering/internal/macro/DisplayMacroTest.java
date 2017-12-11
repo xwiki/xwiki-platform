@@ -39,6 +39,7 @@ import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -202,9 +203,14 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
+                DocumentReference reference = new DocumentReference("wiki", "space", "page");
                 allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
-
+                will(returnValue(reference));
+                allowing(mockSetup.bridge).getProperty(reference,
+                        new DocumentReference("RedirectClass",
+                                new SpaceReference("XWiki", reference.getWikiReference())),
+                        "location");
+                will(returnValue(null));
                 allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
                 will(returnValue(true));
                 allowing(mockSetup.bridge).getDocument(with(any(DocumentReference.class)));
@@ -336,6 +342,11 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 allowing(mockDocumentReferenceResolver).resolve(with(resolve),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
+                allowing(mockSetup.bridge).getProperty(reference,
+                        new DocumentReference("RedirectClass",
+                                new SpaceReference("XWiki", reference.getWikiReference())),
+                        "location");
+                will(returnValue(null));
                 allowing(mockSetup.bridge).getDocument(reference);
                 will(returnValue(mockDocument));
                 allowing(mockDocument).getSyntax();

@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.display;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -44,6 +45,7 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.display.DisplayMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -126,7 +128,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         throws MacroExecutionException
     {
         // Step 1: Perform checks.
-        if (parameters.getReference() == null) {
+        if (StringUtils.isBlank(parameters.getReference())) {
             throw new MacroExecutionException(
                 "You must specify a 'reference' parameter pointing to the entity to display.");
         }
@@ -206,13 +208,28 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
     private DocumentReference resolve(MacroBlock block, DisplayMacroParameters parameters)
         throws MacroExecutionException
     {
+        // We have already checked previously that the reference is not empty
         String reference = parameters.getReference();
 
-        if (reference == null) {
-            throw new MacroExecutionException(
-                "You must specify a 'reference' parameter pointing to the entity to include.");
+        // Parse that reference to get the real document reference
+        DocumentReference documentReference = macroDocumentReferenceResolver.resolve(reference, block);
+
+        // But the document might have a redirect object
+        DocumentReference redirectClass = new DocumentReference(documentReference.getWikiReference().getName(),
+                "XWiki", "RedirectClass");
+        Object redirectLocation = documentAccessBridge.getProperty(documentReference, redirectClass, "location");
+        HashSet<String> visitedLocations = new HashSet<>();
+        // While we end-up on a document that have a redirect object, follow that redirection
+        while (redirectLocation != null) {
+            reference = (String) redirectLocation;
+            if (!visitedLocations.add(reference)) {
+                throw new MacroExecutionException(String.format("Infinite redirection recursion: [%s].",
+                        parameters.getReference()));
+            }
+            documentReference = macroDocumentReferenceResolver.resolve(reference, block);
+            redirectLocation = documentAccessBridge.getProperty(documentReference, redirectClass, "location");
         }
 
-        return this.macroDocumentReferenceResolver.resolve(reference, block);
+        return documentReference;
     }
 }

@@ -102,7 +102,7 @@ annotations.config.title=Annotations configuration panel
 annotations.config.display.title=Annotation display
 annotations.config.type.title=Annotation type
 annotations.config.activate.title=Annotation activation
-annotations.config.activate.explanation=The following two settings allow you to configure in which locations are annotations active. The first setting specifies the general rule, while the second list specifies the locations for which the rule shouldn't apply. For example, activated "yes" and exception locations "XWiki" and "Main" means that annotations will be active on all locations except for "XWiki" and "Main". As an opposite example, using activated "no" and exception locations "Documents" means that annotations will be active only for the "Documents" location.
+annotations.config.activate.explanation=The following two settings allow you to configure which locations annotations are active in. The first setting specifies the general rule, while the second list specifies the locations for which the rule shouldn't apply. For example, activated "yes" and exception locations "XWiki" and "Main" means that annotations will be active on all locations except for "XWiki" and "Main". As an opposite example, using activated "no" and exception locations "Documents" means that annotations will be active only for the "Documents" location.
 annotations.config.type.explanation=Add properties to this class if you want extra properties for your annotations.
 admin.annotations=Annotations
 admin.annotations.description=Configure the page annotations
@@ -112,9 +112,9 @@ AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active 
 AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
 AnnotationCode.AnnotationConfig_displayed=Display annotations by default
-AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when checking "Show annotations" on each page
+AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
 AnnotationCode.AnnotationConfig_displayHighlight=Display annotations highlight by default
-AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if the annotations highlight should be displayed always or only on hovering an annotation or the structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if the annotation's highlight should be displayed always or only when hovering over the annotation or the structure of annotations
 AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure</content>
   <object>
     <name>AnnotationCode.Translations</name>

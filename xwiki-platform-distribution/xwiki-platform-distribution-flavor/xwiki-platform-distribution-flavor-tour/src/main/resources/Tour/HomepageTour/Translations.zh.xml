@@ -42,27 +42,28 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>##Homepage Tour (by steps order)
-tour.homepageTour.welcome.title=欢迎来到XWiki
-tour.homepageTour.welcome.content=在接下来的几分钟里你将会探索wiki的外观和他的基本功能。
-tour.homepageTour.panels.title=面板
-tour.homepageTour.panels.contentA=你可以通过当前面板链接到wiki上的应用程序和页面。
-tour.homepageTour.panels.contentB=管理员可以个性化这些面板，也可以设置那些面板可以出现在这里。
-tour.homepageTour.breadcrumbs.title=导航栏
+  <content>## XWiki Translation for language zh generated from http://www.l10n.xwiki.org
 tour.homepageTour.breadcrumbs.contentA=你可以从导航栏看出你当前的网页位置和层次结构。
-tour.homepageTour.breadcrumbs.contentB= 你随时可以通过按{0}按钮的方式返回主页。
-tour.homepageTour.pageContent.title=页面内容
-tour.homepageTour.pageContent.contentA=这是将显示当前页面内容。
-tour.homepageTour.pageContent.contentB=编辑这个页面可以向这个页面增加表格、列表、宏和文章结构来整理你的知识。
-tour.homepageTour.pageMenu.title=页面菜单tour.homepageTour.pageMenu.contentA=这个菜单包括可以对这个页面进行的改动，若你有相应的权限，就可以编辑、创建、管理此页面。
-tour.homepageTour.pageMenu.contentB=这个{0}按钮可以显示更多的行为，比如导出、打印、分享。
-tour.homepageTour.pageTabs.title=页面标签
-tour.homepageTour.pageTabs.contentA=你可以和其他用户一起对页面的内容进行评论。
-tour.homepageTour.pageTabs.contentB=你也可以添加附件，查看页面版本和页面信息。
-tour.homepageTour.header.title=标题
+tour.homepageTour.breadcrumbs.contentB=你随时可以通过按{0}按钮的方式返回主页。
+tour.homepageTour.breadcrumbs.title=导航栏
 tour.homepageTour.header.contentA=你可以查找相关内容，查看页面改动，进入个人信息页面。
 tour.homepageTour.header.contentB={0} 按钮可以打开抽屉菜单，菜单里有更多与本wiki相关的行为，比如索引和管理。
-tour.homepageTour.tourComplete.title=导游完成
+tour.homepageTour.header.title=标题
+tour.homepageTour.pageContent.contentA=这是将显示当前页面内容。
+tour.homepageTour.pageContent.contentB=编辑这个页面可以向这个页面增加表格、列表、宏和文章结构来整理你的知识。
+tour.homepageTour.pageContent.title=页面内容
+tour.homepageTour.pageMenu.contentB=这个{0}按钮可以显示更多的行为，比如导出、打印、分享。
+tour.homepageTour.pageMenu.title=页面菜单tour.homepageTour.pageMenu.contentA\=这个菜单包括可以对这个页面进行的改动，若你有相应的权限，就可以编辑、创建、管理此页面。
+tour.homepageTour.pageTabs.contentA=你可以和其他用户一起对页面的内容进行评论。
+tour.homepageTour.pageTabs.contentB=你也可以添加附件，查看页面版本和页面信息。
+tour.homepageTour.pageTabs.title=页面标签
+tour.homepageTour.panels.contentA=你可以通过当前面板链接到wiki上的应用程序和页面。
+tour.homepageTour.panels.contentB=管理员可以个性化这些面板，也可以设置那些面板可以出现在这里。
+tour.homepageTour.panels.title=面板
 tour.homepageTour.tourComplete.contentA=XWiki的基本外观和功能探索完毕。
-tour.homepageTour.tourComplete.contentB=每个特色更详细的介绍可以在{0}documentation{1}中查看。</content>
+tour.homepageTour.tourComplete.contentB=每个特色更详细的介绍可以在{0}documentation{1}中查看。
+tour.homepageTour.tourComplete.title=导游完成
+tour.homepageTour.welcome.content=在接下来的几分钟里你将会探索wiki的外观和他的基本功能。
+tour.homepageTour.welcome.title=欢迎来到XWiki
+</content>
 </xwikidoc>

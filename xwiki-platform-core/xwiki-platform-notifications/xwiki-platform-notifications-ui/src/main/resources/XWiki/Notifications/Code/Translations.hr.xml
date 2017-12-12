@@ -52,7 +52,6 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclus
 notifications.email.seeChanges=Izmjene\: {0}
 notifications.email.subject={0} događaj(a) u wikiju
 notifications.email.title=Događaj(i) u wikiju
-notifications.events.addComment.description={1} je komentirao/la dokument {0}.
 notifications.events.by=Korisnika {0}.
 notifications.events.lastChange=Posljednja izmjena\: {0}.
 notifications.events.lastComment=Posljednji komentar\: {0}.

@@ -35,35 +35,36 @@
   <date>1467283422000</date>
   <contentUpdateDate>1467283422000</contentUpdateDate>
   <version>1.1</version>
-  <title>Prijevodi</title>
+  <title>Translations</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## Vodi\u010D kroz po\u010Detnu stranicu (po koracima)
-tour.homepageTour.welcome.title=Dobrodo\u0161li u XWiki
-tour.homepageTour.welcome.content=U sljede\u0107ih nekoliko minuta otkrit \u0107ete su\u010Delje i osnovne funkcionalnosti va\u0161eg wikija.
-tour.homepageTour.panels.title=Paneli
-tour.homepageTour.panels.contentA=Postoje\u0107i paneli omogu\u0107avaju vam da pristupite aplikacijama i stranicama va\u0161eg wikija.
-tour.homepageTour.panels.contentB=Administratori ih mogu prilagoditi i odlu\u010Diti koji paneli se prikazuju.
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+tour.homepageTour.breadcrumbs.contentA=Mrvice vam omogućavaju identifikaciju lokacije vaše stranice i navigaciju kroz hijerarhiju.
+tour.homepageTour.breadcrumbs.contentB=Gumb {0} će vas uvijek odvesti na početnu stranicu.
 tour.homepageTour.breadcrumbs.title=Mrvice
-tour.homepageTour.breadcrumbs.contentA=Mrvice vam omogu\u0107avaju identifikaciju lokacije va\u0161e stranice i navigaciju kroz hijerarhiju.
-tour.homepageTour.breadcrumbs.contentB=Gumb {0} \u0107e vas uvijek odvesti na po\u010Detnu stranicu.
-tour.homepageTour.pageContent.title=Sadr\u017Eaj stranice
-tour.homepageTour.pageContent.contentA=Ovo je mjesto u kojem se prikazuje sadr\u017Eaj teku\u0107e stranice.
-tour.homepageTour.pageContent.contentB=Uredite ovu stranicu kako biste dodali tablice, liste, makroe i strukture za organiziranje va\u0161eg znanja.
-tour.homepageTour.pageMenu.title=Izbornik stranice
-tour.homepageTour.pageMenu.contentA=Ovaj izbornik sadr\u017Ei akcije vezane uz stranicu. S odgovaraju\u0107im pravima mo\u017Eete ure\u0111ivati, izra\u0111ivati, administrirati ili brisati stranice.
-tour.homepageTour.pageMenu.contentB=Gumb {0} otkriva dodatne akcije poput izvoza, ispisa, dijeljenja itd.
-tour.homepageTour.pageTabs.title=Kartice stranice
-tour.homepageTour.pageTabs.contentA=Komentari su izvrstan na\u010Din za korisnike da diskutiraju o sadr\u017Eaju stranice.
-tour.homepageTour.pageTabs.contentB=Tako\u0111er mo\u017Eete dodavati datoteke, uspore\u0111ivati verzije stranice ili vidjeti informacije o stranici.
+tour.homepageTour.header.contentA=Možete pretraživati sadržaj, motriti promjene stranica ili pristupiti vašem korisničkom profilu.
+tour.homepageTour.header.contentB=Gumb {0} otvara ladicu koja sadrži akcije vezane uz wiki, poput administracije i imenika.
 tour.homepageTour.header.title=Zaglavlje
-tour.homepageTour.header.contentA=Mo\u017Eete pretra\u017Eivati sadr\u017Eaj, motriti promjene stranica ili pristupiti va\u0161em korisni\u010Dkom profilu.
-tour.homepageTour.header.contentB=Gumb {0} otvara ladicu koja sadr\u017Ei akcije vezane uz wiki, poput administracije i imenika.
-tour.homepageTour.tourComplete.title=Obilazak zavr\u0161en
-tour.homepageTour.tourComplete.contentA=Ovim je zavr\u0161en va\u0161 obilazak kroz su\u010Delje i osnovne funkcionalnosti XWikija.
-tour.homepageTour.tourComplete.contentB=Za vi\u0161e detalja o pojedinoj zna\u010Dajki, pristupite {0}dokumentaciji{1}.</content>
+tour.homepageTour.pageContent.contentA=Ovo je mjesto u kojem se prikazuje sadržaj tekuće stranice.
+tour.homepageTour.pageContent.contentB=Uredite ovu stranicu kako biste dodali tablice, liste, makroe i strukture za organiziranje vašeg znanja.
+tour.homepageTour.pageContent.title=Sadržaj stranice
+tour.homepageTour.pageMenu.contentA=Ovaj izbornik sadrži akcije vezane uz stranicu. S odgovarajućim pravima možete uređivati, izrađivati, administrirati ili brisati stranice.
+tour.homepageTour.pageMenu.contentB=Gumb {0} otkriva dodatne akcije poput izvoza, ispisa, dijeljenja itd.
+tour.homepageTour.pageMenu.title=Izbornik stranice
+tour.homepageTour.pageTabs.contentA=Komentari su izvrstan način za korisnike da diskutiraju o sadržaju stranice.
+tour.homepageTour.pageTabs.contentB=Također možete dodavati datoteke, uspoređivati verzije stranice ili vidjeti informacije o stranici.
+tour.homepageTour.pageTabs.title=Kartice stranice
+tour.homepageTour.panels.contentA=Postojeći paneli omogućavaju vam da pristupite aplikacijama i stranicama vašeg wikija.
+tour.homepageTour.panels.contentB=Administratori ih mogu prilagoditi i odlučiti koji paneli se prikazuju.
+tour.homepageTour.panels.title=Paneli
+tour.homepageTour.tourComplete.contentA=Ovim je završen vaš obilazak kroz sučelje i osnovne funkcionalnosti XWikija.
+tour.homepageTour.tourComplete.contentB=Za više detalja o pojedinoj značajki, pristupite {0}dokumentaciji{1}.
+tour.homepageTour.tourComplete.title=Obilazak završen
+tour.homepageTour.welcome.content=U sljedećih nekoliko minuta otkrit ćete sučelje i osnovne funkcionalnosti vašeg wikija.
+tour.homepageTour.welcome.title=Dobrodošli u XWiki
+</content>
 </xwikidoc>

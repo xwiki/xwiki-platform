@@ -35,34 +35,36 @@
   <date>1467283422000</date>
   <contentUpdateDate>1467283422000</contentUpdateDate>
   <version>1.1</version>
-  <title>Traductions</title>
+  <title>Translations</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>tour.homepageTour.welcome.title=Bienvenue sur XWiki
-tour.homepageTour.welcome.content=Dans les prochaines minutes vous allez découvrir l'information de votre Wiki et ses fonctionnalités principales.
-tour.homepageTour.panels.title=Panneaux
-tour.homepageTour.panels.contentA=Les panneaux initiaux vous permettent d'accéder aux applications de votre Wiki.
-tour.homepageTour.panels.contentB=Les Administrateurs peuvent les modifier et décider quels panneaux sont affichés.
+  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+tour.homepageTour.breadcrumbs.contentA=Le fil d'Ariane permet d'identifier où la page courante se situe au sein du wiki. Ce fil permet aussi de naviguer dans la hiérarchie des pages.
+tour.homepageTour.breadcrumbs.contentB=Le bouton {0} vous ramène à la page d''accueil de votre Wiki.
 tour.homepageTour.breadcrumbs.title=Fil d'Ariane
-tour.homepageTour.breadcrumbs.contentA=Le fil d'Ariane permet d'identifier ou une page est localisée et naviguer dans la hiérarchie.
-tour.homepageTour.breadcrumbs.contentB=Le button {0} vous ramène à la page d''accueil de votre Wiki.
-tour.homepageTour.pageContent.title=Contenu de la page
-tour.homepageTour.pageContent.contentA=C'est l'endroit ou le contenu de la page courante est affiché.
-tour.homepageTour.pageContent.contentB=Editer cette page pour ajouter des tables, listes, macros et structurer le contenu afin d'organiser votre connaissance.
-tour.homepageTour.pageMenu.title=Menu de la page
-tour.homepageTour.pageMenu.contentA=Ce menu contient les actions liées à la page courante. Avec les droits appropriés vous pouvez éditer, créer, administrer et effacer les pages.
-tour.homepageTour.pageMenu.contentB=Le boutton {0} révele les actions additionnelles comme: Exporter, Imprimer, Partager, etc.
-tour.homepageTour.pageTabs.title=Onglets de la page
-tour.homepageTour.pageTabs.contentA=Les commentaires sont une façon intéressante pour les utilisateurs pour discusser autour du contenu d'une page.
-tour.homepageTour.pageTabs.contentB=Vous pouvez aussi attacher des pièces jointes, comparer les versions des pages et voir les informations complémentaires d'une page
+tour.homepageTour.header.contentA=Ce menu vous permet de faire des recherches dans le contenu du wiki, de voir vos notifications et d'accéder à votre profil utilisateur.
+tour.homepageTour.header.contentB=Le bouton {0} ouvre un tiroir contenant des actions liées à votre Wiki, comme l''administration ou l''index des pages.
 tour.homepageTour.header.title=En-tête
-tour.homepageTour.header.contentA=Vous pouvez chercher dans le contenu, ajouter des pages à vos favoris et accéder à votre profil utilisateur.
-tour.homepageTour.header.contentB=Le boutton {0} ouvre un tiroir contenant des actions liées à votre Wiki, comme l''administration ou l''index des pages.
+tour.homepageTour.pageContent.contentA=C'est ici que le contenu propre à la page actuelle est affiché.
+tour.homepageTour.pageContent.contentB=Nous vous encourageons à modifier cette page pour y ajouter des tables, des listes, ou encore des macros...\n\nStructurez cette page d'accueil selon vos souhaits, afin d'organiser votre base de connaissance.
+tour.homepageTour.pageContent.title=Contenu de la page
+tour.homepageTour.pageMenu.contentA=Ce menu contient les actions liées à la page courante. Avec les droits appropriés vous pouvez modifier, créer, administrer et supprimer les pages.
+tour.homepageTour.pageMenu.contentB=Le bouton {0} propose des actions additionnelles comme\: Exporter, Imprimer, Partager, etc.
+tour.homepageTour.pageMenu.title=Menu de la page
+tour.homepageTour.pageTabs.contentA=Ici, vous pouvez lire et ajouter des commentaires à la page actuelle. C'est une façon simple et fonctionnelle qui permet aux utilisateurs de discuter du contenu d'une page.
+tour.homepageTour.pageTabs.contentB=Vous pouvez aussi attacher des pièces jointes, comparer les versions des pages et voir les informations complémentaires d'une page.
+tour.homepageTour.pageTabs.title=Onglets de la page
+tour.homepageTour.panels.contentA=Par défaut, les panneaux ici présents vous permettent d'accéder aux applications de votre Wiki. Ils contiennent aussi une aide à la navigation.
+tour.homepageTour.panels.contentB=En outre, les Administrateurs peuvent modifier ces panneaux et décider quels sont ceux qui doivent être affichés.
+tour.homepageTour.panels.title=Panneaux
+tour.homepageTour.tourComplete.contentA=C'est ainsi que s'achève la visite guidée de l'interface d'XWiki et de ses principales fonctionnalités \!
+tour.homepageTour.tourComplete.contentB=Pour plus d''informations, nous vous invitons à consulter la {0}documentation{1} officielle.
 tour.homepageTour.tourComplete.title=La visite guidée est terminé
-tour.homepageTour.tourComplete.contentA=Ceci complète la visite guidée de l'interface d'XWiki et de ses fonctionnalités principales.
-tour.homepageTour.tourComplete.contentB=Pour plus d''informations sur chaque fonctionnalité, visitez la {0}documentation{1}.</content>
+tour.homepageTour.welcome.content=Dans les prochaines minutes vous allez découvrir l'interface de votre Wiki et ses principales fonctionnalités.
+tour.homepageTour.welcome.title=Bienvenue sur XWiki
+</content>
 </xwikidoc>

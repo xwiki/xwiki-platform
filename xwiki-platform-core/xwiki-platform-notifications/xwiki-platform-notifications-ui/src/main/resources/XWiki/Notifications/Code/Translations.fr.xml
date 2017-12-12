@@ -56,7 +56,6 @@ XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclus
 notifications.email.seeChanges=Changements \: 
 notifications.email.subject={0} événement(s) sur le wiki
 notifications.email.title=Évènements sur le wiki \:
-notifications.events.addComment.description=Le document {0} a été commenté par {1}.
 notifications.events.by=Par {0}.
 notifications.events.lastChange=Dernière modification \: {0}.
 notifications.events.lastComment=Dernier commentaire \: {0}.

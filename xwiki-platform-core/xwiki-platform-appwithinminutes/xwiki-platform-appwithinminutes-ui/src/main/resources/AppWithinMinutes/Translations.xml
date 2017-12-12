@@ -78,9 +78,9 @@ platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you t
 
 ### Wizard Step 1: Application Name
 appWithinMinutes.createApp.location.label=Location
-appWithinMinutes.createApp.location.hint=The location in the page hierarchy where to create the application.
+appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
 appWithinMinutes.createApp.parent.label=Parent
-appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave empty if you want to create a top level application.
+appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
 appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
 appWithinMinutes.codeSpace.title=Code
 appWithinMinutes.codeSpace.description=This is the place where the application code is located.
@@ -155,7 +155,7 @@ appWithinMinutes.templateProviderEditor.title={0} Entries
 appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
 appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
 appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=From where to create the entries
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
 appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.

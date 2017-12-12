@@ -46,6 +46,6 @@ public class EventClassDocumentInitializerTest
 
         this.mocker.getComponentUnderTest().createClass(testXClass);
 
-        assertEquals(8, testXClass.getFieldList().size());
+        assertEquals(9, testXClass.getFieldList().size());
     }
 }

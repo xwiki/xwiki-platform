@@ -80,6 +80,11 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
      */
     private static final String UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON = "applicationIcon";
 
+    /**
+     * The event descriptor event type icon field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_EVENT_TYPE_ICON = "eventTypeIcon";
+
     private String eventType;
 
     private String validationExpression;
@@ -93,6 +98,8 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     private String applicationId;
 
     private String applicationIcon;
+
+    private String eventTypeIcon;
 
     private List<String> eventTriggers;
 
@@ -134,6 +141,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
                     ? rawApplicationIdProperty : this.applicationName;
 
             this.applicationIcon = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_APPLICATION_ICON);
+            this.eventTypeIcon = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_EVENT_TYPE_ICON);
         } catch (Exception e) {
             throw new EventStreamException(
                     String.format("Unable to extract the parameters of the [%s] EventClass.",
@@ -223,5 +231,11 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     public String getApplicationIcon()
     {
         return this.applicationIcon;
+    }
+
+    @Override
+    public String getEventTypeIcon()
+    {
+        return this.eventTypeIcon;
     }
 }

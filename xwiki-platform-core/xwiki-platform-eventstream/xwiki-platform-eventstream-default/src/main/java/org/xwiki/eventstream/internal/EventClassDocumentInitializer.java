@@ -67,6 +67,7 @@ public class EventClassDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("applicationId", "Application Identifier", 64);
         xclass.addTextField("eventType", "Event type", 64);
         xclass.addTextField("applicationIcon", "Event icon", 64);
+        xclass.addTextField("eventTypeIcon", "Event Type icon", 64);
         xclass.addTextField("eventDescription", "Event description", 64);
         xclass.addStaticListField("listenTo", "Listen to …", 64, true,
                 false, "", INPUT, STATIC_LIST_FIELD_SEPARATOR);

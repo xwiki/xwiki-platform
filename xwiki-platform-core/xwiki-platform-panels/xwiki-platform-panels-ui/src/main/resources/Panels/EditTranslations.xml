@@ -134,7 +134,7 @@
   #end
   ## Some documents have no default language set. This is the case with documents having scripts, which obviously are
   ## not translatable and more importantly are not written in a specific spoken language. In order to be consistent with
-  ## the language displayed in the top right corner (global.vm) we use 'default' when the default language is not
+  ## the language displayed at the top right corner (global.vm) we use 'default' when the default language is not
   ## specified. This is a temporary solution.
   #set ($defaultLanguage = "$!doc.defaultLocale")
   #if ($defaultLanguage == '')

@@ -855,10 +855,10 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
 .notification-icon .img-thumbnail.small{
   font-size: 1em;
   height: 2em;
-  left: -0.6em;
+  left: 0.5em;
   padding: 0.1em;
-  position: relative;
-  top: -1.2em;
+  position: absolute;
+  bottom: -0.8em;
   width: 2em;
 }
 

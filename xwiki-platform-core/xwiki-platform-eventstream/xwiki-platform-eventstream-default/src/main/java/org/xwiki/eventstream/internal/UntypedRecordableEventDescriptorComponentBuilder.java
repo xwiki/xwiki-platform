@@ -31,6 +31,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -60,6 +61,9 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
     @Inject
     private AuthorizationManager authorizationManager;
 
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     @Override
     public EntityReference getClassReference()
     {
@@ -75,7 +79,8 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
 
             return Arrays.asList(
                     new DefaultUntypedRecordableEventDescriptor(
-                            baseObject.getReference(), parentDocument.getAuthorReference(), baseObject));
+                            baseObject.getReference(), parentDocument.getAuthorReference(), baseObject,
+                            contextualLocalizationManager));
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the UntypedRecordableEvent wiki component "

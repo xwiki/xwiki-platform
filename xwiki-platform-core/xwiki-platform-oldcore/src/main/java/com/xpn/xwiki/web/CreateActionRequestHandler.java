@@ -519,9 +519,7 @@ public class CreateActionRequestHandler
     private DocumentReferenceResolver<String> getCurrentMixedResolver()
     {
         // resolver to use to resolve references received in request parameters
-        DocumentReferenceResolver<String> resolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
-        return resolver;
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
     }
 
     private boolean isTemplateProviderAllowedInSpace(BaseObject templateObject, SpaceReference spaceReference,
@@ -747,7 +745,7 @@ public class CreateActionRequestHandler
     
     /**
      * @return the authorization manager
-     * @since 8.3M1
+     * @since 9.11
      */
     protected AuthorizationManager getAuthorizationManager()
     {

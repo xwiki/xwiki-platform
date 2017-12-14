@@ -43,6 +43,8 @@ import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -183,6 +185,11 @@ public class CreateActionRequestHandler
      * Space homepage document name.
      */
     private static final String WEBHOME = "WebHome";
+    
+    /**
+     * Authorization manager.
+     */
+    private AuthorizationManager authorizationManager;
 
     private ScriptContextManager scriptContextManager;
 
@@ -423,13 +430,8 @@ public class CreateActionRequestHandler
     private List<Document> loadAvailableTemplateProviders(SpaceReference spaceReference,
         DocumentReference templateClassReference, XWikiContext context)
     {
-        XWiki wiki = context.getWiki();
         List<Document> templates = new ArrayList<>();
         try {
-            // resolver to use to resolve references received in request parameters
-            DocumentReferenceResolver<String> resolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
-
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
             Query query =
                 queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
@@ -445,8 +447,14 @@ public class CreateActionRequestHandler
             List<String> templateProviderDocNames = query.execute();
             for (String templateProviderName : templateProviderDocNames) {
                 // get the document and template provider object
-                DocumentReference reference = resolver.resolve(templateProviderName);
-                XWikiDocument templateDoc = wiki.getDocument(reference, context);
+                DocumentReference reference = getCurrentMixedResolver().resolve(templateProviderName);
+                
+                // Verify that the current user has the view right on the Template document
+                if (!getAuthorizationManager().hasAccess(Right.VIEW, context.getUserReference(), reference)) {
+                    continue;
+                }
+                    
+                XWikiDocument templateDoc = context.getWiki().getDocument(reference, context);
                 BaseObject templateObject = templateDoc.getXObject(templateClassReference);
 
                 // Check the template provider's visibility restrictions.
@@ -506,6 +514,14 @@ public class CreateActionRequestHandler
         }
 
         return templates;
+    }
+
+    private DocumentReferenceResolver<String> getCurrentMixedResolver()
+    {
+        // resolver to use to resolve references received in request parameters
+        DocumentReferenceResolver<String> resolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
+        return resolver;
     }
 
     private boolean isTemplateProviderAllowedInSpace(BaseObject templateObject, SpaceReference spaceReference,
@@ -727,6 +743,15 @@ public class CreateActionRequestHandler
     public VelocityContext getVelocityContext()
     {
         return Utils.getComponent(VelocityManager.class).getVelocityContext();
+    }
+    
+    /**
+     * @return the authorization manager
+     * @since 8.3M1
+     */
+    protected AuthorizationManager getAuthorizationManager()
+    {
+        return Utils.getComponent(AuthorizationManager.class);
     }
 
     /**

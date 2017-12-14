@@ -403,16 +403,13 @@ public class CreateActionRequestHandler
     {
         BaseObject result = null;
 
-        // resolver to use to resolve references received in request parameters
-        DocumentReferenceResolver<String> referenceResolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
-
         // set the template, from the template provider param
         String templateProviderDocReferenceString = request.getParameter(TEMPLATE_PROVIDER);
 
         if (!StringUtils.isEmpty(templateProviderDocReferenceString)) {
             // parse this document reference
-            DocumentReference templateProviderRef = referenceResolver.resolve(templateProviderDocReferenceString);
+            DocumentReference templateProviderRef =
+                getCurrentMixedResolver().resolve(templateProviderDocReferenceString);
             // get the document of the template provider and the object
             XWikiDocument templateProviderDoc = context.getWiki().getDocument(templateProviderRef, context);
             result = templateProviderDoc.getXObject(templateProviderClass);

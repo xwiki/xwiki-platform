@@ -26,6 +26,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.text.StringUtils;
@@ -107,13 +108,24 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
 
     private DocumentReference authorReference;
 
-    DefaultUntypedRecordableEventDescriptor(EntityReference reference, DocumentReference authorReference,
-            BaseObject baseObject) throws EventStreamException
+    private ContextualLocalizationManager contextualLocalizationManager;
+
+    /**
+     * Construct a DefaultUntypedRecordableEventDescriptor.
+     * @param reference reference of the document holding the descriptor
+     * @param authorReference reference of the author of the document
+     * @param baseObject object holding the descriptor
+     * @param contextualLocalizationManager an instance of the component ContextualLocalizationManager
+     * @throws EventStreamException if an error occurs
+     */
+    public DefaultUntypedRecordableEventDescriptor(EntityReference reference, DocumentReference authorReference,
+        BaseObject baseObject, ContextualLocalizationManager contextualLocalizationManager)
+            throws EventStreamException
     {
         this.entityReference = reference;
         this.authorReference = authorReference;
         this.setProperties(baseObject);
-
+        this.contextualLocalizationManager = contextualLocalizationManager;
     }
 
     /**
@@ -212,7 +224,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     @Override
     public String getApplicationName()
     {
-        return this.applicationName;
+        return this.contextualLocalizationManager.getTranslationPlain(this.applicationName);
     }
 
     @Override

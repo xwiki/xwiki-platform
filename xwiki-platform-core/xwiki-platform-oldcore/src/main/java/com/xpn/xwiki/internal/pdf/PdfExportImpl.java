@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.pdf.impl;
+package com.xpn.xwiki.internal.pdf;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,31 +33,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
 
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
-import org.apache.avalon.framework.configuration.DefaultConfiguration;
-import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.fop.apps.EnvironmentProfile;
-import org.apache.fop.apps.EnvironmentalProfileFactory;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.FopFactoryBuilder;
-import org.apache.fop.apps.FormattingResults;
-import org.apache.fop.apps.PageSequenceResults;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -68,7 +51,6 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -88,7 +70,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import io.sf.carte.doc.dom4j.CSSStylableElement;
 import io.sf.carte.doc.dom4j.XHTMLDocument;
@@ -103,9 +84,6 @@ import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
  */
 public class PdfExportImpl implements PdfExport
 {
-    /** The location where fonts to be used during PDF export should be placed. */
-    private static final String FONTS_PATH = "/WEB-INF/fonts/";
-
     /** The name of the default XHTML2FOP transformation file. */
     private static final String DEFAULT_XHTML2FOP_XSLT = "xhtml2fo.xsl";
 
@@ -129,110 +107,15 @@ public class PdfExportImpl implements PdfExport
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
-    /** XSLT transformer factory. */
-    private static TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
-    /** The Apache FOP instance used for XSL-FO processing. */
-    private static FopFactory fopFactory;
-
     /**
      * Used to get the temporary directory.
      */
     private Environment environment = Utils.getComponent((Type) Environment.class);
 
-    // Fields initialization
-    static {
-        // ----------------------------------------------------------------------
-        // FOP configuration
-        // ----------------------------------------------------------------------
-
-        EnvironmentProfile environmentProfile = EnvironmentalProfileFactory.createDefault(new File(".").toURI(),
-            Utils.getComponent(PDFResourceResolver.class));
-        FopFactoryBuilder builder = new FopFactoryBuilder(environmentProfile);
-
-        // Load configuration
-        Configuration configuration = null;
-        try (InputStream fopConfigurationFile = PdfExportImpl.class.getResourceAsStream("/fop-config.xml")) {
-            if (fopConfigurationFile != null) {
-                configuration = new DefaultConfigurationBuilder().build(fopConfigurationFile);
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Wrong FOP configuration: " + ExceptionUtils.getRootCauseMessage(e));
-        }
-
-        if (configuration != null) {
-            // Get a writable configuration instance
-            if (!(configuration instanceof DefaultConfiguration)) {
-                try {
-                    configuration = new DefaultConfiguration(configuration, true);
-                } catch (ConfigurationException e) {
-                    // Should never happen
-                    LOGGER.error("Failed to copy configuration", e);
-                }
-            }
-
-            if (configuration instanceof DefaultConfiguration) {
-                DefaultConfiguration writableConfiguration = (DefaultConfiguration) configuration;
-
-                // Add XWiki fonts folder to the configuration
-                try {
-                    Environment environment = Utils.getComponent(Environment.class);
-                    String fontsPath = environment.getResource(FONTS_PATH).getPath();
-                    Execution execution = Utils.getComponent(Execution.class);
-                    XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-                    if (xcontext != null) {
-                        XWikiRequest request = xcontext.getRequest();
-                        if (request != null && request.getSession() != null) {
-                            fontsPath = request.getSession().getServletContext().getRealPath(FONTS_PATH);
-                        }
-                    }
-
-                    // <renderers>
-                    DefaultConfiguration renderersConfiguration =
-                        (DefaultConfiguration) writableConfiguration.getChild("renderers", false);
-                    if (renderersConfiguration == null) {
-                        renderersConfiguration = new DefaultConfiguration("renderers");
-                        writableConfiguration.addChild(renderersConfiguration);
-                    }
-
-                    // <renderer mime="application/pdf">
-                    DefaultConfiguration pdfRenderer = null;
-                    for (Configuration renderer : renderersConfiguration.getChildren()) {
-                        if ("application/pdf".equals(renderer.getAttribute("mime"))) {
-                            pdfRenderer = (DefaultConfiguration) renderer;
-                        }
-                    }
-                    if (pdfRenderer == null) {
-                        pdfRenderer = new DefaultConfiguration("renderer");
-                        pdfRenderer.setAttribute("mime", "application/pdf");
-                        renderersConfiguration.addChild(pdfRenderer);
-                    }
-
-                    // <fonts>
-                    DefaultConfiguration fontsConfiguration =
-                        (DefaultConfiguration) pdfRenderer.getChild("fonts", false);
-                    if (fontsConfiguration == null) {
-                        fontsConfiguration = new DefaultConfiguration("fonts");
-                        pdfRenderer.addChild(fontsConfiguration);
-                    }
-
-                    // <directory>fontdirectory</directory>
-                    DefaultConfiguration directoryConfiguration = new DefaultConfiguration("directory");
-                    directoryConfiguration.setValue(fontsPath);
-                    fontsConfiguration.addChild(directoryConfiguration);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
-                        + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
-                        + "FOP cannot access this directory. If this is an upgrade from a previous version, "
-                        + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
-                }
-            }
-
-            builder.setConfiguration(configuration);
-        }
-
-        fopFactory = builder.build();
-    }
+    /**
+     * Used to render XSL-FO to PDF.
+     */
+    private XSLFORenderer xslFORenderer = Utils.getComponent(XSLFORenderer.class, "fop");
 
     @Override
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException
@@ -362,37 +245,7 @@ public class PdfExportImpl implements PdfExport
         throws XWikiException
     {
         try {
-            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-
-            // Transform FOP fatal errors into warnings so that the PDF export isn't stopped
-            foUserAgent.getEventBroadcaster().addEventListener(new XWikiFOPEventListener());
-
-            // Construct fop with desired output format
-            Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);
-
-            // Identity transformer
-            Transformer transformer = transformerFactory.newTransformer();
-
-            // Setup input stream
-            Source source = new StreamSource(new StringReader(xmlfo));
-
-            // Resulting SAX events (the generated FO) must be piped through to FOP
-            Result res = new SAXResult(fop.getDefaultHandler());
-
-            // Start XSLT transformation and FOP processing
-            transformer.transform(source, res);
-
-            // Result processing
-            FormattingResults foResults = fop.getResults();
-            if (foResults != null && LOGGER.isDebugEnabled()) {
-                @SuppressWarnings("unchecked")
-                java.util.List<PageSequenceResults> pageSequences = foResults.getPageSequences();
-                for (PageSequenceResults pageSequenceResults : pageSequences) {
-                    LOGGER.debug("PageSequence " + StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>")
-                        + " generated " + pageSequenceResults.getPageCount() + " pages.");
-                }
-                LOGGER.debug("Generated " + foResults.getPageCount() + " pages in total.");
-            }
+            this.xslFORenderer.render(new ByteArrayInputStream(xmlfo.getBytes("UTF-8")), out, type.getMimeType());
         } catch (IllegalStateException e) {
             throw createException(e, type, XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION);
         } catch (Exception e) {

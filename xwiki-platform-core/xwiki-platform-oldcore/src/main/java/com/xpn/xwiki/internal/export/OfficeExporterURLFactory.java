@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.pdf.impl.FileSystemURLFactory;
+import com.xpn.xwiki.internal.pdf.FileSystemURLFactory;
 
 /**
  * URL factory used while exporting a wiki page as an office document.

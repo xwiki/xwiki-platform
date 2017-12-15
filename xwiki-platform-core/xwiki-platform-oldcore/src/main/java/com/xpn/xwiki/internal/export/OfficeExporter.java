@@ -36,7 +36,7 @@ import org.xwiki.officeimporter.server.OfficeServer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.pdf.impl.PdfExportImpl;
+import com.xpn.xwiki.internal.pdf.PdfExportImpl;
 import com.xpn.xwiki.web.Utils;
 
 /**

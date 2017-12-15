@@ -20,19 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.AdminUIX" locale="">
+<xwikidoc version="1.3" reference="XWiki.AdminUIX" locale="">
   <web>XWiki</web>
   <name>AdminUIX</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1443617069000</creationDate>
+  <creationDate>1443613469000</creationDate>
   <parent>XWiki.XWikiPreferences</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1443617916000</date>
-  <contentUpdateDate>1443617069000</contentUpdateDate>
+  <date>1511976524000</date>
+  <contentUpdateDate>1511976524000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -56,6 +56,7 @@
       <validationScript/>
       <content>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>content</name>
         <number>3</number>
         <prettyName>Extension Content</prettyName>
@@ -83,7 +84,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parameters>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>parameters</name>
         <number>4</number>
         <prettyName>Extension Parameters</prettyName>

@@ -17,30 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.pdf.impl;
+package com.xpn.xwiki.internal.pdf;
 
-import org.apache.fop.events.Event;
-import org.apache.fop.events.EventListener;
-import org.apache.fop.events.model.EventSeverity;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.xwiki.component.annotation.Role;
 
 /**
- * Prevent errors happening in FOP from stopping the PDF export. For example unrecognized FOP properties are ignored
- * and don't generate an exception.
- *
+ * Renders XSL-FO to supported output formats.
+ * 
  * @version $Id$
- * @since 9.4RC1
+ * @since 9.11
  */
-public class XWikiFOPEventListener implements EventListener
+@Role
+public interface XSLFORenderer
 {
     /**
-     * @param event the FOP event received, see
-     *        <a href="https://xmlgraphics.apache.org/fop/trunk/events.html#consumer">FOP events</a>
+     * Renders the XSL-FO from the input stream to the specified output format.
+     * 
+     * @param input the XSL-FO input
+     * @param output where to write the output
+     * @param outputFormat the output format
+     * @throws Exception if XSL-FO rendering fails
      */
-    public void processEvent(Event event)
-    {
-        // Transform fatal events into warnings in order to not stop the PDF export process
-        if (event.getSeverity().equals(EventSeverity.FATAL)) {
-            event.setSeverity(EventSeverity.WARN);
-        }
-    }
+    void render(InputStream input, OutputStream output, String outputFormat) throws Exception;
 }

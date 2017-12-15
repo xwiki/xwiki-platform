@@ -56,10 +56,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.export.html.HtmlPackager;
 import com.xpn.xwiki.internal.export.OfficeExporter;
 import com.xpn.xwiki.internal.export.OfficeExporterURLFactory;
+import com.xpn.xwiki.internal.pdf.PdfExportImpl;
+import com.xpn.xwiki.internal.pdf.PdfURLFactory;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
-import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 

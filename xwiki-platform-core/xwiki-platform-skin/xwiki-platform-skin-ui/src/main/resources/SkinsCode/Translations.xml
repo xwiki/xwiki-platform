@@ -46,7 +46,7 @@ skin.sheet.overriddenTemplates=Overridden templates
 skin.sheet.addTemplate=Add a new overriding template
 skin.sheet.add=Add
 skin.sheet.overrideTemplateWarning=This section allows you to override a template of the skin. This is technical and you should be aware of the consequences.
-skin.sheet.deprecatedPropertiesWarning=This section is here for retro-compatibility reason. You should use the 'overridden templates' mechanism above.
+skin.sheet.deprecatedPropertiesWarning=This section is here for retro-compatibility reasons. You should use the 'overridden templates' mechanism above.
 skin.sheet.nojs=Without JavaScript, you cannot use this section. But you can use the {0}Object Editor{1} instead, and manually add {2} objects.
 
 skin.sheet.js.deleting=Deleting...

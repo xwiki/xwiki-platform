@@ -1,41 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
+<?xml version='1.1' encoding='UTF-8'?>
 <xwikidoc version="1.3" reference="Menu.UIExtensionSheet" locale="">
   <web>Menu</web>
   <name>UIExtensionSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1372193154000</creationDate>
+  <creator>XWiki.superadmin</creator>
+  <creationDate>1372189554000</creationDate>
   <parent>Menu.WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1395771452000</date>
-  <contentUpdateDate>1395771452000</contentUpdateDate>
+  <author>XWiki.superadmin</author>
+  <contentAuthor>XWiki.superadmin</contentAuthor>
+  <date>1511976589000</date>
+  <contentUpdateDate>1511976589000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <comment/>
+  <comment>Install extension [org.xwiki.platform:xwiki-platform-menu-ui/9.10.1]</comment>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
@@ -82,40 +61,40 @@
 #end
 (% class="xform" %)
 (((
-  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_extensionPointId"#end&gt;{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label&gt;{{/html}}##
+  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_extensionPointId"#end>{{translation key="menu.uix.extensionPoint.label"/}}&lt;/label>{{/html}}##
     (% class="xHint" %){{translation key="menu.uix.extensionPoint.hint"/}}
   #if ($xcontext.action == 'edit')
-    : {{html}}&lt;select id="XWiki.UIExtensionClass_0_extensionPointId" name="XWiki.UIExtensionClass_0_extensionPointId"&gt;
-        &lt;option value=""&gt;$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option&gt;
+    : {{html}}&lt;select id="XWiki.UIExtensionClass_0_extensionPointId" name="XWiki.UIExtensionClass_0_extensionPointId">
+        &lt;option value="">$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option>
         #foreach ($extensionPointId in $extensionPoints.keySet())
           #set ($selected = $extensionPointId == $selectedExtensionPointId)
-          &lt;option value="$extensionPointId"#if ($selected) selected="selected"#end&gt;
+          &lt;option value="$extensionPointId"#if ($selected) selected="selected"#end>
             #displayExtensionPointTitle($extensionPointId)
-          &lt;/option&gt;
+          &lt;/option>
         #end
-      &lt;/select&gt;{{/html}}
+      &lt;/select>{{/html}}
   #else
     : #displayExtensionPointTitle($selectedExtensionPointId)
   #end
   ##
   ##
   #if ($xcontext.action == 'edit')
-    ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_content"&gt;{{translation key="menu.uix.content.label"/}}&lt;/label&gt;{{/html}}##
+    ; {{html wiki="true"}}&lt;label for="XWiki.UIExtensionClass_0_content">{{translation key="menu.uix.content.label"/}}&lt;/label>{{/html}}##
       (% class="xHint" %){{translation key="menu.uix.content.hint"/}}
-    : {{html}}&lt;select id="XWiki.UIExtensionClass_0_content" name="XWiki.UIExtensionClass_0_content"&gt;
-        &lt;option value=""&gt;$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option&gt;
+    : {{html}}&lt;select id="XWiki.UIExtensionClass_0_content" name="XWiki.UIExtensionClass_0_content">
+        &lt;option value="">$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option>
         #foreach ($entry in $extensionPoints.entrySet())
           #set ($value = $escapetool.xml($entry.value).replaceAll("\r", '&amp;#13;').replaceAll("\n", '&amp;#10;'))
           #set ($selected = $entry.value == $selectedContent)
-          &lt;option value="$value"#if ($selected) selected="selected"#end&gt;
+          &lt;option value="$value"#if ($selected) selected="selected"#end>
             #displayExtensionPointTitle($entry.key)
-          &lt;/option&gt;
+          &lt;/option>
         #end
-      &lt;/select&gt;{{/html}}
+      &lt;/select>{{/html}}
   #end
   ##
   ##
-  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_scope"#end&gt;{{translation key="menu.uix.scope.label"/}}&lt;/label&gt;{{/html}}##
+  ; {{html wiki="true"}}&lt;label#if ($xcontext.action == 'edit') for="XWiki.UIExtensionClass_0_scope"#end>{{translation key="menu.uix.scope.label"/}}&lt;/label>{{/html}}##
     (% class="xHint" %){{translation key="menu.uix.scope.hint"/}}
   : $doc.display('scope')
 )))
@@ -219,7 +198,7 @@
 });</code>
     </property>
     <property>
-      <name/>
+      <name></name>
     </property>
     <property>
       <parse>0</parse>

@@ -43,7 +43,7 @@ import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityManager;
 
@@ -185,11 +185,6 @@ public class CreateActionRequestHandler
      * Space homepage document name.
      */
     private static final String WEBHOME = "WebHome";
-    
-    /**
-     * Authorization manager.
-     */
-    private AuthorizationManager authorizationManager;
 
     private ScriptContextManager scriptContextManager;
 
@@ -447,7 +442,7 @@ public class CreateActionRequestHandler
                 DocumentReference reference = getCurrentMixedResolver().resolve(templateProviderName);
                 
                 // Verify that the current user has the view right on the Template document
-                if (!getAuthorizationManager().hasAccess(Right.VIEW, context.getUserReference(), reference)) {
+                if (!getAuthManager().hasAccess(Right.VIEW, reference)) {
                     continue;
                 }
                     
@@ -744,9 +739,9 @@ public class CreateActionRequestHandler
      * @return the authorization manager
      * @since 9.11
      */
-    protected AuthorizationManager getAuthorizationManager()
+    protected ContextualAuthorizationManager getAuthManager()
     {
-        return Utils.getComponent(AuthorizationManager.class);
+        return Utils.getComponent(ContextualAuthorizationManager.class);
     }
 
     /**

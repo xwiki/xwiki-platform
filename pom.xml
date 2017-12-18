@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>9.11</version>
+  <version>9.11.1-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -81,7 +81,7 @@
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
     <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>xwiki-platform-9.11</tag>
+    <tag>stable-9.11.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

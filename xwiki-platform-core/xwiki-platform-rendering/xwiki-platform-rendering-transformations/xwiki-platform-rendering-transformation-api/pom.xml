@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-transformations</artifactId>
-    <version>9.11</version>
+    <version>9.11.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-transformation-api</artifactId>
   <name>XWiki Platform - Rendering - Transformations - API</name>

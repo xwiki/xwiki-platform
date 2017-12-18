@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-crypto-store</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>9.11-SNAPSHOT</version>
+    <version>9.11</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-crypto-store-api</artifactId>

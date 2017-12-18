@@ -139,7 +139,10 @@
       <dataSpace/>
     </property>
     <property>
-      <description>This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</description>
+      <description>{{velocity}}
+$services.localization.render('menu.description')
+{{/velocity}}
+</description>
     </property>
   </object>
   <object>

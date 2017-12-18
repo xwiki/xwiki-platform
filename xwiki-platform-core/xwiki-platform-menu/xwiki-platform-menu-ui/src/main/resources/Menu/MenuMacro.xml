@@ -1063,7 +1063,9 @@ $xwiki.getDocument('MenuTemplate').content
       <defaultCategory>Navigation</defaultCategory>
     </property>
     <property>
-      <description>Displays a menu created using simple wiki syntax (nested lists and links).</description>
+      <description>{{velocity}}$services.localization.render('menu.macro.description'){{/velocity}}
+
+</description>
     </property>
     <property>
       <id>menu</id>
@@ -1135,7 +1137,10 @@ $xwiki.getDocument('MenuTemplate').content
       <defaultValue>horizontal</defaultValue>
     </property>
     <property>
-      <description>The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.</description>
+      <description>{{velocity}}
+$services.localization.render('menu.macro.type.description')
+{{/velocity}}
+</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -1201,7 +1206,12 @@ $xwiki.getDocument('MenuTemplate').content
       <defaultValue/>
     </property>
     <property>
-      <description>Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.</description>
+      <description>{{velocity}}
+$services.localization.render('menu.macro.id.description')
+{{/velocity}}
+
+ 
+</description>
     </property>
     <property>
       <mandatory>0</mandatory>

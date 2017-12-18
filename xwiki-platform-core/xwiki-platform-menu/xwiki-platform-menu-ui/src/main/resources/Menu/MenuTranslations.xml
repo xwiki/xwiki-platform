@@ -72,7 +72,30 @@ menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
 menu.uix.content.label=UI Extension Content
 menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
 menu.uix.scope.label=Menu Visibility Scope
-menu.uix.scope.hint=Specifies in which context the menu is visible.</content>
+menu.uix.scope.hint=Specifies in which context the menu is visible.
+menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+menu.macro.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
+menu.macro.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+
+##Menu Description
+ 
+
+menu.description= This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+
+##Menu Macro
+
+rendering.macro.menu.name=Menu
+
+rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+
+rendering.macro.menu.parameter.id.name=Id
+
+rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+
+rendering.macro.menu.parameter.type.name=Type
+
+rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.</content>
   <object>
     <name>Menu.MenuTranslations</name>
     <number>0</number>
@@ -105,7 +128,7 @@ menu.uix.scope.hint=Specifies in which context the menu is visible.</content>
       </scope>
     </class>
     <property>
-      <scope>ON_DEMAND</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
 </xwikidoc>

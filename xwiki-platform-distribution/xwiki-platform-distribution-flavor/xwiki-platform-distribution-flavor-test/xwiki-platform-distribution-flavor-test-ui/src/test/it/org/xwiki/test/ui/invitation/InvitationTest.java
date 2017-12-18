@@ -259,9 +259,9 @@ public class InvitationTest extends AbstractTest
             getGreenMail().waitForIncomingEmail(2000, 2);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             Assert.assertTrue("Messages were received when they shouldn't have been sent!", messages.length == 0);
-            Assert.assertTrue("User was not shown the correct error message.",
-                sent.getMessageBoxContent().equals("Your message couldn't be sent because there were no valid email "
-                + "addresses to send to."));
+            Assert.assertEquals("User was not shown the correct error message.",
+                "Your message could not be sent because there were no valid email addresses to send to.",
+                sent.getMessageBoxContent());
             stopGreenMail();
 
             // Become admin and allow users to send to multiple.

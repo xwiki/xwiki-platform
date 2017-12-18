@@ -44,6 +44,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -55,7 +56,7 @@ import org.xwiki.xar.XarPackage;
 public class HTTPPerformanceTest
 {
     private static final DefaultStringEntityReferenceSerializer SERIALIZER =
-        new DefaultStringEntityReferenceSerializer();
+        new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     protected static List<DocumentReference> readXarContents(String fileName, String patternFilter) throws Exception
     {

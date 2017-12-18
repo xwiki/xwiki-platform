@@ -1,67 +1,88 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="">
   <web>Menu</web>
   <name>MenuTranslations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
-  <creator>XWiki.superadmin</creator>
+  <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1372185741000</creationDate>
   <parent>MenuClass</parent>
-  <author>XWiki.Admin</author>
-  <contentAuthor>XWiki.Admin</contentAuthor>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1513524879000</date>
   <contentUpdateDate>1513368603000</contentUpdateDate>
-  <version>2.5</version>
+  <version>1.1</version>
   <title/>
   <comment/>
-  <minorEdit>true</minorEdit>
+  <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content># Class fields&#xd;
-Menu.MenuClass_content1=Menu Structure&#xd;
-&#xd;
-# Live table generic keys&#xd;
-menu.livetable.doc.title=Page title&#xd;
-menu.livetable.doc.name=Page name&#xd;
-menu.livetable.doc.space=Space&#xd;
-menu.livetable.doc.fullname=Page full name&#xd;
-menu.livetable.doc.author=Last Author&#xd;
-menu.livetable.doc.creator=Creator&#xd;
-menu.livetable.doc.date=Update date&#xd;
-menu.livetable.doc.creationDate=Creation date&#xd;
-menu.livetable._avatar=Avatar&#xd;
-menu.livetable._images=Images&#xd;
-menu.livetable._attachments=Attachments&#xd;
-menu.livetable._actions=Actions&#xd;
-menu.livetable._actions.edit=Edit&#xd;
-menu.livetable._actions.delete=Delete&#xd;
-menu.livetable.emptyvalue=-&#xd;
-&#xd;
-# Live table specific keys&#xd;
-menu.livetable.content1=Menu Structure&#xd;
-&#xd;
-# UIX keys&#xd;
-menu.uix.extensionPoint.label=Menu Display Location&#xd;
-menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.&#xd;
-menu.uix.extensionPoint.value.nowhere=Nowhere&#xd;
-menu.uix.extensionPoint.value.template.header.after=After the Page Header&#xd;
-menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel&#xd;
-menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel&#xd;
-menu.uix.content.label=UI Extension Content&#xd;
-menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.&#xd;
-menu.uix.scope.label=Menu Visibility Scope&#xd;
-menu.uix.scope.hint=Specifies in which context the menu is visible.&#xd;
-&#xd;
-##Menu description&#xd;
-menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.&#xd;
-&#xd;
-## Menu macro keys&#xd;
-rendering.macro.menu.name=Menu&#xd;
-rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).&#xd;
-rendering.macro.menu.parameter.id.name=Id&#xd;
-rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.&#xd;
-rendering.macro.menu.parameter.type.name=Type&#xd;
+  <content># Class fields
+Menu.MenuClass_content1=Menu Structure
+
+# Live table generic keys
+menu.livetable.doc.title=Page title
+menu.livetable.doc.name=Page name
+menu.livetable.doc.space=Space
+menu.livetable.doc.fullname=Page full name
+menu.livetable.doc.author=Last Author
+menu.livetable.doc.creator=Creator
+menu.livetable.doc.date=Update date
+menu.livetable.doc.creationDate=Creation date
+menu.livetable._avatar=Avatar
+menu.livetable._images=Images
+menu.livetable._attachments=Attachments
+menu.livetable._actions=Actions
+menu.livetable._actions.edit=Edit
+menu.livetable._actions.delete=Delete
+menu.livetable.emptyvalue=-
+
+# Live table specific keys
+menu.livetable.content1=Menu Structure
+
+# UIX keys
+menu.uix.extensionPoint.label=Menu Display Location
+menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
+menu.uix.extensionPoint.value.nowhere=Nowhere
+menu.uix.extensionPoint.value.template.header.after=After the Page Header
+menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
+menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
+menu.uix.content.label=UI Extension Content
+menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
+menu.uix.scope.label=Menu Visibility Scope
+menu.uix.scope.hint=Specifies in which context the menu is visible.
+
+##Menu description
+menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+
+## Menu macro keys
+rendering.macro.menu.name=Menu
+rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+rendering.macro.menu.parameter.type.name=Type
 rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.</content>
   <object>
     <name>Menu.MenuTranslations</name>

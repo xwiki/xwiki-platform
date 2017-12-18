@@ -27,12 +27,12 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1372186729000</creationDate>
+  <creationDate>1372190329000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1513524588000</date>
-  <contentUpdateDate>1513368110000</contentUpdateDate>
+  <date>1513616039000</date>
+  <contentUpdateDate>1513616039000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -136,13 +136,10 @@
       <columns>doc.name doc.date doc.author _actions</columns>
     </property>
     <property>
-      <dataSpace></dataSpace>
+      <dataSpace/>
     </property>
     <property>
-      <description>{{velocity}}&#xd;
-$services.localization.render('menu.description')&#xd;
-{{/velocity}}&#xd;
-</description>
+      <description>This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</description>
     </property>
   </object>
   <object>
@@ -250,7 +247,7 @@ $services.localization.render('menu.description')&#xd;
       </scope>
     </class>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
@@ -259,8 +256,8 @@ $services.localization.render('menu.description')&#xd;
       <name>platform.panels.MenuApplication</name>
     </property>
     <property>
-      <parameters>label=Menu&#xd;
-target=Menu.WebHome&#xd;
+      <parameters>label=Menu
+target=Menu.WebHome
 icon=icon:text_list_bullets</parameters>
     </property>
     <property>
@@ -341,13 +338,13 @@ icon=icon:text_list_bullets</parameters>
       <allow>1</allow>
     </property>
     <property>
-      <groups></groups>
+      <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
       <levels>view,edit,delete</levels>
     </property>
     <property>
-      <users></users>
+      <users/>
     </property>
   </object>
 </xwikidoc>

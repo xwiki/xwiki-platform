@@ -27,12 +27,12 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1372185741000</creationDate>
+  <creationDate>1372189341000</creationDate>
   <parent>MenuClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1513524879000</date>
-  <contentUpdateDate>1513368603000</contentUpdateDate>
+  <date>1513615997000</date>
+  <contentUpdateDate>1513615997000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -72,18 +72,7 @@ menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
 menu.uix.content.label=UI Extension Content
 menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
 menu.uix.scope.label=Menu Visibility Scope
-menu.uix.scope.hint=Specifies in which context the menu is visible.
-
-##Menu description
-menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
-
-## Menu macro keys
-rendering.macro.menu.name=Menu
-rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
-rendering.macro.menu.parameter.id.name=Id
-rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
-rendering.macro.menu.parameter.type.name=Type
-rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.</content>
+menu.uix.scope.hint=Specifies in which context the menu is visible.</content>
   <object>
     <name>Menu.MenuTranslations</name>
     <number>0</number>
@@ -116,7 +105,7 @@ rendering.macro.menu.parameter.type.description=The optional menu type determine
       </scope>
     </class>
     <property>
-      <scope>WIKI</scope>
+      <scope>ON_DEMAND</scope>
     </property>
   </object>
 </xwikidoc>

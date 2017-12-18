@@ -1,41 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
-<xwikidoc version="1.2" reference="Menu.MenuMacro" locale="">
+<?xml version='1.1' encoding='UTF-8'?>
+<xwikidoc version="1.3" reference="Menu.MenuMacro" locale="">
   <web>Menu</web>
   <name>MenuMacro</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
+  <creator>XWiki.superadmin</creator>
   <creationDate>1385073516000</creationDate>
   <parent>Menu.WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1414602842000</date>
-  <contentUpdateDate>1414597922000</contentUpdateDate>
-  <version>1.1</version>
+  <author>XWiki.Admin</author>
+  <contentAuthor>XWiki.Admin</contentAuthor>
+  <date>1513367785000</date>
+  <contentUpdateDate>1513367785000</contentUpdateDate>
+  <version>5.1</version>
   <title>Menu Macro</title>
-  <comment/>
+  <comment>Rollback to version 4.1</comment>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
@@ -99,7 +78,9 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -154,7 +135,7 @@ $xwiki.getDocument('MenuTemplate').content
   $('.menu-horizontal li ul').parent().addClass('xDropdown');
 
   // Make sure the menu separators are really empty.
-  $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
+  $('.menu-horizontal, .menu-vertical').find('li > br:first-child').remove();
 
   // Collapsible menu bahavior.
   $('.menu-vertical.collapsible').each(function(){
@@ -174,13 +155,13 @@ $xwiki.getDocument('MenuTemplate').content
   });
 
   // In case of horizontal responsive menus, make sub-submenus in the navbar work on mobile devices
-  $(document).on('touchstart.dropdown.data-api', '.dropdown-submenu &gt; a', function (event) {
+  $(document).on('touchstart.dropdown.data-api', '.dropdown-submenu > a', function (event) {
     event.preventDefault();
   });
 })</code>
     </property>
     <property>
-      <name/>
+      <name></name>
     </property>
     <property>
       <parse>0</parse>
@@ -209,7 +190,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -220,9 +201,11 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -235,7 +218,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -248,7 +231,7 @@ $xwiki.getDocument('MenuTemplate').content
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -259,7 +242,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -270,7 +253,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -354,7 +337,7 @@ $xwiki.getDocument('MenuTemplate').content
 }
 
 /* Vertical separator */
-.skin-colibri .menu-horizontal &gt; ul &gt; li:empty {
+.skin-colibri .menu-horizontal > ul > li:empty {
   border-left: 1px solid $theme.textSecondaryColor;
   margin: 0 .5em;
   padding: 0;
@@ -366,11 +349,11 @@ $xwiki.getDocument('MenuTemplate').content
   color: inherit;
 }
 
-.skin-colibri .menu-horizontal &gt; ul &gt; li {
+.skin-colibri .menu-horizontal > ul > li {
   display: inline-block;
 }
 
-.skin-colibri .menu-horizontal &gt; ul &gt; li.xDropdown:after {
+.skin-colibri .menu-horizontal > ul > li.xDropdown:after {
   content: '\25BC';
   font-size: .8em;
   margin-left: .5em;
@@ -382,7 +365,7 @@ $xwiki.getDocument('MenuTemplate').content
   margin-left: .5em;
 }
 
-.skin-colibri .menu-horizontal &gt; ul ul {
+.skin-colibri .menu-horizontal > ul ul {
   background: none repeat scroll 0 0 $theme.menuBackgroundColor;
   border-radius: 0 0 .8em .8em;
   box-shadow: 0 1px 1px $theme.borderColor;
@@ -393,7 +376,7 @@ $xwiki.getDocument('MenuTemplate').content
   z-index: 1000;
 }
 
-.skin-colibri .menu-horizontal li:hover &gt; ul {
+.skin-colibri .menu-horizontal li:hover > ul {
   display: block;
 }
 
@@ -455,7 +438,7 @@ $xwiki.getDocument('MenuTemplate').content
   display: none;
 }
 
-.skin-colibri .menu-vertical .xDropdown.open &gt; .xDropdown-menu {
+.skin-colibri .menu-vertical .xDropdown.open > .xDropdown-menu {
   display: block;
 }</code>
     </property>
@@ -492,7 +475,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -503,9 +486,11 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -518,7 +503,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -531,7 +516,7 @@ $xwiki.getDocument('MenuTemplate').content
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -542,7 +527,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -553,7 +538,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -615,12 +600,12 @@ $xwiki.getDocument('MenuTemplate').content
       }
     }
     .xDropdown.open {
-      &gt; .xDropdown-toggle:after {
+      > .xDropdown-toggle:after {
         /* Expanded arrow style */
         .caret;
         margin-top: @line-height-computed / 2;
       }
-      &gt; .xDropdown-menu {
+      > .xDropdown-menu {
         display: block;
       }
     }
@@ -634,11 +619,11 @@ $xwiki.getDocument('MenuTemplate').content
     .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
     min-height: @navbar-height;
     padding-left: 25px;
-    &amp; &gt; ul {
+    &amp; > ul {
       padding-left: 0;
       list-style-type: none;
       margin: 0;
-      &amp; &gt; li {
+      &amp; > li {
         position: relative;
         display: block;
         padding: @nav-link-padding;
@@ -655,7 +640,7 @@ $xwiki.getDocument('MenuTemplate').content
           background-color: @navbar-default-link-active-bg;
           color: @navbar-default-link-active-color;
           /* When hovering, have the same color for text and link usage */
-          &amp; &gt; span &gt; a {
+          &amp; > span > a {
             background-color: @navbar-default-link-active-bg;
             color: @navbar-default-link-active-color;
           }
@@ -718,7 +703,7 @@ $xwiki.getDocument('MenuTemplate').content
             overflow: hidden;
             text-overflow: ellipsis; // Displaying ... if the text is too long
             &amp;:hover {
-              /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
+              /* &amp;:extend(.dropdown-menu>li>a:hover); */
               text-decoration: none;
               color: @dropdown-link-hover-color;
               background-color: @dropdown-link-hover-bg;
@@ -740,12 +725,12 @@ $xwiki.getDocument('MenuTemplate').content
               color: @dropdown-link-hover-color;
               background-color: @dropdown-link-hover-bg;
               /* When in dropdown we also have a link, adjust the hover color */
-              &amp; &gt; span &gt; a {
+              &amp; > span > a {
                 color: @dropdown-link-hover-color;
               }
             }
             /* When in dropdown we also have a link, reset the duplicated padding */
-            &amp; &gt; span &gt; a {
+            &amp; > span > a {
               padding: 0;
               display: inherit;
             }
@@ -767,7 +752,7 @@ $xwiki.getDocument('MenuTemplate').content
     /* Stylization: Generic */
     li {
       /* Display submenus on hover */
-      &amp;:hover &gt; ul {
+      &amp;:hover > ul {
         display: block;
       }
       /* Display an arrow for expandable items */
@@ -799,9 +784,9 @@ $xwiki.getDocument('MenuTemplate').content
     }
     /* Resetting rules for mobile view */
     @media (max-width: @screen-xs-max) {
-      &gt; ul { 
+      > ul { 
         margin: 0 0 0 -25px; /* Remove padding added in normal view */
-        &gt; li {
+        > li {
           &amp;:empty {
             .nav-divider(@navbar-default-border);
           }
@@ -833,7 +818,7 @@ $xwiki.getDocument('MenuTemplate').content
                 color: inherit;
               }
               /* When in dropdown we also have a link */
-              &gt; span &gt; a { 
+              > span > a { 
                 color: @navbar-default-link-color;
               }
             }
@@ -910,6 +895,7 @@ $xwiki.getDocument('MenuTemplate').content
       <validationScript/>
       <code>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>code</name>
         <number>9</number>
         <prettyName>Macro code</prettyName>
@@ -919,7 +905,9 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>contentDescription</name>
         <number>8</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
@@ -954,7 +942,9 @@ $xwiki.getDocument('MenuTemplate').content
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultCategory>
       <description>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
@@ -1023,12 +1013,12 @@ $xwiki.getDocument('MenuTemplate').content
   (% role="navigation" class="menu-horizontal-toggle" %)(((
     (% class="navbar-header" %)(((
       {{html}}
-        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{id}" aria-expanded="false"&gt;
-          &lt;span class="sr-only"&gt;&lt;/span&gt;
-          &lt;span class="icon-bar"&gt;&lt;/span&gt;
-          &lt;span class="icon-bar"&gt;&lt;/span&gt;
-          &lt;span class="icon-bar"&gt;&lt;/span&gt;
-        &lt;/button&gt;
+        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{id}" aria-expanded="false">
+          &lt;span class="sr-only">&lt;/span>
+          &lt;span class="icon-bar">&lt;/span>
+          &lt;span class="icon-bar">&lt;/span>
+          &lt;span class="icon-bar">&lt;/span>
+        &lt;/button>
       {{/html}}
     )))
     (% id="${id}" class="menu menu-$!type collapse navbar-collapse" %)(((
@@ -1187,7 +1177,7 @@ $xwiki.getDocument('MenuTemplate').content
       </name>
     </class>
     <property>
-      <defaultValue/>
+      <defaultValue></defaultValue>
     </property>
     <property>
       <description>Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.</description>

@@ -26,21 +26,16 @@ import java.util.List;
 import javax.script.ScriptContext;
 
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * This class is meant to be instanciated and then registered to the Component Manager by the
@@ -50,22 +45,8 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @version $Id$
  * @since 9.5RC1
  */
-public class WikiNotificationDisplayer implements WikiComponent, NotificationDisplayer
+public class WikiNotificationDisplayer extends AbstractWikiNotificationRenderer implements NotificationDisplayer
 {
-    private static final String EVENT_BINDING_NAME = "event";
-
-    private TemplateManager templateManager;
-
-    private ScriptContextManager scriptContextManager;
-
-    private ComponentManager componentManager;
-
-    private BaseObjectReference objectReference;
-
-    private DocumentReference authorReference;
-
-    private String eventType;
-
     private Template notificationTemplate;
 
     private List<String> supportedEvents;
@@ -84,49 +65,10 @@ public class WikiNotificationDisplayer implements WikiComponent, NotificationDis
             ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
             throws NotificationException
     {
-        this.objectReference = baseObject.getReference();
-        this.authorReference = authorReference;
-        this.templateManager = templateManager;
-        this.scriptContextManager = scriptContextManager;
-        this.componentManager = componentManager;
-
-        this.eventType = this.extractProperty(baseObject, WikiNotificationDisplayerDocumentInitializer.EVENT_TYPE);
+        super(authorReference, templateManager, scriptContextManager, componentManager, baseObject);
         this.supportedEvents = Arrays.asList(this.eventType);
-
-        // Create the template from the given BaseObject property
-        try {
-            String xObjectTemplate = this.extractProperty(baseObject,
-                    WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
-            if (!StringUtils.isBlank(xObjectTemplate)) {
-                this.notificationTemplate = templateManager.createStringTemplate(
-                        xObjectTemplate, this.getAuthorReference());
-            } else {
-                this.notificationTemplate = null;
-            }
-
-        } catch (Exception e) {
-            throw new NotificationException(
-                    String.format("Unable to render the template provided in the base object [%s]",
-                            baseObject), e);
-        }
-    }
-
-    /**
-     * Extract the the given property value from the given XObject.
-     *
-     * @param baseObject the XObject that should contain the parameters
-     * @param propertyName the value of the property that should be extracted
-     * @throws NotificationException if an error occurred while extracting the parameter from the base object
-     */
-    private String extractProperty(BaseObject baseObject, String propertyName) throws NotificationException
-    {
-        try {
-            return baseObject.getStringValue(propertyName);
-        } catch (Exception e) {
-            throw new NotificationException(
-                    String.format("Unable to extract the parameter [%s] from the [%s] NotificationDisplayerClass.",
-                            propertyName, baseObject), e);
-        }
+        this.notificationTemplate = extractTemplate(baseObject,
+                WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
     }
 
     @Override
@@ -166,38 +108,8 @@ public class WikiNotificationDisplayer implements WikiComponent, NotificationDis
     }
 
     @Override
-    public DocumentReference getDocumentReference()
-    {
-        return (DocumentReference) this.objectReference.getParent();
-    }
-
-    @Override
-    public EntityReference getEntityReference()
-    {
-        return this.objectReference;
-    }
-
-    @Override
-    public DocumentReference getAuthorReference()
-    {
-        return this.authorReference;
-    }
-
-    @Override
     public Type getRoleType()
     {
         return NotificationDisplayer.class;
-    }
-
-    @Override
-    public String getRoleHint()
-    {
-        return this.eventType;
-    }
-
-    @Override
-    public WikiComponentScope getScope()
-    {
-        return WikiComponentScope.WIKI;
     }
 }

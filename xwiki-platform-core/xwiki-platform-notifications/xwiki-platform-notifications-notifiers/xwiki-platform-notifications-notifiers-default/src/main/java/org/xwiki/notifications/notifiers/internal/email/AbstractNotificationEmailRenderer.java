@@ -20,26 +20,14 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.velocity.VelocityManager;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.ExternalServletURLFactory;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Helper for NotificationEmailRenderer that use the Template Manager to render notifications.
@@ -49,30 +37,11 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public abstract class AbstractNotificationEmailRenderer implements NotificationEmailRenderer
 {
-    protected static final String EVENT_BINDING_NAME = "event";
-
-    protected static final String USER_BINDING_NAME = "emailUser";
-
     @Inject
-    // In 2017, it's safer to use XHTML 1.0 for emails because the emails clients have a very unequal HTML support
-    @Named("xhtml/1.0")
-    protected BlockRenderer htmlBlockRenderer;
-
-    @Inject
-    @Named("plain/1.0")
-    protected BlockRenderer plainTextBlockRenderer;
+    protected EmailTemplateRenderer emailTemplateRenderer;
 
     @Inject
     protected TemplateManager templateManager;
-
-    @Inject
-    protected VelocityManager velocityManager;
-
-    @Inject
-    protected Provider<XWikiContext> contextProvider;
-
-    @Inject
-    protected RenderingContext renderingContext;
 
     /**
      * Execute a template.
@@ -87,54 +56,24 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
     protected Block executeTemplate(CompositeEvent event, String userId, String templatePath, Syntax syntax)
             throws NotificationException
     {
-        XWikiContext context = contextProvider.get();
-        XWikiURLFactory originalURLFactory = context.getURLFactory();
-        try {
-            // Bind the event to some variable in the velocity context
-            velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, event);
-            velocityManager.getCurrentVelocityContext().put(USER_BINDING_NAME, userId);
-            // Use the external URL factory to generate full URLs
-            context.setURLFactory(new ExternalServletURLFactory(context));
-            // Set the given syntax in the rendering context
-            if (renderingContext instanceof MutableRenderingContext) {
-                ((MutableRenderingContext) renderingContext).push(null, null, syntax, null,
-                        false, syntax);
-            }
-            // Generate the full template name
-            String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
-            // Get the template
-            Template template = templateManager.getTemplate(templateName);
-            // Render the template or fallback to the default one
-            return template != null ? templateManager.execute(template)
-                    : templateManager.execute(String.format(templatePath, "default"));
-        } catch (Exception e) {
-            throw new NotificationException("Failed to render the notification.", e);
-        } finally {
-            // Cleaning the rendering context
-            if (renderingContext instanceof MutableRenderingContext) {
-                ((MutableRenderingContext) renderingContext).pop();
-            }
-            // Cleaning the URL factory
-            context.setURLFactory(originalURLFactory);
-            // Cleaning the velocity context
-            velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
-            velocityManager.getCurrentVelocityContext().remove(USER_BINDING_NAME);
+        // Generate the full template name
+        String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
+        // Get the template
+        Template template = templateManager.getTemplate(templateName);
+        if (template == null) {
+            template = templateManager.getTemplate(String.format(templatePath, "default"));
         }
+        return emailTemplateRenderer.executeTemplate(event, userId, template, syntax);
     }
 
     protected String renderHTML(Block block)
     {
-        WikiPrinter printer = new DefaultWikiPrinter();
-        htmlBlockRenderer.render(block, printer);
-        return printer.toString();
+        return emailTemplateRenderer.renderHTML(block);
     }
 
     protected String renderPlainText(Block block)
     {
-        // TODO: this does not work at all (templates enforce HTML syntax I guess)
-        WikiPrinter printer = new DefaultWikiPrinter();
-        plainTextBlockRenderer.render(block, printer);
-        return printer.toString();
+        return emailTemplateRenderer.renderPlainText(block);
     }
 
 }

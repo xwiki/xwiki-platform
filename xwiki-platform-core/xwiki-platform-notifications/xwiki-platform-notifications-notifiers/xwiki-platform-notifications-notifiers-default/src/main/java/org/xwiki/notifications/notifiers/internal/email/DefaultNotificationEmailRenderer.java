@@ -20,6 +20,7 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -29,6 +30,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.text.StringUtils;
 
 /**
  * Default implementation of {@link NotificationEmailRenderer}.
@@ -41,6 +43,7 @@ import org.xwiki.rendering.syntax.Syntax;
 public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailRenderer
 {
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     private NotificationEmailRenderer getRenderer(CompositeEvent event)
@@ -57,7 +60,10 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.renderHTML(event, userId);
+            String result = renderer.renderHTML(event, userId);
+            if (StringUtils.isNotBlank(result)) {
+                return result;
+            }
         }
 
         return renderHTML(executeTemplate(event, userId, "notification/email/%s.html.vm",
@@ -70,7 +76,10 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.renderPlainText(event, userId);
+            String result = renderer.renderPlainText(event, userId);
+            if (StringUtils.isNotBlank(result)) {
+                return result;
+            }
         }
 
         return renderPlainText(executeTemplate(event, userId, "notification/email/%s.plain.vm",
@@ -82,7 +91,10 @@ public class DefaultNotificationEmailRenderer extends AbstractNotificationEmailR
     {
         NotificationEmailRenderer renderer = getRenderer(event);
         if (renderer != null) {
-            return renderer.generateEmailSubject(event, userId);
+            String result = renderer.generateEmailSubject(event, userId);
+            if (StringUtils.isNotBlank(result)) {
+                return result;
+            }
         }
 
         return renderPlainText(executeTemplate(event, userId, "notification/email/%s.subject.vm",

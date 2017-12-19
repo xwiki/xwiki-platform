@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.notifiers.internal;
+package org.xwiki.notifications.notifiers.internal.email;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.NotificationDisplayer;
+import org.xwiki.notifications.notifiers.internal.AbstractWikiNotificationRendererComponentBuilder;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.TemplateManager;
 
@@ -44,9 +45,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 9.5RC1
  */
 @Component
-@Named(WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME)
+@Named(WikiEmailNotificationRendererDocumentInitializer.XCLASS_NAME)
 @Singleton
-public class WikiNotificationDisplayerComponentBuilder extends AbstractWikiNotificationRendererComponentBuilder
+public class WikiEmailNotificationRendererComponentBuilder extends AbstractWikiNotificationRendererComponentBuilder
 {
     @Inject
     private TemplateManager templateManager;
@@ -61,7 +62,7 @@ public class WikiNotificationDisplayerComponentBuilder extends AbstractWikiNotif
     public EntityReference getClassReference()
     {
         return new EntityReference(
-                WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME,
+                WikiEmailNotificationRendererDocumentInitializer.XCLASS_NAME,
                 EntityType.OBJECT);
     }
 
@@ -69,7 +70,7 @@ public class WikiNotificationDisplayerComponentBuilder extends AbstractWikiNotif
     protected WikiComponent instantiateComponent(DocumentReference authorReference, BaseObject baseObject)
             throws NotificationException
     {
-        return new WikiNotificationDisplayer(authorReference, templateManager, scriptContextManager, componentManager,
-                baseObject);
+        return new WikiEmailNotificationRenderer(authorReference, templateManager, scriptContextManager,
+                componentManager, baseObject);
     }
 }

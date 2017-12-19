@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.namespace.NamespaceValidator;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
@@ -52,6 +53,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.ExtensionQuery;
+import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
@@ -1093,5 +1095,35 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     public Collection<LocalExtension> getLocalExtensions()
     {
         return this.<LocalExtensionScriptService>get(LocalExtensionScriptService.ID).getLocalExtensions();
+    }
+
+    /**
+     * Get the accessible (i.e. core or installed) extension instance from the passed namespace and matching the passed
+     * feature/id.
+     * 
+     * @param feature the extension id or provided feature (virtual extension)
+     * @param namespace the namespace from where the extension is usable
+     * @return the {@link Extension} instance
+     * @since 9.12RC1
+     */
+    public Extension getAccessibleExtension(String feature, Namespace namespace)
+    {
+        return this.extensionManager.getAccessibleExtension(feature, namespace);
+    }
+
+    /**
+     * Search accessible (i.e. core or installed) extensions based of the provided query and only in the passed
+     * namespace.
+     *
+     * @param namespace the namespace where to search
+     * @param query the extension query used to filter and order the result
+     * @return the found extensions descriptors, empty list if nothing could be found
+     * @throws SearchException error when trying to search provided pattern
+     * @since 9.12RC1
+     */
+    public IterableResult<Extension> searchAccessibleExtensions(Namespace namespace, ExtensionQuery query)
+        throws SearchException
+    {
+        return this.extensionManager.searchAccessibleExtensions(namespace, query);
     }
 }

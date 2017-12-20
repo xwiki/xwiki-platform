@@ -74,11 +74,17 @@ public class WikiEmailNotificationRendererDocumentInitializer extends AbstractMa
     private static final List<String> SPACE_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
     /**
+     * Reference of the XClass to create.
+     */
+    public static final LocalDocumentReference CLASS_REFERENCE
+            = new LocalDocumentReference(SPACE_PATH, "NotificationEmailRendererClass");
+
+    /**
      * Default constructor.
      */
     public WikiEmailNotificationRendererDocumentInitializer()
     {
-        super(new LocalDocumentReference(SPACE_PATH, "NotificationEmailRendererClass"));
+        super(CLASS_REFERENCE);
     }
 
     @Override

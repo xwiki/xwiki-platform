@@ -64,11 +64,17 @@ public class WikiNotificationDisplayerDocumentInitializer extends AbstractMandat
     private static final List<String> SPACE_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
     /**
+     * Reference of the XClass to create.
+     */
+    public static final LocalDocumentReference CLASS_REFERENCE
+            = new LocalDocumentReference(SPACE_PATH, "NotificationDisplayerClass");
+
+    /**
      * Default constructor.
      */
     public WikiNotificationDisplayerDocumentInitializer()
     {
-        super(new LocalDocumentReference(SPACE_PATH, "NotificationDisplayerClass"));
+        super(CLASS_REFERENCE);
     }
 
     @Override

@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
@@ -61,9 +60,7 @@ public class WikiEmailNotificationRendererComponentBuilder extends AbstractWikiN
     @Override
     public EntityReference getClassReference()
     {
-        return new EntityReference(
-                WikiEmailNotificationRendererDocumentInitializer.XCLASS_NAME,
-                EntityType.OBJECT);
+        return WikiEmailNotificationRendererDocumentInitializer.CLASS_REFERENCE;
     }
 
     @Override

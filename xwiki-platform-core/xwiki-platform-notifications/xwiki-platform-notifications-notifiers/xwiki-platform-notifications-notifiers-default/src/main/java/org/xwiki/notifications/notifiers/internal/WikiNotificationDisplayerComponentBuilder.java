@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
@@ -60,9 +59,7 @@ public class WikiNotificationDisplayerComponentBuilder extends AbstractWikiNotif
     @Override
     public EntityReference getClassReference()
     {
-        return new EntityReference(
-                WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME,
-                EntityType.OBJECT);
+        return WikiNotificationDisplayerDocumentInitializer.CLASS_REFERENCE;
     }
 
     @Override

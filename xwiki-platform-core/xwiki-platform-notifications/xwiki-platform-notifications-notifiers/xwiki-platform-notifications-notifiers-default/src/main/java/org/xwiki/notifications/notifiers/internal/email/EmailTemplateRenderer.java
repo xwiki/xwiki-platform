@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
@@ -34,9 +35,9 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.ExternalServletURLFactory;
@@ -70,7 +71,7 @@ public class EmailTemplateRenderer
     private TemplateManager templateManager;
 
     @Inject
-    private VelocityManager velocityManager;
+    private ScriptContextManager scriptContextManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -93,10 +94,11 @@ public class EmailTemplateRenderer
     {
         XWikiContext context = contextProvider.get();
         XWikiURLFactory originalURLFactory = context.getURLFactory();
+        ScriptContext scriptContext = scriptContextManager.getScriptContext();
         try {
             // Bind the event to some variable in the velocity context
-            velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, event);
-            velocityManager.getCurrentVelocityContext().put(USER_BINDING_NAME, userId);
+            scriptContext.setAttribute(EVENT_BINDING_NAME, event, ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute(USER_BINDING_NAME, userId, ScriptContext.ENGINE_SCOPE);
             // Use the external URL factory to generate full URLs
             context.setURLFactory(new ExternalServletURLFactory(context));
             // Set the given syntax in the rendering context
@@ -116,8 +118,8 @@ public class EmailTemplateRenderer
             // Cleaning the URL factory
             context.setURLFactory(originalURLFactory);
             // Cleaning the velocity context
-            velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
-            velocityManager.getCurrentVelocityContext().remove(USER_BINDING_NAME);
+            scriptContext.removeAttribute(EVENT_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
+            scriptContext.removeAttribute(USER_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
         }
     }
 

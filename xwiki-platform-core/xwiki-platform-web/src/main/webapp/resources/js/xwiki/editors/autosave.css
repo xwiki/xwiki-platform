@@ -3,11 +3,11 @@
   display: inline;
 }
 #autosaveControl * {
-  vertical-align: text-bottom;
+  vertical-align: middle;
 }
 #autosaveControl input.autosave-frequency {
   text-align: center;
-  vertical-align: baseline;
+  vertical-align: middle;
   padding-bottom: 0;
   width: 2em;
 }

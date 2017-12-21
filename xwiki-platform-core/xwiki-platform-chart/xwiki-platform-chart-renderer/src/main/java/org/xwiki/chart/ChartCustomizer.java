@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.jfree.chart.JFreeChart;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allows implementing JFreeChart customizations (colors, fonts, etc) for the drawn graphs.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.0RC1
  */
 @Role
-@Unstable
 public interface ChartCustomizer
 {
     /**

@@ -1,4 +1,4 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -35,13 +35,12 @@
   <contentUpdateDate>1513606718000</contentUpdateDate>
   <version>1.1</version>
   <title>Sandbox Test Page 1</title>
-  <comment>Install extension [org.xwiki.platform:xwiki-platform-sandbox/9.11]</comment>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>KlikÅ¡Ä·iniet uz **"MainÄ«t"** saites, lai mainÄ«t Å¡Ä«s lapas saturu. PÄ“c tam klikÅ¡Ä·iniet uz  **"SaglabÄt un skatÄ«t"**, lai apskatÄ«tu kÄ izskatÄs jÅ«s mainÄ«tais lapas saturs.
+  <content>Klikšķiniet uz **"Mainīt"** saites, lai mainīt šīs lapas saturu. Pēc tam klikšķiniet uz  **"Saglabāt un skatīt"**, lai apskatītu kā izskatās jūs mainītais lapas saturs.
 
-= Å eit ir parauga teksts, lai jÅ«s redzÄ“tu, kÄ lapa izskatÄs =
-
-Arvien vÄ“l pÅ«ta dienvidus vakara vÄ“jÅ¡, un arvien vÄ“l milzÄ«gais ledus gabals peldÄ“ja tÄlÄk un tÄlÄk jÅ«rÄ iekÅ¡Ä. Uz ledus gabala atradÄs Äetrpadsmit zvejnieki un divi zirgi. Ä»audis bij nodarbojuÅ¡ies ar ÄliÅ†Ä£u cirÅ¡anu un tÄ«klu laiÅ¡anu Å«denÄ«, un neviens no viÅ†iem nebij pamanÄ«jis, ka ledus no jÅ«rmalas bij sÄcis virzÄ«ties projÄm.</content>
+= Šeit ir parauga teksts, lai jūs redzētu, kā lapa izskatās =
+Arvien vēl pūta dienvidus vakara vējš, un arvien vēl milzīgais ledus gabals peldēja tālāk un tālāk jūrā iekšā. Uz ledus gabala atradās četrpadsmit zvejnieki un divi zirgi. Ļaudis bij nodarbojušies ar āliņģu ciršanu un tīklu laišanu ūdenī, un neviens no viņiem nebij pamanījis, ka ledus no jūrmalas bij sācis virzīties projām.</content>
 </xwikidoc>

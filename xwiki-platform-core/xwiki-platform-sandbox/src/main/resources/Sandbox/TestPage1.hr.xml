@@ -1,4 +1,4 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -34,14 +34,14 @@
   <date>1513606718000</date>
   <contentUpdateDate>1513606718000</contentUpdateDate>
   <version>1.1</version>
-  <title>Testna stranica 1 pjeÅ¡Äanika</title>
-  <comment>Install extension [org.xwiki.platform:xwiki-platform-sandbox/9.11]</comment>
+  <title>Testna stranica 1 pješčanika</title>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>Kliknite na **"Uredi"** i izmijenite sadrÅ¾aj ove stranice, potom kliknite na **"Spremi i pregledaj"** da biste vidjeli kako one izgledaju na vaÅ¡oj stranici!
+  <content>Kliknite na **"Uredi"** i izmijenite sadržaj ove stranice, potom kliknite na **"Spremi i pregledaj"** da biste vidjeli kako one izgledaju na vašoj stranici!
 
-= Evo neÅ¡to fiktivnog teksta da vidite kako izgleda stranica =
+= Evo nešto fiktivnog teksta da vidite kako izgleda stranica =
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</content>
 </xwikidoc>

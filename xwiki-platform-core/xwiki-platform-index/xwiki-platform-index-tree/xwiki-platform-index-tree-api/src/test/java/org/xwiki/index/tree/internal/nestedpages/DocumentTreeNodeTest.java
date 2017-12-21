@@ -44,7 +44,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.tree.TreeNode;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**

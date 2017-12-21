@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * The character symbols used to represent an {@link org.xwiki.model.reference.EntityReference} as a String.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.1M2
  */
-@Unstable
 @Role
 public interface SymbolScheme
 {

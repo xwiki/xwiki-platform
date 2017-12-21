@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow executing some code with the right of a provided user.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.3RC1
  */
 @Role
-@Unstable
 public interface AuthorExecutor
 {
     /**

@@ -43,7 +43,6 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for {@link ResourceReferenceHandler}s that can handle servlet resource requests.
@@ -54,7 +53,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.2.2
  * @since 8.3
  */
-@Unstable
 public abstract class AbstractServletResourceReferenceHandler<R extends ResourceReference>
     extends AbstractResourceReferenceHandler<ResourceType>
 {

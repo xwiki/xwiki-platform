@@ -20,19 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="WikiManager.Translations" locale="">
+<xwikidoc version="1.1">
   <web>WikiManager</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1293854400000</creationDate>
+  <creationDate>1293832800000</creationDate>
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1512001787000</date>
-  <contentUpdateDate>1512001787000</contentUpdateDate>
+  <date>1307189790000</date>
+  <contentUpdateDate>1307189790000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -160,13 +160,13 @@ platform.wiki.delete.error.wikiIdDoesNotMatch=You must type in the exact Wiki Id
 platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
 
 ## Wiki macro
-platform.wiki.macro.noWikis=There are currently no wiki created (except the main one).
+platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
 rendering.macro.wikis.name=Wikis
 rendering.macro.wikis.description=List all wikis
 
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Workspaces (Legacy)
-rendering.macro.workspaces.description=Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.
+rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
 
 ## Browse
 platform.wiki.browse=Browse Wikis
@@ -220,15 +220,15 @@ platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
 platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
 platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=User Scope
-platform.wiki.create.wizard.userScope.hint=Select what kind of users can access to the wiki
+platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
 platform.wiki.create.wizard.template.label=Template
 platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
 platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as initial content of the new wiki
 platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
 platform.wiki.create.wizard.flavortemplate.templateTab=Template
-platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created but then the Distribution Wizard will be started to initialize your wiki. If you skip it, your wiki will be empty.
+platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started to initialize your wiki. If you skip the wizard, your wiki will be empty.
 platform.wiki.create.wizard.step.previous=Previous Step
-platform.wiki.create.wizard.step.next=Go to next step
+platform.wiki.create.wizard.step.next=Next step
 platform.wiki.create.wizard.step.create=Create
 
 platform.wiki.create.wizard.step.creation=Wiki creation
@@ -330,7 +330,7 @@ platform.wiki.delete.confirmation.no=No, take me back!
         <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>GLOBAL|WIKI|USER|ON_DEMAND</values>

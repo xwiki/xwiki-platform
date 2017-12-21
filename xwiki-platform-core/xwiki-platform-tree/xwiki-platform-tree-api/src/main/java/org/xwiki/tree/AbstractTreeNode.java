@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for representing a node in a tree structure.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.3M2
  * @since 7.4.5
  */
-@Unstable
 public abstract class AbstractTreeNode implements TreeNode
 {
     @Inject

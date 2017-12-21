@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for representing a composite tree, where each type of node is handled by a separate component. The node
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.3M2
  * @since 7.4.5
  */
-@Unstable
 public abstract class AbstractCompositeTree extends AbstractTree
 {
     protected final Map<String, TreeNode> treeNodeByNodeType = new HashMap<String, TreeNode>();

@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.tree.Tree;
 
 /**
@@ -43,7 +42,6 @@ import org.xwiki.tree.Tree;
 @Component
 @Named("tree")
 @Singleton
-@Unstable
 public class TreeScriptService implements ScriptService
 {
     @Inject

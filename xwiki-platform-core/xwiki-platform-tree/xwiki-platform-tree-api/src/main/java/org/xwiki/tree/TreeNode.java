@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to represent a node in a tree structure.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 7.4.5
  */
 @Role
-@Unstable
 public interface TreeNode
 {
     /**

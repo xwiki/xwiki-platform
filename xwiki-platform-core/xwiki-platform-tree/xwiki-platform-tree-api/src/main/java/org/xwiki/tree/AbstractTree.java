@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for representing a tree structure.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.3M2
  * @since 7.4.5
  */
-@Unstable
 public abstract class AbstractTree extends AbstractTreeNode implements Tree
 {
     @Override

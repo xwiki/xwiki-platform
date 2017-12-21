@@ -36,7 +36,6 @@ import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xar.XarPackage;
 
 import com.xpn.xwiki.XWikiContext;
@@ -145,7 +144,6 @@ public class XarScriptService implements ScriptService
      * @return true if the XAR export feature is available in the current XWiki instance, false otherwise
      * @since 8.3RC1
      */
-    @Unstable
     public boolean isXARExportAvailable()
     {
         boolean available = false;

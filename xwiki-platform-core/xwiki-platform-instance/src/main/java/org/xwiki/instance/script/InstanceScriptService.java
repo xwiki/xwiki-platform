@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides instance-specific scripting APIs.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("instance")
 @Singleton
-@Unstable
 public class InstanceScriptService implements ScriptService
 {
     @Inject

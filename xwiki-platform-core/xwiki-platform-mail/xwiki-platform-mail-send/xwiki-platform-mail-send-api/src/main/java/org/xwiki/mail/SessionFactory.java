@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.mail.Session;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Create a Java Mail {@link javax.mail.Session} object, taking its properties from some configuration location but
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.3RC1
  */
 @Role
-@Unstable
 public interface SessionFactory
 {
     /**

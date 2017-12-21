@@ -25,7 +25,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parse the passed content and execute it.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.4RC1
  */
-@Unstable
 @Role
 public interface ContentExecutor<T>
 {

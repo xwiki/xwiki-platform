@@ -23,7 +23,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Manages the available {@link Editor}s.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.2RC1
  */
 @Role
-@Unstable
 public interface EditorManager
 {
     /**

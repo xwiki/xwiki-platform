@@ -19,15 +19,12 @@
  */
 package org.xwiki.edit;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Describes an {@link Editor}.
  * 
  * @version $Id$
  * @since 8.2RC1
  */
-@Unstable
 public interface EditorDescriptor
 {
     /**

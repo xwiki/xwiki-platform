@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.edit.internal.DefaultEditorDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Builds an {@link EditorDescriptor} instance.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  */
 @Component(roles = EditorDescriptorBuilder.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-@Unstable
 public class EditorDescriptorBuilder implements EditorDescriptor
 {
     private String id;

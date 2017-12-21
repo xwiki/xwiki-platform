@@ -22,7 +22,6 @@ package org.xwiki.edit;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base interface for editors.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.2RC1
  */
 @Role
-@Unstable
 public interface Editor<D>
 {
     /**

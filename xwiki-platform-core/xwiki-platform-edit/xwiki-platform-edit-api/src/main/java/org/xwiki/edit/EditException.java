@@ -19,15 +19,12 @@
  */
 package org.xwiki.edit;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * An edit exception.
  * 
  * @version $Id$
  * @since 8.2RC1
  */
-@Unstable
 public class EditException extends Exception
 {
     /**

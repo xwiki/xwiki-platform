@@ -22,7 +22,6 @@ package org.xwiki.edit;
 import java.lang.reflect.Type;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Edit configuration options.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.2RC1
  */
 @Role
-@Unstable
 public interface EditConfiguration
 {
     /**

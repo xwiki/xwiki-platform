@@ -32,7 +32,6 @@ import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script oriented edit APIs.
@@ -43,7 +42,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(EditScriptService.ROLE_HINT)
-@Unstable
 public class EditScriptService implements ScriptService
 {
     /**

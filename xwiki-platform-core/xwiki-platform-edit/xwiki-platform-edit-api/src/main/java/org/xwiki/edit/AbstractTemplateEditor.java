@@ -21,7 +21,6 @@ package org.xwiki.edit;
 
 import javax.inject.Inject;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 
 /**
@@ -31,7 +30,6 @@ import org.xwiki.template.TemplateManager;
  * @version $Id$
  * @since 8.2RC1
  */
-@Unstable
 public abstract class AbstractTemplateEditor<D> extends AbstractEditor<D>
 {
     @Inject

@@ -29,7 +29,6 @@ import org.xwiki.edit.EditConfiguration;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for specialized edit script services that target specific types of editors.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.2RC1
  */
-@Unstable
 public abstract class AbstractTypedEditScriptService<D> implements ScriptService
 {
     @Inject

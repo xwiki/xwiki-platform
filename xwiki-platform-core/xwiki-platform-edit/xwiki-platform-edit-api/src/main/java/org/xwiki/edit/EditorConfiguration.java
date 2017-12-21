@@ -20,7 +20,6 @@
 package org.xwiki.edit;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to customize the {@link EditConfiguration} for a specific data type. It allows you to:
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.2RC1
  */
 @Role
-@Unstable
 public interface EditorConfiguration<D>
 {
     /**

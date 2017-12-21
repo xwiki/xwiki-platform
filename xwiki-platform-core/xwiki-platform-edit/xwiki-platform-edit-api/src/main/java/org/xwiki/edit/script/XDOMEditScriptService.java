@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.edit.Editor;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
 
 /**
  * Edit script service specialized in {@link XDOM} {@link Editor}s.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(EditScriptService.ROLE_HINT + ".xdom")
-@Unstable
 public class XDOMEditScriptService extends AbstractTypedEditScriptService<XDOM>
 {
     /**

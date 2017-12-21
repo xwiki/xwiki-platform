@@ -29,7 +29,6 @@ import org.xwiki.edit.EditException;
 import org.xwiki.edit.Editor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Edit script service specialized in {@link SyntaxContent} {@link Editor}s.
@@ -40,7 +39,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(EditScriptService.ROLE_HINT + ".syntaxContent")
-@Unstable
 public class SyntaxContentEditScriptService extends AbstractTypedEditScriptService<SyntaxContent>
 {
     /**

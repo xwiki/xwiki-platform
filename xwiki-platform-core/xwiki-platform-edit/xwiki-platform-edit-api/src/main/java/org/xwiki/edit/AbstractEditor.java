@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.script.ScriptContext;
 
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for editors that take their input from the {@link ScriptContext}.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.2RC1
  */
-@Unstable
 public abstract class AbstractEditor<D> implements Editor<D>
 {
     /**

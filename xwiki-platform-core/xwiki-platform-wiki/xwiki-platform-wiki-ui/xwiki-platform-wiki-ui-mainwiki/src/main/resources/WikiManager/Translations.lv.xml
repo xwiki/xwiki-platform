@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,24 +19,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="WikiManager.Translations" locale="lv">
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="lv">
   <web>WikiManager</web>
   <name>Translations</name>
   <language>lv</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1293854400000</creationDate>
+  <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1293832800000</creationDate>
-  <date>1307189790000</date>
-  <contentUpdateDate>1307189790000</contentUpdateDate>
+  <date>1512001789000</date>
+  <contentUpdateDate>1512001789000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>

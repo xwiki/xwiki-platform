@@ -62,7 +62,7 @@
           <!-- Exclude Tools from being Clovered since 1) we don't really care getting TPC for our tools and
                2) it's a bit involved to configure the various Maven poms using those plugins to have the Clover JAR
                injected in the right places. -->
-          <groupId>com.atlassian.maven.plugins</groupId>
+          <groupId>org.openclover</groupId>
           <artifactId>clover-maven-plugin</artifactId>
           <configuration>
             <skip>true</skip>

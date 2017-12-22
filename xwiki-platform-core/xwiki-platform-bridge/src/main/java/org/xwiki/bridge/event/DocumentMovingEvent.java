@@ -33,7 +33,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * </ul>
  * 
  * @version $Id$
- * @since 2.7RC1
+ * @since 9.1RC1
  */
 public class DocumentMovingEvent extends AbstractDocumentEvent
 {

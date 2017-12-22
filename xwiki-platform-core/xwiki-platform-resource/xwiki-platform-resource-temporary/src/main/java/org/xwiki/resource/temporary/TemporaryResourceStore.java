@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to read and write temporary resources.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.3
  */
 @Role
-@Unstable
 public interface TemporaryResourceStore
 {
     /**

@@ -21,7 +21,6 @@ package org.xwiki.ratings;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -32,7 +31,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 8.2.1
  */
 @Role
-@Unstable
 public interface RatingsConfiguration
 {   
     /**

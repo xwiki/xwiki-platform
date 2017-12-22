@@ -37,7 +37,6 @@ import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -410,7 +409,6 @@ public class RatingsScriptService implements ScriptService
       * @return the configuration document
       * @since 8.2.1
       */
-    @Unstable
     public Document getConfigurationDocument(DocumentReference documentReference)
     {
         return ratingsConfiguration.getConfigurationDocument(documentReference).newDocument(getXWikiContext());

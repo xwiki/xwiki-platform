@@ -31,7 +31,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,7 +46,6 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 @Component
 @Singleton
-@Unstable
 public class DefaultRatingsConfiguration implements RatingsConfiguration
 {
     @Inject

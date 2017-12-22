@@ -31,7 +31,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -159,7 +158,6 @@ public class MessageStreamScriptService implements ScriptService
      * @return true if the Message Stream feature is active or false otherwise
      * @since 8.4RC1
      */
-    @Unstable
     public boolean isActive()
     {
         boolean result = false;

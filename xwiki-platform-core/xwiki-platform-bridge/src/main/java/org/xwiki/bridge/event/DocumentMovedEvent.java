@@ -44,25 +44,42 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
      */
     private static final long serialVersionUID = 1L;
     
-    /**
-     * Constructor initializing the event filter with an
-     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any other document delete event.
+   /**
+     * The move document is about to be moved to.
+     */
+    private String move;
+   
+   /**
+     * Matches all {@link DocumentMovedEvent} events.
      */
     public DocumentMovedEvent()
     {
         super();
     }
-    
+
     /**
-     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter}, meaning that this event will match only delete events affecting the same document.
+     * Matches {@link DocumentMovedEvent} events that target the specified document.
      * 
      * @param documentReference the reference of the document to match
      */
-    public DocumentMovedEvent(DocumentReference documentReference)    
+    public DocumentMovedEvent(DocumentReference documentReference)
+    {
+        this(documentReference, null);
+    }
+
+    /**
+     * Matches {@link DocumentMovedEvent} events that target the specified document and move. The move is
+     * matched only if it's not {@code null}.
+     * 
+     * @param documentReference the reference of the document to match
+     * @param move the move the document was moved to
+     */
+    public DocumentMovedEvent(DocumentReference documentReference, String move)
     {
         super(documentReference);
+        this.move = move;
     }
-    
+
     /**
      * Constructor using a custom {@link EventFilter}.
      * 
@@ -71,5 +88,26 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
     public DocumentMovedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
+    }
+
+    /**
+     * @return the move the document was moved to
+     */
+    public String getMove()
+    {
+        return move;
+    }
+
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        boolean matches = super.matches(otherEvent);
+
+        if (matches) {
+            DocumentMovedEvent documentMovedEvent = (DocumentMovedEvent) otherEvent;
+            matches = move == null || move.equals(documentMovedEvent.getMove());
+        }
+
+        return matches;
     }
 }

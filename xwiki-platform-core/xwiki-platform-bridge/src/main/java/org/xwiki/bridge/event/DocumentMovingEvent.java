@@ -33,7 +33,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * </ul>
  * 
  * @version $Id$
- * @since 9.1RC1
+ * @since 10.0RC1
  */
 public class DocumentMovingEvent extends AbstractDocumentEvent
 {
@@ -45,8 +45,7 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
     
     /**
      * Constructor initializing the event filter with an
-     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other document delete event.
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any other document delete event.
      */
     public DocumentMovingEvent()
     {
@@ -54,8 +53,7 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
     }
     
     /**
-     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only delete events affecting the same document.
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter}, meaning that this event will match only delete events affecting the same document.
      * 
      * @param documentReference the reference of the document to match
      */

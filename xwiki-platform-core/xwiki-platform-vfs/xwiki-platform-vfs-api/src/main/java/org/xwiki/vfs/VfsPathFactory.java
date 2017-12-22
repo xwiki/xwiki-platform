@@ -23,7 +23,6 @@ import java.net.URI;
 import java.nio.file.Path;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Helper to create a {@link Path} instance from an XWiki VFS URI
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 8.4RC1
  */
 @Role
-@Unstable
 public interface VfsPathFactory
 {
     /**

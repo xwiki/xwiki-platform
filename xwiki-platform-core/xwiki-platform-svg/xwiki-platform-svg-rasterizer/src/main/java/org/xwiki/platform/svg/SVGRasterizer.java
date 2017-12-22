@@ -22,7 +22,6 @@ package org.xwiki.platform.svg;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
-import org.xwiki.stability.Unstable;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +33,6 @@ import java.io.IOException;
  * @since 8.0M1
  */
 @Role
-@Unstable("New API introduced in 8.0")
 public interface SVGRasterizer
 {
     /**

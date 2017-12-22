@@ -31,7 +31,6 @@ import org.xwiki.platform.svg.SVGRasterizer;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -43,7 +42,6 @@ import org.xwiki.url.ExtendedURL;
 @Component
 @Named("svg")
 @Singleton
-@Unstable("New API introduced in 8.0")
 public class SVGScriptService implements ScriptService
 {
     @Inject

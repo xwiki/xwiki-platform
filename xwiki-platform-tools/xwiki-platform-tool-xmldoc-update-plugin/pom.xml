@@ -145,7 +145,7 @@
            thus when unit tests are executed we need the Clover JAR in the classpath -->
       <dependencies>
         <dependency>
-          <groupId>com.atlassian.clover</groupId>
+          <groupId>org.openclover</groupId>
           <artifactId>clover</artifactId>
           <scope>test</scope>
         </dependency>

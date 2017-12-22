@@ -189,7 +189,7 @@
            the WAR will call Clover APIs at runtime when they execute. -->
       <dependencies>
         <dependency>
-          <groupId>com.atlassian.clover</groupId>
+          <groupId>org.openclover</groupId>
           <artifactId>clover</artifactId>
         </dependency>
       </dependencies>
@@ -209,7 +209,7 @@
             <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
             <dependencies>
               <dependency>
-                <groupId>com.atlassian.clover</groupId>
+                <groupId>org.openclover</groupId>
                 <artifactId>clover</artifactId>
                 <version>${clover.version}</version>
               </dependency>

@@ -490,7 +490,7 @@
       <id>clover</id>
       <dependencies>
         <dependency>
-          <groupId>com.atlassian.clover</groupId>
+          <groupId>org.openclover</groupId>
           <artifactId>clover</artifactId>
         </dependency>
       </dependencies>

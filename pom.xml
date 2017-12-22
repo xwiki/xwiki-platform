@@ -789,7 +789,7 @@
               <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
               <dependencies>
                 <dependency>
-                  <groupId>com.atlassian.clover</groupId>
+                  <groupId>org.openclover</groupId>
                   <artifactId>clover</artifactId>
                   <version>${clover.version}</version>
                 </dependency>
@@ -802,7 +802,7 @@
               <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
               <dependencies>
                 <dependency>
-                  <groupId>com.atlassian.clover</groupId>
+                  <groupId>org.openclover</groupId>
                   <artifactId>clover</artifactId>
                   <version>${clover.version}</version>
                 </dependency>

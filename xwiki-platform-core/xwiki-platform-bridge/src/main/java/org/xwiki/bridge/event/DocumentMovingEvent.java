@@ -23,18 +23,19 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered before a document is moved.
+ * An event triggered after a document is moved.
  * <p>
  * The event also send the following parameters:
  * </p>
  * <ul>
- * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance which is going to be saved</li>
+ * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
  * 
  * @version $Id$
  * @since 10.0RC1
  */
+@Unstable 
 public class DocumentMovingEvent extends AbstractDocumentEvent
 {
     /**
@@ -43,25 +44,42 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
      */
     private static final long serialVersionUID = 1L;
     
-    /**
-     * Constructor initializing the event filter with an
-     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any other document delete event.
+   /**
+     * The move document is about to be moved to.
+     */
+    private String move;
+   
+   /**
+     * Matches all {@link DocumentMovingEvent} events.
      */
     public DocumentMovingEvent()
     {
         super();
     }
-    
+
     /**
-     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter}, meaning that this event will match only delete events affecting the same document.
+     * Matches {@link DocumentMovingEvent} events that target the specified document.
      * 
      * @param documentReference the reference of the document to match
      */
-    public DocumentMovingEvent(DocumentReference documentReference)    
+    public DocumentMovingEvent(DocumentReference documentReference)
+    {
+        this(documentReference, null);
+    }
+
+    /**
+     * Matches {@link DocumentMovingEvent} events that target the specified document and move. The move is
+     * matched only if it's not {@code null}.
+     * 
+     * @param documentReference the reference of the document to match
+     * @param move the move the document was moved to
+     */
+    public DocumentMovingEvent(DocumentReference documentReference, String move)
     {
         super(documentReference);
+        this.move = move;
     }
-    
+
     /**
      * Constructor using a custom {@link EventFilter}.
      * 
@@ -70,5 +88,26 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
     public DocumentMovingEvent(EventFilter eventFilter)
     {
         super(eventFilter);
+    }
+
+    /**
+     * @return the move the document was moved to
+     */
+    public String getMove()
+    {
+        return move;
+    }
+
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        boolean matches = super.matches(otherEvent);
+
+        if (matches) {
+            DocumentMovingEvent documentMovingEvent = (DocumentMovingEvent) otherEvent;
+            matches = move == null || move.equals(documentMovingEvent.getMove());
+        }
+
+        return matches;
     }
 }

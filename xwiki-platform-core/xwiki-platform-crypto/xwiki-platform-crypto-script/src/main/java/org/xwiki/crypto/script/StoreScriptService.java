@@ -36,7 +36,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service allowing a user to create keys pairs and issue certificates.
@@ -47,7 +46,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(CryptoScriptService.ROLEHINT + '.' + StoreScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class StoreScriptService implements ScriptService
 {
     /**

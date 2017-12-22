@@ -65,7 +65,6 @@ import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
 import org.xwiki.crypto.signer.param.CMSSignerInfo;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service allowing a user to create keys pairs and issue certificates.
@@ -76,7 +75,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(CryptoScriptService.ROLEHINT + '.' + RSACryptoScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class RSACryptoScriptService implements ScriptService
 {
     /**

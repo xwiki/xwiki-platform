@@ -28,7 +28,6 @@ import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Wrapper over {@link KeyStore} for scripting.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.4RC1
  */
-@Unstable
 public class ScriptingKeyStore extends AbstractScriptingStore
 {
     private KeyStore store;

@@ -29,7 +29,6 @@ import org.xwiki.crypto.pkix.params.x509certificate.extension.X509IpAddress;
 import org.xwiki.crypto.pkix.params.x509certificate.extension.X509Rfc822Name;
 import org.xwiki.crypto.pkix.params.x509certificate.extension.X509URI;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Helper script service to create X509 names.
@@ -40,7 +39,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(CryptoScriptService.ROLEHINT + '.' + X509NameScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class X509NameScriptService implements ScriptService
 {
     /**

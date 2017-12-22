@@ -21,7 +21,6 @@ package org.xwiki.platform.flavor.job;
 
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.job.Request;
-import org.xwiki.stability.Unstable;
 
 /**
  * Request used in {@link org.xwiki.platform.flavor.internal.job.FlavorSearchJob}.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.0RC1
  */
-@Unstable
 public class FlavorSearchRequest extends InstallRequest
 {
     /**

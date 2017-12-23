@@ -49,7 +49,7 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any other document move event.
      */
      
-     /**
+    /**
      * The move document is about to be moved to.
      */
     private String move;
@@ -91,7 +91,12 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
         this.move = move;
     }
 
-    /**
+    public DocumentMovedEvent(String move)
+    {
+        super(move);
+    }
+    
+   /**
      * Constructor using a custom {@link EventFilter}.
      * 
      * @param eventFilter the filter to use for matching events
@@ -120,56 +125,5 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
         }
 
         return matches;
-    }
-
-private void move(DocumentReference documentReference, EventFilter eventFilter)
-    {
-        this.progressManager.pushLevelProgress(7, this);
-
-        try {
-            // Step 1: Delete the destination document if needed.
-            this.progressManager.startStep(this);
-            if (this.modelBridge.exists(eventFilter)) {
-                if (this.request.isInteractive() && !confirmOverwrite(documentReference, eventFilter)) {
-                    this.logger.warn(
-                        "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
-                       documentReference , eventFilter);
-                    return;
-                } else if (!this.modelBridge.delete(eventFilter)) {
-                    return;
-                }
-            }
-            this.progressManager.endStep(this);
-
-            // Step 2: Copy the source document to the destination.
-            this.progressManager.startStep(this);
-            if (!this.modelBridge.copy(documentReference, eventFilter)) {
-                return;
-            }
-            this.progressManager.endStep(this);
-
-            // Step 3: Update the destination document based on the source document parameters.
-            this.progressManager.startStep(this);
-            this.modelBridge.update(eventFilter, this.request.getEntityParameters(documentReference));
-            this.progressManager.endStep(this);
-
-            // Step 4 + 5: Update other documents that might be affected by this move.
-            updateDocuments(documentReference, eventFilter);
-
-            // Step 6: Delete the source document.
-            this.progressManager.startStep(this);
-            if (this.request.isDeleteSource()) {
-                this.modelBridge.delete(documentReference);
-            }
-            this.progressManager.endStep(this);
-
-            // Step 7: Create an automatic redirect.
-            this.progressManager.startStep(this);
-            if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
-                this.modelBridge.createRedirect(documentReference, eventFilter);
-            }
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
     }
 }

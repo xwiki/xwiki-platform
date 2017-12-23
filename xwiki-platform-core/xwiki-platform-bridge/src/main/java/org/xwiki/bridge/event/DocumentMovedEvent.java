@@ -58,9 +58,9 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
    /**
      * Matches all {@link DocumentMovedEvent} events.
      */
-    public DocumentMovedEvent()
+    public DocumentMovedEvent(EndEvent endEvent)
     {
-        super();
+        super(endEvent);
     }
 
     /**

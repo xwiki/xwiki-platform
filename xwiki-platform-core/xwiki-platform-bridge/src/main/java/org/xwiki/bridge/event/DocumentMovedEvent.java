@@ -49,10 +49,7 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any other document move event.
      */
-     
-    /**
-     * The move document is about to be moved to.
-     */
+   
     private String move;
    
    /**
@@ -85,9 +82,8 @@ public class DocumentMovedEvent extends AbstractDocumentEvent
      * @param documentReference the reference of the document to match
      * @param move the move the document was moved to
      */
-    public DocumentMovedEvent(DocumentReference documentReference)
+    public DocumentMovedEvent(DocumentReference documentReference, String move)
     {
-        String move;
         super(documentReference);
         this.move = move;
     }

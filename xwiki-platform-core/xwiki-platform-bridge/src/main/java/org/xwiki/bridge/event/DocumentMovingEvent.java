@@ -45,9 +45,6 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
      */
     private static final long serialVersionUID = 1L;
     
-   /**
-     * The move document is about to be moved to.
-     */
     private String move;
    
    /**
@@ -75,9 +72,8 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
      * @param documentReference the reference of the document to match
      * @param move the move the document was moved to
      */
-    public DocumentMovingEvent(DocumentReference documentReference)
+    public DocumentMovingEvent(DocumentReference documentReference,String move)
     {
-         String move;
         super(documentReference);
         this.move = move;
     }

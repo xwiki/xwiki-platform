@@ -81,7 +81,7 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
             // For Guest users, raise an error
             if (xcontext.getUserReference() == null) {
                 throw new XWikiRestException(
-                    String.format("Cannot change property [%s] since the current is guest", propertyName));
+                    String.format("Cannot change property [%s] since the current user is guest", propertyName));
             }
 
             XWikiDocument userDocument = xcontext.getWiki().getDocument(xcontext.getUserReference(), xcontext);
@@ -137,11 +137,20 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
         if (!listClass.isMultiSelect()) {
             List<String> items = listClass.getList(xcontext);
             int pos = items.indexOf(object.getStringValue(propertyName));
+
             if (pos != -1) {
                 if (pos == items.size() - 1) {
                     newValue = items.get(0);
                 } else {
                     newValue = items.get(pos + 1);
+                }
+            } else {
+                // If no item is already selected in the static list, we assume that the default item used is the
+                // first in the list.
+                if (items.size() <= 2) {
+                    newValue = items.get(items.size() - 1);
+                } else {
+                    newValue = items.get(1);
                 }
             }
         }

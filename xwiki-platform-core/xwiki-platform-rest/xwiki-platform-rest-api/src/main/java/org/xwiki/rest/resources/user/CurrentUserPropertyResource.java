@@ -28,7 +28,7 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
 /**
- * Update a boolean or static kilst property of the current user to its next value (for a Boolean this means set it
+ * Update a boolean or static list property of the current user to its next value (for a Boolean this means set it
  * to true if it was false and vice versa).
  *
  * @version $Id$

@@ -53,9 +53,9 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
    /**
      * Matches all {@link DocumentMovingEvent} events.
      */
-    public DocumentMovingEvent()
+    public DocumentMovingEvent(BeginEvent beginEvent)
     {
-        super();
+        super(beginEvent);
     }
 
     /**
@@ -75,8 +75,9 @@ public class DocumentMovingEvent extends AbstractDocumentEvent
      * @param documentReference the reference of the document to match
      * @param move the move the document was moved to
      */
-    public DocumentMovingEvent(DocumentReference documentReference, String move)
+    public DocumentMovingEvent(DocumentReference documentReference)
     {
+         String move;
         super(documentReference);
         this.move = move;
     }

@@ -75,6 +75,7 @@
 ##        ADD KEYBOARD SHORTCUTS
 ###########################################
 <script type="text/javascript">
+  #if($!xcontext.user != 'XWiki.XWikiGuest')
     //<![CDATA[
     /**
      * Perform a PUT on the given REST API. If the request is successful, reload the page.
@@ -87,23 +88,28 @@
      */
     var developerShortcutsRestCall = function(restUrl, errorMessage) {
         const req = new XMLHttpRequest();
+        var notification = new XWiki.widgets.Notification(
+            "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.ajax.inprogress'))",
+            'inprogress');
 
         req.onreadystatechange = function(event) {
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status >= 200 && this.status < 300) {
                     // Reload the page to apply the user modifications
-                    new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.ajax.success'))", 'success');
+                    notification.replace(new XWiki.widgets.Notification(
+                        "$escapetool.javascript($services.localization.render(
+                                'core.shortcuts.developer.user.ajax.success'))", 'done'));
                     location.reload()
+                } else if (this.status == 500) {
+                    notification.replace(new XWiki.widgets.Notification(this.data, 'error'));
                 } else {
-                    new XWiki.widgets.Notification(errorMessage, 'error');
+                    notification.replace(new XWiki.widgets.Notification(errorMessage, 'error'));
                 }
             }
         };
 
         req.open('PUT', restUrl, true);
         req.send(null);
-
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.ajax.inprogress'))", 'inprogress');
     };
 
     // Append developer shortcuts for toggeling userType and hiddenDocuments in the current user profile
@@ -117,4 +123,5 @@
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
     }, {'type': shortcut.type.SEQUENCE, 'disable_in_input': true });
     //]]>
+  #end
 </script>

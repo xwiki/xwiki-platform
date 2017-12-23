@@ -21,6 +21,7 @@ package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.observation.event.EndEvent;
 
 /**
  * An event triggered after a document is moved.

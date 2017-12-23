@@ -40,6 +40,7 @@ import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * A job that can move entities to a new parent within the hierarchy.
@@ -172,7 +173,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         }
     }
 
-    private void move(DocumentReference oldReference, DocumentReference newReference)
+    private void move(DocumentReference oldReference, DocumentReference newReference, ObservationManager observationManager)
     {
         this.progressManager.pushLevelProgress(7, this);
 

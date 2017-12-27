@@ -1516,23 +1516,17 @@ public class XWiki implements EventListener
 
     public String getResourceContent(String name) throws IOException
     {
-        InputStream temp = null;
         if (getEngineContext() != null) {
-
-            try {
-                temp = getResourceAsStream(name);
+            try (InputStream is = getResourceAsStream(name)) {
+                if (is == null) {
+                    // Resources should always be encoded as UTF-8, to reduce the dependency on the system encoding
+                    return FileUtils.readFileToString(new File(name), DEFAULT_ENCODING);
+                }
+                return IOUtils.toString(is, DEFAULT_ENCODING);
             } catch (Exception e) {
             }
         }
-
-        if (temp == null) {
-            // Resources should always be encoded as UTF-8, to reduce the dependency on the system encoding
-            return FileUtils.readFileToString(new File(name), DEFAULT_ENCODING);
-        }
-
-        try (InputStream is = temp) {
-            return IOUtils.toString(is, DEFAULT_ENCODING);
-        }
+        return null;
     }
 
     public Date getResourceLastModificationDate(String name)

@@ -1552,22 +1552,16 @@ public class XWiki implements EventListener
 
     public byte[] getResourceContentAsBytes(String name) throws IOException
     {
-        InputStream temp = null;
         if (getEngineContext() != null) {
-
-            try {
-                temp = getResourceAsStream(name);
+            try (InputStream is = getResourceAsStream(name)) {
+                if (is == null) {
+                    return FileUtils.readFileToByteArray(new File(name));
+                }
+                return IOUtils.toByteArray(is);
             } catch (Exception e) {
             }
         }
-
-        if (temp == null) {
-            return FileUtils.readFileToByteArray(new File(name));
-        }
-
-        try (InputStream is = temp) {
-            return IOUtils.toByteArray(is);
-        }
+        return null;
     }
 
     public boolean resourceExists(String name)

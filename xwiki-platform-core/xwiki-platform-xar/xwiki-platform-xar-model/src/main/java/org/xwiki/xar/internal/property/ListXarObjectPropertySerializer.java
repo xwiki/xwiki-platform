@@ -49,7 +49,7 @@ public class ListXarObjectPropertySerializer implements XarObjectPropertySeriali
     @Override
     public Object read(XMLStreamReader reader) throws XMLStreamException
     {
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
 
         for (int eventType = reader.next(); eventType != XMLStreamConstants.END_ELEMENT; eventType = reader.next()) {
             if (eventType == XMLStreamConstants.CHARACTERS || eventType == XMLStreamConstants.CDATA

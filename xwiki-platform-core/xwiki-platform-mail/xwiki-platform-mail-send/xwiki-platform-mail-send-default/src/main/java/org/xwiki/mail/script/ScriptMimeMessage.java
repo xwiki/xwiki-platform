@@ -82,7 +82,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
 
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
-     * Directly supports BodyPart objects instead of the content as well.
+     *
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter

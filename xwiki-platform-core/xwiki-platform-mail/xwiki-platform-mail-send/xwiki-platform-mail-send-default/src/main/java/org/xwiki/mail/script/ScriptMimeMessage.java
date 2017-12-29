@@ -109,16 +109,20 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
         BodyPart bodyPart;
 
         try {
-            MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
+            if (!(content instanceof BodyPart)) {
+                MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
 
-            // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
-            // Note that if the user has already passed a "mimetype" parameter then we don't override it!
-            Map<String, Object> enhancedParameters = new HashMap<>();
-            enhancedParameters.put("mimetype", mimeType);
-            enhancedParameters.putAll(parameters);
+                // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
+                // Note that if the user has already passed a "mimetype" parameter then we don't override it!
+                Map<String, Object> enhancedParameters = new HashMap<>();
+                enhancedParameters.put("mimetype", mimeType);
+                enhancedParameters.putAll(parameters);
 
+                bodyPart = factory.create(content, enhancedParameters);
+            } else {
+                bodyPart = (BodyPart) content;
+            }
             Multipart multipart = getMultipart();
-            bodyPart = factory.create(content, enhancedParameters);
             multipart.addBodyPart(bodyPart);
         } catch (Exception e) {
             // Save the exception for reporting through the script services's getError() API

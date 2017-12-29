@@ -86,7 +86,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
-     * @param content the content to include in the mail
+     * @param content the content to include in the mail, also directly accepts BodyPart objects
      */
     public BodyPart addPart(String mimeType, Object content)
     {
@@ -95,11 +95,11 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
 
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
-     * Directly supports BodyPart objects instead of the content as well.
+     *
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
-     * @param content the content to include in the mail
+     * @param content the content to include in the mail, also directly accepts BodyPart objects
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
      *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys and values

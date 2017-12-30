@@ -89,7 +89,8 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime type
      *            of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *            {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc. Also
-     *            accepts a {@link BodyPart} object, in which case, the mime type is not used.
+     *            accepts a {@link BodyPart} object, in which case, the mime type is not used. A
+     *            {@link BodyPart} object can be passed for scripting languages other than Velocity.
      */
     public BodyPart addPart(String mimeType, Object content)
     {
@@ -105,11 +106,12 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime type
      *            of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *            {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc. Also
-     *            accepts a {@link BodyPart} object, in which case, the mime type is not used.
+     *            accepts a {@link BodyPart} object, in which case, the mime type and parameters are not used. A
+     *            {@link BodyPart} object can be passed for scripting languages other than Velocity.
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *            using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed
      *            using the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys
-     *            and values
+     *            and values.
      */
     public BodyPart addPart(String mimeType, Object content, Map<String, Object> parameters)
     {

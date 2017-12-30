@@ -20,19 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="XWiki.OfficeImporter" locale="">
   <web>XWiki</web>
   <name>OfficeImporter</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1377854961000</creationDate>
+  <creationDate>1377851361000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1377855795000</date>
-  <contentUpdateDate>1377855795000</contentUpdateDate>
+  <date>1511976572000</date>
+  <contentUpdateDate>1511976572000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.officeimporter.import.title')</title>
   <comment/>

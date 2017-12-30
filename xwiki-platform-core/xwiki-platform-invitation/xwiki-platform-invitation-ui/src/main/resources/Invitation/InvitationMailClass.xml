@@ -20,19 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="Invitation.InvitationMailClass" locale="">
   <web>Invitation</web>
   <name>InvitationMailClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1271864541000</creationDate>
+  <creationDate>1271860941000</creationDate>
   <parent>Invitation.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1271865584000</date>
-  <contentUpdateDate>1271865483000</contentUpdateDate>
+  <date>1511976573000</date>
+  <contentUpdateDate>1511976573000</contentUpdateDate>
   <version>1.1</version>
   <title>InvitationMailClass</title>
   <comment/>

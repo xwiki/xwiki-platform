@@ -22,6 +22,7 @@ package org.xwiki.mail.script;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -89,5 +90,15 @@ public class ScriptMimeMessageTest
         this.scriptMessage.addHeader("X-Test", testHeader);
 
         assertEquals(testHeader, this.scriptMessage.getHeader("X-Test", null));
+    }
+    
+    @Test
+    public void addPart() throws Exception
+    {
+        String header = "bodyPartTest";
+        MimeBodyPart bp = new MimeBodyPart();
+        bp.addHeader("BodyPart-Test", header);
+        this.scriptMessage.addPart(bp);
+        assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test", null));
     }
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.script;
 
+import java.util.Collections;
+
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
@@ -100,5 +102,25 @@ public class ScriptMimeMessageTest
         bp.addHeader("BodyPart-Test", header);
         this.scriptMessage.addPart(bp);
         assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test", null));
+    }
+    
+    @Test
+    public void addPartTwo() throws Exception
+    {
+        String header = "bodyPartTest2";
+        MimeBodyPart bp = new MimeBodyPart();
+        bp.addHeader("BodyPart-Test2", header);
+        this.scriptMessage.addPart(null, bp);
+        assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test2", null));
+    }
+
+    @Test
+    public void addPartThree() throws Exception
+    {
+        String header = "bodyPartTest3";
+        MimeBodyPart bp = new MimeBodyPart();
+        bp.addHeader("BodyPart-Test3", header);
+        this.scriptMessage.addPart(null, bp, Collections.<String, Object>emptyMap());
+        assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test3", null));
     }
 }

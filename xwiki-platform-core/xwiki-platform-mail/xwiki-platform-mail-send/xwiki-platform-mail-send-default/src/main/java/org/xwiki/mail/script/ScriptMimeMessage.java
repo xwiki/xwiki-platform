@@ -79,7 +79,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
         this.execution = execution;
         this.componentManager = componentManager;
     }
-
+    
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
@@ -209,7 +209,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     /**
      * Add a mail header.
      *
-     * @param name the header's name (eg "Message-Id")
+     * @param name the header's name  (eg "Message-Id")
      * @param value the header's value
      */
     @Override
@@ -239,19 +239,19 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
             // content.
             if (String.class.isAssignableFrom(contentClass)) {
                 try {
-                    factory = this.componentManager
-                        .getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
+                    factory = this.componentManager.getInstance(
+                        new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
                 } catch (ComponentLookupException eee) {
                     // This shouldn't happen, if it does then it's an error and we want that error to bubble up till
                     // the user since it would be pretty bad to send an email with some missing body part!
                     throw new MessagingException(String.format(
                         "Failed to find default Mime Body Part Factory for mime type [%s] and Content type [%s]",
-                        mimeType, contentClass.getName()), e);
+                            mimeType, contentClass.getName()), e);
                 }
             } else {
                 throw new MessagingException(String.format(
                     "Failed to a Mime Body Part Factory matching the mime type [%s] and the Content type [%s]",
-                    mimeType, contentClass.getName()), e);
+                        mimeType, contentClass.getName()), e);
             }
         }
         return factory;
@@ -263,13 +263,12 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
         MimeBodyPartFactory factory;
         try {
             // Look a secure version of a specific MimeBodyPartFactory for the passed Mime Type and Content type.
-            factory = this.componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeBodyPartFactory.class, contentClass),
-                String.format("%s/secure", mimeType));
+            factory = this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
+                contentClass), String.format("%s/secure", mimeType));
         } catch (ComponentLookupException e) {
             // Look for a specific MimeBodyPartFactory for the passed Mime Type and Content type (non secure).
-            factory = this.componentManager
-                .getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class, contentClass), mimeType);
+            factory = this.componentManager.getInstance(
+                new DefaultParameterizedType(null, MimeBodyPartFactory.class, contentClass), mimeType);
         }
         return factory;
     }

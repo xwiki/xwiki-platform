@@ -82,7 +82,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
-     * This method can be used for scripting languages other than Velocity
+     *
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param bodyPart a {@link BodyPart} object to include in the mail
@@ -101,8 +101,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime type
      *            of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *            {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc. Also
-     *            accepts a {@link BodyPart} object, in which case, the mime type is not used. A
-     *            {@link BodyPart} object can be passed for scripting languages other than Velocity.
+     *            accepts a {@link BodyPart} object, in which case, the mime type is not used.
      */
     public BodyPart addPart(String mimeType, Object content)
     {
@@ -118,8 +117,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime type
      *            of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *            {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc. Also
-     *            accepts a {@link BodyPart} object, in which case, the mime type and parameters are not used. A
-     *            {@link BodyPart} object can be passed for scripting languages other than Velocity.
+     *            accepts a {@link BodyPart} object, in which case, the mime type and parameters are not used. 
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *            using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed
      *            using the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys

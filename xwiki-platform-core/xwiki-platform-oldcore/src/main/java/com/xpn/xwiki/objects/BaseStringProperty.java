@@ -21,6 +21,8 @@ package com.xpn.xwiki.objects;
 
 import com.google.common.base.Objects;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$
  */
@@ -62,12 +64,23 @@ public class BaseStringProperty extends BaseProperty
         if (!super.equals(obj)) {
             return false;
         }
-        
+
         if (!(obj instanceof BaseStringProperty)) {
             return false;
         }
-        
+
         return Objects.equal(this.getValue(), ((BaseStringProperty) obj).getValue());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getValue());
+
+        return builder.toHashCode();
     }
 
     @Override

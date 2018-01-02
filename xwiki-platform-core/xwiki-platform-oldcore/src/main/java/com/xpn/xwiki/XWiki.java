@@ -1042,9 +1042,8 @@ public class XWiki implements EventListener
 
     /**
      * @param content the content of the text area
-     * @param context see {@link XWikiContext}
      */
-    public static String getTextArea(String content, XWikiContext context)
+    public static String getTextArea(String content)
     {
         StringBuilder result = new StringBuilder();
 

@@ -101,8 +101,8 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
-     * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime type
-     *        of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
+     * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime 
+     *        type of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *        {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc. Also
      *        accepts a {@link BodyPart} object, in which case, the mime type is not used.
      */
@@ -117,13 +117,13 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
-     * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime type
-     *        of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
+     * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime 
+     *        type of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *        {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc. Also
      *        accepts a {@link BodyPart} object, in which case, the mime type and parameters are not used.
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
-     *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed
-     *        using the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys
+     *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using 
+     *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys
      *        and values.
      */
     public BodyPart addPart(String mimeType, Object content, Map<String, Object> parameters)

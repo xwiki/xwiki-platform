@@ -87,7 +87,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
      *         part after it's been set (get/set some headers, etc)
      * @param bodyPart a {@link BodyPart} object to include in the mail
-     * @since 
+     * @since 10.0-SNAPSHOT
      */
     @Unstable
     public BodyPart addPart(BodyPart bodyPart)

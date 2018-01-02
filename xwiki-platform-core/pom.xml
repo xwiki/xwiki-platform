@@ -138,6 +138,16 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.rendering.block.ExpandedMacroBlock",
+                    "new": "class org.xwiki.rendering.block.ExpandedMacroBlock",
+                    "superClass": "org.xwiki.rendering.block.AbstractMacroBlock",
+                    "package": "org.xwiki.rendering.block",
+                    "classSimpleName": "ExpandedMacroBlock",
+                    "elementKind": "class",
+                    "justification": "No breackage. Just moved commons stuff in an abtract class."
+                  }
                 ]
               }
             }

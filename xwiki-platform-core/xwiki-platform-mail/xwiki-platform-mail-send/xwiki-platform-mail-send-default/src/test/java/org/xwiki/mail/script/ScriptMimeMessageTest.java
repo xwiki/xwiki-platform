@@ -95,7 +95,7 @@ public class ScriptMimeMessageTest
     }
     
     @Test
-    public void addPart() throws Exception
+    public void addBodyPart() throws Exception
     {
         String header = "bodyPartTest";
         MimeBodyPart bp = new MimeBodyPart();
@@ -105,7 +105,7 @@ public class ScriptMimeMessageTest
     }
     
     @Test
-    public void addPartTwo() throws Exception
+    public void addBodyPartUsingMimeTypeMethod() throws Exception
     {
         String header = "bodyPartTest2";
         MimeBodyPart bp = new MimeBodyPart();
@@ -115,7 +115,7 @@ public class ScriptMimeMessageTest
     }
 
     @Test
-    public void addPartThree() throws Exception
+    public void addBodyPartUsingMimetypeAndParametersMethod() throws Exception
     {
         String header = "bodyPartTest3";
         MimeBodyPart bp = new MimeBodyPart();

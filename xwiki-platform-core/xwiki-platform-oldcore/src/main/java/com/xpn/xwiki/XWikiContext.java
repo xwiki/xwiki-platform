@@ -23,6 +23,7 @@ import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +69,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  *
  * @version $Id$
  */
-public class XWikiContext extends Hashtable<Object, Object>
+public class XWikiContext extends HashMap<Object, Object>
 {
     /**
      * Type instance for {@code Provider<XWikiContext>}.

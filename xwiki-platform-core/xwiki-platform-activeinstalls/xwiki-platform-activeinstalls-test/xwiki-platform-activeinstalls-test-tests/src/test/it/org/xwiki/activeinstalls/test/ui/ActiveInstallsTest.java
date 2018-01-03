@@ -143,7 +143,7 @@ public class ActiveInstallsTest extends AbstractTest
         getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData");
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
-            vp.getContent().matches("XWiki Version Active Installs Count\\r?\\n[0-9]\\.[0-9].* 1"));
+            vp.getContent().matches("XWiki Version Active Installs Count\\r?\\n[0-9]+\\.[0-9]+.* 1"));
 
         // Verify XWiki Cycle versions data
         getUtil().gotoPage("ActiveInstalls", "XWikiVersionsCycleData");

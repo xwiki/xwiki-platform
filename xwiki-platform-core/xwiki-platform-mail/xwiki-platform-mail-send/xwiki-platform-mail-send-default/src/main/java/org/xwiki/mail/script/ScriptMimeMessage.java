@@ -85,7 +85,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
      * @param bodyPart a {@link BodyPart} object to include in the mail
-     * @since 10.0-SNAPSHOT
+     * @since 10.0RC1
      */
     @Unstable
     public void addPart(BodyPart bodyPart)

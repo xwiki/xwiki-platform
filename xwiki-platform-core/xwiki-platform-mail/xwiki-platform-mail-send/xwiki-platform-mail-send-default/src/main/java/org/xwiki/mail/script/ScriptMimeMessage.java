@@ -90,7 +90,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     @Unstable
     public void addPart(BodyPart bodyPart)
     {
-        return addPart(null, bodyPart);
+        addPart(null, bodyPart);
     }
 
     /**

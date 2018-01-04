@@ -26,6 +26,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 import com.xpn.xwiki.util.Util;
 
+/**
+ * Dot action.
+ *
+ * @version $Id$
+ */
 @Deprecated
 public class DotAction extends XWikiAction
 {

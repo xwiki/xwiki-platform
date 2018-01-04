@@ -139,8 +139,8 @@ public class NumberPropertyTest
     {
         final Number value = 101;
 
-        NumberProperty n1 = new NumberProperty();
-        NumberProperty n2 = new NumberProperty();
+        NumberProperty n1 = new IntegerProperty();
+        NumberProperty n2 = new IntegerProperty();
 
         n1.setValue(value);
         n2.setValue(value);

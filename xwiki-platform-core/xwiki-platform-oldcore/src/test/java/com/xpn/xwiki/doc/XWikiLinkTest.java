@@ -22,14 +22,12 @@ package com.xpn.xwiki.doc;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.xpn.xwiki.XWikiList;
-
 /**
  * Unit tests for the {@link XWikiList} class.
  *
  * @version $Id$
  */
-public class XWikiListTest
+public class XWikiLinkTest
 {
 
     @Test
@@ -39,9 +37,9 @@ public class XWikiListTest
         final String link = "test link";
         final String fullName = "test fullName";
 
-        XWikiList l1 = new XWikiList(docId, link, fullName);
-        XWikiList l2 = new XWikiList(docId, link, fullName);
-        XWikiList l3 = new XWikiList(docId, link, fullName);
+        XWikiLink l1 = new XWikiLink(docId, link, fullName);
+        XWikiLink l2 = new XWikiLink(docId, link, fullName);
+        XWikiLink l3 = new XWikiLink(docId, link, fullName);
 
         // Reflexive
         Assert.assertEquals(l1, l1);

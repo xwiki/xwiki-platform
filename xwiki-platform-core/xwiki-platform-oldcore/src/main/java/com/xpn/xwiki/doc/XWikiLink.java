@@ -21,6 +21,8 @@ package com.xpn.xwiki.doc;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 public class XWikiLink implements Serializable
 {
     private long docId;
@@ -89,8 +91,22 @@ public class XWikiLink implements Serializable
     @Override
     public boolean equals(Object obj)
     {
-        XWikiLink objlink = (XWikiLink) obj;
-        return (objlink.getDocId() == getDocId() && objlink.getLink().equals(getLink()));
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof XWikiLink)) {
+            return false;
+        }
+
+        XWikiLink o = (XWikiLink)obj;
+
+        EqualsBuilder builder = new EqualsBuilder();
+        builder.append(getDocId(), o.getDocId());
+        builder.append(getLink(), o.getLink());
+        builder.append(getFullName(), o.getFullName());
+
+        return builder.isEquals();
     }
 
     @Override

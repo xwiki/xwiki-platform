@@ -31,7 +31,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Unit tests for {@link NumberProperty}.
- * 
+ *
  * @version $Id$
  * @since 5.2M1
  */
@@ -132,5 +132,19 @@ public class NumberPropertyTest
         notNullValueProperty.setValue(1);
 
         Assert.assertFalse(nullValueProperty.equals(notNullValueProperty));
+    }
+
+    @Test
+    public void testHashCode()
+    {
+        final Number value = 101;
+
+        NumberProperty n1 = new NumberProperty();
+        NumberProperty n2 = new NumberProperty();
+
+        n1.setValue(value);
+        n2.setValue(value);
+
+        Assert.assertEquals(n1.hashCode(), n2.hashCode());
     }
 }

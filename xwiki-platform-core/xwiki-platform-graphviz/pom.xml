@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-graphviz</artifactId>
   <name>XWiki Platform - GraphViz - Parent POM</name>
-  <description>Handle notifications</description>
+  <description>Deprecated GraphViz plugin</description>
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-graphviz-oldcore</module>

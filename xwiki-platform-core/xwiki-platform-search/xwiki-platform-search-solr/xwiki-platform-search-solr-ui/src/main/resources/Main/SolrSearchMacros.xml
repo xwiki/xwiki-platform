@@ -658,7 +658,7 @@ $services.localization.render('core.users.unknownUser')##
   #end
   #if ("$!phraseFieldsBoost" != '')
     #set ($discard = $query.bindValue('pf', $phraseFieldsBoost))
-    #set ($discard = $query.bindValue('ps', '10'))
+    #set ($discard = $query.bindValue('ps', $solrConfig.phraseFieldSlop))
   #end
 #end
 

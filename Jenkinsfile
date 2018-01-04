@@ -35,7 +35,6 @@ stage ('Platform Builds') {
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       build(
         name: 'Main',
-        goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
         properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
       )
@@ -47,7 +46,6 @@ stage ('Platform Builds') {
       // Build the distributions
       build(
         name: 'Distribution',
-        goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
         pom: 'xwiki-platform-distribution/pom.xml'
       )
@@ -163,7 +161,6 @@ def buildFunctionalTest(map)
 
   build(
     name: map.name,
-    goals: 'clean deploy',
     profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
     mavenOpts: map.mavenOpts,
     pom: "${sharedPOMPrefix}/${map.pom}"

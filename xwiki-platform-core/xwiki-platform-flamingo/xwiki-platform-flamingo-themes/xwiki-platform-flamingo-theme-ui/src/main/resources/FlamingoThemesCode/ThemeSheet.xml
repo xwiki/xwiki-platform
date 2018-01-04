@@ -599,14 +599,16 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     // Since the input is hidden (by the attachmentSelector macro), we need to do some black magic (i.e. register a MutationObserver) to make it trigger the "change" event.
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
     var trackChange = function(element) {
-      var observer = new MutationObserver(function(mutations, observer) {
-        if (mutations[0].attributeName == "value") {
-          $(element).trigger("change");
-        }
-      });
-      observer.observe(element, {
-        attributes: true
-      });
+      if (typeof element !== 'undefined') {
+        var observer = new MutationObserver(function(mutations, observer) {
+          if (mutations[0].attributeName == "value") {
+            $(element).trigger("change");
+          }
+        });
+        observer.observe(element, {
+          attributes: true
+        });
+      }
     }
     // Enable change tracking for the logo field.
     trackChange(logoFieldInput[0]);

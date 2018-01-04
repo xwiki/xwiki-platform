@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 
@@ -97,30 +98,27 @@ public class ScriptMimeMessageTest
     @Test
     public void addBodyPart() throws Exception
     {
-        String header = "bodyPartTest";
         MimeBodyPart bp = new MimeBodyPart();
-        bp.addHeader("BodyPart-Test", header);
+        bp.addHeader("randomTestHeader", "randomTestHeader");
         this.scriptMessage.addPart(bp);
-        assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test", null));
+        assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
     }
     
     @Test
     public void addBodyPartUsingMimeTypeMethod() throws Exception
     {
-        String header = "bodyPartTest2";
         MimeBodyPart bp = new MimeBodyPart();
-        bp.addHeader("BodyPart-Test2", header);
+        bp.addHeader("randomTestHeader2", "randomTestHeader2");
         this.scriptMessage.addPart(null, bp);
-        assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test2", null));
+        assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
     }
 
     @Test
     public void addBodyPartUsingMimetypeAndParametersMethod() throws Exception
     {
-        String header = "bodyPartTest3";
         MimeBodyPart bp = new MimeBodyPart();
-        bp.addHeader("BodyPart-Test3", header);
+        bp.addHeader("randomTestHeader3", "randomTestHeader3");
         this.scriptMessage.addPart(null, bp, Collections.<String, Object>emptyMap());
-        assertEquals(header, this.scriptMessage.getHeader("BodyPart-Test3", null));
+        assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
     }
 }

@@ -58,6 +58,7 @@
                    comment^25.0
                    author_display^20.0 creator_display^20.0  attauthor_display^20.0'
   ,
+  'phraseFieldSlop': '10',
   'sortFields': {
     'DOCUMENT': {
       'score': 'desc',

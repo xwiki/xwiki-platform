@@ -51,8 +51,8 @@ skin.sheet.nojs=Without JavaScript, you cannot use this section. But you can use
 
 skin.sheet.js.deleting=Deleting...
 skin.sheet.js.deletingDone=The template has been deleted!
-skin.sheet.js.error.csrf=CSRF validation failed when saving. Try to refresh your browser first.
-skin.sheet.js.error.rights=Failed to save the skins because you don't have the right to do it.
+skin.sheet.js.error.csrf=CSRF validation failed when saving. Refresh your browser to try again.
+skin.sheet.js.error.rights=Failed to save the skins because of insufficient permissions.
 skin.sheet.js.deleteConfirmationText=Are you sure you want to delete this template?
 skin.sheet.js.deleteConfirmationYes=Yes, delete it
 skin.sheet.js.deleteConfirmationNo=No, cancel

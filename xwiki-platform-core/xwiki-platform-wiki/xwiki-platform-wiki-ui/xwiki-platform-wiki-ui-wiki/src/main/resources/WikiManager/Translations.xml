@@ -98,7 +98,7 @@ platform.wiki.currentwiki.currentUserNotMember=You are not a member of this wiki
 platform.wiki.currentwiki.currentuserCanJoin=If you like, you can {0}join this wiki{1}.
 platform.wiki.currentwiki.currentUserIsMember=You are a member of this wiki.
 platform.wiki.currentwiki.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, you can use the {0}User Directory{1} page.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, see {0}User Directory{1}.
 platform.wiki.currentwiki.invitationPendingForCurrentWiki=You have been invited to join this wiki
 platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=You have requested to join this wiki
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
@@ -159,7 +159,7 @@ WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
 # HINTS
 platform.wiki.currentwiki.prop.wikiprettyname.hint=The display name of the wiki.
 platform.wiki.currentwiki.prop.description.hint=A brief description of the wiki and its purpose.
-platform.wiki.currentwiki.prop.owner.hint=A user who will have all the rights on the wiki.
+platform.wiki.currentwiki.prop.owner.hint=A user who has all the rights on the wiki.
 platform.wiki.currentwiki.prop.membershipType.hint=The way users can join this wiki.
 platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki's generated externals URLs will start with {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.

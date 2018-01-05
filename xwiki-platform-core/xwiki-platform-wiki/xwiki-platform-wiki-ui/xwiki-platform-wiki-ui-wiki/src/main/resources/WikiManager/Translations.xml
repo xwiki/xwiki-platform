@@ -159,7 +159,7 @@ WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
 # HINTS
 platform.wiki.currentwiki.prop.wikiprettyname.hint=The display name of the wiki.
 platform.wiki.currentwiki.prop.description.hint=A brief description of the wiki and its purpose.
-platform.wiki.currentwiki.prop.owner.hint=A user who has access to all the rights on the wiki.
+platform.wiki.currentwiki.prop.owner.hint=A user who has all the rights on the wiki.
 platform.wiki.currentwiki.prop.membershipType.hint=The way users can join this wiki.
 platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki's generated externals URLs will start with {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.

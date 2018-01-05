@@ -39,9 +39,12 @@ stage ('Platform Builds') {
         properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
       )
 
-      // Note: if an error occurs in the first build above, then an exception will be raised and this job will not
-      // execute which is what we want since failures can be test flickers for ex, and it could still be interesting to
-      // get a distribution to test xwiki manually.
+      // Note: We want the following behavior:
+      // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
+      //   happen since Jenkins will throw an exception and we don't catch it.
+      // - if the previous build has failures (e.g. test execution failures), we want subsequent builds to execute
+      //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to test
+      // xwiki manually.
 
       // Build the distributions
       build(

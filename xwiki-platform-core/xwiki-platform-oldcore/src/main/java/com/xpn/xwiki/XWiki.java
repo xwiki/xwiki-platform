@@ -1557,11 +1557,10 @@ public class XWiki implements EventListener
                 if (is != null) {
                     return IOUtils.toByteArray(is);
                 }
-            } catch(Exception e){
+            } catch (Exception e) {
             }
-            return FileUtils.readFileToByteArray(new File(name));
         }
-        return new byte[0];
+        return FileUtils.readFileToByteArray(new File(name));
     }
 
     public boolean resourceExists(String name)

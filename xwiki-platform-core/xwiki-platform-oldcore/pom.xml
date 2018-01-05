@@ -260,12 +260,6 @@
       <groupId>com.sun.mail</groupId>
       <artifactId>javax.mail</artifactId>
     </dependency>
-    <!-- Used by the image plugin to resize the images (i.e. create thumbnails) on the server side. -->
-    <dependency>
-      <groupId>net.coobird</groupId>
-      <artifactId>thumbnailator</artifactId>
-      <version>0.4.8</version>
-    </dependency>
 
     <!-- Other XWiki modules -->
     <dependency>
@@ -325,6 +319,12 @@
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other
          modules using it to the Servlet environment, which is pretty bad. To be able to remove this dependency
          we first need to be able to split DefaultVelocityManager so that the part that is related to the Servlet
@@ -757,7 +757,6 @@
                 **/objects/ObjectInterface.java,
                 **/objects/PropertyInterface.java,
                 **/objects/StringListProperty.java,
-                **/plugin/image/ImagePlugin.java,
                 **/plugin/autotag/FrenchStemmer.java,
                 **/plugin/mail/MailPluginApi.java,
                 **/plugin/mail/MailPlugin.java,

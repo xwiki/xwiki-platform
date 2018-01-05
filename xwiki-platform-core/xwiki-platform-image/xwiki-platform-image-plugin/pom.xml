@@ -24,64 +24,46 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-watchlist</artifactId>
+    <artifactId>xwiki-platform-image</artifactId>
     <version>10.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-watchlist-api</artifactId>
-  <name>XWiki Platform - WatchList - API</name>
-  <description>API to manipulate a user's WatchList.</description>
+  <artifactId>xwiki-platform-image-plugin</artifactId>
+  <name>XWiki Platform - Image - Plugin</name>
+  <description>Deprecated Image plugin</description>
   <properties>
-    <!-- Name to display in the Extension Manager -->
-    <xwiki.extension.name>Watchlist API</xwiki.extension.name>
-    <!-- This module is currently under refactoring. The ratio has been lowered to avoid noise. Need to bring it back to at
-      least 0.11 which was before the refactoring started. -->
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <checkstyle.suppressions.location>${basedir}/src/main/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-diffplugin</artifactId>
-      <version>${project.version}</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-scheduler-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Default implementation of the mail-send-api. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed in order to be able to mock oldcore's XWikiDocument -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

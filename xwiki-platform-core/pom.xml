@@ -191,6 +191,7 @@
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-help</module>
     <module>xwiki-platform-icon</module>
+    <module>xwiki-platform-image</module>
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>

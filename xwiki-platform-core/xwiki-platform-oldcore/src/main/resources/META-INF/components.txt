@@ -114,8 +114,6 @@ com.xpn.xwiki.internal.store.hibernate.HibernateStore
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager
 com.xpn.xwiki.internal.template.TemplateListener
-com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
-com.xpn.xwiki.internal.plugin.image.ThumbnailatorImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
 com.xpn.xwiki.script.sheet.SheetScriptService

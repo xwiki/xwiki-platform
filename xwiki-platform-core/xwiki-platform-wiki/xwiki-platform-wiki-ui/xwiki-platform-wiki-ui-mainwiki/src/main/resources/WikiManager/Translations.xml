@@ -109,7 +109,7 @@ platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{
 platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
 platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
 platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-platform.wiki.users.join.error.needInvitation=This wiki is invite only. In order to join it, you need to receive an invitation from one of its admins.
+platform.wiki.users.join.error.needInvitation=This wiki can only be joined by invite only. To do so, you need to receive an invitation from one of its admins.
 platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
 platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
 platform.wiki.users.join.request.cancelYes=Yes
@@ -132,7 +132,7 @@ platform.wiki.users.leave.empty=
 platform.wiki.users.delete.title=Delete Wiki "{0}"
 platform.wiki.users.delete.empty=
 platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
-platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After this, a wiki admin will review your request and consider accepting or rejecting it.
+platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
 platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
 platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
 platform.wiki.users.invitation.message.label=Invitation message
@@ -156,7 +156,7 @@ platform.wiki.users.profile.activity.show=show activity
 ## Wiki Deletion
 platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
 platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-platform.wiki.delete.error.wikiIdDoesNotMatch=You must type in the exact Wiki Identifier of the wiki that should be deleted.
+platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
 
 ## Wiki macro
@@ -197,7 +197,7 @@ platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Description
 platform.wiki.prop.owner=Owner
 platform.wiki.prop.membershipType.label=Membership Type
-platform.wiki.prop.membershipType.hint=The way users can join this wiki.
+platform.wiki.prop.membershipType.hint=How users can join this wiki.
 
 ## Wizard
 platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
@@ -205,7 +205,7 @@ platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
 platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
 platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
 platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independently of the rights configured in the Administration.
+platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independent of the rights configured in the Administration.
 platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
 platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
 platform.wiki.create.wizard.step.nameAndType.shortname=Name

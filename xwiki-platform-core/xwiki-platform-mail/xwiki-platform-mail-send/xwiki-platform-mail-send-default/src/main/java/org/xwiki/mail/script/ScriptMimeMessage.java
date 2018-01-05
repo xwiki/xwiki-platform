@@ -130,28 +130,6 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     }
 
     /**
-     * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
-     *
-     * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
-     *         part after it's been set (get/set some headers, etc)
-     * @param bodyPart the Mime Body Part object to be added
-     */
-    public BodyPart addPart(BodyPart bodyPart)
-    {
-        BodyPart temp = bodyPart;
-        try {
-            Multipart multipart = getMultipart();
-            multipart.addBodyPart(bodyPart);
-        } catch (Exception e) {
-            // Save the exception for reporting through the script services's getError() API
-            setError(e);
-            temp = null;
-        }
-
-        return temp;
-    }
-
-    /**
      * @param subject the subject to set in the Mime Message
      */
     @Override

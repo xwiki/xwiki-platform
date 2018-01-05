@@ -440,6 +440,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 // Index the raw value that is saved in the database. This is most probably a string so we'll be able to
                 // perform exact matches on this value.
                 setPropertyValue(solrDocument, property, new TypedValue(rawValue), locale);
+                // This should allow tags to be matched in a case insensitive manner from Solr
+                setPropertyValue(solrDocument, property, new TypedValue(rawValue, TypedValue.TEXT), locale);
                 ListItem valueInfo = knownValues.get(rawValue);
                 if (valueInfo != null && valueInfo.getValue() != null && !valueInfo.getValue().equals(rawValue)) {
                     // Index the display value as text (based on the given locale). This is the text seen by the user

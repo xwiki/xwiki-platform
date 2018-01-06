@@ -347,7 +347,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>4.5.0</version>
+        <version>4.5.1</version>
       </dependency>
 
       <dependency>
@@ -440,7 +440,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.0.42</version>
+        <version>3.0.43</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

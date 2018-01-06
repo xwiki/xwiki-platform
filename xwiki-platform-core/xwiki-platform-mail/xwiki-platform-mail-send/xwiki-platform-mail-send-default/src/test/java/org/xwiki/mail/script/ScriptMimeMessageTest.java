@@ -19,9 +19,13 @@
  */
 package org.xwiki.mail.script;
 
+import java.util.Collections;
+
 import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -89,5 +93,32 @@ public class ScriptMimeMessageTest
         this.scriptMessage.addHeader("X-Test", testHeader);
 
         assertEquals(testHeader, this.scriptMessage.getHeader("X-Test", null));
+    }
+    
+    @Test
+    public void addBodyPart() throws Exception
+    {
+        MimeBodyPart bp = new MimeBodyPart();
+        bp.addHeader("randomTestHeader", "randomTestHeader");
+        this.scriptMessage.addPart(bp);
+        assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
+    }
+    
+    @Test
+    public void addBodyPartUsingMimeTypeMethod() throws Exception
+    {
+        MimeBodyPart bp = new MimeBodyPart();
+        bp.addHeader("randomTestHeader2", "randomTestHeader2");
+        this.scriptMessage.addPart(null, bp);
+        assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
+    }
+
+    @Test
+    public void addBodyPartUsingMimetypeAndParametersMethod() throws Exception
+    {
+        MimeBodyPart bp = new MimeBodyPart();
+        bp.addHeader("randomTestHeader3", "randomTestHeader3");
+        this.scriptMessage.addPart(null, bp, Collections.<String, Object>emptyMap());
+        assertEquals(bp, ((Multipart)(this.scriptMessage.getContent())).getBodyPart(0));
     }
 }

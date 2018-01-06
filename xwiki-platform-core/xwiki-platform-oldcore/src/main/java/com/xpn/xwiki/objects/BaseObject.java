@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dom4j.Element;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -238,6 +239,17 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getNumber());
+
+        return builder.toHashCode();
     }
 
     @Override

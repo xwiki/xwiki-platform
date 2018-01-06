@@ -35,19 +35,20 @@ stage ('Platform Builds') {
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       build(
         name: 'Main',
-        goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
         properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
       )
 
-      // Note: if an error occurs in the first build above, then an exception will be raised and this job will not
-      // execute which is what we want since failures can be test flickers for ex, and it could still be interesting to
-      // get a distribution to test xwiki manually.
+      // Note: We want the following behavior:
+      // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
+      //   happen since Jenkins will throw an exception and we don't catch it.
+      // - if the previous build has failures (e.g. test execution failures), we want subsequent builds to execute
+      //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to test
+      // xwiki manually.
 
       // Build the distributions
       build(
         name: 'Distribution',
-        goals: 'clean deploy',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
         pom: 'xwiki-platform-distribution/pom.xml'
       )
@@ -163,7 +164,6 @@ def buildFunctionalTest(map)
 
   build(
     name: map.name,
-    goals: 'clean deploy',
     profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
     mavenOpts: map.mavenOpts,
     pom: "${sharedPOMPrefix}/${map.pom}"

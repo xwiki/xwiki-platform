@@ -37,7 +37,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 /**
  * Unit tests for the {@link BaseObject} class.
- * 
+ *
  * @version $Id$
  */
 @ReferenceComponentList
@@ -164,5 +164,19 @@ public class BaseObjectTest
         }
 
         Assert.assertEquals("newvalue", currentObject.getStringValue("str"));
+    }
+
+    @Test
+    public void testHashCode()
+    {
+        final int number = 101;
+
+        BaseObject o1 = new BaseObject();
+        BaseObject o2 = new BaseObject();
+
+        o1.setNumber(number);
+        o2.setNumber(number);
+
+        Assert.assertEquals(o1.hashCode(), o2.hashCode());
     }
 }

@@ -38,6 +38,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.stability.Unstable;
 
 /**
  * Extends {@link javax.mail.internet.MimeMessage} with additional helper methods for scripts.
@@ -79,6 +80,18 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
         this.execution = execution;
         this.componentManager = componentManager;
     }
+    
+    /**
+     * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
+     *
+     * @param bodyPart a {@link BodyPart} object to include in the mail
+     * @since 10.0RC1
+     */
+    @Unstable
+    public void addPart(BodyPart bodyPart)
+    {
+        addPart(null, bodyPart);
+    }
 
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
@@ -89,6 +102,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime
      *        type of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *        {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc.
+     *        Also accepts a {@link BodyPart} object, in which case, the mime type is not used.
      */
     public BodyPart addPart(String mimeType, Object content)
     {
@@ -104,25 +118,31 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
      * @param content the content to include in the mail. The type depends on the mimetype. For example for a mime
      *        type of {@code text/plain} or {@code text/html}, the content should be a String, for a mime type of
      *        {@code xwiki/template} it should be a {@link org.xwiki.model.reference.DocumentReference}, etc.
+     *        Also accepts a {@link BodyPart} object, in which case, the mime type and parameters are not used.
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
-     *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys and values
+     *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys
+     *        and values.
      */
     public BodyPart addPart(String mimeType, Object content, Map<String, Object> parameters)
     {
         BodyPart bodyPart;
 
         try {
-            MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
+            if (!(content instanceof BodyPart)) {
+                MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
 
-            // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
-            // Note that if the user has already passed a "mimetype" parameter then we don't override it!
-            Map<String, Object> enhancedParameters = new HashMap<>();
-            enhancedParameters.put("mimetype", mimeType);
-            enhancedParameters.putAll(parameters);
+                // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
+                // Note that if the user has already passed a "mimetype" parameter then we don't override it!
+                Map<String, Object> enhancedParameters = new HashMap<>();
+                enhancedParameters.put("mimetype", mimeType);
+                enhancedParameters.putAll(parameters);
 
+                bodyPart = factory.create(content, enhancedParameters);
+            } else {
+                bodyPart = (BodyPart) content;
+            }
             Multipart multipart = getMultipart();
-            bodyPart = factory.create(content, enhancedParameters);
             multipart.addBodyPart(bodyPart);
         } catch (Exception e) {
             // Save the exception for reporting through the script services's getError() API

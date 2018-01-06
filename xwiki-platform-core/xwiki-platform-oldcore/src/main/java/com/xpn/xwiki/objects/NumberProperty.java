@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class NumberProperty extends BaseProperty
 {
@@ -59,6 +60,17 @@ public abstract class NumberProperty extends BaseProperty
         return new EqualsBuilder().appendSuper(super.equals(obj))
             .append(getValue(), ((NumberProperty) obj).getValue())
             .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getValue());
+
+        return builder.toHashCode();
     }
 
     @Override

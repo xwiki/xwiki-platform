@@ -55,6 +55,11 @@
       <artifactId>xwiki-platform-scheduler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Default implementation of the mail-send-api. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

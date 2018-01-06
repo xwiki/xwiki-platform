@@ -171,8 +171,15 @@ public class BaseObjectTest
     {
         final int number = 101;
 
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "document");
+        DocumentReference classReference = new DocumentReference("wiki", "space", "class");
+
         BaseObject o1 = new BaseObject();
+        o1.setDocumentReference(documentReference);
+        o1.setXClassReference(classReference);
         BaseObject o2 = new BaseObject();
+        o2.setDocumentReference(documentReference);
+        o2.setXClassReference(classReference);
 
         o1.setNumber(number);
         o2.setNumber(number);

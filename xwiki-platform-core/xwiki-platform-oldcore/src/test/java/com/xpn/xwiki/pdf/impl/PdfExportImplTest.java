@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.pdf;
+package com.xpn.xwiki.pdf.impl;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,8 +31,7 @@ import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.pdf.PDFResourceResolver;
-import com.xpn.xwiki.internal.pdf.PdfExportImpl;
+import com.xpn.xwiki.internal.pdf.XSLFORenderer;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import static org.junit.Assert.assertEquals;

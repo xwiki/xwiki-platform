@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.pdf.PdfURLFactory;
+import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 
 public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {

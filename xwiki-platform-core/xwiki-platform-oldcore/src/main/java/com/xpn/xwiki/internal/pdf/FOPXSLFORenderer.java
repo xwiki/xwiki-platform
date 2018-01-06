@@ -56,6 +56,8 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.pdf.impl.PDFResourceResolver;
+import com.xpn.xwiki.pdf.impl.XWikiFOPEventListener;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**

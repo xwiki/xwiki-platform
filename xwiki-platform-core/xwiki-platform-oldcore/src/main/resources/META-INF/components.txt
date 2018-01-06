@@ -99,7 +99,6 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
-com.xpn.xwiki.internal.pdf.PDFResourceResolver
 com.xpn.xwiki.internal.pdf.FOPXSLFORenderer
 com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
@@ -143,6 +142,7 @@ com.xpn.xwiki.objects.meta.StringMetaClass
 com.xpn.xwiki.objects.meta.TextAreaMetaClass
 com.xpn.xwiki.objects.meta.UsersMetaClass
 com.xpn.xwiki.objects.meta.TimezoneMetaClass
+com.xpn.xwiki.pdf.impl.PDFResourceResolver
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.script.parentchild.ParentChildScriptService

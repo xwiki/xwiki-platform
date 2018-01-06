@@ -886,11 +886,10 @@ public class Util
      */
     public static long getHash(String uid)
     {
-        MessageDigest md5 = null;
         long hash = 0;
 
         try {
-            md5 = MessageDigest.getInstance("MD5");
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
             byte[] digest = md5.digest(uid.getBytes("UTF-8"));
             for (int l = digest.length, i = Math.max(0, digest.length - 9); i < l; i++) {
                 hash = hash << 8 | ((long) digest[i] & 0xFF);

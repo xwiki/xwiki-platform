@@ -56,6 +56,7 @@
       <validationScript/>
       <content>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>content</name>
         <number>3</number>
         <prettyName>Extension Content</prettyName>
@@ -83,7 +84,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parameters>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>parameters</name>
         <number>4</number>
         <prettyName>Extension Parameters</prettyName>

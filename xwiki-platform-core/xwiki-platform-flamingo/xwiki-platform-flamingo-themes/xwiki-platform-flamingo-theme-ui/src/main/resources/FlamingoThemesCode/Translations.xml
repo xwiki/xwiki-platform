@@ -81,7 +81,7 @@
 platform.flamingo.themes.home.currenttheme=Current Theme
 platform.flamingo.themes.home.otherthemes=Other available Themes
 platform.flamingo.themes.home.warningOldColorThemeInstalled=This is the application to manage the Flamingo Themes. A Flamingo Theme is a customizable variation of any skin based on Flamingo. If you want to manage Color Themes for Colibri-based skins, you should go to {0}Colibri Color Themes Application{1}.
-platform.flamingo.themes.home.warningCurrentOldColorTheme=The current Theme is a Colibri Color Theme which is not optimized to work with a skin based on Flamingo. We have made our best to make it compatible, but the results might not be optimal.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=The current Theme is a Colibri Color Theme which is not optimized to work with a skin based on Flamingo. We have tried our best to make it compatible, but the results might not be optimal.
 platform.flamingo.themes.home.useThisTheme=Use this Theme
 platform.flamingo.themes.home.newThemeName=Theme name...
 platform.flamingo.themes.home.create=Create new Theme
@@ -107,8 +107,8 @@ platform.flamingo.themes.category.panels=Panels
 platform.flamingo.themes.category.breadcrumb=Breadcrumb
 platform.flamingo.themes.category.advanced=Advanced
 platform.flamingo.themes.defaultvalue=Default
-platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code that will be added into the skin.
-platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a more recent browser.
+platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
+platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
 

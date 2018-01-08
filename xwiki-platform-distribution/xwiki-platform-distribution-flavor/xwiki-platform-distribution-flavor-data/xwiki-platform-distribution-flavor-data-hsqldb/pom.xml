@@ -27,7 +27,7 @@
     <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
     <version>9.11.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-data-hsqldb</artifactId>
+  <artifactId>xwiki-platform-distribution-flavor-data-hsqldb</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data - HSQLDB</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Data - HSQLDB</description>

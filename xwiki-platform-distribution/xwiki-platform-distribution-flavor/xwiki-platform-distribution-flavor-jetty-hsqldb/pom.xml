@@ -47,7 +47,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-data-hsqldb</artifactId>
+      <artifactId>xwiki-platform-distribution-flavor-data-hsqldb</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <optional>true</optional>

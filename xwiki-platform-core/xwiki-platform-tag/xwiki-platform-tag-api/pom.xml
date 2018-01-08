@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tag</artifactId>
-    <version>9.11.1-SNAPSHOT</version>
+    <version>9.11.1</version>
   </parent>
   <artifactId>xwiki-platform-tag-api</artifactId>
   <name>XWiki Platform - Tag - API</name>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-crypto-store</artifactId>
-    <version>9.11.1-SNAPSHOT</version>
+    <version>9.11.1</version>
   </parent>
   <artifactId>xwiki-platform-crypto-store-wiki</artifactId>
   <name>XWiki Platform - Cryptographic Services - Storage - Wiki</name>

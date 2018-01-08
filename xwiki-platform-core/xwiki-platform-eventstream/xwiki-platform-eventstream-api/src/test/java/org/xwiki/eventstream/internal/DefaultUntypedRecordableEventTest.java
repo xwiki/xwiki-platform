@@ -19,6 +19,9 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.eventstream.RecordableEvent;
@@ -76,5 +79,22 @@ public class DefaultUntypedRecordableEventTest
     public void matchesWithIncorrectObject() throws Exception
     {
         assertFalse(this.defaultUntypedRecordableEvent.matches(new RandomRecordableEvent()));
+    }
+
+    @Test
+    public void target() throws Exception
+    {
+        HashSet<String> target = new HashSet<>();
+        target.add("a");
+        target.add("b");
+        DefaultUntypedRecordableEvent event = new DefaultUntypedRecordableEvent("unitTestEvent",
+                target);
+        assertEquals(target, event.getTarget());
+
+        DefaultUntypedRecordableEvent event2 = new DefaultUntypedRecordableEvent("unitTestEvent");
+        assertEquals(Collections.emptySet(), event2.getTarget());
+
+        DefaultUntypedRecordableEvent event3 = new DefaultUntypedRecordableEvent();
+        assertEquals(Collections.emptySet(), event3.getTarget());
     }
 }

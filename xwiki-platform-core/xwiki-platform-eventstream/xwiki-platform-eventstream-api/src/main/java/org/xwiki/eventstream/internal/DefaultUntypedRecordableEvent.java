@@ -19,6 +19,10 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.xwiki.eventstream.TargetableEvent;
 import org.xwiki.eventstream.UntypedRecordableEvent;
 
 /**
@@ -27,18 +31,36 @@ import org.xwiki.eventstream.UntypedRecordableEvent;
  * @version $Id$
  * @since 9.6RC1
  */
-public class DefaultUntypedRecordableEvent implements UntypedRecordableEvent
+public class DefaultUntypedRecordableEvent implements UntypedRecordableEvent, TargetableEvent
 {
     private String eventType;
+
+    private Set<String> target;
 
     DefaultUntypedRecordableEvent(String eventType)
     {
         this.eventType = eventType;
+        this.target = Collections.emptySet();
     }
 
     DefaultUntypedRecordableEvent()
     {
         this.eventType = "";
+        this.target = Collections.emptySet();
+    }
+
+    /**
+     * Construct a DefaultUntypedRecordableEvent.
+     * @param eventType event type
+     * @param target list of target (can't be null !)
+     *
+     * @since 9.11.2
+     * @since 10.0RC1
+     */
+    DefaultUntypedRecordableEvent(String eventType, Set<String> target)
+    {
+        this.eventType = eventType;
+        this.target = target;
     }
 
     @Override
@@ -51,5 +73,11 @@ public class DefaultUntypedRecordableEvent implements UntypedRecordableEvent
     public boolean matches(Object otherEvent)
     {
         return otherEvent != null && otherEvent instanceof UntypedRecordableEvent;
+    }
+
+    @Override
+    public Set<String> getTarget()
+    {
+        return this.target;
     }
 }

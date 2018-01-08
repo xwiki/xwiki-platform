@@ -19,7 +19,10 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -75,6 +78,16 @@ public class UntypedEventListener extends AbstractEventListener
      */
     public static final String SOURCE_BINDING_NAME = "source";
 
+    /**
+     * Name of the module.
+     */
+    private static final String EVENT_STREAM_MODULE = "org.xwiki.platform:xwiki-platform-eventstream-api";
+
+    /**
+     * Name of the binding used for the results of the velocity templates.
+     */
+    private static final String XRETURN_BINDING = "xreturn";
+
     @Inject
     private ObservationManager observationManager;
 
@@ -117,21 +130,25 @@ public class UntypedEventListener extends AbstractEventListener
             // Filter the event descriptors concerned by the event, then create the concerned events
             for (UntypedRecordableEventDescriptor descriptor : descriptors) {
                 // If the event is expected by our descriptor
-                if (descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
-                        && this.checkXObjectCondition(descriptor, source)
-                        && this.evaluateVelocityTemplate(
-                        event, source, descriptor.getAuthorReference(), descriptor.getValidationExpression()))
-                {
+                if (eventMatchesDescriptor(event, source, descriptor)) {
+                    Set<String> target = getTarget(event, source, descriptor.getAuthorReference(),
+                            descriptor.getTargetExpression());
                     observationManager.notify(
-                            new DefaultUntypedRecordableEvent(descriptor.getEventType()),
-                            "org.xwiki.platform:xwiki-platform-eventstream-api",
-                            source);
+                            new DefaultUntypedRecordableEvent(descriptor.getEventType(), target),
+                            EVENT_STREAM_MODULE, source);
                 }
             }
         } catch (ComponentLookupException e) {
             logger.error("Unable to retrieve a list of registered UntypedRecordableEventDescriptor "
                     + "from the ComponentManager.", e);
         }
+    }
+
+    private boolean eventMatchesDescriptor(Event event, Object source, UntypedRecordableEventDescriptor descriptor)
+    {
+        return descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
+                && checkXObjectCondition(descriptor, source)
+                && isValidated(event, source, descriptor.getAuthorReference(), descriptor.getValidationExpression());
     }
 
     /**
@@ -158,55 +175,81 @@ public class UntypedEventListener extends AbstractEventListener
      * @param templateContent the velocity template that should be evaluated
      * @return true if the template evaluation returned «true» or if the template is empty
      */
-    private boolean evaluateVelocityTemplate(Event event, Object source, DocumentReference userReference,
+    private boolean isValidated(Event event, Object source, DocumentReference userReference,
             String templateContent)
     {
         try {
-            // We don’t need to evaluate the template if it’s empty
+            // When no validation expression is defined, then it's always valid
             if (StringUtils.isBlank(templateContent)) {
                 return true;
             }
 
-            scriptContextManager.getCurrentScriptContext().setAttribute(
-                    EVENT_BINDING_NAME,
-                    event,
-                    ScriptContext.ENGINE_SCOPE);
+            // Execute the template
+            XDOM xdom = evaluateVelocity(event, source, userReference, templateContent);
 
-            scriptContextManager.getCurrentScriptContext().setAttribute(
-                    SOURCE_BINDING_NAME,
-                    source,
-                    ScriptContext.ENGINE_SCOPE
-            );
+            // First check if the "xreturn" attribute has been set
+            Object xreturn = scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
+            if (xreturn != null && xreturn instanceof Boolean) {
+                return (Boolean) xreturn;
+            }
+
+            // Otherwise, for backward-compatibility, render the template to a string, and compare this
+            // string with "true".
+            WikiPrinter printer = new DefaultWikiPrinter();
+            renderer.render(xdom, printer);
+            String render = printer.toString().trim();
+            return "true".equals(render);
+
+        } catch (Exception e) {
+            logger.warn("Unable to render a notification validation template.", e);
+            return false;
+        }
+    }
+
+    private Set<String> getTarget(Event event, Object source, DocumentReference userReference,
+            String templateContent)
+    {
+        try {
+            // No target if the template is empty
+            if (StringUtils.isBlank(templateContent)) {
+                return Collections.emptySet();
+            }
+
+            // Evaluate the template and look for the "xreturn" binding
+            evaluateVelocity(event, source, userReference, templateContent);
+            Object xreturn = scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
+            if (xreturn != null && xreturn instanceof Iterable) {
+                Set<String> target = new HashSet<>();
+                for (Object o : (Iterable) xreturn) {
+                    if (o instanceof String) {
+                        target.add((String) o);
+                    }
+                }
+                return target;
+            }
+
+        } catch (Exception e) {
+            logger.warn("Unable to render the target template.", e);
+        }
+
+        // Fallback to empty set
+        return Collections.emptySet();
+    }
+
+    private XDOM evaluateVelocity(Event event, Object source, DocumentReference userReference,
+            String templateContent) throws Exception
+    {
+        ScriptContext currentScriptContext = scriptContextManager.getCurrentScriptContext();
+        currentScriptContext.setAttribute(EVENT_BINDING_NAME, event, ScriptContext.ENGINE_SCOPE);
+        currentScriptContext.setAttribute(SOURCE_BINDING_NAME, source, ScriptContext.ENGINE_SCOPE);
+        try {
 
             Template customTemplate = templateManager.createStringTemplate(templateContent, userReference);
-            XDOM templateXDOM = templateManager.execute(customTemplate);
+            return templateManager.execute(customTemplate);
 
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(templateXDOM, printer);
-
-            scriptContextManager.getCurrentScriptContext().removeAttribute(
-                    EVENT_BINDING_NAME,
-                    ScriptContext.ENGINE_SCOPE);
-
-            scriptContextManager.getCurrentScriptContext().removeAttribute(
-                    SOURCE_BINDING_NAME,
-                    ScriptContext.ENGINE_SCOPE);
-
-            return printer.toString().trim().equals("true");
-        } catch (Exception e) {
-            logger.warn(String.format(
-                    "Unable to render a notification validation template. Error : %s",
-                    e.getMessage()));
-
-            scriptContextManager.getCurrentScriptContext().removeAttribute(
-                    EVENT_BINDING_NAME,
-                    ScriptContext.ENGINE_SCOPE);
-
-            scriptContextManager.getCurrentScriptContext().removeAttribute(
-                    SOURCE_BINDING_NAME,
-                    ScriptContext.ENGINE_SCOPE);
-
-            return false;
+        } finally {
+            currentScriptContext.removeAttribute(EVENT_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
+            currentScriptContext.removeAttribute(SOURCE_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
         }
     }
 }

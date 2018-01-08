@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="Panels.ApplicationsPanelEntry" locale="">
   <web>Panels</web>
   <name>ApplicationsPanelEntry</name>
   <language/>
@@ -56,6 +56,7 @@
       <validationScript/>
       <content>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>content</name>
         <number>3</number>
         <prettyName>Extension Content</prettyName>
@@ -83,7 +84,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parameters>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>parameters</name>
         <number>4</number>
         <prettyName>Extension Parameters</prettyName>

@@ -66,4 +66,12 @@ public interface UntypedRecordableEventDescriptor extends RecordableEventDescrip
      */
     DocumentReference getAuthorReference();
 
+    /**
+     * @return the velocity template that generate the list of targets
+     * @since 9.11.2
+     * @since 10.0RC1
+     */
+    default String getTargetExpression() {
+        return null;
+    }
 }

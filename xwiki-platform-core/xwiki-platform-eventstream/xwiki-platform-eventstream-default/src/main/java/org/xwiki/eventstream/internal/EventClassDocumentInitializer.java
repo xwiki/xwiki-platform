@@ -75,5 +75,7 @@ public class EventClassDocumentInitializer extends AbstractMandatoryClassInitial
                 false, "", INPUT, STATIC_LIST_FIELD_SEPARATOR);
         xclass.addTextAreaField("validationExpression", "Validation expression",
                 40, 3, TextAreaClass.ContentType.VELOCITY_CODE);
+        xclass.addTextAreaField("target", "Target",
+                40, 3, TextAreaClass.ContentType.VELOCITY_CODE);
     }
 }

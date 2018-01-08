@@ -20,30 +20,34 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.script.ScriptContext;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentCreatingEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ApplicationStoppedEvent;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -62,9 +66,29 @@ public class UntypedEventListenerTest
     public final MockitoComponentMockingRule<UntypedEventListener> mocker =
             new MockitoComponentMockingRule<>(UntypedEventListener.class);
 
-    private ObservationManager observationManager;
+    /**
+     * Inner classed used to verify what is sent to the observation manager
+     */
+    class MyAnswer implements Answer
+    {
+        private DefaultUntypedRecordableEvent sentEvent;
 
-    private DocumentReferenceResolver documentReferenceResolver;
+        @Override
+        public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+        {
+            sentEvent = invocationOnMock.getArgument(0);
+            return null;
+        }
+
+        public DefaultUntypedRecordableEvent getSentEvent()
+        {
+            return sentEvent;
+        }
+    }
+
+    private MyAnswer answer;
+
+    private ObservationManager observationManager;
 
     private ScriptContextManager scriptContextManager;
 
@@ -72,145 +96,191 @@ public class UntypedEventListenerTest
 
     private ModelBridge modelBridge;
 
-    private DocumentUpdatingEvent registeredEvent1;
-    private DocumentUpdatedEvent registeredEvent2;
-    private DocumentDeletedEvent registeredEvent3;
-    private DocumentCreatingEvent registeredEvent4;
-    private DocumentCreatedEvent registeredEvent5;
+    private TemplateManager templateManager;
 
-    private LocalDocumentReference tagClassLocalReference;
-    private LocalDocumentReference randomClassLocalReference;
+    private Template template;
+
+    private XDOM xdom;
+
+    private ScriptContext scriptContext;
+
+    private BlockRenderer renderer;
 
     @Before
     public void setUp() throws Exception
     {
-        observationManager = mocker.registerMockComponent(ObservationManager.class);
         componentManager = mocker.registerMockComponent(ComponentManager.class, "wiki");
         modelBridge = mocker.registerMockComponent(ModelBridge.class);
+        renderer = mocker.getInstance(BlockRenderer.class, "html/5.0");
 
         scriptContextManager = mocker.registerMockComponent(ScriptContextManager.class);
-        when(scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
+        scriptContext = mock(ScriptContext.class);
+        when(scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContext);
 
-        documentReferenceResolver = mocker.registerMockComponent(DocumentReferenceResolver.class);
-
-        // registeredEvent{1, 2, 3, 4, 5, 6} are events that will pass the «Event Triggers» tests
-        registeredEvent1 = mock(DocumentUpdatingEvent.class);
-        registeredEvent2 = mock(DocumentUpdatedEvent.class);
-        registeredEvent3 = mock(DocumentDeletedEvent.class);
-        registeredEvent4 = mock(DocumentCreatingEvent.class);
-        registeredEvent5 = mock(DocumentCreatedEvent.class);
-
-        tagClassLocalReference = mock(LocalDocumentReference.class);
-        randomClassLocalReference = mock(LocalDocumentReference.class);
+        templateManager = mocker.getInstance(TemplateManager.class);
+        template = mock(Template.class);
+        xdom = mock(XDOM.class);
+        when(templateManager.createStringTemplate(anyString(), any())).thenReturn(template);
+        when(templateManager.execute(template)).thenReturn(xdom);
     }
 
-    /**
-     * Mocks the component manager in order to add default comportments.
-     *
-     * @throws Exception
-     */
-    private void mockUntypedRecordableEventDescriptorManager() throws Exception
+    @Before
+    public void watchObservationManager() throws Exception
     {
-        UntypedRecordableEventDescriptor descriptor1 = mock(UntypedRecordableEventDescriptor.class);
-        when(descriptor1.getEventTriggers()).thenReturn(Arrays.asList(
-                registeredEvent1.getClass().getCanonicalName(),
-                DocumentUpdatedEvent.class.getCanonicalName()
-        ));
+        observationManager = mocker.registerMockComponent(ObservationManager.class);
+        answer = new MyAnswer();
+        doAnswer(answer).when(observationManager).notify(any(DefaultUntypedRecordableEvent.class), anyString(), any());
+    }
 
-        UntypedRecordableEventDescriptor descriptor2 = mock(UntypedRecordableEventDescriptor.class);
-        when(descriptor2.getEventTriggers()).thenReturn(Arrays.asList(
-                registeredEvent2.getClass().getCanonicalName(),
-                ApplicationStoppedEvent.class.getCanonicalName()
-        ));
+    private UntypedRecordableEventDescriptor mockDescriptor() throws Exception
+    {
+        UntypedRecordableEventDescriptor descriptor = mock(UntypedRecordableEventDescriptor.class);
+        when(descriptor.getEventTriggers()).thenReturn(Arrays.asList(DocumentUpdatedEvent.class.getCanonicalName()));
+        when(descriptor.getEventType()).thenReturn("myCustomEvent");
+        when(modelBridge.checkXObjectPresence(any(), any())).thenReturn(true);
+        when(componentManager.getInstanceList(any())).thenReturn(Arrays.asList(descriptor));
 
-        UntypedRecordableEventDescriptor descriptor3 = mock(UntypedRecordableEventDescriptor.class);
-        when(descriptor3.getEventTriggers()).thenReturn(Arrays.asList(
-                registeredEvent3.getClass().getCanonicalName()
-        ));
+        return descriptor;
+    }
 
-        UntypedRecordableEventDescriptor descriptor4 = mock(UntypedRecordableEventDescriptor.class);
-        when(descriptor4.getEventTriggers()).thenReturn(Arrays.asList(
-                registeredEvent4.getClass().getCanonicalName(),
-                DocumentUpdatedEvent.class.getCanonicalName()
-        ));
+    @Test
+    public void onEventWithBlankValidationAndBlankTarget() throws Exception
+    {
+        // Mocks
+        mockDescriptor();
 
-        UntypedRecordableEventDescriptor descriptor5 = mock(UntypedRecordableEventDescriptor.class);
-        when(descriptor5.getEventTriggers()).thenReturn(Arrays.asList(
-                registeredEvent5.getClass().getCanonicalName()
-        ));
+        // Test
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
 
-        when(descriptor1.getValidationExpression()).thenReturn(" ");
-        when(descriptor1.getObjectTypes()).thenReturn(Collections.EMPTY_LIST);
+        // Verify
+        verify(this.observationManager, times(1)).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
 
-        when(descriptor2.getValidationExpression()).thenReturn(
-                "{{velocity}} #if(1==1) true #else false #end {{/velocity}}");
-        when(descriptor2.getObjectTypes()).thenReturn(Arrays.asList("XWiki.TagClass"));
-
-        when(descriptor3.getValidationExpression()).thenReturn(
-                "{{velocity}} #if(1!=1) true #else false #end {{/velocity}}");
-        when(descriptor3.getObjectTypes()).thenReturn(Collections.EMPTY_LIST);
-
-        when(descriptor4.getValidationExpression()).thenReturn("  ");
-        when(descriptor4.getObjectTypes()).thenReturn(Arrays.asList("XWiki.TagClass"));
-
-        when(descriptor5.getValidationExpression()).thenReturn(
-                "{{velocity}}\n#if(2==2) true #else false #end\n{{/velocity}}");
-        when(descriptor5.getObjectTypes()).thenReturn(Collections.EMPTY_LIST);
-
-        when(this.componentManager.getInstanceList(any())).thenReturn(Arrays.asList(
-                descriptor1,
-                descriptor2,
-                descriptor3,
-                descriptor4,
-                descriptor5
-        ));
-
-        DocumentReference tagClassReference = mock(DocumentReference.class);
-        when(tagClassReference.getLocalDocumentReference()).thenReturn(this.tagClassLocalReference);
-        when(this.documentReferenceResolver.resolve("XWiki.TagClass")).thenReturn(tagClassReference);
-
-        DocumentReference randomClassReference = mock(DocumentReference.class);
-        when(randomClassReference.getLocalDocumentReference()).thenReturn(this.randomClassLocalReference);
-        when(this.documentReferenceResolver.resolve("XWiki.AnotherRandomClass"))
-                .thenReturn(randomClassReference);
+        assertNotNull(answer.getSentEvent());
+        assertTrue(answer.getSentEvent().getTarget().isEmpty());
+        assertEquals("myCustomEvent", answer.getSentEvent().getEventType());
     }
 
     @Test
     public void onEventWithWrongEvent() throws Exception
     {
-        Object source = mock(Object.class);
-        ApplicationReadyEvent event = mock(ApplicationReadyEvent.class);
+        // Mocks
+        mockDescriptor();
 
-        mockUntypedRecordableEventDescriptorManager();
+        // Test
+        mocker.getComponentUnderTest().onEvent(new ApplicationReadyEvent(), mock(Object.class), null);
 
-        mocker.getComponentUnderTest().onEvent(event, source, null);
-
+        // Verify
         verify(this.observationManager, never()).notify(any(), any(), any());
+        assertNull(answer.getSentEvent());
     }
 
     @Test
-    public void onEventWithCorrectEventAndDefinedXObjectAndBlankValidation() throws Exception
+    public void onEventWithoutXObject() throws Exception
     {
+        // Mocks
+        mockDescriptor();
+
+        // Same than onEventWithBlankValidationAndBlankTarget() but with no XObject
+        when(modelBridge.checkXObjectPresence(any(), any())).thenReturn(false);
+
+        // Test
         Object source = mock(Object.class);
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), source, null);
 
-        when(this.modelBridge.checkXObjectPresence(any(), any())).thenReturn(true);
-
-        mockUntypedRecordableEventDescriptorManager();
-
-        mocker.getComponentUnderTest().onEvent(registeredEvent4, source, null);
-
-        verify(this.observationManager, times(1)).notify(any(), any(), any());
+        // Verify
+        verify(this.observationManager, never()).notify(any(), any(), any());
+        assertNull(answer.getSentEvent());
     }
 
     @Test
-    public void onEventWithCorrectEventAndBlankXObjectAndIncorrectValidation() throws Exception
+    public void onEventWithCorrectValidation() throws Exception
     {
+        // Mocks
+        UntypedRecordableEventDescriptor descriptor = mockDescriptor();
+        when(descriptor.getValidationExpression()).thenReturn("someVelocityCode");
+        when(scriptContext.getAttribute("xreturn")).thenReturn(true);
+
+        // Test
         Object source = mock(Object.class);
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), source, null);
 
-        mockUntypedRecordableEventDescriptorManager();
+        // Verify
+        verify(this.observationManager, times(1)).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
+        assertNotNull(answer.getSentEvent());
+        assertEquals("myCustomEvent", answer.getSentEvent().getEventType());
+    }
 
-        mocker.getComponentUnderTest().onEvent(registeredEvent3, source, null);
+    @Test
+    public void onEventWithIncorrectValidation() throws Exception
+    {
+        // Mocks
+        UntypedRecordableEventDescriptor descriptor = mockDescriptor();
+        when(descriptor.getValidationExpression()).thenReturn("someVelocityCode");
+        when(scriptContext.getAttribute("xreturn")).thenReturn(false);
 
+        // Test
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
+
+        // Verify
         verify(this.observationManager, never()).notify(any(), any(), any());
+        assertNull(answer.getSentEvent());
+    }
+
+    @Test
+    public void onEventWithCorrectValidation2() throws Exception
+    {
+        // Mocks
+        UntypedRecordableEventDescriptor descriptor = mockDescriptor();
+        when(descriptor.getValidationExpression()).thenReturn("someVelocityCode");
+        doAnswer(invocationOnMock -> {
+            WikiPrinter wikiPrinter = invocationOnMock.getArgument(1);
+            wikiPrinter.println("    true ");
+            return null;
+        }).when(renderer).render(any(XDOM.class), any(WikiPrinter.class));
+
+        // Test
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
+
+        // Verify
+        verify(this.observationManager, times(1)).notify(any(DefaultUntypedRecordableEvent.class), any(), any());
+        assertNotNull(answer.getSentEvent());
+        assertEquals("myCustomEvent", answer.getSentEvent().getEventType());
+    }
+
+    @Test
+    public void onEventWithIncorrectValidation2() throws Exception
+    {
+        // Mocks
+        UntypedRecordableEventDescriptor descriptor = mockDescriptor();
+        when(descriptor.getValidationExpression()).thenReturn("someVelocityCode");
+
+        // Test
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
+
+        // Verify
+        verify(this.observationManager, never()).notify(any(), any(), any());
+        assertNull(answer.getSentEvent());
+    }
+
+    @Test
+    public void onEventWithTarget() throws Exception
+    {
+        // Mocks
+        UntypedRecordableEventDescriptor descriptor = mockDescriptor();
+        when(descriptor.getTargetExpression()).thenReturn("someVelocityCode");
+        // Target velocity
+        when(scriptContext.getAttribute("xreturn")).thenReturn(Arrays.asList("UserA", "UserB"));
+
+        // Test
+        mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), mock(Object.class), null);
+
+        // Verify
+        verify(this.observationManager, times(1)).notify(
+                any(DefaultUntypedRecordableEvent.class), any(), any());
+        assertNotNull(answer.getSentEvent());
+        assertNotNull(answer.getSentEvent().getTarget());
+        assertTrue(answer.getSentEvent().getTarget().contains("UserA"));
+        assertTrue(answer.getSentEvent().getTarget().contains("UserB"));
+        assertEquals(2, answer.getSentEvent().getTarget().size());
     }
 }

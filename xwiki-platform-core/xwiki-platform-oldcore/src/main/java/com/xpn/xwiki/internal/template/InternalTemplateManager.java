@@ -538,7 +538,7 @@ public class InternalTemplateManager
 
         try {
             xdom = getXDOM(template);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             this.logger.error("Error while getting template [{}] XDOM", template.getId(), e);
 
             xdom = generateError(e);
@@ -722,7 +722,7 @@ public class InternalTemplateManager
 
         try {
             xdom = execute(template);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             this.logger.error("Error while executing template [{}]", template.getId(), e);
 
             xdom = generateError(e);

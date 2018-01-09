@@ -56,7 +56,7 @@ import org.xwiki.security.authorization.cache.SecurityShadowEntry;
  * Default implementation of the security cache.
  *
  * @version $Id$
- * @since 4.0M2 
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -94,7 +94,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
     /** The new entry being added */
     private SecurityCacheEntry newEntry;
-   
+
     /**
      * @return a new configured security cache
      * @throws InitializationException if a CacheException arise during creation
@@ -313,7 +313,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          */
         boolean updateParentGroups(Collection<GroupSecurityReference> groups)
             throws ParentEntryEvictedException
-        {            
+        {
             if (isUser() || !(entry instanceof SecurityRuleEntry)) {
                 return false;
             }
@@ -415,7 +415,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         } else {
                             try {
                                 DefaultSecurityCache.this.cache.remove(child.getKey());
-                            } catch (Throwable e) {
+                            } catch (Exception e) {
                                 logger.error("Security cache failure during eviction of entry [{}]", child.getKey(), e);
                             }
                         }
@@ -550,7 +550,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * @param userReference the user reference requested.
      * @param reference the reference requested.
-     * @return a security cache entry corresponding to the given user and reference, null if none is available 
+     * @return a security cache entry corresponding to the given user and reference, null if none is available
      *         in the cache.
      */
     private SecurityCacheEntry getEntry(UserSecurityReference userReference, SecurityReference reference)
@@ -609,7 +609,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 // Upgrade it to a user/group entry
                 oldEntry.entry = entry;
             }
-            
+
             return true;
         }
         // The slot is available
@@ -862,9 +862,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     public Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki)
     {
         Collection<GroupSecurityReference> groups = new HashSet<>();
-        
+
         SecurityCacheEntry userEntry = (entityWiki != null) ? getShadowEntry(user, entityWiki) : getEntry(user);
-        
+
         // If the user is not in the cache, or if it is, but not as a user, but as a regular document
         if (userEntry == null || !userEntry.isUser()) {
             // In that case, the ancestors are not fully loaded
@@ -874,7 +874,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         // We are going to get the parents of the security cache entry recursively, that is why we use a stack
         // (instead of using the execution stack which would be more costly).
         Deque<SecurityCacheEntry> entriesToExplore = new ArrayDeque<>();
-        
+
         // Special case if the user is a shadow.
         if (entityWiki != null) {
             // We start with the parents of the original entry, and the parent of this shadow (excluding the original)
@@ -883,14 +883,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             // We start with the current user
             entriesToExplore.add(userEntry);
         }
-        
+
         // Let's go
         while (!entriesToExplore.isEmpty()) {
             SecurityCacheEntry entry = entriesToExplore.pop();
-            
+
             // We add the parents of the current entry
             addParentsToTheListOfEntriesToExplore(entry.parents, groups, entriesToExplore);
-            
+
             // If the entry has a shadow (in the concerned subwiki), we also add the parents of the shadow
             if (entityWiki != null) {
                 GroupSecurityReference entryRef = (GroupSecurityReference) entry.getEntry().getReference();
@@ -902,10 +902,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 }
             }
         }
-        
+
         return groups;
     }
-    
+
     private void addParentsWhenEntryIsShadow(SecurityCacheEntry shadow, UserSecurityReference user,
             Collection<GroupSecurityReference> groups,
             Deque<SecurityCacheEntry> entriesToExplore)
@@ -947,14 +947,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         if (parents == null) {
             return;
         }
-        
-        for (SecurityCacheEntry parent : parents) {            
+
+        for (SecurityCacheEntry parent : parents) {
             // skip this parent if the entry is a shadow and the parent is the original entry
             // (ie: don't explore the original entry)
             if (originalEntry != null && parent == originalEntry) {
                 continue;
             }
-            
+
             // Add the parent group (if we have not already seen it)
             SecurityReference parentRef = parent.getEntry().getReference();
             if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference) parentRef)) {
@@ -963,5 +963,5 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         }
     }
 
-    
+
 }

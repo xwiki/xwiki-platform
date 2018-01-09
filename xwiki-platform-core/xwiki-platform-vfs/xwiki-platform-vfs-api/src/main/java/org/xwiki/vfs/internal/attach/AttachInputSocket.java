@@ -68,10 +68,10 @@ public class AttachInputSocket extends AbstractInputSocket<AttachNode>
         final IoBuffer buffer = entry.getPool().allocate();
         try {
             IoSockets.copy(entry.input(), buffer.output());
-        } catch (final Throwable ex) {
+        } catch (final Exception ex) {
             try {
                 buffer.release();
-            } catch (final Throwable ex2) {
+            } catch (final Exception ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;

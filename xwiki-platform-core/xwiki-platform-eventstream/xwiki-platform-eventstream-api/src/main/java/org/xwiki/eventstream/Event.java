@@ -340,6 +340,7 @@ public interface Event
 
     /**
      * @param target a list of entities (users, groups) that are interested by this event
+     * @since 9.2RC1
      */
     default void setTarget(Set<String> target) {
         LoggerFactory.getLogger(Event.class)
@@ -348,6 +349,7 @@ public interface Event
 
     /**
      * @return a list of entities (users, groups) that are interested by this event
+     * @since 9.2RC1
      */
     default Set<String> getTarget() {
         return Collections.emptySet();

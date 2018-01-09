@@ -34,6 +34,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -81,6 +82,9 @@ public class DefaultNotificationManager implements NotificationManager
     @Inject
     private NotificationFilterManager notificationFilterManager;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     /**
      * For internal use, avoid to give more than 7 parameters to methods.
      */
@@ -93,6 +97,7 @@ public class DefaultNotificationManager implements NotificationManager
         public Date endDate;
         public Date fromDate;
         public List<String> blackList;
+        private String userId;
 
         Parameters(DocumentReference userReference, NotificationFormat format, boolean onlyUnread,
                 int expectedCount,
@@ -105,6 +110,7 @@ public class DefaultNotificationManager implements NotificationManager
             this.endDate = endDate;
             this.fromDate = fromDate;
             this.blackList = blackList;
+            this.userId = entityReferenceSerializer.serialize(userReference);
         }
     }
 
@@ -223,7 +229,7 @@ public class DefaultNotificationManager implements NotificationManager
                     continue;
                 }
 
-                if (filterEvent(event, parameters.userReference, parameters.format)) {
+                if (filterEvent(event, parameters)) {
                     continue;
                 }
 
@@ -247,11 +253,15 @@ public class DefaultNotificationManager implements NotificationManager
         }
     }
 
-    private boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
-            throws NotificationException
+    private boolean filterEvent(Event event, Parameters parameters) throws NotificationException
     {
-        for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
-            if (filter.filterEvent(event, user, format)) {
+        // Don't record events that have a target that don't include the current user
+        if (!event.getTarget().isEmpty() && !event.getTarget().contains(parameters.userId)) {
+            return true;
+        }
+
+        for (NotificationFilter filter : notificationFilterManager.getAllFilters(parameters.userReference)) {
+            if (filter.filterEvent(event, parameters.userReference, parameters.format)) {
                 return true;
             }
         }

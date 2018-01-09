@@ -106,7 +106,7 @@
           <span class="sr-only">$services.localization.render('core.menu.toggleDropdown')</span>
         </button>
       #end
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu #if ("$!actionUrl" == '')dropdown-menu-right#end"">
         $menuContent
       </ul>
     #end

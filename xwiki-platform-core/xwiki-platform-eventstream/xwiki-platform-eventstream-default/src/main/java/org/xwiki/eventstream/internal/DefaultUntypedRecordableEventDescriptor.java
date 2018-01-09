@@ -57,6 +57,11 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     private static final String UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION = "validationExpression";
 
     /**
+     * The event descriptor target expression field name in the XObject.
+     */
+    private static final String UNTYPED_EVENT_DESCRIPTOR_TARGET = "target";
+
+    /**
      * The event descriptor triggers field name in the XObject.
      */
     private static final String UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS = "listenTo";
@@ -89,6 +94,8 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     private String eventType;
 
     private String validationExpression;
+
+    private String target;
 
     private List<String> objectTypes;
 
@@ -141,6 +148,7 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
             this.eventType = untypedEventObject.getStringValue(UNTYPED_EVENT_EVENT_TYPE);
             this.validationExpression =
                     untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_VALIDATION_EXPRESSION);
+            this.target = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_TARGET);
             this.objectTypes = untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_OBJECT_TYPE);
             this.eventDescription = untypedEventObject.getStringValue(UNTYPED_EVENT_DESCRIPTOR_DESCRIPTION);
             this.eventTriggers = untypedEventObject.getListValue(UNTYPED_EVENT_DESCRIPTOR_EVENT_TRIGGERS);
@@ -249,5 +257,10 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     public String getEventTypeIcon()
     {
         return this.eventTypeIcon;
+    }
+
+    @Override
+    public String getTargetExpression() {
+        return this.target;
     }
 }

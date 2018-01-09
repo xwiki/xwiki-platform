@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -629,6 +630,21 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getXClassReference());
+
+        for (Map.Entry<String, Object> e : getFields().entrySet()) {
+            builder.append(e.getValue());
+        }
+
+        return builder.toHashCode();
+    }
+
+    @Override
     public BaseCollection clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
@@ -785,7 +801,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * Return a XML version of this collection.
      * <p>
      * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
-     * 
+     *
      * @return the XML as a String
      */
     public String toXMLString()

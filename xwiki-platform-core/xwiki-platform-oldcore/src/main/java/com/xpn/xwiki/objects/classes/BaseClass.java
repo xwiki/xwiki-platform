@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dom4j.Element;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -106,7 +107,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks.
-     * 
+     *
      * @since 7.2M3
      */
     private DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
@@ -501,6 +502,24 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(getCustomClass());
+        builder.append(customMapping);
+        builder.append(getCustomMapping());
+        builder.append(getDefaultViewSheet());
+        builder.append(getDefaultEditSheet());
+        builder.append(getDefaultWeb());
+        builder.append(getValidationScript());
+        builder.append(getNameField());
+
+        return builder.toHashCode();
     }
 
     public void merge(BaseClass bclass)

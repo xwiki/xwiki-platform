@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -607,7 +608,7 @@ public class Document extends Api
      * Gets the real locale of the document. The real locale is either the default locale field when the locale field is
      * empty (when the document is the default document) or the locale field otherwise when the document is a
      * translation document
-     * 
+     *
      * @return the actual locale of the document
      * @since 8.0M1
      */
@@ -618,7 +619,7 @@ public class Document extends Api
 
     /**
      * Same as {@link #getDefaultLocale()} but as String.
-     * 
+     *
      * @return the locale of the default document
      * @deprecated since 8.0M1, use {@link #getDefaultLocale()} instead
      */
@@ -717,7 +718,7 @@ public class Document extends Api
      * Execute and render the document in the current context.
      * <p>
      * The code is executed with right of this document content author.
-     * 
+     *
      * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
      * @return the result
      * @throws XWikiException when failing to display the document
@@ -2162,9 +2163,20 @@ public class Document extends Api
         return d.getXWikiContext().equals(getXWikiContext()) && this.doc.equals(d.doc);
     }
 
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(doc);
+
+        return builder.toHashCode();
+    }
+
     /**
      * Check if the passed one is the one wrapped by this {@link Document}.
-     * 
+     *
      * @param document the document to compare
      * @return true if passed document is the wrapped one
      * @since 8.3M1

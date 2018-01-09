@@ -22,6 +22,7 @@ package com.xpn.xwiki.user.api;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -127,5 +128,17 @@ public class XWikiUser
         }
 
         return equals;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.appendSuper(super.hashCode());
+        builder.append(main);
+        builder.append(user);
+
+        return builder.toHashCode();
     }
 }

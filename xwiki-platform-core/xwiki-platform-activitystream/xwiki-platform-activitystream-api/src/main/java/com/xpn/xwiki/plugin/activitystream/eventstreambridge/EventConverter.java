@@ -165,6 +165,7 @@ public class EventConverter
         result.setDocumentVersion(e.getVersion());
 
         result.setParameters(e.getParameters());
+        result.setTarget(e.getTarget());
         return result;
     }
 

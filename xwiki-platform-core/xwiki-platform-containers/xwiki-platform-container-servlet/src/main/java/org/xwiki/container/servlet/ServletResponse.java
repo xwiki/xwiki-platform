@@ -24,9 +24,16 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.xwiki.container.RedirectResponse;
 import org.xwiki.container.Response;
 
-public class ServletResponse implements Response
+/**
+ * This is the implementation of {@link Response} for {@link HttpServletResponse}.
+ *
+ * @since ???
+ * @version $Id$
+ */
+public class ServletResponse implements Response, RedirectResponse
 {
     private HttpServletResponse httpServletResponse;
 
@@ -60,5 +67,14 @@ public class ServletResponse implements Response
     public void setContentType(String mimeType)
     {
         this.httpServletResponse.setContentType(mimeType);
+    }
+
+    /**
+     * @since 10.0RC1
+     */
+    @Override
+    public void sendRedirect(String location) throws IOException
+    {
+        this.httpServletResponse.sendRedirect(location);
     }
 }

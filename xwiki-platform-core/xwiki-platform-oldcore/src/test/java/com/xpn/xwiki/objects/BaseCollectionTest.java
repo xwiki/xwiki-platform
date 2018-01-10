@@ -19,33 +19,58 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import org.junit.Assert;
 
 import org.dom4j.Element;
 import org.junit.Test;
 
+import com.xwiki.model.EntityType;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit tests for the {@link BaseCollection} class.
- * 
+ *
  * @version $Id$
  */
 public class BaseCollectionTest extends AbstractBridgedComponentTestCase
 {
+
+    private static class BaseCollectionTestSubclass
+    {
+        @Override
+        public Element toXML(BaseClass bclass)
+        {
+            return null;
+        }
+    }
+
     @Test
     public void testGetXClassWithNullReference() throws Exception
     {
-        BaseCollection collection = new BaseCollection()
-        {
-            @Override
-            public Element toXML(BaseClass bclass)
-            {
-                return null;
-            }
-        };
+        BaseCollection collection = new BaseCollectionTestSubclass();
 
         Assert.assertNull(collection.getXClass(getContext()));
+    }
+
+    @Test
+    public void testHashCode()
+    {
+        EntityReference reference = new EntityReference("test", EntityType.WIKI);
+        Map map = new HashMap();
+
+        BaseCollection collection1 = new BaseCollectionTestSubclass();
+        BaseCollection collection2 = new BaseCollectionTestSubclass();
+
+        collection1.setXClassReference(reference);
+        collcetion2.setXClassReference(reference);
+
+        collection1.setFields(map);
+        collection2.setFields(map);
+
+        Assert.assertEquals(collection1.hashCode(), collection2.hashCode());
     }
 }

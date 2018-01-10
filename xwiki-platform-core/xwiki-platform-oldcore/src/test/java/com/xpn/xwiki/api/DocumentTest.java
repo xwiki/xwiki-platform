@@ -253,4 +253,16 @@ public class DocumentTest
             document.getContentAuthorReference());
         assertEquals(new DocumentReference("wiki1", "XWiki", "initialcreator"), document.getCreatorReference());
     }
+
+    @Test
+    public void testHashCode()
+    {
+        XWikiDocument doc = new XWikiDcoument(new DocumentReference("test", "test", "test"));
+        XWikiContext context = new XWikiContext();
+
+        Document d1 = new Document(doc, context);
+        Document d2 = new Document(doc, context);
+
+        Assert.assertEquals(d1.hashCode(), d2.hashCode());
+    }
 }

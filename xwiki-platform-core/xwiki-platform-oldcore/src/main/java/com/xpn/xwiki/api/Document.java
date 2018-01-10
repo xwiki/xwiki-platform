@@ -2169,7 +2169,8 @@ public class Document extends Api
         HashCodeBuilder builder = new HashCodeBuilder();
 
         builder.appendSuper(super.hashCode());
-        builder.append(doc);
+        builder.append(getDoc());
+        builder.append(getXWikiContext());
 
         return builder.toHashCode();
     }

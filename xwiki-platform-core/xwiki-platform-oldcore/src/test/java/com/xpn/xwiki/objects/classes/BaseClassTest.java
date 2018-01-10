@@ -130,4 +130,37 @@ public class BaseClassTest
 
         assertTrue(baseClass.addTextAreaField("field", "pretty name", 55, 33));
     }
+
+    @Test
+    public void testHashCode()
+    {
+        String customClass = "test";
+        String customMapping = "test";
+        String defaultViewSheet = "test";
+        String defaultEditSheet = "test";
+        String defaultWeb = "test";
+        String validationScript = "test";
+        String nameField = "test";
+
+        BaseClass c1 = new BaseClass();
+        BaseClass c2 = new BaseClass();
+
+        c1.setCustomClass(customClass);
+        c1.setCustomMapping(customMapping);
+        c1.setDefaultViewSheet(defaultViewSheet);
+        c1.setDefaultEditSheet(defaultEditSheet);
+        c1.setDefaultWeb(defaultWeb);
+        c1.setValidationScript(validationScript);
+        c1.setNameField(nameField);
+
+        c2.setCustomClass(customClass);
+        c2.setCustomMapping(customMapping);
+        c2.setDefaultViewSheet(defaultViewSheet);
+        c2.setDefaultEditSheet(defaultEditSheet);
+        c2.setDefaultWeb(defaultWeb);
+        c2.setValidationScript(validationScript);
+        c2.setNameField(nameField);
+
+        Assert.assertEquals(c1.hashCode(), c2.hashCode());
+    }
 }

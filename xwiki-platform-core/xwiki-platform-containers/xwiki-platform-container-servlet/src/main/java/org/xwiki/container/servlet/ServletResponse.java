@@ -31,6 +31,7 @@ import org.xwiki.container.Response;
  * This is the implementation of {@link Response} for {@link HttpServletResponse}.
  *
  * @since ???
+ * @since 10.0RC1
  * @version $Id$
  */
 public class ServletResponse implements Response, RedirectResponse
@@ -69,9 +70,6 @@ public class ServletResponse implements Response, RedirectResponse
         this.httpServletResponse.setContentType(mimeType);
     }
 
-    /**
-     * @since 10.0RC1
-     */
     @Override
     public void sendRedirect(String location) throws IOException
     {

@@ -30,8 +30,6 @@ import org.xwiki.container.Response;
 /**
  * This is the implementation of {@link Response} for {@link HttpServletResponse}.
  *
- * @since ???
- * @since 10.0RC1
  * @version $Id$
  */
 public class ServletResponse implements Response, RedirectResponse

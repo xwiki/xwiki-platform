@@ -1,5 +1,2 @@
 org.xwiki.resource.internal.MainResourceReferenceHandlerManager
 org.xwiki.resource.internal.DefaultResourceReferenceManager
-org.xwiki.resource.internal.entity.EntityResourceReferenceHandler
-org.xwiki.resource.internal.entity.EntityResourceReferenceHandlerManager
-org.xwiki.resource.internal.entity.DefaultEntityResourceActionLister

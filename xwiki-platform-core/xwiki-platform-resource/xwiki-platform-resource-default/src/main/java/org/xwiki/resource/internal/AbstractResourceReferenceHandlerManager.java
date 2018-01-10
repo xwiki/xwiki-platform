@@ -54,13 +54,13 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
      */
     @Inject
     @Named("context")
-    private ComponentManager contextComponentManager;
+    protected ComponentManager contextComponentManager;
 
     @Inject
-    private ObservationManager observation;
+    protected ObservationManager observation;
 
     @Inject
-    private Logger logger;
+    protected Logger logger;
 
     protected abstract boolean matches(ResourceReferenceHandler handler, T resourceReferenceQualifier);
 
@@ -100,7 +100,7 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
         return result;
     }
 
-    private Set<ResourceReferenceHandler> getMatchingHandlers(T resourceReferenceQualifier)
+    protected Set<ResourceReferenceHandler> getMatchingHandlers(T resourceReferenceQualifier)
         throws ResourceReferenceHandlerException
     {
         // Look for a Handler supporting the Resource Type located in the passed Resource Reference object.
@@ -115,7 +115,7 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
         return orderedHandlers;
     }
 
-    private List<ResourceReferenceHandler> getHandlers(Class typeClass) throws ResourceReferenceHandlerException
+    protected List<ResourceReferenceHandler> getHandlers(Class typeClass) throws ResourceReferenceHandlerException
     {
         try {
             return this.contextComponentManager

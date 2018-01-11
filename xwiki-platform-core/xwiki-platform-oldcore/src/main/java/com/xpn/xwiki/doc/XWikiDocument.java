@@ -494,7 +494,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     // TODO: use a Map instead of a List to store attachment in XWikiDocument
     private final List<XWikiAttachment> attachmentList =
-        new AbstractNotifyOnUpdateList<XWikiAttachment>(new ArrayList<XWikiAttachment>())
+        new AbstractNotifyOnUpdateList<XWikiAttachment>(new DecoratedList())
         {
             @Override
             public void onUpdate()
@@ -4846,17 +4846,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
     {
         List<XWikiAttachment> list = getAttachmentList();
-        for (int i = 0; i < list.size(); i++) {
-            XWikiAttachment attachment = list.get(i);
-            if (attachmentToRemove.getFilename().equals(attachment.getFilename())) {
-                list.remove(i);
-                this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachment, toRecycleBin));
-                setMetaDataDirty(true);
-                return attachment;
-            }
-        }
-
-        return null;
+        XWikiAttachment attachment = ((DecoratedList) (list)).remove(attachmentToRemove);
+        this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachment, toRecycleBin));
+        setMetaDataDirty(true);
+        return attachment;
     }
 
     /**
@@ -5403,10 +5396,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment getAttachment(String filename)
     {
-        for (XWikiAttachment attach : getAttachmentList()) {
-            if (attach.getFilename().equals(filename)) {
-                return attach;
-            }
+        XWikiAttachment output = ((DecoratedList)(getAttachmentList())).getByFilename(filename);
+        if(output!=null) {
+            return output;
         }
 
         for (XWikiAttachment attach : getAttachmentList()) {
@@ -5442,22 +5434,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         attachment.setDoc(this);
 
-        // Replace any attachment with the same name
-        // TODO: use a Map instead of a List to store attachment in XWikiDocument
-        for (ListIterator<XWikiAttachment> it = getAttachmentList().listIterator(); it.hasNext();) {
-            XWikiAttachment currentAttachment = it.next();
-
-            if (StringUtils.equals(currentAttachment.getFilename(), attachment.getFilename())) {
-                it.remove();
-                it.add(attachment);
-
-                return currentAttachment;
-            }
-        }
-
-        getAttachmentList().add(attachment);
-
-        return null;
+        DecoratedList list = (DecoratedList) getAttachmentList();
+        XWikiAttachment currentAttachment = list.getByFilename(attachment.getFilename());
+        list.set(attachment);
+        return currentAttachment;
     }
 
     /**

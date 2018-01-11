@@ -40,6 +40,10 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#set ($supportedLocales = $xwiki.getXWikiPreference('languages').split('\s*[|, ]\s*'))
+{{/velocity}}    
+    
+{{velocity output="false"}}
 #set ($__defaultSolrConfig = {
   'queryFields': {
     'DOCUMENT': 'title^10.0 name^10.0
@@ -51,14 +55,60 @@
     'OBJECT': 'objcontent',
     'OBJECT_PROPERTY': 'propertyvalue'
   },
-  'phraseFields': 'title_en^200.0 title__^200.0
-                   filename^45.0 
-                   doccontent_en^40.0 doccontent__^40.0
-                   attcontent_en^35.0 attcontent__^35.0 
-                   comment^25.0
-                   author_display^20.0 creator_display^20.0  attauthor_display^20.0'
-  ,
-  'phraseFieldSlop': '10',
+  'phraseFields': {
+    'DOCUMENT': "#expandField('title' '^400.0')
+                 #expandField('doccontent' '^80.0')
+                 filename^90.0 #expandField('attcontent' '^70.0')
+                 comment^50.0
+                 author_display^40.0 creator_display^40.0 attauthor_display^20.0",
+    'ATTACHMENT': "filename^90.0 #expandField('attcontent' '^70.0') attauthor_display^40.0",
+    'OBJECT': 'objcontent^10.0',
+    'OBJECT_PROPERTY': 'propertyvalue^10.0',
+    ''        : "#expandField('title' '^400.0')
+                 #expandField('doccontent' '^80.0')
+                 filename^90.0 #expandField('attcontent' '^70.0')
+                 author_display^40.0 creator_display^40.0
+                 comment^50.0 attauthor_display^20.0
+                 objcontent^10.0 propertyvalue^10.0"
+  },
+  'bigramPhraseFields': {
+    'DOCUMENT': "#expandField('title' '^200.0')
+                 #expandField('doccontent' '^40.0')
+                 filename^45.0 #expandField('attcontent' '^35.0')
+                 comment^25.0 
+                 author_display^20.0 creator_display^20.0 attauthor_display^10.0",
+    'ATTACHMENT': "filename^45.0 #expandField('attcontent' '^35.0') attauthor_display^20.0",
+    'OBJECT': 'objcontent^5.0',
+    'OBJECT_PROPERTY': 'propertyvalue^5.0',
+    ''        : "#expandField('title' '^200.0')
+                 #expandField('doccontent' '^40.0')
+                 filename^45.0 #expandField('attcontent' '^35.0')
+                 author_display^20.0 creator_display^20.0
+                 comment^25.0 attauthor_display^10.0
+                 objcontent^5.0 propertyvalue^5.0"
+  },
+  'trigramPhraseFields': {
+    'DOCUMENT': "#expandField('title' '^300.0')
+                 #expandField('doccontent' '^60.0')
+                 filename^67.5 #expandField('attcontent' '^52.5')
+                 comment^37.5 
+                 author_display^30.0 creator_display^30.0 attauthor_display^15.0",
+    'ATTACHMENT': "filename^67.5 #expandField('attcontent' '^52.5') attauthor_display^30.0",
+    'OBJECT': 'objcontent^7.5',
+    'OBJECT_PROPERTY': 'propertyvalue^7.5',
+    ''        : "#expandField('title' '^300.0')
+                 #expandField('doccontent' '^60.0')
+                 filename^67.5 #expandField('attcontent' '^52.5')
+                 author_display^30.0 creator_display^30.0
+                 comment^37.5 attauthor_display^15.0
+                 objcontent^7.5 propertyvalue^7.5"
+  },
+  'phraseFieldSlop': '15',
+  'bigramPhraseFieldSlop': '5',
+  'trigramPhraseFieldSlop': '10',
+  'boostQuery': ['property.XWiki.TagClass.tags_string','^1000.0'],
+  'tieBreaker': '0.1',
+  'minShouldMatch': '2',
   'sortFields': {
     'DOCUMENT': {
       'score': 'desc',
@@ -163,5 +213,13 @@
   #set ($discard = $__defaultSolrConfig.putAll($solrConfig))
 #end
 #set ($solrConfig = $__defaultSolrConfig)
+
+#macro (expandField $fieldName $fieldBoost)
+  ${fieldName}__${fieldBoost} ##
+  #foreach ($locale in $supportedLocales)
+    ${fieldName}_${locale}${fieldBoost} ##
+  #end
+#end
+    
 {{/velocity}}</content>
 </xwikidoc>

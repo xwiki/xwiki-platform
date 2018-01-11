@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>userdirectory.userScopeFilter=User scope:
-userdirectory.userScopeFilter.hint=Select the category of users you wish to display.
+userdirectory.userScopeFilter.hint=Select the category of users you want to display.
 userdirectory.userScopeFilter.local=Local users
 userdirectory.userScopeFilter.global=Global users who are members of this wiki
 platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.

@@ -84,11 +84,11 @@ appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave 
 appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
 appWithinMinutes.codeSpace.title=Code
 appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent it, because otherwise none of the application code pages would be visible as they are all hidden by default.
+appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevents to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
 platform.appwithinminutes.appNamePageTitle=Create Application
 platform.appwithinminutes.appNameLabel=Application Name
-platform.appwithinminutes.appNameHint=The application name determines the home page URL and the location where the application code is stored.
-platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Application home page URL
+platform.appwithinminutes.appNameHint=The application name determines the homepage URL and the location where the application code is stored.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Application homepage URL
 platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
 platform.appwithinminutes.appNameIsUsedWarning=This application already exists. If you go to the next step you will be editing the existing application.
 platform.appwithinminutes.appNameEmptyError=Please enter the application name.
@@ -190,15 +190,15 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Images
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
-platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the home page above the live table with the application data. Use it to describe the application.
+platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
 platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
 platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=Add
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you wish to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Icon
-platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or reference an attached image.
 
 ### Application home page
 platform.appwithinminutes.appLiveTableHeading=Entries
@@ -214,8 +214,8 @@ platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
 
 ### Delete application dialog
-platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you wish to continue?
-platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you wish to continue?
+platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
+platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
 platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
@@ -245,9 +245,9 @@ platform.appwithinminutes.wizardStep2Description=Describe the application data
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Presentation
 #@deprecated appWithinMinutes.wizardStep.presentation.title
-platform.appwithinminutes.wizardStep3Title=Customize your application home page
+platform.appwithinminutes.wizardStep3Title=Customize your application homepage
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-platform.appwithinminutes.wizardStep3Description=Customize the application home page</content>
+platform.appwithinminutes.wizardStep3Description=Customize the application homepage</content>
   <object>
     <name>AppWithinMinutes.Translations</name>
     <number>0</number>

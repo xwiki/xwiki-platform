@@ -39,12 +39,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.panels.applications.helper=Here, you can select which applications are available in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
+  <content>platform.panels.applications.helper=Here, you can select which applications are displayed in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
 platform.panels.applications.displayedapps=Applications in the bar
 platform.panels.applications.blacklistedapps=Applications not in the bar
 platform.panels.applications.save=Save
 platform.panels.applications.revert=Reset
-platform.panels.applications.ajax.success=The configuration has been saved.
+platform.panels.applications.ajax.success=Saved!
 platform.panels.applications.ajax.csrf=CSRF validation failed. Try to reload the page.
 platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.error=Failed to save your change(s).

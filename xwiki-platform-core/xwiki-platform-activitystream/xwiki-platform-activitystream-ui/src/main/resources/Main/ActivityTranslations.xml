@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>activity.page.link.title=Located in {0}
-activity.rss.pages.modified=Modified Pages RSS Feed
+activity.rss.pages.modified=Modified Pages' RSS Feed
 activity.rss.feed.description=RSS feed for document changes
 activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
 activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"

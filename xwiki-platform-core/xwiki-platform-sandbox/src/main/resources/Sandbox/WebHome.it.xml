@@ -26,11 +26,11 @@
   <language>it</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <creator>XWiki.superadmin</creator>
+  <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1252441800000</creationDate>
   <parent>Main.WebHome</parent>
-  <author>XWiki.superadmin</author>
-  <contentAuthor>XWiki.superadmin</contentAuthor>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1513606718000</date>
   <contentUpdateDate>1513606718000</contentUpdateDate>
   <version>1.1</version>

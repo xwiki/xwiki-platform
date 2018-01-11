@@ -42,7 +42,7 @@
   <content>rendering.macro.tree.name=Tree
 rendering.macro.tree.description=Displays a tree hierarchy defined by the macro content or the source parameter.
 rendering.macro.tree.parameter.reference.name=Reference
-rendering.macro.tree.parameter.reference.description=The reference to the resource that describes the tree structure and its context menu and which is called to perform the actions on the tree nodes. This resource is used to load the tree dynamically (on demand) when a tree node is opened and to ask for the context menu when the user right-clicks on a tree node that has it. So the resource is not static. For static trees you should use the macro content instead. The reference can be a document reference or an URL/path.
+rendering.macro.tree.parameter.reference.description=The reference to the resource that describes the tree structure and its context menu, and which is called to perform the actions on the tree nodes. This resource is used to load the tree dynamically (on demand) when a tree node is opened, and to ask for the context menu when the user right-clicks on a tree node that has it. So the resource is not static. For static trees you should use the macro content instead. The reference can be a document reference or an URL/path.
 rendering.macro.tree.parameter.root.name=Root
 rendering.macro.tree.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.
 rendering.macro.tree.parameter.showRoot.name=Show Root
@@ -64,7 +64,7 @@ rendering.macro.tree.parameter.checkboxes.description=Whether to display a check
 rendering.macro.tree.parameter.openTo.name=Open to
 rendering.macro.tree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also.
 rendering.macro.tree.parameter.finder.name=Finder
-rendering.macro.tree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
+rendering.macro.tree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected, the tree is expanded up to the corresponding node.
 rendering.macro.tree.parameter.limit.name=Limit
 rendering.macro.tree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large. The tree passes this parameter to the tree source so it works only with dynamic trees whose source implements child count limit.
 rendering.macro.tree.content.description=You can use nested HTML unordered lists to describe the tree structure. See http://www.jstree.com/docs/html/ for more information.

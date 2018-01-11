@@ -41,10 +41,10 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=Tips
 help.tipsPanel.noTipMessage=No Tip available!
-help.tipsPanel.gettingStartedTip=If you're starting with XWiki, check out the [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
+help.tipsPanel.gettingStartedTip=If you're a new XWiki user, check out the [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
 help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.\nSee [[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
 help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 minutes to [[fill this survey&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] and help this open source project!
-help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
+help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate sibling and children pages.
 help.macroList.title=Available Macros
 help.macroList.id=Id
 help.macroList.name=Name

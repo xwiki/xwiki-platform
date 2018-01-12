@@ -43,7 +43,7 @@
 admin.email.description=Configure mail sending parameters and view mail statuses.
 admin.emailgeneral=Advanced
 admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
-admin.emailsend=Mail sending
+admin.emailsend=Mail Sending
 admin.emailsend.description=Configure mail sending parameters.
 admin.emailstatus=Mail Sending Status
 admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.

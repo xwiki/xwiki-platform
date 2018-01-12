@@ -42,7 +42,7 @@
   <content>invitation.applicationsPanelEntryLabel=Invitation
 
 # Invitation Administration Section
-Invitation.WebHome_from_address.hint=The email address used to send the invitation emails.
+Invitation.WebHome_from_address.hint=The email address used to send the invitation emails from.
 Invitation.WebHome_smtp_server_password.hint=The password to connect to the SMTP server.
 Invitation.WebHome_smtp_server_username.hint=The username to connect to the SMTP server.
 Invitation.WebHome_smtp_port.hint=The port of the SMTP server to use.

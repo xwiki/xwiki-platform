@@ -26,9 +26,10 @@ import java.util.ListIterator;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * AttachmentList that holds elements in order of filename.
@@ -36,19 +37,23 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 10.0RC1
  */
-public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
+public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
 {
 
     private Map<String, XWikiAttachment> map;
+
+    private XWikiDocument document;
 
     /**
      * Initializes the map.
      * 
      * @since 10.0RC1
      */
-    public XWikiAttachmentList()
+    public XWikiAttachmentList(XWikiDocument document)
     {
-        map = new TreeMap<String, XWikiAttachment>();
+        map = new ConcurrentSkipListMap<String, XWikiAttachment>();
+        this.document = document;
+        document.setMetaDataDirty(true);
     }
 
     /**
@@ -67,7 +72,7 @@ public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
         added(attachment);
         return true;
     }
-    
+
     /**
      * Adds attachment to the list in order of filename.
      * 
@@ -76,7 +81,7 @@ public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
      * @since 10.0RC1
      */
     @Override
-    public void add(int index,XWikiAttachment attachment)
+    public void add(int index, XWikiAttachment attachment)
     {
         map.put(attachment.getFilename(), attachment);
         super.clear();
@@ -141,11 +146,11 @@ public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     @Override
     public boolean remove(Object attachment)
     {
-        String filename = ((XWikiAttachment)(attachment)).getFilename();
+        String filename = ((XWikiAttachment) (attachment)).getFilename();
         XWikiAttachment removedAttachment = map.remove(filename);
         super.clear();
         super.addAll(map.values());
-        return removedAttachment==null ? false : true;
+        return removedAttachment == null ? false : true;
     }
 
     /**
@@ -176,7 +181,7 @@ public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     /** Called when the list is updated. The method will be called at least once, but may be called several times */
     public void onUpdate()
     {
-        
+        document.setMetaDataDirty(true);
     }
 
     /**
@@ -185,7 +190,7 @@ public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
      */
     protected void added(XWikiAttachment element)
     {
-        // should be overwritten by extending classes that need to know about new elements
+        element.setDoc(document);
     }
 
     /**
@@ -210,7 +215,4 @@ public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
         return super.containsAll(c);
     }
 
-    
-    
-    
 }

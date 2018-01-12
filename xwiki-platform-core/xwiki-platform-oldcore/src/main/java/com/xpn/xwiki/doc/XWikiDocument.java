@@ -493,20 +493,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private final List<XWikiAttachment> attachmentList = new XWikiAttachmentList()
-        {
-            @Override
-            public void onUpdate()
-            {
-                setMetaDataDirty(true);
-            }
-
-            @Override
-            protected void added(XWikiAttachment element)
-            {
-                element.setDoc(XWikiDocument.this);
-            }
-        };
+    private final XWikiAttachmentList attachmentList = new XWikiAttachmentList(XWikiDocument.this);
 
     // Caching
     private boolean fromCache = false;
@@ -4708,7 +4695,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public List<XWikiAttachment> getAttachmentList()
+    public XWikiAttachmentList getAttachmentList()
     {
         return this.attachmentList;
     }
@@ -4848,7 +4835,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (!list.contains(attachmentToRemove)) {
             attachmentToRemove = null;
         } else {
-            ((XWikiAttachmentList) (list)).remove(attachmentToRemove);
+            list.remove(attachmentToRemove);
         }
         this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
         setMetaDataDirty(true);
@@ -5399,7 +5386,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment getAttachment(String filename)
     {
-        XWikiAttachment output = ((XWikiAttachmentList) (getAttachmentList())).getByFilename(filename);
+        XWikiAttachment output = getAttachmentList().getByFilename(filename);
         if (output != null) {
             return output;
         }
@@ -5437,7 +5424,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         attachment.setDoc(this);
 
-        XWikiAttachmentList list = (XWikiAttachmentList) getAttachmentList();
+        XWikiAttachmentList list = getAttachmentList();
         XWikiAttachment currentAttachment = list.getByFilename(attachment.getFilename());
         list.set(attachment);
         return currentAttachment;

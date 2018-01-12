@@ -90,7 +90,7 @@ annotations.altered.text=This annotation could not be displayed because the anno
 annotations.updated.text=This annotation was automatically repositioned after a page update. Originally: 
 annotations.action.validate.text=[Validate]
 annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
-annotations.action.validate.success=Annotation validated!
+annotations.action.validate.success=Annotation validated,
 annotations.action.validate.loaderror=Failed: 
 
 annotations.filters.show=Filter

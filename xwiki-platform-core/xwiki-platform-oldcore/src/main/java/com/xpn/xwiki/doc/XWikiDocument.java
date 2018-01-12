@@ -4836,9 +4836,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             attachmentToRemove = null;
         } else {
             list.remove(attachmentToRemove);
+            this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
+            setMetaDataDirty(true);
         }
-        this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
-        setMetaDataDirty(true);
         return attachmentToRemove;
     }
 

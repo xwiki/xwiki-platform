@@ -36,7 +36,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
 {
 
     /** The list to wrap. */
-    private final List<E> list;
+    protected final List<E> list;
 
     /**
      * @param list the list to wrap.

@@ -31,16 +31,19 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
+
 /**
  * AttachmentList that holds elements in order of filename.
  * 
  * @version $Id$
+ * @param <E>
  * @since 10.0RC1
  */
-public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
+public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachment>
 {
 
-    private Map<String, XWikiAttachment> map;
+    private final Map<String, XWikiAttachment> map = new ConcurrentSkipListMap<String, XWikiAttachment>();
 
     private XWikiDocument document;
 
@@ -51,9 +54,8 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
      */
     public XWikiAttachmentList(XWikiDocument document)
     {
-        map = new ConcurrentSkipListMap<String, XWikiAttachment>();
+        super(new ArrayList<XWikiAttachment>());
         this.document = document;
-        document.setMetaDataDirty(true);
     }
 
     /**
@@ -66,8 +68,8 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     public boolean add(XWikiAttachment attachment)
     {
         map.put(attachment.getFilename(), attachment);
-        super.clear();
-        super.addAll(map.values());
+        this.list.clear();
+        this.list.addAll(map.values());
         onUpdate();
         added(attachment);
         return true;
@@ -83,11 +85,7 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     @Override
     public void add(int index, XWikiAttachment attachment)
     {
-        map.put(attachment.getFilename(), attachment);
-        super.clear();
-        super.addAll(map.values());
-        onUpdate();
-        added(attachment);
+        add(attachment);
     }
 
     /**
@@ -100,7 +98,6 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     {
         super.clear();
         map.clear();
-        onUpdate();
     }
 
     /**
@@ -116,10 +113,20 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
             map.put(x.getFilename(), x);
             added(x);
         }
-        super.clear();
-        super.addAll(map.values());
+        this.list.clear();
+        this.list.addAll(map.values());
         return true;
+    }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @since 10.0RC1
+     */
+    @Override
+    public boolean addAll(int index, Collection<? extends XWikiAttachment> c)
+    {
+        return addAll(c);
     }
 
     /**
@@ -130,10 +137,8 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     @Override
     public XWikiAttachment remove(int index)
     {
-        XWikiAttachment removedAttachment = map.remove(super.get(index).getFilename());
-        onUpdate();
+        XWikiAttachment removedAttachment = map.remove(this.list.get(index).getFilename());
         return removedAttachment == null ? null : super.remove(index);
-
     }
 
     /**
@@ -146,10 +151,11 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     @Override
     public boolean remove(Object attachment)
     {
-        String filename = ((XWikiAttachment) (attachment)).getFilename();
-        XWikiAttachment removedAttachment = map.remove(filename);
-        super.clear();
-        super.addAll(map.values());
+        int index = list.indexOf(attachment);
+        XWikiAttachment removedAttachment = null;
+        if (index != -1) {
+            removedAttachment = remove(index);
+        }
         return removedAttachment == null ? false : true;
     }
 
@@ -162,10 +168,26 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
      */
     public XWikiAttachment set(XWikiAttachment attachment)
     {
-        map.put(attachment.getFilename(), attachment);
-        super.clear();
-        super.addAll(map.values());
-        return attachment;
+        XWikiAttachment ret = map.put(attachment.getFilename(), attachment);
+        this.list.clear();
+        this.list.addAll(map.values());
+        added(ret);
+        onUpdate();
+        return ret;
+    }
+
+    /**
+     * Adds or replaces attachment with the same filename as the parameter.
+     * 
+     * @param index this parameter is not used but is needed to override the method
+     * @param attachment the attachment to add to the list
+     * @return the attachment that was added to the list in order of filename
+     * @since 10.0RC1
+     */
+    @Override
+    public XWikiAttachment set(int index, XWikiAttachment attachment)
+    {
+        return set(attachment);
     }
 
     /**
@@ -176,6 +198,26 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     public XWikiAttachment getByFilename(String filename)
     {
         return map.get(filename);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c)
+    {
+        for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
+            if (this.list.contains(x))
+                remove(x);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c)
+    {
+        for (XWikiAttachment x : this.list) {
+            if (!((Collection<? extends XWikiAttachment>) (c)).contains(x))
+                remove(x);
+        }
+        return true;
     }
 
     /** Called when the list is updated. The method will be called at least once, but may be called several times */
@@ -191,28 +233,6 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     protected void added(XWikiAttachment element)
     {
         element.setDoc(document);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 10.0RC1
-     */
-    @Override
-    public boolean contains(Object x)
-    {
-        return super.contains((XWikiAttachment) x);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 10.0RC1
-     */
-    @Override
-    public boolean containsAll(Collection<?> c)
-    {
-        return super.containsAll(c);
     }
 
 }

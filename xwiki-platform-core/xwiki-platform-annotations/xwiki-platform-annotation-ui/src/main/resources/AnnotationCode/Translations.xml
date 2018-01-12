@@ -58,7 +58,7 @@ annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit annotation
 annotations.action.edit.submit.text=Update
 annotations.action.edit.cancel.text=Cancel
-annotations.action.edit.success=Annotation updated!
+annotations.action.edit.success=Annotation updated,
 annotations.action.edit.loaderror=Failed: 
 annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
 

@@ -123,7 +123,7 @@ platform.flamingo.themes.global=Global
 #######################################
 ## until 7.3M1
 #######################################
-platform.flamingo.themes.lessCode.warning=Unfortunatly, this field is not taken into account in the live preview.
+platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
 
 #@deprecatedend</content>
 </xwikidoc>

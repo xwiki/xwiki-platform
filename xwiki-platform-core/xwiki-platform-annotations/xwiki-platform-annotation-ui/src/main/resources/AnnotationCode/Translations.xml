@@ -86,7 +86,7 @@ annotations.action.view.form.loaderror=Failed:
 annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
 annotations.action.view.thread=See thread
 
-annotations.altered.text=This annotation could not be displayed because the annotated text was not found on the page: 
+annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page: 
 annotations.updated.text=This annotation was automatically repositioned after an update of the page. Originally: 
 annotations.action.validate.text=[Validate]
 annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation

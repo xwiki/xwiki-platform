@@ -493,8 +493,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    private final List<XWikiAttachment> attachmentList =
-        new AbstractNotifyOnUpdateList<XWikiAttachment>(new XWikiAttachmentList())
+    private final List<XWikiAttachment> attachmentList = new XWikiAttachmentList()
         {
             @Override
             public void onUpdate()
@@ -4846,10 +4845,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
     {
         List<XWikiAttachment> list = getAttachmentList();
-        XWikiAttachment attachment = ((XWikiAttachmentList) (list)).remove(attachmentToRemove);
-        this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachment, toRecycleBin));
+        if (!list.contains(attachmentToRemove)) {
+            attachmentToRemove = null;
+        } else {
+            ((XWikiAttachmentList) (list)).remove(attachmentToRemove);
+        }
+        this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
         setMetaDataDirty(true);
-        return attachment;
+        return attachmentToRemove;
     }
 
     /**

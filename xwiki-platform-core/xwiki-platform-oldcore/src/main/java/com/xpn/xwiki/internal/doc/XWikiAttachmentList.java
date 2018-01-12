@@ -22,6 +22,9 @@ package com.xpn.xwiki.internal.doc;
 import java.util.ArrayList;
 
 import java.util.Collection;
+import java.util.ListIterator;
+import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 10.0RC1
  */
-public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
+public abstract class XWikiAttachmentList extends ArrayList<XWikiAttachment>
 {
 
     private Map<String, XWikiAttachment> map;
@@ -51,6 +54,7 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     /**
      * Adds attachment to the list in order of filename.
      * 
+     * @param attachment XWikiAttachment to add to the list
      * @since 10.0RC1
      */
     @Override
@@ -59,7 +63,26 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
         map.put(attachment.getFilename(), attachment);
         super.clear();
         super.addAll(map.values());
+        onUpdate();
+        added(attachment);
         return true;
+    }
+    
+    /**
+     * Adds attachment to the list in order of filename.
+     * 
+     * @param index index is ignored as list is reordered based on filename
+     * @param attachment XWikiAttachment to add to the list
+     * @since 10.0RC1
+     */
+    @Override
+    public void add(int index,XWikiAttachment attachment)
+    {
+        map.put(attachment.getFilename(), attachment);
+        super.clear();
+        super.addAll(map.values());
+        onUpdate();
+        added(attachment);
     }
 
     /**
@@ -72,6 +95,7 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     {
         super.clear();
         map.clear();
+        onUpdate();
     }
 
     /**
@@ -82,8 +106,10 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     @Override
     public boolean addAll(Collection<? extends XWikiAttachment> c)
     {
+        onUpdate();
         for (XWikiAttachment x : c) {
             map.put(x.getFilename(), x);
+            added(x);
         }
         super.clear();
         super.addAll(map.values());
@@ -99,8 +125,8 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
     @Override
     public XWikiAttachment remove(int index)
     {
-
         XWikiAttachment removedAttachment = map.remove(super.get(index).getFilename());
+        onUpdate();
         return removedAttachment == null ? null : super.remove(index);
 
     }
@@ -112,14 +138,14 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
      * @return XWikiAttachment that was removed or null if not found
      * @since 10.0RC1
      */
-    public XWikiAttachment remove(XWikiAttachment attachment)
+    @Override
+    public boolean remove(Object attachment)
     {
-        String filename = attachment.getFilename();
+        String filename = ((XWikiAttachment)(attachment)).getFilename();
         XWikiAttachment removedAttachment = map.remove(filename);
         super.clear();
         super.addAll(map.values());
-        return removedAttachment;
-
+        return removedAttachment==null ? false : true;
     }
 
     /**
@@ -147,4 +173,44 @@ public class XWikiAttachmentList extends ArrayList<XWikiAttachment>
         return map.get(filename);
     }
 
+    /** Called when the list is updated. The method will be called at least once, but may be called several times */
+    public void onUpdate()
+    {
+        
+    }
+
+    /**
+     * @param element XWikiAttachment that was added to the list
+     * @since 10.0RC1
+     */
+    protected void added(XWikiAttachment element)
+    {
+        // should be overwritten by extending classes that need to know about new elements
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @since 10.0RC1
+     */
+    @Override
+    public boolean contains(Object x)
+    {
+        return super.contains((XWikiAttachment) x);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @since 10.0RC1
+     */
+    @Override
+    public boolean containsAll(Collection<?> c)
+    {
+        return super.containsAll(c);
+    }
+
+    
+    
+    
 }

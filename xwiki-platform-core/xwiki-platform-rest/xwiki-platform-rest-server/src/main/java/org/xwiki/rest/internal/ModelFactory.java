@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal;
 
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -187,7 +188,7 @@ public class ModelFactory
 
             // Remove objects
             List<com.xpn.xwiki.api.Object> toRemove = new ArrayList<>();
-            for (Vector<com.xpn.xwiki.api.Object> objects : doc.getxWikiObjects().values()) {
+            for (ArrayList<com.xpn.xwiki.api.Object> objects : doc.getxWikiObjects().values()) {
                 for (com.xpn.xwiki.api.Object object : objects) {
                     if (!newReferences.contains(object.getReference())) {
                         toRemove.add(object);

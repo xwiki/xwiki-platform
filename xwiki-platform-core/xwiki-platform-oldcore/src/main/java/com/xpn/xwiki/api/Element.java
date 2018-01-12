@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.api;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -75,5 +76,14 @@ public class Element extends Api
     public EntityReference getReference()
     {
         return this.element.getReference();
+    }
+
+    /**
+     * @return the reference to the document
+     * @since 10.0RC1
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return this.element.getDocumentReference();
     }
 }

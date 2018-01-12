@@ -63,9 +63,9 @@ Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP serve
 Mail.SendMailConfigClass_password=Email Server Password
 Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
 Mail.SendMailConfigClass_properties=Additional Properties
-Mail.SendMailConfigClass_properties.hint=List of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
+Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
 Mail.SendMailConfigClass_sendWaitTime=Send Wait Time
-Mail.SendMailConfigClass_sendWaitTime.hint=Delay between each mail being sent, in milliseconds (defaults to 8 seconds)
+Mail.SendMailConfigClass_sendWaitTime.hint=The delay between each mail being sent, in milliseconds (defaults to 8 seconds)
 Mail.SendMailConfigClass_discardSuccessStatuses=Discard Success Statuses?
 Mail.SendMailConfigClass_discardSuccessStatuses.hint=No matter whether mail statuses are kept or not for mail that has been sent successfully (defaults to true)
 Mail.SendMailStatus_livetable.date=Date

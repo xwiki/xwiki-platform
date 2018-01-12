@@ -45,14 +45,14 @@ annotations.menu.loaderror=Failed:
 annotations.tab.info.noannotations=No annotations for this page
 
 annotations.settings.display=Show annotations 
-annotations.settings.error.wrongsyntax=Annotations are not available for pages in XWiki/1.0 syntax.
+annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 annotations.settings.error.notarget=No page specified to get annotations settings for.
 
 annotations.annotated.loading=Loading annotated page
 annotations.annotated.loaderror=Failed: 
 annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
 annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
-annotations.annotated.error.wrongsyntax=Annotations are not available for pages in XWiki/1.0 syntax.
+annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 
 annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit this annotation
@@ -78,7 +78,7 @@ annotations.action.create.loaderror=Failed:
 annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page. 
 annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
 annotations.action.create.helpmessage=To annotate a piece of text, select it and hit {0}.
-annotations.action.create.error.wrongsyntax=Annotations are not available for pages in XWiki/1.0 syntax.
+annotations.action.create.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 annotations.action.create.error.notarget=Unspecified target (page) to create annotations for.
 
 annotations.action.view.hide.text=hide

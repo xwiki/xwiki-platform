@@ -43,7 +43,7 @@
 admin.email.description=Configure mail sending parameters and view mail statuses.
 admin.emailgeneral=Advanced
 admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
-admin.emailsend=Sending mail
+admin.emailsend=Mail sending
 admin.emailsend.description=Configure mail sending parameters.
 admin.emailstatus=Mail Sending Status
 admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.
@@ -59,9 +59,9 @@ Mail.SendMailConfigClass_host.hint=The SMTP server to send to. Defaults to "loca
 Mail.SendMailConfigClass_port=Email Server Port
 Mail.SendMailConfigClass_port.hint=The port of the SMTP server to use. Defaults to 25
 Mail.SendMailConfigClass_username=Email Server Username
-Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server
+Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, only when authentication is required
 Mail.SendMailConfigClass_password=Email Server Password
-Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server
+Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
 Mail.SendMailConfigClass_properties=Additional Properties
 Mail.SendMailConfigClass_properties.hint=List of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
 Mail.SendMailConfigClass_sendWaitTime=Send Wait Time

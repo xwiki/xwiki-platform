@@ -114,7 +114,7 @@ AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for 
 AnnotationCode.AnnotationConfig_displayed=Display annotations by default
 AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
 AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
-AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if an annotation's highlight should be displayed always or only when hovering over the annotations or the structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
 AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure</content>
   <object>
     <name>AnnotationCode.Translations</name>

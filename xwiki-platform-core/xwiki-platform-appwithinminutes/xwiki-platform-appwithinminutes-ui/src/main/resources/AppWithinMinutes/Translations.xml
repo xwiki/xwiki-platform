@@ -198,7 +198,7 @@ platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=Add
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Icon
-platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or reference an attached image.
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
 ### Application home page
 platform.appwithinminutes.appLiveTableHeading=Entries

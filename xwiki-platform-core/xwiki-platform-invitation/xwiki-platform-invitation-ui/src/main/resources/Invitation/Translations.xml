@@ -47,7 +47,7 @@ Invitation.WebHome_smtp_server_password.hint=The password to connect to the SMTP
 Invitation.WebHome_smtp_server_username.hint=The username to connect to the SMTP server.
 Invitation.WebHome_smtp_port.hint=The port of the SMTP server to use.
 Invitation.WebHome_smtp_server.hint=The SMTP server to send to.
-Invitation.WebHome_javamail_extra_props.hint=List of additional JavaMail properties to use.</content>
+Invitation.WebHome_javamail_extra_props.hint=The list of additional JavaMail properties to use.</content>
   <object>
     <name>Invitation.Translations</name>
     <number>0</number>

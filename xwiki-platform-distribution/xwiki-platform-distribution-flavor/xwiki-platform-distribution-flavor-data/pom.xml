@@ -58,9 +58,7 @@
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Step 1: Copy and filter the Hibernate config file which will be used by the packager
-           plugin -->
-        <!-- Step 2: Import the XAR dependencies into the database -->
+        <!-- Generate a full XWiki permanent directory (including an HSQLDB-filled database) -->
         <plugin>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
@@ -71,7 +69,7 @@
             </hibernateConfig>
           </configuration>
           <dependencies>
-            <!-- Since we're building XWiki Enterprise, we need to add the ActivityStream plugin as a dependency,
+            <!-- Since we're building XWiki Standard, we need to add the ActivityStream plugin as a dependency,
                  which has its own mapping and migrators. -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
@@ -186,7 +184,7 @@
             </execution>
           </executions>
         </plugin>
-        <!-- Step 3: Zip the generated data -->
+        <!-- Zip the generated permanent directory (data dir) -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>

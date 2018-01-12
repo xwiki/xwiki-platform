@@ -160,6 +160,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.render.LinkedResourceHelper;
@@ -492,9 +493,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    // TODO: use a Map instead of a List to store attachment in XWikiDocument
     private final List<XWikiAttachment> attachmentList =
-        new AbstractNotifyOnUpdateList<XWikiAttachment>(new DecoratedList())
+        new AbstractNotifyOnUpdateList<XWikiAttachment>(new XWikiAttachmentList())
         {
             @Override
             public void onUpdate()
@@ -4846,7 +4846,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
     {
         List<XWikiAttachment> list = getAttachmentList();
-        XWikiAttachment attachment = ((DecoratedList) (list)).remove(attachmentToRemove);
+        XWikiAttachment attachment = ((XWikiAttachmentList) (list)).remove(attachmentToRemove);
         this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachment, toRecycleBin));
         setMetaDataDirty(true);
         return attachment;
@@ -5396,8 +5396,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment getAttachment(String filename)
     {
-        XWikiAttachment output = ((DecoratedList)(getAttachmentList())).getByFilename(filename);
-        if(output!=null) {
+        XWikiAttachment output = ((XWikiAttachmentList) (getAttachmentList())).getByFilename(filename);
+        if (output != null) {
             return output;
         }
 
@@ -5434,7 +5434,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         attachment.setDoc(this);
 
-        DecoratedList list = (DecoratedList) getAttachmentList();
+        XWikiAttachmentList list = (XWikiAttachmentList) getAttachmentList();
         XWikiAttachment currentAttachment = list.getByFilename(attachment.getFilename());
         list.set(attachment);
         return currentAttachment;

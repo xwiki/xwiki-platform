@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="AppWithinMinutes.Document" locale="">
   <web>AppWithinMinutes</web>
   <name>Document</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1352133857000</date>
-  <contentUpdateDate>1352133857000</contentUpdateDate>
+  <date>1514830435000</date>
+  <contentUpdateDate>1514830435000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorDocumentCategoryName')</title>
   <comment/>

@@ -58,7 +58,7 @@ annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit annotation
 annotations.action.edit.submit.text=Update
 annotations.action.edit.cancel.text=Cancel
-annotations.action.edit.success=Annotation updated,
+annotations.action.edit.success=Annotation updated.
 annotations.action.edit.loaderror=Failed: 
 annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
 
@@ -73,7 +73,7 @@ annotations.action.create.submit.text=Add annotation
 annotations.action.create.cancel.text=Cancel
 annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
 annotations.action.create.form.loaderror=Failed: 
-annotations.action.create.success=Annotation added,
+annotations.action.create.success=Annotation added.
 annotations.action.create.loaderror=Failed: 
 annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page. 
 annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
@@ -90,7 +90,7 @@ annotations.altered.text=This annotation could not be displayed because the anno
 annotations.updated.text=This annotation was automatically repositioned after a page update. Originally: 
 annotations.action.validate.text=[Validate]
 annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
-annotations.action.validate.success=Annotation validated,
+annotations.action.validate.success=Annotation validated.
 annotations.action.validate.loaderror=Failed: 
 
 annotations.filters.show=Filter

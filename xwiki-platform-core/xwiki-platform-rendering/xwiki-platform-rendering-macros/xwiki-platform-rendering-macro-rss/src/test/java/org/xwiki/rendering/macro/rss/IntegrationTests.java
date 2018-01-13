@@ -45,7 +45,7 @@ public class IntegrationTests
 
         final SkinAccessBridge mockSkinAccessBridge = mockery.mock(SkinAccessBridge.class);
         DefaultComponentDescriptor<SkinAccessBridge> descriptorSAB = new DefaultComponentDescriptor<SkinAccessBridge>();
-        descriptorSAB.setRole(SkinAccessBridge.class);
+        descriptorSAB.setRoleType(SkinAccessBridge.class);
         componentManager.registerComponent(descriptorSAB, mockSkinAccessBridge);
 
         mockery.checking(new Expectations() {{

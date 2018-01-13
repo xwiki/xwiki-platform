@@ -53,7 +53,7 @@ public class AbstractRefactoringTestCase extends AbstractComponentTestCase
         final DocumentAccessBridge mockDocumentAccessBridge = this.mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
+        descriptorDAB.setRoleType(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
         
         mockery.checking(new Expectations() {{

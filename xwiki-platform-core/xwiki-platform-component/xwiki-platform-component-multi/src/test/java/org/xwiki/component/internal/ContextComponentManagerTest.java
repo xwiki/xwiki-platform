@@ -131,7 +131,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         // Register component for the current user
         ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "user");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
-        cd.setRole(Role.class);
+        cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
         userCM.registerComponent(cd);
 
@@ -187,7 +187,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         ComponentManager documentCM = getComponentManager().getInstance(ComponentManager.class, "document");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
-        cd.setRole(Role.class);
+        cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
 
         // Register component for the current user
@@ -283,7 +283,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "space");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
-        cd.setRole(Role.class);
+        cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
 
         // Register component for the current user
@@ -343,7 +343,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         // Register in the current wiki.
         ComponentManager wikiCM = getComponentManager().getInstance(ComponentManager.class, "wiki");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
-        cd.setRole(Role.class);
+        cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
         wikiCM.registerComponent(cd);
 
@@ -435,7 +435,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Register in the current wiki.
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
-        cd.setRole(Role.class);
+        cd.setRoleType(Role.class);
         cd.setImplementation(RoleImpl.class);
         getComponentManager().registerComponent(cd);
 

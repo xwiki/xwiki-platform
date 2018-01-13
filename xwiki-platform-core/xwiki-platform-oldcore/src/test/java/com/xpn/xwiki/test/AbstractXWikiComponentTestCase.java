@@ -158,7 +158,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     private <T> DefaultComponentDescriptor<T> createComponentDescriptor(Class<T> role)
     {
         DefaultComponentDescriptor<T> descriptor = new DefaultComponentDescriptor<T>();
-        descriptor.setRole(role);
+        descriptor.setRoleType(role);
         return descriptor;
     }
 }

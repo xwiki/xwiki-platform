@@ -1,4 +1,4 @@
-<?xml version='1.1' encoding='UTF-8'?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -26,11 +26,11 @@
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>XWiki.admin</creator>
+  <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1411997494000</creationDate>
   <parent>AppWithinMinutes.Date</parent>
-  <author>XWiki.admin</author>
-  <contentAuthor>XWiki.admin</contentAuthor>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1514830439000</date>
   <contentUpdateDate>1514830439000</contentUpdateDate>
   <version>1.1</version>

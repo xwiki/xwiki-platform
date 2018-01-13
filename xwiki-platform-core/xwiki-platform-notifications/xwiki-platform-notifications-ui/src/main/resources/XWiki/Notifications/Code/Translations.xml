@@ -45,13 +45,13 @@ platform.core.profile.category.notifications=Notifications
 notifications.filters.cancel=Cancel
 notifications.filters.submit=Save
 notifications.filters.type.label=Filter type:
-notifications.filters.type.hint=How the filter should act towards an event in the given location
+notifications.filters.type.hint=How should the filter respond to an event in the given location?
 notifications.filters.location.label=Filter scope:
-notifications.filters.location.hint=What part of the wiki should be concerned by the filter?
+notifications.filters.location.hint=About which part of the wiki should the filter be concerned?
 
 ## Advanced filters options
 notifications.settings.filters.advanced=Advanced filtering options
-notifications.filters.advanced.toggles.hint=These filters are activated by default, you can disable them by using the button next to each filter.
+notifications.filters.advanced.toggles.hint=These filters are activated by default, you can disable them using the button next to each filter.
 notifications.filters.advanced.toggles.table.name=Filter name
 notifications.filters.advanced.toggles.table.description=Description
 notifications.filters.advanced.toggles.table.toggle=Toggle
@@ -70,7 +70,7 @@ notifications.filters.type.exclusive=Exclusive
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
 notifications.filters.preferences.scopeNotificationFilter.page=Page only
-notifications.filters.preferences.scopeNotificationFilter.space=Page and children
+notifications.filters.preferences.scopeNotificationFilter.space=Page and its children
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
 notifications.filters.preferences.allEvents=-
@@ -78,7 +78,7 @@ notifications.filters.preferences.allEvents=-
 notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
 notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
 notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
-notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
+notifications.filters.preferences.addPreference.notificationFormat.hint=To which format of notifications should the filter be applied?
 notifications.filters.preferences.addPreference.eventType.label=Event Type
 notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
 notifications.filters.preferences.addPreference.location.label=Filter Scope
@@ -119,9 +119,9 @@ notifications.menu.more=Load older notifications
 notifications.menu.details=Details ({0})
 notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
-notifications.settings.menu.hint=The notification menu is located on the top right of the page, and you can see it by clicking on the bell ({0})
+notifications.settings.menu.hint=The notification menu is located on the top right of the page, and you can see it by clicking on the bell ({0}).
 notifications.settings.email=Email
-notifications.settings.email.hint=An email is sent to you regularly with the summary of what happened in the wiki
+notifications.settings.email.hint=An email is sent to you regularly with the summary of what happened in the wiki.
 notifications.settings.email.title=Email Preferences
 notifications.settings.email.frequency=Email Frequency
 notifications.settings.email.frequency.hint=Choose how often you want to receive an email with the summary of what happened in the wiki.
@@ -131,7 +131,7 @@ notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
 notifications.settings.filters=Filters ({0})
 notifications.settings.addFilter=Add filter
-notifications.settings.errorFilterWiki=Error: you must select a wiki, not a page
+notifications.settings.errorFilterWiki=Error: You must select a wiki, not a page
 notifications.settings.preferences=Preferences
 notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
 notifications.settings.applications.title=Applications
@@ -140,7 +140,7 @@ notifications.settings.applications.appName=Name
 notifications.settings.events=Events
 notifications.settings.watch.title=Watched Pages
 notifications.settings.watch.autowatchmode=Automatic page watching
-notifications.settings.watch.autowatchmode.hint=Decide if you wish to watch a page after you have worked on it
+notifications.settings.watch.autowatchmode.hint=Decide whether you wish to watch a page after you have worked on it
 notifications.events.by=edited by {0}.
 notifications.events.lastChange=Last change: {0}.
 notifications.events.lastComment=Last comment: {0}.
@@ -179,7 +179,7 @@ notifications.userprofile.follow=Start following
 notifications.userprofile.unfollow=Stop following
 notifications.userprofile.done=Done
 notifications.userprofile.saving=Saving...
-notifications.userprofile.error=Error saving the notification setting</content>
+notifications.userprofile.error=An error occured while saving the notification setting</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

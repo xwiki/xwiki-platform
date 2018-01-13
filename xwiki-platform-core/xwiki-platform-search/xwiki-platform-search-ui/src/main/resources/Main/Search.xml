@@ -35,7 +35,7 @@
   <contentUpdateDate>1514830426000</contentUpdateDate>
   <version>1.1</version>
   <title>#if("$!{request.text}" == '')$services.localization.render('search.page.title.noquery')#else$services.localization.render('search.page.title.query', [$request.text])#end</title>
-  <comment></comment>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>

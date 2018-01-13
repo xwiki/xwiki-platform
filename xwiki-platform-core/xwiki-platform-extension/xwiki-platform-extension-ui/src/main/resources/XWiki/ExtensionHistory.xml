@@ -35,7 +35,7 @@
   <contentUpdateDate>1514830378000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('extension.history')</title>
-  <comment></comment>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
@@ -233,19 +233,19 @@
       </sectionOrder>
     </class>
     <property>
-      <categoryIcon></categoryIcon>
+      <categoryIcon/>
     </property>
     <property>
-      <codeToExecute></codeToExecute>
+      <codeToExecute/>
     </property>
     <property>
-      <configurationClass></configurationClass>
+      <configurationClass/>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory></displayBeforeCategory>
+      <displayBeforeCategory/>
     </property>
     <property>
       <displayInCategory>extensionmanager</displayInCategory>
@@ -254,13 +254,13 @@
       <displayInSection>XWiki.ExtensionHistory</displayInSection>
     </property>
     <property>
-      <heading></heading>
+      <heading/>
     </property>
     <property>
-      <iconAttachment></iconAttachment>
+      <iconAttachment/>
     </property>
     <property>
-      <linkPrefix></linkPrefix>
+      <linkPrefix/>
     </property>
     <property>
       <propertiesToShow/>

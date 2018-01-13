@@ -79,13 +79,13 @@ public class AnnotationsMockSetup
         // IOTargetService mockup
         ioTargetService = mockery.mock(IOTargetService.class);
         DefaultComponentDescriptor<IOTargetService> iotsDesc = new DefaultComponentDescriptor<IOTargetService>();
-        iotsDesc.setRole(IOTargetService.class);
+        iotsDesc.setRoleType(IOTargetService.class);
         componentManager.registerComponent(iotsDesc, ioTargetService);
 
         // IOService mockup
         ioService = mockery.mock(IOService.class);
         DefaultComponentDescriptor<IOService> ioDesc = new DefaultComponentDescriptor<IOService>();
-        ioDesc.setRole(IOService.class);
+        ioDesc.setRoleType(IOService.class);
         componentManager.registerComponent(ioDesc, ioService);
 
         this.docFactory = docFactory;

@@ -305,7 +305,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Velocity Manager mock.
         final VelocityManager mockVelocityManager = getMockery().mock(VelocityManager.class);
         DefaultComponentDescriptor<VelocityManager> descriptorVM = new DefaultComponentDescriptor<VelocityManager>();
-        descriptorVM.setRole(VelocityManager.class);
+        descriptorVM.setRoleType(VelocityManager.class);
         getComponentManager().registerComponent(descriptorVM, mockVelocityManager);
 
         // Initialize velocity engine.
@@ -367,7 +367,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Velocity Manager mock.
         final VelocityManager mockVelocityManager = getMockery().mock(VelocityManager.class);
         DefaultComponentDescriptor<VelocityManager> descriptorVM = new DefaultComponentDescriptor<VelocityManager>();
-        descriptorVM.setRole(VelocityManager.class);
+        descriptorVM.setRoleType(VelocityManager.class);
         getComponentManager().registerComponent(descriptorVM, mockVelocityManager);
 
         // Initialize velocity engine.

@@ -4831,8 +4831,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
     {
-        List<XWikiAttachment> list = this.attachmentList;
-        if (list.remove(attachmentToRemove)) {
+        if (this.attachmentList.remove(attachmentToRemove)) {
             this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
             setMetaDataDirty(true);
         } else {
@@ -5422,11 +5421,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public XWikiAttachment setAttachment(XWikiAttachment attachment)
     {
         attachment.setDoc(this);
-
-        XWikiAttachmentList list = this.attachmentList;
-        XWikiAttachment currentAttachment = list.getByFilename(attachment.getFilename());
-        list.set(attachment);
-        return currentAttachment;
+        return this.attachmentList.set(attachment);
     }
 
     /**

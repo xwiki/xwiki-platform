@@ -136,7 +136,11 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     public XWikiAttachment remove(int index)
     {
         XWikiAttachment removedAttachment = map.remove(this.list.get(index).getFilename());
-        return removedAttachment == null ? null : super.remove(index);
+        if (removedAttachment != null) {
+            removedAttachment = super.remove(index);
+            document.setMetaDataDirty(true);
+        }
+        return removedAttachment;
     }
 
     /**

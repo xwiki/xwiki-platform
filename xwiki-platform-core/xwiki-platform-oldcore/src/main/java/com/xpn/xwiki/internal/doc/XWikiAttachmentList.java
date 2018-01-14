@@ -45,7 +45,7 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
 
     private final Map<String, XWikiAttachment> map = new ConcurrentSkipListMap<String, XWikiAttachment>();
 
-    private XWikiDocument document;
+    private final XWikiDocument document;
 
     /**
      * Initializes the map.
@@ -68,8 +68,7 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     public boolean add(XWikiAttachment attachment)
     {
         map.put(attachment.getFilename(), attachment);
-        this.list.clear();
-        this.list.addAll(map.values());
+        this.list = new ArrayList<XWikiAttachment>(map.values());
         onUpdate();
         added(attachment);
         return true;
@@ -108,13 +107,12 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     @Override
     public boolean addAll(Collection<? extends XWikiAttachment> c)
     {
-        onUpdate();
         for (XWikiAttachment x : c) {
             map.put(x.getFilename(), x);
             added(x);
         }
-        this.list.clear();
-        this.list.addAll(map.values());
+        this.list = new ArrayList<XWikiAttachment>(map.values());
+        onUpdate();
         return true;
     }
 
@@ -169,8 +167,7 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     public XWikiAttachment set(XWikiAttachment attachment)
     {
         XWikiAttachment ret = map.put(attachment.getFilename(), attachment);
-        this.list.clear();
-        this.list.addAll(map.values());
+        this.list = new ArrayList<XWikiAttachment>(map.values());
         added(ret);
         onUpdate();
         return ret;

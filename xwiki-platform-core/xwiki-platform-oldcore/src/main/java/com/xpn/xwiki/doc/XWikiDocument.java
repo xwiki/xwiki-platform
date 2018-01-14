@@ -4695,7 +4695,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public XWikiAttachmentList getAttachmentList()
+    public List<XWikiAttachment> getAttachmentList()
     {
         return this.attachmentList;
     }
@@ -4831,13 +4831,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
     {
-        List<XWikiAttachment> list = getAttachmentList();
-        if (!list.contains(attachmentToRemove)) {
-            attachmentToRemove = null;
-        } else {
-            list.remove(attachmentToRemove);
+        List<XWikiAttachment> list = this.attachmentList;
+        if (list.remove(attachmentToRemove)) {
             this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
             setMetaDataDirty(true);
+        } else {
+            attachmentToRemove = null;
         }
         return attachmentToRemove;
     }
@@ -5386,7 +5385,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment getAttachment(String filename)
     {
-        XWikiAttachment output = getAttachmentList().getByFilename(filename);
+        XWikiAttachment output = this.attachmentList.getByFilename(filename);
         if (output != null) {
             return output;
         }
@@ -5424,7 +5423,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         attachment.setDoc(this);
 
-        XWikiAttachmentList list = getAttachmentList();
+        XWikiAttachmentList list = this.attachmentList;
         XWikiAttachment currentAttachment = list.getByFilename(attachment.getFilename());
         list.set(attachment);
         return currentAttachment;

@@ -129,6 +129,11 @@ ${escapetool.h}set (${escapetool.d}columnsProperties = {
 ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #end
 #end
+#set($userPicker = false)
+#if($column == 'doc.author')
+#set($userPicker = true)
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
+#end
 #end
 
 #macro(generateLiveTable)

@@ -186,7 +186,7 @@ platform.wiki.browse._actions.delete=Delete
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept it
+WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
 WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
 WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
 WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki

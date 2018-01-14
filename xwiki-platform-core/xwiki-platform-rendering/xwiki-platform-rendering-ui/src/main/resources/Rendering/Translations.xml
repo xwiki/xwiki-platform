@@ -42,7 +42,7 @@
   <content>admin.syntaxes=Syntaxes
 admin.syntaxes.description=Choose the default page syntax and configure the available markup syntaxes.
 Rendering.RenderingConfigClass_disabledSyntaxes=Disabled Syntaxes
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=The list of markup syntaxes that pages cannot be written in
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=The list of markup syntaxes in which pages cannot be written
 </content>
   <object>
     <name>Rendering.Translations</name>

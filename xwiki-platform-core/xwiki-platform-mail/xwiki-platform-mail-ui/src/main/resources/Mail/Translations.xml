@@ -46,8 +46,8 @@ admin.emailgeneral.description=Configure advanced mail parameters, like mail add
 admin.emailsend=Mail Sending
 admin.emailsend.description=Configure mail sending parameters.
 admin.emailstatus=Mail Sending Status
-admin.emailstatus.description=View the statuses of sent mails and resend mails that have failed to be sent.
-admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property that sent the mail did not specify the mail status should be persisted.
+admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.
+admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
 Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
 Mail.GeneralMailConfigClass_obfuscate.hint=This only affects the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 Mail.SendMailConfigClass_from=Email address to send from
@@ -65,7 +65,7 @@ Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP serve
 Mail.SendMailConfigClass_properties=Additional Properties
 Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
 Mail.SendMailConfigClass_sendWaitTime=Send Wait Time
-Mail.SendMailConfigClass_sendWaitTime.hint=The delay to wait between each mail being sent, in milliseconds (defaults to 8 seconds)
+Mail.SendMailConfigClass_sendWaitTime.hint=The delay between each mail being sent, in milliseconds (defaults to 8 seconds)
 Mail.SendMailConfigClass_discardSuccessStatuses=Discard Success Statuses?
 Mail.SendMailConfigClass_discardSuccessStatuses.hint=No matter whether mail statuses are kept or not for mail that has been sent successfully (defaults to true)
 Mail.SendMailStatus_livetable.date=Date
@@ -78,7 +78,7 @@ Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Resend
 mailSender.admin.resendSuccess=The mail has been resent successfully
-mailSender.admin.resendFailure=The mail has failed to be resent. Click for more details.</content>
+mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
   <object>
     <name>Mail.Translations</name>
     <number>0</number>

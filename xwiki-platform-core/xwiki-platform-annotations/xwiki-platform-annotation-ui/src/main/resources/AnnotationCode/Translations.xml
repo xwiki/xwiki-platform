@@ -40,9 +40,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>annotations.title=Annotate
-annotations.menu.loading=Loading annotations settings
+annotations.menu.loading=Loading annotation settings
 annotations.menu.loaderror=Failed: 
-annotations.tab.info.noannotations=No annotations for this page
+annotations.tab.info.noannotations=No annotations on this page
 
 annotations.settings.display=Show annotations 
 annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
@@ -55,15 +55,15 @@ annotations.annotated.error.noannotatedelement=Annotations could not be loaded b
 annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 
 annotations.action.edit.text=[Edit]
-annotations.action.edit.tooltip=Edit this annotation
+annotations.action.edit.tooltip=Edit annotation
 annotations.action.edit.submit.text=Update
 annotations.action.edit.cancel.text=Cancel
-annotations.action.edit.success=Annotation has been successfully updated.
+annotations.action.edit.success=Annotation updated.
 annotations.action.edit.loaderror=Failed: 
 annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
 
 annotations.action.delete.text=[Delete]
-annotations.action.delete.tooltip=Delete this annotation
+annotations.action.delete.tooltip=Delete annotation
 annotations.action.delete.confirm=Are you sure you want to delete this annotation?
 annotations.action.delete.inProgress=Deleting annotation...
 annotations.action.delete.done=Annotation deleted
@@ -73,7 +73,7 @@ annotations.action.create.submit.text=Add annotation
 annotations.action.create.cancel.text=Cancel
 annotations.action.create.selection.invalid=Please select a non-empty text in the page content.
 annotations.action.create.form.loaderror=Failed: 
-annotations.action.create.success=Annotation has been successfully added
+annotations.action.create.success=Annotation added.
 annotations.action.create.loaderror=Failed: 
 annotations.action.create.error.unauthorized=You are not authorized to add annotations on this page. 
 annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this page. Try to login first.
@@ -84,16 +84,16 @@ annotations.action.create.error.notarget=Unspecified target (page) to create ann
 annotations.action.view.hide.text=hide
 annotations.action.view.form.loaderror=Failed: 
 annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
-annotations.action.view.thread=See thread
+annotations.action.view.thread=View thread
 
 annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page: 
-annotations.updated.text=This annotation was automatically repositioned after an update of the page. Originally: 
+annotations.updated.text=This annotation was automatically repositioned after a page update. Originally: 
 annotations.action.validate.text=[Validate]
 annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
-annotations.action.validate.success=Annotation has been successfully validated.
+annotations.action.validate.success=Annotation validated.
 annotations.action.validate.loaderror=Failed: 
 
-annotations.filters.show=Refine the display criteria
+annotations.filters.show=Filter
 annotations.filters.nooption=There are no values to filter for "{0}"
 annotations.filters.anyvalue=any value
 annotations.filters.clearvalue=clear
@@ -113,8 +113,8 @@ AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locatio
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
 AnnotationCode.AnnotationConfig_displayed=Display annotations by default
 AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
-AnnotationCode.AnnotationConfig_displayHighlight=Display annotations highlight by default
-AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if the annotation's highlight should be displayed always or only when hovering over the annotation or the structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
 AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure</content>
   <object>
     <name>AnnotationCode.Translations</name>

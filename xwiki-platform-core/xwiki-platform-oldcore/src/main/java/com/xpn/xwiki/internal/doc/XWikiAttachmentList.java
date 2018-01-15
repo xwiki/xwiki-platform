@@ -152,9 +152,9 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public boolean remove(Object attachment)
     {
         XWikiAttachment xwikiAttachment = (XWikiAttachment) attachment;
-        if(map.put(xwikiAttachment.getFilename(), xwikiAttachment) == null)
+        if(map.remove(xwikiAttachment.getFilename()) == null) {
             return false;
-        map.remove(attachment);
+        }
         updateMap();
         return true;
     }

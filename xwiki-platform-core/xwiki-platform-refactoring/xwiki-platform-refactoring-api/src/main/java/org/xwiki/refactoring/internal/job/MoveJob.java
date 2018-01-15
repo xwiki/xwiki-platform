@@ -222,6 +222,8 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
                 this.modelBridge.createRedirect(oldReference, newReference);
             }
+            DocumentMovedEvent newEvent = new DocumentMovingEvent();
+            getObservationManager().notify(oldReference,newReference);
         } finally {
             this.progressManager.popLevelProgress(this);
         }

@@ -67,11 +67,7 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     @Override
     public boolean add(XWikiAttachment attachment)
     {
-        map.put(attachment.getFilename(), attachment);
-        this.list = new ArrayList<XWikiAttachment>(map.values());
-        onUpdate();
-        added(attachment);
-        return true;
+        return set(attachment) != null;
     }
 
     /**
@@ -95,13 +91,14 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     @Override
     public void clear()
     {
-        super.clear();
-        map.clear();
+        updateMap();
     }
 
     /**
-     * {@inheritDoc}
+     * Adds all attachments to the list in order of filename.
      * 
+     * @param index index is ignored as list is reordered based on filename
+     * @param c Collection that contains XWikiAttachment objects
      * @since 10.0RC1
      */
     @Override
@@ -111,14 +108,15 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
             map.put(x.getFilename(), x);
             added(x);
         }
-        this.list = new ArrayList<XWikiAttachment>(map.values());
-        onUpdate();
+        updateMap();
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * Adds all attachments to the list in order of filename.
      * 
+     * @param index index is ignored as list is reordered based on filename
+     * @param c Collection that contains XWikiAttachment objects
      * @since 10.0RC1
      */
     @Override
@@ -147,18 +145,18 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
      * Removes XWikiAttachment.
      * 
      * @param attachment XWikiAttachment to remove.
-     * @return XWikiAttachment that was removed or null if not found
+     * @return true unless the attachment is not found
      * @since 10.0RC1
      */
     @Override
     public boolean remove(Object attachment)
     {
-        int index = list.indexOf(attachment);
-        XWikiAttachment removedAttachment = null;
-        if (index != -1) {
-            removedAttachment = remove(index);
-        }
-        return removedAttachment == null ? false : true;
+        XWikiAttachment xwikiAttachment = (XWikiAttachment) attachment;
+        if(map.put(xwikiAttachment.getFilename(), xwikiAttachment) == null)
+            return false;
+        map.remove(attachment);
+        updateMap();
+        return true;
     }
 
     /**
@@ -170,11 +168,10 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
      */
     public XWikiAttachment set(XWikiAttachment attachment)
     {
-        XWikiAttachment ret = map.put(attachment.getFilename(), attachment);
-        this.list = new ArrayList<XWikiAttachment>(map.values());
-        added(ret);
-        onUpdate();
-        return ret;
+        map.put(attachment.getFilename(), attachment);
+        added(attachment);
+        updateMap();
+        return attachment;
     }
 
     /**
@@ -204,27 +201,41 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     @Override
     public boolean removeAll(Collection<?> c)
     {
+        boolean changed = false;
         for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
-            if (this.list.contains(x))
-                remove(x);
+            if (this.list.contains(x)) {
+                if(remove(x)) {
+                    changed = true;
+                }
+            }
         }
-        return true;
+        return changed;
     }
 
     @Override
     public boolean retainAll(Collection<?> c)
     {
+        boolean changed = false;
         for (XWikiAttachment x : this.list) {
-            if (!((Collection<? extends XWikiAttachment>) (c)).contains(x))
-                remove(x);
+            if (!((Collection<? extends XWikiAttachment>) (c)).contains(x)) {
+                if(remove(x)) {
+                    changed = true;
+                }
+            }
         }
-        return true;
+        return changed;
     }
 
     /** Called when the list is updated. The method will be called at least once, but may be called several times */
     public void onUpdate()
     {
         document.setMetaDataDirty(true);
+    }
+    
+    public void updateMap()
+    {
+        document.setMetaDataDirty(true);
+        this.list = new ArrayList<>(map.values());
     }
 
     /**

@@ -200,11 +200,13 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public boolean removeAll(Collection<?> c)
     {
         boolean changed = false;
-        XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
         for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
-                if (remove(x)) {
+                if (map.remove(x.getFilename(),x)) {
                     changed = true;
                 }
+        }
+        if(changed) {
+            updatedMap();
         }
         return changed;
     }
@@ -219,6 +221,9 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
                 changed = true;
             }
         }
+        if(changed) {
+            updatedMap();
+        }
         return changed;
     }
 
@@ -226,7 +231,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     private void updatedMap()
     {
         document.setMetaDataDirty(true);
-        this.setCollection(map.values());
+        this.setCollection(new ArrayList<>(map.values()));
     }
 
     /**

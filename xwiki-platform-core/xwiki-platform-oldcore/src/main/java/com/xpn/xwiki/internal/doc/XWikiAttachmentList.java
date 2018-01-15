@@ -22,16 +22,12 @@ package com.xpn.xwiki.internal.doc;
 import java.util.ArrayList;
 
 import java.util.Collection;
-import java.util.ListIterator;
-import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import org.apache.commons.collections4.list.AbstractListDecorator;
 
 /**

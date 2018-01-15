@@ -201,7 +201,8 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     {
         boolean changed = false;
         for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
-            if (map.remove(x.getFilename(), x)) {
+            if (map.get(x.getFilename()) == x) {
+                map.remove(x.getFilename());
                 changed = true;
             }
         }
@@ -218,7 +219,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         Collection<XWikiAttachment> values = map.values();
         for (XWikiAttachment x : values) {
             if (!c.contains(x)) {
-                map.remove(x.getFilename(), x);
+                map.remove(x.getFilename());
                 changed = true;
             }
         }

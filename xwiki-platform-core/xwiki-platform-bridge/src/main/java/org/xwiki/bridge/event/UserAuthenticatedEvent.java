@@ -19,16 +19,15 @@
  */
 package org.xwiki.bridge.event;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.EndEvent;
-import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered after a document is authenticated.
+ * An event triggered after a user is authenticated.
  * <p>
  * The event also send the following parameters:
  * </p>
  * <ul>
- * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
  * 
@@ -40,28 +39,18 @@ public class UserAuthenticatedEvent implements EndEvent
 {
 	 private static final long serialVersionUID = 1L;
 
-	  public UserAuthenticatedEvent()
+        public UserAuthenticatedEvent()
     {
-
+        super();
     }
-
-     /**
-     * Constructor initializing the user name of the event.
+    
+    /**
+     * Constructor initializing the user refrences of the event.
      * 
-     * @param userauthenticate the name of the authenticated user
+     * @param DocumentReference the refrences of the authenticated user
      */
-     public UserAuthenticatedEvent(String userauthenticate)
+     public UserAuthenticatedEvent(DocumentReference documentReference)
     {
-        super(userauthenticate);
+        super(documentReference);
     } 
-
-     /**
-     * Constructor using a custom {@link EventFilter}.
-     * 
-     * @param eventFilter the filter to use for matching events
-     */
-     public UserAuthenticatedEvent(EventFilter eventFilter)
-    {
-        super(eventFilter);
-    }
 }

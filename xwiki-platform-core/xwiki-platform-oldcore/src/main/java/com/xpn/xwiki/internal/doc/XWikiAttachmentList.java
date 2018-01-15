@@ -215,9 +215,10 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public boolean retainAll(Collection<?> c)
     {
         boolean changed = false;
-        XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
-        for (XWikiAttachment x : list) {
-            if (remove(x)) {
+        Collection<XWikiAttachment> values = map.values();
+        for(XWikiAttachment x : values) {
+            if(!c.contains(x)) {
+                map.remove(x.getFilename(),x);
                 changed = true;
             }
         }

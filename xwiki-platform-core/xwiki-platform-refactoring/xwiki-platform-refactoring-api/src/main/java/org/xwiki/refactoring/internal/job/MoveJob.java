@@ -181,7 +181,11 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         this.progressManager.pushLevelProgress(7, this);
 
         try {
-            // Step 1: Delete the destination document if needed.
+           //Step 1: Moving the document
+            DocumentMovingEvent newEvent = new DocumentMovingEvent();
+            getObservationManager().notify(oldReference,newReference);
+            
+           // Step 2: Delete the destination document if needed.
             this.progressManager.startStep(this);
             if (this.modelBridge.exists(newReference)) {
                 if (this.request.isInteractive() && !confirmOverwrite(oldReference, newReference)) {
@@ -195,34 +199,35 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             }
             this.progressManager.endStep(this);
 
-            // Step 2: Copy the source document to the destination.
+            // Step 3: Copy the source document to the destination.
             this.progressManager.startStep(this);
             if (!this.modelBridge.copy(oldReference, newReference)) {
                 return;
             }
             this.progressManager.endStep(this);
 
-            // Step 3: Update the destination document based on the source document parameters.
+            // Step 4: Update the destination document based on the source document parameters.
             this.progressManager.startStep(this);
             this.modelBridge.update(newReference, this.request.getEntityParameters(oldReference));
             this.progressManager.endStep(this);
 
-            // Step 4 + 5: Update other documents that might be affected by this move.
+            // Step 5 + 6: Update other documents that might be affected by this move.
             updateDocuments(oldReference, newReference);
 
-            // Step 6: Delete the source document.
+            // Step 7: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
                 this.modelBridge.delete(oldReference);
             }
             this.progressManager.endStep(this);
 
-            // Step 7: Create an automatic redirect.
+            // Step 8: Create an automatic redirect.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
                 this.modelBridge.createRedirect(oldReference, newReference);
             }
-            DocumentMovedEvent newEvent = new DocumentMovingEvent();
+            //Step 9: Moved the document
+            DocumentMovedEvent newEvent = new DocumentMovedEvent();
             getObservationManager().notify(oldReference,newReference);
         } finally {
             this.progressManager.popLevelProgress(this);

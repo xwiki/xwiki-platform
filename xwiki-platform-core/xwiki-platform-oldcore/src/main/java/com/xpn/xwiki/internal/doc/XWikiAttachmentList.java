@@ -202,11 +202,9 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         boolean changed = false;
         XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
         for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
-            if (list.contains(x)) {
                 if (remove(x)) {
                     changed = true;
                 }
-            }
         }
         return changed;
     }

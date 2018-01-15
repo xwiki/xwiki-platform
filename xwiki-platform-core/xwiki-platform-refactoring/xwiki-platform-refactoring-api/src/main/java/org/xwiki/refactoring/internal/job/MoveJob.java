@@ -67,6 +67,9 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
     
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+    
+    @Inject
+    private ObservationManager observationManager;
 
     @Override
     public String getType()
@@ -172,8 +175,8 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             move(oldReference, newReference);
         }
     }
-
-    private void move(DocumentReference oldReference, DocumentReference newReference, ObservationManager observationManager)
+    
+    private void move(DocumentReference oldReference, DocumentReference newReference)
     {
         this.progressManager.pushLevelProgress(7, this);
 
@@ -222,6 +225,19 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+    
+    private ObservationManager getObservationManager()
+    {
+        if (this.observationManager == null) {
+            try {
+                this.observationManager = componentManager.getInstance(ObservationManager.class);
+
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Cound not retrieve an Observation Manager against the component manager");
+            }
+        }
+        return this.observationManager;
     }
 
     private void updateDocuments(DocumentReference oldReference, DocumentReference newReference)

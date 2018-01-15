@@ -37,9 +37,9 @@ import org.xwiki.observation.event.EndEvent;
 
 public class UserAuthenticatedEvent implements EndEvent
 {
-	 private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-        public UserAuthenticatedEvent()
+    public UserAuthenticatedEvent()
     {
         super();
     }

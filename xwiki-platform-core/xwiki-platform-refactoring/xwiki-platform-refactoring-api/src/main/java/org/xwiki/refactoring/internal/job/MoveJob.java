@@ -226,19 +226,6 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             this.progressManager.popLevelProgress(this);
         }
     }
-    
-    private ObservationManager getObservationManager()
-    {
-        if (this.observationManager == null) {
-            try {
-                this.observationManager = componentManager.getInstance(ObservationManager.class);
-
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException("Cound not retrieve an Observation Manager against the component manager");
-            }
-        }
-        return this.observationManager;
-    }
 
     private void updateDocuments(DocumentReference oldReference, DocumentReference newReference)
     {

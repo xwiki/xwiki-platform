@@ -64,7 +64,8 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     @Override
     public boolean add(XWikiAttachment attachment)
     {
-        return set(attachment) != null;
+        XWikiAttachment set = set(attachment);
+        return !set.equals(attachment);
     }
 
     /**
@@ -99,7 +100,8 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     {
         boolean changed = false;
         for (XWikiAttachment x : c) {
-            if (map.put(x.getFilename(), x) == null) {
+            XWikiAttachment put = map.put(x.getFilename(), x);
+            if (!x.equals(put)) {
                 changed = true;
                 added(x);
             }
@@ -174,7 +176,8 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * 
      * @param index this parameter is not used but is needed to override the method
      * @param attachment the attachment to add to the list
-     * @return the attachment that was added to the list in order of filename
+     * @return the attachment that was previously matched to the same filename or null if no attachment was matched to
+     *         it
      * @since 10.0RC1
      */
     @Override

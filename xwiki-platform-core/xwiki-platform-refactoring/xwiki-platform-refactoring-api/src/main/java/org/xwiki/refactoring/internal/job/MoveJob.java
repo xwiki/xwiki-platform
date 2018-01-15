@@ -175,7 +175,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             move(oldReference, newReference);
         }
     }
-    
+
     private void move(DocumentReference oldReference, DocumentReference newReference)
     {
         this.progressManager.pushLevelProgress(7, this);

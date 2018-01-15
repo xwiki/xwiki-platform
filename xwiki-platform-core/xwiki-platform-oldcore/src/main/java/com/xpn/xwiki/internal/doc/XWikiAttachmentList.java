@@ -84,15 +84,11 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         add(attachment);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 10.0RC1
-     */
     @Override
     public void clear()
     {
-        updateMap();
+        map.clear();
+        updatedMap();
     }
 
     /**
@@ -113,7 +109,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
             }
         }
         if (changed) {
-            updateMap();
+            updatedMap();
         }
         return changed;
     }
@@ -136,7 +132,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     {
         XWikiAttachment removedAttachment = map.remove(this.decorated().get(index).getFilename());
         if (removedAttachment != null) {
-            updateMap();
+            updatedMap();
         }
         return removedAttachment;
     }
@@ -155,7 +151,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         if (map.remove(xwikiAttachment.getFilename()) == null) {
             return false;
         }
-        updateMap();
+        updatedMap();
         return true;
     }
 
@@ -172,7 +168,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         XWikiAttachment put = map.put(attachment.getFilename(), attachment);
         if (put == null || !put.equals(attachment)) {
             added(attachment);
-            updateMap();
+            updatedMap();
         }
         return put;
     }
@@ -230,7 +226,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     }
 
     /** Sets MetaDataDirty to true and resets the list with the values in the map */
-    private void updateMap()
+    private void updatedMap()
     {
         document.setMetaDataDirty(true);
         this.setCollection(map.values());
@@ -242,7 +238,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      */
     protected void added(XWikiAttachment element)
     {
-       element.setDoc(document);
+        element.setDoc(document);
     }
 
 }

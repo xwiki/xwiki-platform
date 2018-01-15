@@ -60,10 +60,14 @@ $response.setContentType('application/json')
   #set ($limit = 15)
 #end
 #set($docNameFilter = $request.get('ddoc.fullName'))
+#set($dateFilter = $request.get('ddoc.date'))
 #set($deleterFilter = $request.get('ddoc.deleter'))
 #set($sql = '')
 #if("$!{docNameFilter}" != '')
   #set($sql = "and lower(ddoc.fullName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+#end
+#if("$!{dateFilter}" != '')
+  #set($sql = $sql + "and ddoc.date between '%${dateFilter.split("-")[0]}%' and '%${dateFilter.split("-")[1]}%' ")
 #end
 #if("$!{deleterFilter}" != '')
   #set($sql = $sql + "and lower(ddoc.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")

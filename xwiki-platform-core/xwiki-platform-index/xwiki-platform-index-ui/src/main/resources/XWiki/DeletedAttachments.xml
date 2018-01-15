@@ -145,6 +145,7 @@ $response.setContentType('application/json')
 #end
 #set($filenameFilter = $request.get('datt.filename'))
 #set($docNameFilter = $request.get('datt.docName'))
+#set($dateFilter = $request.get('ddoc.date'))
 #set($deleterFilter = $request.get('datt.deleter'))
 #set($sql = '')
 #if("$!{filenameFilter}" != '')
@@ -152,6 +153,9 @@ $response.setContentType('application/json')
 #end
 #if("$!{docNameFilter}" != '')
   #set($sql = "and lower(datt.docName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+#end
+#if("$!{dateFilter}" != '')
+  #set($sql = $sql + "and ddoc.date between '%${dateFilter.split("-")[0]}%' and '%${dateFilter.split("-")[1]}%' ")
 #end
 #if("$!{deleterFilter}" != '')
   #set($sql = $sql + "and lower(datt.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")

@@ -163,7 +163,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * Adds or replaces attachment with the same filename as the parameter.
      * 
      * @param attachment the attachment to add to the list
-     * @return the attachment that was added to the list in order of filename
+     * @return the attachment that was previously matched to the same filename or null if no attachment was matched to it
      * @since 10.0RC1
      */
     public XWikiAttachment set(XWikiAttachment attachment)
@@ -173,7 +173,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
             added(attachment);
             updateMap();
         }
-        return attachment;
+        return put;
     }
 
     /**

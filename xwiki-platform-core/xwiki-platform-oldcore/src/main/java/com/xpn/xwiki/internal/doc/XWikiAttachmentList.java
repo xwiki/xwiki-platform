@@ -107,12 +107,12 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     {
         boolean changed = false;
         for (XWikiAttachment x : c) {
-            if(map.put(x.getFilename(), x) == null) {
+            if (map.put(x.getFilename(), x) == null) {
                 changed = true;
                 added(x);
             }
         }
-        if(changed) {
+        if (changed) {
             updateMap();
         }
         return changed;
@@ -135,8 +135,8 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public XWikiAttachment remove(int index)
     {
         XWikiAttachment removedAttachment = map.remove(this.decorated().get(index).getFilename());
-        if(removedAttachment != null) {
-        updateMap();
+        if (removedAttachment != null) {
+            updateMap();
         }
         return removedAttachment;
     }
@@ -152,7 +152,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public boolean remove(Object attachment)
     {
         XWikiAttachment xwikiAttachment = (XWikiAttachment) attachment;
-        if(map.remove(xwikiAttachment.getFilename()) == null) {
+        if (map.remove(xwikiAttachment.getFilename()) == null) {
             return false;
         }
         updateMap();
@@ -163,13 +163,14 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * Adds or replaces attachment with the same filename as the parameter.
      * 
      * @param attachment the attachment to add to the list
-     * @return the attachment that was previously matched to the same filename or null if no attachment was matched to it
+     * @return the attachment that was previously matched to the same filename or null if no attachment was matched to
+     *         it
      * @since 10.0RC1
      */
     public XWikiAttachment set(XWikiAttachment attachment)
     {
         XWikiAttachment put = map.put(attachment.getFilename(), attachment);
-        if(put == null || !put.equals(attachment)) {
+        if (put == null || !put.equals(attachment)) {
             added(attachment);
             updateMap();
         }
@@ -207,7 +208,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
         for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
             if (list.contains(x)) {
-                if(remove(x)) {
+                if (remove(x)) {
                     changed = true;
                 }
             }
@@ -221,9 +222,9 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         boolean changed = false;
         XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
         for (XWikiAttachment x : list) {
-                if(remove(x)) {
-                    changed = true;
-                }
+            if (remove(x)) {
+                changed = true;
+            }
         }
         return changed;
     }
@@ -241,7 +242,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      */
     protected void added(XWikiAttachment element)
     {
-        element.setDoc(document);
+       element.setDoc(document);
     }
 
 }

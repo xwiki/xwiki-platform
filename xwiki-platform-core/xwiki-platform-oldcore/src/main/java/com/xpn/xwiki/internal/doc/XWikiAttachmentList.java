@@ -65,7 +65,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public boolean add(XWikiAttachment attachment)
     {
         XWikiAttachment set = set(attachment);
-        return !set.equals(attachment);
+        return set != attachment;
     }
 
     /**
@@ -101,7 +101,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
         boolean changed = false;
         for (XWikiAttachment x : c) {
             XWikiAttachment put = map.put(x.getFilename(), x);
-            if (!x.equals(put)) {
+            if (put != x) {
                 changed = true;
                 added(x);
             }
@@ -164,7 +164,7 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public XWikiAttachment set(XWikiAttachment attachment)
     {
         XWikiAttachment put = map.put(attachment.getFilename(), attachment);
-        if (put == null || !put.equals(attachment)) {
+        if (put != attachment) {
             added(attachment);
             updatedMap();
         }

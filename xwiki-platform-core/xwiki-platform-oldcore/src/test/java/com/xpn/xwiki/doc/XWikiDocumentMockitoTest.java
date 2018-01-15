@@ -116,6 +116,8 @@ public class XWikiDocumentMockitoTest
     private BaseObject baseObject2;
 
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+    
+    private List<XWikiAttachment> attachmentList = this.document.getAttachmentList();
 
     @Before
     public void setUp() throws Exception
@@ -1396,5 +1398,38 @@ public class XWikiDocumentMockitoTest
         newDocument.fromXML(document, false);
 
         assertEquals(this.document, newDocument);
+    }
+    
+    @Test
+    public void listAddAttachment() throws XWikiException{
+        XWikiAttachment attachment = new XWikiAttachment(this.document, "testAttachment");
+        attachmentList.add(attachment);
+        assertEquals(this.document.getAttachmentList().contains(attachment),true);
+    }
+    
+    @Test
+    public void listMaintainsOrder() throws XWikiException{
+        XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
+        XWikiAttachment attachment2 = new XWikiAttachment(this.document, "attachmentB");
+        XWikiAttachment attachment3 = new XWikiAttachment(this.document, "attachmentC");
+        attachmentList.add(attachment3);
+        attachmentList.add(attachment1);
+        attachmentList.add(attachment2);
+        List<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
+        list.add(attachment1);
+        list.add(attachment2);
+        list.add(attachment3);
+        assertEquals(this.document.getAttachmentList(),list);
+    }
+    
+    @Test
+    public void testTest() throws XWikiException{
+        assertEquals("hi","hello");
+    }
+    
+    @Test
+    public void listClear() throws XWikiException{
+        attachmentList.clear();
+        assertEquals(attachmentList,new ArrayList<XWikiAttachment>());
     }
 }

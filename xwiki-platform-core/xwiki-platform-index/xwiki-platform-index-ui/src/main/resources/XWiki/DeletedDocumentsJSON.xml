@@ -60,10 +60,24 @@ $response.setContentType('application/json')
   #set ($limit = 15)
 #end
 #set($docNameFilter = $request.get('ddoc.fullName'))
+#set($dateFilter = $request.get('ddoc.date'))
 #set($deleterFilter = $request.get('ddoc.deleter'))
 #set($sql = '')
 #if("$!{docNameFilter}" != '')
   #set($sql = "and lower(ddoc.fullName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+#end
+#if("$!{dateFilter}" != '')
+  #set($dates = $dateFilter.split('-'))
+  #if($dates.size() == 2)
+    ## Date range matching
+    #set($sql = "${sql} and ddoc.date between ? and ? ")
+    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[0]))))
+    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[1]))))
+  #else
+    ## Single value matching
+    #set($sql = "${sql} and upper(str(ddoc.date)) like upper(str(?)) ")
+    #set($discard = $params.add($dateFilter))
+  #end
 #end
 #if("$!{deleterFilter}" != '')
   #set($sql = $sql + "and lower(ddoc.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
@@ -84,8 +98,8 @@ $response.setContentType('application/json')
 #end
 #set($selectSql = "select ddoc.id from XWikiDeletedDocument as ddoc where 1=1 " + $sql + " order by $order $dir")
 #set($countSql = "select count(*) from XWikiDeletedDocument as ddoc where 1=1 " + $sql)
-#set($items = $services.query.hql($selectSql).setLimit($limit).setOffset($offset).execute())
-#set($totalItems = $services.query.hql($countSql).execute().get(0))
+#set($items = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset).execute())
+#set($totalItems = $services.query.hql($countSql).bindValues($params).execute().get(0))
 #set($returnedItems = $items.size())
 ## ==============================================
 ## json starts

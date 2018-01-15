@@ -145,13 +145,28 @@ $response.setContentType('application/json')
 #end
 #set($filenameFilter = $request.get('datt.filename'))
 #set($docNameFilter = $request.get('datt.docName'))
+#set($dateFilter = $request.get('datt.date'))
 #set($deleterFilter = $request.get('datt.deleter'))
 #set($sql = '')
+#set($params = [])
 #if("$!{filenameFilter}" != '')
   #set($sql = "and lower(datt.filename) like '%${filenameFilter.trim().toLowerCase()}%' ")
 #end
 #if("$!{docNameFilter}" != '')
   #set($sql = "and lower(datt.docName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+#end
+#if("$!{dateFilter}" != '')
+  #set($dates = $dateFilter.split('-'))
+  #if($dates.size() == 2)
+    ## Date range matching
+    #set($sql = "${sql} and datt.date between ? and ? ")
+    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[0]))))
+    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[1]))))
+  #else
+    ## Single value matching
+    #set($sql = "${sql} and upper(str(datt.date)) like upper(str(?)) ")
+    #set($discard = $params.add($dateFilter))
+  #end
 #end
 #if("$!{deleterFilter}" != '')
   #set($sql = $sql + "and lower(datt.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
@@ -168,8 +183,8 @@ $response.setContentType('application/json')
 #end
 #set($selectSql = "select datt.id, $order from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
 #set($countSql = "select count(*) from DeletedAttachment as datt where 1=1 " + $sql)
-#set($items = $services.query.hql($selectSql).setLimit($limit).setOffset($offset).execute())
-#set($totalItems = $services.query.hql($countSql).execute().get(0))
+#set($items = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset).execute())
+#set($totalItems = $services.query.hql($countSql).bindValues($params).execute().get(0))
 #set($returnedItems = $items.size())
 ## ==============================================
 ## json starts

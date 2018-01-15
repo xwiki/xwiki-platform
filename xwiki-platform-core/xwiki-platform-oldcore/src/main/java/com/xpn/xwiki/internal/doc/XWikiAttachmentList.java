@@ -32,6 +32,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
+import org.apache.commons.collections4.list.AbstractListDecorator;
 
 /**
  * AttachmentList that holds elements in order of filename.
@@ -40,7 +41,7 @@ import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
  * @param <E>
  * @since 10.0RC1
  */
-public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachment>
+public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
 {
 
     private final Map<String, XWikiAttachment> map = new ConcurrentSkipListMap<String, XWikiAttachment>();
@@ -104,12 +105,17 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     @Override
     public boolean addAll(Collection<? extends XWikiAttachment> c)
     {
+        boolean changed = false;
         for (XWikiAttachment x : c) {
-            map.put(x.getFilename(), x);
-            added(x);
+            if(map.put(x.getFilename(), x) == null) {
+                changed = true;
+                added(x);
+            }
         }
-        updateMap();
-        return true;
+        if(changed) {
+            updateMap();
+        }
+        return changed;
     }
 
     /**
@@ -125,18 +131,12 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
         return addAll(c);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 10.0RC1
-     */
     @Override
     public XWikiAttachment remove(int index)
     {
-        XWikiAttachment removedAttachment = map.remove(this.list.get(index).getFilename());
-        if (removedAttachment != null) {
-            removedAttachment = super.remove(index);
-            document.setMetaDataDirty(true);
+        XWikiAttachment removedAttachment = map.remove(this.decorated().get(index).getFilename());
+        if(removedAttachment != null) {
+        updateMap();
         }
         return removedAttachment;
     }
@@ -168,9 +168,11 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
      */
     public XWikiAttachment set(XWikiAttachment attachment)
     {
-        map.put(attachment.getFilename(), attachment);
-        added(attachment);
-        updateMap();
+        XWikiAttachment put = map.put(attachment.getFilename(), attachment);
+        if(put == null || !put.equals(attachment)) {
+            added(attachment);
+            updateMap();
+        }
         return attachment;
     }
 
@@ -202,8 +204,9 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     public boolean removeAll(Collection<?> c)
     {
         boolean changed = false;
+        XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
         for (XWikiAttachment x : (Collection<? extends XWikiAttachment>) c) {
-            if (this.list.contains(x)) {
+            if (list.contains(x)) {
                 if(remove(x)) {
                     changed = true;
                 }
@@ -216,26 +219,20 @@ public class XWikiAttachmentList extends AbstractNotifyOnUpdateList<XWikiAttachm
     public boolean retainAll(Collection<?> c)
     {
         boolean changed = false;
-        for (XWikiAttachment x : this.list) {
-            if (!((Collection<? extends XWikiAttachment>) (c)).contains(x)) {
+        XWikiAttachmentList list = (XWikiAttachmentList) this.decorated();
+        for (XWikiAttachment x : list) {
                 if(remove(x)) {
                     changed = true;
                 }
-            }
         }
         return changed;
     }
 
-    /** Called when the list is updated. The method will be called at least once, but may be called several times */
-    public void onUpdate()
+    /** Sets MetaDataDirty to true and resets the list with the values in the map */
+    private void updateMap()
     {
         document.setMetaDataDirty(true);
-    }
-    
-    public void updateMap()
-    {
-        document.setMetaDataDirty(true);
-        this.list = new ArrayList<>(map.values());
+        this.setCollection(map.values());
     }
 
     /**

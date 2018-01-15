@@ -21,7 +21,7 @@
  
  import org.xwiki.model.reference.DocumentReference;
  import org.xwiki.observation.event.filter.EventFilter;
- import org.xwiki.observation.event.EndEvent;
+ import org.xwiki.observation.event.EndFoldEvent;
  
  /**
   * An event triggered after a document is moved.
@@ -37,7 +37,7 @@
   * @since 10.0RC1
   */
  @Unstable 
- public class DocumentMovedEvent extends AbstractDocumentEvent implements EndEvent
+ public class DocumentMovedEvent extends AbstractDocumentEvent implements EndFoldEvent
  {
  +    /**
       * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

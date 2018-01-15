@@ -1,4 +1,45 @@
-{{velocity}}
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.DeletedAttachments" locale="">
+  <web>XWiki</web>
+  <name>DeletedAttachments</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1262178920000</creationDate>
+  <parent>Main.AllDocs</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1504192142000</date>
+  <contentUpdateDate>1504192142000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.index.attachmentsTrash')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
 #set($dateFormat = 'yyyy MMMM d, HH:mm')
 #if(!$request.list)
 $xwiki.ssx.use('XWiki.DeletedAttachments')##
@@ -13,7 +54,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
     'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
   })##
 #set($options = {
-    'url'               : "$xwiki.getURL('XWiki.DeletedAttachments', 'view', 'list=1&xpage=plain&outputSyntax=plain')",
+    'url'               : "$xwiki.getURL('XWiki.DeletedAttachments', 'view', 'list=1&amp;xpage=plain&amp;outputSyntax=plain')",
     'callback'          : 'XWiki.index.trash.attachments.displayEntry',
     'translationPrefix' : 'platform.index.trashAttachments.'
   })##
@@ -21,13 +62,13 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
 ##
 ##
 {{html wiki="true" clean="false"}}
-<div class="hidden">
+&lt;div class="hidden"&gt;
 #livetable('attachmentTrash' $columns $columnsProperties $options)
-</div>
+&lt;/div&gt;
 {{/html}}
 
 {{html wiki="true" clean="false"}}
-<noscript>
+&lt;noscript&gt;
 
   #set($deletedAttachments = $services.query.hql('select count(datt.id) from DeletedAttachment as datt').execute().get(0))
   #if($deletedAttachments == 0)
@@ -39,17 +80,17 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
     #set($datt = $xwiki.getDeletedAttachment("$id"))
     #set($originalAttachment = $datt.getAttachment())
     #set($originalDocument = $xwiki.getDocument($datt.docName))
-    <tr>
-      <td><a href="$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}").replaceAll('&', '&amp;')">$escapetool.xml($datt.filename)</a></td>
-      <td><a href="$originalDocument.getURL()">$escapetool.xml($originalDocument.plainTitle) ($escapetool.xml(${originalDocument.fullName}))</a></td>
-      <td>$xwiki.formatDate($datt.getDate(), $dateFormat)</td>
-      <td>$xwiki.getUserName($datt.getDeleter())</td>
-      <td class="itemActions">
+    &lt;tr&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}").replaceAll('&amp;', '&amp;amp;')"&gt;$escapetool.xml($datt.filename)&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getURL()"&gt;$escapetool.xml($originalDocument.plainTitle) ($escapetool.xml(${originalDocument.fullName}))&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;$xwiki.formatDate($datt.getDate(), $dateFormat)&lt;/td&gt;
+      &lt;td&gt;$xwiki.getUserName($datt.getDeleter())&lt;/td&gt;
+      &lt;td class="itemActions"&gt;
         #if($datt.canDelete())
-          <a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')">$services.localization.render('platform.index.trashAttachmentsDeleteText')</a>
+          &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
         #end
-      </td>
-    </tr>
+      &lt;/td&gt;
+    &lt;/tr&gt;
   #end
 ##
   #if("$!{request.view}" == '')
@@ -63,25 +104,25 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
     'url' : $doc.getURL('view', $queryParams)
   })
   #pagination($paginationParameters)
-  <table id="searchResults" class="xwiki-livetable xwiki-livetable-display">
-    <thead class="xwiki-livetable-display-header"><tr>
-      <th scope="col" class="xwiki-livetable-display-header-text selected asc">$services.localization.render('platform.index.trashAttachments.datt.filename')</th>
-      <th scope="col" class="xwiki-livetable-display-header-text">$services.localization.render('platform.index.trashAttachments.datt.docName')</th>
-      <th scope="col" class="xwiki-livetable-display-header-text">$services.localization.render('platform.index.trashAttachments.datt.date')</th>
-      <th scope="col" class="xwiki-livetable-display-header-text">$services.localization.render('platform.index.trashAttachments.datt.deleter')</th>
-      <th scope="col" class="xwiki-livetable-display-header-text">$services.localization.render('platform.index.trashAttachments.actions')</th>
-    </tr></thead>
-    <tbody class="xwiki-livetable-display-body">
+  &lt;table id="searchResults" class="xwiki-livetable xwiki-livetable-display"&gt;
+    &lt;thead class="xwiki-livetable-display-header"&gt;&lt;tr&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$services.localization.render('platform.index.trashAttachments.datt.filename')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.datt.docName')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.datt.date')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.datt.deleter')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashAttachments.actions')&lt;/th&gt;
+    &lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody class="xwiki-livetable-display-body"&gt;
     #set ($query = $services.query.hql('select datt.id from DeletedAttachment as datt order by datt.filename asc'))
     #foreach($item in $query.setLimit($paginationParameters.itemsPerPage).setOffset($paginationParameters.firstItem).execute())
       #displayDeletedAttachment($item)
     #end
-    </tbody>
-  </table>
+    &lt;/tbody&gt;
+  &lt;/table&gt;
   #set($discard = $paginationParameters.put('position', 'bottom'))
   #pagination($paginationParameters)
   #end ## deletedAttachments != 0
-</noscript>
+&lt;/noscript&gt;
 {{/html}}##
 #else ## request.list
 ## ============================================================================================
@@ -95,7 +136,7 @@ $response.setContentType('application/json')
 #set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
-#if (!$offset || $offset < 0)
+#if (!$offset || $offset &lt; 0)
   #set ($offset = 0)
 #end
 #set($limit = $mathtool.toInteger($request.get('limit')))
@@ -157,12 +198,12 @@ $response.setContentType('application/json')
 "rows": [
 #foreach($item in $items)
   #set($datt = $xwiki.getDeletedAttachment("$item.get(0)"))
-  #if($velocityCount > 1) , #end
+  #if($velocityCount &gt; 1) , #end
   {
     #set($originalAttachment = $datt.getAttachment())
     #set($originalDocument = $xwiki.getDocument($datt.docName))
     #if ($originalDocument)
-      "deleteUrl" : "$originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&form_token=$!{services.csrf.getToken()}")",
+      "deleteUrl" : "$originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;form_token=$!{services.csrf.getToken()}")",
       #if ($originalAttachment)
         "url" : "$originalDocument.getAttachmentRevisionURL($originalAttachment.filename, $originalAttachment.version, "rid=${datt.id}")",
       #end
@@ -187,4 +228,411 @@ $response.setContentType('application/json')
 ## ==============================================
 #end## xpage=plain
 #end## request.list
-{{/velocity}}
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2b1a4426-e37b-40ba-9ad3-4055a466da0a</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Make sure the XWiki.index.trash.attachments 'namespace' exists.
+if (typeof XWiki == "undefined") {
+  XWiki = new Object();
+}
+if (typeof XWiki.index == "undefined") {
+  XWiki.index = new Object();
+}
+if (typeof XWiki.index.trash == "undefined") {
+  XWiki.index.trash = new Object();
+}
+if (typeof XWiki.index.trash.attachments == "undefined") {
+  XWiki.index.trash.attachments = new Object();
+}
+
+/**
+ * Callback function used by the DeletedAttachments livetable for generating the HTML code needed to display an entry.
+ * 
+ * @param row the JSON data corresponding to the entry to be displayed
+ * @param i the index of the row in the list of entries
+ * @param table the LiveTable javascript object
+ */
+XWiki.index.trash.attachments.displayEntry = function (row, i, table) {
+  var tr = new Element('tr'); // The resulting table row
+  var file = new Element('a', {'href' : row.url}).update(row.filename);
+  tr.appendChild(new Element('td').update(file));
+  var doc = new Element('a', {'href' : row.documentUrl}).update(row.title);
+  doc.appendChild(document.createTextNode(' (' + row.docName + ')'));
+  tr.appendChild(new Element('td').update(doc));
+  tr.appendChild(new Element('td').update(row.date));
+  var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
+  tr.appendChild(new Element('td').update(deleter));
+  var actions = new Element('td', {'class' : 'itemActions'});
+  if(row.canDelete) {
+    var delete_ = new Element('a', {
+        'href' : row.deleteUrl,
+        'class' : "tool delete",
+        'title' : "$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"
+      }).update("$services.localization.render('platform.index.trashAttachmentsActionsDeleteText')");
+    actions.appendChild(delete_);
+    delete_.observe('click', XWiki.index.trash.attachments.confirmDelete.bindAsEventListener(delete_, table, i));
+  }
+  tr.appendChild(actions);
+  return tr;
+}
+
+/**
+ * Event listener, called when clicking a delete version link. It displays a confirmation box, speeding up the two-step
+ * deletion process.
+ * 
+ * @param event the link activation event
+ * @param table the LiveTable javascript object
+ * @param rowIdx the index of the row corresponding to the entry to be deleted
+ */
+XWiki.index.trash.attachments.confirmDelete = function(event, table, rowIdx) {
+  event.stop();
+  if (this.disabled) {
+    // Do nothing if the button was already clicked and it's waiting for a response from the server.
+    return;
+  } else {
+    new XWiki.widgets.ConfirmedAjaxRequest(
+      /* Ajax request URL */
+      this.href + '&amp;confirm=1' + (Prototype.Browser.Opera ? "" : "&amp;ajax=1"),
+      /* Ajax request parameters */
+      {
+        onCreate : function() {
+          // Disable the button, to avoid a cascade of clicks from impatient users
+          this.disabled = true;
+        }.bind(this),
+        onSuccess : function(table, rowIdx) {
+          // Remove the corresponding HTML element from the UI and update the livetable
+          table.deleteRow(rowIdx);
+        }.bind(this, table, rowIdx),
+        // This is an expected 404, returned when the document has been successfully deleted and is no longer found
+        on404 : function(response, table, rowIdx) {
+          response.request.options.onSuccess(table, rowIdx);
+        }.bindAsEventListener(this, table, rowIdx),
+        onComplete : function() {
+          // In the end: re-enable the button
+          this.disabled = false;
+        }.bind(this)
+      },
+      /* Interaction parameters */
+      {
+         confirmationText: "$services.localization.render('core.recyclebin.completelyDeleteConfirm')",
+         progressMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteInProgress')",
+         successMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteDone')",
+         failureMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteFailed')"
+      }
+      );
+  }
+}
+/*
+ * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
+ * Re-display it when the document loads and Javascript is available.
+ */
+document.observe('xwiki:dom:loaded', function() {
+  if ($('attachmentTrash')) {
+    $('attachmentTrash').up('.hidden').removeClassName('hidden');
+  }
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>33778e4e-5d86-472e-b065-c9c87b5b282e</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.itemActions .tool {
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+  float: left;
+  text-indent: -1000em;
+  overflow: hidden;
+  background: transparent no-repeat center center;
+}
+.itemActions .delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')") !important;
+}
+.itemActions .restore {
+   background-image: url("$xwiki.getSkinFile('icons/silk/arrow_refresh.png')") !important;
+}
+.itemActions .cannot-restore {
+   background-image: url("$xwiki.getSkinFile('icons/silk/page_error.png')") !important;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>8d68ba7a-72d3-4f9f-a984-c7c47139b0a8</guid>
+    <class>
+      <name>XWiki.XWikiRights</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <allow>
+        <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>allow</displayType>
+        <name>allow</name>
+        <number>4</number>
+        <prettyName>Allow/Deny</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </allow>
+      <groups>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>groups</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Groups</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+      </groups>
+      <levels>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>levels</name>
+        <number>2</number>
+        <prettyName>Levels</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+      </levels>
+      <users>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>users</name>
+        <number>3</number>
+        <picker>1</picker>
+        <prettyName>Users</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </users>
+    </class>
+    <property>
+      <allow>1</allow>
+    </property>
+    <property>
+      <groups>XWiki.XWikiAdminGroup</groups>
+    </property>
+    <property>
+      <levels>view,edit</levels>
+    </property>
+    <property>
+      <users/>
+    </property>
+  </object>
+</xwikidoc>

@@ -20,7 +20,7 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.event.EndEvent;
+import org.xwiki.observation.event.EndFoldEvent;
 
 /**
  * An event triggered after a user is authenticated.
@@ -35,7 +35,7 @@ import org.xwiki.observation.event.EndEvent;
  * @since 10.0RC1
  */
 
-public class UserAuthenticatedEvent implements EndEvent
+public class UserAuthenticatedEvent implements EndFoldEvent
 {
     private static final long serialVersionUID = 1L;
 

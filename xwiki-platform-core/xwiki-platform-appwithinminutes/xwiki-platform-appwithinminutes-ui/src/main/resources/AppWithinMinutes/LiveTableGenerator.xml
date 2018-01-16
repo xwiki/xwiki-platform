@@ -124,7 +124,10 @@ ${escapetool.h}set (${escapetool.d}columnsProperties = {
 #set($userPicker = false)
 #foreach($column in $columns)
 #set($field = $xclass.get($column))
-#if($field &amp;&amp; ($field.classType == 'Users' || $field.classType == 'Groups') &amp;&amp; !$userPicker)
+#if ($column == 'doc.author')
+#set($field == true)
+#end
+#if($field &amp;&amp; ($field.classType == 'Users' || $field.classType == 'Groups' || $column == 'doc.author') &amp;&amp; !$userPicker)
 #set($userPicker = true)
 ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
 #end

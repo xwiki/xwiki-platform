@@ -238,6 +238,20 @@ public class InternalTemplateManager
         }
     }
 
+    private class ClassloaderTemplate extends AbtractTemplate<FilesystemTemplateContent, ClassloaderResource>
+    {
+        ClassloaderTemplate(ClassloaderResource resource)
+        {
+            super(resource);
+        }
+
+        @Override
+        protected FilesystemTemplateContent getContentInternal(String content)
+        {
+            return new FilesystemTemplateContent(content);
+        }
+    }
+
     private class DefaultTemplate extends AbtractTemplate<DefaultTemplateContent, Resource<?>>
     {
         DefaultTemplate(Resource<?> resource)
@@ -826,7 +840,7 @@ public class InternalTemplateManager
 
         URL url = classloader.getResource(templatePath);
 
-        return url != null ? new DefaultTemplate(new ClassloaderResource(url, templateName)) : null;
+        return url != null ? new ClassloaderTemplate(new ClassloaderResource(url, templateName)) : null;
     }
 
     private Template createTemplate(Resource<?> resource)

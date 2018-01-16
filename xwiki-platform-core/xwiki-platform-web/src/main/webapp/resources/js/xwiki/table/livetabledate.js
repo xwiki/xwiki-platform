@@ -63,6 +63,21 @@ require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'
           updateInput(this, event, picker);
         });
 
+        
+        input.on('keypress', function (e) {
+          if(e.which !== 13) return;
+          var txt = input.val().trim();
+          var range = txt.split(' - ');
+          if (range.length == 2){
+            //range
+            hidden.val(moment(range[0]).format('x')+'-'+moment(range[1]).format('x'));
+          }
+          else{
+            //date or part of date
+            hidden.val(txt);
+          }
+        });
+
         input.on('hide.daterangepicker', function(event) {
           // Overwrite at instance level the 'hide' function added by Prototype.js to the Element prototype.
           // This removes the 'hide' function only for the event target.

@@ -3860,6 +3860,8 @@ public class XWiki implements EventListener
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         return getAuthService().checkAuth(context);
+        UserAuthenticatedEvent newEvent = new UserAuthenticatedEvent();
+        getObservationManager().notify(context);
     }
 
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException

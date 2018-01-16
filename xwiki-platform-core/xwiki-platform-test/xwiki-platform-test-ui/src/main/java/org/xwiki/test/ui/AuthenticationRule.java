@@ -24,10 +24,6 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 import static org.xwiki.test.ui.AbstractTest.getUtil;
-import org.xwiki.observation.ObservationManager;
-
-@Inject
-private ObservationManager observationManager;
 
 /**
  * Authenticates a user in the wiki before the test starts.

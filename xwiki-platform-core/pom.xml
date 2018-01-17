@@ -147,6 +147,50 @@
                     "classSimpleName": "ExpandedMacroBlock",
                     "elementKind": "class",
                     "justification": "No breackage. Just moved commons stuff in an abtract class."
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDUnchanged",
+                    "old": "field org.xwiki.refactoring.job.CreateRequest.serialVersionUID",
+                    "new": "field org.xwiki.refactoring.job.CreateRequest.serialVersionUID",
+                    "serialVersionUID": "1",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "CreateRequest",
+                    "fieldName": "serialVersionUID",
+                    "elementKind": "field",
+                    "justification": "Not a breackage in this context"
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDUnchanged",
+                    "old": "field org.xwiki.refactoring.job.EntityRequest.serialVersionUID",
+                    "new": "field org.xwiki.refactoring.job.EntityRequest.serialVersionUID",
+                    "serialVersionUID": "1",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "EntityRequest",
+                    "fieldName": "serialVersionUID",
+                    "elementKind": "field",
+                    "justification": "Not a breackage in this context"
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDUnchanged",
+                    "old": "field org.xwiki.refactoring.job.MoveRequest.serialVersionUID",
+                    "new": "field org.xwiki.refactoring.job.MoveRequest.serialVersionUID",
+                    "serialVersionUID": "2",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "MoveRequest",
+                    "fieldName": "serialVersionUID",
+                    "elementKind": "field",
+                    "justification": "Not a breackage in this context"
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDUnchanged",
+                    "old": "field org.xwiki.refactoring.job.RestoreRequest.serialVersionUID",
+                    "new": "field org.xwiki.refactoring.job.RestoreRequest.serialVersionUID",
+                    "serialVersionUID": "7738465742607715013",
+                    "package": "org.xwiki.refactoring.job",
+                    "classSimpleName": "RestoreRequest",
+                    "fieldName": "serialVersionUID",
+                    "elementKind": "field",
+                    "justification": "Not a breackage in this context"
                   }
                 ]
               }

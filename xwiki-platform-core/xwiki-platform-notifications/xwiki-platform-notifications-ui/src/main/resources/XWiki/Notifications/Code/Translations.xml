@@ -99,7 +99,7 @@ notifications.format.email=Email
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=Filters
-notifications.settings.filters.preferences.hint=Create filters to control more precisely when the active events should trigger notifications.
+notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
 
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Name
@@ -114,18 +114,18 @@ notifications.menu.header.settings=Settings
 notifications.menu.clear=Clear All
 notifications.menu.clearing=Clearing the notifications
 notifications.menu.cleared=Notifications have been cleared
-notifications.menu.nothing=No notification available!
+notifications.menu.nothing=No notifications available!
 notifications.menu.more=Load older notifications
 notifications.menu.details=Details ({0})
 notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
 notifications.settings.menu.hint=The notification menu is located on the top right of the page, and you can see it by clicking on the bell ({0})
 notifications.settings.email=Email
-notifications.settings.email.hint=An email is sent to you regularly with the summary of what happened in the wiki
+notifications.settings.email.hint=An email is sent to you regularly with a summary of what happened on the wiki
 notifications.settings.email.title=Email Preferences
 notifications.settings.email.frequency=Email Frequency
-notifications.settings.email.frequency.hint=Choose how often you want to receive an email with the summary of what happened in the wiki.
-notifications.settings.email.diffType.hint=Select the level of details you want to receive about all the changes in the email.
+notifications.settings.email.frequency.hint=Choose how often you want to receive an email with the summary of what happened on the wiki.
+notifications.settings.email.diffType.hint=Select the level of detail you want to receive about all the changes in the email.
 notifications.settings.saving=Your settings are being saved...
 notifications.settings.saved=Saved!
 notifications.settings.savingfailed=Failed to save your settings
@@ -155,7 +155,7 @@ notifications.email.linkDetails=See details
 notifications.rss.feedLink=RSS Feed
 notifications.rss.feedLinkDescription=Event feed for notifications
 notifications.rss.feedTitle=Notifications RSS feed
-notifications.rss.feedDescription=This RSS feed can be customized in your profile page.
+notifications.rss.feedDescription=This RSS feed can be customized on your profile page.
 notifications.rss.seeChanges=Changes: {0}
 notifications.globalsettings.email=Notifications Email
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily

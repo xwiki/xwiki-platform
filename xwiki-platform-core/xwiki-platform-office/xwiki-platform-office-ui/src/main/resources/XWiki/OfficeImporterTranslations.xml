@@ -40,8 +40,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>office.createForm.type.name=Page from Office
-office.createForm.type.description=Import office documents into wiki pages
-office.form.error.noDocument=You must use the {0}create action{1} to import an office document.
+office.createForm.type.description=Import Office documents into wiki pages
+office.form.error.noDocument=You must use the {0}create action{1} to import an Office document.
 office.form.append.hint=The document already exists! Append the result to the existing wiki page
 
 office.config.serverType.hint=The Office server type. It can be internally managed (local) or external (remote).

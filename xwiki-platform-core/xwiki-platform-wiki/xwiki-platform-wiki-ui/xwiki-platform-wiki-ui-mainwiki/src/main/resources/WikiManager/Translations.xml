@@ -223,7 +223,7 @@ platform.wiki.create.wizard.userScope.label=User Scope
 platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
 platform.wiki.create.wizard.template.label=Template
 platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as initial content of the new wiki
+platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
 platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
 platform.wiki.create.wizard.flavortemplate.templateTab=Template
 platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
@@ -254,7 +254,7 @@ platform.wiki.sheet.title.viewaliases=View aliases
 platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
 platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
 platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
-platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
+platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
 platform.wiki.sheet.desc.server=The alias used to access the wiki.
 platform.wiki.sheet.desc.description=A brief wiki description.
 platform.wiki.sheet.desc.homepage=The homepage of the wiki.
@@ -267,7 +267,7 @@ platform.wiki.sheet.prop.homepage=Homepage
 platform.wiki.sheet.prop.iswikitemplate=Wiki template
 platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
 platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-platform.wiki.sheet.aliases=An alias is an other name for the wiki. You can add aliases to create different URLs for the wiki.
+platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
 
 ###############################################################################
 ## Deprecated

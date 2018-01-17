@@ -81,7 +81,6 @@
     <dependency>
       <artifactId>jaxen</artifactId>
       <groupId>jaxen</groupId>
-      <version>1.1.6</version>
       <scope>runtime</scope>
     </dependency>
     <!-- Need to have SLF4J bindings available at runtime when the plugin executes -->

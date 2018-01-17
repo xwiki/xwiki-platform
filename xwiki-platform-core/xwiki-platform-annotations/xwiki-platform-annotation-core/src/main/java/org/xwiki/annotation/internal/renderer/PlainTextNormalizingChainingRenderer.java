@@ -250,7 +250,19 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
     }
 
     @Override
+    public void beginListItem(Map<String, String> parameters)
+    {
+        printSpace();
+    }
+
+    @Override
     public void endListItem()
+    {
+        printSpace();
+    }
+
+    @Override
+    public void endListItem(Map<String, String> parameters)
     {
         printSpace();
     }

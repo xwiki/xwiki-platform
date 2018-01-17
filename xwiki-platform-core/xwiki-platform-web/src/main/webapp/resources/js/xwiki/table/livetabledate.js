@@ -69,7 +69,7 @@ require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'
             var range = txt.split(' - ');
             if (range.length === 2) {
               //range
-              hidden.val(moment(range[0], dateFormat).format('x')+'-'+moment(range[1], dateFormat).format('x'));
+              hidden.val(moment(range[0], dateFormat).format('x') + '-' + moment(range[1], dateFormat).format('x'));
             } else {
               //date or part of date
               hidden.val(txt);

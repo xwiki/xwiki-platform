@@ -95,7 +95,8 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
 
     /**
      * Allows to retrieve the contents of an uploaded file as a sequence of bytes. {@link #loadFileList()} needs to be
-     * called beforehand.
+     * called beforehand. This method returns the contents of the first matching FileItem with the formfieldName. If you are dealing
+     * with multiple files with the same formfieldName you should use {@link #getFileItems()}
      *
      * @param formfieldName The name of the form field.
      * @return The contents of the file.
@@ -108,7 +109,8 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
 
     /**
      * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList()} needs to be called
-     * beforehand.
+     * beforehand. This method returns the contents of the first matching FileItem with the formfieldName. If you are dealing with
+     * multiple files with the same form field name you should use {@link #getFileItems()}
      *
      * @deprecated not well named, use {@link #getFileItemAsString(String)}
      * @param formfieldName The name of the form field.
@@ -123,7 +125,8 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
 
     /**
      * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList()} needs to be called
-     * beforehand.
+     * beforehand. This method returns the contents of the first matching FileItem with the formfieldName. If you are dealing with
+     * multiple files with the same form field name you should use {@link #getFileItems()}
      *
      * @param formfieldName The name of the form field.
      * @return The contents of the file.
@@ -145,7 +148,8 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
     }
 
     /**
-     * Get the name of the file uploaded for a form field.
+     * This method returns the name of the first matching file with the formfieldName. If you are dealing with
+     * multiple files with the same form field name you should use {@link #getFileItemNames()}
      *
      * @param formfieldName The name of the form field.
      * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.

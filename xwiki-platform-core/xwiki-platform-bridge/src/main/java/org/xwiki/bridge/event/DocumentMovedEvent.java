@@ -33,17 +33,16 @@
   * 
   * @version $Id$
   * @since 10.0RC1
-  */
- @Unstable 
- public class DocumentMovedEvent implements EndFoldEvent
+  */ 
+ public class DocumentMovedEvent extends AbstractDocumentEvent implements EndFoldEvent
  {
- +    /**
+     /**
       * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
       * changes.
       */
      private static final long serialVersionUID = 1L;
      
-    /**
+     /**
       * Matches all {@link DocumentMovedEvent} events.
       */
      public DocumentMovedEvent()

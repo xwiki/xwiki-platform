@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jobStatus xmlns="http://www.xwiki.org">
+  <link href="http://localhost:8080/xwiki/rest/jobstatus/extension/action/org.xwiki.contrib%3Aapplication-faq-ui/wiki%3Axwiki/" rel="self"/>
+  <id>extension/action/org.xwiki.contrib:application-faq-ui/wiki:xwiki</id>
+  <request>
+    <id>
+      <element>extension</element>
+      <element>action</element>
+      <element>org.xwiki.contrib:application-faq-ui</element>
+      <element>wiki:xwiki</element>
+    </id>
+    <interactive>true</interactive>
+    <remote>false</remote>
+    <verbose>true</verbose>
+    <property>
+      <key>extensions</key>
+      <value>
+        <list xmlns="" xmlns:ns2="http://www.xwiki.org">
+          <org.xwiki.extension.ExtensionId>
+            <id>org.xwiki.contrib:application-faq-ui</id>
+            <version class="org.xwiki.extension.version.internal.DefaultVersion" serialization="custom">
+              <org.xwiki.extension.version.internal.DefaultVersion>
+                <string>8.1.3</string>
+              </org.xwiki.extension.version.internal.DefaultVersion>
+            </version>
+          </org.xwiki.extension.ExtensionId>
+        </list>
+      </value>
+    </property>
+    <property>
+      <key>extensions.excluded</key>
+      <value>
+        <set xmlns="" xmlns:ns2="http://www.xwiki.org"/>
+      </value>
+    </property>
+    <property>
+      <key>rewriter</key>
+      <value>
+        <org.xwiki.extension.script.ScriptExtensionRewriter xmlns="" xmlns:ns2="http://www.xwiki.org">
+          <installOnRootNamespace/>
+        </org.xwiki.extension.script.ScriptExtensionRewriter>
+      </value>
+    </property>
+    <property>
+      <key>extension.properties</key>
+      <value>
+        <map xmlns="" xmlns:ns2="http://www.xwiki.org">
+          <entry>
+            <string>user.reference</string>
+            <string>xwiki:XWiki.Admin</string>
+          </entry>
+        </map>
+      </value>
+    </property>
+    <property>
+      <key>rootModificationsAllowed</key>
+      <value>
+        <boolean xmlns="" xmlns:ns2="http://www.xwiki.org">true</boolean>
+      </value>
+    </property>
+    <property>
+      <key>caller.reference</key>
+      <value>
+        <org.xwiki.model.reference.DocumentReference xmlns="" xmlns:ns2="http://www.xwiki.org">
+          <name>superadmin</name>
+          <parent class="org.xwiki.model.reference.SpaceReference">
+            <name>XWiki</name>
+            <parent class="org.xwiki.model.reference.WikiReference">
+              <name>xwiki</name>
+              <type>WIKI</type>
+            </parent>
+            <type>SPACE</type>
+          </parent>
+          <type>DOCUMENT</type>
+        </org.xwiki.model.reference.DocumentReference>
+      </value>
+    </property>
+    <property>
+      <key>interactive</key>
+      <value>
+        <boolean xmlns="" xmlns:ns2="http://www.xwiki.org">true</boolean>
+      </value>
+    </property>
+    <property>
+      <key>checkrights</key>
+      <value>
+        <boolean xmlns="" xmlns:ns2="http://www.xwiki.org">true</boolean>
+      </value>
+    </property>
+    <property>
+      <key>context.action</key>
+      <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">get</value>
+    </property>
+    <property>
+      <key>user.reference</key>
+      <value>
+        <org.xwiki.model.reference.DocumentReference xmlns="" xmlns:ns2="http://www.xwiki.org">
+          <name>Admin</name>
+          <parent class="org.xwiki.model.reference.SpaceReference">
+            <name>XWiki</name>
+            <parent class="org.xwiki.model.reference.WikiReference">
+              <name>xwiki</name>
+              <type>WIKI</type>
+            </parent>
+            <type>SPACE</type>
+          </parent>
+          <type>DOCUMENT</type>
+        </org.xwiki.model.reference.DocumentReference>
+      </value>
+    </property>
+    <property>
+      <key>context.wiki</key>
+      <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">xwiki</value>
+    </property>
+    <property>
+      <key>namespaces</key>
+      <value>
+        <list xmlns="" xmlns:ns2="http://www.xwiki.org">
+          <string>wiki:xwiki</string>
+        </list>
+      </value>
+    </property>
+  </request>
+  <state>FINISHED</state>
+  <progress>
+    <offset>1.0</offset>
+    <currentLevelOffset>1.0</currentLevelOffset>
+  </progress>
+  <startDate>2018-01-12T10:16:30.992+01:00</startDate>
+  <endDate>2018-01-12T10:16:31.711+01:00</endDate>
+</jobStatus>

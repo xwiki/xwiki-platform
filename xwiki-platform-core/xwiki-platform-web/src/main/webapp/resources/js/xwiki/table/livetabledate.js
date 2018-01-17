@@ -64,7 +64,7 @@ require(['jquery', 'jdateformatparser', 'daterangepicker', 'xwiki-events-bridge'
         });
 
         input.on('keypress', function (e) {
-          if(e.which !== 13) {
+          if(e.which === 13) {
             var txt = input.val().trim();
             var range = txt.split(' - ');
             if (range.length === 2) {

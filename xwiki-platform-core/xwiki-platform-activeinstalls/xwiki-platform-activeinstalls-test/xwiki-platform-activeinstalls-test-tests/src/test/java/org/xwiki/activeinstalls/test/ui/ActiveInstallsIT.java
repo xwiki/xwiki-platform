@@ -35,7 +35,7 @@ import static com.github.tlrx.elasticsearch.test.EsSetup.*;
  * @version $Id$
  * @since 5.2M2
  */
-public class ActiveInstallsTest extends AbstractTest
+public class ActiveInstallsIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
@@ -47,7 +47,7 @@ public class ActiveInstallsTest extends AbstractTest
         // by manually starting an XWiki instance and an ES instance prior to running this test (in this case we don't
         // provision ES).
         if (ElasticSearchRunner.esSetup != null) {
-            // When XWiki was started by ElasticSearchRunner from AllTests, a page was checked to verify that the XWiki
+            // When XWiki was started by ElasticSearchRunner from AllITs, a page was checked to verify that the XWiki
             // instance was up. This, in turn, triggered the send of an asynchronous ping to the ES instance
             // (started prior to the XWiki start in ElasticSearchRunner).
             //

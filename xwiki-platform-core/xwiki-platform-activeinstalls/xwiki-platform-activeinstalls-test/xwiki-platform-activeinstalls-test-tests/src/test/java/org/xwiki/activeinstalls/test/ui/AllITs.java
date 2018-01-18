@@ -28,6 +28,6 @@ import org.junit.runner.*;
  * @since 5.2M2
  */
 @RunWith(ElasticSearchRunner.class)
-public class AllTests
+public class AllITs
 {
 }

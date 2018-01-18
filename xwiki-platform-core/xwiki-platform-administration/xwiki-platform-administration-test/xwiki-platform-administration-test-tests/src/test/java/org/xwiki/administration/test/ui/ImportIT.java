@@ -39,7 +39,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 2.3M1
  */
-public class ImportTest extends AbstractTest
+public class ImportIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());

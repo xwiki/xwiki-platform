@@ -30,7 +30,7 @@ import org.xwiki.repository.test.RepositoryTestUtils;
  * 
  * @version $Id$
  */
-public class AbstractExtensionAdminAuthenticatedTest extends AbstractTest
+public class AbstractExtensionAdminAuthenticatedIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
@@ -54,7 +54,7 @@ public class AbstractExtensionAdminAuthenticatedTest extends AbstractTest
 
         // This will not be null if we are in the middle of allTests
         if (repositoryTestUtils == null || extensionTestUtils == null) {
-            AllTests.initExtensions(context);
+            AllITs.initExtensions(context);
         }
     }
 

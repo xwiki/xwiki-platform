@@ -57,7 +57,7 @@ import org.xwiki.extension.test.po.SimpleSearchPane;
 import org.xwiki.extension.test.po.UnusedPagesPane;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.repository.test.TestExtension;
-import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedIT;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.EntityDiff;
@@ -74,7 +74,7 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 4.2M1
  */
-public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
+public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 {
     @Override
     public void setUp() throws Exception
@@ -88,7 +88,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         getExtensionTestUtils().uninstall("scriptServiceJarExtension");
 
         // Delete the pages that are provided by the XAR extensions we use in tests.
-        getUtil().rest().deletePage("ExtensionTest", "Alice");
+        getUtil().rest().deletePage(getTestClassName(), "Alice");
         assertFalse(getUtil().pageExists("ExtensionTest", "Alice"));
         getUtil().rest().deletePage("ExtensionTest", "Bob");
         assertFalse(getUtil().pageExists("ExtensionTest", "Bob"));

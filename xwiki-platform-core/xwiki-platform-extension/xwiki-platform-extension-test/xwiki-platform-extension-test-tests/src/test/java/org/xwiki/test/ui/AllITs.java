@@ -42,9 +42,9 @@ import org.xwiki.test.integration.XWikiExecutorSuite;
  * @version $Id$
  */
 @RunWith(PageObjectSuite.class)
-public class AllTests
+public class AllITs
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AllTests.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AllITs.class);
 
     private static RepositoryUtils repositoryUtil;
 

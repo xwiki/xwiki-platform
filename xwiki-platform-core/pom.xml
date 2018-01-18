@@ -55,6 +55,7 @@
           <configuration>
             <systemProperties combine.children="append">
               <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
+              <!-- TODO: Remove this property once all functional tests have been moved to use the failsafe plugin -->
               <property>
                 <name>screenshotDirectory</name>
                 <value>${basedir}/target/screenshots</value>
@@ -75,6 +76,19 @@
               <version>${commons.version}</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemProperties combine.children="append">
+              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
+              <property>
+                <name>screenshotDirectory</name>
+                <value>${basedir}/target/screenshots</value>
+              </property>
+            </systemProperties>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>net.alchim31.maven</groupId>

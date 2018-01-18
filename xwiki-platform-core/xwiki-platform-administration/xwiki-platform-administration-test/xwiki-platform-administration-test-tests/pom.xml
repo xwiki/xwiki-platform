@@ -47,8 +47,6 @@
     <!-- We need to use the mail module in some tests (e.g. ResetPasswordTest) -->
     <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Functional tests are allowed to output content to the console -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- XWiki.ResetPassword uses the saveAsAuthor() API which performs a check on whether permissions have been dropped
          and since the PR checker works by dropping permissions, it causes the user to become guest and thus the doc
          save fails. Thus we need to exclude the page from the PR checker -->
@@ -98,18 +96,10 @@
     </dependency>
   </dependencies>
   <build>
-    <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Make sure we only run AllTests since that test runs all the other ones, thus starting/stopping XWiki only
-           once -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-        </configuration>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
       <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
            https://jira.xwiki.org/browse/XWIKI-7683 -->

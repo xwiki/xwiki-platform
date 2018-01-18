@@ -51,7 +51,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
  * @version $Id$
  * @since 7.0M2
  */
-public class ResetPasswordTest extends AbstractTest
+public class ResetPasswordIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());

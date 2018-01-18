@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 4.3M1
  */
-public class AdministrationTest extends AbstractTest
+public class AdministrationIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());

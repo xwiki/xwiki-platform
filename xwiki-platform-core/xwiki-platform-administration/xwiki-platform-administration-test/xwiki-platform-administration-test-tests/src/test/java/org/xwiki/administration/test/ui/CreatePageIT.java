@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 2.4M1
  */
-public class CreatePageTest extends AbstractTest
+public class CreatePageIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
@@ -334,7 +334,7 @@ public class CreatePageTest extends AbstractTest
         assertEquals("NewPage", newPage.getDocumentTitle());
         assertEquals(templateContent, newPage.getContent());
         // and the parent, it should be the template provider, since that's where we created it from
-        assertEquals("/CreatePageTest/NewPage", newPage.getBreadcrumbContent());
+        assertEquals("/" + getTestClassName() + "/NewPage", newPage.getBreadcrumbContent());
     }
 
     /**

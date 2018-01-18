@@ -30,7 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
-public class GroupTest extends AbstractTest
+public class GroupIT extends AbstractTest
 {
     private static final String TESTER = "tester";
 

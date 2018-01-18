@@ -1402,6 +1402,9 @@ XWiki.Annotation = Class.create({
           // Stop the bubble click event.
           event.stop();
 
+          // The content of the Comments tab is reloaded when a comment is added so we can't cache the reference to the
+          // reply button.
+          replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
           // Click the reply button from the comments tab button instead.
           replyButtonInTab.click();
 

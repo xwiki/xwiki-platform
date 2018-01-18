@@ -624,7 +624,7 @@ XWiki.Annotation = Class.create({
   // whether the annotations should be displayed as highlighted or only the icons
   displayHighlight : true,
   // add annotation shortcuts
-  addAnnotationShortcuts : ['Ctrl+M', 'Meta+M', 'Ctrl+I', 'Meta+I'],
+  addAnnotationShortcuts : ['Meta+M', 'Meta+I'],
   // show annotations shortcuts
   toggleAnnotationsShortcuts : ['Alt+A'],
   // shortcuts for closing the open dialog, be it create, edit or display

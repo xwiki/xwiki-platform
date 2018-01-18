@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -117,6 +117,8 @@
       #set ($type = 'none')
       #set ($html = true)
       #set ($sortable = false)
+      #set ($link = 'view')
+    #elseif ($column == 'blog' || $column == 'blogfeed')
       #set ($link = 'view')
     #elseif ($column == 'doc.name')
       #set ($link = 'view')

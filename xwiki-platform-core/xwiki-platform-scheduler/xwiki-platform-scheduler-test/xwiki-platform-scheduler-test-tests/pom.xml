@@ -44,8 +44,6 @@
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <!-- Functional tests are allowed to output content to the console -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -92,8 +90,11 @@
     </dependency>
   </dependencies>
   <build>
-    <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
       <!-- TODO: Remove when the http://jira.codehaus.org/browse/MNG-1911 is fixed, see also
            https://jira.xwiki.org/browse/XWIKI-7683 -->
       <plugin>

@@ -36,7 +36,7 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
  * 
  * @version $Id$
  */
-public class SchedulerTest extends AbstractTest
+public class SchedulerIT extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());

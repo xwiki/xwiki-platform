@@ -36,6 +36,7 @@
     <module>xwiki-platform-tool-configuration-resources</module>
     <module>xwiki-platform-tool-jetty</module>
     <module>xwiki-platform-tool-packager-plugin</module>
+    <module>xwiki-platform-tool-provision-plugin</module>
     <module>xwiki-platform-tool-rootwebapp</module>
     <module>xwiki-platform-tool-standards-validator</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>

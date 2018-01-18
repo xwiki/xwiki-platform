@@ -42,7 +42,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  */
 // TODO: provide PO APIs when Filter application is in a more final state
-public class FilterTest extends AbstractTest
+public class FilterIT extends AbstractTest
 {
     // Login as superadmin to have delete rights.
     @Rule

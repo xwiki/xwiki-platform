@@ -66,6 +66,7 @@ import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -117,7 +118,7 @@ public class XWikiDocumentMockitoTest
 
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
     
-    private List<XWikiAttachment> attachmentList = this.document.getAttachmentList();
+    private List<XWikiAttachment> attachmentList;
 
     @Before
     public void setUp() throws Exception
@@ -129,7 +130,7 @@ public class XWikiDocumentMockitoTest
 
         this.document = new XWikiDocument(DOCUMENT_REFERENCE);
         this.document.setSyntax(Syntax.PLAIN_1_0);
-
+        this.attachmentList = this.document.getAttachmentList();
         this.baseClass = this.document.getXClass();
         this.baseClass.addTextField("string", "String", 30);
         this.baseClass.addTextAreaField("area", "Area", 10, 10);
@@ -888,10 +889,9 @@ public class XWikiDocumentMockitoTest
         // Make sure we set the flags to false to verify it's changed
         this.document.setContentDirty(false);
         this.document.setMetaDataDirty(false);
-
-        // Add attachments (2).
-        document.addAttachment(attachment);
-
+     // Add attachments (2).
+        XWikiAttachment attachment2 =
+            document.addAttachment("file2", new ByteArrayInputStream(new byte[] {}), this.oldcore.getXWikiContext());
         assertTrue(this.document.isMetaDataDirty());
         assertFalse(this.document.isContentDirty());
 
@@ -1401,14 +1401,18 @@ public class XWikiDocumentMockitoTest
     }
     
     @Test
-    public void listAddAttachment() throws XWikiException{
+    public void listAddAttachment() throws XWikiException
+    {
         XWikiAttachment attachment = new XWikiAttachment(this.document, "testAttachment");
         attachmentList.add(attachment);
-        assertEquals(this.document.getAttachmentList().contains(attachment),true);
+        assertTrue(this.document.getAttachmentList().contains(attachment));
+        assertTrue(this.document.getAttachment("testAttachment") == attachment);
+        assertTrue(((XWikiAttachmentList) (attachmentList)).getByFilename("testAttachment") == attachment);
     }
-    
+
     @Test
-    public void listMaintainsOrder() throws XWikiException{
+    public void listMaintainsOrder() throws XWikiException
+    {
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
         XWikiAttachment attachment2 = new XWikiAttachment(this.document, "attachmentB");
         XWikiAttachment attachment3 = new XWikiAttachment(this.document, "attachmentC");
@@ -1419,17 +1423,46 @@ public class XWikiDocumentMockitoTest
         list.add(attachment1);
         list.add(attachment2);
         list.add(attachment3);
-        assertEquals(this.document.getAttachmentList(),list);
+        assertEquals(this.document.getAttachmentList(), list);
     }
-    
+
     @Test
-    public void testTest() throws XWikiException{
-        assertEquals("hi","hello");
-    }
-    
-    @Test
-    public void listClear() throws XWikiException{
+    public void listClear() throws XWikiException
+    {
         attachmentList.clear();
-        assertEquals(attachmentList,new ArrayList<XWikiAttachment>());
+        assertTrue(attachmentList.isEmpty());
     }
+
+    @Test
+    public void listRemove() throws XWikiException
+    {
+        // remove through object parameter
+        XWikiAttachment attachment = new XWikiAttachment(this.document, "remove");
+        attachmentList.add(attachment);
+        attachmentList.remove(attachment);
+        assertFalse(attachmentList.contains(attachment));
+
+        // remove through index parameter
+        XWikiAttachment attachment2 = new XWikiAttachment(this.document, "remove");
+        attachmentList.add(attachment2);
+        attachmentList.remove(0);
+        assertFalse(attachmentList.contains(attachment2));
+
+    }
+
+    @Test
+    public void listSet() throws XWikiException
+    {
+        XWikiAttachment attachment = new XWikiAttachment(this.document, "testAttachment");
+        attachmentList.set(0, attachment);
+        assertTrue(this.document.getAttachmentList().contains(attachment));
+        assertTrue(this.document.getAttachment("testAttachment") == attachment);
+        XWikiAttachment attachment2 = new XWikiAttachment(this.document, "testAttachment");
+        attachmentList.set(0, attachment2);
+        assertTrue(this.document.getAttachmentList().contains(attachment2));
+        assertFalse(this.document.getAttachmentList().contains(attachment));
+        assertFalse(this.document.getAttachment("testAttachment") == attachment);
+        assertTrue(this.document.getAttachment("testAttachment") == attachment2);
+    }
+
 }

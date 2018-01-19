@@ -36,7 +36,8 @@ stage ('Platform Builds') {
       build(
         name: 'Main',
         profiles: 'legacy,integration-tests,office-tests,snapshotModules',
-        properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+        systemProperties:
+          '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
       )
 
       // Note: We want the following behavior:
@@ -122,7 +123,7 @@ stage ('Platform Builds') {
         name: 'TestRelease',
         goals: 'clean install',
         profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
-        properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+        systemProperties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
       )
     },
     'quality': {
@@ -147,8 +148,8 @@ def build(map)
       if (map.profiles) {
         profiles = map.profiles
       }
-      if (map.properties) {
-        properties = map.properties
+      if (map.systemProperties) {
+          systemProperties = map.systemProperties
       }
       if (map.pom) {
         pom = map.pom

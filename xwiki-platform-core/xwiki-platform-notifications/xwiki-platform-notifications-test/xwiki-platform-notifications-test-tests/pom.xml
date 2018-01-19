@@ -38,8 +38,6 @@
       com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin,\
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin
     </xwikiCfgPlugins>
-    <!-- Functional tests are allowed to output content to the console -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- Mapping needed by the ActivityStream migrator since AS is a dependency of the User Directory -->
     <!-- Mapping needed by the Mail Sender -->
     <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
@@ -138,7 +136,6 @@
       <version>1.3</version>
       <scope>test</scope>
     </dependency>
-
     <!-- Make sure we have the Logback SLF4J binding for client side logging for our tests and make sure other logging
          systems go through SLF4J -->
     <dependency>
@@ -158,8 +155,11 @@
     </dependency>
   </dependencies>
   <build>
-    <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
@@ -188,17 +188,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
-           browser several times -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllTests.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

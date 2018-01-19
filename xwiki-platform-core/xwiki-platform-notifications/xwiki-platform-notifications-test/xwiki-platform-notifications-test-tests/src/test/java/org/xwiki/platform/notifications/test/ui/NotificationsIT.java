@@ -62,7 +62,7 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 9.4RC1
  */
-public class NotificationsTest extends AbstractTest
+public class NotificationsIT extends AbstractTest
 {
     private static final String FIRST_USER_NAME = "user1";
     private static final String SECOND_USER_NAME = "user2";

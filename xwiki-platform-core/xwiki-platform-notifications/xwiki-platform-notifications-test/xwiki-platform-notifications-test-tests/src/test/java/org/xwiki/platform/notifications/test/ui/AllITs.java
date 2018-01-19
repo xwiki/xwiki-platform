@@ -27,6 +27,6 @@ import org.xwiki.test.ui.PageObjectSuite;
  * @since 9.4RC1
  */
 @RunWith(PageObjectSuite.class)
-public class AllTests
+public class AllITs
 {
 }

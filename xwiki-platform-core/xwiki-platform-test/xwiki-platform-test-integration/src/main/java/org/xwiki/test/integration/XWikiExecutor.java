@@ -56,11 +56,11 @@ import org.slf4j.LoggerFactory;
 public class XWikiExecutor
 {
     /**
-     * Only start XWiki if the System property xwiki.startXWiki.skip is undefined or has a value of false. This allows
-     * the build to start XWiki (this is the case for example when running functional tests with Docker).
+     * Only start XWiki if the System property {@code xwiki.test.startXWiki} is undefined or has a value of true.
+     * This allows the build to start XWiki (this is the case for example when running functional tests with Docker).
      */
     private static final boolean SHOULD_START_XWIKI =
-        !Boolean.valueOf(System.getProperty("xwiki.startXWiki.skip", "false"));
+        Boolean.valueOf(System.getProperty("xwiki.test.startXWiki", "true"));
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 

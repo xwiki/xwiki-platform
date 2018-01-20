@@ -52,13 +52,6 @@ import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
 public abstract class AbstractTest
 {
     /**
-     * Only start XWiki if the System property xwiki.startXWiki.skip is undefined or has a value of false. This allows
-     * the build to start XWiki (this is the case for example when running functional tests with Docker).
-     */
-    private static final boolean SHOULD_START_XWIKI =
-        !Boolean.valueOf(System.getProperty("xwiki.startXWiki.skip", "false"));
-
-    /**
      * The object used to access the name of the current test.
      */
     @Rule
@@ -112,9 +105,8 @@ public abstract class AbstractTest
             PersistentTestContext persistentTestContext = new PersistentTestContext();
             initializeSystem(persistentTestContext);
 
-            if (SHOULD_START_XWIKI) {
-                persistentTestContext.start();
-            }
+            // Start XWiki
+            persistentTestContext.start();
 
             // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
             // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
@@ -128,9 +120,6 @@ public abstract class AbstractTest
     {
         // The context can be null if the XWiki Server couldn't start for example.
         if (context != null) {
-            if (SHOULD_START_XWIKI) {
-                context.stop();
-            }
             context.shutdown();
         }
     }

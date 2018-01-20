@@ -111,16 +111,12 @@ public class PersistentTestContext
         }
     }
 
-    public void stop() throws Exception
-    {
-        for (XWikiExecutor executor : this.executors) {
-            executor.stop();
-        }
-    }
-
     public void shutdown() throws Exception
     {
         this.driver.quit();
+        for (XWikiExecutor executor : this.executors) {
+            executor.stop();
+        }
     }
 
     public Map<String, Object> getProperties()

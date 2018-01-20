@@ -55,6 +55,13 @@ import org.slf4j.LoggerFactory;
  */
 public class XWikiExecutor
 {
+    /**
+     * Only start XWiki if the System property xwiki.startXWiki.skip is undefined or has a value of false. This allows
+     * the build to start XWiki (this is the case for example when running functional tests with Docker).
+     */
+    private static final boolean SHOULD_START_XWIKI =
+        !Boolean.valueOf(System.getProperty("xwiki.startXWiki.skip", "false"));
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
     /**
@@ -197,16 +204,21 @@ public class XWikiExecutor
     /**
      * Start XWiki using the following strategy:
      * <ul>
-     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
-     * running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
-     * <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance is
-     * already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
+     *   <li>If the {@code xwiki.startXWiki.skip} system property is set to "true" then don't start/stop XWiki</li>
+     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
+     *       running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
+     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance
+     *       is already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
      * </ul>
      * 
      * @throws Exception when failing to start XWiki
      */
     public void start() throws Exception
     {
+        if (!SHOULD_START_XWIKI) {
+            return;
+        }
+
         this.wasStarted = false;
         if (VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
             LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
@@ -354,6 +366,10 @@ public class XWikiExecutor
 
     public void stop() throws Exception
     {
+        if (!SHOULD_START_XWIKI) {
+            return;
+        }
+
         LOGGER.debug("Checking if we need to stop the XWiki server running at [{}]...", getURL());
 
         // Do not try to stop XWiki if we've not been successful in starting it!

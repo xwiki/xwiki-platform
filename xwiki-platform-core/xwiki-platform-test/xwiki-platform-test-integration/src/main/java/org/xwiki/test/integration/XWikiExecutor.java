@@ -204,7 +204,7 @@ public class XWikiExecutor
     /**
      * Start XWiki using the following strategy:
      * <ul>
-     *   <li>If the {@code xwiki.startXWiki.skip} system property is set to "true" then don't start/stop XWiki</li>
+     *   <li>If the {@code xwiki.test.startXWiki} system property is set to "false" then don't start/stop XWiki</li>
      *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
      *       running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
      *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance

@@ -96,6 +96,7 @@ public class PageObjectSuite extends XWikiExecutorSuite
     {
         if (context != null) {
             try {
+                context.stop();
                 context.shutdown();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to shutdown PersistentTestContext", e);

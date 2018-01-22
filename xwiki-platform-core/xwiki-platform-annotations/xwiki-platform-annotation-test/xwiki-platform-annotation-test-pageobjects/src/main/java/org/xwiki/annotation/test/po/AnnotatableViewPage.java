@@ -32,12 +32,12 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AnnotatableViewPage extends BaseElement
 {
-    private static final String XWIKI_ANNOTATION_ADD_SUCCESS = "Annotation has been successfully added";
+    private static final String XWIKI_ANNOTATION_ADD_SUCCESS = "Annotation added";
 
     private static final String XWIKI_ANNOTATION_DELETE_SUCCESS = "Annotation deleted";
 
     private static final String XWIKI_SYNTAX_1_WARNING =
-        "Annotations are not available for pages in XWiki/1.0 syntax.";
+        "Annotations are not available for pages written in XWiki/1.0 syntax.";
 
     private AnnotationsPane annotationsPane;
 

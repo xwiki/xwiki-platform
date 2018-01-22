@@ -74,6 +74,12 @@ public class XWikiExecutor
 
     public static final String URL = System.getProperty("xwiki.test.baseURL", "http://localhost");
 
+    /**
+     * By default assume that XWiki is deployed under the "xwiki" Servlet context. Pass an empty string to singify the
+     * root context. Note the "/" suffix which is required.
+     */
+    public static final String DEFAULT_CONTEXT = System.getProperty("xwiki.test.context", "/xwiki");
+
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
 
     public static final String DEFAULT_STOPPORT = System.getProperty("xwikiStopPort", "8079");
@@ -530,7 +536,7 @@ public class XWikiExecutor
         // We use "get" action for 2 reasons:
         // 1) the page loads faster since it doesn't need to display the skin
         // 2) if the page doesn't exist it won't return a 404 HTTP Response code
-        return URL + ":" + getPort() + "/xwiki/bin/get/Main/";
+        return URL + ":" + getPort() + DEFAULT_CONTEXT + "/bin/get/Main/";
     }
 
     private String getDefaultStartCommand(int port, int stopPort, int rmiPort)

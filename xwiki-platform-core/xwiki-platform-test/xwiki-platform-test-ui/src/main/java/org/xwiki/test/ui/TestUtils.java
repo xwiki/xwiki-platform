@@ -120,7 +120,8 @@ public class TestUtils
      * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
      */
     @Deprecated
-    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT + "/xwiki/";
+    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT
+        + XWikiExecutor.DEFAULT_CONTEXT + "/";
 
     /**
      * @since 5.0M2
@@ -933,7 +934,8 @@ public class TestUtils
     public String getBaseURL()
     {
         return XWikiExecutor.URL + ":"
-            + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT) + "/xwiki/";
+            + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
+            + XWikiExecutor.DEFAULT_CONTEXT + "/";
     }
 
     /**

@@ -43,6 +43,7 @@ import org.restlet.data.MediaType;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionId;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
@@ -54,31 +55,31 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * Example usage:
  * <p>
  *
- * <pre>{@code
- * <plugin>
- *   <groupId>org.xwiki.platform</groupId>
- *   <artifactId>xwiki-platform-tool-provision-plugin</artifactId>
- *   <version>...version...</version>
- *   <configuration>
- *     <username>Admin</username>
- *     <password>admin</password>
- *     <extensionIds>
- *       <extensionId>
- *         <id>org.xwiki.contrib.markdown:syntax-markdown-markdown12</id>
- *         <version>8.5.1</version>
- *       </extensionId>
- *     </extensionIds>
- *   </configuration>
- *   <executions>
- *     <execution>
- *       <id>install</id>
- *       <goals>
- *         <goal>install</goal>
- *       </goals>
- *     </execution>
- *   </executions>
- * </plugin>
- * }</pre>
+ * <pre><code>
+ * &#60;plugin>
+ *   &#60;groupId>org.xwiki.platform&#60;/groupId>
+ *   &#60;artifactId>xwiki-platform-tool-provision-plugin&#60;/artifactId>
+ *   &#60;version>...version...&#60;/version>
+ *   &#60;configuration>
+ *     &#60;username>Admin&#60;/username>
+ *     &#60;password>admin&#60;/password>
+ *     &#60;extensionIds>
+ *       &#60;extensionId>
+ *         &#60;id>org.xwiki.contrib.markdown:syntax-markdown-markdown12&#60;/id>
+ *         &#60;version>8.5.1&#60;/version>
+ *       &#60;/extensionId>
+ *     &#60;/extensionIds>
+ *   &#60;/configuration>
+ *   &#60;executions>
+ *     &#60;execution>
+ *       &#60;id>install&#60;/id>
+ *       &#60;goals>
+ *         &#60;goal>install&#60;/goal>
+ *       &#60;/goals>
+ *     &#60;/execution>
+ *   &#60;/executions>
+ * &#60;/plugin>
+ * </code></pre>
  *
  * @version $Id$
  * @since 10.0RC1
@@ -117,6 +118,12 @@ public class InstallMojo extends AbstractMojo
     @Parameter
     private List<ExtensionId> extensionIds;
 
+    /**
+     * If defined, all pages will be installed under that user.
+     */
+    @Parameter(required = false)
+    private String installUserReference;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -148,8 +155,10 @@ public class InstallMojo extends AbstractMojo
 
         // Set the extension list to install
         for (ExtensionId extensionId : this.extensionIds) {
-            installRequest.addExtension(
-                new org.xwiki.extension.ExtensionId(extensionId.getId(), extensionId.getVersion()));
+            org.xwiki.extension.ExtensionId extId =
+                new org.xwiki.extension.ExtensionId(extensionId.getId(), extensionId.getVersion());
+            getLog().info(String.format("Installing extension [%s]...", extId));
+            installRequest.addExtension(extId);
         }
 
         // Set the namespaces into which to install the extensions
@@ -159,6 +168,11 @@ public class InstallMojo extends AbstractMojo
             for (String namespace : this.namespaces) {
                 installRequest.addNamespace(namespace);
             }
+        }
+
+        // Set any user for installing pages (if defined)
+        if (this.installUserReference != null) {
+            installRequest.setProperty("user.reference", new DocumentReference("xwiki", "XWiki", "superadmin"));
         }
 
         JobRequest request = getModelFactory().toRestJobRequest(installRequest);

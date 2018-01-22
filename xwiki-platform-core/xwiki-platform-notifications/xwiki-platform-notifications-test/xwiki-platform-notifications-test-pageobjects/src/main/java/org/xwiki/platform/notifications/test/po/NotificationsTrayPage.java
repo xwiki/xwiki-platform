@@ -67,7 +67,7 @@ public class NotificationsTrayPage extends ViewPage
     {
         this.showNotificationTray();
 
-        return !this.notificationsArea.getText().equals("No notification available!");
+        return !this.notificationsArea.getText().equals("No notifications available!");
     }
 
     /**

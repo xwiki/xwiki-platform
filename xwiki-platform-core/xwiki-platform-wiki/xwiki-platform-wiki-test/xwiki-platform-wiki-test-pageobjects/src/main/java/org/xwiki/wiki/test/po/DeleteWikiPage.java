@@ -54,7 +54,7 @@ public class DeleteWikiPage extends ExtendedViewPage
 
     public boolean hasUserErrorMessage()
     {
-        return errorMessage.isDisplayed() && errorMessage.getText().contains("You must type in");
+        return errorMessage.isDisplayed() && errorMessage.getText().contains("Type in the exact");
     }
 
     public boolean hasWikiDeleteConfirmationInput(String value)

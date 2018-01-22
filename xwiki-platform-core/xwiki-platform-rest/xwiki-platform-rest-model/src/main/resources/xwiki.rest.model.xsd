@@ -322,6 +322,8 @@
           </element>
           <element name="startDate" type="dateTime"></element>
           <element name="endDate" type="dateTime"></element>
+          <element name="serialized" type="boolean" minOccurs="0" maxOccurs="1"></element>
+          <element name="isolated" type="boolean" minOccurs="0" maxOccurs="1"></element>
           <element name="errorMessage" type="string"></element>
         </sequence>
       </extension>
@@ -330,11 +332,19 @@
 
   <complexType name="JobRequest">
     <sequence>
-      <element name="id" type="xwiki:JobId" maxOccurs="1" minOccurs="0"></element>
+      <element name="id" type="xwiki:JobId" maxOccurs="1"
+        minOccurs="0">
+      </element>
       <element name="interactive" type="boolean"></element>
       <element name="remote" type="boolean"></element>
       <element name="verbose" type="boolean" default="true"></element>
-      <element name="property" type="xwiki:MapEntry" minOccurs="0" maxOccurs="unbounded"></element>
+      <element name="statusSerialized" type="boolean" minOccurs="0" maxOccurs="1"></element>
+      <element name="statusLogIsolated" type="boolean" minOccurs="0"
+        maxOccurs="1">
+      </element>
+      <element name="property" type="xwiki:MapEntry" minOccurs="0"
+        maxOccurs="unbounded">
+      </element>
     </sequence>
   </complexType>
 

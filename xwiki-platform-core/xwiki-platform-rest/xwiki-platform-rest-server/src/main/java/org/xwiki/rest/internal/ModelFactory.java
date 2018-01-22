@@ -903,6 +903,8 @@ public class ModelFactory
         restJobRequest.setInteractive(request.isInteractive());
         restJobRequest.setRemote(request.isRemote());
         restJobRequest.setVerbose(request.isVerbose());
+        restJobRequest.setStatusSerialized(request.isStatusSerialized());
+        restJobRequest.setStatusLogIsolated(request.isStatusLogIsolated());
 
         for (String key : request.getPropertyNames()) {
             restJobRequest.getProperties().add(toRestMapEntry(key, request.getProperty(key)));
@@ -948,6 +950,8 @@ public class ModelFactory
 
         request.setInteractive(restJobRequest.isInteractive());
         request.setVerbose(restJobRequest.isVerbose());
+        request.setStatusSerialized(restJobRequest.isStatusSerialized());
+        request.setStatusLogIsolated(restJobRequest.isStatusLogIsolated());
 
         for (MapEntry restEntry : restJobRequest.getProperties()) {
             request.setProperty(restEntry.getKey(), this.jaxbConverter.unserializeAny(restEntry.getValue()));
@@ -998,6 +1002,11 @@ public class ModelFactory
             link.setRel(Relations.SELF);
             status.getLinks().add(link);
         }
+
+        // Log isolation
+        status.setIsolated(jobStatus.isIsolated());
+        // Status serialization
+        status.setSerialized(jobStatus.isSerialized());
 
         return status;
     }

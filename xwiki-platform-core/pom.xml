@@ -205,6 +205,34 @@
                     "fieldName": "serialVersionUID",
                     "elementKind": "field",
                     "justification": "Not a breackage in this context"
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.rest.model.jaxb.JobRequest",
+                    "new": "class org.xwiki.rest.model.jaxb.JobRequest",
+                    "annotationType": "javax.xml.bind.annotation.XmlType",
+                    "annotation": "@javax.xml.bind.annotation.XmlType(name = \"JobRequest\", propOrder = {\"id\", \"interactive\", \"remote\", \"verbose\", \"statusSerialized\", \"statusLogIsolated\", \"properties\"})",
+                    "attribute": "propOrder",
+                    "oldValue": "{\"id\", \"interactive\", \"remote\", \"verbose\", \"properties\"}",
+                    "newValue": "{\"id\", \"interactive\", \"remote\", \"verbose\", \"statusSerialized\", \"statusLogIsolated\", \"properties\"}",
+                    "package": "org.xwiki.rest.model.jaxb",
+                    "classSimpleName": "JobRequest",
+                    "elementKind": "class",
+                    "justification": "Not a breackage in this context"
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.rest.model.jaxb.JobStatus",
+                    "new": "class org.xwiki.rest.model.jaxb.JobStatus",
+                    "annotationType": "javax.xml.bind.annotation.XmlType",
+                    "annotation": "@javax.xml.bind.annotation.XmlType(name = \"JobStatus\", propOrder = {\"id\", \"request\", \"state\", \"progress\", \"log\", \"startDate\", \"endDate\", \"serialized\", \"isolated\", \"errorMessage\"})",
+                    "attribute": "propOrder",
+                    "oldValue": "{\"id\", \"request\", \"state\", \"progress\", \"log\", \"startDate\", \"endDate\", \"errorMessage\"}",
+                    "newValue": "{\"id\", \"request\", \"state\", \"progress\", \"log\", \"startDate\", \"endDate\", \"serialized\", \"isolated\", \"errorMessage\"}",
+                    "package": "org.xwiki.rest.model.jaxb",
+                    "classSimpleName": "JobStatus",
+                    "elementKind": "class",
+                    "justification": "Not a breackage in this context"
                   }
                 ]
               }

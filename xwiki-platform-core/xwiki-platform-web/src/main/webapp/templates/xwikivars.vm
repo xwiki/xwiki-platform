@@ -28,8 +28,9 @@
 ## preferences page.
 #set ($spacePreferencesDocumentReference = $services.model.resolveDocument('WebPreferences'))
 #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spacePreferencesDocumentReference))
-#set ($hasWatch = $services.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize(
-  $services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+#set ($hasWatch = $services.watchlist && $services.watchlist.isEnabled() && !$isGuest && !$isSuperAdmin
+  && $xwiki.exists($services.model.serialize(
+    $services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 #set ($hasDashboard = $xwiki.exists($services.model.serialize(
   $services.model.createDocumentReference($xcontext.database, 'Dashboard', 'XWikiUserDashboardSheet'), 'local')))
 ##

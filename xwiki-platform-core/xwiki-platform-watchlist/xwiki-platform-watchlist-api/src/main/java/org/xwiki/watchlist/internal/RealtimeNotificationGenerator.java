@@ -37,12 +37,12 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.watchlist.WatchListConfiguration;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
 import org.xwiki.watchlist.internal.api.WatchListEventType;
 import org.xwiki.watchlist.internal.api.WatchListNotifier;
@@ -115,12 +115,8 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     @Inject
     private WatchListEventMatcher watchlistEventMatcher;
 
-    /**
-     * Used to access xwiki.properties.
-     */
     @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource xwikiProperties;
+    private WatchListConfiguration configuration;
 
     /**
      * Allow processing of remote events.
@@ -142,13 +138,13 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
      */
     public void initialize() throws InitializationException
     {
-        this.allowRemote = this.xwikiProperties.getProperty("watchlist.realtime.allowRemote", false);
+        this.allowRemote = configuration.allowRealtimeRemote();
     }
 
     @Override
     public List<Event> getEvents()
     {
-        if (this.xwikiProperties.getProperty("watchlist.realtime.enabled", false)) {
+        if (configuration.isRealtimeEnabled()) {
             // If the realtime notification feature is explicitly enabled (temporarily disabled by default), then enable
             // this event listener.
             return super.getEvents();

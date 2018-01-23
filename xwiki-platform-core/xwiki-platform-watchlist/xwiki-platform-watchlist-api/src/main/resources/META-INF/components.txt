@@ -2,6 +2,7 @@ org.xwiki.watchlist.internal.ActivityEventWatchListEventConverter
 org.xwiki.watchlist.internal.AutomaticWatchModeListener
 org.xwiki.watchlist.internal.DefaultUserAvatarAttachmentExtractor
 org.xwiki.watchlist.internal.DefaultWatchList
+org.xwiki.watchlist.internal.DefaultWatchListConfiguration
 org.xwiki.watchlist.internal.DefaultWatchListEventFeedManager
 org.xwiki.watchlist.internal.DefaultWatchListEventHTMLDiffExtractor
 org.xwiki.watchlist.internal.DefaultWatchListEventMatcher

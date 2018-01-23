@@ -621,6 +621,14 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Image plugin -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- ********************************************************************** -->
     <!-- Stuff filled with Maven hacks making them hard to install as extension right now -->
 
@@ -694,6 +702,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-zipexplorer</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Graphviz -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-graphviz-oldcore</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

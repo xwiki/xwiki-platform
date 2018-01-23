@@ -31,6 +31,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.watchlist.WatchListConfiguration;
 import org.xwiki.watchlist.internal.DefaultWatchListNotifier;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 import org.xwiki.watchlist.internal.api.WatchList;
@@ -160,6 +161,11 @@ public class WatchListJob extends AbstractJob implements Job
     public void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
         try {
+            // Don't go further if the application is disabled
+            if (!isWatchListEnabled()) {
+                return;
+            }
+
             init(jobContext);
 
             if (this.watchListJobObject == null) {
@@ -199,5 +205,10 @@ public class WatchListJob extends AbstractJob implements Job
             // We're in a job, we don't throw exceptions
             LOGGER.error("Exception while running job", e);
         }
+    }
+
+    private boolean isWatchListEnabled()
+    {
+        return Utils.getComponent(WatchListConfiguration.class).isEnabled();
     }
 }

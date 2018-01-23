@@ -35,6 +35,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.watchlist.WatchListConfiguration;
 import org.xwiki.watchlist.internal.DefaultWatchListStore;
 import org.xwiki.watchlist.internal.api.WatchList;
 import org.xwiki.watchlist.internal.api.WatchedElementType;
@@ -70,6 +71,20 @@ public class WatchListScriptService implements ScriptService
 
     @Inject
     private Execution execution;
+
+    @Inject
+    private WatchListConfiguration configuration;
+
+    /**
+     * @return if the watchlist application is enabled
+     *
+     * @since 10.0
+     * @since 9.11.2
+     */
+    public boolean isEnabled()
+    {
+        return configuration.isEnabled();
+    }
 
     /**
      * @param type the type of element, as defined by {@link WatchedElementType}

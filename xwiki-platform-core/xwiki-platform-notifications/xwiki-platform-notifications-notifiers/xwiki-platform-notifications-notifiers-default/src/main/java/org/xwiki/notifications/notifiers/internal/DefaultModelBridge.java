@@ -62,7 +62,14 @@ public class DefaultModelBridge implements ModelBridge
             BaseObject obj = doc.getObject(entityReferenceSerializer.serialize(objectReference.getXClassReference()),
                     true, xcontext);
             if (obj != null) {
+                // Set the value
                 obj.set(property, value, xcontext);
+
+                // Prevent version changes
+                doc.setMetaDataDirty(false);
+                doc.setContentDirty(false);
+
+                // Save
                 xcontext.getWiki().saveDocument(doc, String.format("Property [%s] set.", property), xcontext);
             }
         } catch (XWikiException e) {

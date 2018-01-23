@@ -160,7 +160,7 @@
                     "package": "org.xwiki.rendering.block",
                     "classSimpleName": "ExpandedMacroBlock",
                     "elementKind": "class",
-                    "justification": "No breackage. Just moved commons stuff in an abtract class."
+                    "justification": "No breakage. Just moved commons stuff in an abtract class."
                   },
                   {
                     "code": "java.field.serialVersionUIDUnchanged",
@@ -171,7 +171,7 @@
                     "classSimpleName": "CreateRequest",
                     "fieldName": "serialVersionUID",
                     "elementKind": "field",
-                    "justification": "Not a breackage in this context"
+                    "justification": "Not a breakage in this context"
                   },
                   {
                     "code": "java.field.serialVersionUIDUnchanged",
@@ -182,7 +182,7 @@
                     "classSimpleName": "EntityRequest",
                     "fieldName": "serialVersionUID",
                     "elementKind": "field",
-                    "justification": "Not a breackage in this context"
+                    "justification": "Not a breakage in this context"
                   },
                   {
                     "code": "java.field.serialVersionUIDUnchanged",
@@ -193,7 +193,7 @@
                     "classSimpleName": "MoveRequest",
                     "fieldName": "serialVersionUID",
                     "elementKind": "field",
-                    "justification": "Not a breackage in this context"
+                    "justification": "Not a breakage in this context"
                   },
                   {
                     "code": "java.field.serialVersionUIDUnchanged",
@@ -204,7 +204,7 @@
                     "classSimpleName": "RestoreRequest",
                     "fieldName": "serialVersionUID",
                     "elementKind": "field",
-                    "justification": "Not a breackage in this context"
+                    "justification": "Not a breakage in this context"
                   },
                   {
                     "code": "java.annotation.attributeValueChanged",
@@ -218,7 +218,7 @@
                     "package": "org.xwiki.rest.model.jaxb",
                     "classSimpleName": "JobRequest",
                     "elementKind": "class",
-                    "justification": "Not a breackage in this context"
+                    "justification": "Not a breakage in this context"
                   },
                   {
                     "code": "java.annotation.attributeValueChanged",
@@ -232,7 +232,7 @@
                     "package": "org.xwiki.rest.model.jaxb",
                     "classSimpleName": "JobStatus",
                     "elementKind": "class",
-                    "justification": "Not a breackage in this context"
+                    "justification": "Not a breakage in this context"
                   }
                 ]
               }

@@ -30,7 +30,7 @@
     <!-- Unpack the data files to package it in the distribution -->
     <dependencySet>
       <includes>
-        <include>org.xwiki.platform:xwiki-platform-distribution-data-hsqldb</include>
+        <include>org.xwiki.platform:xwiki-platform-distribution-flavor-data-hsqldb</include>
       </includes>
       <outputDirectory>/data</outputDirectory>
       <unpack>true</unpack>

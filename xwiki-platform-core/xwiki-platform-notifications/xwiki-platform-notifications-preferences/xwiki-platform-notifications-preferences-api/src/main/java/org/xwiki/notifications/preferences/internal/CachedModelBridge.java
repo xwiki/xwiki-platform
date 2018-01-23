@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
@@ -53,17 +54,25 @@ public class CachedModelBridge implements ModelBridge
     @Inject
     private Execution execution;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
             throws NotificationException
     {
+        // We need to store the user reference in the cache's key, otherwise all users of the same context will share
+        // the same cache, which can happen when a notification email is triggered.
+        final String specificUserNotificationsPreferences = String.format("%s_[%s]",
+                USER_NOTIFICATIONS_PREFERENCES, serializer.serialize(userReference));
+
         ExecutionContext context = execution.getContext();
-        if (context.hasProperty(USER_NOTIFICATIONS_PREFERENCES)) {
-            return (List<NotificationPreference>) context.getProperty(USER_NOTIFICATIONS_PREFERENCES);
+        if (context.hasProperty(specificUserNotificationsPreferences)) {
+            return (List<NotificationPreference>) context.getProperty(specificUserNotificationsPreferences);
         }
 
         List<NotificationPreference> preferences = modelBridge.getNotificationsPreferences(userReference);
-        context.setProperty(USER_NOTIFICATIONS_PREFERENCES, preferences);
+        context.setProperty(specificUserNotificationsPreferences, preferences);
 
         return preferences;
     }

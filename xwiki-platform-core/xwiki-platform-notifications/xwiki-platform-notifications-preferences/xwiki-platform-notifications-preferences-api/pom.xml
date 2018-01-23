@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Preferences - API</name>
   <description>Handle notifications user preferences</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

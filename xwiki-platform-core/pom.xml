@@ -207,6 +207,17 @@
                     "justification": "Not a breakage in this context"
                   },
                   {
+                    "code": "java.field.serialVersionUIDUnchanged",
+                    "old": "field org.xwiki.platform.wiki.creationjob.WikiCreationRequest.serialVersionUID",
+                    "new": "field org.xwiki.platform.wiki.creationjob.WikiCreationRequest.serialVersionUID",
+                    "serialVersionUID": "-1887940302223327347",
+                    "package": "org.xwiki.platform.wiki.creationjob",
+                    "classSimpleName": "WikiCreationRequest",
+                    "fieldName": "serialVersionUID",
+                    "elementKind": "field",
+                    "justification": "Not a breakage in this context"
+                  },
+                  {
                     "code": "java.annotation.attributeValueChanged",
                     "old": "class org.xwiki.rest.model.jaxb.JobRequest",
                     "new": "class org.xwiki.rest.model.jaxb.JobRequest",

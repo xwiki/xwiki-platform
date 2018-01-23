@@ -149,7 +149,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     {
         this.currentEvents = Collections.emptyList();
         this.currentUserEmail = null;
-        while (this.currentEvents.isEmpty() && currentUserEmail == null && this.userIterator.hasNext()) {
+        while ((this.currentEvents.isEmpty() || currentUserEmail == null) && this.userIterator.hasNext()) {
             this.currentUser = this.userIterator.next();
             try {
                 this.currentUserEmail = new InternetAddress(getUserEmail(this.currentUser));

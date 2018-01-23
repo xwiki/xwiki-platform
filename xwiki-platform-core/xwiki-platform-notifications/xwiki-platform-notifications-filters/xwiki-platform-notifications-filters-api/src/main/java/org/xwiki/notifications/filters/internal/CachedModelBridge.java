@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
@@ -49,23 +50,33 @@ public class CachedModelBridge implements ModelBridge
 
     private static final String USER_FILTER_PREFERENCES = "userAllNotificationFilterPreferences";
 
+    private static final String CONTEXT_KEY_FORMAT = "%s_[%s]";
+
     @Inject
     private ModelBridge modelBridge;
 
     @Inject
     private Execution execution;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
+        // We need to store the user reference in the cache's key, otherwise all users of the same context will share
+        // the same cache, which can happen when a notification email is triggered.
+        final String contextEntry = String.format(CONTEXT_KEY_FORMAT, USER_FILTER_PREFERENCES,
+                serializer.serialize(user));
+
         ExecutionContext context = execution.getContext();
-        Object cachedPreferences = context.getProperty(USER_FILTER_PREFERENCES);
+        Object cachedPreferences = context.getProperty(contextEntry);
         if (cachedPreferences != null && cachedPreferences instanceof Set) {
             return (Set<NotificationFilterPreference>) cachedPreferences;
         }
 
         Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user);
-        context.setProperty(USER_FILTER_PREFERENCES, preferences);
+        context.setProperty(contextEntry, preferences);
 
         return preferences;
     }
@@ -74,7 +85,10 @@ public class CachedModelBridge implements ModelBridge
     public Set<String> getDisabledNotificationFiltersHints(DocumentReference user)
             throws NotificationException
     {
-        final String contextEntry = USER_TOGGLEABLE_FILTER_PREFERENCES;
+        // We need to store the user reference in the cache's key, otherwise all users of the same context will share
+        // the same cache, which can happen when a notification email is triggered.
+        final String contextEntry = String.format(CONTEXT_KEY_FORMAT, USER_TOGGLEABLE_FILTER_PREFERENCES,
+            serializer.serialize(user));
 
         ExecutionContext context = execution.getContext();
         if (context.hasProperty(contextEntry)) {
@@ -113,7 +127,10 @@ public class CachedModelBridge implements ModelBridge
     private void clearCache()
     {
         ExecutionContext context = execution.getContext();
-        context.removeProperty(USER_FILTER_PREFERENCES);
-        context.removeProperty(USER_TOGGLEABLE_FILTER_PREFERENCES);
+        for (String key: context.getProperties().keySet()) {
+            if (key.startsWith(USER_FILTER_PREFERENCES) || key.startsWith(USER_TOGGLEABLE_FILTER_PREFERENCES)) {
+                context.removeProperty(key);
+            }
+        }
     }
 }

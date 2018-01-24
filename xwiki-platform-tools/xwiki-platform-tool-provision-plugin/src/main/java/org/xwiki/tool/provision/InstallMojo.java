@@ -53,7 +53,6 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * when provisioning an XWiki instance for executing functional tests.
  *
  * Example usage:
- * <p>
  *
  * <pre><code>
  * &#60;plugin&#62;

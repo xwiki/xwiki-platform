@@ -1,4 +1,4 @@
 Pages:
-  [create] [Title 2](http://localhost:8080/xwiki/bin/view/NotificationsTest/Page2).
+  [create] [Title 2](http://localhost:8080/xwiki/bin/view/NotificationsEmailTest/Page2).
   edited by user1.
-  Changes: http://localhost:8080/xwiki/bin/view/NotificationsTest/Page2?viewer=changes&rev1=1.1&rev2=1.1
+  Changes: http://localhost:8080/xwiki/bin/view/NotificationsEmailTest/Page2?viewer=changes&rev1=1.1&rev2=1.1

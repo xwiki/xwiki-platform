@@ -89,6 +89,8 @@ public class NotificationsIT extends AbstractTest
 
     private static final String UPDATE = "update";
 
+    private static final String NOTIFICATIONS_EMAIL_TEST = "NotificationsEmailTest";
+
     private static GreenMail mail;
 
     @Before
@@ -339,15 +341,15 @@ public class NotificationsIT extends AbstractTest
         p.setEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT, BootstrapSwitch.State.ON);
 
         getUtil().login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        DocumentReference page1 = new DocumentReference("xwiki", getTestClassName(), "Page1");
-        DocumentReference page2 = new DocumentReference("xwiki", getTestClassName(), "Page2");
+        DocumentReference page1 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page1");
+        DocumentReference page2 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page2");
 
         // Yes we wait on a timer, but it is to be sure the following events will be stored AFTER the settings have been
         // changed.
         Thread.sleep(1000);
 
-        getUtil().createPage(getTestClassName(), "Page1", "Content 1", "Title 1");
-        getUtil().createPage(getTestClassName(), "Page2", "Content 2", "Title 2");
+        getUtil().createPage(NOTIFICATIONS_EMAIL_TEST, "Page1", "Content 1", "Title 1");
+        getUtil().createPage(NOTIFICATIONS_EMAIL_TEST, "Page2", "Content 2", "Title 2");
 
         // Trigger the notification email job
         getUtil().login(SUPERADMIN_USER_NAME, SUPERADMIN_PASSWORD);

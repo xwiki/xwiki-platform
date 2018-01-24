@@ -56,29 +56,29 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * <p>
  *
  * <pre><code>
- * &#60;plugin>
- *   &#60;groupId>org.xwiki.platform&#60;/groupId>
- *   &#60;artifactId>xwiki-platform-tool-provision-plugin&#60;/artifactId>
- *   &#60;version>...version...&#60;/version>
- *   &#60;configuration>
- *     &#60;username>Admin&#60;/username>
- *     &#60;password>admin&#60;/password>
- *     &#60;extensionIds>
- *       &#60;extensionId>
- *         &#60;id>org.xwiki.contrib.markdown:syntax-markdown-markdown12&#60;/id>
- *         &#60;version>8.5.1&#60;/version>
- *       &#60;/extensionId>
- *     &#60;/extensionIds>
- *   &#60;/configuration>
- *   &#60;executions>
- *     &#60;execution>
- *       &#60;id>install&#60;/id>
- *       &#60;goals>
- *         &#60;goal>install&#60;/goal>
- *       &#60;/goals>
- *     &#60;/execution>
- *   &#60;/executions>
- * &#60;/plugin>
+ * &#60;plugin&#62;
+ *   &#60;groupId&#62;org.xwiki.platform&#60;/groupId&#62;
+ *   &#60;artifactId&#62;xwiki-platform-tool-provision-plugin&#60;/artifactId&#62;
+ *   &#60;version&#62;...version...&#60;/version&#62;
+ *   &#60;configuration&#62;
+ *     &#60;username&#62;Admin&#60;/username&#62;
+ *     &#60;password&#62;admin&#60;/password&#62;
+ *     &#60;extensionIds&#62;
+ *       &#60;extensionId&#62;
+ *         &#60;id&#62;org.xwiki.contrib.markdown:syntax-markdown-markdown12&#60;/id&#62;
+ *         &#60;version&#62;8.5.1&#60;/version&#62;
+ *       &#60;/extensionId&#62;
+ *     &#60;/extensionIds&#62;
+ *   &#60;/configuration&#62;
+ *   &#60;executions&#62;
+ *     &#60;execution&#62;
+ *       &#60;id&#62;install&#60;/id&#62;
+ *       &#60;goals&#62;
+ *         &#60;goal&#62;install&#60;/goal&#62;
+ *       &#60;/goals&#62;
+ *     &#60;/execution&#62;
+ *   &#60;/executions&#62;
+ * &#60;/plugin&#62;
  * </code></pre>
  *
  * @version $Id$

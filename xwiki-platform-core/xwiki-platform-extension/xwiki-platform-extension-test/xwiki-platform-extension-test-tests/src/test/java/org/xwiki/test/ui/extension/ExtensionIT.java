@@ -88,7 +88,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         getExtensionTestUtils().uninstall("scriptServiceJarExtension");
 
         // Delete the pages that are provided by the XAR extensions we use in tests.
-        getUtil().rest().deletePage(getTestClassName(), "Alice");
+        getUtil().rest().deletePage("ExtensionTest", "Alice");
         assertFalse(getUtil().pageExists("ExtensionTest", "Alice"));
         getUtil().rest().deletePage("ExtensionTest", "Bob");
         assertFalse(getUtil().pageExists("ExtensionTest", "Bob"));

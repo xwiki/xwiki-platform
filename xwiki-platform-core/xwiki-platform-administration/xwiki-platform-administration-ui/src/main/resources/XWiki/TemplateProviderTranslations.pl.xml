@@ -26,18 +26,15 @@
   <language>pl</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>XWiki.TemplateProviderClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1467626480000</creationDate>
+  <parent>XWiki.TemplateProviderClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1467626545000</date>
   <contentUpdateDate>1467626545000</contentUpdateDate>
   <version>1.1</version>
   <title>TemplateProvider Translations</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>

@@ -109,7 +109,41 @@ def builds = [
 ]
 
 stage ('Platform Builds') {
-  askUserAndBuild(builds)
+  askUserAndBuild(builds) {
+    def build(map)
+    {
+      node {
+        xwikiBuild(map.name) {
+          mavenOpts = map.mavenOpts ?: "-Xmx2500m -Xms512m"
+          if (map.goals) {
+            goals = map.goals
+          }
+          if (map.profiles) {
+            profiles = map.profiles
+          }
+          if (map.properties) {
+            properties = map.properties
+          }
+          if (map.pom) {
+            pom = map.pom
+          }
+        }
+      }
+    }
+
+    def buildFunctionalTest(map)
+    {
+      def sharedPOMPrefix =
+        'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
+
+      build(
+        name: map.name,
+        profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
+        mavenOpts: map.mavenOpts,
+        pom: "${sharedPOMPrefix}/${map.pom}"
+      )
+    }
+  }
 }
 
 def buildAll()
@@ -184,36 +218,3 @@ def buildAll()
   )
 }
 
-def build(map)
-{
-  node {
-    xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2500m -Xms512m"
-      if (map.goals) {
-        goals = map.goals
-      }
-      if (map.profiles) {
-        profiles = map.profiles
-      }
-      if (map.properties) {
-        properties = map.properties
-      }
-      if (map.pom) {
-        pom = map.pom
-      }
-    }
-  }
-}
-
-def buildFunctionalTest(map)
-{
-  def sharedPOMPrefix =
-    'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
-
-  build(
-    name: map.name,
-    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
-    mavenOpts: map.mavenOpts,
-    pom: "${sharedPOMPrefix}/${map.pom}"
-  )
-}

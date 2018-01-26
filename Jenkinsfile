@@ -114,7 +114,7 @@ stage ('Platform Builds') {
       timeout(time: 60, unit: 'SECONDS') {
         def choices = builds.collect { k,v -> "$k" }.join('\n')
         userInput = input(id: 'userInput', message: 'Select what to build', parameters: [
-          choice(choices: 'All\n${choices}', description: 'Choose with build to execute', name: 'build')
+          choice(choices: "All\n${choices}", description: 'Choose with build to execute', name: 'build')
         ])
       }
     } catch(err) {

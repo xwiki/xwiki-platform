@@ -109,7 +109,9 @@ def builds = [
 ]
 
 stage ('Platform Builds') {
-  builds[askUser(builds)]
+  def selection = askUser(builds)
+  echo "Buiding: ${selection}"
+  builds[selection]
 }
 
 def buildAll()

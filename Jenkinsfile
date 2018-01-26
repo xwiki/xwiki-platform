@@ -25,6 +25,9 @@
 
 // Definitions of all builds
 def builds = [
+  'All' : {
+    buildAll()
+  },
   'Main' : {
     build(
       name: 'Main',
@@ -106,34 +109,7 @@ def builds = [
 ]
 
 stage ('Platform Builds') {
-
-  // If a user is manually triggering this job, then ask what to build
-  if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
-    def userInput
-    try {
-      timeout(time: 60, unit: 'SECONDS') {
-        def choices = builds.collect { k,v -> "$k" }.join('\n')
-        userInput = input(id: 'userInput', message: 'Select what to build', parameters: [
-          choice(choices: "All\n${choices}", description: 'Choose with build to execute', name: 'build')
-        ])
-      }
-    } catch(err) {
-      def user = err.getCauses()[0].getUser()
-      if ('SYSTEM' == user.toString()) { // SYSTEM means timeout.
-        userInput = 'All'
-      } else {
-        // Aborted by user
-        throw err
-      }
-    }
-    if (userInput == 'All') {
-      buildAll()
-    } else {
-      builds[userInput]
-    }
-  } else {
-    buildAll()
-  }
+  askUserInputAndBuild(builds)
 }
 
 def buildAll()

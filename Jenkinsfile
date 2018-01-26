@@ -25,9 +25,6 @@
 
 // Definitions of all builds
 def builds = [
-  'All' : {
-    buildAll()
-  },
   'Main' : {
     build(
       name: 'Main',
@@ -109,7 +106,12 @@ def builds = [
 ]
 
 stage ('Platform Builds') {
-  builds[askUser(builds)].call()
+  def selection = askUser(builds)
+  if (selection == 'All') {
+    buildAll()
+  } else {
+    builds[selection].call()
+  }
 }
 
 def buildAll()

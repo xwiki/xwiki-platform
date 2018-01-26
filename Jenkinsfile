@@ -135,53 +135,53 @@ def buildAll(builds)
       // xwiki manually.
 
       // Build the distributions
-      builds['Distribution']
+      builds['Distribution'].call()
 
       // Building the various functional tests, after the distribution has been built successfully.
 
       // Build the Flavor Test POM, required for the pageobjects module below.
-      builds['Flavor Test - POM']
+      builds['Flavor Test - POM'].call()
 
       // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
-      builds['Flavor Test - PageObjects']
+      builds['Flavor Test - PageObjects'].call()
 
       // Now run all tests in parallel
       parallel(
         'flavor-test-ui': {
           // Run the Flavor UI tests
-          builds['Flavor Test - UI']
+          builds['Flavor Test - UI'].call()
         },
         'flavor-test-misc': {
           // Run the Flavor Misc tests
-          builds['Flavor Test - Misc']
+          builds['Flavor Test - Misc'].call()
         },
         'flavor-test-storage': {
           // Run the Flavor Storage tests
-          builds['Flavor Test - Storage']
+          builds['Flavor Test - Storage'].call()
         },
         'flavor-test-escaping': {
           // Run the Flavor Escaping tests
-          builds['Flavor Test - Escaping']
+          builds['Flavor Test - Escaping'].call()
         },
         'flavor-test-selenium': {
           // Run the Flavor Selenium tests
-          builds['Flavor Test - Selenium']
+          builds['Flavor Test - Selenium'].call()
         },
         'flavor-test-webstandards': {
           // Run the Flavor Webstandards tests
           // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
           // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
-          builds['Flavor Test - Webstandards']
+          builds['Flavor Test - Webstandards'].call()
         }
       )
     },
     'testrelease': {
       // Simulate a release and verify all is fine, in preparation for the release day.
-      builds['TestRelease']
+      builds['TestRelease'].call()
     },
     'quality': {
       // Run the quality checks
-      builds['Quality']
+      builds['Quality'].call()
     }
   )
 }

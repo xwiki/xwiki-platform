@@ -23,7 +23,121 @@
 // @Library("XWiki@<branch, tag, sha1>") _
 // See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
+// Definitions of all builds
+def builds = [
+  'Main' : {
+    build(
+      name: 'Main',
+      profiles: 'legacy,integration-tests,office-tests,snapshotModules',
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+    )
+  },
+  'Distribution' : {
+    build(
+      name: 'Distribution',
+      profiles: 'legacy,integration-tests,office-tests,snapshotModules',
+      pom: 'xwiki-platform-distribution/pom.xml'
+    )
+  },
+  'Flavor Test - POM' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - POM',
+      pom: 'pom.xml'
+    )
+  },
+  'Flavor Test - PageObjects' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - PageObjects',
+      pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml'
+    )
+  },
+  'Flavor Test - UI' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - UI',
+      pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml'
+    )
+  },
+  'Flavor Test - Misc' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Misc',
+      pom: 'xwiki-platform-distribution-flavor-test-misc/pom.xml'
+    )
+  },
+  'Flavor Test - Storage': {
+    buildFunctionalTest(
+      name: 'Flavor Test - Storage',
+      pom: 'xwiki-platform-distribution-flavor-test-storage/pom.xml'
+    )
+  },
+  'Flavor Test - Escaping' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Escaping',
+      pom: 'xwiki-platform-distribution-flavor-test-escaping/pom.xml'
+    )
+  },
+  'Flavor Test - Selenium' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Selenium',
+      pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml'
+    )
+  },
+  'Flavor Test - Webstandards' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Webstandards',
+      pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
+      mavenOpts: '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
+    )
+  },
+  'TestRelease': {
+    build(
+      name: 'TestRelease',
+      goals: 'clean install',
+      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+    )
+  },
+  'Quality' : {
+    build(
+      name: 'Quality',
+      goals: 'clean install jacoco:report',
+      profiles: 'quality,legacy'
+    )
+  }
+]
+
 stage ('Platform Builds') {
+
+  // If a user is manually triggering this job, then ask what to build
+  if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
+    def userInput
+    try {
+      timeout(time: 60, unit: 'SECONDS') {
+        def choices = builds.collect { k,v -> "$k" }.join('\n')
+        userInput = input(id: 'userInput', message: 'Select what to build', parameters: [
+          choice(choices: 'All\n${choices}', description: 'Choose with build to execute', name: 'build')
+        ])
+      }
+    } catch(err) {
+      def user = err.getCauses()[0].getUser()
+      if ('SYSTEM' == user.toString()) { // SYSTEM means timeout.
+        userInput = 'All'
+      } else {
+        // Aborted by user
+        throw err
+      }
+    }
+    if (userInput == 'All') {
+      buildAll()
+    } else {
+      builds[userInput]
+    }
+  } else {
+    buildAll()
+  }
+}
+
+def buildAll()
+{
   parallel(
     'main': {
       // Build, skipping quality checks so that the result of the build can be sent as fast as possible to the devs.
@@ -33,11 +147,7 @@ stage ('Platform Builds') {
       //
       // Note: We configure the snapshot extension repository in XWiki (-PsnapshotModules) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
-      build(
-        name: 'Main',
-        profiles: 'legacy,integration-tests,office-tests,snapshotModules',
-        properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
-      )
+      builds['Main']
 
       // Note: We want the following behavior:
       // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will
@@ -47,91 +157,53 @@ stage ('Platform Builds') {
       // xwiki manually.
 
       // Build the distributions
-      build(
-        name: 'Distribution',
-        profiles: 'legacy,integration-tests,office-tests,snapshotModules',
-        pom: 'xwiki-platform-distribution/pom.xml'
-      )
+      builds['Distribution']
 
       // Building the various functional tests, after the distribution has been built successfully.
 
       // Build the Flavor Test POM, required for the pageobjects module below.
-      buildFunctionalTest(
-        name: 'Flavor Test - POM',
-        pom: 'pom.xml'
-      )
+      builds['Flavor Test - POM']
 
       // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
-      buildFunctionalTest(
-        name: 'Flavor Test - PageObjects',
-        pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml'
-      )
+      builds['Flavor Test - PageObjects']
 
       // Now run all tests in parallel
       parallel(
         'flavor-test-ui': {
           // Run the Flavor UI tests
-          buildFunctionalTest(
-            name: 'Flavor Test - UI',
-            pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml'
-          )
+          builds['Flavor Test - UI']
         },
         'flavor-test-misc': {
           // Run the Flavor Misc tests
-          buildFunctionalTest(
-            name: 'Flavor Test - Misc',
-            pom: 'xwiki-platform-distribution-flavor-test-misc/pom.xml'
-          )
+          builds['Flavor Test - Misc']
         },
         'flavor-test-storage': {
           // Run the Flavor Storage tests
-          buildFunctionalTest(
-            name: 'Flavor Test - Storage',
-            pom: 'xwiki-platform-distribution-flavor-test-storage/pom.xml'
-          )
+          builds['Flavor Test - Storage']
         },
         'flavor-test-escaping': {
           // Run the Flavor Escaping tests
-          buildFunctionalTest(
-            name: 'Flavor Test - Escaping',
-            pom: 'xwiki-platform-distribution-flavor-test-escaping/pom.xml'
-          )
+          builds['Flavor Test - Escaping']
         },
         'flavor-test-selenium': {
           // Run the Flavor Selenium tests
-          buildFunctionalTest(
-            name: 'Flavor Test - Selenium',
-            pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml'
-          )
+          builds['Flavor Test - Selenium']
         },
         'flavor-test-webstandards': {
           // Run the Flavor Webstandards tests
           // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
           // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
-          buildFunctionalTest(
-            name: 'Flavor Test - Webstandards',
-            pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
-            mavenOpts: '-Xmx2500m -Xms512m -XX:ThreadStackSize=2048'
-          )
+          builds['Flavor Test - Webstandards']
         }
       )
     },
     'testrelease': {
       // Simulate a release and verify all is fine, in preparation for the release day.
-      build(
-        name: 'TestRelease',
-        goals: 'clean install',
-        profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution',
-        properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
-      )
+      builds['TestRelease']
     },
     'quality': {
       // Run the quality checks
-      build(
-        name: 'Quality',
-        goals: 'clean install jacoco:report',
-        profiles: 'quality,legacy'
-      )
+      builds['Quality']
     }
   )
 }

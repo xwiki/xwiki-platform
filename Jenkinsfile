@@ -108,13 +108,13 @@ def builds = [
 stage ('Platform Builds') {
   def selection = askUser(builds)
   if (selection == 'All') {
-    buildAll()
+    buildAll(builds)
   } else {
     builds[selection].call()
   }
 }
 
-def buildAll()
+def buildAll(builds)
 {
   parallel(
     'main': {

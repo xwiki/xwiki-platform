@@ -125,7 +125,7 @@ def buildAll(builds)
       //
       // Note: We configure the snapshot extension repository in XWiki (-PsnapshotModules) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
-      builds['Main']
+      builds['Main'].call()
 
       // Note: We want the following behavior:
       // - if an error occurs during the previous build we don't want the subsequent builds to execute. This will

@@ -109,7 +109,7 @@ def builds = [
 ]
 
 stage ('Platform Builds') {
-  askUserInputAndBuild(builds)
+  askUserAndBuild(builds)
 }
 
 def buildAll()

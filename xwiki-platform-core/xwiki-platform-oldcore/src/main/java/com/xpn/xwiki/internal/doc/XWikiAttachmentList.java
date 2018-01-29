@@ -46,8 +46,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
 
     /**
      * Initializes the map.
-     * 
-     * @since 10.0RC1
      */
     public XWikiAttachmentList(XWikiDocument document)
     {
@@ -59,7 +57,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * Adds attachment to the list in order of filename.
      * 
      * @param attachment XWikiAttachment to add to the list
-     * @since 10.0RC1
      */
     @Override
     public boolean add(XWikiAttachment attachment)
@@ -73,7 +70,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * 
      * @param index index is ignored as list is reordered based on filename
      * @param attachment XWikiAttachment to add to the list
-     * @since 10.0RC1
      */
     @Override
     public void add(int index, XWikiAttachment attachment)
@@ -93,7 +89,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * 
      * @param index index is ignored as list is reordered based on filename
      * @param c Collection that contains XWikiAttachment objects
-     * @since 10.0RC1
      */
     @Override
     public boolean addAll(Collection<? extends XWikiAttachment> c)
@@ -117,7 +112,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * 
      * @param index index is ignored as list is reordered based on filename
      * @param c Collection that contains XWikiAttachment objects
-     * @since 10.0RC1
      */
     @Override
     public boolean addAll(int index, Collection<? extends XWikiAttachment> c)
@@ -140,7 +134,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * 
      * @param attachment XWikiAttachment to remove.
      * @return true unless the attachment is not found
-     * @since 10.0RC1
      */
     @Override
     public boolean remove(Object attachment)
@@ -159,7 +152,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * @param attachment the attachment to add to the list
      * @return the attachment that was previously matched to the same filename or null if no attachment was matched to
      *         it
-     * @since 10.0RC1
      */
     public XWikiAttachment set(XWikiAttachment attachment)
     {
@@ -178,7 +170,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      * @param attachment the attachment to add to the list
      * @return the attachment that was previously matched to the same filename or null if no attachment was matched to
      *         it
-     * @since 10.0RC1
      */
     @Override
     public XWikiAttachment set(int index, XWikiAttachment attachment)
@@ -189,7 +180,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     /**
      * @param filename the filename of the attachment to be returned.
      * @return attachment with the given filename or null if not found.
-     * @since 10.0RC1
      */
     public XWikiAttachment getByFilename(String filename)
     {
@@ -238,7 +228,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
 
     /**
      * @param element XWikiAttachment that was added to the list
-     * @since 10.0RC1
      */
     protected void added(XWikiAttachment element)
     {

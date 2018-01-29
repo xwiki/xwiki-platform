@@ -618,12 +618,7 @@ $services.localization.render('core.users.unknownUser')##
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
   #set ($discard = $query.bindValue('tie', $solrConfig.tieBreaker))
-  #set ($discard = $query.bindValue('mm', $solrConfig.minShouldMatch))
-  ## Little rudimentary but this should impart higher relevance to
-  ## documents with tags matching the search terms. Will only match single word tags at the moment
-  #set ($fieldName = $solrConfig.boostQuery[0])
-  #set ($fieldBoost = $solrConfig.boostQuery[1])
-  #set ($discard = $query.bindValue('bq', "${fieldName}:(${queryString})${fieldBoost}"))    
+  #set ($discard = $query.bindValue('mm', $solrConfig.minShouldMatch))  
   #setQueryFields($query)
   #setPhraseFields($query)
   #setFacetFields($query)

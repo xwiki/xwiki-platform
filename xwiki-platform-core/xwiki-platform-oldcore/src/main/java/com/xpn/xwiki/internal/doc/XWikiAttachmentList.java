@@ -35,7 +35,7 @@ import org.apache.commons.collections4.list.AbstractListDecorator;
  * 
  * @version $Id$
  * @param <E>
- * @since 10.0RC1
+ * @since 11.0RC1
  */
 public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
 {

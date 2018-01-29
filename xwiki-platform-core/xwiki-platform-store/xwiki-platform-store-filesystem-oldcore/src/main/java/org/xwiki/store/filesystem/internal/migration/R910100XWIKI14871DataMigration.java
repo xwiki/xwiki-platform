@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -54,7 +55,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.filesystem.internal.GenericFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.XWikiException;
@@ -229,10 +229,15 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
             }
 
             // Refactor file storage to be based on database id instead of date
-            File newDirectory = new File(directory.getParentFile(),
-                GenericFileUtils.getURLEncoded(dbAttachment.getFilename() + "-id" + databaseId));
+            File newDirectory =
+                new File(directory.getParentFile(), encode(dbAttachment.getFilename() + "-id" + databaseId));
             FileUtils.moveDirectory(directory, newDirectory);
         }
+    }
+
+    private String encode(String name) throws UnsupportedEncodingException
+    {
+        return URLEncoder.encode(name, "UTF-8");
     }
 
     private String decode(String name) throws UnsupportedEncodingException
@@ -240,14 +245,14 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
         return URLDecoder.decode(name, "UTF-8");
     }
 
-    private DocumentReference getDocumentReference(File directory) throws UnsupportedEncodingException
+    private DocumentReference getDocumentReference(File directory) throws IOException
     {
         String name = decode(directory.getName());
 
         return new DocumentReference(name, (SpaceReference) getEntityReference(directory.getParentFile()));
     }
 
-    private EntityReference getEntityReference(File directory) throws UnsupportedEncodingException
+    private EntityReference getEntityReference(File directory) throws IOException
     {
         String name = decode(directory.getName());
 
@@ -255,7 +260,7 @@ public class R910100XWIKI14871DataMigration extends AbstractHibernateDataMigrati
 
         File parent = directory.getParentFile();
 
-        if (parent.equals(root)) {
+        if (parent.getCanonicalPath().equals(root.getCanonicalPath())) {
             return new WikiReference(name);
         } else {
             return new SpaceReference(name, getEntityReference(parent));

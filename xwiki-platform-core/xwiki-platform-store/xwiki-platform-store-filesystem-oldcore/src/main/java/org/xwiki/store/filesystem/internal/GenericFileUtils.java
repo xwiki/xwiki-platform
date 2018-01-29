@@ -19,9 +19,7 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import org.xwiki.store.internal.FileSystemStoreUtils;
 
 /**
  * Internal class for providing static utilities used by multiple classes in this package.
@@ -40,54 +38,10 @@ public final class GenericFileUtils
     private static final String FILE_VERSION_PREFIX = "~v";
 
     /**
-     * The character set to use for encoding and decoding. This should always be UTF-8.
-     */
-    private static final String CHARSET = "UTF-8";
-
-    /**
-     * Error message to give if CHARSET is unavailable.
-     */
-    private static final String NO_CHARSET = "UTF-8 not available, this Java VM is not standards compliant!";
-
-    /**
      * Private constructor for utility class.
      */
     private GenericFileUtils()
     {
-    }
-
-    /**
-     * Get a URL encoded version of the string. same as URLEncoder.encode(toEncode, "UTF-8") but the checked exception
-     * is caught since UTF-8 is mandatory for all Java virtual machines.
-     *
-     * @param toEncode the string to URL encode.
-     * @return a URL encoded version of toEncode.
-     * @see #getURLDecoded(String)
-     */
-    public static String getURLEncoded(final String toEncode)
-    {
-        try {
-            return URLEncoder.encode(toEncode, CHARSET);
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(NO_CHARSET);
-        }
-    }
-
-    /**
-     * Get a URL decoded version of the string. same as URLEncoder.decode(toDecode, "UTF-8") but the checked exception
-     * is caught since UTF-8 is mandatory for all Java virtual machines.
-     *
-     * @param toDecode the string to URL decode.
-     * @return a URL decoded version of toDecode.
-     * @see #getURLEncoded(String)
-     */
-    public static String getURLDecoded(final String toDecode)
-    {
-        try {
-            return URLDecoder.decode(toDecode, CHARSET);
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(NO_CHARSET);
-        }
     }
 
     /**
@@ -105,8 +59,8 @@ public final class GenericFileUtils
      */
     public static String getVersionedFilename(final String filename, final String versionName)
     {
-        final String attachFilename = getURLEncoded(filename);
-        final String version = getURLEncoded(versionName);
+        final String attachFilename = FileSystemStoreUtils.encode(filename, false);
+        final String version = FileSystemStoreUtils.encode(versionName, false);
         if (attachFilename.contains(".")) {
             // file.txt version 1.1 --> file~v1.1.txt
             return attachFilename.substring(0, attachFilename.lastIndexOf('.')) + FILE_VERSION_PREFIX + version

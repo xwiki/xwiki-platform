@@ -19,11 +19,18 @@
  */
 package org.xwiki.store.internal;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.lang3.CharUtils;
+
 /**
  * Various file system module utils.
  * 
  * @version $Id$
- * @since 9.0RC1
+ * @since 10.1RC1
  */
 public final class FileSystemStoreUtils
 {
@@ -32,8 +39,128 @@ public final class FileSystemStoreUtils
      */
     public static final String HINT = "file";
 
+    private static final int CASEDIFF = ('a' - 'A');
+
     private FileSystemStoreUtils()
     {
+        // Utility class
+    }
 
+    /**
+     * Return a safe version of the passed name for any filesystem.
+     * <p>
+     * In practice it means the following:
+     * <ul>
+     * <li>any forbidden character is encoded with URL escaping format</li>
+     * <li>in case of case sensitivity upper case characters are encoded with URL escaping format</li>
+     * </ul>
+     * 
+     * @param name the name to escape
+     * @param caseInsensitive true if case insensitive filesystems should be supported
+     * @return a safe version of the name
+     */
+    public static String encode(String name, boolean caseInsensitive)
+    {
+        StringBuilder builder = new StringBuilder(name.length() * 3);
+
+        for (int i = 0; i < name.length(); ++i) {
+            char c = name.charAt(i);
+
+            boolean encode = false;
+
+            switch (c) {
+                // % is used for encoding
+                // + is used for encoding
+                // Characters reserved on Windows and Unix
+                // (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx#naming_conventions)
+                case '%':
+                case '+':
+                case '<':
+                case '>':
+                case ':':
+                case '"':
+                case '/':
+                case '\\':
+                case '|':
+                case '?':
+                case '*':
+                    encode = true;
+
+                    break;
+
+                case ' ':
+                    // White space at the beginning of a file is forbidden on Windows
+                    if (i == name.length() - 1) {
+                        builder.append("+");
+
+                        continue;
+                    }
+
+                    break;
+
+                case '.':
+                    // Dot at the beginning of a file means hidden file on Unix systems
+                    // Dot at the end of a file is forbidden on Windows
+                    if (i == 0 || i == name.length() - 1) {
+                        encode = true;
+                    }
+
+                    break;
+
+                default:
+                    // Encode any non ASCII character to avoid surprises
+                    // For case insensitive filesystem encode upper case characters
+                    if (!CharUtils.isAscii(c) || (caseInsensitive && Character.isUpperCase(c))) {
+                        encode = true;
+                    }
+
+                    break;
+            }
+
+            if (encode) {
+                encode(c, builder);
+            } else {
+                builder.append(c);
+            }
+        }
+
+        return builder.toString();
+    }
+
+    private static void encode(char c, StringBuilder builder)
+    {
+        Charset charset = StandardCharsets.UTF_8;
+
+        byte[] ba = String.valueOf(c).getBytes(charset);
+        for (int j = 0; j < ba.length; j++) {
+            builder.append('%');
+            char ch = Character.forDigit((ba[j] >> 4) & 0xF, 16);
+            // converting to use uppercase letter as part of
+            // the hex value if ch is a letter.
+            if (Character.isLetter(ch)) {
+                ch -= CASEDIFF;
+            }
+            builder.append(ch);
+            ch = Character.forDigit(ba[j] & 0xF, 16);
+            if (Character.isLetter(ch)) {
+                ch -= CASEDIFF;
+            }
+            builder.append(ch);
+        }
+    }
+
+    /**
+     * Decode name encoded with {@link #encode(String, boolean)}.
+     * 
+     * @param name the name to decode
+     * @return the decoded name
+     */
+    public static String decode(String name)
+    {
+        try {
+            return URLDecoder.decode(name, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UTF-8 encoding is not present on the system!", e);
+        }
     }
 }

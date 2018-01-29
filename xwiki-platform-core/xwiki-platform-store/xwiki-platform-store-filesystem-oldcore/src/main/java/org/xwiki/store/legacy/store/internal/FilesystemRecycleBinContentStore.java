@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.FileSerializer;
@@ -59,13 +58,6 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
      */
     @Inject
     private FilesystemStoreTools fileTools;
-
-    /**
-     * Used to extract the {@link DocumentReference} from the path to the deleted attachment.
-     */
-    @Inject
-    @Named("path")
-    private DocumentReferenceResolver<String> pathDocumentReferenceResolver;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;

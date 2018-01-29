@@ -20,8 +20,12 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +38,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -61,6 +66,10 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractHibernateD
 
     @Inject
     protected DocumentReferenceResolver<String> resolver;
+
+    @Inject
+    @Named("path")
+    protected EntityReferenceSerializer<String> pathSerializer;
 
     @Inject
     protected Logger logger;
@@ -158,6 +167,35 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractHibernateD
             query.setParameter("store", store);
             query.setParameterList("ids", values);
             query.executeUpdate();
+        }
+    }
+
+    protected File getDocumentDir(final DocumentReference docRef)
+    {
+        final File path = new File(this.fstools.getStorageLocationFile(), this.pathSerializer.serialize(docRef, false));
+        File docDir = new File(path, FilesystemStoreTools.DOCUMENT_DIR_NAME);
+
+        // Add the locale
+        Locale docLocale = docRef.getLocale();
+        if (docLocale != null) {
+            final File docLocalesDir = new File(docDir, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
+            final File docLocaleDir = new File(docLocalesDir,
+                docLocale.equals(Locale.ROOT) ? FilesystemStoreTools.DOCUMENT_LOCALES_ROOT_NAME : docLocale.toString());
+            docDir = new File(docLocaleDir, FilesystemStoreTools.DOCUMENTLOCALE_DIR_NAME);
+        }
+
+        return docDir;
+    }
+
+    protected File getAttachmentDir(final AttachmentReference attachmentReference)
+    {
+        final File docDir = getDocumentDir(attachmentReference.getDocumentReference());
+        final File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENT_DIR_NAME);
+
+        try {
+            return new File(attachmentsDir, URLEncoder.encode(attachmentReference.getName(), "UTF8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new HibernateException("UTF8 is unknown", e);
         }
     }
 }

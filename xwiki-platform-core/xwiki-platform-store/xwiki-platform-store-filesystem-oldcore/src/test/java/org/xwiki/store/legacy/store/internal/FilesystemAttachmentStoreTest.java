@@ -42,10 +42,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.FileStringEntityReferenceSerializer;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
@@ -185,7 +185,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
-        this.fileTools = new DefaultFilesystemStoreTools(new PathStringEntityReferenceSerializer(), storageLocation,
+        this.fileTools = new FilesystemStoreTools(new FileStringEntityReferenceSerializer(), storageLocation,
             new DummyLockProvider());
 
         this.attachStore = new FilesystemAttachmentStore();

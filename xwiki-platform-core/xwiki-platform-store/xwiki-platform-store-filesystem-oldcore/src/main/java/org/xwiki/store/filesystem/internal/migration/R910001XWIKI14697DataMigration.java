@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.store.filesystem.internal.DefaultAttachmentFileProvider;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -62,6 +63,7 @@ public class R910001XWIKI14697DataMigration extends AbstractXWIKI14697DataMigrat
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        return this.fstools.attachmentArchiveExist(attachmentReference);
+        return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName())
+            .getAttachmentVersioningMetaFile().exists();
     }
 }

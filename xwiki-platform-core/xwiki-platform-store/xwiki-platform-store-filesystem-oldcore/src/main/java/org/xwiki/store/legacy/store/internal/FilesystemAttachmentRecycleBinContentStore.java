@@ -88,13 +88,6 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     @Named(FileSystemStoreUtils.HINT)
     private AttachmentVersioningStore attachmentVersionStore;
 
-    /**
-     * Used to extract the {@link DocumentReference} from the path to the deleted attachment.
-     */
-    @Inject
-    @Named("path")
-    private DocumentReferenceResolver<String> pathDocumentReferenceResolver;
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 

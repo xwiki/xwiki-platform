@@ -21,6 +21,8 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
 
+import org.xwiki.store.internal.FileSystemStoreUtils;
+
 /**
  * A means of getting files for storing information about a given attachment.
  *
@@ -92,7 +94,7 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     public File getAttachmentContentFile()
     {
         // storage/xwiki/Main/WebHome/~this/attachments/some.file/some.file
-        return new File(this.attachmentDir, GenericFileUtils.getURLEncoded(this.attachmentFileName));
+        return new File(this.attachmentDir, FileSystemStoreUtils.encode(this.attachmentFileName, false));
     }
 
     /**

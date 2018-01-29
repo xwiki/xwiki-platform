@@ -160,6 +160,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.render.LinkedResourceHelper;
@@ -492,22 +493,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private Map<DocumentReference, List<BaseObject>> xObjects = new TreeMap<DocumentReference, List<BaseObject>>();
 
-    // TODO: use a Map instead of a List to store attachment in XWikiDocument
-    private final List<XWikiAttachment> attachmentList =
-        new AbstractNotifyOnUpdateList<XWikiAttachment>(new ArrayList<XWikiAttachment>())
-        {
-            @Override
-            public void onUpdate()
-            {
-                setMetaDataDirty(true);
-            }
-
-            @Override
-            protected void added(XWikiAttachment element)
-            {
-                element.setDoc(XWikiDocument.this);
-            }
-        };
+    private final XWikiAttachmentList attachmentList = new XWikiAttachmentList(XWikiDocument.this);
 
     // Caching
     private boolean fromCache = false;
@@ -4845,18 +4831,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment removeAttachment(XWikiAttachment attachmentToRemove, boolean toRecycleBin)
     {
-        List<XWikiAttachment> list = getAttachmentList();
-        for (int i = 0; i < list.size(); i++) {
-            XWikiAttachment attachment = list.get(i);
-            if (attachmentToRemove.getFilename().equals(attachment.getFilename())) {
-                list.remove(i);
-                this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachment, toRecycleBin));
-                setMetaDataDirty(true);
-                return attachment;
-            }
+        if (this.attachmentList.remove(attachmentToRemove)) {
+            this.attachmentsToRemove.add(new XWikiAttachmentToRemove(attachmentToRemove, toRecycleBin));
+            setMetaDataDirty(true);
+        } else {
+            attachmentToRemove = null;
         }
-
-        return null;
+        return attachmentToRemove;
     }
 
     /**
@@ -5403,10 +5384,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment getAttachment(String filename)
     {
-        for (XWikiAttachment attach : getAttachmentList()) {
-            if (attach.getFilename().equals(filename)) {
-                return attach;
-            }
+        XWikiAttachment output = this.attachmentList.getByFilename(filename);
+        if (output != null) {
+            return output;
         }
 
         for (XWikiAttachment attach : getAttachmentList()) {
@@ -5440,24 +5420,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiAttachment setAttachment(XWikiAttachment attachment)
     {
-        attachment.setDoc(this);
-
-        // Replace any attachment with the same name
-        // TODO: use a Map instead of a List to store attachment in XWikiDocument
-        for (ListIterator<XWikiAttachment> it = getAttachmentList().listIterator(); it.hasNext();) {
-            XWikiAttachment currentAttachment = it.next();
-
-            if (StringUtils.equals(currentAttachment.getFilename(), attachment.getFilename())) {
-                it.remove();
-                it.add(attachment);
-
-                return currentAttachment;
-            }
-        }
-
-        getAttachmentList().add(attachment);
-
-        return null;
+        return this.attachmentList.set(attachment);
     }
 
     /**

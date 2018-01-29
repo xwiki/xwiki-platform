@@ -106,7 +106,6 @@
   'phraseFieldSlop': '15',
   'bigramPhraseFieldSlop': '5',
   'trigramPhraseFieldSlop': '10',
-  'boostQuery': ['property.XWiki.TagClass.tags_string','^1000.0'],
   'tieBreaker': '0.1',
   'minShouldMatch': '2',
   'sortFields': {

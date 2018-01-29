@@ -54,6 +54,20 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
 {
     private static final int BATCH_SIZE = 50;
 
+    /**
+     * The query to perform to get all users having a not-empty email address.
+     *
+     * Here, we re using <code>length(objUser.email) > 0</code> instead of <code>objUser.email <> ''</code> because
+     * ORACLE stores NULL instead of empty strings.
+     *
+     * But if we do
+     * <code>objUser.email <> NULL AND objUser.email <> ''</code>, then we have wrong results with MySQL.
+     *
+     * This <code>length()</code> trick allows us to use the same query on every database we support, but a better
+     * solution would be to write a different query for ORACLE than for the others, because this length() may be bad for
+     * performances.
+     */
+    // TODO: try with the solution suggested by Sergiu Dumitriu there: https://jira.xwiki.org/browse/XWIKI-14914
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
             + "doc.object(XWiki.XWikiUsers) objUser where length(objUser.email) > 0 order by doc.fullName";
 

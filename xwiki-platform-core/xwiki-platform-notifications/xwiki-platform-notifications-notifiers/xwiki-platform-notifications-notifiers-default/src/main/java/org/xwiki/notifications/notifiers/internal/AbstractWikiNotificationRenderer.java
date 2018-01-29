@@ -37,7 +37,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * Helper to build wiki components that render templates related to notifications.
  *
  * @version $Id$
- * @since 10.0RC1
+ * @since 10.0
  * @since 9.11.1
  */
 public abstract class AbstractWikiNotificationRenderer implements WikiComponent

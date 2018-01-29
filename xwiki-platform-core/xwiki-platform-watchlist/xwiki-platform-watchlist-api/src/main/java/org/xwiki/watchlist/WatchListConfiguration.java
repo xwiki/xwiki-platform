@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Role;
  *
  * @version $Id$
  *
- * @since 10.0RC1
+ * @since 10.0
  * @since 9.11.2
  */
 @Role

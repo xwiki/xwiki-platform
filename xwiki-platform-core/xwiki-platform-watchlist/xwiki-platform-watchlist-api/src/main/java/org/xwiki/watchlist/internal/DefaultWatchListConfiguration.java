@@ -30,7 +30,7 @@ import org.xwiki.watchlist.WatchListConfiguration;
  * Default implementation of {@link WatchListConfiguration}.
  *
  * @version $Id$
- * @since 10.0RC1
+ * @since 10.0
  * @since 9.11.2
  */
 @Component

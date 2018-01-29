@@ -48,7 +48,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  *
  * @version $Id$
  * @since 9.11.1
- * @since 10.0RC1
+ * @since 10.0
  */
 @Component(roles = EmailTemplateRenderer.class)
 @Singleton

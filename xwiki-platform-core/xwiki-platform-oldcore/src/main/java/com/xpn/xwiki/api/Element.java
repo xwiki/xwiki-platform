@@ -80,7 +80,7 @@ public class Element extends Api
 
     /**
      * @return the reference to the document
-     * @since 10.0RC1
+     * @since 10.0
      */
     public DocumentReference getDocumentReference()
     {

@@ -55,7 +55,7 @@ public class DefaultUntypedRecordableEvent implements UntypedRecordableEvent, Ta
      * @param target list of target (can't be null !)
      *
      * @since 9.11.2
-     * @since 10.0RC1
+     * @since 10.0
      */
     DefaultUntypedRecordableEvent(String eventType, Set<String> target)
     {

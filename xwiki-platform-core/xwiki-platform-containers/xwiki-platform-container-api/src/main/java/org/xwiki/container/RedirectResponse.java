@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * redirects.
  *
  * @version $Id$
- * @since 10.0RC1
+ * @since 10.0
  */
 @Unstable
 public interface RedirectResponse extends Response

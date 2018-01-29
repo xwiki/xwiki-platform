@@ -81,7 +81,7 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * </code></pre>
  *
  * @version $Id$
- * @since 10.0RC1
+ * @since 10.0
  */
 @Mojo(name = "install", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 public class InstallMojo extends AbstractMojo

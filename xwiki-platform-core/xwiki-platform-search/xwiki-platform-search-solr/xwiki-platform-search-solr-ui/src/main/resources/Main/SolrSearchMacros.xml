@@ -617,7 +617,10 @@ $services.localization.render('core.users.unknownUser')##
   #set ($discard = $query.setLimit($rows))
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
+  #set ($discard = $query.bindValue('tie', $solrConfig.tieBreaker))
+  #set ($discard = $query.bindValue('mm', $solrConfig.minShouldMatch))  
   #setQueryFields($query)
+  #setPhraseFields($query)
   #setFacetFields($query)
   #setFilterQuery($query)
   #setHighlightQuery($query)
@@ -643,6 +646,55 @@ $services.localization.render('core.users.unknownUser')##
   #end
   #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
+  #end
+#end
+    
+#macro (setPhraseFields $query)
+  ## Set the main phrase field parameter boosts so that queries with all search terms
+  ## in close proximity have high relevance
+  #if ($solrConfig.phraseFields.substring(0, 0) == '')
+    ## If the value of the 'phraseFields' parameter is a string then it means that the
+    ## same query fields are used for all result types.
+    #set ($phraseFieldsBoost = $solrConfig.phraseFields)
+  #else
+    ## There are different phrase fields for each result type.
+    ## Including type = null, which will result from all facets being deselected
+    #set ($phraseFieldsBoost = $solrConfig.phraseFields.get("$!type"))
+  #end
+  #if ("$!phraseFieldsBoost" != '')
+    #set ($discard = $query.bindValue('pf', $phraseFieldsBoost))
+    #set ($discard = $query.bindValue('ps', $solrConfig.phraseFieldSlop))
+  #end
+  ## Set the bigram phrase field parameter boosts so that queries with groups of two
+  ## search terms in close proximity have high relevance
+  #if ($solrConfig.bigramPhraseFields.substring(0, 0) == '')
+    ## If the value of the 'bigramPhraseFields' parameter is a string then it means that the
+    ## same query fields are used for all result types.
+    #set ($bigramPhraseFieldsBoost = $solrConfig.bigramPhraseFields)
+  #else
+    ## There are different phrase fields for each result type.
+    ## Including type = null, which will result from all facets being deselected
+    #set ($bigramPhraseFieldsBoost = $solrConfig.bigramPhraseFields.get("$!type"))
+  #end
+  #if ("$!bigramPhraseFieldsBoost" != '')
+    #set ($discard = $query.bindValue('pf2', $bigramPhraseFieldsBoost))
+    #set ($discard = $query.bindValue('ps2', $solrConfig.bigramPhraseFieldSlop))
+  #end
+  ## Set the trigram phrase field parameter boosts so that queries with groups of three
+  ## search terms in close proximity have high relevance.
+  ## Generally (pf boost) > (pf3 boost) > (pf2 boost)
+  #if ($solrConfig.trigramPhraseFields.substring(0, 0) == '')
+    ## If the value of the 'trigramPhraseFields' parameter is a string then it means that the
+    ## same query fields are used for all result types.
+    #set ($trigramPhraseFieldsBoost = $solrConfig.trigramPhraseFields)
+  #else
+    ## There are different phrase fields for each result type.
+    ## including type = null, which will result from all facets being deselected
+    #set ($trigramPhraseFieldsBoost = $solrConfig.trigramPhraseFields.get("$!type"))
+  #end
+  #if ("$!trigramPhraseFieldsBoost" != '')
+    #set ($discard = $query.bindValue('pf3', $trigramPhraseFieldsBoost))
+    #set ($discard = $query.bindValue('ps3', $solrConfig.trigramPhraseFieldSlop))
   #end
 #end
 

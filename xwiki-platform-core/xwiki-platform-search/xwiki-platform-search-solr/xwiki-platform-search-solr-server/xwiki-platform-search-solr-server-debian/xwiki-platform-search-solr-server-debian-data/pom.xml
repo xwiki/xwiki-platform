@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-server-debian</artifactId>
-    <version>10.0-SNAPSHOT</version>
+    <version>10.0</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-debian-data</artifactId>
   <packaging>deb</packaging>

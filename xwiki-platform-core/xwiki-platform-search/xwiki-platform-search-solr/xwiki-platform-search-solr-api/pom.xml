@@ -154,7 +154,7 @@
       </plugin>
       <!-- Attach default configuration package -->
       <!-- We require the jar in both test and package but we don't want to get it if we don't need it (for example
-           with backward-compatiblity check) -->
+           with backward-compatibility check) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

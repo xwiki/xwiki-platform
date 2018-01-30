@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>8.4.6-SNAPSHOT</version>
+    <version>8.4.6</version>
   </parent>
   <artifactId>xwiki-platform-localization-script</artifactId>
   <name>XWiki Platform - Localization - Script</name>

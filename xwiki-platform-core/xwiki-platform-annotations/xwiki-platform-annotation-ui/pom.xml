@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotations</artifactId>
-    <version>8.4.6-SNAPSHOT</version>
+    <version>8.4.6</version>
   </parent>
   <artifactId>xwiki-platform-annotation-ui</artifactId>
   <name>XWiki Platform - Annotations - UI</name>

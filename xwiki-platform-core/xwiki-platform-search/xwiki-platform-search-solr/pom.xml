@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>8.4.6-SNAPSHOT</version>
+    <version>8.4.6</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>

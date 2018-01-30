@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>8.4.6-SNAPSHOT</version>
+    <version>8.4.6</version>
   </parent>
   <artifactId>xwiki-platform-tree-api</artifactId>
   <name>XWiki Platform - Tree - API</name>

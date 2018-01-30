@@ -27,7 +27,7 @@ REM     e.g. to increase the memory allocated to the JVM to 1GB, use
 REM       set XWIKI_OPTS=-Xmx1024m
 REM   JETTY_OPTS - optional parameters passed to Jetty's start.jar. For example to list the configuration that will
 REM       execute, try setting it to "--list-config". See
-REM       http://www.eclipse.org/jetty/documentation/9.2.3.v20140905/start-jar.html for more options.
+REM       http://www.eclipse.org/jetty/documentation/current/start-jar.html for more options.
 REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
 REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
 REM -------------------------------------------------------------------------

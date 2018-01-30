@@ -25,7 +25,7 @@
 #   XWIKI_OPTS - parameters passed to the Java VM when running XWiki e.g. to increase the memory allocated to the
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
 #   JETTY_OPTS - optional parameters passed to Jetty's start.jar. See
-#       http://www.eclipse.org/jetty/documentation/9.2.3.v20140905/start-jar.html for options.
+#       http://www.eclipse.org/jetty/documentation/current/start-jar.html for options.
 #   JETTY_PORT - the port on which to start Jetty.
 #   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
 # ----------------------------------------------------------------------------------------------------------------

@@ -33,6 +33,7 @@ import org.xwiki.observation.internal.DefaultObservationContext;
 import org.xwiki.observation.internal.ObservationContextListener;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.watchlist.WatchListConfiguration;
 import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
 import org.xwiki.watchlist.internal.api.WatchListStore;
 import org.xwiki.watchlist.internal.api.WatchedElementType;
@@ -64,6 +65,8 @@ public class AutomaticWatchModeListenerTest
     public final MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
         AutomaticWatchModeListener.class);
 
+    private WatchListConfiguration configuration;
+
     @Before
     public void setUp() throws Exception
     {
@@ -74,6 +77,9 @@ public class AutomaticWatchModeListenerTest
         execution.setContext(new ExecutionContext());
 
         this.observationContextListener = mocker.getInstance(EventListener.class, "ObservationContextListener");
+
+        this.configuration = mocker.getInstance(WatchListConfiguration.class);
+        when(this.configuration.isEnabled()).thenReturn(true);
     }
 
     /**
@@ -100,6 +106,19 @@ public class AutomaticWatchModeListenerTest
         // We simulate a XARImportingEvent in the Execution Context
         this.observationContextListener.onEvent(new XARImportingEvent(), null, null);
 
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
+
+        verify(mockStore, never()).getAutomaticWatchMode(any());
+        verify(mockStore, never()).addWatchedElement(any(), any(), any(WatchedElementType.class));
+    }
+
+    /**
+     * Verify that we don't do anything when the watchlist is disabled.
+     */
+    @Test
+    public void onEventWhenWatchListDisabled() throws Exception
+    {
+        when(this.configuration.isEnabled()).thenReturn(false);
         mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
 
         verify(mockStore, never()).getAutomaticWatchMode(any());

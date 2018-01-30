@@ -37,6 +37,7 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.watchlist.WatchListConfiguration;
 import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
 import org.xwiki.watchlist.internal.api.WatchListStore;
 import org.xwiki.watchlist.internal.api.WatchedElementType;
@@ -110,6 +111,9 @@ public class AutomaticWatchModeListener extends AbstractEventListener
     @Inject
     private ObservationContext observationContext;
 
+    @Inject
+    private WatchListConfiguration configuration;
+
     /**
      * Default constructor.
      */
@@ -125,7 +129,7 @@ public class AutomaticWatchModeListener extends AbstractEventListener
         XWikiContext context = (XWikiContext) data;
 
         // Does not auto-watch updated or created documents when they are in the context of other events.
-        if (!observationContext.isIn(SKIPPED_EVENTS)) {
+        if (configuration.isEnabled() && !observationContext.isIn(SKIPPED_EVENTS)) {
             documentModifiedHandler(event, currentDoc, context);
         }
     }

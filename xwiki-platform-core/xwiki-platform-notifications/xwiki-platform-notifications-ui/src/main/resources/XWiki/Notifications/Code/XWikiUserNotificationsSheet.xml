@@ -551,6 +551,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
      * Save the current settings
      */
     var save = function() {
+      // To avoid having several requests in the same time (which could lead to error 500), we disable all the triggers during the save process
+      var toggles = $('.bootstrap-switch input');
+      toggles.bootstrapSwitch('disabled', true);
       var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       var data = [];
       for (var i = 0; i &lt; applications.length; ++i) {
@@ -577,6 +580,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
       }).error(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+      }).always(function() {
+        // Enable again the triggers
+        toggles.bootstrapSwitch('disabled', false);
       });
     };
 

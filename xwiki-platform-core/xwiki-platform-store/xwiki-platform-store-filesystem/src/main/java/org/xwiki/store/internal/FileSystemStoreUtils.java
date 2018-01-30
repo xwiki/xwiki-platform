@@ -21,7 +21,6 @@ package org.xwiki.store.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.CharUtils;
@@ -38,8 +37,6 @@ public final class FileSystemStoreUtils
      * The standard role hint used by most filesystem store implementations.
      */
     public static final String HINT = "file";
-
-    private static final int CASEDIFF = ('a' - 'A');
 
     private FileSystemStoreUtils()
     {
@@ -129,22 +126,19 @@ public final class FileSystemStoreUtils
 
     private static void encode(char c, StringBuilder builder)
     {
-        Charset charset = StandardCharsets.UTF_8;
+        byte[] ba = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
 
-        byte[] ba = String.valueOf(c).getBytes(charset);
         for (int j = 0; j < ba.length; j++) {
             builder.append('%');
+
             char ch = Character.forDigit((ba[j] >> 4) & 0xF, 16);
-            // converting to use uppercase letter as part of
-            // the hex value if ch is a letter.
-            if (Character.isLetter(ch)) {
-                ch -= CASEDIFF;
-            }
+            // Make it upper case
+            ch = Character.toUpperCase(ch);
             builder.append(ch);
+
             ch = Character.forDigit(ba[j] & 0xF, 16);
-            if (Character.isLetter(ch)) {
-                ch -= CASEDIFF;
-            }
+            // Make it upper case
+            ch = Character.toUpperCase(ch);
             builder.append(ch);
         }
     }

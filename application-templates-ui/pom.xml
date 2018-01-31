@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.contrib.templates</groupId>
     <artifactId>application-templates</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>application-templates-ui</artifactId>
   <packaging>xar</packaging>

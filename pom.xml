@@ -48,7 +48,7 @@
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/application-templates.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-templates.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/application-templates</url>
+    <url>https://github.com/xwiki-contrib/application-templates/tree/master</url>
     <tag>HEAD</tag>
   </scm>
   <distributionManagement>

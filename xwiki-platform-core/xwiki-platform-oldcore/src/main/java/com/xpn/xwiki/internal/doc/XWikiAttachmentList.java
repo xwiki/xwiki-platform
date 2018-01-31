@@ -190,7 +190,8 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
      */
     public XWikiAttachment getByFilename(String filename)
     {
-        return this.map.get(filename);
+        // Null key is forbidden in ConcurrentSkipListMap
+        return filename != null ? this.map.get(filename) : null;
     }
 
     @Override
@@ -214,10 +215,10 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment>
     public boolean retainAll(Collection<?> c)
     {
         boolean changed = false;
-        Collection<XWikiAttachment> values = map.values();
+        Collection<XWikiAttachment> values = this.map.values();
         for (XWikiAttachment x : values) {
             if (!c.contains(x)) {
-                map.remove(x.getFilename());
+                this.map.remove(x.getFilename());
                 changed = true;
             }
         }

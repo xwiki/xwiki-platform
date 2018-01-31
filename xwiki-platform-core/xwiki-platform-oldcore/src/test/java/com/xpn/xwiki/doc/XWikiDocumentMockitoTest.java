@@ -1399,6 +1399,12 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
+    public void getAttachmentWithNullFilename() throws XWikiException
+    {
+        assertNull(this.document.getAttachment(null));
+    }
+
+    @Test
     public void listAdd() throws XWikiException
     {
         // reset

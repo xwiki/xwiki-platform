@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-directory-test</artifactId>
-    <version>9.11.2</version>
+    <version>9.11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-directory-test-tests</artifactId>
   <name>XWiki Platform - User - Directory - Tests - Functional Tests</name>

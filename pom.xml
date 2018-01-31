@@ -31,7 +31,7 @@
   </parent>
   <groupId>org.xwiki.contrib.templates</groupId>
   <artifactId>application-templates</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
   <name>Templates Application - Parent POM</name>
   <description>A collection of content templates</description>
@@ -49,7 +49,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-templates.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-templates.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-templates/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>application-templates-1.0.2</tag>
   </scm>
   <distributionManagement>
     <repository>

@@ -126,6 +126,13 @@ public class MailTest extends AbstractTest
         // Select XWiki space administration.
         AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
 
+        // 2018-01-31: Got a failure on CI showing that the first assert below this line was failing because the
+        // current page was still the one before move to the XWiki space admin. Thus taking extra step to ensure we
+        // wait. However I don't understand why this happens since getDriver().url() called by
+        // gotoSpaceAdministrationPage() should wait for the page to be loaded before returning.
+        getDriver().waitUntilCondition(driver ->
+            driver.getTitle().equals("Page Administration - XWiki"));
+
         // All those sections should not be present
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending Status"));

@@ -1248,7 +1248,7 @@
     #if ($exactMatch)
       #set ($spaceField = 'space_exact')
     #end
-    #set ($discard = $params.add("fq=$spaceField:$localSpaceReference"))
+    #set ($discard = $params.add("fq=$spaceField:""$localSpaceReference"""))
   #end
 #end
 
@@ -1272,7 +1272,7 @@
     &amp;&amp; $documentReference &amp;&amp; $documentReference.name != $defaultDocumentName))
   #addSpaceLocationSolrParams($rootReference $params $macro.exactMatch)
   #if ($documentReference &amp;&amp; $macro.exactMatch)
-    #set ($discard = $params.add("fq=name_exact:$documentReference.name"))
+    #set ($discard = $params.add("fq=name_exact:""$documentReference.name"""))
   #end
 #end
 

@@ -131,7 +131,7 @@ public class MailTest extends AbstractTest
         // wait. However I don't understand why this happens since getDriver().url() called by
         // gotoSpaceAdministrationPage() should wait for the page to be loaded before returning.
         getDriver().waitUntilCondition(driver ->
-            driver.getTitle().equals("Page Administration - XWiki"));
+            spaceAdministrationPage.getMetaDataValue("reference").equals("xwiki:XWiki.WebPreferences"));
 
         // All those sections should not be present
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Mail", "Mail Sending"));

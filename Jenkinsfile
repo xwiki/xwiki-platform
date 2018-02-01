@@ -42,7 +42,8 @@ def builds = [
   'Flavor Test - POM' : {
     buildFunctionalTest(
       name: 'Flavor Test - POM',
-      pom: 'pom.xml'
+      pom: 'pom.xml',
+      properties: '-N'
     )
   },
   'Flavor Test - PageObjects' : {
@@ -216,6 +217,7 @@ def buildFunctionalTest(map)
     name: map.name,
     profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
     mavenOpts: map.mavenOpts,
-    pom: "${sharedPOMPrefix}/${map.pom}"
+    pom: "${sharedPOMPrefix}/${map.pom}",
+    properties: map.properties
   )
 }

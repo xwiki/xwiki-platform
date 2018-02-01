@@ -99,10 +99,10 @@ import static org.mockito.Mockito.*;
     SendMailQueueManager.class,
     FileSystemMailContentStore.class
 })
-public class JavaIntegrationTest
+public class JavaIntegrationTest extends AbstractMailIntegrationTest
 {
     @Rule
-    public GreenMailRule mail = new GreenMailRule(ServerSetupTest.SMTP);
+    public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTP));
 
     @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();

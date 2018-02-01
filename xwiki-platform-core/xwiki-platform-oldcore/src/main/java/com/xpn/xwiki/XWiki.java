@@ -3766,8 +3766,18 @@ public class XWiki implements EventListener
             doc.setParentReference(parentReference);
             doc.setContent(content);
             doc.setSyntax(syntax);
+
+            // Set the user itself as the creator of the document, so that she has the CREATOR right on her user page.
             doc.setCreatorReference(doc.getDocumentReference());
-            doc.setAuthorReference(doc.getDocumentReference());
+
+            // However, we use the context user for the author to see in the history who has really created the user
+            // (it may be an administrator).
+            if (context.getUserReference() != null) {
+                doc.setAuthorReference(context.getUserReference());
+            } else {
+                // Except if the current user is guest (which means the user registered herself)
+                doc.setAuthorReference(doc.getDocumentReference());
+            }
 
             // The information from the user profile needs to be indexed using the proper locale. If multilingual is
             // enabled then the user can choose the desired locale (from the list of supported locales) before

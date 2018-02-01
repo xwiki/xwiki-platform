@@ -99,7 +99,7 @@ import static org.mockito.Mockito.when;
     FileSystemMailContentStore.class
 })
 // @formatter:on
-public class AuthenticatingIntegrationTest
+public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 {
     // Required by GreenMail.
     static {
@@ -107,7 +107,7 @@ public class AuthenticatingIntegrationTest
     }
 
     @Rule
-    public GreenMailRule mail = new GreenMailRule(ServerSetupTest.SMTPS);
+    public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTPS));
 
     @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();

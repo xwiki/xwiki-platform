@@ -107,10 +107,10 @@ import static org.mockito.Mockito.when;
     FileSystemMailContentStore.class
 })
 // @formatter:on
-public class ScriptingIntegrationTest
+public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
 {
     @Rule
-    public GreenMailRule mail = new GreenMailRule(ServerSetupTest.SMTP);
+    public GreenMailRule mail = new GreenMailRule(getCustomServerSetup(ServerSetupTest.SMTP));
 
     @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();

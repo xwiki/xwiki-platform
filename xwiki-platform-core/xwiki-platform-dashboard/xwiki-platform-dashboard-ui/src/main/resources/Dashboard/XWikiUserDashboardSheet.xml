@@ -31,8 +31,8 @@
   <parent>XWiki.XWikiUserSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1321289334000</date>
-  <contentUpdateDate>1321289334000</contentUpdateDate>
+  <date>1517480211000</date>
+  <contentUpdateDate>1517480211000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiUserDashboardSheet</title>
   <comment/>
@@ -46,19 +46,16 @@
 #else
   #set($dashboardPrefs = $doc.getObject("Dashboard.UserDashboardPreferencesClass"))
   #if(!$dashboardPrefs)
-    ## create the object and then display
+    ## add the object to teh temporary document to reuse the displayer
     #set($dashboardPrefs = $doc.newObject("Dashboard.UserDashboardPreferencesClass"))
     ## get the default value of the property that we're interested in
     #set($dbPrefsClass = $dashboardPrefs.xWikiClass)
     #set($displayOnMainPageProp = $dbPrefsClass.get('displayOnMainPage'))
     #set($defaultValue = $displayOnMainPageProp.getProperty('defaultValue').value)
-    ## this default value is of type long, for some reason, so I'll have to compare here instead of just set
-    #if ($defaultValue &gt; 0) 
-      #set($ok = $dashboardPrefs.set('displayOnMainPage', 1))
-    #else
-      #set($ok = $dashboardPrefs.set('displayOnMainPage', 0))
+    #set($ok = $dashboardPrefs.set('displayOnMainPage', $defaultValue ))
+    #if ($xcontext.action == 'edit')
+      #set($ok = $doc.save('Initialize default dashboard user setup'))
     #end
-    #set($ok = $doc.save())
   #end
   {{html clean="false" wiki="true"}}
   &lt;div class="full column xform"&gt;

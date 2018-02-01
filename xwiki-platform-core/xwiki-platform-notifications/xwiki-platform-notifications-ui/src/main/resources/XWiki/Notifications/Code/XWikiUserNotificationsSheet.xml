@@ -1415,7 +1415,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AddNotificationFilterPref
         }
       });
     });
-    // Enable / Disable action for class filter preferences
+    // Enable / Disable action for classic filter preferences
     $(data.row).find('.notificationFilterPreferenceCheckbox').on('switchChange.bootstrapSwitch', function(event, state) {
       // TODO: Translation keys
       var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');

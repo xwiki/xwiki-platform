@@ -211,12 +211,12 @@
   &lt;/div&gt;
   #set($collist  = ['name', 'filterType', 'eventTypes', 'notificationFormats', 'isEnabled', '_actions'])
   #set($colprops = {
-    'name':                { 'sortable': true, 'html': true },
-    'filterType':          { 'sortable': true },
-    'eventTypes':          { 'sortable': true, 'html': true },
-    'notificationFormats': { 'sortable': true, 'html': true },
-    'isEnabled':           { 'html' : true },
-    '_actions':            { 'sortable': false, 'actions': ['delete']}
+    'name':                { 'sortable': false, 'html': true, 'filterable': false },
+    'filterType':          { 'sortable': false, 'filterable': false },
+    'eventTypes':          { 'sortable': false, 'html': true, 'filterable': false },
+    'notificationFormats': { 'sortable': false, 'html': true, 'filterable': false },
+    'isEnabled':           { 'sortable': false, 'html' : true, 'filterable': false },
+    '_actions':            { 'sortable': false, 'actions': ['delete'], 'filterable': false}
   })
   #set($options  = {
     'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
@@ -228,7 +228,6 @@
   })
 
   #livetable("notificationFilterPreferencesLiveTable" $collist $colprops $options)
-  #displayAdvancedFilterSettingsModal()
 &lt;/div&gt;
 ######################################################
 ### ADD FILTER MODAL
@@ -377,47 +376,6 @@
     &lt;/div&gt;
   &lt;/td&gt;
 #end
-
-#**
- * Add a button that opens a livetable listing every filters that can be toggled by the user.
- *#
-#macro(displayAdvancedFilterSettingsModal)
-&lt;p&gt;
-  &lt;a href="#" data-target="#modal-advanced-filters-preferences" data-toggle="modal" class="btn btn-default"&gt;
-    $escapetool.xml($services.localization.render('notifications.settings.filters.advanced'))
-  &lt;/a&gt;
-&lt;/p&gt;
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="modal-advanced-filters-preferences"&gt;
-  &lt;div class="modal-dialog" role="document"&gt;
-    &lt;div class="modal-content"&gt;
-      &lt;div class="modal-header"&gt;
-        &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
-        &lt;h4 class="modal-title"&gt;$services.localization.render('notifications.settings.filters.advanced')&lt;/h4&gt;
-      &lt;/div&gt;
-      &lt;div class="modal-body"&gt;
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.toggles.hint'))&lt;/span&gt;
-        #set($collist  = ['name', 'description', 'toggle'])
-        #set($colprops = {
-          'name'       : { 'sortable': false },
-          'description': { 'sortable': false },
-          'toggle'     : { 'sortable': false, 'html': true}
-        })
-        #set($options  = {
-          'resultPage'        : 'XWiki.Notifications.Code.NotificationPreferenceToggleableFiltersLivetableResults',
-          'rowCount'          : 10,
-          'description'       : 'This table lists all filters that are provided to the user by default and that can be disabled by the user.',
-          'translationPrefix' : 'notifications.filters.advanced.toggles.table.',
-          'outputOnlyHtml'    : true
-        })
-        #livetable("notificationToggleableFiltersLivetable" $collist $colprops $options)
-      &lt;/div&gt;
-      &lt;div class="modal-footer"&gt;
-        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;$escapetool.xml($services.localization.render('notifications.filters.advanced.modal.close'))&lt;/button&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;&lt;!-- /.modal-content --&gt;
-  &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
-&lt;/div&gt;&lt;!-- /.modal --&gt;
-#end
 {{/velocity}}
 </content>
   <object>
@@ -517,7 +475,7 @@ require.config({
 /**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget, AdvancedFilterPreferences, AddNotificationFilterPreferenceLivetable) {
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget, AddNotificationFilterPreferenceLivetable) {
 
   /**
    * Page initialization
@@ -531,12 +489,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
       applications.push(new ApplicationWidget($(this)));
     });
 
-    // Initialize the advanced filter preferences modal
-    new AdvancedFilterPreferences($('#modal-advanced-filters-preferences'));
-
     new AddNotificationFilterPreferenceLivetable($('#modal-add-filter-preference'), window['livetable_notificationFilterPreferencesLiveTable'], $('.filterPreferences button.btn-addfilter'));
     var initBootstrapSwitches = function () {
-      $('#notificationFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox').bootstrapSwitch({
+      $('#notificationFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
         size: 'mini',
         labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
       });
@@ -1275,37 +1230,30 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
       <cache>long</cache>
     </property>
     <property>
-      <code>define('AdvancedFilterPreferences', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+      <code>define('ToggleableFilterPreference', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
   /**
-  * Construct the AdvancedFilterPreferences object.
+  * Construct the Toggleable Filter Preference object.
   */
   return function(domElement) {
     var self               = this;
-    self.domElement        = domElement;
-    self.toggles           = domElement.find('.notificationAdvancedFilterPreferenceCheckbox');
+    self.domElement        = $(domElement);
     /**
      * Initialization
      */
     self.init = function () {
-      // Enable bootstrap switches
-      $(self.toggles).bootstrapSwitch({
-        size: 'mini',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
-      });
-
       // On change
-      $(self.toggles).on('switchChange.bootstrapSwitch', function(event, state) {
-        setTimeout(function() { self.save($(event.target), state); }, 1);
+      self.domElement.on('switchChange.bootstrapSwitch', function(event, state) {
+        setTimeout(function() { self.save(state); }, 1);
       });
     };
 
     /**
      * Save the filter preference
      */
-    self.save = function(elem, state) {
+    self.save = function(state) {
       var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var filterName = elem.attr('data-filterName');
-      var objectNumber = elem.attr('data-objectNumber');
+      var filterName = self.domElement.attr('data-filterName');
+      var objectNumber = self.domElement.attr('data-objectNumber');
       if (objectNumber == '') {
         // If the object does not exist yet, create it
         var restURL = xm.restURL + '/objects?media=json';
@@ -1315,7 +1263,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
           'property#isEnabled': state ? '1' : '0'
         };
         $.post(restURL, params).done(function (data) {
-          elem.attr('data-objectNumber', data.number);
+          self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
         }).fail(function () {
@@ -1347,7 +1295,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
 </code>
     </property>
     <property>
-      <name>Advanced Filter Preferences</name>
+      <name>Toggleable Filter Preference</name>
     </property>
     <property>
       <parse>1</parse>
@@ -1438,7 +1386,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-meta', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm) {
+      <code>require(['jquery', 'xwiki-meta', 'ToggleableFilterPreference', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ToggleableFilterPreference) {
 
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT);
@@ -1467,8 +1415,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
         }
       });
     });
-    // Enable / Disable action
-    $(data.row).find('.isEnabled .bootstrap-switch').on('switchChange.bootstrapSwitch', function(event, state) {
+    // Enable / Disable action for class filter preferences
+    $(data.row).find('.notificationFilterPreferenceCheckbox').on('switchChange.bootstrapSwitch', function(event, state) {
       // TODO: Translation keys
       var notif = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.inProgress'))", 'inprogress');
       $.post(serviceURL, {
@@ -1484,8 +1432,12 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AdvancedFilterPreferences
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
       });
     });
+    // Enable / Disable action for toggleable filter preferences
+    $(data.row).find('.toggleableFilterPreferenceCheckbox').each(function() {
+      new ToggleableFilterPreference(this);
+    });
   });
-  
+
   // Initializer
   $(document).ready(function() {
     // This script is usually loaded after the livetable is displayed and so the previous callback is not called.

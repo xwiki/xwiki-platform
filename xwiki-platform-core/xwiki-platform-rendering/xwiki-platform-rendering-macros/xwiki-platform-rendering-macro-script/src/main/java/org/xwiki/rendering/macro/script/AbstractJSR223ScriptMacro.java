@@ -67,11 +67,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     public static final String BINDING_CONTEXT = "context";
 
     /**
-     * The name of the "out" binding..
-     */
-    public static final String BINDING_OUT = "out";
-
-    /**
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
      */
     private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines";
@@ -123,7 +118,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
     public AbstractJSR223ScriptMacro(String macroName, String macroDescription,
-        Class< ? extends JSR223ScriptMacroParameters> parametersBeanClass)
+        Class<? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, parametersBeanClass);
     }
@@ -135,7 +130,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
     public AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
-        Class< ? extends JSR223ScriptMacroParameters> parametersBeanClass)
+        Class<? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
     }
@@ -227,14 +222,11 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
         Writer currentWriter = scriptContext.getWriter();
         Reader currentReader = scriptContext.getReader();
-        Object currentContextBinding = scriptContext.getAttribute(BINDING_CONTEXT, ScriptContext.ENGINE_SCOPE);
-        Object currentFilename = scriptContext.getAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
-        // Some engines like Groovy are duplicating the writer in "out" binding
-        Object currentOut = scriptContext.getAttribute(BINDING_OUT, ScriptContext.ENGINE_SCOPE);
+        Map<String, Object> currentEngineBindings =
+            new HashMap<>(scriptContext.getBindings(ScriptContext.ENGINE_SCOPE));
         // Set standard javax.script.filename property
-        MetaDataBlock metaDataBlock =
-            context.getCurrentMacroBlock().getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE),
-                Axes.ANCESTOR_OR_SELF);
+        MetaDataBlock metaDataBlock = context.getCurrentMacroBlock()
+            .getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Axes.ANCESTOR_OR_SELF);
         if (metaDataBlock != null) {
             scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE),
                 ScriptContext.ENGINE_SCOPE);
@@ -254,15 +246,23 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
             scriptContext.setWriter(currentWriter);
             // restore current reader
             scriptContext.setReader(currentReader);
+
             // restore "context" binding
-            scriptContext.setAttribute(BINDING_CONTEXT, currentContextBinding, ScriptContext.ENGINE_SCOPE);
+            restoreBinding(currentEngineBindings, scriptContext, BINDING_CONTEXT);
             // restore "javax.script.filename" binding
-            scriptContext.setAttribute(ScriptEngine.FILENAME, currentFilename, ScriptContext.ENGINE_SCOPE);
-            // restore "out" binding
-            scriptContext.setAttribute(BINDING_OUT, currentOut, ScriptContext.ENGINE_SCOPE);
+            restoreBinding(currentEngineBindings, scriptContext, ScriptEngine.FILENAME);
         }
 
         return result;
+    }
+
+    private void restoreBinding(Map<String, Object> currentEngineBindings, ScriptContext scriptContext, String name)
+    {
+        if (currentEngineBindings.containsKey(name)) {
+            scriptContext.setAttribute(name, currentEngineBindings.get(name), ScriptContext.ENGINE_SCOPE);
+        } else {
+            scriptContext.removeAttribute(name, ScriptContext.ENGINE_SCOPE);
+        }
     }
 
     private List<Block> convertScriptExecution(Object scriptResult, StringWriter scriptContextWriter, P parameters,
@@ -274,8 +274,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
             result = ((XDOM) scriptResult).getChildren();
         } else if (scriptResult instanceof Block) {
             result = Collections.singletonList((Block) scriptResult);
-        } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
-            && ((List< ? >) scriptResult).get(0) instanceof Block) {
+        } else if (scriptResult instanceof List && !((List<?>) scriptResult).isEmpty()
+            && ((List<?>) scriptResult).get(0) instanceof Block) {
             result = (List<Block>) scriptResult;
         } else if (scriptResult instanceof Class) {
             // Class result means class definition and we don't want to print anything in this case
@@ -289,7 +289,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
                 contentToParse = this.converterManager.convert(String.class, scriptResult);
             }
             // Run the wiki syntax parser on the Script returned content
-            result = parseScriptResult(contentToParse, parameters, context);            
+            result = parseScriptResult(contentToParse, parameters, context);
         }
 
         return result;

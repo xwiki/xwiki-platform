@@ -48,6 +48,7 @@ public class DummyLockProvider implements LockProvider
      * @param toLockOn unused.
      * @return a lock which doesn't work.
      */
+    @Override
     public ReadWriteLock getLock(final Object toLockOn)
     {
         final Lock dl = new DummyLock();

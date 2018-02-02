@@ -75,6 +75,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -1548,4 +1549,27 @@ public class XWikiDocumentMockitoTest
         assertFalse(attachmentList.contains(attachment4));
     }
 
+    @Test
+    public void modifyAttachmentName()
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        this.document.getAttachmentList().add(attachment);
+
+        assertSame(1, this.document.getAttachmentList().size());
+        assertSame(attachment, this.document.getAttachmentList().get(0));
+
+        attachment.setFilename("attachment");
+
+        assertSame(1, this.document.getAttachmentList().size());
+        assertSame(attachment, this.document.getAttachmentList().get(0));
+        assertSame(attachment, this.document.getAttachment("attachment"));
+
+        attachment.setFilename("attachment2");
+
+        assertSame(1, this.document.getAttachmentList().size());
+        assertSame(attachment, this.document.getAttachmentList().get(0));
+        assertNull(this.document.getAttachment("attachment"));
+        assertSame(attachment, this.document.getAttachment("attachment2"));
+    }
 }

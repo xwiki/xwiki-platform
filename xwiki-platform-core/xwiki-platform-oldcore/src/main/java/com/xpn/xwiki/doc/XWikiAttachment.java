@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -73,6 +74,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class XWikiAttachment implements Cloneable
 {
+    public static interface AttachmentNameChanged
+    {
+        void onAttachmentNameModified(String previousAttachmentName, XWikiAttachment attachment);
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachment.class);
 
     /**
@@ -149,6 +155,8 @@ public class XWikiAttachment implements Cloneable
     private AttachmentReference reference;
 
     private boolean forceSetFilesize;
+
+    private List<AttachmentNameChanged> listeners = new CopyOnWriteArrayList<>();
 
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
@@ -331,8 +339,14 @@ public class XWikiAttachment implements Cloneable
     {
         if (ObjectUtils.notEqual(getFilename(), filename)) {
             setMetaDataDirty(true);
+
+            String previousFileName = this.getFilename();
+
             this.filename = filename;
+
+            notificateNameModifed(previousFileName, this);
         }
+
         this.reference = null;
     }
 
@@ -1343,5 +1357,22 @@ public class XWikiAttachment implements Cloneable
         }
 
         return this.archiveStoreInstance;
+    }
+
+    public void addNameModifiedListener(AttachmentNameChanged listener)
+    {
+        this.listeners.add(listener);
+    }
+
+    public void removeNameModifiedListener(AttachmentNameChanged listener)
+    {
+        this.listeners.remove(listener);
+    }
+
+    public void notificateNameModifed(String previousAttachmentName, XWikiAttachment attachment)
+    {
+        for (AttachmentNameChanged listener : this.listeners) {
+            listener.onAttachmentNameModified(previousAttachmentName, attachment);
+        }
     }
 }

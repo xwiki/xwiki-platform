@@ -164,7 +164,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>4.3.2.Final</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

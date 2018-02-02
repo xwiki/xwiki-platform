@@ -231,7 +231,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             // Safer to clone for thread safety and in case the save fail
             document = document.clone();
 
-            document.loadAttachmentsContent(xcontext);
+            document.loadAttachmentsContentSafe(xcontext);
             document.apply(inputDocument);
 
             // Get the version from the input document

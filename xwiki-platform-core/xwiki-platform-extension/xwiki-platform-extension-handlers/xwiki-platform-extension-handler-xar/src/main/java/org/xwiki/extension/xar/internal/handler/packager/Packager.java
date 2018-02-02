@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -68,6 +69,7 @@ import org.xwiki.xar.internal.model.XarModel;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
@@ -213,7 +215,7 @@ public class Packager
 
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
         XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
-        currentDocument.loadAttachmentsContent(xcontext);
+        currentDocument.loadAttachmentsContentSafe(xcontext);
         XWikiDocument previousDocument;
         XarExtensionPlan xarExtensionPlan = configuration.getXarExtensionPlan();
         if (xarExtensionPlan != null) {

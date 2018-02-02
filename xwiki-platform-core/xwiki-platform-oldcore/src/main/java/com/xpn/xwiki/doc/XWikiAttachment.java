@@ -852,7 +852,7 @@ public class XWikiAttachment implements Cloneable
             }
         }
 
-        return this.content.getContentInputStream();
+        return this.content != null ? this.content.getContentInputStream() : null;
     }
 
     /**

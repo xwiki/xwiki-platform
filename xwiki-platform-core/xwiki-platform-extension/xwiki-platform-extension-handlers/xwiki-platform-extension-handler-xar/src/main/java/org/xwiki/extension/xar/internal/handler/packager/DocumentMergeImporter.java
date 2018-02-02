@@ -293,7 +293,7 @@ public class DocumentMergeImporter
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
                 if (document.isNew()) {
-                    currentDocument.loadAttachmentsContent(xcontext);
+                    currentDocument.loadAttachmentsContentSafe(xcontext);
                     currentDocument.apply(document);
                 } else {
                     currentDocument = document;

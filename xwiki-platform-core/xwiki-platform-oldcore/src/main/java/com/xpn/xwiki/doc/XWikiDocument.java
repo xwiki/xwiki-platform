@@ -41,7 +41,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -158,7 +157,6 @@ import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
-import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
@@ -4083,6 +4081,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         for (XWikiAttachment attachment : getAttachmentList()) {
             attachment.loadAttachmentContent(context);
+        }
+    }
+
+    /**
+     * Same as {@link #loadAttachmentContent(XWikiAttachment, XWikiContext)} but in some context we don't really care if
+     * an attachment content could not be loaded (we are going to overwrite or ignore it).
+     * 
+     * @param context the XWiki context
+     * @since 10.1RC1
+     */
+    public void loadAttachmentsContentSafe(XWikiContext context)
+    {
+        for (XWikiAttachment attachment : getAttachmentList()) {
+            try {
+                attachment.loadAttachmentContent(context);
+            } catch (XWikiException e) {
+                LOGGER.warn("Failed to load attachment [{}]: {}", attachment.getReference(),
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
         }
     }
 

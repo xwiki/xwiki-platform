@@ -355,6 +355,16 @@ public class FilesystemStoreTools implements Initializable
     }
 
     /**
+     * @param wikiId the wiki identifier
+     * @return the {@link File} corresponding to the passed wiki identifier
+     * @since 10.1RC1
+     */
+    public File getWikiDir(String wikiId)
+    {
+        return new File(this.storageDir, wikiId);
+    }
+
+    /**
      * Get the directory associated with this document. This is a path obtained from the owner document reference, where
      * each reference segment (wiki, spaces, document name) contributes to the final path. For a document called
      * xwiki:Main.WebHome, the directory will be: <code>(storageDir)/xwiki/Main/WebHome/~this/</code>

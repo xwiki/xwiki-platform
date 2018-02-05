@@ -39,5 +39,13 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -33,7 +33,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaMetadataKeys;
 import org.slf4j.Logger;
@@ -47,6 +46,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -498,15 +498,13 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected String getContentAsText(XWikiAttachment attachment)
     {
         try {
-            Tika tika = new Tika();
-
             Metadata metadata = new Metadata();
             metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, attachment.getFilename());
 
             InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 
             try {
-                return tika.parseToString(in, metadata);
+                return TikaUtils.parseToString(in, metadata);
             } finally {
                 in.close();
             }

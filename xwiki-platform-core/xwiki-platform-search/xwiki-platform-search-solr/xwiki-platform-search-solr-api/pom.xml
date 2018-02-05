@@ -67,12 +67,10 @@
     </dependency>
     <!-- Extract data from attachments -->
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parsers</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tika-parsers</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
     </dependency>
     <!-- XWiki dependencies -->
     <dependency>

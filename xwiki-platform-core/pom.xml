@@ -330,6 +330,7 @@
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-tika</module>
     <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>

@@ -99,19 +99,16 @@
     </dependency>
     <dependency>
       <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parsers</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tika-parsers</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
     </dependency>
     <!-- Used to parse the images embedded through the Data URI scheme. -->
     <dependency>
       <groupId>com.github.ooxi</groupId>
       <artifactId>jdatauri</artifactId>
       <version>1.0</version>
-    </dependency>
-    <!-- Replace a runtime transitive dependency of tika-parsers because it includes old NekoHTML classes. -->
-    <dependency>
-      <groupId>de.l3s.boilerpipe</groupId>
-      <artifactId>boilerpipe</artifactId>
     </dependency>
     <!-- Runtime dependencies -->
     <dependency>

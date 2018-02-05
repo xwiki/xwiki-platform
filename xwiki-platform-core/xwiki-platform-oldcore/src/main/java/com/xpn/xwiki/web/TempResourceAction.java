@@ -33,11 +33,11 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
+import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -85,11 +85,6 @@ public class TempResourceAction extends XWikiAction
     private static final Logger LOGGER = LoggerFactory.getLogger(TempResourceAction.class);
 
     /**
-     * Used for detecting mime-types of files.
-     */
-    private Tika tika = new Tika();
-
-    /**
      * Used to find the temporary dir.
      */
     private Environment environment = Utils.getComponent(Environment.class);
@@ -112,7 +107,7 @@ public class TempResourceAction extends XWikiAction
         response.setDateHeader("Last-Modified", tempFile.lastModified());
         String contentType = MimeTypes.OCTET_STREAM;
         try {
-            contentType = this.tika.detect(tempFile);
+            contentType = TikaUtils.detect(tempFile);
         } catch (IOException ex) {
             LOGGER.warn(
                 String.format("Unable to determine mime type for temporary resource [%s]", tempFile.getAbsolutePath()),

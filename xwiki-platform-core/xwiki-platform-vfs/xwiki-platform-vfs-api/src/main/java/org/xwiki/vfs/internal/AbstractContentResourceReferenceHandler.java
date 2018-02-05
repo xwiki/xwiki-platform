@@ -25,12 +25,12 @@ import java.io.InputStream;
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.Tika;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.tika.internal.TikaUtils;
 
 /**
  * Helper to implement {@link org.xwiki.resource.ResourceReferenceHandler} components that return content to the
@@ -43,11 +43,6 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
 {
     @Inject
     private Container container;
-
-    /**
-     * Used to determine the Content Type of the requested resource files.
-     */
-    private Tika tika = new Tika();
 
     protected void serveResource(String resourceName, InputStream resourceStream)
         throws ResourceReferenceHandlerException
@@ -62,7 +57,7 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
 
         try {
             Response response = this.container.getResponse();
-            response.setContentType(this.tika.detect(markResetSupportingStream, resourceName));
+            response.setContentType(TikaUtils.detect(markResetSupportingStream, resourceName));
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);

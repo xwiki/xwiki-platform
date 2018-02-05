@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -43,6 +42,7 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.tika.internal.TikaUtils;
 
 /**
  * Base class for {@link ResourceReferenceHandler}s that can handle servlet resource requests.
@@ -66,11 +66,6 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
 
     @Inject
     private Container container;
-
-    /**
-     * Used to determine the Content Type of the requested resource files.
-     */
-    private Tika tika = new Tika();
 
     @Override
     public void handle(ResourceReference resourceReference, ResourceReferenceHandlerChain chain)
@@ -179,7 +174,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         try {
             Response response = this.container.getResponse();
             setResponseHeaders(response, resourceReference);
-            response.setContentType(this.tika.detect(resourceStream, resourceName));
+            response.setContentType(TikaUtils.detect(resourceStream, resourceName));
             IOUtils.copy(resourceStream, response.getOutputStream());
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);

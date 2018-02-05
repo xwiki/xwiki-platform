@@ -24,38 +24,30 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-resource</artifactId>
+    <artifactId>xwiki-platform-tika</artifactId>
     <version>10.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-resource-servlet</artifactId>
-  <name>XWiki Platform - Resource - Servlet</name>
+  <artifactId>xwiki-platform-tika-parsers</artifactId>
+  <name>XWiki Platform - Tika - Parsers</name>
   <packaging>jar</packaging>
-  <description>Routing for incoming Resource Requests in a Servlet Container</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Servlets for the Resource API</xwiki.extension.name>
-  </properties>
+  <description>Tika extra parsers</description>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-servlet</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Used to determine the Content Type of the requested resource. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tika-detect</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parsers</artifactId>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-simple</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

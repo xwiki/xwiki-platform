@@ -120,8 +120,9 @@
 
     <!-- For extracting metadata from various document types -->
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tika-detect</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- The platform -->

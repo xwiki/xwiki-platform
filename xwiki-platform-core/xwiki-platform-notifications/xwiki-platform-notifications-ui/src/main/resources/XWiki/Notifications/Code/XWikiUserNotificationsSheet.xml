@@ -204,7 +204,7 @@
   &lt;div class="row"&gt;
     &lt;p class="xHint col-md-10"&gt;$escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))&lt;/p&gt;
     &lt;div class="col-md-2 text-right"&gt;
-      &lt;button class="btn btn-default btn-addfilter" data-target="#modal-add-filter-preference" data-toggle="modal"&gt;
+      &lt;button type="button" class="btn btn-default btn-addfilter" data-target="#modal-add-filter-preference" data-toggle="modal"&gt;
         &lt;span class="fa fa-plus"&gt;&lt;/span&gt;&amp;nbsp;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))
       &lt;/button&gt;
     &lt;/div&gt;
@@ -240,7 +240,7 @@
         &lt;h4 class="modal-title"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/h4&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
-        &lt;form class="xform"&gt;
+        &lt;div class="xform"&gt;
           &lt;dl class="location-picker"&gt;
             &lt;dt&gt;
               &lt;label for="notificationFilterTypeSelector"&gt;$escapetool.xml($services.localization.render('notifications.filters.type.label'))&lt;/label&gt;
@@ -294,7 +294,7 @@
               })
             &lt;/dd&gt;
           &lt;/dl&gt;
-        &lt;/form&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
       &lt;div class="modal-footer"&gt;
         &lt;button type="button" class="btn btn-default" data-action="cancel" data-dismiss="modal"&gt;$services.localization.render('notifications.filters.cancel')&lt;/button&gt;

@@ -329,6 +329,11 @@ public class ImportAction extends XWikiAction
             // Print the import log
             if (LOGGER.isDebugEnabled()) {
                 logger.log(LOGGER);
+            } else {
+                // TODO: remove when the UI show the log properly
+                for (LogEvent logEvent : logger.getLogsFrom(LogLevel.ERROR)) {
+                    logEvent.log(LOGGER);
+                }
             }
 
             // Close the input source

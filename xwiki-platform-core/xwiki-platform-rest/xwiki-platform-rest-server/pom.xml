@@ -131,7 +131,7 @@
     </dependency>
     <!-- Replace the version triggered by restlet by a more accurate and up to date one -->
     <dependency>
-      <groupId>org.json</groupId>
+      <groupId>com.tdunning</groupId>
       <artifactId>json</artifactId>
     </dependency>
     <dependency>

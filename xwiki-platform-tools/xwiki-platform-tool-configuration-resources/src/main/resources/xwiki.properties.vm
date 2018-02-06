@@ -767,9 +767,9 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 
 #-# [Since 10.0RC1]
 #-# [Since 9.11.2]
-#-# Controls if the notifications feature is enabled. Default value is true.
+#-# Controls if the notifications feature is enabled. Default value is false.
 #-# Thanks to this option, you can disable the application without uninstalling it.
-# watchlist.enabled = true
+# watchlist.enabled = false
 
 #-# [Since 7.0RC1]
 #-# Controls if the realtime notifications feature is enabled. Default value is false.

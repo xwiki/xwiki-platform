@@ -43,7 +43,7 @@ public class DefaultWatchListConfiguration implements WatchListConfiguration
     @Override
     public boolean isEnabled()
     {
-        return configurationSource.getProperty("watchlist.enabled", true);
+        return configurationSource.getProperty("watchlist.enabled", false);
     }
 
     @Override

@@ -485,6 +485,11 @@
             <artifactId>jaxb-impl</artifactId>
             <groupId>com.sun.xml.bind</groupId>
           </exclusion>
+          <!-- Restlet does not use the right artifact for JSON -->
+          <exclusion>
+            <artifactId>json</artifactId>
+            <groupId>org.json</groupId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>

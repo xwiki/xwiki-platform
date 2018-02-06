@@ -87,6 +87,11 @@
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
     </dependency>
+    <!-- Replace org.json:json for license reasons -->
+    <dependency>
+      <groupId>com.tdunning</groupId>
+      <artifactId>json</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-repository-model</artifactId>

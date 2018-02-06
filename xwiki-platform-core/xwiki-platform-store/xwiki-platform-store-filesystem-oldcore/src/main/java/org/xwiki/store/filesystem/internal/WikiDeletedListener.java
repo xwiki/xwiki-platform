@@ -44,6 +44,9 @@ import org.xwiki.observation.event.Event;
 @Singleton
 public class WikiDeletedListener extends AbstractEventListener
 {
+    /**
+     * The name of the listener.
+     */
     public static final String NAME = "org.xwiki.store.filesystem.internal.WikiDeletedListener";
 
     @Inject
@@ -52,6 +55,9 @@ public class WikiDeletedListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
+    /**
+     * The default constructor.
+     */
     public WikiDeletedListener()
     {
         super(NAME, new WikiDeletedEvent());

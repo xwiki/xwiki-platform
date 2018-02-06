@@ -67,6 +67,14 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     public static final String BINDING_CONTEXT = "context";
 
     /**
+     * The name of the "out" binding..
+     * 
+     * @deprecated not used since 10.1RC1 because the bug has been fixed in Groovy
+     */
+    @Deprecated
+    public static final String BINDING_OUT = "out";
+
+    /**
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
      */
     private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines";

@@ -60,8 +60,7 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
     @Override
     public boolean isEnabled()
     {
-        return StringUtils.equalsIgnoreCase("true",
-                configurationSource.getProperty("notifications.watchedEntities.enabled", "false"));
+        return configurationSource.getProperty("notifications.watchedEntities.enabled", true);
     }
 
     @Override

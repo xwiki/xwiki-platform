@@ -865,6 +865,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# This feature mimics what the "Watchlist Application" does so it may not be a good idea to have both on the platform.
 #-#
 #-# The default is :
-# notifications.watchedEntities.enabled = false
+# notifications.watchedEntities.enabled = true
 
 $!xwikiPropertiesAdditionalProperties

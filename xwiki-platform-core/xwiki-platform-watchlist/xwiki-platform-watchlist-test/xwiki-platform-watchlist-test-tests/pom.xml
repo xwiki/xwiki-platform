@@ -159,6 +159,39 @@
           </execution>
         </executions>
       </plugin>
+      <!-- We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension to
+      install on a subwiki by default (which is something we test)
+      Otherwise the wiki creation form will display the flavor picker and the functional tests do not handle it. -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <version>1.5.3</version>
+        <configuration>
+          <basedir>${basedir}/target/xwiki/</basedir>
+          <regex>false</regex>
+          <commentsEnabled>false</commentsEnabled>
+          <skip>${skipTests}</skip>
+        </configuration>
+        <executions>
+          <!-- Disable DW -->
+          <execution>
+            <id>change-xwiki.properties</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <filesToInclude>webapps/xwiki/WEB-INF/xwiki.properties</filesToInclude>
+              <replacements>
+                <replacement>
+                  <token># watchlist.enabled = false</token>
+                  <value>watchlist.enabled = true</value>
+                </replacement>
+              </replacements>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>

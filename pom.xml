@@ -660,6 +660,16 @@
                 <id>org.glassfish.jaxb:jaxb-core</id>
                 <features>com.sun.xml.bind:jaxb-core</features>
               </extensionOverride>
+              <extensionOverride>
+                <!-- Open Java is the same as JSON-Java but with a different license -->
+                <id>com.tdunning:json</id>
+                <features>org.json:json</features>
+              </extensionOverride>
+              <extensionOverride>
+                <!-- Embbed javax.el:javax.el-api -->
+                <id>org.glassfish:javax.el</id>
+                <features>javax.el:javax.el-api</features>
+              </extensionOverride>
 
               <!-- Right id of the The Bouncy Castle Crypto packages -->
               <extensionOverride>

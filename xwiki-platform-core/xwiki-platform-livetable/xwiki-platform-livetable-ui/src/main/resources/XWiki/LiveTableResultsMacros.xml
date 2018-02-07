@@ -587,28 +587,8 @@
       #set ($discard = $tablelist.add($colName))
       #if ($colName.startsWith('doc.'))
         #if ($colName == 'doc.location')
-          ## Location is a special case, that we need to handle separatly.
-          ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
           #set ($safeColName = 'doc.fullName')
-          #set ($matchNestedDocument = "(doc.name = 'WebHome' and upper(doc.space) like upper(?) escape '!')")
-          #set ($matchTerminalDocument = "(doc.name &lt;&gt; 'WebHome' and upper(doc.fullName) like upper(?) escape '!')")
-          #set ($whereSql = "${whereSql} and ($matchNestedDocument or $matchTerminalDocument)")
-          ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
-          ## wildcards). However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
-          ## As a consequence, we must escape these characters.
-          ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
-          ## Since we use '!' for the escaping, we also double existing ones.
-          #set ($locationFilterValue = $filterValue.replaceAll('([\[%_!])', '!$1'))
-          ## Because the user might filter with "/" as separator we replace that by "%", because it could be "." 
-          ## (the space separator) or "/" (as it is in the document name).
-          ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
-          ## to filter on different levels:
-          ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
-          ##        On the other hand, it will also returns: "BlogForIntrospection", which might be unexpected.
-          #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%'))
-          #set ($discard = $whereParams.add("%${locationFilterValue}%"))
-          ## We add the parameter twice because we use it twice in the WHERE clause (it's not a named parameter).
-          #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+          #addLivetableLocationFilter($whereSql, $whereParams, $filterValue, true)
         #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
           #livetable_getTableAlias($colname)
           #livetable_filterDateProperty()

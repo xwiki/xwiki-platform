@@ -19,26 +19,7 @@ $response.setContentType("application/json")
     #set ($discard = $queryParams.add($exclude))
   #end
 #end
-#if ("$!request.get('doc.location')" != '')
-  ## Location is a special case, that we need to handle separatly.
-  ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
-  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.fullName) LIKE LOWER(?) ESCAPE '!'")
-  #set ($locationFilterValue = $request.get('location'))
-  ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as wildcards).
-  ## However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
-  ## As a consequence, we must escape these characters.
-  ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
-  ## Since we use '!' for the escaping, we also double existing ones.
-  #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
-  ## Because the user might filter with "/" as separator we replace that by "%", because it could be "." 
-  ## (the space separator) or "/" (as it is in the document name).
-  ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
-  ## to filter on different levels:
-  ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
-  ##        On the other hand, it will also returns: "BlogForIntrospection", which might be unexpected.
-  #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%'))
-  #set ($discard = $queryParams.add("%${locationFilterValue}%"))
-#end
+#addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'), false, "AND LOWER(ddoc.fullName) LIKE LOWER(?) ESCAPE '!'")
 #set ($batchId = $request.get('doc.batchId'))
 #if ("$!batchId" != '')
   #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.batchId) LIKE LOWER(?)")

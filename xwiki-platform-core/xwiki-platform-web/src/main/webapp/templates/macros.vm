@@ -1751,6 +1751,55 @@ function (row, i, table) {
   return tr;
 }
 #end
+
+#**
+ * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
+ *
+ * @param whereQL existing where clause to augment
+ * @param whereParams existing query params to augment
+ * @param filterWebHome if true then treat "WebHome" as a normal input string like any other (defaults to false)
+ * @param customWhereQL if defined then use that query instead of computing it ourselves. In this case the filterWebHome
+ *        parameter value is ignored
+ * @internal
+ *#
+#macro(addLivetableLocationFilter $whereQL $whereParams $locationValue $filterWebHome $customWhereQL)
+  #if ("$!locationValue" != '')
+    ## Location is a special case, that we need to handle separatly.
+    ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
+    #if ("$!customWhereQL" != '')
+      #set ($internalWhereQL = "${whereQL} $customWhereQL")
+    #else
+      #if ($filterWebHome == true)
+        #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
+        #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
+        #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+      #else
+        #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
+      #end
+    #end
+    #set ($locationFilterValue = $locationValue)
+    ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
+    ## wildcards). However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
+    ## As a consequence, we must escape these characters.
+    ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
+    ## Since we use '!' for the escaping, we also double existing ones.
+    #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
+    ## Because the user might filter with "/" as separator we replace that by "%", because it could be "."
+    ## (the space separator) or "/" (as it is in the document name).
+    ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
+    ## to filter on different levels:
+    ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
+    #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%.%'))
+    #if ("$!customWhereQL" == '')
+      #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+      #if ($filterWebHome == true)
+        #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+      #end
+    #end
+    #set ($whereQL = $NULL)
+    #setVariable("$whereQL", $internalWhereQL)
+ #end
+#end
 ##
 ##
 #**

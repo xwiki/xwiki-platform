@@ -63,6 +63,7 @@ $response.setContentType('application/json')
 #set($dateFilter = $request.get('ddoc.date'))
 #set($deleterFilter = $request.get('ddoc.deleter'))
 #set($sql = '')
+#set($params = [])
 #if("$!{docNameFilter}" != '')
   #set($sql = "and lower(ddoc.fullName) like '%${docNameFilter.trim().toLowerCase()}%' ")
 #end

@@ -67,58 +67,69 @@
 #set ($filters = $collectionstool.arrayList)
 #set ($discard = $filters.addAll($services.notification.filters.filters))
 #set ($filters = $sorttool.sort($filters, ['name']))
+#set ($displayHiddenDocument = "$xwiki.getUserPreference('displayHiddenDocuments')" == '1')
 #foreach ($filter in $filters)
   #set ($filtersPreferences = $collectionstool.arrayList)
   #set ($discard = $filtersPreferences.addAll($services.notification.filters.getFilterPreferences($filter)))
   #set ($filtersPreferences = $sorttool.sort($filtersPreferences, ['filterPreferenceName']))
   #foreach ($preference in $filtersPreferences)
-    #set ($index = $index + 1)
-    ## Optimization to render only displayed rows (between $offset and $limitOffset)
-    #if ($index &gt; $offset and $index &lt;= $limitOffset)
-      #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
-
-      ## Compute the list of event types
-      #set($eventTypeList = '&lt;ul class="list-unstyled"&gt;')
-      #if ($preference.getProperties('EVENT_TYPE').isEmpty())
-        #set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
-      #else
-        #set ($types = {})
-        #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-          #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
+    #set ($pages = $preference.getProperties('PAGE'))
+    #set ($spaces = $preference.getProperties('SPACE'))
+    #if (!$displayHiddenDocument &amp;&amp; ($pages.size() == 1 &amp;&amp; $xwiki.getDocument($pages[0]).isHidden() 
+      || $spaces.size() == 1 &amp;&amp; $xwiki.getDocument($services.model.resolveSpace($spaces[0], 'default')).isHidden()))
+      ## Don't display a preference for an hidden page or space.
+      ## Why? If a user has the autowatch option enabled and create a new hidden document (for example, when she creates an application with AWM, hidden code pages are created as well),
+      ## we don't want to pollute the livetable with these hidden pages that the user don't know about. Moreover, the notifications will filter events concerning hidden pages,
+      ## so even if the filter exists, it has no effect to the user.
+      ## Here we handle only the case where pages.size() == 1 or spaces.size() == 1.
+      ## In the case there are several elements in the lists, they might have different "hidden" properties, and we don't handle it
+      ## Note: in the current implementation of watched entities, it's never the case.
+      ## TODO: handle these cases too in case custom filters need this.
+    #else
+      #set ($index = $index + 1)
+      ## Optimization to render only displayed rows (between $offset and $limitOffset)
+      #if ($index &gt; $offset and $index &lt;= $limitOffset)
+        #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
+        ## Compute the list of event types
+        #set($eventTypeList = '&lt;ul class="list-unstyled"&gt;')
+        #if ($preference.getProperties('EVENT_TYPE').isEmpty())
+          #set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
+        #else
+          #set ($types = {})
+          #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+            #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
+          #end
+          #foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
+            #set ($eventTypeList = $eventTypeList + '&lt;li&gt;' + $types.get($eventType) + '&lt;/li&gt;')
+          #end
         #end
-        #foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
-          #set ($eventTypeList = $eventTypeList + '&lt;li&gt;' + $types.get($eventType) + '&lt;/li&gt;')
+        #set($eventTypeList = $eventTypeList + '&lt;/ul&gt;')
+        ## Compute the list of notification formats
+        #set($notificationFormatsList = '&lt;ul class="list-unstyled"&gt;')
+        #foreach ($notificationFormat in $preference.getFilterFormats())
+          #set ($notificationFormatsList = $notificationFormatsList + '&lt;li&gt;' + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;/li&gt;')
         #end
+        #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
+        #set ($isEnabled = '')
+        #set ($isDisabled = '')
+        #if ($preference.filterPreferenceName.startsWith('watchlist_'))
+          #set ($isDisabled = 'disabled = "disabled"')
+        #end
+        #if ($preference.isEnabled())
+          #set ($isEnabled = 'checked = "checked"')
+        #end
+        #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled $isDisabled /&gt;")
+        #set ($element = {
+          'filterPreferenceName': $preference.filterPreferenceName,
+          'name'                : $display,
+          'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
+          'eventTypes'          : $eventTypeList,
+          'notificationFormats' : $notificationFormatsList,
+          'isEnabled'           : $isEnabled,
+          'doc_viewable'        : true
+        })
+        #set ($discard = $elements.add($element))
       #end
-      #set($eventTypeList = $eventTypeList + '&lt;/ul&gt;')
-
-      ## Compute the list of notification formats
-      #set($notificationFormatsList = '&lt;ul class="list-unstyled"&gt;')
-      #foreach ($notificationFormat in $preference.getFilterFormats())
-        #set ($notificationFormatsList = $notificationFormatsList + '&lt;li&gt;' + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;/li&gt;')
-      #end
-      #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
-
-      #set ($isEnabled = '')
-      #set ($isDisabled = '')
-      #if ($preference.filterPreferenceName.startsWith('watchlist_'))
-        #set ($isDisabled = 'disabled = "disabled"')
-      #end
-      #if ($preference.isEnabled())
-        #set ($isEnabled = 'checked = "checked"')
-      #end
-      #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceName='${preference.getName()}' $isEnabled $isDisabled /&gt;")
-
-      #set ($element = {
-        'filterPreferenceName': $preference.filterPreferenceName,
-        'name'                : $display,
-        'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-        'eventTypes'          : $eventTypeList,
-        'notificationFormats' : $notificationFormatsList,
-        'isEnabled'           : $isEnabled,
-        'doc_viewable'        : true
-      })
-      #set ($discard = $elements.add($element))
     #end
   #end
 #end

@@ -59,11 +59,41 @@
 ## Build the list of NotificationFilterPreference related to the given user.
 ##
 #set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
-#set ($restBaseURL = $services.rest.url($document.documentReference))
 #set ($elements = [])
-
-## Get the list of available filters for the user
 #set ($index = 0)
+## First: get the list of available toggeable filters for the user
+## We display them first because we don't want them to be hidden by thousands of page filters the autowatch option
+## might have created. It would be not good to have to go to the last page of the livetable to find out these commonly
+## used filters.
+#set ($filters = $services.notification.filters.getToggleableNotificationFilters())
+#foreach ($filter in $filters)
+  #set ($index = $index + 1)
+  ## Optimization to render only displayed rows (between $offset and $limitOffset)
+  #if ($index &gt; $offset and $index &lt;= $limitOffset)
+    #set ($checked = 'checked = "checked"')
+    #set ($objectNumber = '')
+    #foreach ($obj in $document.getObjects('XWiki.Notifications.Code.ToggleableFilterPreferenceClass'))
+      #if ($filter.name.equals($obj.getValue('filterName')) &amp;&amp; $obj.getValue('isEnabled') == 0)
+        #set ($checked = '')
+        #set ($objectNumber = $!obj.reference.objectNumber)
+      #end
+    #end
+    #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
+    #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
+    #set ($element = {
+      'filterPreferenceName': $name,
+      'name'                : $name,
+      'filterType'          : $services.localization.render("notifications.filters.description.$filter.name"),
+      'eventTypes'          : '',
+      'notificationFormats' : '',
+      'isEnabled'           : $checkbox,
+      'doc_viewable'        : true,
+      'doc_hasdelete'       : false
+    })
+    #set ($discard = $elements.add($element))
+  #end
+#end
+## Also get the list of available filters for the user
 #set ($filters = $collectionstool.arrayList)
 #set ($discard = $filters.addAll($services.notification.filters.filters))
 #set ($filters = $sorttool.sort($filters, ['name']))
@@ -131,35 +161,6 @@
         #set ($discard = $elements.add($element))
       #end
     #end
-  #end
-#end
-## Also get the list of available toggable filters for the user
-#set ($filters = $services.notification.filters.getToggleableNotificationFilters())
-#foreach ($filter in $filters)
-  #set ($index = $index + 1)
-  ## Optimization to render only displayed rows (between $offset and $limitOffset)
-  #if ($index &gt; $offset and $index &lt;= $limitOffset)
-    #set ($checked = 'checked = "checked"')
-    #set ($objectNumber = '')
-    #foreach ($obj in $document.getObjects('XWiki.Notifications.Code.ToggleableFilterPreferenceClass'))
-      #if ($filter.name.equals($obj.getValue('filterName')) &amp;&amp; $obj.getValue('isEnabled') == 0)
-        #set ($checked = '')
-        #set ($objectNumber = $!obj.reference.objectNumber)
-      #end
-    #end
-    #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
-    #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
-    #set ($element = {
-      'filterPreferenceName': $name,
-      'name'                : $name,
-      'filterType'          : $services.localization.render("notifications.filters.description.$filter.name"),
-      'eventTypes'          : '',
-      'notificationFormats' : '',
-      'isEnabled'           : $checkbox,
-      'doc_viewable'        : true,
-      'doc_hasdelete'       : false
-    })
-    #set ($discard = $elements.add($element))
   #end
 #end
 

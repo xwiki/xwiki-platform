@@ -23,7 +23,7 @@ $response.setContentType("application/json")
   ## Location is a special case, that we need to handle separatly.
   ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
   #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.fullName) LIKE LOWER(?) ESCAPE '!'")
-  #set ($locationFilterValue = $request.get('location'))
+  #set ($locationFilterValue = $request.get('doc.location'))
   ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as wildcards).
   ## However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
   ## As a consequence, we must escape these characters.

@@ -21,6 +21,7 @@ package org.xwiki.tika.internal;
 
 import java.io.IOException;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.tika.exception.TikaException;
 import org.junit.jupiter.api.Test;
 
@@ -37,5 +38,12 @@ public class TikaUtilsTest
     public void parsePDF() throws IOException, TikaException
     {
         assertEquals("\nPDF content\n\n\n", TikaUtils.parseToString(getClass().getResource("/pdf.pdf")));
+    }
+
+    @Test
+    public void parseAutoclosable() throws IOException, TikaException
+    {
+        assertEquals("\nPDF content\n\n\n",
+            TikaUtils.parseToString(new AutoCloseInputStream(getClass().getResourceAsStream("/pdf.pdf"))));
     }
 }

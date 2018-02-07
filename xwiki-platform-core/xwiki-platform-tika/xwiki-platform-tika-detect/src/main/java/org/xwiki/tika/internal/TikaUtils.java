@@ -19,16 +19,19 @@
  */
 package org.xwiki.tika.internal;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.exception.ZeroByteFileException;
 import org.apache.tika.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +72,19 @@ public final class TikaUtils
         return tika;
     }
 
+    // TODO: Remove when https://issues.apache.org/jira/browse/IO-568 is fixed (AutoCloseInputStream does not properly
+    // support mark/reset)
+    private static InputStream safeInputStream(InputStream stream)
+    {
+        if (stream instanceof AutoCloseInputStream) {
+            return new BufferedInputStream(stream);
+        }
+
+        return stream;
+    }
+
     /**
-     * Detects the media type of the given file. The type detection is based on the document content and a potential
-     * known file extension.
-     * <p>
-     * Use the {@link #detect(String)} method when you want to detect the type of the document without actually
-     * accessing the file.
-     *
+     * @see Tika#detect(File)
      * @param file the file
      * @return detected media type
      * @throws IOException if the file can not be read
@@ -87,12 +96,7 @@ public final class TikaUtils
     }
 
     /**
-     * Detects the media type of the file at the given path. The type detection is based on the document content and a
-     * potential known file extension.
-     * <p>
-     * Use the {@link #detect(String)} method when you want to detect the type of the document without actually
-     * accessing the file.
-     *
+     * @see Tika#detect(Path)
      * @param path the path of the file
      * @return detected media type
      * @throws IOException if the file can not be read
@@ -103,15 +107,7 @@ public final class TikaUtils
     }
 
     /**
-     * Detects the media type of the given document. The type detection is based on the content of the given document
-     * stream and the name of the document.
-     * <p>
-     * If the document stream supports the {@link InputStream#markSupported() mark feature}, then the stream is marked
-     * and reset to the original position before this method returns. Only a limited number of bytes are read from the
-     * stream.
-     * <p>
-     * The given document stream is <em>not</em> closed by this method.
-     *
+     * @see Tika#detect(InputStream, String)
      * @param stream the document stream
      * @param name document name
      * @return detected media type
@@ -119,19 +115,11 @@ public final class TikaUtils
      */
     public static String detect(InputStream stream, String name) throws IOException
     {
-        return tika.detect(stream, name);
+        return tika.detect(safeInputStream(stream), name);
     }
 
     /**
-     * Detects the media type of the given document. The type detection is based on the content of the given document
-     * stream.
-     * <p>
-     * If the document stream supports the {@link InputStream#markSupported() mark feature}, then the stream is marked
-     * and reset to the original position before this method returns. Only a limited number of bytes are read from the
-     * stream.
-     * <p>
-     * The given document stream is <em>not</em> closed by this method.
-     *
+     * @see Tika#detect(InputStream)
      * @param stream the document stream
      * @return detected media type
      * @throws IOException if the stream can not be read
@@ -142,12 +130,7 @@ public final class TikaUtils
     }
 
     /**
-     * Detects the media type of a document with the given file name. The type detection is based on known file name
-     * extensions.
-     * <p>
-     * The given name can also be a URL or a full file path. In such cases only the file name part of the string is used
-     * for type detection.
-     *
+     * @see Tika#detect(String)
      * @param name the file name of the document
      * @return detected media type
      */
@@ -157,17 +140,7 @@ public final class TikaUtils
     }
 
     /**
-     * Parses the given document and returns the extracted text content. The given input stream is closed by this
-     * method.
-     * <p>
-     * To avoid unpredictable excess memory use, the returned string contains only up to {@link #getMaxStringLength()}
-     * first characters extracted from the input document. Use the {@link #setMaxStringLength(int)} method to adjust
-     * this limitation.
-     * <p>
-     * <strong>NOTE:</strong> Unlike most other Tika methods that take an {@link InputStream}, this method will close
-     * the given stream for you as a convenience. With other methods you are still responsible for closing the stream or
-     * a wrapper instance returned by Tika.
-     *
+     * @see Tika#parseToString(InputStream, Metadata)
      * @param stream the document to be parsed
      * @param metadata document metadata
      * @return extracted text content
@@ -176,21 +149,16 @@ public final class TikaUtils
      */
     public static String parseToString(InputStream stream, Metadata metadata) throws IOException, TikaException
     {
-        return tika.parseToString(stream, metadata);
+        try {
+            return tika.parseToString(safeInputStream(stream), metadata);
+        } catch (ZeroByteFileException e) {
+            // How is empty file an issue ?
+            return "";
+        }
     }
 
     /**
-     * Parses the given document and returns the extracted text content. The given input stream is closed by this
-     * method.
-     * <p>
-     * To avoid unpredictable excess memory use, the returned string contains only up to {@link #getMaxStringLength()}
-     * first characters extracted from the input document. Use the {@link #setMaxStringLength(int)} method to adjust
-     * this limitation.
-     * <p>
-     * <strong>NOTE:</strong> Unlike most other Tika methods that take an {@link InputStream}, this method will close
-     * the given stream for you as a convenience. With other methods you are still responsible for closing the stream or
-     * a wrapper instance returned by Tika.
-     *
+     * @see Tika#parseToString(InputStream)
      * @param stream the document to be parsed
      * @return extracted text content
      * @throws IOException if the document can not be read
@@ -198,16 +166,16 @@ public final class TikaUtils
      */
     public static String parseToString(InputStream stream) throws IOException, TikaException
     {
-        return tika.parseToString(stream);
+        try {
+            return tika.parseToString(safeInputStream(stream));
+        } catch (ZeroByteFileException e) {
+            // How is empty file an issue ?
+            return "";
+        }
     }
 
     /**
-     * Parses the file at the given path and returns the extracted text content.
-     * <p>
-     * To avoid unpredictable excess memory use, the returned string contains only up to {@link #getMaxStringLength()}
-     * first characters extracted from the input document. Use the {@link #setMaxStringLength(int)} method to adjust
-     * this limitation.
-     *
+     * @see Tika#parseToString(Path)
      * @param path the path of the file to be parsed
      * @return extracted text content
      * @throws IOException if the file can not be read
@@ -215,16 +183,16 @@ public final class TikaUtils
      */
     public static String parseToString(Path path) throws IOException, TikaException
     {
-        return tika.parseToString(path);
+        try {
+            return tika.parseToString(path);
+        } catch (ZeroByteFileException e) {
+            // How is empty file an issue ?
+            return "";
+        }
     }
 
     /**
-     * Parses the given file and returns the extracted text content.
-     * <p>
-     * To avoid unpredictable excess memory use, the returned string contains only up to {@link #getMaxStringLength()}
-     * first characters extracted from the input document. Use the {@link #setMaxStringLength(int)} method to adjust
-     * this limitation.
-     *
+     * @see Tika#parseToString(File)
      * @param file the file to be parsed
      * @return extracted text content
      * @throws IOException if the file can not be read
@@ -233,16 +201,16 @@ public final class TikaUtils
      */
     public static String parseToString(File file) throws IOException, TikaException
     {
-        return tika.parseToString(file);
+        try {
+            return tika.parseToString(file);
+        } catch (ZeroByteFileException e) {
+            // How is empty file an issue ?
+            return "";
+        }
     }
 
     /**
-     * Parses the resource at the given URL and returns the extracted text content.
-     * <p>
-     * To avoid unpredictable excess memory use, the returned string contains only up to {@link #getMaxStringLength()}
-     * first characters extracted from the input document. Use the {@link #setMaxStringLength(int)} method to adjust
-     * this limitation.
-     *
+     * @see Tika#parseToString(URL)
      * @param url the URL of the resource to be parsed
      * @return extracted text content
      * @throws IOException if the resource can not be read
@@ -250,6 +218,11 @@ public final class TikaUtils
      */
     public static String parseToString(URL url) throws IOException, TikaException
     {
-        return tika.parseToString(url);
+        try {
+            return tika.parseToString(url);
+        } catch (ZeroByteFileException e) {
+            // How is empty file an issue ?
+            return "";
+        }
     }
 }

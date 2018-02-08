@@ -40,11 +40,14 @@
     -->
 
     <!--
-     All new table names should be all lower case versions of the name of the class which they represent
-     for example:
-     XWikiDocument should map to a table called xwikidocument
-     All new column names should be all lower case versions of the property which they represent for example:
-     fullName should map to a column called fullname
+      Rules:
+        * All new table names should be all lower case versions of the name of the class which they represent. For
+          example: "XWikiDocument" should map to a table called "xwikidocument"
+        * All new column names should be all lower case versions of the property which they represent for example:
+          "fullName" should map to a column called "fullname"
+        * Avoid using "unique=true" constraint since that prevents being able to insert text ending up with spaces
+          (by default most DBs ignore trailing spaces in comparisons and thus the uniqueness constraint prevents
+          entering content differing only by trailing spaces).
     -->
 
     <!-- JDBC driver will try to map a materialized_clob type to a java.sql.Clob Java type when loading objects from
@@ -98,7 +101,7 @@
         </id>
         <!-- Note: We don't create an index explicity for this column since Hibernate/Oracle will create one by default
              since we have a unique constraint -->
-        <property name="reference" type="string" unique="true" column="XWS_REFERENCE" length="255" not-null="true" />
+        <property name="reference" type="string" column="XWS_REFERENCE" length="255" not-null="true" />
         <property name="name" type="string" column="XWS_NAME" length="255" index="SPACE_NAME" not-null="true" />
         <property name="parent" type="string" column="XWS_PARENT" length="255" index="SPACE_PARENT" />
         <property name="hidden" type="boolean" column="XWS_HIDDEN" index="SPACE_HIDDEN" not-null="true" />

@@ -1123,7 +1123,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void maybeDeleteXWikiSpace(SpaceReference spaceReference, String deletedDocument, Session session)
     {
-        if (countAllDocuments(spaceReference, session, "fullName <> ?", deletedDocument) == 0) {
+        if (countAllDocuments(spaceReference, session, "fullName <> ? AND (language IS NULL OR language = '')",
+            deletedDocument) == 0) {
             // The document was the last document in the space
             XWikiSpace space = new XWikiSpace(spaceReference, this);
 

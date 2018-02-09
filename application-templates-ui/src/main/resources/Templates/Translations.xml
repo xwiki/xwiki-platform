@@ -82,7 +82,7 @@ template.templateProvider.simplePage.description=With table of content</content>
       </scope>
     </class>
     <property>
-      <scope>GLOBAL</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
 </xwikidoc>

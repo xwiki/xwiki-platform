@@ -475,3 +475,71 @@ ul.collapsible.document-tree {
   font-weight: normal;
   padding-right: .3em;
 }
+
+@media screen and (min-width: 675px) {
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
+  .dependency-item{
+       height: 7.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 2.962vw;
+  }
+}
+
+@media screen and (min-width: 620px) {
+
+  .dependency-item{
+       height: 12.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 3.962vw;
+  }
+}
+@media screen and (min-width: 475px) {
+
+  .dependency-item{
+       height: 14.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 3.962vw;
+  }
+}
+@media screen and (min-width: 431px) {
+
+  .dependency-item{
+       height: 20.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 3.962vw;
+       padding-left: 5.962vw;
+  }
+}
+@media screen and (min-width: 420px) {
+
+  .dependency-item{
+       height: 27.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 4.962vw;
+  }
+}
+@media screen and (min-width: 357px) {
+
+  .dependency-item{
+       height: 43.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 5.962vw;
+  }
+}
+@media screen and (min-width: 357px) {
+
+  .dependency-item{
+       height: 43.407vw;
+  }
+  .dependency-item .extension-status {
+       padding-top: 5.962vw;
+  }
+}

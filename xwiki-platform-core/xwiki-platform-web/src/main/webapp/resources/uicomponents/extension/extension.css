@@ -489,7 +489,9 @@ ul.collapsible.document-tree {
 }
 
 @media screen and (min-width: 620px) {
-
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
   .dependency-item{
        height: 12.407vw;
   }
@@ -498,7 +500,9 @@ ul.collapsible.document-tree {
   }
 }
 @media screen and (min-width: 475px) {
-
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
   .dependency-item{
        height: 14.407vw;
   }
@@ -507,7 +511,9 @@ ul.collapsible.document-tree {
   }
 }
 @media screen and (min-width: 431px) {
-
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
   .dependency-item{
        height: 20.407vw;
   }
@@ -517,7 +523,9 @@ ul.collapsible.document-tree {
   }
 }
 @media screen and (min-width: 420px) {
-
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
   .dependency-item{
        height: 27.407vw;
   }
@@ -526,7 +534,9 @@ ul.collapsible.document-tree {
   }
 }
 @media screen and (min-width: 357px) {
-
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
   .dependency-item{
        height: 43.407vw;
   }
@@ -535,7 +545,9 @@ ul.collapsible.document-tree {
   }
 }
 @media screen and (min-width: 357px) {
-
+    .extension-header .extension-status {
+        margin: 0 1em;
+    }
   .dependency-item{
        height: 43.407vw;
   }

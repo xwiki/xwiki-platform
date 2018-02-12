@@ -50,6 +50,6 @@ public class TranslationDocumentClassInitializer extends AbstractMandatoryClassI
     protected void createClass(BaseClass xclass)
     {
         xclass.addStaticListField(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, "Scope",
-            "ON_DEMAND|WIKI|USER|GLOBAL");
+            "GLOBAL|WIKI|USER|ON_DEMAND");
     }
 }

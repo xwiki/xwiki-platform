@@ -113,8 +113,9 @@ public class NotificationsTrayPage extends ViewPage
     {
         if (!this.notificationsHeader.isDisplayed()) {
             this.watchListButton.click();
-            waitUntilNotificationsAreLoaded();
+            getDriver().waitUntilElementIsVisible(By.className("notifications-header"));
         }
+        waitUntilNotificationsAreLoaded();
     }
 
     private void waitUntilNotificationsAreLoaded()

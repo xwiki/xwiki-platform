@@ -29,11 +29,13 @@
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
-  <description>Module dealing with actual data representing wiki macros (wiki pages, objects, etc.)</description>
+  <description>Defines the ability to store macros into wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Macro Store</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

@@ -49,9 +49,9 @@
   #if ("$!request.untilDate" != '' &amp;&amp; "$!request.blackList" != '')
     #set ($untilDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.untilDate).longValue()).toDate())
     #set ($blackList = $request.blackList.split(','))
-    #set ($events = $services.notification.sources.getEvents(false, $batchSize, $untilDate, $blackList))
+    #set ($events = $services.notification.sources.getEvents($batchSize, $untilDate, $blackList))
   #else
-    #set ($events = $services.notification.sources.getEvents(false, $batchSize))
+    #set ($events = $services.notification.sources.getEvents($batchSize))
   #end
   #foreach ($status in $services.notification.getCompositeEventStatuses($events))
     #set ($event = $status.compositeEvent)
@@ -78,7 +78,7 @@
     Get the number of unread notifications as JSON
 ********************************************************#
 #elseif ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
-  $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(true, 21)})
+  $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
 #********************************************************
              Mark a notification as read
 ********************************************************#

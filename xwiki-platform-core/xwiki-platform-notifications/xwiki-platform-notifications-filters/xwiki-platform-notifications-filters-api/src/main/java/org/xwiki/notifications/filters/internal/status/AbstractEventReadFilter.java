@@ -76,7 +76,7 @@ public abstract class AbstractEventReadFilter implements NotificationFilter, Tog
     public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
             NotificationFormat format)
     {
-        if (format == this.format) {
+        if (type == NotificationFilterType.EXCLUSIVE && format == this.format) {
             return not(new InListOfReadEventsNode(user));
         }
         return null;

@@ -55,7 +55,6 @@ import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -373,19 +372,6 @@ public class QueryGenerator
                 new PropertyValueNode(EventProperty.DATE),
                 OrderByNode.Order.DESC
         );
-    }
-
-    private AbstractOperatorNode handleEventStatus(boolean onlyUnread, DocumentReference user,
-            AbstractOperatorNode topNode)
-    {
-        if (onlyUnread) {
-            return topNode.and(
-                    new NotNode(
-                            new InListOfReadEventsNode(user)
-                    )
-            );
-        }
-        return topNode;
     }
 
     private AbstractOperatorNode handleHiddenEvents(AbstractOperatorNode topNode)

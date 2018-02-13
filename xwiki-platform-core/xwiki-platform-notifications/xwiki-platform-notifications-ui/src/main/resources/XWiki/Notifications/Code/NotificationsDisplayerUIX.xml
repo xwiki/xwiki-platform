@@ -369,11 +369,22 @@
   };
   
   /**
+   * Display a "no notification" message.
+   */
+  var displayNoNotification = function () {
+    $('.notifications-area').removeClass('loading').html($('&lt;p&gt;').addClass('text-center noitems').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+  };
+  
+  /**
    * Get the number of unread notifications.
    */
   var getUnreadNotificationsCount = function () {
     $.getJSON(url, {action: 'getUnreadCount'}).done(function (data) {
       updateNotificationCount(data.unread);
+      // Display the "nothing!" message if there is no notification
+      if (data.unread == 0) {
+         displayNoNotification();
+      }
     });
   };
 
@@ -398,7 +409,7 @@
       $('.notifications-load-more').remove();
       // Display the "nothing!" message if there is no notification
       if (data.notifications.length == 0 &amp;&amp; !untilDate) {
-        area.html($('&lt;p&gt;').addClass('text-center noitems').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+        displayNoNotification();
       } else if (untilDate == 0) {
         // Display the clean button if there is some notification, but only the first time (not when clicking on
         // "load more notification") otherwise we would have several clean buttons which would be useless and painful.
@@ -444,7 +455,7 @@
      */
     var notificationsMenusHasBeenOpened = false;
     $('#tmNotifications').on('show.bs.dropdown', function () {
-      if (!notificationsMenusHasBeenOpened) {
+      if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount &gt; 0) {
         loadNotifications(0);
       }
       notificationsMenusHasBeenOpened = true;

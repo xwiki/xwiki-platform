@@ -62,6 +62,10 @@ notifications.filters.name.systemUserNotificationFilter=System Filter
 notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user
 notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
 notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity
+notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
+notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
+notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
+notifications.filters.description.eventReadEmailFilter=Hide notifications that you have marked as read
 
 ## Filter Types
 notifications.filters.type.inclusive=Inclusive

@@ -17,55 +17,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.user;
+package org.xwiki.notifications.filters.internal.status;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
-import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
-
 /**
- * Filter used to hide events sent by the current user.
+ * Abstract implementation of EventReadFilter.
  *
  * @version $Id$
- * @since 9.11RC1
+ * @since 10.1RC1
  */
-@Component
-@Singleton
-@Named(OwnEventFilter.FILTER_NAME)
-public class OwnEventFilter implements NotificationFilter, ToggleableNotificationFilter
+public abstract class AbstractEventReadFilter implements NotificationFilter, ToggleableNotificationFilter
 {
-    /**
-     * Name of the filter.
-     */
-    public static final String FILTER_NAME = "ownEventsNotificationFilter";
+    private String filterName;
 
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
+    private NotificationFormat format;
+
+    /**
+     * Construct an AbstractEventReadFilter.
+     * @param filterName name of the filter
+     * @param format format on which the filter applies
+     */
+    public AbstractEventReadFilter(String filterName, NotificationFormat format)
+    {
+        this.filterName = filterName;
+        this.format = format;
+    }
 
     @Override
     public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return user.equals(event.getUser());
+        // We only handle it at the expression level to avoid too much accesses to the database
+        return false;
     }
 
     @Override
     public boolean matchesPreference(NotificationPreference preference)
     {
-        // As the filter is applied globally, it’s not bound to any preference
         return false;
     }
 
@@ -79,8 +74,8 @@ public class OwnEventFilter implements NotificationFilter, ToggleableNotificatio
     public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
             NotificationFormat format)
     {
-        if (type == NotificationFilterType.EXCLUSIVE) {
-            return value(EventProperty.USER).notEq(value(serializer.serialize(user)));
+        if (format == this.format) {
+            return new InListOfReadEventsNode(user);
         }
         return null;
     }
@@ -88,6 +83,12 @@ public class OwnEventFilter implements NotificationFilter, ToggleableNotificatio
     @Override
     public String getName()
     {
-        return FILTER_NAME;
+        return filterName;
+    }
+
+    @Override
+    public boolean isEnabledByDefault()
+    {
+        return false;
     }
 }

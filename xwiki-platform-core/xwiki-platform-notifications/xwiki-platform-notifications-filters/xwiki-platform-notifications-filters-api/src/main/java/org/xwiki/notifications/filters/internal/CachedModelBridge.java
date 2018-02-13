@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -82,8 +83,7 @@ public class CachedModelBridge implements ModelBridge
     }
 
     @Override
-    public Set<String> getDisabledNotificationFiltersHints(DocumentReference user)
-            throws NotificationException
+    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
     {
         // We need to store the user reference in the cache's key, otherwise all users of the same context will share
         // the same cache, which can happen when a notification email is triggered.
@@ -92,13 +92,13 @@ public class CachedModelBridge implements ModelBridge
 
         ExecutionContext context = execution.getContext();
         if (context.hasProperty(contextEntry)) {
-            return (Set<String>) context.getProperty(contextEntry);
+            return (Map<String, Boolean>) context.getProperty(contextEntry);
         }
 
-        Set<String> disabledFiltersHints = modelBridge.getDisabledNotificationFiltersHints(user);
-        context.setProperty(contextEntry, disabledFiltersHints);
+        Map<String, Boolean> values = modelBridge.getToggeableFilterActivations(user);
+        context.setProperty(contextEntry, values);
 
-        return disabledFiltersHints;
+        return values;
     }
 
     @Override

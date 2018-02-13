@@ -46,6 +46,7 @@ import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperato
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractUnaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
+import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
 import org.xwiki.text.StringUtils;
 
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;

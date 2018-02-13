@@ -115,10 +115,10 @@ public class DefaultPeriodicMimeMessageIteratorTest
         CompositeEvent event1 = mock(CompositeEvent.class);
         CompositeEvent event2 = mock(CompositeEvent.class);
 
-        when(notificationManager.getEvents("xwiki:XWiki.UserA", NotificationFormat.EMAIL, false,
+        when(notificationManager.getEvents("xwiki:XWiki.UserA", NotificationFormat.EMAIL,
                 Integer.MAX_VALUE / 4, null, new Date(0L), Collections.emptyList()))
                 .thenReturn(Arrays.asList(event1));
-        when(notificationManager.getEvents("xwiki:XWiki.UserC", NotificationFormat.EMAIL, false,
+        when(notificationManager.getEvents("xwiki:XWiki.UserC", NotificationFormat.EMAIL,
                 Integer.MAX_VALUE / 4, null, new Date(0L), Collections.emptyList()))
                 .thenReturn(Arrays.asList(event2));
 

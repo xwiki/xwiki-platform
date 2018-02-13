@@ -56,34 +56,32 @@ public class NotificationSourcesScriptService implements ScriptService
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * @param onyUnread either or not to return only unread events
      * @param expectedCount number of expected events
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
+     * @since 10.1RC1
      */
-    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount) throws NotificationException
+    public List<CompositeEvent> getEvents(int expectedCount) throws NotificationException
     {
         return notificationManager.getEvents(
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onyUnread,
                 expectedCount
         );
     }
 
     /**
-     * @param onyUnread either or not to return only unread events
      * @param expectedCount number of expected events
      * @param untilDate do not return events happened after this date
      * @param blackList array of events id to exclude from the search
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
+     * @since 10.1RC1
      */
-    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, String[] blackList)
+    public List<CompositeEvent> getEvents(int expectedCount, Date untilDate, String[] blackList)
             throws NotificationException
     {
         return notificationManager.getEvents(
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onyUnread,
                 expectedCount,
                 untilDate,
                 Arrays.asList(blackList)
@@ -91,19 +89,17 @@ public class NotificationSourcesScriptService implements ScriptService
     }
 
     /**
-     * @param onyUnread either or not to return only unread events
      * @param expectedCount number of expected events
      * @param untilDate do not return events happened after this date
      * @param blackList list of events id to exclude from the search
      * @return the matching events for the current user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      */
-    public List<CompositeEvent> getEvents(boolean onyUnread, int expectedCount, Date untilDate, List<String> blackList)
+    public List<CompositeEvent> getEvents(int expectedCount, Date untilDate, List<String> blackList)
             throws NotificationException
     {
         return notificationManager.getEvents(
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onyUnread,
                 expectedCount,
                 untilDate,
                 blackList
@@ -113,16 +109,14 @@ public class NotificationSourcesScriptService implements ScriptService
     /**
      * Return the number of events to display as notifications concerning the current user.
      *
-     * @param onlyUnread either if only unread events should be counted or all events
      * @param maxCount maximum number of events to count
      * @return the list of events to display as notifications
      * @throws NotificationException if an error happens
      */
-    public long getEventsCount(boolean onlyUnread, int maxCount) throws NotificationException
+    public long getEventsCount(int maxCount) throws NotificationException
     {
         return notificationManager.getEventsCount(
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                onlyUnread,
                 maxCount
         );
     }

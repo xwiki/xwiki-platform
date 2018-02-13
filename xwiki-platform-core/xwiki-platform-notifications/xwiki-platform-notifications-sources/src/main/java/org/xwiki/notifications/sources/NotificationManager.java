@@ -43,48 +43,47 @@ public interface NotificationManager
      * Return events to display as notifications concerning the specified user.
      *
      * @param userId id of the user
-     * @param onlyUnread if only unread events should be returned
      * @param expectedCount the maximum events to return
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
+     * @since 10.1RC1
      */
-    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount) throws NotificationException;
+    List<CompositeEvent> getEvents(String userId, int expectedCount) throws NotificationException;
 
     /**
      * Return events to display as notifications concerning the specified user.
      *
      * @param userId id of the user
-     * @param onlyUnread if only unread events should be returned
      * @param expectedCount the maximum events to return
      * @param untilDate do not return events happened after this date
      * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
+     * @since 10.1RC1
      */
-    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
+    List<CompositeEvent> getEvents(String userId, int expectedCount, Date untilDate, List<String> blackList)
+            throws NotificationException;
+
+    /**
+     * Return events to display as notifications concerning the specified user.
+     *
+     * @param userId id of the user
+     * @param expectedCount the maximum events to return
+     * @param untilDate do not return events happened after this date
+     * @param fromDate do not return events happened before this date
+     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
+     * @return the matching events for the user, could be less than expectedCount but not more
+     * @throws NotificationException if error happens
+     * @since 10.1RC1
+     */
+    List<CompositeEvent> getEvents(String userId, int expectedCount, Date untilDate, Date fromDate,
             List<String> blackList) throws NotificationException;
 
     /**
      * Return events to display as notifications concerning the specified user.
      *
      * @param userId id of the user
-     * @param onlyUnread if only unread events should be returned
-     * @param expectedCount the maximum events to return
-     * @param untilDate do not return events happened after this date
-     * @param fromDate do not return events happened before this date
-     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
-     * @return the matching events for the user, could be less than expectedCount but not more
-     * @throws NotificationException if error happens
-     */
-    List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
-            Date fromDate, List<String> blackList) throws NotificationException;
-
-    /**
-     * Return events to display as notifications concerning the specified user.
-     *
-     * @param userId id of the user
      * @param format format of the notifications
-     * @param onlyUnread if only unread events should be returned
      * @param expectedCount the maximum events to return
      * @param untilDate do not return events happened after this date
      * @param fromDate do not return events happened before this date
@@ -92,21 +91,22 @@ public interface NotificationManager
      * @return the matching events for the user, could be less than expectedCount but not more
      * @throws NotificationException if error happens
      *
-     * @since 9.5RC1
+     * @since 10.1RC1
      */
-    List<CompositeEvent> getEvents(String userId, NotificationFormat format, boolean onlyUnread, int expectedCount,
-            Date untilDate, Date fromDate, List<String> blackList) throws NotificationException;
+    List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
+            Date fromDate, List<String> blackList) throws NotificationException;
 
     /**
      * Return the number of events to display as notifications concerning the specified user.
      *
      * @param userId id of the user
-     * @param onlyUnread either if only unread events should be counted or all events
      * @param maxCount maximum number of events to count
      * @return the list of events to display as notifications
      * @throws NotificationException if an error happens
+     *
+     * @since 10.1RC1
      */
-    long getEventsCount(String userId, boolean onlyUnread, int maxCount) throws NotificationException;
+    long getEventsCount(String userId, int maxCount) throws NotificationException;
 
     /**
      * Set the start date for every notification preference of the given user.

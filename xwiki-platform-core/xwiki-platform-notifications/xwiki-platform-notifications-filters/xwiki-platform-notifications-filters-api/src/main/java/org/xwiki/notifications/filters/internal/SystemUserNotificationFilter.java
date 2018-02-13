@@ -49,8 +49,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Component
 @Singleton
 @Named(SystemUserNotificationFilter.FILTER_NAME)
-@ToggleableNotificationFilter
-public class SystemUserNotificationFilter implements NotificationFilter
+public class SystemUserNotificationFilter implements NotificationFilter, ToggleableNotificationFilter
 {
     /**
      * The name of the filter.

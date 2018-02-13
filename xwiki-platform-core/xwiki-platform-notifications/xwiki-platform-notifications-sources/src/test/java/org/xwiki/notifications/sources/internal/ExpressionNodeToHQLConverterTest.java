@@ -42,6 +42,7 @@ import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
+import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.text.StringUtils;
 

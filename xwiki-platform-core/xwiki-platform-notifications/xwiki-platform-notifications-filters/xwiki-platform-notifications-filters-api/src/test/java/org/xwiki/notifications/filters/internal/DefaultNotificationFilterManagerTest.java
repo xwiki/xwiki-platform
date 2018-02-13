@@ -22,7 +22,9 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -132,9 +134,10 @@ public class DefaultNotificationFilterManagerTest
                 .thenReturn(Collections.singletonMap("1", disabledFilter));
 
         when(disabledFilter.getName()).thenReturn(SystemUserNotificationFilter.FILTER_NAME);
+        Map<String, Boolean> filterActivations = new HashMap<>();
+        filterActivations.put(SystemUserNotificationFilter.FILTER_NAME, false);
 
-        when(modelBridge.getDisabledNotificationFiltersHints(testUser))
-                .thenReturn(Collections.singleton(SystemUserNotificationFilter.FILTER_NAME));
+        when(modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
 
         Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getAllFilters(testUser);
 

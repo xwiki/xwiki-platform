@@ -17,40 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal;
+package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationFormat;
 
 /**
- * This interface characterise a notification filter that can be enabled or disabled in the preferences of every user.
+ * Filter that is applied to the notification emails and that remove events that the user have marked as read.
  *
  * @version $Id$
  * @since 10.1RC1
  */
-public interface ToggleableNotificationFilter
+@Component
+@Singleton
+@Named(EventReadEmailFilter.FILTER_NAME)
+public class EventReadEmailFilter extends AbstractEventReadFilter
 {
     /**
-     * @return either or not this filter should be enabled by default
+     * Name of the filter.
      */
-    default boolean isEnabledByDefault() {
-        return true;
-    }
+    public static final String FILTER_NAME = "eventReadEmailFilter";
 
     /**
-     * @return the formats handled by this filter
+     * Construct an EventReadEmailFilter.
      */
-    default List<NotificationFormat> getFormats() {
-        return Arrays.asList(NotificationFormat.values());
+    public EventReadEmailFilter()
+    {
+        super(FILTER_NAME, NotificationFormat.EMAIL);
     }
 
-    /**
-     * @return the events handled by this filter
-     */
-    default List<String> getEventTypes() {
-        return Collections.emptyList();
+    @Override
+    public List<NotificationFormat> getFormats()
+    {
+        return Collections.singletonList(NotificationFormat.EMAIL);
     }
 }

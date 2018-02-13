@@ -40,9 +40,15 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($discard = $response.setContentType('application/xml'))
-#set($result = $services.notification.notifiers.getFeed(20, false))
-$result
+#if ($xcontext.action == 'get' &amp;&amp; "$request.outputSyntax" == 'plain')
+  #set($discard = $response.setContentType('application/xml'))
+#else
+  {{code language="xml"}}
+#end
+$services.notification.notifiers.getFeed(20)
+#if ($xcontext.action != 'get' || "$request.outputSyntax" != 'plain')
+  {{/code}}
+#end
 {{/velocity}}
 </content>
 </xwikidoc>

@@ -193,7 +193,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
 
-            if (!filter.getClass().isAnnotationPresent(ToggleableNotificationFilter.class)) {
+            if (!(filter instanceof ToggleableNotificationFilter)) {
                 it.remove();
             }
         }
@@ -309,13 +309,13 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     {
         Iterator<NotificationFilter> it = filters.iterator();
 
-        Set<String> disabledFiltersHints = modelBridge.getDisabledNotificationFiltersHints(user);
+        Map<String, Boolean> filterActivations = modelBridge.getToggeableFilterActivations(user);
 
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
 
-            if (filter.getClass().isAnnotationPresent(ToggleableNotificationFilter.class)
-                    && disabledFiltersHints.contains(filter.getName())) {
+            if (filter instanceof ToggleableNotificationFilter && filterActivations.containsKey(filter.getName())
+                    && !filterActivations.get(filter.getName())) {
                 it.remove();
             }
         }

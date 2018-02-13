@@ -28,6 +28,8 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
+
 /**
  * Abstract implementation of EventReadFilter.
  *
@@ -75,7 +77,7 @@ public abstract class AbstractEventReadFilter implements NotificationFilter, Tog
             NotificationFormat format)
     {
         if (format == this.format) {
-            return new InListOfReadEventsNode(user);
+            return not(new InListOfReadEventsNode(user));
         }
         return null;
     }

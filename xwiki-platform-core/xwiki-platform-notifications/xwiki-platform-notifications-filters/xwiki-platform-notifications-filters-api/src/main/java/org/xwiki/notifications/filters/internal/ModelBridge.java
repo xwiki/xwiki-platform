@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
@@ -46,13 +47,14 @@ public interface ModelBridge
     Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
 
     /**
-     * Get all the notification filters that are marked as disabled in the user profile.
+     * For all toggeable notification filters, get if the filter is enabled regarding the user profile.
      *
      * @param user the user to use
-     * @return a set of ToggleableNotificationFilters names that are marked as disabled
+     * @return a map of notification filters with their activation state
      * @throws NotificationException if an error happens
+     * @since 10.1RC1
      */
-    Set<String> getDisabledNotificationFiltersHints(DocumentReference user) throws NotificationException;
+    Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException;
 
     /**
      * Delete a filter preference.

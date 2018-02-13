@@ -70,13 +70,17 @@
   #set ($index = $index + 1)
   ## Optimization to render only displayed rows (between $offset and $limitOffset)
   #if ($index &gt; $offset and $index &lt;= $limitOffset)
-    #set ($checked = 'checked = "checked"')
+    #set ($checked = $filter.isEnabledByDefault())
     #set ($objectNumber = '')
-    #foreach ($obj in $document.getObjects('XWiki.Notifications.Code.ToggleableFilterPreferenceClass'))
-      #if ($filter.name.equals($obj.getValue('filterName')) &amp;&amp; $obj.getValue('isEnabled') == 0)
-        #set ($checked = '')
-        #set ($objectNumber = $!obj.reference.objectNumber)
-      #end
+    #set ($obj = $document.getObject('XWiki.Notifications.Code.ToggleableFilterPreferenceClass', 'filterName', $filter.name))
+    #if ($obj)
+      #set ($checked = $obj.getValue('isEnabled') != 0)
+      #set ($objectNumber = $!obj.reference.objectNumber)
+    #end
+    #if ($checked)
+      #set ($checked = 'checked = "checked"')
+    #else
+      #set ($checked = '')
     #end
     #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
     #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
@@ -84,8 +88,8 @@
       'filterPreferenceName': $name,
       'name'                : $name,
       'filterType'          : $services.localization.render("notifications.filters.description.$filter.name"),
-      'eventTypes'          : '',
-      'notificationFormats' : '',
+      'eventTypes'          : "#displayNotificationsEventTypeList($filter.eventTypes)",
+      'notificationFormats' : "#displayNotificationFormatsList($filter.formats)",
       'isEnabled'           : $checkbox,
       'doc_viewable'        : true,
       'doc_hasdelete'       : false
@@ -120,28 +124,9 @@
       ## Optimization to render only displayed rows (between $offset and $limitOffset)
       #if ($index &gt; $offset and $index &lt;= $limitOffset)
         #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
-        ## Compute the list of event types
-        #set($eventTypeList = '&lt;ul class="list-unstyled"&gt;')
-        #if ($preference.getProperties('EVENT_TYPE').isEmpty())
-          #set ($eventTypeList = $escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents')))
-        #else
-          #set ($types = {})
-          #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-            #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
-          #end
-          #foreach ($eventType in $preference.getProperties('EVENT_TYPE'))
-            #set ($eventTypeList = $eventTypeList + '&lt;li&gt;' + $types.get($eventType) + '&lt;/li&gt;')
-          #end
-        #end
-        #set($eventTypeList = $eventTypeList + '&lt;/ul&gt;')
-        ## Compute the list of notification formats
-        #set($notificationFormatsList = '&lt;ul class="list-unstyled"&gt;')
-        #foreach ($notificationFormat in $preference.getFilterFormats())
-          #set ($notificationFormatsList = $notificationFormatsList + '&lt;li&gt;' + $services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()") + '&lt;/li&gt;')
-        #end
-        #set($notificationFormatsList = $notificationFormatsList + '&lt;/ul&gt;')
         #set ($isEnabled = '')
         #set ($isDisabled = '')
+        ## The watchlist bridge does not handle disabling a specific filter
         #if ($preference.filterPreferenceName.startsWith('watchlist_'))
           #set ($isDisabled = 'disabled = "disabled"')
         #end
@@ -153,8 +138,8 @@
           'filterPreferenceName': $preference.filterPreferenceName,
           'name'                : $display,
           'filterType'          : $services.localization.render("notifications.filters.type.$!preference.getFilterType().name().toLowerCase()"),
-          'eventTypes'          : $eventTypeList,
-          'notificationFormats' : $notificationFormatsList,
+          'eventTypes'          : "#displayNotificationsEventTypeList($preference.getProperties('EVENT_TYPE'))",
+          'notificationFormats' : "#displayNotificationFormatsList($preference.getFilterFormats())",
           'isEnabled'           : $isEnabled,
           'doc_viewable'        : true
         })
@@ -163,7 +148,6 @@
     #end
   #end
 #end
-
 ##
 ## JSON.
 ##
@@ -179,6 +163,31 @@ $jsontool.serialize({
   'offset'      : $offset,
   'rows'        : $elements
 })
+#end
+##
+## MACROS
+##
+#macro (displayNotificationsEventTypeList $list)
+  &lt;ul class="list-unstyled"&gt;
+  #if ($list.isEmpty())
+    &lt;li&gt;$escapetool.xml($services.localization.render('notifications.filters.preferences.allEvents'))&lt;/li&gt;
+  #else
+    #set ($types = {})
+    #foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
+      #set ($discard = $types.put($descriptor.eventType, "$!services.localization.render($descriptor.description)"))
+    #end
+    #foreach ($eventType in $list)
+      &lt;li&gt;$escapetool.xml($types.get($eventType))&lt;/li&gt;
+    #end
+  #end
+  &lt;/ul&gt;
+#end
+#macro (displayNotificationFormatsList $formatList)
+  &lt;ul class="list-unstyled"&gt;
+  #foreach ($notificationFormat in $formatList)
+    &lt;li&gt;$services.localization.render("notifications.format.$!notificationFormat.name().toLowerCase()")&lt;/li&gt;
+  #end
+  &lt;/ul&gt;
 #end
 {{/velocity}}</content>
 </xwikidoc>

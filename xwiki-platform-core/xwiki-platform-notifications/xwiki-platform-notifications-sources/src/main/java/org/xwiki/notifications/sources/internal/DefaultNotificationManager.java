@@ -92,20 +92,17 @@ public class DefaultNotificationManager implements NotificationManager
     {
         public DocumentReference userReference;
         public NotificationFormat format;
-        public boolean onlyUnread;
         public int expectedCount;
         public Date endDate;
         public Date fromDate;
         public List<String> blackList;
         private String userId;
 
-        Parameters(DocumentReference userReference, NotificationFormat format, boolean onlyUnread,
-                int expectedCount,
+        Parameters(DocumentReference userReference, NotificationFormat format, int expectedCount,
                 Date endDate, Date fromDate, List<String> blackList)
         {
             this.userReference = userReference;
             this.format = format;
-            this.onlyUnread = onlyUnread;
             this.expectedCount = expectedCount;
             this.endDate = endDate;
             this.fromDate = fromDate;
@@ -115,14 +112,13 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount)
+    public List<CompositeEvent> getEvents(String userId, int expectedCount)
             throws NotificationException
     {
         return getEvents(new ArrayList<>(),
                 new Parameters(
                     documentReferenceResolver.resolve(userId),
                     NotificationFormat.ALERT,
-                    onlyUnread,
                     expectedCount,
                     null,
                     null,
@@ -132,14 +128,13 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int count, Date untilDate,
-            List<String> blackList) throws NotificationException
+    public List<CompositeEvent> getEvents(String userId, int count, Date untilDate, List<String> blackList)
+            throws NotificationException
     {
         return getEvents(new ArrayList<>(),
                 new Parameters(
                         documentReferenceResolver.resolve(userId),
                         NotificationFormat.ALERT,
-                        onlyUnread,
                         count,
                         untilDate,
                         null,
@@ -149,14 +144,13 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public List<CompositeEvent> getEvents(String userId, boolean onlyUnread, int expectedCount, Date untilDate,
-            Date fromDate, List<String> blackList) throws NotificationException
+    public List<CompositeEvent> getEvents(String userId, int expectedCount, Date untilDate, Date fromDate,
+            List<String> blackList) throws NotificationException
     {
         return getEvents(new ArrayList<>(),
                 new Parameters(
                         documentReferenceResolver.resolve(userId),
                         NotificationFormat.ALERT,
-                        onlyUnread,
                         expectedCount,
                         untilDate,
                         fromDate,
@@ -166,14 +160,13 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public List<CompositeEvent> getEvents(String userId, NotificationFormat format, boolean onlyUnread,
-            int expectedCount, Date untilDate, Date fromDate, List<String> blackList) throws NotificationException
+    public List<CompositeEvent> getEvents(String userId, NotificationFormat format, int expectedCount, Date untilDate,
+            Date fromDate, List<String> blackList) throws NotificationException
     {
         return getEvents(new ArrayList<>(),
                 new Parameters(
                         documentReferenceResolver.resolve(userId),
                         format,
-                        onlyUnread,
                         expectedCount,
                         untilDate,
                         fromDate,
@@ -183,7 +176,7 @@ public class DefaultNotificationManager implements NotificationManager
     }
 
     @Override
-    public long getEventsCount(String userId, boolean onlyUnread, int maxCount) throws NotificationException
+    public long getEventsCount(String userId, int maxCount) throws NotificationException
     {
         DocumentReference user = documentReferenceResolver.resolve(userId);
 
@@ -191,7 +184,6 @@ public class DefaultNotificationManager implements NotificationManager
                 new Parameters(
                         user,
                         NotificationFormat.ALERT,
-                        onlyUnread,
                         maxCount,
                         null,
                         null,
@@ -210,8 +202,8 @@ public class DefaultNotificationManager implements NotificationManager
         final int batchSize = parameters.expectedCount * 2;
         try {
             // Create the query
-            Query query = queryGenerator.generateQuery(parameters.userReference, parameters.format,
-                    parameters.onlyUnread, parameters.endDate, parameters.fromDate, parameters.blackList);
+            Query query = queryGenerator.generateQuery(parameters.userReference, parameters.format, parameters.endDate,
+                    parameters.fromDate, parameters.blackList);
             if (query == null) {
                 return Collections.emptyList();
             }

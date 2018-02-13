@@ -62,7 +62,7 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
         return notificationManager.getEvents(serializer.serialize(user),
-                NotificationFormat.EMAIL, false, Integer.MAX_VALUE / 4, null,
+                NotificationFormat.EMAIL, Integer.MAX_VALUE / 4, null,
                 lastTrigger, Collections.emptyList());
     }
 }

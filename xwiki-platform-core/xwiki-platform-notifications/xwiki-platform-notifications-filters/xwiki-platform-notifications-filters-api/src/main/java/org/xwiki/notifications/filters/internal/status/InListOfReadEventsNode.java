@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.sources.internal;
+package org.xwiki.notifications.filters.internal.status;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
@@ -26,7 +26,7 @@ import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
  * Special node to filter on events that has been read by the given user.
  *
  * @version $Id$
- * @since 9.8RC1
+ * @since 10.1RC1
  */
 public class InListOfReadEventsNode extends AbstractOperatorNode
 {

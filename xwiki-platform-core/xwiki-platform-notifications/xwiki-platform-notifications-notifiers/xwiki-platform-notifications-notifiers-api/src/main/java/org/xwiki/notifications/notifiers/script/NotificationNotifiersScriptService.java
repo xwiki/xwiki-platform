@@ -78,14 +78,15 @@ public class NotificationNotifiersScriptService implements ScriptService
      * Get the RSS notifications feed of the given user.
      *
      * @param entryNumber number of entries to get
-     * @param onlyUnread if only unread events should be returned
      * @return the notifications RSS feed
      * @throws NotificationException if an error occurs
+     *
+     * @since 10.1RC1
      */
-    public String getFeed(int entryNumber, boolean onlyUnread) throws NotificationException
+    public String getFeed(int entryNumber) throws NotificationException
     {
         String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
-        return this.getFeed(userId, entryNumber, onlyUnread);
+        return this.getFeed(userId, entryNumber);
     }
 
     /**
@@ -93,16 +94,17 @@ public class NotificationNotifiersScriptService implements ScriptService
      *
      * @param userId id of the user
      * @param entryNumber number of entries to get
-     * @param onlyUnread if only unread events should be returned
      * @return the notifications RSS feed
      * @throws NotificationException if an error occurs
+     *
+     * @since 10.1RC1
      */
-    public String getFeed(String userId, int entryNumber, boolean onlyUnread) throws NotificationException
+    public String getFeed(String userId, int entryNumber) throws NotificationException
     {
         SyndFeedOutput output = new SyndFeedOutput();
         try {
             return output.outputString(this.notificationRSSManager.renderFeed(
-                    this.notificationManager.getEvents(userId, onlyUnread, entryNumber)));
+                    this.notificationManager.getEvents(userId, entryNumber)));
         } catch (Exception e) {
             throw new NotificationException("Unable to render RSS feed", e);
         }

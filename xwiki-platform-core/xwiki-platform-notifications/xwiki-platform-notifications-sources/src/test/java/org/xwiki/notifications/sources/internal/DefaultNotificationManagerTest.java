@@ -49,7 +49,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -92,8 +91,7 @@ public class DefaultNotificationManagerTest
         when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
         query = mock(Query.class);
         when(queryGenerator.generateQuery(any(DocumentReference.class), any(NotificationFormat.class),
-                anyBoolean(), nullable(Date.class),
-                nullable(Date.class), nullable(List.class))).thenReturn(query);
+                nullable(Date.class), nullable(Date.class), nullable(List.class))).thenReturn(query);
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
         when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
@@ -135,7 +133,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 2);
 
         // Verify
         assertEquals(2, results.size());
@@ -161,7 +159,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 2);
 
         // Verify
         assertEquals(0, results.size());
@@ -173,13 +171,12 @@ public class DefaultNotificationManagerTest
         // Mocks
         NotificationException exception = new NotificationException("Error");
         when(queryGenerator.generateQuery(eq(userReference), any(NotificationFormat.class),
-                eq(true), isNull(),
-                isNull(), any(List.class))).thenThrow(exception);
+                isNull(), isNull(), any(List.class))).thenThrow(exception);
 
         // Test
         NotificationException caughtException = null;
         try {
-            mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+            mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 2);
         } catch (NotificationException e) {
             caughtException = e;
         }
@@ -203,7 +200,7 @@ public class DefaultNotificationManagerTest
                 Arrays.asList(event1, event2, event2, event1, event3));
 
         // Test
-        long result = mocker.getComponentUnderTest().getEventsCount("xwiki:XWiki.UserA", true, 5);
+        long result = mocker.getComponentUnderTest().getEventsCount("xwiki:XWiki.UserA", 5);
 
         // Verify
         assertEquals(5, result);
@@ -242,7 +239,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 2);
 
         // Verify
         assertEquals(1, results.size());
@@ -282,7 +279,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 2);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 2);
 
         // Verify
         assertEquals(1, results.size());
@@ -330,7 +327,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 5);
 
         // Verify
         assertEquals(2, results.size());
@@ -371,7 +368,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 5);
 
         // Verify
         assertEquals(1, results.size());
@@ -486,7 +483,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 50);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 50);
 
         // Verify
         assertEquals(4, results.size());
@@ -548,7 +545,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 50);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 50);
 
         // Verify
         assertEquals(1, results.size());
@@ -599,7 +596,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 5);
 
         // Verify
         assertEquals(2, results.size());
@@ -655,7 +652,7 @@ public class DefaultNotificationManagerTest
 
         // Test
         List<CompositeEvent> results
-                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", true, 5);
+                = mocker.getComponentUnderTest().getEvents("xwiki:XWiki.UserA", 5);
 
         assertEquals(1, results.size());
 

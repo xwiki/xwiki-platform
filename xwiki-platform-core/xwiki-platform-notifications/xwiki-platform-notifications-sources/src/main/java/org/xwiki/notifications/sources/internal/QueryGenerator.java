@@ -55,6 +55,7 @@ import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
+import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -99,7 +100,6 @@ public class QueryGenerator
      *
      * @param user user interested in the notifications
      * @param format only match notifications enabled for that format
-     * @param onlyUnread if only unread events should be returned
      * @param endDate do not return events happened after this date
      * @param startDate do not return events happened before this date. Note that since 9.7RC1, this start date is
      * completely optional, {@link NotificationPreference#getStartDate()} should be used for more granular control on
@@ -109,12 +109,11 @@ public class QueryGenerator
      * @throws NotificationException if error happens
      * @throws QueryException if error happens
      */
-    public Query generateQuery(DocumentReference user, NotificationFormat format, boolean onlyUnread,
-            Date endDate,
-            Date startDate, List<String> blackList) throws NotificationException, QueryException
+    public Query generateQuery(DocumentReference user, NotificationFormat format, Date endDate, Date startDate,
+            List<String> blackList) throws NotificationException, QueryException
     {
         ExpressionNodeToHQLConverter.HQLQuery result = hqlConverter.parse(
-                generateQueryExpression(user, format, onlyUnread, endDate, startDate, blackList)
+                generateQueryExpression(user, format, endDate, startDate, blackList)
         );
         if (result.getQuery().isEmpty()) {
             return null;
@@ -133,7 +132,6 @@ public class QueryGenerator
      *
      * @param user user interested in the notifications
      * @param format only match notifications enabled for that format
-     * @param onlyUnread if only unread events should be returned
      * @param endDate do not return events happened after this date
      * @param startDate do not return events happened before this date. Note that since 9.7RC1, this start date is
      * completely optional, {@link NotificationPreference#getStartDate()} should be used for more granular control on
@@ -146,12 +144,12 @@ public class QueryGenerator
      *
      * @since 9.8RC1
      */
-    public ExpressionNode generateQueryExpression(DocumentReference user, NotificationFormat format, boolean onlyUnread,
-            Date endDate, Date startDate, List<String> blackList) throws NotificationException, QueryException
+    public ExpressionNode generateQueryExpression(DocumentReference user, NotificationFormat format, Date endDate,
+            Date startDate, List<String> blackList) throws NotificationException, QueryException
     {
         // First: get the active preferences of the given user
-        List<NotificationPreference> preferences = notificationPreferenceManager.getPreferences(
-                user, true, format);
+        List<NotificationPreference> preferences = notificationPreferenceManager.getPreferences(user, true,
+                format);
 
         // Ensure that we have at least one filter preference that is active
         if (preferences.isEmpty()
@@ -206,7 +204,6 @@ public class QueryGenerator
         topNode = handleBlackList(blackList, topNode);
         topNode = handleEndDate(endDate, topNode);
         topNode = handleHiddenEvents(topNode);
-        topNode = handleEventStatus(onlyUnread, user, topNode);
         topNode = handleWiki(user, topNode);
         topNode = handleOrder(topNode);
 

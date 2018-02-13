@@ -34,11 +34,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -100,6 +102,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private ComponentManager componentManager;
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
@@ -176,34 +181,38 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public Set<String> getDisabledNotificationFiltersHints(DocumentReference userReference)
-            throws NotificationException
+    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationPreferencesScopeClass
-                = TOGGLEABLE_FILTER_PREFERENCE_CLASS.setWikiReference(userReference.getWikiReference());
+                = TOGGLEABLE_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
-        Set<String> disabledFilters = new HashSet<>();
+        Map<String, Boolean> filterStatus = new HashMap<>();
 
         try {
-            XWikiDocument doc = xwiki.getDocument(userReference, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesScopeClass);
-            if (preferencesObj != null) {
-                for (BaseObject obj : preferencesObj) {
-                    if (obj.getIntValue(FIELD_IS_ENABLED, 1) == 0) {
-                        disabledFilters.add(obj.getStringValue(FIELD_FILTER_NAME));
+            XWikiDocument doc = xwiki.getDocument(user, context);
+            for (NotificationFilter filter : componentManager.<NotificationFilter>getInstanceList(
+                    NotificationFilter.class)) {
+                if (filter instanceof ToggleableNotificationFilter) {
+                    ToggleableNotificationFilter toggleableFilter = (ToggleableNotificationFilter) filter;
+                    boolean status = toggleableFilter.isEnabledByDefault();
+                    BaseObject obj = doc.getXObject(notificationPreferencesScopeClass, FIELD_FILTER_NAME,
+                            filter.getName());
+                    if (obj != null) {
+                        status = obj.getIntValue(FIELD_IS_ENABLED, status ? 1 : 0) != 0;
                     }
+                    filterStatus.put(filter.getName(), status);
                 }
             }
         } catch (Exception e) {
             throw new NotificationException(
                     String.format("Failed to get the toggleable filters preferences for the user [%s].",
-                            userReference), e);
+                            user), e);
         }
 
-        return disabledFilters;
+        return filterStatus;
     }
 
     @Override

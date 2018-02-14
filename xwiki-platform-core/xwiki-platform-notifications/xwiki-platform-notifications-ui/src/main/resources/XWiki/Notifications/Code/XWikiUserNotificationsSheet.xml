@@ -202,8 +202,10 @@
 &lt;h1&gt;$escapetool.xml($services.localization.render('notifications.settings.filters.preferences.title'))&lt;/h1&gt;
 &lt;div class="xform"&gt;
   &lt;div class="row"&gt;
-    &lt;p class="xHint col-md-10"&gt;$escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))&lt;/p&gt;
-    &lt;div class="col-md-2 text-right"&gt;
+    &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
+      $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.hint'))
+    &lt;/p&gt;
+    &lt;div class="col-xs-12 col-sm-3 col-md-4 col-lg-3 text-right"&gt;
       &lt;button type="button" class="btn btn-default btn-addfilter" data-target="#modal-add-filter-preference" data-toggle="modal"&gt;
         &lt;span class="fa fa-plus"&gt;&lt;/span&gt;&amp;nbsp;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))
       &lt;/button&gt;

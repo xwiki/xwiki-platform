@@ -840,8 +840,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       </visibility>
     </class>
     <property>
-      <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
-{{velocity}}
+      <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}{{velocity}}
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################

@@ -320,6 +320,7 @@ require(['jquery', 'xwiki-meta', 'AddNotificationFilterPreferenceLivetable', 'bo
    */
   $(document).ready(function() {
 
+    new AddNotificationFilterPreferenceLivetable($('#modal-add-filter-preference'), window['livetable_notificationFilterPreferencesLiveTable'], $('.filterPreferences button.btn-addfilter'));
     var initBootstrapSwitches = function () {
       $('#notificationFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
         size: 'mini',

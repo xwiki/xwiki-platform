@@ -86,47 +86,8 @@
 #if ($services.notification.areEmailsEnabled())
 (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
 (((
-{{html clean="false"}}
-&lt;h1&gt;$escapetool.xml($services.localization.render('notifications.settings.email.title'))&lt;/h1&gt;
-&lt;div class="notification-top-panel-preferences"&gt;
-  &lt;div class="xform"&gt;
-    &lt;dl&gt;
-      &lt;dt class="label"&gt;&lt;label&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency'))&lt;/label&gt;
-      &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #set ($interval = 'daily')
-        #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
-        #if ("$!objInterval" != '')
-          #set ($interval = $objInterval.getValue('interval'))
-        #end
-        &lt;select class="notificationEmailInterval"&gt;
-          &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
-          &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
-          &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
-          &lt;option value="live" #if($interval == 'live')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live'))&lt;/option&gt;
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt class="label"&gt;&lt;label&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType'))&lt;/label&gt;
-      &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.diffType.hint'))&lt;/p&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #set ($diffType = $services.notification.preferences.getDiffType())
-        #set ($objPref = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
-        #if ("$!objPref" != '')
-          #set ($diffType = $objPref.getValue('diffType'))
-        #end
-        &lt;select class="notificationEmailDiffType"&gt;
-          &lt;option value="NOTHING" #if($diffType == 'NOTHING')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING'))&lt;/option&gt;
-          &lt;option value="STANDARD"  #if($diffType == 'STANDARD')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD'))&lt;/option&gt;
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-{{/html}}
+  = {{translation key="notifications.settings.email.title" /}} =
+  {{notificationsEmailPreferences /}}
 )))
 #end
 ######################################################
@@ -561,36 +522,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'AddNotificationFilterPref
     $('td.notificationTypeCell, td.notificationAppCell').each(function(){
       $(this).find('.hidden').removeClass('hidden');
       $(this).removeClass('loading');
-    });
-
-    /**
-     * Handle the notification email interval
-     */
-    $('.notificationEmailInterval').change(function () {
-      var intervalSelect = $(this);
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-      $.post(serviceURL, {
-        'interval': intervalSelect.val()
-      }).done(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      });
-    });
-
-    /**
-     * Handle the include diff in email setting
-     */
-    $('.notificationEmailDiffType').change(function () {
-      var diffTypeSelect = $(this);
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var serviceURL = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
-      $.post(serviceURL, {
-        'diffType': diffTypeSelect.val()
-      }).done(function (data) {
-        notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      });
     });
 
     /**

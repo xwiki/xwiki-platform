@@ -840,7 +840,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       </visibility>
     </class>
     <property>
-      <code>{{velocity}}
+      <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
+{{velocity}}
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
@@ -851,31 +852,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 ######################################################
 ### GLOBALS
 ######################################################
-##
-## Get all event types and group them by applications
-##
 #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
-#set ($types = [])
-#foreach ($descriptor in $services.eventstream.getRecordableEventDescriptors($xcontext.isMainWiki()))
-  #set ($discard = $types.add({
-    'applicationName' : "$!services.localization.render($descriptor.applicationName)",
-    'applicationIcon' : "$!services.icon.renderHTML($descriptor.applicationIcon)",
-    'description'     : "$!services.localization.render($descriptor.description)",
-    'eventType'       : "$!descriptor.eventType",
-    'filter'          : "$!descriptor.filter",
-    'applicationId'   : "$!descriptor.applicationId"
-  }))
-#end
-#set ($apps = [])
-#set ($lastAppId = '')
-#foreach ($type in $sorttool.sort($types, ['applicationName', 'eventType']))
-  #if ($lastAppId != $type.applicationId)
-    #set ($lastAppId = $type.applicationId)
-    #set ($lastApp = [])
-    #set ($discard = $apps.add($lastApp))
-  #end
-  #set ($discard = $lastApp.add($type))
-#end
 ######################################################
 ### MACRO CONTENT
 ######################################################
@@ -908,7 +885,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
   #end
 &lt;/table&gt;
 &lt;/div&gt;
-{{/html}}
 
 #**
  * Display Application
@@ -980,8 +956,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     &lt;/div&gt;
   &lt;/td&gt;
 #end
-{{/velocity}}
-</code>
+{{/html}}
+{{/velocity}}</code>
     </property>
     <property>
       <contentDescription/>

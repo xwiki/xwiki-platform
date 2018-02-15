@@ -31,6 +31,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
@@ -48,6 +49,10 @@ public class CachedModelBridge implements ModelBridge
 {
     private static final String USER_NOTIFICATIONS_PREFERENCES = "userNotificationsPreferences";
 
+    private static final String WIKI_NOTIFICATIONS_PREFERENCES = "wikiNotificationsPreferences";
+
+    private static final String CACHE_KEY_PATTERN = "%s_[%s]";
+
     @Inject
     private ModelBridge modelBridge;
 
@@ -63,7 +68,7 @@ public class CachedModelBridge implements ModelBridge
     {
         // We need to store the user reference in the cache's key, otherwise all users of the same context will share
         // the same cache, which can happen when a notification email is triggered.
-        final String specificUserNotificationsPreferences = String.format("%s_[%s]",
+        final String specificUserNotificationsPreferences = String.format(CACHE_KEY_PATTERN,
                 USER_NOTIFICATIONS_PREFERENCES, serializer.serialize(userReference));
 
         ExecutionContext context = execution.getContext();
@@ -73,6 +78,25 @@ public class CachedModelBridge implements ModelBridge
 
         List<NotificationPreference> preferences = modelBridge.getNotificationsPreferences(userReference);
         context.setProperty(specificUserNotificationsPreferences, preferences);
+
+        return preferences;
+    }
+
+    @Override
+    public List<NotificationPreference> getNotificationsPreferences(WikiReference wikiReference)
+            throws NotificationException
+    {
+        // We need to store the wiki reference in the cache's key
+        final String specificWikiNotificationsPreferences = String.format(CACHE_KEY_PATTERN,
+                WIKI_NOTIFICATIONS_PREFERENCES, serializer.serialize(wikiReference));
+
+        ExecutionContext context = execution.getContext();
+        if (context.hasProperty(specificWikiNotificationsPreferences)) {
+            return (List<NotificationPreference>) context.getProperty(specificWikiNotificationsPreferences);
+        }
+
+        List<NotificationPreference> preferences = modelBridge.getNotificationsPreferences(wikiReference);
+        context.setProperty(specificWikiNotificationsPreferences, preferences);
 
         return preferences;
     }

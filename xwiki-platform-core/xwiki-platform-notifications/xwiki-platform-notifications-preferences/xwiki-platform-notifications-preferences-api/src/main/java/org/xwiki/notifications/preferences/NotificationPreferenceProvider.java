@@ -38,7 +38,8 @@ public interface NotificationPreferenceProvider
 {
     /**
      * Get the priority that the preferences given by this provider should have.
-     * This is useful when different notification preferences are in conflict.
+     * This is useful when different notification preferences are in conflict. The higher is the number, the higher
+     * is the priority.
      *
      * @return the priority of the provider
      */

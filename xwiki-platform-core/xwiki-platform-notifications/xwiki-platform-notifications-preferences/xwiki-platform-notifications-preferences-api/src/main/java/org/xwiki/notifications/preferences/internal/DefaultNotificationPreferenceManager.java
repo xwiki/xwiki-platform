@@ -20,11 +20,14 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,17 +73,21 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
             List<NotificationPreferenceProvider> providers =
                     componentManager.getInstanceList(NotificationPreferenceProvider.class);
 
-            List<NotificationPreference> notificationPreferences = new ArrayList<>();
+            Set<NotificationPreference> notificationPreferences = new HashSet<>();
 
-            /**
-             * TODO: Handle notification preferences conflicts.
-             * That’s why {@link NotificationPreferenceProvider#getProviderPriority()} exists.
-             */
+            // We handle conflicts between similar preferences by sorting the providers by order. Since
+            // notificationPreferences is a set, only the first occurrence of a preference is stored.
+            Collections.sort(providers, (o1, o2) ->
+                // The comparison is inverted so the higher priorities are sorted first
+                o2.getProviderPriority() - o1.getProviderPriority()
+            );
             for (NotificationPreferenceProvider provider : providers) {
+                // Conflicts are handled thanks to AbstractNotificationPreference.equals()
+                // and AbstractNotificationPreference.equals().
                 notificationPreferences.addAll(provider.getPreferencesForUser(user));
             }
 
-            return notificationPreferences;
+            return new ArrayList<>(notificationPreferences);
         } catch (ComponentLookupException e) {
             // Don’t include the DocumentReference parameter here as it’s not relevant
             throw new NotificationException(

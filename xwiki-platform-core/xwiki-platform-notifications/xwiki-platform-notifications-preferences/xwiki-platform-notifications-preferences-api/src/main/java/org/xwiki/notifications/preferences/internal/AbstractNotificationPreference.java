@@ -22,10 +22,12 @@ package org.xwiki.notifications.preferences.internal;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -110,5 +112,34 @@ public abstract class AbstractNotificationPreference implements NotificationPref
     public NotificationPreferenceCategory getCategory()
     {
         return category;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        // Here, we only compute a subset of the properties, because we want to say equals() == true if the other
+        // preference is about the same event type, etc...
+        AbstractNotificationPreference that = (AbstractNotificationPreference) o;
+        EqualsBuilder equalsBuilder = new EqualsBuilder();
+        equalsBuilder.append(that.format, format);
+        equalsBuilder.append(that.properties, properties);
+        return equalsBuilder.isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        // Here, we only compute a subset of the properties, because we want to have the same hashcode if the other
+        // preference is about the same event type, etc...
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+        hashCodeBuilder.append(format);
+        hashCodeBuilder.append(properties);
+        return hashCodeBuilder.hashCode();
     }
 }

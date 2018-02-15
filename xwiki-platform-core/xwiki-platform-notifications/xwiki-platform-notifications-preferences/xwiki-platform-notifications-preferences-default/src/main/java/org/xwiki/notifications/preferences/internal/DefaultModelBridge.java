@@ -20,6 +20,7 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -64,19 +66,30 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String FORMAT_FIELD = "format";
 
+    private static final String WIKI_SPACE = "XWiki";
+
+    private static final String NOTIFICATIONS = "Notifications";
+
+    private static final String CODE = "Code";
+
     private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
-        new SpaceReference("Notifications",
-            new SpaceReference("XWiki", new WikiReference("xwiki"))
-        )
+        new SpaceReference(NOTIFICATIONS, new SpaceReference(WIKI_SPACE, new WikiReference("xwiki")))
     );
 
     private static final DocumentReference NOTIFICATION_PREFERENCE_CLASS = new DocumentReference(
             "NotificationPreferenceClass", NOTIFICATION_CODE_SPACE
     );
 
+    private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
+            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
+    );
+
     private static final String NOTIFICATION_START_DATE_UPDATE_COMMENT = "Update start date for the notifications.";
 
     private static final String SET_USER_START_DATE_ERROR_MESSAGE = "Failed to set the user start date for [%s].";
+
+    private static final LocalDocumentReference XWIKI_PREFERENCES
+            = new LocalDocumentReference(WIKI_SPACE, "XWikiPreferences");
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -88,16 +101,30 @@ public class DefaultModelBridge implements ModelBridge
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
             throws NotificationException
     {
+        return getNotificationPreferences(userReference, "userProfile");
+    }
+
+    @Override
+    public List<NotificationPreference> getNotificationsPreferences(WikiReference wikiReference)
+            throws NotificationException
+    {
+        return getNotificationPreferences(new DocumentReference(XWIKI_PREFERENCES, wikiReference),
+                "wiki");
+    }
+
+    private List<NotificationPreference> getNotificationPreferences(DocumentReference document,
+            String providerHint) throws NotificationException
+    {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationPreferencesClass
-                = NOTIFICATION_PREFERENCE_CLASS.setWikiReference(userReference.getWikiReference());
+                = NOTIFICATION_PREFERENCE_CLASS.setWikiReference(document.getWikiReference());
 
         List<NotificationPreference> preferences = new ArrayList<>();
 
         try {
-            XWikiDocument doc = xwiki.getDocument(userReference, context);
+            XWikiDocument doc = xwiki.getDocument(document, context);
             List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
@@ -113,10 +140,10 @@ public class DefaultModelBridge implements ModelBridge
                         notificationPreferenceBuilder.setStartDate(
                                 (objStartDate != null) ? objStartDate : doc.getCreationDate());
                         notificationPreferenceBuilder.setFormat(StringUtils.isNotBlank(objFormat)
-                                    ? NotificationFormat.valueOf(objFormat.toUpperCase())
-                                    : NotificationFormat.ALERT);
-                        notificationPreferenceBuilder.setTarget(userReference);
-                        notificationPreferenceBuilder.setProviderHint("userProfile");
+                                ? NotificationFormat.valueOf(objFormat.toUpperCase())
+                                : NotificationFormat.ALERT);
+                        notificationPreferenceBuilder.setTarget(document);
+                        notificationPreferenceBuilder.setProviderHint(providerHint);
                         notificationPreferenceBuilder.setEnabled(
                                 obj.getIntValue(NOTIFICATION_ENABLED_FIELD, 0) != 0);
                         notificationPreferenceBuilder.setCategory(NotificationPreferenceCategory.DEFAULT);
@@ -127,8 +154,8 @@ public class DefaultModelBridge implements ModelBridge
             }
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to get the notification preferences for the user [%s].",
-                            userReference), e);
+                    String.format("Failed to get the notification preferences from the document [%s].",
+                            document), e);
         }
 
         return preferences;
@@ -210,13 +237,13 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void saveNotificationsPreferences(DocumentReference userReference,
+    public void saveNotificationsPreferences(DocumentReference targetDocument,
             List<NotificationPreference> notificationPreferences) throws NotificationException
     {
         try {
             XWikiContext context = contextProvider.get();
             XWiki xwiki = context.getWiki();
-            XWikiDocument document =  xwiki.getDocument(userReference, context);
+            XWikiDocument document =  xwiki.getDocument(targetDocument, context);
 
             for (NotificationPreference notificationPreference : notificationPreferences) {
 
@@ -261,7 +288,7 @@ public class DefaultModelBridge implements ModelBridge
 
         } catch (XWikiException e) {
             throw new NotificationException(String.format(
-                    "Failed to save the notification preference for [%s]", userReference));
+                    "Failed to save the notification preference into [%s]", targetDocument));
         }
     }
 }

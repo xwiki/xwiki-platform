@@ -20,21 +20,24 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -55,42 +58,44 @@ public class DefaultNotificationPreferenceManagerTest
 
     private ModelBridge modelBridge;
 
-    private ComponentManager componentManager;
-
     private NotificationPreference mockPreference11;
     private NotificationPreference mockPreference12;
     private NotificationPreference mockPreference21;
     private NotificationPreference mockPreference22;
+    private NotificationPreference mockPreference23;
 
     private NotificationPreferenceProvider mockPreferenceProvider1;
     private NotificationPreferenceProvider mockPreferenceProvider2;
+
+    private class NotificationPreferenceImplementation extends AbstractNotificationPreference
+    {
+        public NotificationPreferenceImplementation(boolean isNotificationEnabled, NotificationFormat format,
+                NotificationPreferenceCategory category, Date startDate, String providerHint,
+                Map<NotificationPreferenceProperty, Object> properties)
+        {
+            super(isNotificationEnabled, format, category, startDate, providerHint, properties);
+        }
+    }
 
     @Before
     public void setUp() throws Exception
     {
         modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
 
-        componentManager = mocker.registerMockComponent(ComponentManager.class);
-
-        mockPreference11 = mock(NotificationPreference.class);
-        when(mockPreference11.getFormat()).thenReturn(NotificationFormat.ALERT);
-        when(mockPreference11.isNotificationEnabled()).thenReturn(true);
-        when(mockPreference11.getProviderHint()).thenReturn("1");
-
-        mockPreference12 = mock(NotificationPreference.class);
-        when(mockPreference12.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        when(mockPreference12.isNotificationEnabled()).thenReturn(true);
-        when(mockPreference12.getProviderHint()).thenReturn("1");
-
-        mockPreference21 = mock(NotificationPreference.class);
-        when(mockPreference21.getFormat()).thenReturn(NotificationFormat.ALERT);
-        when(mockPreference21.isNotificationEnabled()).thenReturn(false);
-        when(mockPreference21.getProviderHint()).thenReturn("2");
-
-        mockPreference22 = mock(NotificationPreference.class);
-        when(mockPreference22.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        when(mockPreference22.isNotificationEnabled()).thenReturn(false);
-        when(mockPreference22.getProviderHint()).thenReturn("2");
+        Map<NotificationPreferenceProperty, Object> map1 = new HashMap<>();
+        map1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
+        Map<NotificationPreferenceProperty, Object> map2 = new HashMap<>();
+        map1.put(NotificationPreferenceProperty.EVENT_TYPE, "addComment");
+        mockPreference11 = new NotificationPreferenceImplementation(true, NotificationFormat.ALERT,
+                NotificationPreferenceCategory.DEFAULT, null, "1", map1);
+        mockPreference12 = new NotificationPreferenceImplementation(true, NotificationFormat.EMAIL,
+                NotificationPreferenceCategory.DEFAULT, null, "1", map1);
+        mockPreference21 = new NotificationPreferenceImplementation(false, NotificationFormat.ALERT,
+                NotificationPreferenceCategory.DEFAULT, null, "2", map2);
+        mockPreference22 = new NotificationPreferenceImplementation(false, NotificationFormat.EMAIL,
+                NotificationPreferenceCategory.DEFAULT, null, "2", map2);
+        mockPreference23 = new NotificationPreferenceImplementation(false, NotificationFormat.EMAIL,
+                NotificationPreferenceCategory.DEFAULT, null, "2", map1);
 
         mockPreferenceProvider1 = mock(NotificationPreferenceProvider.class);
         mockPreferenceProvider2 = mock(NotificationPreferenceProvider.class);
@@ -98,22 +103,16 @@ public class DefaultNotificationPreferenceManagerTest
 
     private void mockPreferenceProviders(DocumentReference user) throws Exception
     {
-
-
         when(mockPreferenceProvider1.getPreferencesForUser(user))
                 .thenReturn(Arrays.asList(mockPreference11, mockPreference12));
         when(mockPreferenceProvider2.getPreferencesForUser(user))
-                .thenReturn(Arrays.asList(mockPreference21, mockPreference22));
+                .thenReturn(Arrays.asList(mockPreference21, mockPreference22, mockPreference23));
 
-        when(componentManager.hasComponent(any(), any())).thenReturn(true);
+        mocker.registerComponent(NotificationPreferenceProvider.class, "1", mockPreferenceProvider1);
+        mocker.registerComponent(NotificationPreferenceProvider.class, "2", mockPreferenceProvider2);
 
-        when(componentManager.getInstance(any(), eq("1")))
-                .thenReturn(mockPreferenceProvider1);
-        when(componentManager.getInstance(any(), eq("2")))
-                .thenReturn(mockPreferenceProvider2);
-
-        when(componentManager.getInstanceList(NotificationPreferenceProvider.class))
-                .thenReturn(Arrays.asList(mockPreferenceProvider1, mockPreferenceProvider2));
+        when(mockPreferenceProvider1.getProviderPriority()).thenReturn(100);
+        when(mockPreferenceProvider2.getProviderPriority()).thenReturn(200);
     }
 
     @Test
@@ -155,7 +154,7 @@ public class DefaultNotificationPreferenceManagerTest
                 true, NotificationFormat.EMAIL);
 
         assertEquals(1, preferences.size());
-        assertTrue(preferences.contains(mockPreference12));
+        assertTrue(preferences.contains(mockPreference23));
 
         preferences = mocker.getComponentUnderTest().getPreferences(user,
                 false, NotificationFormat.EMAIL);

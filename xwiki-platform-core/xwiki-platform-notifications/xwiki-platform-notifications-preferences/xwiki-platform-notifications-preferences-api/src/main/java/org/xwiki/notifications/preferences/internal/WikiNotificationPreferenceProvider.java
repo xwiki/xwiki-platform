@@ -31,22 +31,21 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
 
 /**
- * This is the default implementation of {@link NotificationPreferenceProvider}.
- * Note that this provider uses the notification preferences defined in the user profile XObjects in order to work
- * properly.
+ * This implementation of {@link NotificationPreferenceProvider} handles preferences stored at the wiki level, to
+ * provide default preferences for all users of that wiki.
  *
  * @version $Id$
- * @since 9.7RC1
+ * @since 10.1RC1
  */
 @Component
 @Singleton
-@Named(UserProfileNotificationPreferenceProvider.NAME)
-public class UserProfileNotificationPreferenceProvider extends AbstractDocumentNotificationPreferenceProvider
+@Named(WikiNotificationPreferenceProvider.NAME)
+public class WikiNotificationPreferenceProvider extends AbstractDocumentNotificationPreferenceProvider
 {
     /**
      * The name of the provider.
      */
-    public static final String NAME = "userProfile";
+    public static final String NAME = "wiki";
 
     @Override
     public int getProviderPriority()

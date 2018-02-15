@@ -901,7 +901,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       </visibility>
     </class>
     <property>
-      <code>{{template name="locationPicker_macros.vm" /}}{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}{{velocity}}
+      <code>{{template name="locationPicker_macros.vm" /}}
+
+{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
+
+{{velocity}}
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################

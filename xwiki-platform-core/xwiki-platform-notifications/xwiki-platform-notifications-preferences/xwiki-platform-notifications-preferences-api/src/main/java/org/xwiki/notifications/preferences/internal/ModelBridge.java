@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
@@ -46,6 +47,17 @@ public interface ModelBridge
      */
     List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
         throws NotificationException;
+
+    /**
+     * Return the notifications preferences that are stored as XObjects in the wiki administration.
+     *
+     * @param wikiReference the wiki where to load data
+     * @return the list of preferences
+     *
+     * @throws NotificationException if an error occurs
+     */
+    List<NotificationPreference> getNotificationsPreferences(WikiReference wikiReference)
+            throws NotificationException;
 
     /**
      * Set the start date of every NotificationPreference of the given user to the given startDate.

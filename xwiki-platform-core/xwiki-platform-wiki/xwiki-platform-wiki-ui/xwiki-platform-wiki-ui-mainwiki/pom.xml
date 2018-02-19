@@ -130,4 +130,17 @@
       <type>xar</type>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <version>${commons.version}</version>
+        <configuration>
+          <!-- TODO: in the future move the translations to the WIKI scope -->
+          <translationVisibilitySkip>true</translationVisibilitySkip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

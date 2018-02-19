@@ -43,10 +43,10 @@
 AnnotationCode.AnnotationConfig_activated=Anotacije su aktivirane
 AnnotationCode.AnnotationConfig_activated.hint=Odlučite hoće li u wikiju biti aktivirane anotacije
 AnnotationCode.AnnotationConfig_annotationClass=XWiki klasa koja definira strukturu anotacija
-AnnotationCode.AnnotationConfig_displayHighlight=Pretpostavljeno prikaži označavanje anotacija
+AnnotationCode.AnnotationConfig_displayHighlight=Zadano prikaži označavanje anotacija
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Odlučite hoće li označavanje anotacija uvijek biti prikazano ili samo kod dovođenja kursora miša nad anotaciju ili anotacijske strukture
-AnnotationCode.AnnotationConfig_displayed=Pretpostavljeno prikaži anotacije
-AnnotationCode.AnnotationConfig_displayed.hint=Odlučite hoće li anotacije biti pretpostavljeno prikazane ili tek nakon klikanja na "Prikaži anotacije" na svakoj stranici
+AnnotationCode.AnnotationConfig_displayed=Zadano prikaži anotacije
+AnnotationCode.AnnotationConfig_displayed.hint=Odlučite hoće li anotacije biti zadano prikazane ili tek nakon klikanja na "Prikaži anotacije" na svakoj stranici
 AnnotationCode.AnnotationConfig_exceptionSpaces=Osim za sljedeće lokacije
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deaktivirajte anotacije za sljedeći podskup lokacija\:
 admin.annotations=Anotacije

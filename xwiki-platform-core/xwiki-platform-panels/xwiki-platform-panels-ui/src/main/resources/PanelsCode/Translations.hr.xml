@@ -48,7 +48,7 @@ platform.panels.applications.ajax.noright=Nemate ovlast za uređivanje PanelsCod
 platform.panels.applications.ajax.success=Konfiguracija je spremljena.
 platform.panels.applications.blacklistedapps=Aplikacije koje nisu u traci
 platform.panels.applications.displayedapps=Aplikacije u traci
-platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (pretpostavljeno na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene\!
+platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (zadano na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene\!
 platform.panels.applications.revert=Ponovo postavi
 platform.panels.applications.save=Spremi
 </content>

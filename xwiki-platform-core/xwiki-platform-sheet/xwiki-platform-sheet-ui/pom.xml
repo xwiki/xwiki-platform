@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-sheet</artifactId>
-    <version>10.1-rc-1</version>
+    <version>10.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-sheet-ui</artifactId>
   <name>XWiki Platform - Sheet - UI</name>

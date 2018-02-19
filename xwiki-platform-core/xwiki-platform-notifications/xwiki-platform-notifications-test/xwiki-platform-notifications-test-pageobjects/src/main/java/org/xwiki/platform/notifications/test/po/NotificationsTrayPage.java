@@ -137,7 +137,11 @@ public class NotificationsTrayPage extends ViewPage
     {
         if (!this.notificationsHeader.isDisplayed()) {
             this.watchListButton.click();
+            getDriver().waitUntilCondition(webDriver -> this.notificationsHeader.isDisplayed());
             waitUntilNotificationsAreLoaded();
+        }
+        if (!this.notificationsHeader.isDisplayed()) {
+            throw new RuntimeException("Failed to open the notification menu!");
         }
     }
 

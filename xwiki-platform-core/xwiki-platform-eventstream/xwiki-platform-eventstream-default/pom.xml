@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-eventstream</artifactId>
-    <version>10.1-SNAPSHOT</version>
+    <version>10.1-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-eventstream-default</artifactId>
   <name>XWiki Platform - Event Stream - Default bridge</name>

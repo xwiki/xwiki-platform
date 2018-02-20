@@ -37,6 +37,8 @@ import org.xwiki.test.ui.po.ViewPage;
 @Unstable
 public class NotificationsTrayPage extends ViewPage
 {
+    private static final String CLASS = "class";
+
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;
 
@@ -59,9 +61,12 @@ public class NotificationsTrayPage extends ViewPage
     {
     }
 
+    /**
+     * @return either or not the notification menu is open
+     */
     public boolean isMenuOpen()
     {
-        return Arrays.asList(notificationsButton.getAttribute("class").split(" ")).contains("open");
+        return Arrays.asList(notificationsButton.getAttribute(CLASS).split(" ")).contains("open");
     }
 
     /**
@@ -129,7 +134,7 @@ public class NotificationsTrayPage extends ViewPage
 
     private void waitUntilNotificationsAreLoaded()
     {
-        getDriver().waitUntilCondition(webDriver -> !notificationsArea.getAttribute("class").contains("loading"));
+        getDriver().waitUntilCondition(webDriver -> !notificationsArea.getAttribute(CLASS).contains("loading"));
     }
 
     private List<WebElement> getNotifications()

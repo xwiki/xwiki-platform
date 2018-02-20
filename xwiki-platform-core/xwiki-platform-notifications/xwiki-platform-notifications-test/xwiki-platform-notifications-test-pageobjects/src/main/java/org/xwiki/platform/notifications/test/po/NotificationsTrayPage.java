@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -42,8 +43,8 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "li#tmNotifications a[title='Watchlist']")
     private WebElement watchListButton;
 
-    @FindBy(css = "li#tmNotifications .dropdown-menu")
-    private WebElement notificationsMenu;
+    @FindBy(css = "li#tmNotifications")
+    private WebElement notificationsButton;
 
     @FindBy(css = "li#tmNotifications span.notifications-count")
     private WebElement countBadge;
@@ -56,6 +57,11 @@ public class NotificationsTrayPage extends ViewPage
      */
     public NotificationsTrayPage()
     {
+    }
+
+    public boolean isMenuOpen()
+    {
+        return Arrays.asList(notificationsButton.getAttribute("class").split(" ")).contains("open");
     }
 
     /**
@@ -111,12 +117,12 @@ public class NotificationsTrayPage extends ViewPage
      */
     private void showNotificationTray()
     {
-        if (!this.notificationsMenu.isDisplayed()) {
+        if (!isMenuOpen()) {
             this.watchListButton.click();
-            getDriver().waitUntilCondition(webDriver -> this.notificationsMenu.isDisplayed());
+            getDriver().waitUntilCondition(webDriver -> isMenuOpen());
             waitUntilNotificationsAreLoaded();
         }
-        if (!this.notificationsMenu.isDisplayed()) {
+        if (!isMenuOpen()) {
             throw new RuntimeException("Failed to open the notification menu!");
         }
     }

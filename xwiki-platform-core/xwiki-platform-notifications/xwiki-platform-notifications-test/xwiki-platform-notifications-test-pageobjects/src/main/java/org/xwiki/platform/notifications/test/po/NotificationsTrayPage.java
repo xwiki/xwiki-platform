@@ -42,8 +42,8 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "li#tmNotifications a[title='Watchlist']")
     private WebElement watchListButton;
 
-    @FindBy(css = "li#tmNotifications div.notifications-header div:first-child strong")
-    private WebElement notificationsHeader;
+    @FindBy(css = "li#tmNotifications .dropdown-menu")
+    private WebElement notificationsMenu;
 
     @FindBy(css = "li#tmNotifications span.notifications-count")
     private WebElement countBadge;
@@ -111,12 +111,12 @@ public class NotificationsTrayPage extends ViewPage
      */
     private void showNotificationTray()
     {
-        if (!this.notificationsHeader.isDisplayed()) {
+        if (!this.notificationsMenu.isDisplayed()) {
             this.watchListButton.click();
-            getDriver().waitUntilCondition(webDriver -> this.notificationsHeader.isDisplayed());
+            getDriver().waitUntilCondition(webDriver -> this.notificationsMenu.isDisplayed());
             waitUntilNotificationsAreLoaded();
         }
-        if (!this.notificationsHeader.isDisplayed()) {
+        if (!this.notificationsMenu.isDisplayed()) {
             throw new RuntimeException("Failed to open the notification menu!");
         }
     }

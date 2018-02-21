@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,18 +48,17 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.objects.meta.StaticListMetaClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
@@ -72,7 +70,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -280,7 +277,7 @@ public class XWikiDocumentMockitoTest
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        MockitoComponentManagerRule mocker = this.oldcore.getMocker();
+        MockitoComponentManager mocker = this.oldcore.getMocker();
         XWikiContext context = this.oldcore.getXWikiContext();
         DocumentReferenceResolver<String> documentReferenceResolverString =
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -329,7 +326,7 @@ public class XWikiDocumentMockitoTest
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        MockitoComponentManagerRule mocker = this.oldcore.getMocker();
+        MockitoComponentManager mocker = this.oldcore.getMocker();
         XWikiContext context = this.oldcore.getXWikiContext();
         DocumentReferenceResolver<String> documentReferenceResolverString =
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");

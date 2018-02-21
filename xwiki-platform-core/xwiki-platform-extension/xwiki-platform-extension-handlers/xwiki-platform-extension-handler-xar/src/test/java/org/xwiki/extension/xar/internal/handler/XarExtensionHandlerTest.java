@@ -55,7 +55,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
@@ -83,7 +83,7 @@ public class XarExtensionHandlerTest
 {
     private MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
-    private MockitoComponentManagerRule componentManager = this.oldcore.getMocker();
+    private MockitoComponentManager componentManager = this.oldcore.getMocker();
 
     @Rule
     public MockitoRepositoryUtilsRule repositoryUtil =

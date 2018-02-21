@@ -130,6 +130,9 @@ public class NotificationsTrayPage extends ViewPage
             return;
         } else {
             this.showNotificationTray();
+            if (!this.clearAllLink.isDisplayed()) {
+                throw new RuntimeException("'Clear All' link is not displayed!");
+            }
             this.clearAllLink.click();
             // Wait for the confirm box to be visible
             getDriver().waitUntilElementIsVisible(By.className("xdialog-content"));

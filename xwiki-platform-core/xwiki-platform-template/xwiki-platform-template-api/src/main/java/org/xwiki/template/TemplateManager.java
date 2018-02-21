@@ -27,7 +27,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
 
 /**
- * Internal toolkit to experiment on wiki bases templates.
+ * Internal toolkit to experiment on wiki-based templates.
  *
  * @version $Id$
  * @since 7.0M1

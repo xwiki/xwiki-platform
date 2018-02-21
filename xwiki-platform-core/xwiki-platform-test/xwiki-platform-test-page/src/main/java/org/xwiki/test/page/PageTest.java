@@ -44,7 +44,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -100,7 +100,7 @@ public class PageTest
      * The Component Manager to use for getting Component instances or registering Mock Components in the test,
      * provided for ease of use (can also be retrieved through {@link #oldcore}).
      */
-    protected MockitoComponentManagerRule mocker = oldcore.getMocker();
+    protected MockitoComponentManager mocker = oldcore.getMocker();
 
     /**
      * Set up components before Components declared in {@link org.xwiki.test.annotation.ComponentList} are handled.

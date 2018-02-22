@@ -444,9 +444,9 @@
     getUnreadNotificationsCount();
 
     /**
-     * Prevent the dropdown menu for being closed when the user clicks on the notifications area.
+     * Prevent the dropdown menu for being closed when the user clicks on the notifications menu.
      */
-    $('.notifications-area').click(function(event) {
+    $('#tmNotifications .dropdown-menu').click(function(event) {
       event.stopPropagation();
     });
 

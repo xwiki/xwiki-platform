@@ -843,6 +843,11 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
 
 {{velocity}}
+#if (!$xcontext.userReference)
+  {{info}}
+    {{translation key="notifications.settings.applications.forGuest" /}}
+  {{/info}}
+#else
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
@@ -958,6 +963,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
   &lt;/td&gt;
 #end
 {{/html}}
+#end
 {{/velocity}}</code>
     </property>
     <property>

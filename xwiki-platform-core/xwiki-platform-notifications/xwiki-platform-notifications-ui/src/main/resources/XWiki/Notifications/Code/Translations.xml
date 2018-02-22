@@ -103,7 +103,8 @@ notifications.format.email=Email
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=Filters
-notifications.settings.filters.preferences.hint=Create filters to control more precisely when the active events should trigger notifications.
+notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
+notifications.settings.filters.preferences.forGuest=Log in or register to handle your notification filters.
 
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Name
@@ -125,6 +126,7 @@ notifications.settings.title=Notifications Preferences
 notifications.settings.menu=Notification menu
 notifications.settings.menu.hint=The notification menu is located on the top right of the page, and you can see it by clicking on the bell ({0})
 notifications.settings.email=Email
+notifications.settings.email.forGuest=Log in or register to handle your notification settings.
 notifications.settings.email.disabled=The notifications emails are disabled. Please contact your administrator.
 notifications.settings.email.hint=An email is sent to you regularly with a summary of what happened on the wiki
 notifications.settings.email.title=Email Preferences
@@ -141,6 +143,7 @@ notifications.settings.preferences=Preferences
 notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
 notifications.settings.applications.title=Applications
 notifications.settings.applications.hint=This is the list of applications that can send notifications. You can enable or disable any of them.
+notifications.settings.applications.forGuest=Log in or register to handle your notification settings.
 notifications.settings.applications.appName=Name
 notifications.settings.events=Events
 notifications.settings.watch.title=Watched Pages

@@ -906,6 +906,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
 {{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
 
 {{velocity}}
+#if (!$xcontext.userReference)
+  {{info}}
+    {{translation key="notifications.settings.filters.preferences.forGuest" /}}
+  {{/info}}
+#else
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
@@ -1023,6 +1028,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
 &lt;/div&gt;&lt;!-- /.modal --&gt;
 {{/html}}
+#end
 {{/velocity}}</code>
     </property>
     <property>

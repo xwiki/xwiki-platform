@@ -298,7 +298,7 @@ require(['jquery'], function ($) {
     </class>
     <property>
       <code>{{velocity}}
-#if ($services.notification.areEmailsEnabled())
+#if ($services.notification.areEmailsEnabled() &amp;&amp; $xcontext.userReference)
   #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsEmailPreferencesMacro'))
   {{html clean="false"}}
     &lt;div class="notification-top-panel-preferences"&gt;
@@ -340,10 +340,14 @@ require(['jquery'], function ($) {
       &lt;/div&gt;
     &lt;/div&gt;
   {{/html}}
-#else
+#elseif($xcontext.userReference)
   {{warning}}
     {{localization key="notifications.settings.email.disabled" /}}
   {{warning}}
+#else
+  {{info}}
+    {{translation key="notifications.settings.email.forGuest" /}}
+  {{/info}}
 #end
 {{/velocity}}
 </code>

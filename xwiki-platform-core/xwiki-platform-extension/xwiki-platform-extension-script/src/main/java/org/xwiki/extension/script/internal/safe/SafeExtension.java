@@ -77,7 +77,7 @@ public class SafeExtension<T extends Extension> extends WrappingExtension<T>
     @Override
     public <P> P getProperty(String key, P def)
     {
-        return safe(super.getProperty(key));
+        return safe(super.getProperty(key, def));
     }
 
     @Override

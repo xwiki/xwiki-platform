@@ -37,6 +37,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 /**
@@ -47,7 +50,12 @@ import org.xwiki.url.filesystem.FilesystemExportContext;
  */
 public class FilesystemResourceReferenceCopier
 {
-    private static final Pattern URL_PATTERN = Pattern.compile("url\\('(.*?)'|\"(.*?)\"\\)");
+    private static final Logger LOGGER  = LoggerFactory.getLogger(FilesystemResourceReferenceCopier.class);
+
+    /**
+     * Matches {@code url("whatever")} or {@code ur('whatever')}.
+     */
+    private static final Pattern URL_PATTERN = Pattern.compile("url\\(['\"](.*?)['\"]\\)");
 
     private static final String CONCAT_PATH_FORMAT = "%s/%s";
 
@@ -55,17 +63,25 @@ public class FilesystemResourceReferenceCopier
     {
         // Get the JAR URL by looking up the passed resource name to extract the location of the JAR
         URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(resourceName);
-        JarURLConnection connection = (JarURLConnection) resourceURL.openConnection();
-        URL jarURL = connection.getJarFileURL();
+        // The resourceName can contain invalid resource pointers. For example if a CSS file contains
+        // "url($!services.webjars.url(...))". In this case ignore it and don't copy the resource to the file system.
+        if (resourceURL != null) {
+            JarURLConnection connection = (JarURLConnection) resourceURL.openConnection();
+            URL jarURL = connection.getJarFileURL();
 
-        File file;
-        try {
-            file = new File(jarURL.toURI());
-        } catch (URISyntaxException e) {
-            file = new File(jarURL.getPath());
+            File file;
+            try {
+                file = new File(jarURL.toURI());
+            } catch (URISyntaxException e) {
+                file = new File(jarURL.getPath());
+            }
+
+            return file;
+        } else {
+            LOGGER.debug("Cannot construct JAR File for resource [{}] which couldn't be found in the context "
+                + "ClassLoader.", resourceName);
+            return null;
         }
-
-        return file;
     }
 
     void copyResourceFromJAR(String resourcePrefix, String resourceName, String targetPrefix,
@@ -76,7 +92,12 @@ public class FilesystemResourceReferenceCopier
         // JAR!
 
         String resourcePath = String.format(CONCAT_PATH_FORMAT, resourcePrefix, resourceName);
-        JarFile jar = new JarFile(getJARFile(resourcePath));
+        File jarFile = getJARFile(resourcePath);
+        if (jarFile == null) {
+            // Ignore errors
+            return;
+        }
+        JarFile jar = new JarFile(jarFile);
         try {
             for (Enumeration<JarEntry> enumeration = jar.entries(); enumeration.hasMoreElements();) {
                 JarEntry entry = enumeration.nextElement();
@@ -88,10 +109,10 @@ public class FilesystemResourceReferenceCopier
                     File targetLocation = new File(exportContext.getExportDir(), targetPath);
                     if (!targetLocation.exists()) {
                         targetLocation.getParentFile().mkdirs();
-                        FileOutputStream fos = new FileOutputStream(targetLocation);
                         InputStream is = jar.getInputStream(entry);
-                        IOUtils.copy(is, fos);
-                        fos.close();
+                        try (FileOutputStream fos = new FileOutputStream(targetLocation)) {
+                            IOUtils.copy(is, fos);
+                        }
                         is.close();
                     }
                 }
@@ -105,7 +126,12 @@ public class FilesystemResourceReferenceCopier
         FilesystemExportContext exportContext) throws Exception
     {
         String resourcePath = String.format(CONCAT_PATH_FORMAT, resourcePrefix, resourceName);
-        JarFile jar = new JarFile(getJARFile(resourcePath));
+        File jarFile = getJARFile(resourcePath);
+        if (jarFile == null) {
+            // Ignore errors
+            return;
+        }
+        JarFile jar = new JarFile(jarFile);
         try {
             for (Enumeration<JarEntry> enumeration = jar.entries(); enumeration.hasMoreElements();) {
                 JarEntry entry = enumeration.nextElement();
@@ -148,8 +174,14 @@ public class FilesystemResourceReferenceCopier
         }
     }
 
-    private boolean isRelativeURL(String url) throws Exception
+    private boolean isRelativeURL(String url)
     {
-        return  !new URI(url).isAbsolute();
+        try {
+            return !new URI(url).isAbsolute();
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Failed to find if URL is relative or not for [{}]. Don't copy it to the filesystem. "
+                + "Error: [{}]", url, ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
     }
 }

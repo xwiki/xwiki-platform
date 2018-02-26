@@ -41,23 +41,23 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
 Mail.GeneralMailConfigClass_obfuscate=Zatamni adrese e-pošte
-Mail.GeneralMailConfigClass_obfuscate.hint=Ovo zahvaća samo adrese e-pošte pohranjene u objektnim svojstvima tipa Email, sve dok pretpostavljeni prikazivač svojstava tipa E-pošta ne bude prebrisan. Primjer\: a...@domena.org
+Mail.GeneralMailConfigClass_obfuscate.hint=Ovo zahvaća samo adrese e-pošte pohranjene u objektnim svojstvima tipa Email, sve dok zadani prikazivač svojstava tipa E-pošta ne bude prebrisan. Primjer\: a...@domena.org
 Mail.SendMailConfigClass_bcc=BCC adrese e-pošte
-Mail.SendMailConfigClass_bcc.hint=Pretpostavljena lista BCC adresa e-pošte, odvojenih zarezom, za upotrijebiti prilikom slanja e-pošte
+Mail.SendMailConfigClass_bcc.hint=Zadana lista BCC adresa e-pošte, odvojenih zarezom, za upotrijebiti prilikom slanja e-pošte
 Mail.SendMailConfigClass_discardSuccessStatuses=Zanemariti statuse o uspjehu?
-Mail.SendMailConfigClass_discardSuccessStatuses.hint=Čuvaju li se ili ne statusi uspješno poslane e-pošte (pretpostavljeno je istinito)
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Čuvaju li se ili ne statusi uspješno poslane e-pošte (zadano je istinito)
 Mail.SendMailConfigClass_from=Adresa e-pošte s koje se šalje
-Mail.SendMailConfigClass_from.hint=Pretpostavljena adresa e-pošte koja se koristi za slanje obavijesne e-pošte
+Mail.SendMailConfigClass_from.hint=Zadana adresa e-pošte koja se koristi za slanje obavijesne e-pošte
 Mail.SendMailConfigClass_host=Poslužitelj e-pošte
-Mail.SendMailConfigClass_host.hint=SMTP poslužitelj prema kojem slati. Pretpostavljeno je "localhost".
+Mail.SendMailConfigClass_host.hint=SMTP poslužitelj prema kojem slati. Zadano je "localhost".
 Mail.SendMailConfigClass_password=Lozinka na poslužitelju e-pošte
 Mail.SendMailConfigClass_password.hint=Lozinka za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
 Mail.SendMailConfigClass_port=Priključak poslužitelja e-pošte
-Mail.SendMailConfigClass_port.hint=Priključak SMTP poslužitelja kojeg se koristi. Pretpostavljeno je 25.
+Mail.SendMailConfigClass_port.hint=Priključak SMTP poslužitelja kojeg se koristi. Zadano je 25.
 Mail.SendMailConfigClass_properties=Dodatna svojstva
 Mail.SendMailConfigClass_properties.hint=Lista dodatnih JavaMail svojstava (npr. "mail.smtp.starttls.enable\=true" za TLS)
 Mail.SendMailConfigClass_sendWaitTime=Vrijeme čekanja na slanje
-Mail.SendMailConfigClass_sendWaitTime.hint=Vrijeme čekanja između slanja pojedine e-pošte, u milisekundama (pretpostavljeno je 8 sekundi)
+Mail.SendMailConfigClass_sendWaitTime.hint=Vrijeme čekanja između slanja pojedine e-pošte, u milisekundama (zadano je 8 sekundi)
 Mail.SendMailConfigClass_username=Korisničko ime na poslužitelju e-pošte
 Mail.SendMailConfigClass_username.hint=Korisničko ime za povezivanje na SMTP poslužitelj, samo ukoliko je potrebna autentikacija
 Mail.SendMailStatus_livetable.actions=Akcije

@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -36,14 +37,16 @@ import org.xwiki.test.ui.po.ViewPage;
 @Unstable
 public class NotificationsTrayPage extends ViewPage
 {
+    private static final String CLASS = "class";
+
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;
 
     @FindBy(css = "li#tmNotifications a[title='Watchlist']")
     private WebElement watchListButton;
 
-    @FindBy(css = "li#tmNotifications div.notifications-header div:first-child strong")
-    private WebElement notificationsHeader;
+    @FindBy(css = "li#tmNotifications")
+    private WebElement notificationsButton;
 
     @FindBy(css = "li#tmNotifications span.notifications-count")
     private WebElement countBadge;
@@ -56,6 +59,14 @@ public class NotificationsTrayPage extends ViewPage
      */
     public NotificationsTrayPage()
     {
+    }
+
+    /**
+     * @return either or not the notification menu is open
+     */
+    public boolean isMenuOpen()
+    {
+        return Arrays.asList(notificationsButton.getAttribute(CLASS).split(" ")).contains("open");
     }
 
     /**
@@ -95,6 +106,9 @@ public class NotificationsTrayPage extends ViewPage
             return;
         } else {
             this.showNotificationTray();
+            if (!this.clearAllLink.isDisplayed()) {
+                throw new RuntimeException("'Clear All' link is not displayed!");
+            }
             this.clearAllLink.click();
             // Wait for the confirm box to be visible
             getDriver().waitUntilElementIsVisible(By.className("xdialog-content"));
@@ -111,16 +125,19 @@ public class NotificationsTrayPage extends ViewPage
      */
     private void showNotificationTray()
     {
-        if (!this.notificationsHeader.isDisplayed()) {
+        if (!isMenuOpen()) {
             this.watchListButton.click();
-            getDriver().waitUntilElementIsVisible(By.className("notifications-header"));
+            getDriver().waitUntilCondition(webDriver -> isMenuOpen());
+            waitUntilNotificationsAreLoaded();
         }
-        waitUntilNotificationsAreLoaded();
+        if (!isMenuOpen()) {
+            throw new RuntimeException("Failed to open the notification menu!");
+        }
     }
 
     private void waitUntilNotificationsAreLoaded()
     {
-        getDriver().waitUntilCondition(webDriver -> !notificationsArea.getAttribute("class").contains("loading"));
+        getDriver().waitUntilCondition(webDriver -> !notificationsArea.getAttribute(CLASS).contains("loading"));
     }
 
     private List<WebElement> getNotifications()

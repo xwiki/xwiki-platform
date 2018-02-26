@@ -11,6 +11,8 @@
 #mapping("borderColor", "@xwiki-border-color")
 #mapping("panelHeaderBackgroundColor", "@panel-default-heading-bg")
 #mapping("textColor", "@text-color")
+#mapping("textPrimaryColor", "@text-muted")
+#mapping("textSecondaryColor", "@text-muted")
 #mapping("linkColor", "@link-color")
 #mapping("titleColor", "@headings-color")
 #mapping("pageBackgroundColor", "@body-bg")

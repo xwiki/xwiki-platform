@@ -40,6 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+office.config.autoStart.hint=Indique si le serveur Office doit être démarré / connecté automatiquement au démarrage de XWiki
 office.config.serverPath.hint=Chemin vers l'installation d'Office
 office.config.serverPort.hint=Numéro de port pour se connecter au serveur Office
 office.config.serverType.hint=Type de serveur Office, cela peut-être interne (local) ou externe (distant).

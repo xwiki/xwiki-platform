@@ -25,10 +25,10 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>10.1-SNAPSHOT</version>
+    <version>10.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-alerts</artifactId>
-  <version>10.1-SNAPSHOT</version>
+  <version>10.2-SNAPSHOT</version>
   <name>XWiki Platform - Alerts - Parent POM</name>
   <packaging>pom</packaging>
   <description>Application that adds an "alert" menu in the skin.</description>

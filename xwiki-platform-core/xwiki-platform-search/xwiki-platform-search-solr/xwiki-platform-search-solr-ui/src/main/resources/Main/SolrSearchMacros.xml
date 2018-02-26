@@ -682,7 +682,7 @@ $services.localization.render('core.users.unknownUser')##
   #end
   ## Set the trigram phrase field parameter boosts so that queries with groups of three
   ## search terms in close proximity have high relevance.
-  ## Generally (pf boost) > (pf3 boost) > (pf2 boost)
+  ## Generally (pf boost) &gt; (pf3 boost) &gt; (pf2 boost)
   #if ($solrConfig.trigramPhraseFields.substring(0, 0) == '')
     ## If the value of the 'trigramPhraseFields' parameter is a string then it means that the
     ## same query fields are used for all result types.

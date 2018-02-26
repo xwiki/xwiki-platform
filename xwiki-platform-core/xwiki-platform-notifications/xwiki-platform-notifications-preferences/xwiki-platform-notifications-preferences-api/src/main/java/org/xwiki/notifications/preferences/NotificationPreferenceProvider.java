@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.stability.Unstable;
 
@@ -53,6 +54,18 @@ public interface NotificationPreferenceProvider
      * @throws NotificationException if an error happened
      */
     List<NotificationPreference> getPreferencesForUser(DocumentReference user) throws NotificationException;
+
+    /**
+     * Get every registered and/or inherited {@link NotificationPreference} for the given wiki.
+     *
+     * @param wiki the wiki for which to retrieve the notification preferences
+     * @return a list of notification preferences
+     * @throws NotificationException if an error happened
+     *
+     * @since 10.2RC1
+     * @since 9.11.3
+     */
+    List<NotificationPreference> getPreferencesForWiki(WikiReference wiki) throws NotificationException;
 
     /**
      * Save a given list of preferences.

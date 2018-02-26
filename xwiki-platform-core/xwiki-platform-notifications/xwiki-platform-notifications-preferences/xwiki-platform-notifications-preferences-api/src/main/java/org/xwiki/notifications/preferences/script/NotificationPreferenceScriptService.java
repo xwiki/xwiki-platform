@@ -33,6 +33,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -45,6 +46,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.text.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -82,9 +84,13 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @param json a list of preferences as JSON
      * @param userReference reference of the user concerned by the preferences
      * @throws NotificationException if error happens
+     * @throws AccessDeniedException if the current user has not the right to edit the given document
      */
-    public void saveNotificationPreferences(String json, DocumentReference userReference) throws NotificationException
+    public void saveNotificationPreferences(String json, DocumentReference userReference)
+            throws NotificationException, AccessDeniedException
     {
+        authorizationManager.checkAccess(Right.EDIT, userReference);
+
         List<NotificationPreference> toSave = new ArrayList<>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -120,7 +126,29 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public void saveNotificationPreferences(String json) throws NotificationException
     {
-        saveNotificationPreferences(json, documentAccessBridge.getCurrentUserReference());
+        try {
+            saveNotificationPreferences(json, documentAccessBridge.getCurrentUserReference());
+        } catch (AccessDeniedException e) {
+            // Should never happen
+            throw new NotificationException(String.format("User [%s] has not the right to edit its own profile!",
+                    documentAccessBridge.getCurrentDocumentReference()), e);
+        }
+    }
+
+    /**
+     * Update notification preferences of the current wiki.
+     *
+     * @param json a list of notification preferences represented as JSON
+     * @throws NotificationException if an error occurs
+     * @throws AccessDeniedException if the current user has not the right to administrate the current wiki
+     */
+    public void saveNotificationPreferencesForCurrentWiki(String json)
+            throws NotificationException, AccessDeniedException
+    {
+        WikiReference currentWiki = documentAccessBridge.getCurrentDocumentReference().getWikiReference();
+        authorizationManager.checkAccess(Right.ADMIN, currentWiki);
+
+        saveNotificationPreferences(json, null);
     }
 
     /**
@@ -183,5 +211,48 @@ public class NotificationPreferenceScriptService implements ScriptService
     public NotificationEmailDiffType getDiffType(String userId)
     {
         return emailUserPreferenceManager.getDiffType(userId);
+    }
+
+    /**
+     * @param eventType an event type
+     * @param format a notification format
+     * @param wiki id of the wiki
+     * @return either or not the given event type is enabled by default on the given wiki in the given format
+     * @throws NotificationException if an error happens
+     * @throws AccessDeniedException if the current user has not the admin right on the wiki
+     */
+    public boolean isEventTypeEnabled(String eventType, NotificationFormat format, String wiki)
+            throws NotificationException, AccessDeniedException
+    {
+        WikiReference wikiReference = new WikiReference(wiki);
+        authorizationManager.checkAccess(Right.ADMIN, wikiReference);
+
+        for (NotificationPreference preference : notificationPreferenceManager.getAllPreferences(wikiReference)) {
+            Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
+                    && preference.getFormat() == format) {
+                return preference.isNotificationEnabled();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param eventType an event type
+     * @param format a notification format
+     * @return either or not the given event type is enabled for the current user in the given format
+     * @throws NotificationException if an error happens
+     */
+    public boolean isEventTypeEnabled(String eventType, NotificationFormat format) throws NotificationException
+    {
+        for (NotificationPreference preference : notificationPreferenceManager.getAllPreferences(
+                documentAccessBridge.getCurrentUserReference())) {
+            Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
+            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
+                    && preference.getFormat() == format) {
+                return preference.isNotificationEnabled();
+            }
+        }
+        return false;
     }
 }

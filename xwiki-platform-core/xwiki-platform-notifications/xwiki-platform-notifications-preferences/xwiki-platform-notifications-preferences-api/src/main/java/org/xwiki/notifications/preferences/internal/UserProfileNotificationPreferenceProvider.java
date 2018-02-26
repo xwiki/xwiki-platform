@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Named;
@@ -26,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
@@ -59,5 +61,12 @@ public class UserProfileNotificationPreferenceProvider extends AbstractDocumentN
             throws NotificationException
     {
         return cachedModelBridge.getNotificationsPreferences(user);
+    }
+
+    @Override
+    public List<NotificationPreference> getPreferencesForWiki(WikiReference wiki) throws NotificationException
+    {
+        // It makes no sense in this provider
+        return Collections.emptyList();
     }
 }

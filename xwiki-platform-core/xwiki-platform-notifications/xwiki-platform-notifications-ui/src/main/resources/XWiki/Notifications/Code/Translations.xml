@@ -123,6 +123,7 @@ notifications.menu.nothing=No notifications available!
 notifications.menu.more=Load older notifications
 notifications.menu.details=Details ({0})
 notifications.settings.title=Notifications Preferences
+notifications.settings.error.notAdmin=You need to be administrator to see this.
 notifications.settings.menu=Notification menu
 notifications.settings.menu.hint=The notification menu is located on the top right of the page, and you can see it by clicking on the bell ({0})
 notifications.settings.email=Email
@@ -187,7 +188,14 @@ notifications.userprofile.follow=Start following
 notifications.userprofile.unfollow=Stop following
 notifications.userprofile.done=Done
 notifications.userprofile.saving=Saving...
-notifications.userprofile.error=Error saving the notification setting</content>
+notifications.userprofile.error=Error saving the notification setting
+
+## Macros description
+rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
+rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

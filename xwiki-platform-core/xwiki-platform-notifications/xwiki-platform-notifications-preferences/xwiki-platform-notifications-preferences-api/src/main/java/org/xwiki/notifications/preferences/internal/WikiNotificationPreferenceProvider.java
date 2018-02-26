@@ -35,7 +35,8 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
  * provide default preferences for all users of that wiki.
  *
  * @version $Id$
- * @since 10.1RC1
+ * @since 10.2RC1
+ * @since 9.11.3
  */
 @Component
 @Singleton
@@ -50,13 +51,13 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
     @Override
     public int getProviderPriority()
     {
-        return 500;
+        return 100;
     }
 
     @Override
     public List<NotificationPreference> getPreferencesForUser(DocumentReference user)
             throws NotificationException
     {
-        return cachedModelBridge.getNotificationsPreferences(user);
+        return cachedModelBridge.getNotificationsPreferences(user.getWikiReference());
     }
 }

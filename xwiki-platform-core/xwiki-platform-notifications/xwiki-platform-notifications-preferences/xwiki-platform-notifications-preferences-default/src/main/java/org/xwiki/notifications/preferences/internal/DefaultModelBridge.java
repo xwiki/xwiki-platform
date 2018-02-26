@@ -42,6 +42,7 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.text.StringUtils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -72,7 +73,7 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String CODE = "Code";
 
-    private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference("Code",
+    private static final SpaceReference NOTIFICATION_CODE_SPACE = new SpaceReference(CODE,
         new SpaceReference(NOTIFICATIONS, new SpaceReference(WIKI_SPACE, new WikiReference("xwiki")))
     );
 
@@ -88,14 +89,16 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String SET_USER_START_DATE_ERROR_MESSAGE = "Failed to set the user start date for [%s].";
 
-    private static final LocalDocumentReference XWIKI_PREFERENCES
-            = new LocalDocumentReference(WIKI_SPACE, "XWikiPreferences");
+    private static final String WIKI_PROVIDER = "wiki";
 
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Inject
     private TargetableNotificationPreferenceBuilder notificationPreferenceBuilder;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
@@ -108,8 +111,14 @@ public class DefaultModelBridge implements ModelBridge
     public List<NotificationPreference> getNotificationsPreferences(WikiReference wikiReference)
             throws NotificationException
     {
-        return getNotificationPreferences(new DocumentReference(XWIKI_PREFERENCES, wikiReference),
-                "wiki");
+        List<NotificationPreference> results = getNotificationPreferences(
+                new DocumentReference(GLOBAL_PREFERENCES, wikiReference), WIKI_PROVIDER);
+        // Inherit preferences from the main wiki
+        if (!wikiReference.getName().equals(wikiDescriptorManager.getMainWikiId())) {
+            results.addAll(getNotificationsPreferences(new WikiReference(wikiDescriptorManager.getMainWikiId())));
+        }
+
+        return results;
     }
 
     private List<NotificationPreference> getNotificationPreferences(DocumentReference document,

@@ -153,14 +153,14 @@ public class DefaultNotificationPreferenceManagerTest
         preferences = mocker.getComponentUnderTest().getPreferences(user,
                 true, NotificationFormat.EMAIL);
 
-        assertEquals(1, preferences.size());
-        assertTrue(preferences.contains(mockPreference23));
+        assertEquals(0, preferences.size());
 
         preferences = mocker.getComponentUnderTest().getPreferences(user,
                 false, NotificationFormat.EMAIL);
 
-        assertEquals(1, preferences.size());
+        assertEquals(2, preferences.size());
         assertTrue(preferences.contains(mockPreference22));
+        assertTrue(preferences.contains(mockPreference23));
     }
 
     @Test

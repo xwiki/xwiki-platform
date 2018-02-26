@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-webjars</artifactId>
-    <version>10.1-SNAPSHOT</version>
+    <version>10.1</version>
   </parent>
   <artifactId>xwiki-platform-webjars-api</artifactId>
   <name>XWiki Platform - WebJars - API</name>

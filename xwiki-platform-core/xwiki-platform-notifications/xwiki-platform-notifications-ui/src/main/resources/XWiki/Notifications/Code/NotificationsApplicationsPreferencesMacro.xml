@@ -177,6 +177,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
       $.post(url, {
         action: 'savePreferences',
+        target: $('.notifPreferences').attr('data-target'),
         json: JSON.stringify(data)
       }).done(function() {
         notification.hide();
@@ -843,10 +844,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <code>{{include reference="XWiki.Notifications.Code.NotificationsPreferencesMacros" /}}
 
 {{velocity}}
-#if (!$xcontext.userReference)
+#if (!$xcontext.userReference &amp;&amp; $xcontext.macro.params.target == 'user')
   {{info}}
     {{translation key="notifications.settings.applications.forGuest" /}}
   {{/info}}
+#elseif ($xcontext.macro.params.target == 'wiki' &amp;&amp; !$services.security.authorization.hasAccess('admin', $services.model.createWikiReference($services.wiki.currentWikiId)))
+  {{error}}
+    {{translation key="notifications.settings.error.notAdmin" /}}
+  {{/error}}
 #else
 ######################################################
 ### CSS and JAVASCRIPTS
@@ -865,7 +870,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences"&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($xcontext.macro.params.target)"&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
@@ -948,15 +953,11 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 #macro(displayPreference $type $format)
   #set ($checked = '')
   #set ($preference = '')
-  #foreach ($pref in $userDoc.getObjects('XWiki.Notifications.Code.NotificationPreferenceClass'))
-    #if (($pref.getValue('format') == $format || ($format == 'alert' &amp;&amp; "$!pref.getValue('format')" == '')) &amp;&amp; $pref.getValue('eventType') == $type.eventType)
-      #set ($preference = $pref)
-      #if ($pref.getValue('notificationEnabled') == 1)
-        #set ($checked = 'checked="checked"')
-      #end
-    #end
+  #if (($xcontext.macro.params.target == 'wiki' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format, $services.wiki.currentWikiId)) ||
+    ($xcontext.macro.params.target == 'user' &amp;&amp; $services.notification.preferences.isEventTypeEnabled($type.eventType, $format)))
+    #set ($checked = 'checked="checked"')
   #end
-    &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-objnumber="$!preference.number" data-filter="${type.filter}"&gt;
+  &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-filter="${type.filter}"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
     &lt;/div&gt;
@@ -989,6 +990,72 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     </property>
     <property>
       <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>9d1dfbad-5ac6-4633-82c8-e9a152e0e657</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>user</defaultValue>
+    </property>
+    <property>
+      <description>Target of the macro (could be "user" for the current user or "wiki" for the current wiki)</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>target</name>
     </property>
   </object>
 </xwikidoc>

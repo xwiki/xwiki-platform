@@ -21,14 +21,17 @@ package org.xwiki.notifications.preferences.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * This implementation of {@link NotificationPreferenceProvider} handles preferences stored at the wiki level, to
@@ -48,6 +51,9 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
      */
     public static final String NAME = "wiki";
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public int getProviderPriority()
     {
@@ -58,6 +64,13 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
     public List<NotificationPreference> getPreferencesForUser(DocumentReference user)
             throws NotificationException
     {
-        return cachedModelBridge.getNotificationsPreferences(user.getWikiReference());
+        return getPreferencesForWiki(user != null ? user.getWikiReference()
+                : new WikiReference(wikiDescriptorManager.getMainWikiId()));
+    }
+
+    @Override
+    public List<NotificationPreference> getPreferencesForWiki(WikiReference wiki) throws NotificationException
+    {
+        return cachedModelBridge.getNotificationsPreferences(wiki);
     }
 }

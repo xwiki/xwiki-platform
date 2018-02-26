@@ -265,6 +265,24 @@
                     "methodName": "getFeed",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.xwiki.notifications.preferences.NotificationPreference> org.xwiki.notifications.preferences.NotificationPreferenceManager::getAllPreferences(org.xwiki.model.reference.WikiReference) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.preferences",
+                    "classSimpleName": "NotificationPreferenceManager",
+                    "methodName": "getAllPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.List<org.xwiki.notifications.preferences.NotificationPreference> org.xwiki.notifications.preferences.NotificationPreferenceProvider::getPreferencesForWiki(org.xwiki.model.reference.WikiReference) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.preferences",
+                    "classSimpleName": "NotificationPreferenceProvider",
+                    "methodName": "getPreferencesForWiki",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

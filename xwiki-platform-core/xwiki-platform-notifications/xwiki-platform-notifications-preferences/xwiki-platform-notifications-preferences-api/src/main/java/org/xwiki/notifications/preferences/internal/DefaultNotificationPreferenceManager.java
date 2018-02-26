@@ -38,6 +38,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -64,16 +65,12 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     @Inject
     private Logger logger;
 
-    @Override
-    public List<NotificationPreference> getAllPreferences(DocumentReference user)
-            throws NotificationException
+    private List<NotificationPreferenceProvider> getProviders() throws NotificationException
     {
         try {
             // Get every registered notification provider
             List<NotificationPreferenceProvider> providers =
                     componentManager.getInstanceList(NotificationPreferenceProvider.class);
-
-            Set<NotificationPreference> notificationPreferences = new HashSet<>();
 
             // We handle conflicts between similar preferences by sorting the providers by order. Since
             // notificationPreferences is a set, only the first occurrence of a preference is stored.
@@ -81,19 +78,39 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
                 // The comparison is inverted so the higher priorities are sorted first
                 o2.getProviderPriority() - o1.getProviderPriority()
             );
-            for (NotificationPreferenceProvider provider : providers) {
-                // Conflicts are handled thanks to AbstractNotificationPreference.equals()
-                // and AbstractNotificationPreference.equals().
-                notificationPreferences.addAll(provider.getPreferencesForUser(user));
-            }
 
-            return new ArrayList<>(notificationPreferences);
+            return providers;
         } catch (ComponentLookupException e) {
-            // Don’t include the DocumentReference parameter here as it’s not relevant
             throw new NotificationException(
                     "Unable to fetch the notifications preferences providers from the component manager", e);
         }
+    }
 
+    @Override
+    public List<NotificationPreference> getAllPreferences(DocumentReference user)
+            throws NotificationException
+    {
+        Set<NotificationPreference> notificationPreferences = new HashSet<>();
+        for (NotificationPreferenceProvider provider : getProviders()) {
+            // Conflicts are handled thanks to AbstractNotificationPreference.equals()
+            // and AbstractNotificationPreference.equals().
+            notificationPreferences.addAll(provider.getPreferencesForUser(user));
+        }
+
+        return new ArrayList<>(notificationPreferences);
+    }
+
+    @Override
+    public List<NotificationPreference> getAllPreferences(WikiReference wiki) throws NotificationException
+    {
+        Set<NotificationPreference> notificationPreferences = new HashSet<>();
+        for (NotificationPreferenceProvider provider : getProviders()) {
+            // Conflicts are handled thanks to AbstractNotificationPreference.equals()
+            // and AbstractNotificationPreference.equals().
+            notificationPreferences.addAll(provider.getPreferencesForWiki(wiki));
+        }
+
+        return new ArrayList<>(notificationPreferences);
     }
 
     @Override

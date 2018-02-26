@@ -51,7 +51,7 @@ public interface ModelBridge
     /**
      * Return the notifications preferences that are stored as XObjects in the wiki administration.
      *
-     * @param wikiReference the wiki where to load data
+     * @param wikiReference the wiki where to load data (null means default preferences)
      * @return the list of preferences
      *
      * @throws NotificationException if an error occurs

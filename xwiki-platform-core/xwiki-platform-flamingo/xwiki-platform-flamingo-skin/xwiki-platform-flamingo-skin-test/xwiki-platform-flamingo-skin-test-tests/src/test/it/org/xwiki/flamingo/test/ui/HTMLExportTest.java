@@ -33,9 +33,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.AllLogRule;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -48,6 +51,9 @@ public class HTMLExportTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule adminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    @Rule
+    public AllLogRule logRule = new AllLogRule(LogLevel.WARN);
 
     private interface PageValidator
     {
@@ -130,6 +136,14 @@ public class HTMLExportTest extends AbstractTest
         //         used with some regex
         assertHTMLExportURL("http://localhost:8080/xwiki/bin/export/UnexistingSpace/UnexistingPage?format=html"
             + "&pages=TopPage.%25", Arrays.asList(new TopPageValidator(),  new NestedPageValidator()));
+
+        // Verify that there was no warning or more severe logs output to the console.
+        StringBuilder builder = new StringBuilder("Should not have got the following logs [\n");
+        for (int i = 0; i < this.logRule.size(); i++) {
+            builder.append(" - ["). append(this.logRule.getMessage(i)).append("]\n");
+        }
+        builder.append("]");
+        assertEquals(builder.toString(), 0, this.logRule.size());
     }
 
     private void assertHTMLExportURL(String htmlExportURL, List<PageValidator> validators) throws Exception

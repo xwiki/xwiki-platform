@@ -48,7 +48,7 @@ public interface DocumentAccessBridge
      * @param documentReference the String reference of the document to find
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
-     * @deprecated use {@link #getDocument(org.xwiki.model.reference.DocumentReference)} instead
+     * @deprecated use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
      */
     @Deprecated
     DocumentModelBridge getDocument(String documentReference) throws Exception;
@@ -62,8 +62,40 @@ public interface DocumentAccessBridge
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
      * @since 2.2M1
+     * @deprecated deprecated since 10.2RC1, use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
      */
+    @Deprecated
     DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception;
+
+    /**
+     * Get the document object associated with the passed document.
+     * 
+     * @param documentReference the reference of the document instance to find
+     * @return the document instance matching the passed document reference
+     * @throws Exception when loading the document failed
+     * @since 10.2RC1
+     * @since 9.11.4
+     */
+    default DocumentModelBridge getDocumentInstance(DocumentReference documentReference) throws Exception
+    {
+        return null;
+    }
+
+    /**
+     * Get the document object associated with the passed document name and context locale.
+     * <p>
+     * Note that the returned document does not contain objects and attachment so it should be used very carefully.
+     * 
+     * @param documentReference the reference of the document instance to find
+     * @return the document instance matching the passed document reference and context locale
+     * @throws Exception when loading the document failed
+     * @since 10.2RC1
+     * @since 9.11.4
+     */
+    default DocumentModelBridge getTranslatedDocumentInstance(DocumentReference documentReference) throws Exception
+    {
+        return getDocument(documentReference);
+    }
 
     /**
      * Get the reference to the current document (found in the Context).

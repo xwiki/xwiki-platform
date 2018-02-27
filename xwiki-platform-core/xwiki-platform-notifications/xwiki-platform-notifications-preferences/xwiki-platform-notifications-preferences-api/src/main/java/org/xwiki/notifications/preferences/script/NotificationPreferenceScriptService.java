@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -72,7 +73,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
-    private TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder;
+    private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
 
     @Inject
     private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
@@ -85,6 +86,10 @@ public class NotificationPreferenceScriptService implements ScriptService
      */
     public void saveNotificationPreferences(String json, DocumentReference userReference) throws NotificationException
     {
+        // Instantiate a new copy of TargetableNotificationPreferenceBuilder because this component is not thread-safe.
+        TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder
+                = targetableNotificationPreferenceBuilderProvider.get();
+
         List<NotificationPreference> toSave = new ArrayList<>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();

@@ -31,7 +31,7 @@
   <name>XWiki Platform - WebJars - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

@@ -34,15 +34,19 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
+import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -80,15 +84,9 @@ public class NotificationPreferenceScriptService implements ScriptService
     @Inject
     private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
 
-    /**
-     * Save preferences given as JSON.
-     * @param json a list of preferences as JSON
-     * @param userReference reference of the user concerned by the preferences
-     * @throws NotificationException if error happens
-     * @throws AccessDeniedException if the current user has not the right to edit the given document
-     */
-    public void saveNotificationPreferences(String json, DocumentReference userReference)
-            throws NotificationException, AccessDeniedException
+    private void saveNotificationPreferences(String json, String providerHint, EntityReference target,
+            NotificationPreferenceCategory category)
+            throws NotificationException
     {
         authorizationManager.checkAccess(Right.EDIT, userReference);
 
@@ -108,10 +106,11 @@ public class NotificationPreferenceScriptService implements ScriptService
                 targetableNotificationPreferenceBuilder.prepare();
                 targetableNotificationPreferenceBuilder.setEnabled(enabled);
                 targetableNotificationPreferenceBuilder.setFormat(format);
-                targetableNotificationPreferenceBuilder.setProviderHint("userProfile");
+                targetableNotificationPreferenceBuilder.setProviderHint(providerHint);
                 targetableNotificationPreferenceBuilder.setProperties(
                         Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
-                targetableNotificationPreferenceBuilder.setTarget(userReference);
+                targetableNotificationPreferenceBuilder.setTarget(target);
+                targetableNotificationPreferenceBuilder.setCategory(category);
 
                 toSave.add(targetableNotificationPreferenceBuilder.build());
             }
@@ -121,6 +120,21 @@ public class NotificationPreferenceScriptService implements ScriptService
         } catch (Exception e) {
             throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);
         }
+    }
+
+    /**
+     * Save preferences given as JSON.
+     * @param json a list of preferences as JSON
+     * @param userReference reference of the user concerned by the preferences
+     * @throws NotificationException if error happens
+     * @throws AccessDeniedException if the current user has not the right to edit the given document
+     */
+    public void saveNotificationPreferences(String json, DocumentReference userReference)
+            throws NotificationException, AccessDeniedException
+    {
+        authorizationManager.checkAccess(Right.EDIT, userReference);
+        saveNotificationPreferences(json, UserProfileNotificationPreferenceProvider.NAME, userReference,
+                NotificationPreferenceCategory.DEFAULT);
     }
 
     /**
@@ -153,7 +167,8 @@ public class NotificationPreferenceScriptService implements ScriptService
         WikiReference currentWiki = documentAccessBridge.getCurrentDocumentReference().getWikiReference();
         authorizationManager.checkAccess(Right.ADMIN, currentWiki);
 
-        saveNotificationPreferences(json, null);
+        saveNotificationPreferences(json, WikiNotificationPreferenceProvider.NAME, currentWiki,
+                NotificationPreferenceCategory.SYSTEM);
     }
 
     /**

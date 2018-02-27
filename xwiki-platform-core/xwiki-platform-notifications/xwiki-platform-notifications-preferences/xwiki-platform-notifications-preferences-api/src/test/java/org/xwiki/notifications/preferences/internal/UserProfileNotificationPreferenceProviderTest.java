@@ -73,15 +73,20 @@ public class UserProfileNotificationPreferenceProviderTest
     public void savePreferencesWithTargetable() throws Exception
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "user");
+        DocumentReference userReference2 = new DocumentReference("wiki", "space", "user2");
 
         TargetableNotificationPreference pref1 = mock(TargetableNotificationPreference.class);
         when(pref1.getTarget()).thenReturn(userReference);
         TargetableNotificationPreference pref2 = mock(TargetableNotificationPreference.class);
         when(pref2.getTarget()).thenReturn(userReference);
+        TargetableNotificationPreference pref3 = mock(TargetableNotificationPreference.class);
+        when(pref3.getTarget()).thenReturn(userReference2);
 
-        mocker.getComponentUnderTest().savePreferences(Arrays.asList(pref1, pref2));
+        mocker.getComponentUnderTest().savePreferences(Arrays.asList(pref1, pref2, pref3));
 
-        verify(cachedModelBridge, times(2)).saveNotificationsPreferences(eq(userReference),
+        verify(cachedModelBridge, times(1)).saveNotificationsPreferences(eq(userReference),
+                any(List.class));
+        verify(cachedModelBridge, times(1)).saveNotificationsPreferences(eq(userReference2),
                 any(List.class));
     }
 }

@@ -25,7 +25,7 @@ import java.util.Map;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -48,10 +48,10 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     private class TargetablePreference extends AbstractNotificationPreference
             implements TargetableNotificationPreference
     {
-        private DocumentReference target;
+        private EntityReference target;
 
         @Override
-        public DocumentReference getTarget()
+        public EntityReference getTarget()
         {
             return target;
         }
@@ -101,7 +101,7 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     }
 
     @Override
-    public void setTarget(DocumentReference target)
+    public void setTarget(EntityReference target)
     {
         preference.target = target;
     }

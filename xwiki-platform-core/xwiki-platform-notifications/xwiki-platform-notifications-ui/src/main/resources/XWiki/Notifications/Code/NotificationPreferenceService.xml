@@ -52,7 +52,11 @@
   #set ($discard = $userDoc.save('Update Notification Email Diff Type'))
 #elseif ("$!request.action" == 'savePreferences')
   #try()
-    $services.notification.preferences.saveNotificationPreferences($request.json)
+    #if ("$!request.target" == 'wiki')
+      $services.notification.preferences.saveNotificationPreferencesForCurrentWiki($request.json)
+    #else
+      $services.notification.preferences.saveNotificationPreferences($request.json)
+    #end
   #end
   #if ("$!exception" != '')
     $response.sendError(500, "$!exceptiontool.getStackTrace($exception)")

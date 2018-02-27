@@ -36,11 +36,17 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,12 +66,14 @@ public class NotificationPreferenceScriptServiceTest
 
     private NotificationPreferenceManager notificationPreferenceManager;
     private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager authorizationManager;
 
     @Before
     public void setUp() throws Exception
     {
         notificationPreferenceManager = mocker.getInstance(NotificationPreferenceManager.class);
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
+        authorizationManager = mocker.getInstance(ContextualAuthorizationManager.class);
     }
 
     @Test
@@ -135,5 +143,44 @@ public class NotificationPreferenceScriptServiceTest
                 wiki.getName()));
         assertFalse(mocker.getComponentUnderTest().isEventTypeEnabled("update", NotificationFormat.EMAIL,
                 wiki.getName()));
+    }
+
+    @Test
+    public void saveNotificationPreferencesForCurrentWiki() throws Exception
+    {
+        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(
+                new DocumentReference("wikiA", "SpaceA", "PageA"));
+        AccessDeniedException e = mock(AccessDeniedException.class);
+        doThrow(e).when(authorizationManager).checkAccess(Right.ADMIN, new WikiReference("wikiA"));
+
+        String json = "";
+        Exception caughtException = null;
+        try {
+            mocker.getComponentUnderTest().saveNotificationPreferencesForCurrentWiki(json);
+        } catch (Exception ex) {
+            caughtException = ex;
+        }
+
+        assertNotNull(caughtException);
+        assertEquals(e, caughtException);
+    }
+
+    @Test
+    public void saveNotificationPreferences() throws Exception
+    {
+        DocumentReference userDoc = new DocumentReference("wikiA", "SpaceA", "UserA");
+        AccessDeniedException e = mock(AccessDeniedException.class);
+        doThrow(e).when(authorizationManager).checkAccess(Right.EDIT, userDoc);
+
+        String json = "";
+        Exception caughtException = null;
+        try {
+            mocker.getComponentUnderTest().saveNotificationPreferences(json, userDoc);
+        } catch (Exception ex) {
+            caughtException = ex;
+        }
+
+        assertNotNull(caughtException);
+        assertEquals(e, caughtException);
     }
 }

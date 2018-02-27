@@ -41,7 +41,9 @@ import org.xwiki.model.reference.ObjectReference;
 public interface DocumentAccessBridge
 {
     /**
-     * Get the document object associated with the passed document name.
+     * Get the document object associated with the passed document name and context language.
+     * <p>
+     * Note that the returned document does not contain objects and attachment so it should be used very carefully.
      * 
      * @param documentReference the String reference of the document to find
      * @return the document object matching the passed document name
@@ -52,7 +54,9 @@ public interface DocumentAccessBridge
     DocumentModelBridge getDocument(String documentReference) throws Exception;
 
     /**
-     * Get the document object associated with the passed document name.
+     * Get the document object associated with the passed document name and context language.
+     * <p>
+     * Note that the returned document does not contain objects and attachment so it should be used very carefully.
      * 
      * @param documentReference the name of the document to find
      * @return the document object matching the passed document name

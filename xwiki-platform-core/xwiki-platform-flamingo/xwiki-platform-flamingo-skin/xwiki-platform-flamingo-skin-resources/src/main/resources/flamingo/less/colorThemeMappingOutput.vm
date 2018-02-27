@@ -16,6 +16,7 @@
 #mapping("linkColor", "@link-color")
 #mapping("titleColor", "@headings-color")
 #mapping("pageBackgroundColor", "@body-bg")
+#mapping("backgroundSecondaryColor", "@well-bg")
 #mapping("menuBackgroundColor", "@navbar-default-bg")
 #mapping("menuLinkColor", "@navbar-default-link-color")
 #mapping("menuSelectedEntryBackgroundColor", "@navbar-default-link-active-bg")

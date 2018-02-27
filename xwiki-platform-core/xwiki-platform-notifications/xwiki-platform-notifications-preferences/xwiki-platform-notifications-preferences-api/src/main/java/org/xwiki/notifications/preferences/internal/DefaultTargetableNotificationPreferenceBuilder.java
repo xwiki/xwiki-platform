@@ -22,10 +22,10 @@ package org.xwiki.notifications.preferences.internal;
 import java.util.Date;
 import java.util.Map;
 
-import javax.inject.Singleton;
-
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -33,13 +33,13 @@ import org.xwiki.notifications.preferences.TargetableNotificationPreference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 
 /**
- * This is the default implementation of {@link TargetableNotificationPreferenceBuilder}.
+ * This is the default implementation of {@link TargetableNotificationPreferenceBuilder}. This implement is not thread safe!
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Component
-@Singleton
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultTargetableNotificationPreferenceBuilder implements TargetableNotificationPreferenceBuilder
 {
     private TargetablePreference preference;
@@ -47,10 +47,10 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     private class TargetablePreference extends AbstractNotificationPreference
             implements TargetableNotificationPreference
     {
-        private DocumentReference target;
+        private EntityReference target;
 
         @Override
-        public DocumentReference getTarget()
+        public EntityReference getTarget()
         {
             return target;
         }
@@ -100,7 +100,7 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
     }
 
     @Override
-    public void setTarget(DocumentReference target)
+    public void setTarget(EntityReference target)
     {
         preference.target = target;
     }

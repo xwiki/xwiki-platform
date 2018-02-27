@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.stability.Unstable;
 
@@ -76,8 +76,10 @@ public interface TargetableNotificationPreferenceBuilder
 
     /**
      * @param target the target of the preference
+     * @since 9.11.3
+     * @since 10.2RC2
      */
-    void setTarget(DocumentReference target);
+    void setTarget(EntityReference target);
 
     /**
      * @param category the category of the preference

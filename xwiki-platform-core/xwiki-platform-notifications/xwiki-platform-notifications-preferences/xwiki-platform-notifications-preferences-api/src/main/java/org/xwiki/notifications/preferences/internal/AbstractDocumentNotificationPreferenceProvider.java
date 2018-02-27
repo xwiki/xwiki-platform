@@ -19,12 +19,17 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
@@ -44,22 +49,45 @@ public abstract class AbstractDocumentNotificationPreferenceProvider implements 
     @Named("cached")
     protected ModelBridge cachedModelBridge;
 
+    @Inject
+    protected Logger logger;
+
     @Override
     public void savePreferences(List<NotificationPreference> preferences) throws NotificationException
     {
+        // Create a map of preferences per target, so we can save the target's document only once for all preferences
+        Map<EntityReference, List<NotificationPreference>> preferencesPerTarget = new HashMap<>();
+
         for (NotificationPreference preference : preferences) {
-            // As we are saving notification preferences a user profile, we can only accept
-            // TargetableNotificationPreference.
             if (preference instanceof TargetableNotificationPreference) {
                 TargetableNotificationPreference targetablePreference = (TargetableNotificationPreference) preference;
 
-                // TODO: Find a way to send one array of preferences to save per user
-                cachedModelBridge.saveNotificationsPreferences(targetablePreference.getTarget(),
-                        Arrays.asList(targetablePreference));
+                List<NotificationPreference> list = preferencesPerTarget.get(targetablePreference.getTarget());
+                if (list == null) {
+                    list = new ArrayList<>();
+                    preferencesPerTarget.put(targetablePreference.getTarget(), list);
+                }
+
+                list.add(targetablePreference);
             } else {
-                throw new NotificationException(String.format("The notification preference %s is not a "
-                        + "TargetableNotificationPreference.", preference));
+                logger.warn("Unsupported NotificationPreference class: [{}]. This preference will not be saved.",
+                        preference.getClass().getName());
             }
+        }
+
+        for (Map.Entry<EntityReference, List<NotificationPreference>> entry : preferencesPerTarget.entrySet()) {
+            savePreferences(entry.getValue(), entry.getKey());
+        }
+    }
+
+    protected void savePreferences(List<NotificationPreference> preferences, EntityReference target)
+            throws NotificationException
+    {
+        if (target instanceof DocumentReference) {
+            cachedModelBridge.saveNotificationsPreferences((DocumentReference) target, preferences);
+        } else {
+            logger.warn("Preference's target [{}] is not a document reference. The corresponding preference will not"
+                    + " be saved.");
         }
     }
 }

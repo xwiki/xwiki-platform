@@ -19,11 +19,11 @@
  */
 package org.xwiki.notifications.preferences;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * A notification preference can (most of the time) be targeted to a certain user or group. A preference using
+ * A notification preference can (most of the time) be targeted to a certain user, group or wiki. A preference using
  * this comportment can implement the following interface.
  *
  * @version $Id$
@@ -33,7 +33,9 @@ import org.xwiki.stability.Unstable;
 public interface TargetableNotificationPreference extends NotificationPreference
 {
     /**
-     * @return the user or the group that should be targeted by the given preference
+     * @return the wiki, the user or the group that should be targeted by the given preference
+     * @since 9.11.3
+     * @since 10.2RC1
      */
-    DocumentReference getTarget();
+    EntityReference getTarget();
 }

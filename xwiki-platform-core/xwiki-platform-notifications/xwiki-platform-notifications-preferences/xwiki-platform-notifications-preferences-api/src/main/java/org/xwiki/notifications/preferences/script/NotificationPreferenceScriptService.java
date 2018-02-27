@@ -27,21 +27,26 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
+import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -74,10 +79,44 @@ public class NotificationPreferenceScriptService implements ScriptService
     private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
-    private TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder;
+    private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
 
     @Inject
     private NotificationEmailUserPreferenceManager emailUserPreferenceManager;
+
+    private void saveNotificationPreferences(String json, String providerHint, EntityReference target,
+            NotificationPreferenceCategory category)
+            throws NotificationException
+    {
+        List<NotificationPreference> toSave = new ArrayList<>();
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Map<String, Object>> preferences = objectMapper.reader().forType(List.class).readValue(json);
+            for (Map<String, Object> item : preferences) {
+                String eventType = (String) item.get("eventType");
+                NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
+                boolean enabled = (Boolean) item.get("enabled");
+
+                TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder
+                        = targetableNotificationPreferenceBuilderProvider.get();
+                targetableNotificationPreferenceBuilder.prepare();
+                targetableNotificationPreferenceBuilder.setEnabled(enabled);
+                targetableNotificationPreferenceBuilder.setFormat(format);
+                targetableNotificationPreferenceBuilder.setProviderHint(providerHint);
+                targetableNotificationPreferenceBuilder.setProperties(
+                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
+                targetableNotificationPreferenceBuilder.setTarget(target);
+                targetableNotificationPreferenceBuilder.setCategory(category);
+
+                toSave.add(targetableNotificationPreferenceBuilder.build());
+            }
+
+            notificationPreferenceManager.savePreferences(toSave);
+
+        } catch (Exception e) {
+            throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);
+        }
+    }
 
     /**
      * Save preferences given as JSON.
@@ -90,32 +129,8 @@ public class NotificationPreferenceScriptService implements ScriptService
             throws NotificationException, AccessDeniedException
     {
         authorizationManager.checkAccess(Right.EDIT, userReference);
-
-        List<NotificationPreference> toSave = new ArrayList<>();
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<Map<String, Object>> preferences = objectMapper.reader().forType(List.class).readValue(json);
-            for (Map<String, Object> item : preferences) {
-                String eventType = (String) item.get("eventType");
-                NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
-                boolean enabled = (Boolean) item.get("enabled");
-
-                targetableNotificationPreferenceBuilder.prepare();
-                targetableNotificationPreferenceBuilder.setEnabled(enabled);
-                targetableNotificationPreferenceBuilder.setFormat(format);
-                targetableNotificationPreferenceBuilder.setProviderHint("userProfile");
-                targetableNotificationPreferenceBuilder.setProperties(
-                        Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, eventType));
-                targetableNotificationPreferenceBuilder.setTarget(userReference);
-
-                toSave.add(targetableNotificationPreferenceBuilder.build());
-            }
-
-            notificationPreferenceManager.savePreferences(toSave);
-
-        } catch (Exception e) {
-            throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);
-        }
+        saveNotificationPreferences(json, UserProfileNotificationPreferenceProvider.NAME, userReference,
+                NotificationPreferenceCategory.DEFAULT);
     }
 
     /**
@@ -148,7 +163,8 @@ public class NotificationPreferenceScriptService implements ScriptService
         WikiReference currentWiki = documentAccessBridge.getCurrentDocumentReference().getWikiReference();
         authorizationManager.checkAccess(Right.ADMIN, currentWiki);
 
-        saveNotificationPreferences(json, null);
+        saveNotificationPreferences(json, WikiNotificationPreferenceProvider.NAME, currentWiki,
+                NotificationPreferenceCategory.SYSTEM);
     }
 
     /**

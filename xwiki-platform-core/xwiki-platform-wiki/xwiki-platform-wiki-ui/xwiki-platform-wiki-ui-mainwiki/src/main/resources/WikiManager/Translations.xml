@@ -338,7 +338,7 @@ platform.wiki.delete.confirmation.no=No, take me back!
       </scope>
     </class>
     <property>
-      <scope>WIKI</scope>
+      <scope>GLOBAL</scope>
     </property>
   </object>
 </xwikidoc>

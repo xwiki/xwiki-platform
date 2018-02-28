@@ -79,7 +79,7 @@ public class XWikiLinkLabelGeneratorTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(documentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("My title");
 
         EntityReferenceSerializer<String> localSerializer =
@@ -105,7 +105,7 @@ public class XWikiLinkLabelGeneratorTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(documentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("My title");
 
         EntityReferenceSerializer<String> localSerializer =
@@ -130,7 +130,7 @@ public class XWikiLinkLabelGeneratorTest
         when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.getDocument(documentReference)).thenThrow(new Exception("error"));
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenThrow(new Exception("error"));
 
         EntityReferenceSerializer<String> localSerializer =
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
@@ -154,7 +154,7 @@ public class XWikiLinkLabelGeneratorTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(documentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn(null);
 
         EntityReferenceSerializer<String> localSerializer =
@@ -179,7 +179,7 @@ public class XWikiLinkLabelGeneratorTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(documentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("$0");
 
         EntityReferenceSerializer<String> localSerializer =
@@ -202,7 +202,7 @@ public class XWikiLinkLabelGeneratorTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(documentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         when(dmb.getTitle()).thenReturn("my title");
 
         EntityReferenceSerializer<String> localSerializer =

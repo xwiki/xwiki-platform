@@ -225,7 +225,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
     {
         String result;
         try {
-            DocumentModelBridge document = this.documentAccessBridge.getDocument(documentReference);
+            DocumentModelBridge document = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
             if (StringUtils.isNotBlank(document.getTitle())) {
                 result = document.getTitle();
             } else {

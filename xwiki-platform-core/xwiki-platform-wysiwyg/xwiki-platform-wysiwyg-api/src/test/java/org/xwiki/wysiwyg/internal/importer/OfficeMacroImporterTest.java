@@ -52,7 +52,7 @@ public class OfficeMacroImporterTest
         DocumentAccessBridge documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
-        when(documentAccessBridge.getDocument(documentReference)).thenReturn(xwikiDocument);
+        when(documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(xwikiDocument);
         when(xwikiDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         XDOM xdom =

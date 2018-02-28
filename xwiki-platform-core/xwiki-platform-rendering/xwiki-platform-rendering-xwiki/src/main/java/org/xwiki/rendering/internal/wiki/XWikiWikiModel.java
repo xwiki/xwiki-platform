@@ -267,7 +267,8 @@ public class XWikiWikiModel implements WikiModel
         }
 
         try {
-            return this.documentAccessBridge.getDocument(new DocumentReference(entityReference)).getXDOM();
+            return this.documentAccessBridge.getTranslatedDocumentInstance(new DocumentReference(entityReference))
+                .getXDOM();
         } catch (Exception e) {
             throw new WikiModelException(String.format("Failed to get XDOM for [%s]", resourceReference), e);
         }

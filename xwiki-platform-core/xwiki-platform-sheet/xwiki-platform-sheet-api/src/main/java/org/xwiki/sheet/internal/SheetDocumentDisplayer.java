@@ -207,7 +207,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     private XDOM applySheet(DocumentModelBridge document, DocumentReference sheetReference,
         DocumentDisplayerParameters parameters) throws Exception
     {
-        DocumentModelBridge sheet = documentAccessBridge.getDocument(sheetReference);
+        DocumentModelBridge sheet = documentAccessBridge.getTranslatedDocumentInstance(sheetReference);
         if (parameters.isTitleDisplayed() && StringUtils.isEmpty(sheet.getTitle())) {
             // The sheet doesn't control the title. Fall back on the default document displayer.
             return null;

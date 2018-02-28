@@ -128,7 +128,7 @@ public class ContextMacroTest
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         when(dab.hasProgrammingRights()).thenReturn(true).thenReturn(true);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(referencedDocumentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
 
         MacroContentParser parser = this.mocker.getInstance(MacroContentParser.class);
         when(parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(
@@ -155,7 +155,7 @@ public class ContextMacroTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(referencedDocumentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
 
         MacroContentParser parser = this.mocker.getInstance(MacroContentParser.class);
         XDOM xdom = new XDOM(Arrays.asList((Block) new ParagraphBlock(Arrays.asList((Block) new LinkBlock(
@@ -185,7 +185,7 @@ public class ContextMacroTest
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(referencedDocumentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
 
         MacroContentParser parser = this.mocker.getInstance(MacroContentParser.class);
         when(parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(

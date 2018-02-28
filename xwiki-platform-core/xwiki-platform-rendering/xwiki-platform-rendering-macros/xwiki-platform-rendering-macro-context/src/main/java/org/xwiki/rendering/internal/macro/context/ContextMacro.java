@@ -150,7 +150,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                     // Apply the transformations but with a Transformation Context having the XDOM of the passed
                     // document so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate
                     // the toc for the passed document instead of the current document).
-                    DocumentModelBridge referencedDoc = this.documentAccessBridge.getDocument(referencedDocReference);
+                    DocumentModelBridge referencedDoc =
+                        this.documentAccessBridge.getTranslatedDocumentInstance(referencedDocReference);
                     XDOM referencedXDOM = referencedDoc.getXDOM();
 
                     if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {

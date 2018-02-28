@@ -336,7 +336,9 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 allowing(mockDocumentReferenceResolver).resolve(with(resolve),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
-                allowing(mockSetup.bridge).getDocument(reference);
+                allowing(mockSetup.bridge).getDocumentInstance(reference);
+                will(returnValue(mockDocument));
+                allowing(mockSetup.bridge).getTranslatedDocumentInstance(reference);
                 will(returnValue(mockDocument));
                 allowing(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
@@ -344,6 +346,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 will(returnValue(getXDOM(content)));
                 allowing(mockDocument).getDocumentReference();
                 will(returnValue(reference));
+                allowing(mockDocument).getRealLanguage();
+                will(returnValue(""));
             }
         });
     }

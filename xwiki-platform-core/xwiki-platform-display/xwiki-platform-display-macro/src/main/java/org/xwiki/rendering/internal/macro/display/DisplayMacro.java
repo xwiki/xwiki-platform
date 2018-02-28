@@ -144,7 +144,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         // Step 2: Retrieve the included document.
         DocumentModelBridge documentBridge;
         try {
-            documentBridge = this.documentAccessBridge.getDocument(includedReference);
+            documentBridge = this.documentAccessBridge.getDocumentInstance(includedReference);
         } catch (Exception e) {
             throw new MacroExecutionException(
                 "Failed to load Document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]",
@@ -159,6 +159,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
+        displayParameters.setContentTranslated(true);
 
         Stack<Object> references = this.displaysBeingExecuted.get();
         if (references == null) {

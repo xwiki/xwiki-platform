@@ -207,7 +207,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
                 allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
                 will(returnValue(true));
-                allowing(mockSetup.bridge).getDocument(with(any(DocumentReference.class)));
+                allowing(mockSetup.bridge).getDocumentInstance(with(any(DocumentReference.class)));
                 will(returnValue(null));
 
                 allowing(mockDocumentDisplayer).display(with(same((DocumentModelBridge) null)),

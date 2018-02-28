@@ -849,7 +849,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference)
         throws Exception
     {
-        pushDocumentInContext(backupObjects, getDocument(documentReference));
+        pushDocumentInContext(backupObjects, getDocumentInstance(documentReference));
     }
 
     @Override

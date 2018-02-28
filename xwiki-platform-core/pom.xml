@@ -79,7 +79,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
+          <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <systemProperties combine.children="append">
               <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->

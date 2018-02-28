@@ -119,7 +119,7 @@
     </dependency>
     <!-- Macro parameters validation -->
     <dependency>
-      <groupId>org.hibernate.validator</groupId>
+      <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>test</scope>
     </dependency>

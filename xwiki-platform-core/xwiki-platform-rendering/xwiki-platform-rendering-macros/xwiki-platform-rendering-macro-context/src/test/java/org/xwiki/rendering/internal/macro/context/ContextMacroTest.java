@@ -59,7 +59,7 @@ import static org.mockito.Mockito.*;
 public class ContextMacroTest
 {
     @Rule
-    public MockitoComponentMockingRule<ContextMacro> mocker = new MockitoComponentMockingRule(ContextMacro.class);
+    public MockitoComponentMockingRule<ContextMacro> mocker = new MockitoComponentMockingRule<>(ContextMacro.class);
 
     @Before
     public void setUp() throws Exception

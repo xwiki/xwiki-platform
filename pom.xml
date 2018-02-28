@@ -47,7 +47,7 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <ckeditor.version>4.7.3</ckeditor.version>
+    <ckeditor.version>4.8.0</ckeditor.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor-dev-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
@@ -146,6 +146,23 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <executions>
+            <!-- Remove the Byte Order Mark from the start of build.sh -->
+            <execution>
+              <id>remove-bom</id>
+              <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+              <phase>process-classes</phase>
+              <goals>
+                <goal>exec</goal>
+              </goals>
+              <configuration>
+                <executable>sed</executable>
+                <arguments>
+                  <argument>-i</argument>
+                  <argument>1s/^\xEF\xBB\xBF//</argument>
+                  <argument>${ckeditor.builder.path}/build.sh</argument>
+                </arguments>
+              </configuration>
+            </execution>
             <!-- Build the CKEditor. -->
             <execution>
               <id>build-ckeditor</id>
@@ -157,7 +174,8 @@
               <configuration>
                 <executable>${ckeditor.builder.path}/build.sh</executable>
                 <arguments>
-                  <argument>-s</argument>
+                  <!-- Exclude from release all plugins/skins that are not specified in build-config. -->
+                  <argument>--skip-omitted-in-build-config</argument>
                 </arguments>
               </configuration>
             </execution>

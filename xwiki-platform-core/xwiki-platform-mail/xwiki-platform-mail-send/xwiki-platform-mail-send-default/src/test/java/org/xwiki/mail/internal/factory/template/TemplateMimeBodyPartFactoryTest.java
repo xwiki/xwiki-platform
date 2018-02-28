@@ -123,7 +123,7 @@ public class TemplateMimeBodyPartFactoryTest
         // Mock the retrieval and conversion of attachments from the Template document
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
-        when(dab.getDocument(this.documentReference)).thenReturn(xwikiDocument);
+        when(dab.getDocumentInstance(this.documentReference)).thenReturn(xwikiDocument);
         XWikiAttachment xwikiAttachment = mock(XWikiAttachment.class);
         when(xwikiDocument.getAttachmentList()).thenReturn(Collections.singletonList(xwikiAttachment));
         AttachmentConverter attachmentConverter = this.mocker.getInstance(AttachmentConverter.class);
@@ -154,7 +154,7 @@ public class TemplateMimeBodyPartFactoryTest
 
         // Mock the retrieval and conversion of attachments from the Template document
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.getDocument(this.documentReference)).thenThrow(new Exception("error"));
+        when(dab.getDocumentInstance(this.documentReference)).thenThrow(new Exception("error"));
 
         try {
             this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);

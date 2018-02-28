@@ -29,7 +29,4 @@ xwikiModule {
   javaTool = 'official'
   // Use a more recent version of Firefox because we use the latest Selenium version.
   properties = '-Dwebdriver.firefox.bin="/home/hudsonagent/firefox-53.0/firefox-bin"'
-  // Temporary disabling build till the CKEeditor team fixes the issue and release it
-  // See https://github.com/ckeditor/ckeditor-dev/pull/833
-  disabled = true
 }

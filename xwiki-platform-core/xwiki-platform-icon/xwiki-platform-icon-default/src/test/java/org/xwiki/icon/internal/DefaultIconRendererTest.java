@@ -98,7 +98,7 @@ public class DefaultIconRendererTest
         mocker.getComponentUnderTest().render("test", iconSet);
 
         // Verify
-        Map<String, Object> parameters = new HashMap();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("rel", "stylesheet");
         verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
         verify(skinExtension, never()).use(any());
@@ -166,7 +166,7 @@ public class DefaultIconRendererTest
         mocker.getComponentUnderTest().renderHTML("test", iconSet);
 
         // Verify
-        Map<String, Object> parameters = new HashMap();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("rel", "stylesheet");
         verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
         verify(skinExtension, never()).use(any());

@@ -101,7 +101,7 @@ public class DefaultIconSetLoaderTest
         DocumentReference iconClassRef = new DocumentReference("wikiId", "IconThemesCode", "IconThemeClass");
         when(documentAccessBridge.getProperty(eq(iconSetRef), eq(iconClassRef), eq("name"))).thenReturn("MyIconTheme");
         DocumentModelBridge doc = mock(DocumentModelBridge.class);
-        when(documentAccessBridge.getDocument(iconSetRef)).thenReturn(doc);
+        when(documentAccessBridge.getDocumentInstance(iconSetRef)).thenReturn(doc);
 
         StringWriter content = new StringWriter();
         IOUtils.copyLarge(new InputStreamReader(getClass().getResourceAsStream("/test.iconset")), content);
@@ -140,7 +140,7 @@ public class DefaultIconSetLoaderTest
     public void loadIconSetFromWikiDocumentWithException() throws Exception
     {
         Exception exception = new Exception("test");
-        when(documentAccessBridge.getDocument(any(DocumentReference.class))).thenThrow(exception);
+        when(documentAccessBridge.getDocumentInstance(any(DocumentReference.class))).thenThrow(exception);
 
         // Test
         Exception caughException = null;

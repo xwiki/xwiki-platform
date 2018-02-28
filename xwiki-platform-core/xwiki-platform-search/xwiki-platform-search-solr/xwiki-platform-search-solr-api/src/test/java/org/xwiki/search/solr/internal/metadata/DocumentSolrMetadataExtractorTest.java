@@ -41,7 +41,6 @@ import org.junit.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
@@ -134,9 +133,6 @@ public class DocumentSolrMetadataExtractorTest
         when(this.document.getLocale()).thenReturn(Locale.ROOT);
         when(this.document.getRealLocale()).thenReturn(Locale.US);
         when(this.document.getTranslatedDocument((Locale) isNull(), same(this.xcontext))).thenReturn(this.document);
-
-        DocumentAccessBridge dab = this.mocker.registerMockComponent(DocumentAccessBridge.class);
-        when(dab.getDocument(this.documentReference)).thenReturn(this.document);
 
         // Field Name Serializer
         EntityReferenceSerializer<String> fieldNameSerializer =

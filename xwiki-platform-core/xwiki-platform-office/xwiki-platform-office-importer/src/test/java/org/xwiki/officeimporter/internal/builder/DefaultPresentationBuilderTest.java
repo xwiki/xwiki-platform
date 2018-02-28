@@ -104,7 +104,7 @@ public class DefaultPresentationBuilderTest
 
         DocumentModelBridge document = mock(DocumentModelBridge.class);
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.getDocument(documentReference)).thenReturn(document);
+        when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(document);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         InputStream officeFileStream = new ByteArrayInputStream("Presentation content".getBytes());

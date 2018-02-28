@@ -103,7 +103,7 @@ public class OfficeImporterScriptServiceTest
         when(documentAccessBridge.exists(documentReference)).thenReturn(true);
 
         DocumentModelBridge document = mock(DocumentModelBridge.class);
-        when(documentAccessBridge.getDocument(documentReference)).thenReturn(document);
+        when(documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(document);
         when(document.getSyntax()).thenReturn(new Syntax(new SyntaxType("test", "Test"), "1.0"));
 
         when(documentAccessBridge.getDocumentContent(documentReference, null)).thenReturn("before");

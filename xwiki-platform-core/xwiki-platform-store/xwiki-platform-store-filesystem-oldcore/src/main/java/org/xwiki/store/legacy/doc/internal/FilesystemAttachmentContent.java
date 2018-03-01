@@ -58,7 +58,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     }
 
     /**
-     * Constructor that doesn't set the attachment.  This is necessary for loading attachment content without touching
+     * Constructor that doesn't set the attachment. This is necessary for loading attachment content without touching
      * the dirty bit of the owner document.
      *
      * @param storage the file where the data is stored.
@@ -70,10 +70,24 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         this.storageFile = storage;
     }
 
+    /**
+     * Clone this {@link FilesystemAttachmentContent} instance.
+     * 
+     * @param filesystemAttachmentContent the content to copy
+     * @since 10.2RC1
+     * @since 9.11.4
+     */
+    public FilesystemAttachmentContent(FilesystemAttachmentContent filesystemAttachmentContent)
+    {
+        super(filesystemAttachmentContent);
+
+        this.storageFile = filesystemAttachmentContent.storageFile;
+    }
+
     @Override
     public FilesystemAttachmentContent clone()
     {
-        return new FilesystemAttachmentContent(this.storageFile, this.getAttachment());
+        return new FilesystemAttachmentContent(this);
     }
 
     @Override

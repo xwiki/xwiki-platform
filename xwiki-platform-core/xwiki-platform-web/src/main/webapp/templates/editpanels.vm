@@ -15,28 +15,30 @@
 #elseif ($editor == 'history')
   #set ($editorPanels = $editorPanelsHistory)
 #end
-#set ($editorPanels = $editorPanels.split(','))
-<div id="editPanels" class="panels editor">
+#if ($!editorPanels != '')
+  #set ($editorPanels = $editorPanels.split(','))
+  <div id="editPanels" class="panels editor">
 
-## Convert the list of panels to panel (UIExtension) IDs
-#set ($panelIDList = [])
-#foreach ($panel in $editorPanels)
-  #set ($panelDocumentReference = $services.model.resolveDocument($panel.trim(), 'currentmixed'))
-  #set ($panelStringReference = $services.model.serialize($panelDocumentReference, 'default'))
-  #set ($discard = $panelIDList.add($panelStringReference))
-#end
-
-## Get the Panel UIExtensions by filtering on the above computed panel ID list
-#set ($panelUIExtensions = $services.uix.getExtensions('platform.panels', {'select' : "$stringtool.join($panelIDList, ',')"}))
-
-## Display each configured panel that the current user has view on
-#foreach ($panelUIExtension in $panelUIExtensions)
-  ## We need to set this because the panelheader macro used in panels needs it
-  #set ($paneldoc = $xwiki.getDocument($panelUIExtension.id))
-  #if ($paneldoc && $!xwiki.hasAccessLevel('view', $paneldoc))
-    $services.rendering.render($panelUIExtension.execute(), "xhtml/1.0")
+  ## Convert the list of panels to panel (UIExtension) IDs
+  #set ($panelIDList = [])
+  #foreach ($panel in $editorPanels)
+    #set ($panelDocumentReference = $services.model.resolveDocument($panel.trim(), 'currentmixed'))
+    #set ($panelStringReference = $services.model.serialize($panelDocumentReference, 'default'))
+    #set ($discard = $panelIDList.add($panelStringReference))
   #end
-#end
 
-</div>
+  ## Get the Panel UIExtensions by filtering on the above computed panel ID list
+  #set ($panelUIExtensions = $services.uix.getExtensions('platform.panels', {'select' : "$stringtool.join($panelIDList, ',')"}))
+
+  ## Display each configured panel that the current user has view on
+  #foreach ($panelUIExtension in $panelUIExtensions)
+    ## We need to set this because the panelheader macro used in panels needs it
+    #set ($paneldoc = $xwiki.getDocument($panelUIExtension.id))
+    #if ($paneldoc && $!xwiki.hasAccessLevel('view', $paneldoc))
+      $services.rendering.render($panelUIExtension.execute(), "xhtml/1.0")
+    #end
+  #end
+
+  </div>
+#end
 #end

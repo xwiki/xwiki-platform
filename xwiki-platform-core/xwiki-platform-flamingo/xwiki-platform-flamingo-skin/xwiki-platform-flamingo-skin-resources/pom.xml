@@ -91,7 +91,7 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.webjars.bower</groupId>
+      <groupId>org.webjars.xwiki</groupId>
       <artifactId>Keypress</artifactId>
       <scope>runtime</scope>
     </dependency>

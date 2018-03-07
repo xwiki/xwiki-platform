@@ -69,7 +69,7 @@ require(['jquery', 'JobRunner'], function($, JobRunner) {
     var url = jobStatus.attr('data-url');
     if (url !== '') {
       var jobLog = jobStatus.find('.log');
-      JobRunner({
+      new JobRunner({
         createStatusRequest: function() {
           return {
             url: url,

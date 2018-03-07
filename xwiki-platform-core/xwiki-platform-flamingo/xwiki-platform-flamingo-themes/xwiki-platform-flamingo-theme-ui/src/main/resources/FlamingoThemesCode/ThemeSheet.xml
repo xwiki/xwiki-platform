@@ -881,14 +881,15 @@ require(['jquery', 'colpick'], function($, Colpick) {
       <cache>long</cache>
     </property>
     <property>
-      <code>#bt-variables {
-  border-left: 1px solid #ddd;
+      <code>#template('colorThemeInit.vm')
+#bt-variables {
+  border-left: 1px solid $theme.borderColor;
   height: 525px;
   overflow-y: auto;
 }
 
 #preview-curtain {
-  background-color: #ddd;
+  background-color: $theme.pageBackgroundColor;
   opacity: 0.9;
   position: absolute;
   text-align: center;
@@ -902,7 +903,7 @@ require(['jquery', 'colpick'], function($, Colpick) {
       <name>CSS</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>

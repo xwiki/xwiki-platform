@@ -307,7 +307,7 @@ public class XWikiWikiModelTest
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(this.referenceResolver.resolve(reference, EntityType.DOCUMENT)).thenReturn(documentReference);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(this.documentAccessBridge.getDocument(documentReference)).thenReturn(dmb);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(dmb);
         XDOM xdom = new XDOM(Collections.emptyList());
         when(dmb.getXDOM()).thenReturn(xdom);
 

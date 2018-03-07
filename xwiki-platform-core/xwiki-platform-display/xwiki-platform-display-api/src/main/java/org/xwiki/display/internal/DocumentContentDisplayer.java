@@ -313,7 +313,8 @@ public class DocumentContentDisplayer implements DocumentDisplayer
     private XDOM getTranslatedContent(DocumentModelBridge document)
     {
         try {
-            DocumentModelBridge translatedDocument = documentAccessBridge.getDocument(document.getDocumentReference());
+            DocumentModelBridge translatedDocument =
+                documentAccessBridge.getTranslatedDocumentInstance(document.getDocumentReference());
             // FIXME: This is not a reliable way to determine if the language of the given document matches the context
             // language. For instance the given document can have "en" language set while the translated document
             // returned by the document access bridge can have "" or "default" language set.

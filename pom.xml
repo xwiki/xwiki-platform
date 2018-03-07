@@ -281,7 +281,7 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.webjars.bower</groupId>
+        <groupId>org.webjars.xwiki</groupId>
         <artifactId>Keypress</artifactId>
         <version>${keypress.version}</version>
         <scope>runtime</scope>

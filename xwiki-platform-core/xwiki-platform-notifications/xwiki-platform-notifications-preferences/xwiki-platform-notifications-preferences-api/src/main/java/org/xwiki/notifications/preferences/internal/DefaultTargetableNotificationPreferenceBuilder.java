@@ -33,7 +33,8 @@ import org.xwiki.notifications.preferences.TargetableNotificationPreference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 
 /**
- * This is the default implementation of {@link TargetableNotificationPreferenceBuilder}. This implement is not thread safe!
+ * This is the default implementation of {@link TargetableNotificationPreferenceBuilder}. This implementation is not
+ * thread-safe and should be instantiated each time a thread is using it.
  *
  * @version $Id$
  * @since 9.7RC1

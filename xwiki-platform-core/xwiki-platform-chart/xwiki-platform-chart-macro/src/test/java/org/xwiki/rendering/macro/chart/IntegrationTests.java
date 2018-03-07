@@ -74,7 +74,7 @@ public class IntegrationTests
             .thenReturn("temppath");
         when(dab.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
         when(dab.exists(documentReference)).thenReturn(true);
-        when(dab.getDocument(documentReference)).thenReturn(document);
+        when(dab.getDocumentInstance(documentReference)).thenReturn(document);
         when(dab.getCurrentUserReference()).thenReturn(null);
 
         DocumentDisplayer displayer = componentManager.registerMockComponent(DocumentDisplayer.class);

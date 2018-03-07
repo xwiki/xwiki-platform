@@ -165,7 +165,7 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
             // Put component document in the context, so that macro transformation rights are checked against the
             // component document and not the context one.
             try {
-                xwikiContext.put(XWIKI_CONTEXT_DOC_KEY, dab.getDocument(componentDocumentReference));
+                xwikiContext.put(XWIKI_CONTEXT_DOC_KEY, dab.getDocumentInstance(componentDocumentReference));
             } catch (Exception e) {
                 throw new WikiComponentRuntimeException(String.format(
                     "Failed to load wiki component document [%s]", componentDocumentReference), e);

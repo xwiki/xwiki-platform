@@ -88,6 +88,10 @@ public class NotificationPreferenceScriptService implements ScriptService
             NotificationPreferenceCategory category)
             throws NotificationException
     {
+        // Instantiate a new copy of TargetableNotificationPreferenceBuilder because this component is not thread-safe.
+        TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder
+                = targetableNotificationPreferenceBuilderProvider.get();
+
         List<NotificationPreference> toSave = new ArrayList<>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();

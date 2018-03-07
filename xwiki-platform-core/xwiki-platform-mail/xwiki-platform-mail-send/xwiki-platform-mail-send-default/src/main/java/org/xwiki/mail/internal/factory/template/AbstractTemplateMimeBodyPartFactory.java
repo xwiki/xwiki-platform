@@ -94,7 +94,7 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
         if (includeTemplateAttachments != null && includeTemplateAttachments) {
             try {
                 List<XWikiAttachment> xwikiAttachments =
-                    ((XWikiDocument) this.bridge.getDocument(documentReference)).getAttachmentList();
+                    ((XWikiDocument) this.bridge.getDocumentInstance(documentReference)).getAttachmentList();
                 attachments.addAll(this.attachmentConverter.convert(xwikiAttachments));
             } catch (Exception e) {
                 throw new MessagingException(

@@ -138,7 +138,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
                 // This is the document containing the wiki macro that will be put in the context available in the macro
                 // Since we're not testing it here, it can be null.
-                allowing(mockDocBridge).getDocument(wikiMacroDocumentReference);
+                allowing(mockDocBridge).getDocumentInstance(wikiMacroDocumentReference);
                 will(returnValue(null));
             }
         });

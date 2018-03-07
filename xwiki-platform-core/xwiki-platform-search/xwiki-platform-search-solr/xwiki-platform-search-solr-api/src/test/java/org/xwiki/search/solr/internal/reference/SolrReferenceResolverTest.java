@@ -37,7 +37,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -163,14 +162,11 @@ public class SolrReferenceResolverTest
 
     private QueryManager queryManager;
 
-    private DocumentAccessBridge mockDAB;
-
     @BeforeComponent
     public void registerComponents() throws Exception
     {
         this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         this.mocker.registerMockComponent(QueryManager.class);
-        this.mockDAB = this.mocker.registerMockComponent(DocumentAccessBridge.class);
 
         WikiDescriptorManager wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getAllIds()).thenReturn(
@@ -276,7 +272,6 @@ public class SolrReferenceResolverTest
 
         // document 111
         when(xwiki.getDocument(eq(documentReference111), any(XWikiContext.class))).thenReturn(xdocument111);
-        when(this.mockDAB.getDocument(documentReference111)).thenReturn(xdocument111);
 
         when(xdocument111.getXClass()).thenReturn(xclass111);
 

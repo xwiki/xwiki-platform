@@ -74,7 +74,7 @@ public class DefaultResourceReferenceHandlerChain implements ResourceReferenceHa
                 this.observation.notify(new ResourceReferenceHandlingEvent(reference), handler);
             }
 
-            Exception exception = null;
+            ResourceReferenceHandlerException exception = null;
             try {
                 handler.handle(reference, this);
             } catch (ResourceReferenceHandlerException e) {
@@ -83,6 +83,11 @@ public class DefaultResourceReferenceHandlerChain implements ResourceReferenceHa
                 if (this.observation != null) {
                     this.observation.notify(new ResourceReferenceHandledEvent(reference), handler, exception);
                 }
+            }
+
+            // Throw the exception if any
+            if (exception != null) {
+                throw exception;
             }
         }
     }

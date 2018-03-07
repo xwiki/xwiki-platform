@@ -62,7 +62,7 @@ public class IntegrationTests
         // Simulate the XDOM of the referenced document
         DocumentAccessBridge dab = componentManager.registerMockComponent(DocumentAccessBridge.class);
         DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getDocument(referencedDocumentReference)).thenReturn(dmb);
+        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
 
         Parser parser = componentManager.getInstance(Parser.class, "xwiki/2.1");
         XDOM xdom = parser.parse(new StringReader("= heading1 =\n==heading2=="));

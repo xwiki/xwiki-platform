@@ -233,7 +233,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     {
         try {
             ComponentManager contextComponentManager = this.contextComponentManagerProvider.get();
-            String syntaxId = this.documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
+            String syntaxId = this.documentAccessBridge.getTranslatedDocumentInstance(targetDocumentReference)
+                .getSyntax().toIdString();
             BlockRenderer renderer = contextComponentManager.getInstance(BlockRenderer.class, syntaxId);
 
             Map<String, String> galleryParameters = Collections.emptyMap();

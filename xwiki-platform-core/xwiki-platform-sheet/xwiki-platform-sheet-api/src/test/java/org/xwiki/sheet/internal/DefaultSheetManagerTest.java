@@ -234,7 +234,7 @@ public class DefaultSheetManagerTest extends AbstractMockingComponentTestCase<Sh
                 inSequence(sheetResolutionSequence);
                 will(returnValue(Collections.singleton(classReference)));
 
-                oneOf(documentAccessBridge).getDocument(classReference);
+                oneOf(documentAccessBridge).getTranslatedDocumentInstance(classReference);
                 inSequence(sheetResolutionSequence);
                 will(returnValue(classDocument));
 

@@ -98,7 +98,7 @@ public class SheetDocumentDisplayerTest
         DocumentModelBridge document = mock(DocumentModelBridge.class, id.toString());
 
         when(document.getDocumentReference()).thenReturn(documentReference);
-        when(this.documentAccessBridge.getDocument(documentReference)).thenReturn(document);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(document);
         when(this.modelBridge.getDefaultEditMode(document)).thenReturn("edit");
         when(this.modelBridge.getDefaultTranslation(document)).thenReturn(document);
 

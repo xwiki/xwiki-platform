@@ -94,7 +94,8 @@ public class DefaultOfficeViewerScriptServiceTest
         DocumentModelBridge document = mock(DocumentModelBridge.class);
         DocumentAccessBridge documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         when(documentAccessBridge.isDocumentViewable(attachmentReference.getDocumentReference())).thenReturn(true);
-        when(documentAccessBridge.getDocument(attachmentReference.getDocumentReference())).thenReturn(document);
+        when(documentAccessBridge.getTranslatedDocumentInstance(attachmentReference.getDocumentReference()))
+            .thenReturn(document);
         when(document.getSyntax()).thenReturn(Syntax.TEX_1_0);
 
         XDOM xdom = new XDOM(Collections.<Block> emptyList());

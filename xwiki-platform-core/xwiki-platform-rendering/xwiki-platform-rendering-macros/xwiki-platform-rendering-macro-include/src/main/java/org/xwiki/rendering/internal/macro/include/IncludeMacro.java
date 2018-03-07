@@ -159,7 +159,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // Step 2: Retrieve the included document.
         DocumentModelBridge documentBridge;
         try {
-            documentBridge = this.documentAccessBridge.getDocument(includedReference);
+            documentBridge = this.documentAccessBridge.getDocumentInstance(includedReference);
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to load Document ["
                 + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]", e);
@@ -180,6 +180,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
+        displayParameters.setContentTranslated(true);
 
         Stack<Object> references = this.inclusionsBeingExecuted.get();
         if (parametersContext == Context.NEW) {

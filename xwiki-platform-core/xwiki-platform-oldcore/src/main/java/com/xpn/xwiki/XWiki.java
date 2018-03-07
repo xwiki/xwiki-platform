@@ -800,6 +800,11 @@ public class XWiki implements EventListener
         // Extract Entity Resource from URL and put it in the Execution Context
         EntityResourceReference entityResourceReference = initializeResourceFromURL(xcontext);
 
+        // If not an entity resource reference assume main wiki
+        if (entityResourceReference == null) {
+            return xwiki;
+        }
+
         // Get the wiki id
         String wikiId = entityResourceReference.getEntityReference().extractReference(EntityType.WIKI).getName();
         if (wikiId.equals(xcontext.getMainXWiki())) {

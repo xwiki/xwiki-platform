@@ -132,7 +132,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
             }
 
             // Create the view and render the result.
-            Syntax fromSyntax = this.documentAccessBridge.getDocument(documentReference).getSyntax();
+            Syntax fromSyntax = this.documentAccessBridge.getTranslatedDocumentInstance(documentReference).getSyntax();
             Syntax toSyntax = Syntax.XHTML_1_0;
             return render(this.officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
         } catch (Exception e) {

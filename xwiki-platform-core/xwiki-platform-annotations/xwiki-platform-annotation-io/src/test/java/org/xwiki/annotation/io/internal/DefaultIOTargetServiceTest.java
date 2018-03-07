@@ -99,7 +99,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
@@ -120,7 +120,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
@@ -142,7 +142,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         {
             {
                 // default resolver should be used
-                allowing(dabMock).getDocument(new DocumentReference("xwiki", "Space", "Page"));
+                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Space", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
@@ -164,7 +164,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         {
             {
                 // default resolver should be used
-                allowing(dabMock).getDocument(new DocumentReference("xwiki", "Space", "Page"));
+                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Space", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
@@ -208,7 +208,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
             {
                 // default resolver should be used. Note that this will fail if default values change, not very well
                 // isolated
-                allowing(dabMock).getDocument(new DocumentReference("xwiki", "Main", "WebHome"));
+                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "WebHome"));
                 will(returnValue(dmb));
                 oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
@@ -235,7 +235,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
                 oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
                                            new DocumentReference("wiki", "XWiki", "Class"), 1, "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getSyntax();
                 will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
@@ -259,7 +259,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
                 oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
                                            new DocumentReference("wiki", "XWiki", "Class"), "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getSyntax();
                 will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
@@ -283,7 +283,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
                 oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "Page"),
                     new DocumentReference("xwiki", "XWiki", "Class"), "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocument(new DocumentReference("xwiki", "Main", "Page"));
+                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "Page"));
                 will(returnValue(dmb));
                 oneOf(dmb).getSyntax();
                 will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
@@ -303,7 +303,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         {
             {
                 // target will be parsed as document, because document is the default
-                allowing(dabMock).getDocument(new DocumentReference("wiki", "Space.Page^XWiki.Class", "property"));
+                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space.Page^XWiki.Class", "property"));
                 will(returnValue(dmb));
                 oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
@@ -330,7 +330,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
                 oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "WebHome"),
                     new DocumentReference("xwiki", "Classes", "Class"), 3, "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocument(new DocumentReference("xwiki", "Main", "WebHome"));
+                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "WebHome"));
                 will(returnValue(dmb));
                 oneOf(dmb).getSyntax();
                 will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));

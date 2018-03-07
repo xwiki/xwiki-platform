@@ -120,7 +120,8 @@ public class OfficeMacroImporter
 
         // Set the SYNTAX MetaData
         try {
-            DocumentModelBridge document = documentAccessBridge.getDocument(attachmentReference.getDocumentReference());
+            DocumentModelBridge document =
+                documentAccessBridge.getTranslatedDocumentInstance(attachmentReference.getDocumentReference());
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, document.getSyntax());
         } catch (Exception e) {
             throw new RuntimeException(String.format(

@@ -98,7 +98,7 @@ public class DefaultIOTargetService implements IOTargetService
             if (ref.getType() == EntityType.OBJECT_PROPERTY) {
                 return getObjectPropertyContent(new ObjectPropertyReference(ref));
             } else if (ref.getType() == EntityType.DOCUMENT) {
-                return dab.getDocument(new DocumentReference(ref)).getContent();
+                return dab.getTranslatedDocumentInstance(new DocumentReference(ref)).getContent();
             } else {
                 // it was parsed as something else, just ignore the parsing and get the document content as its initial
                 // name was
@@ -118,7 +118,7 @@ public class DefaultIOTargetService implements IOTargetService
             if (docRef != null) {
                 // return the syntax of the document in this reference, regardless of the type of reference, obj prop or
                 // doc
-                return dab.getDocument(new DocumentReference(docRef)).getSyntax().toIdString();
+                return dab.getTranslatedDocumentInstance(new DocumentReference(docRef)).getSyntax().toIdString();
             } else {
                 return dab.getDocumentSyntaxId(reference);
             }
@@ -164,7 +164,8 @@ public class DefaultIOTargetService implements IOTargetService
         parameters.setExecutionContextIsolated(true);
         parameters.setContentTranslated(true);
         parameters.setTargetSyntax(renderingContext.getTargetSyntax());
-        return documentDisplayer.display(dab.getDocument(reference), parameters);
+
+        return documentDisplayer.display(dab.getDocumentInstance(reference), parameters);
     }
 
     private XDOM getTransformedXDOM(String content, String sourceSyntaxId)

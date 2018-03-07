@@ -282,7 +282,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
                 allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
                 will(returnValue(true));
-                allowing(mockSetup.bridge).getDocument(with(any(DocumentReference.class)));
+                allowing(mockSetup.bridge).getDocumentInstance(with(any(DocumentReference.class)));
                 will(returnValue(null));
 
                 allowing(mockDocumentDisplayer).display(with(same((DocumentModelBridge) null)),
@@ -340,7 +340,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocument(resolvedReference);
+                oneOf(mockSetup.bridge).getDocumentInstance(resolvedReference);
+                will(returnValue(mockDocument));
+                oneOf(mockSetup.bridge).getTranslatedDocumentInstance(resolvedReference);
                 will(returnValue(mockDocument));
                 oneOf(mockSetup.bridge).getCurrentDocumentReference();
                 will(returnValue(sourceReference));
@@ -348,6 +350,10 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(getXDOM("content")));
                 oneOf(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
+                oneOf(mockDocument).getDocumentReference();
+                will(returnValue(resolvedReference));
+                allowing(mockDocument).getRealLanguage();
+                will(returnValue(""));
             }
         });
 
@@ -378,14 +384,20 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocument(resolvedReference);
+                oneOf(mockSetup.bridge).getDocumentInstance(resolvedReference);
+                will(returnValue(mockDocument));
+                oneOf(mockSetup.bridge).getTranslatedDocumentInstance(resolvedReference);
                 will(returnValue(mockDocument));
                 oneOf(mockSetup.bridge).getCurrentDocumentReference();
                 will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
+                oneOf(mockDocument).getDocumentReference();
+                will(returnValue(resolvedReference));
                 oneOf(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
                 oneOf(mockDocument).getXDOM();
                 will(returnValue(getXDOM("content1\n\n= section =\ncontent2")));
+                allowing(mockDocument).getRealLanguage();
+                will(returnValue(""));
             }
         });
 
@@ -411,7 +423,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocument(resolvedReference);
+                oneOf(mockSetup.bridge).getDocumentInstance(resolvedReference);
+                will(returnValue(mockDocument));
+                allowing(mockSetup.bridge).getTranslatedDocumentInstance(resolvedReference);
                 will(returnValue(mockDocument));
                 oneOf(mockSetup.bridge).getCurrentDocumentReference();
                 will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
@@ -419,8 +433,10 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(Syntax.XWIKI_2_0));
                 oneOf(mockDocument).getXDOM();
                 will(returnValue(getXDOM("content")));
-                oneOf(mockDocument).getDocumentReference();
+                allowing(mockDocument).getDocumentReference();
                 will(returnValue(resolvedReference));
+                allowing(mockDocument).getRealLanguage();
+                will(returnValue(""));
             }
         });
 
@@ -452,7 +468,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 allowing(mockDocumentReferenceResolver).resolve(with(resolve),
                     with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
-                allowing(mockSetup.bridge).getDocument(reference);
+                allowing(mockSetup.bridge).getDocumentInstance(reference);
+                will(returnValue(mockDocument));
+                allowing(mockSetup.bridge).getTranslatedDocumentInstance(reference);
                 will(returnValue(mockDocument));
                 allowing(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
@@ -460,6 +478,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(getXDOM(content)));
                 allowing(mockDocument).getDocumentReference();
                 will(returnValue(reference));
+                allowing(mockDocument).getRealLanguage();
+                will(returnValue(""));
             }
         });
     }

@@ -141,10 +141,8 @@ public class WikiObjectComponentManagerEventListenerProxy
                     }
                 }
             } catch (Exception e) {
-                logger.warn(
-                        String.format("Unable to register the components for [%s] XObjects: %s",
-                                xObjectClass,
-                                e.getMessage()));
+                logger.warn(String.format("Unable to register the components for [%s] XObjects: %s", xObjectClass,
+                    ExceptionUtils.getRootCauseMessage(e)));
             }
         }
     }

@@ -144,7 +144,7 @@ public class DefaultSheetManager implements SheetManager
     {
         DocumentModelBridge classDocument;
         try {
-            classDocument = documentAccessBridge.getDocument(classReference);
+            classDocument = documentAccessBridge.getTranslatedDocumentInstance(classReference);
         } catch (Exception e) {
             String classStringReference = defaultEntityReferenceSerializer.serialize(classReference);
             logger.warn("Failed to get class sheets for [{}]. Reason: [{}]", classStringReference, e.getMessage());

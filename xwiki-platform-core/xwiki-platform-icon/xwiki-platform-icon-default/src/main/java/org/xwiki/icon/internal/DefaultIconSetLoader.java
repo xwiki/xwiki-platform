@@ -73,7 +73,7 @@ public class DefaultIconSetLoader implements IconSetLoader
     {
         try {
             // Get the document
-            DocumentModelBridge doc = documentAccessBridge.getDocument(iconSetReference);
+            DocumentModelBridge doc = documentAccessBridge.getDocumentInstance(iconSetReference);
             String content = doc.getContent();
             // The name of the icon set is stored in the IconThemesCode.IconThemeClass XObject of the document
             DocumentReference iconClassRef = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),

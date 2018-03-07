@@ -42,6 +42,7 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.preferences.TargetableNotificationPreference;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
@@ -88,6 +89,40 @@ public class NotificationPreferenceScriptService implements ScriptService
             NotificationPreferenceCategory category)
             throws NotificationException
     {
+        /*
+            The JSON we get is a "snapshot" of the states of the buttons the user has in front of her eyes when she is
+            managing her preferences.
+
+            We did that so we can save several preferences in the same time without making too much requests (for
+            example when the user enable an application, it actually enable all the app's event types).
+
+            However, this snapshot also "freeze" the default preferences, ie the preferences set at the wiki level and
+            that the user has not changed.
+
+            Example:
+            1. Wiki Administrator enables the application A by default, and doesn't touch the settings for the
+               application B.
+            2. John Doe disables the application A on HIS profile. He doesn't touch the setting for the application B.
+               A "snapshot" of his preferences is saved.
+            3. Wiki Administrator enables the application B by default.
+            4. On the John Doe's preferences, application B is still disabled, because of the snapshot done on step 2.
+
+            I don't think this situation is good. If a user did not EXPLICITLY change a setting, the default settings
+            should be applied.
+
+            For this reason, this code will only save the settings THAT ARE DIFFERENT FROM THE DEFAULT (INHERITED).
+
+            Since this logic is totally related to the way the UI is built, I think it does not deserve its own
+            component or API. In a way, it should even be internal.
+        */
+
+        List<NotificationPreference> existingPreferences = Collections.emptyList();
+        if (target instanceof DocumentReference) {
+            existingPreferences = notificationPreferenceManager.getAllPreferences((DocumentReference) target);
+        } else if (target instanceof WikiReference) {
+            existingPreferences = notificationPreferenceManager.getAllPreferences((WikiReference) target);
+        }
+
         // Instantiate a new copy of TargetableNotificationPreferenceBuilder because this component is not thread-safe.
         TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder
                 = targetableNotificationPreferenceBuilderProvider.get();
@@ -110,7 +145,15 @@ public class NotificationPreferenceScriptService implements ScriptService
                 targetableNotificationPreferenceBuilder.setTarget(target);
                 targetableNotificationPreferenceBuilder.setCategory(category);
 
-                toSave.add(targetableNotificationPreferenceBuilder.build());
+                TargetableNotificationPreference newPreference = targetableNotificationPreferenceBuilder.build();
+
+                // This part is explained by the long comment below
+                NotificationPreference correspondingPreference = getCorrespondingPreference(existingPreferences,
+                        newPreference);
+                if (correspondingPreference == null
+                        || correspondingPreference.isNotificationEnabled() != newPreference.isNotificationEnabled()) {
+                    toSave.add(newPreference);
+                }
             }
 
             notificationPreferenceManager.savePreferences(toSave);
@@ -118,6 +161,19 @@ public class NotificationPreferenceScriptService implements ScriptService
         } catch (Exception e) {
             throw new NotificationException("Failed to save preferences for notifications given as JSON.", e);
         }
+    }
+
+    private NotificationPreference getCorrespondingPreference(List<NotificationPreference> existingPreferences,
+            TargetableNotificationPreference newPreference) {
+        for (NotificationPreference pref: existingPreferences) {
+            // This code heavily
+            // depends on org.xwiki.notifications.preferences.internal.AbstractNotificationPreference.equals()
+            // Please look at it.
+            if (pref.equals(newPreference)) {
+                return pref;
+            }
+        }
+        return null;
     }
 
     /**

@@ -46,10 +46,19 @@
   #set ($discard = $prefObj.set('interval', $request.interval))
   #set ($discard = $userDoc.save('Update Notification Email Interval'))
 #elseif ("$!request.diffType" != '')
-  #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
-  #set ($prefObj = $userDoc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass', true))
-  #set ($discard = $prefObj.set('diffType', $request.diffType))
-  #set ($discard = $userDoc.save('Update Notification Email Diff Type'))
+  #set ($targetDoc = 0)
+  #if ("$!request.target" == 'wiki' &amp;&amp; $hasAdmin)
+    #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
+  #elseif ("$!request.target" == 'user')
+    #set ($targetDoc = $xwiki.getDocument($xcontext.userReference))
+  #end
+  #if ($targetDoc == 0)
+    #set ($discard = $response.sendError(401))
+  #else
+    #set ($prefObj = $targetDoc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass', true))
+    #set ($discard = $prefObj.set('diffType', $request.diffType))
+    #set ($discard = $targetDoc.save('Update Notification Email Diff Type'))
+  #end
 #elseif ("$!request.action" == 'savePreferences')
   #try()
     #if ("$!request.target" == 'wiki')

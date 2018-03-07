@@ -226,10 +226,16 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute/>
+      <codeToExecute>== {{translation key="notifications.settings.email.title" /}} ==
+
+{{notificationsEmailPreferences target="wiki" /}}
+
+== {{translation key="notifications.settings.applications.title" /}} ==
+
+{{notificationsApplicationsPreferences target="wiki" /}}</codeToExecute>
     </property>
     <property>
-      <configurationClass>XWiki.Notifications.Code.NotificationEmailPreferenceClass</configurationClass>
+      <configurationClass/>
     </property>
     <property>
       <configureGlobally>1</configureGlobally>
@@ -244,7 +250,7 @@
       <displayInSection>Notifications</displayInSection>
     </property>
     <property>
-      <heading>$services.localization.render('notifications.globalsettings.email')</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>
@@ -253,9 +259,7 @@
       <linkPrefix/>
     </property>
     <property>
-      <propertiesToShow>
-        <value>diffType</value>
-      </propertiesToShow>
+      <propertiesToShow/>
     </property>
     <property>
       <sectionOrder/>

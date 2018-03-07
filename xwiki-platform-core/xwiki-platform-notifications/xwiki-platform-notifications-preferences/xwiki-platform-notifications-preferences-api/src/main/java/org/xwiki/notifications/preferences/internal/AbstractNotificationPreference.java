@@ -120,11 +120,17 @@ public abstract class AbstractNotificationPreference implements NotificationPref
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null) {
             return false;
         }
         // Here, we only compute a subset of the properties, because we want to say equals() == true if the other
         // preference is about the same event type, etc...
+
+        // See:
+        // org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService.getCorrespondingPreference()
+        // and:
+        // DefaultNotificationPreferenceManager.getAllPreferences(org.xwiki.model.reference.DocumentReference)
+        // to be sure you don't break anything by changing this method.
         AbstractNotificationPreference that = (AbstractNotificationPreference) o;
         EqualsBuilder equalsBuilder = new EqualsBuilder();
         equalsBuilder.append(that.format, format);

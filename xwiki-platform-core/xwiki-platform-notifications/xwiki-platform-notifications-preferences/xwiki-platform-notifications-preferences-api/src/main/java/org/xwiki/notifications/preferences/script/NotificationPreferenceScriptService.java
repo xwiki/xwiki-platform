@@ -101,8 +101,6 @@ public class NotificationPreferenceScriptService implements ScriptService
                 NotificationFormat format = NotificationFormat.valueOf(((String) item.get("format")).toUpperCase());
                 boolean enabled = (Boolean) item.get("enabled");
 
-                TargetableNotificationPreferenceBuilder targetableNotificationPreferenceBuilder
-                        = targetableNotificationPreferenceBuilderProvider.get();
                 targetableNotificationPreferenceBuilder.prepare();
                 targetableNotificationPreferenceBuilder.setEnabled(enabled);
                 targetableNotificationPreferenceBuilder.setFormat(format);

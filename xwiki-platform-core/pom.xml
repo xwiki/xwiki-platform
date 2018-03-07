@@ -391,6 +391,258 @@
                     "methodName": "getPreferencesForWiki",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.field.removed",
+                    "old": "field javax.mail.internet.MimeMessage.cachedContent @ org.xwiki.mail.ExtendedMimeMessage",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "fieldName": "cachedContent",
+                    "elementKind": "field",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getAllHeaderLines() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getAllHeaderLines() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getAllHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getAllHeaders() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getAllHeaders() throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration<javax.mail.Header>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getAllHeaders",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getMatchingHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration<javax.mail.Header>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getMatchingHeaders",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getNonMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getNonMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getNonMatchingHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getNonMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getNonMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "oldType": "java.util.Enumeration<javax.mail.Header>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getNonMatchingHeaders",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.mail.Session javax.mail.Message::getSession() @ org.xwiki.mail.ExtendedMimeMessage",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "getSession",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.mail.Message javax.mail.internet.MimeMessage::reply(boolean, boolean) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "reply",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void javax.mail.internet.MimeMessage::setFrom(java.lang.String) throws javax.mail.MessagingException @ org.xwiki.mail.ExtendedMimeMessage",
+                    "package": "org.xwiki.mail",
+                    "classSimpleName": "ExtendedMimeMessage",
+                    "methodName": "setFrom",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.field.removed",
+                    "old": "field javax.mail.internet.MimeMessage.cachedContent @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "fieldName": "cachedContent",
+                    "elementKind": "field",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getAllHeaderLines() throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getAllHeaderLines() throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getAllHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getAllHeaders() throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getAllHeaders() throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "oldType": "java.util.Enumeration<javax.mail.Header>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getAllHeaders",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getMatchingHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "oldType": "java.util.Enumeration<javax.mail.Header>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getMatchingHeaders",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.mail.internet.MimeMessage::getNonMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getNonMatchingHeaderLines(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getNonMatchingHeaderLines",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<javax.mail.Header> javax.mail.internet.MimeMessage::getNonMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "new": "method java.util.Enumeration javax.mail.internet.MimeMessage::getNonMatchingHeaders(java.lang.String[]) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "oldType": "java.util.Enumeration<javax.mail.Header>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getNonMatchingHeaders",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.mail.Session javax.mail.Message::getSession() @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "getSession",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.mail.Message javax.mail.internet.MimeMessage::reply(boolean, boolean) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "reply",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void javax.mail.internet.MimeMessage::setFrom(java.lang.String) throws javax.mail.MessagingException @ org.xwiki.mail.script.ScriptMimeMessage",
+                    "package": "org.xwiki.mail.script",
+                    "classSimpleName": "ScriptMimeMessage",
+                    "methodName": "setFrom",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method org.xwiki.model.reference.DocumentReference org.xwiki.notifications.preferences.TargetableNotificationPreference::getTarget()",
+                    "new": "method org.xwiki.model.reference.EntityReference org.xwiki.notifications.preferences.TargetableNotificationPreference::getTarget()",
+                    "oldType": "org.xwiki.model.reference.DocumentReference",
+                    "newType": "org.xwiki.model.reference.EntityReference",
+                    "package": "org.xwiki.notifications.preferences",
+                    "classSimpleName": "TargetableNotificationPreference",
+                    "methodName": "getTarget",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder::setTarget(===org.xwiki.model.reference.DocumentReference===)",
+                    "new": "parameter void org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder::setTarget(===org.xwiki.model.reference.EntityReference===)",
+                    "oldType": "org.xwiki.model.reference.DocumentReference",
+                    "newType": "org.xwiki.model.reference.EntityReference",
+                    "package": "org.xwiki.notifications.preferences",
+                    "classSimpleName": "TargetableNotificationPreferenceBuilder",
+                    "methodName": "setTarget",
+                    "parameterIndex": "0",
+                    "elementKind": "parameter",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method void org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService::saveNotificationPreferences(java.lang.String, org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "new": "method void org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService::saveNotificationPreferences(java.lang.String, org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException, org.xwiki.security.authorization.AccessDeniedException",
+                    "exception": "org.xwiki.security.authorization.AccessDeniedException",
+                    "package": "org.xwiki.notifications.preferences.script",
+                    "classSimpleName": "NotificationPreferenceScriptService",
+                    "methodName": "saveNotificationPreferences",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

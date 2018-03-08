@@ -51,7 +51,7 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "li#tmNotifications span.notifications-count")
     private WebElement countBadge;
 
-    @FindBy(css = "li#tmNotifications div.notifications-header a.notification-event-clean")
+    @FindBy(className = "notification-event-clean")
     private WebElement clearAllLink;
 
     /**

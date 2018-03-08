@@ -187,7 +187,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
-      <version>4.2</version>
+      <version>4.3</version>
       <type>xar</type>
       <optional>true</optional>
       <exclusions>

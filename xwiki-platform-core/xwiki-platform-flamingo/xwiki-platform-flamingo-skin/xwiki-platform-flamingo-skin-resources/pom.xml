@@ -91,7 +91,7 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.webjars.xwiki</groupId>
+      <groupId>org.webjars</groupId>
       <artifactId>Keypress</artifactId>
       <scope>runtime</scope>
     </dependency>

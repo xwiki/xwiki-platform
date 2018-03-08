@@ -58,7 +58,7 @@
     <restlet.version>2.3.10</restlet.version>
     <tika.version>1.14</tika.version>
     <pdfbox.version>2.0.8</pdfbox.version>
-    <keypress.version>2.1.3</keypress.version>
+    <keypress.version>2.1.5</keypress.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -281,7 +281,7 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.webjars.xwiki</groupId>
+        <groupId>org.webjars</groupId>
         <artifactId>Keypress</artifactId>
         <version>${keypress.version}</version>
         <scope>runtime</scope>

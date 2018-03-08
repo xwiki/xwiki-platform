@@ -76,7 +76,7 @@ public interface TargetableNotificationPreferenceBuilder
 
     /**
      * @param target the target of the preference
-     * @since 9.11.3
+     * @since 9.11.4
      * @since 10.2RC2
      */
     void setTarget(EntityReference target);

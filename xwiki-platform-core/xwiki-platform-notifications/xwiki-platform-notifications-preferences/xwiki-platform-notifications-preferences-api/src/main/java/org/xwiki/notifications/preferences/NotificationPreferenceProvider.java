@@ -63,7 +63,7 @@ public interface NotificationPreferenceProvider
      * @throws NotificationException if an error happened
      *
      * @since 10.2RC1
-     * @since 9.11.3
+     * @since 9.11.4
      */
     List<NotificationPreference> getPreferencesForWiki(WikiReference wiki) throws NotificationException;
 

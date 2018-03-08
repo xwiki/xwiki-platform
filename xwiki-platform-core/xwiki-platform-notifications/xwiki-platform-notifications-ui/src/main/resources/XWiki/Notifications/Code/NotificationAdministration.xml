@@ -226,13 +226,7 @@
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute>== {{translation key="notifications.settings.email.title" /}} ==
-
-{{notificationsEmailPreferences target="wiki" /}}
-
-== {{translation key="notifications.settings.applications.title" /}} ==
-
-{{notificationsApplicationsPreferences target="wiki" /}}</codeToExecute>
+      <codeToExecute>{{notificationsEmailPreferences target="wiki" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -250,7 +244,226 @@
       <displayInSection>Notifications</displayInSection>
     </property>
     <property>
-      <heading/>
+      <heading>$services.localization.render('notifications.settings.email.title')</heading>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationAdministration</name>
+    <number>1</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>849edf13-6098-4daf-8d1d-99646adc7e9e</guid>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <categoryIcon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
+      <codeToExecute>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
+      <displayInSection>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
+    </class>
+    <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute>{{notificationsApplicationsPreferences target="wiki" /}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
+    </property>
+    <property>
+      <displayInSection>Notifications</displayInSection>
+    </property>
+    <property>
+      <heading>$services.localization.render('notifications.settings.applications.title')</heading>
     </property>
     <property>
       <iconAttachment/>

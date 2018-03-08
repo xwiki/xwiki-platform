@@ -989,7 +989,7 @@ shortcut = new Object({
      */
     add: function(shortcut_combination, callback, opt) {
         // Require Keypress JS to be fully loaded before registering the shortcut.
-        require(["$services.webjars.url('org.webjars.xwiki:Keypress', 'keypress.js')", 'jquery'], function(keypress) {
+        require(["$services.webjars.url('org.webjars:Keypress', 'keypress.js')", 'jquery'], function(keypress) {
 
             // If no options are defined, create a blank map
             opt = (opt) ? opt : {};

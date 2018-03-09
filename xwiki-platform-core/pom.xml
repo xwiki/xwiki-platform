@@ -35,6 +35,9 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+
+    <!-- FIXME: remove when https://github.com/INRIA/spoon/issues/1901 is fixed -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
   <build>
     <pluginManagement>

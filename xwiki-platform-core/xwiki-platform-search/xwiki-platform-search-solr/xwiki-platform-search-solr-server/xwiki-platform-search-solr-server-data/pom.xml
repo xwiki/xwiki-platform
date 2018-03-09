@@ -31,6 +31,10 @@
   <name>XWiki Plarform - Search - SOLR - Server - Data</name>
   <packaging>jar</packaging>
   <description>A package containing SOLR configuration for XWiki</description>
+  <properties>
+    <!-- FIXME: remove when https://github.com/INRIA/spoon/issues/1901 is fixed -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
+  </properties>
   <dependencies>
     <dependency>
       <!-- This is needed at runtime by solrconfig.xml which is why we package below in the lib/ directory of the

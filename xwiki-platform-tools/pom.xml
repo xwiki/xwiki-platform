@@ -47,6 +47,9 @@
 
     <!-- Set the version of Maven used at build time for Maven plugins dependencies -->
     <maven.dependencies.version>${maven.runtime.version}</maven.dependencies.version>
+
+    <!-- FIXME: remove when https://github.com/INRIA/spoon/issues/1901 is fixed -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
   <dependencies>
     <dependency>

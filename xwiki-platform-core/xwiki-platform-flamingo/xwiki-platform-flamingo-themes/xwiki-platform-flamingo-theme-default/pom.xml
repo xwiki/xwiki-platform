@@ -24,24 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-flamingo</artifactId>
+    <artifactId>xwiki-platform-flamingo-themes</artifactId>
     <version>10.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-themes</artifactId>
-  <name>XWiki Platform - Flamingo - Themes - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Flamingo - Themes - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-flamingo-theme-bootswatch</module>
-    <module>xwiki-platform-flamingo-theme-default</module>
-    <module>xwiki-platform-flamingo-theme-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-flamingo-theme-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-flamingo-theme-default</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - Flamingo - Theme - Default</name>
+  <description>Default Theme</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Default Flamingo Theme</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars.bower</groupId>
+      <artifactId>open-sans</artifactId>
+      <version>1.1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

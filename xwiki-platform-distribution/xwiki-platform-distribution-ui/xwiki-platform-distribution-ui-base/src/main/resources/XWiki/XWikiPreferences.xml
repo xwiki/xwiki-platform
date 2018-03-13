@@ -2642,7 +2642,7 @@
       <authenticate_view>0</authenticate_view>
     </property>
     <property>
-      <colorTheme>FlamingoThemes.Charcoal</colorTheme>
+      <colorTheme>FlamingoThemes.Iceberg</colorTheme>
     </property>
     <property>
       <comment_anonymous>---</comment_anonymous>

@@ -11,8 +11,9 @@
         </div>
         <div class="modal-body">
           <div class="panel-group" id="exportModelAccordion" role="tablist" aria-multiselectable="true">
-            #displayOfficeFormats()
-            #displayOtherFormats()
+            #set($exportExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
+            #displayOfficeFormats($exportExtensions)
+            #displayOtherFormats($exportExtensions)
           </div>
         </div>
       </div>
@@ -20,7 +21,7 @@
   </div>
 #end
 ##
-#macro (displayOfficeFormats)
+#macro (displayOfficeFormats $exportExtensions)
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="exportModalHeadingOffice">
       <h4 class="panel-title">
@@ -36,12 +37,17 @@
           <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.odt')</a>
           <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.rtf')</a>
         #end
+        #foreach ($exportExtension in $exportExtensions)
+          #if ($exportExtension.parameters.category == 'office')
+            $services.rendering.render($exportExtension.execute(), 'html/5.0')
+          #end
+        #end
       </div>
     </div>
   </div>
 #end
 ##
-#macro (displayOtherFormats)
+#macro (displayOtherFormats $exportExtensions)
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="exportModalHeadingOther">
       <h4 class="panel-title">
@@ -82,6 +88,9 @@
             #set($exportURL = "$exportURL&amp;pages=${escapetool.url($services.model.serialize($doc.documentReference.parent,'default'))}.WebPreferences")
           #end
           <a href="$doc.getURL('export', "$exportURL&amp;$!docvariant")" class="btn btn-primary">$services.localization.render('core.menu.export.xar')</a>
+        #end
+        #foreach ($exportExtension in $exportExtensions)
+          $services.rendering.render($exportExtension.execute(), 'html/5.0')
         #end
       </div>
     </div>

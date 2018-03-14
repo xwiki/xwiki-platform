@@ -66,6 +66,10 @@ notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
 notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
 notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
 notifications.filters.description.eventReadEmailFilter=Hide notifications that you have marked as read
+notifications.filters.name.minorEventAlertNotificationFilter=Minor Event (Alert)
+notifications.filters.description.minorEventAlertNotificationFilter=Hide notifications concerning minor changes on pages
+notifications.filters.name.minorEventEmailNotificationFilter=Minor Event (Email)
+notifications.filters.description.minorEventEmailNotificationFilter=Hide notifications concerning minor changes on pages
 
 ## Filter Types
 notifications.filters.type.inclusive=Inclusive

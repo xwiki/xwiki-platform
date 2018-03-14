@@ -30,6 +30,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
 import org.xwiki.notifications.filters.expression.DateValueNode;
+import org.xwiki.notifications.filters.expression.EndsWith;
 import org.xwiki.notifications.filters.expression.EntityReferenceNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
@@ -249,6 +250,10 @@ public class ExpressionNodeToHQLConverter
                     parseValue((AbstractValueNode) operator.getRightOperand(), result));
         } else if (operator instanceof StartsWith) {
             returnValue = String.format("%s LIKE concat(%s, '%%') ESCAPE '!'",
+                    parseValue((AbstractValueNode) operator.getLeftOperand(), result),
+                    parseValue((AbstractValueNode) operator.getRightOperand(), true, result));
+        } else if (operator instanceof EndsWith) {
+            returnValue = String.format("%s LIKE concat('%%', %s) ESCAPE '!'",
                     parseValue((AbstractValueNode) operator.getLeftOperand(), result),
                     parseValue((AbstractValueNode) operator.getRightOperand(), true, result));
         } else if (operator instanceof GreaterThanNode) {

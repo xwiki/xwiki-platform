@@ -1,3 +1,5 @@
+org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter
+org.xwiki.notifications.filters.internal.minor.MinorEventEmailNotificationFilter
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterExpressionGenerator
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer

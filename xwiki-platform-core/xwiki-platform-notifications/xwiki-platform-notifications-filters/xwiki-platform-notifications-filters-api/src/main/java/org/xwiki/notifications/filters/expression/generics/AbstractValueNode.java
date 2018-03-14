@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.expression.generics;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import org.xwiki.notifications.filters.expression.EndsWith;
 import org.xwiki.notifications.filters.expression.EqualsNode;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
@@ -100,6 +101,19 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     public StartsWith startsWith(AbstractValueNode node)
     {
         return new StartsWith(this, node);
+    }
+
+    /**
+     * Helper that allows to create {@link EndsWith} without having to instantiate new objects.
+     *
+     * @param node the node that will be the second operand of the "like" node
+     * @return a {@link StartsWith} where the current object is the first operand and the parameter is the second operand
+     *
+     * @since 10.2RC1
+     */
+    public EndsWith endsWith(AbstractValueNode node)
+    {
+        return new EndsWith(this, node);
     }
 
     /**

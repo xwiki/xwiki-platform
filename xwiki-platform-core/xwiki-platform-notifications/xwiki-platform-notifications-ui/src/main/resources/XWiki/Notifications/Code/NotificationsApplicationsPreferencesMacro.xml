@@ -884,7 +884,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         &lt;/th&gt;
         #set ($colsCount = 3)
       #end
-      &lt;td&gt;&lt;/td&gt;
+      &lt;th&gt;&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##

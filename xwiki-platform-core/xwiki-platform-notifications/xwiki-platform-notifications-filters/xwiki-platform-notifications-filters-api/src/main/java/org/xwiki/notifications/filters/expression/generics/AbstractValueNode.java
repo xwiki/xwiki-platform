@@ -110,6 +110,7 @@ public abstract class AbstractValueNode<T> extends AbstractNode
      * @return a {@link StartsWith} where the current object is the first operand and the parameter is the second operand
      *
      * @since 10.2RC1
+     * @since 9.11.4
      */
     public EndsWith endsWith(AbstractValueNode node)
     {

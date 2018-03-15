@@ -28,6 +28,7 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 10.2RC1
+ * @since 9.11.4
  */
 @Unstable
 public final class EndsWith extends AbstractBinaryOperatorNode

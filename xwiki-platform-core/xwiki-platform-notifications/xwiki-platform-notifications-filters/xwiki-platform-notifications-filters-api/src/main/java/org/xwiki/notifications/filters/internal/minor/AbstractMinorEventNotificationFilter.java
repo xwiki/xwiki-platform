@@ -37,6 +37,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
  *
  * @version $Id$
  * @since 10.2RC1
+ * @since 9.11.4
  */
 public abstract class AbstractMinorEventNotificationFilter implements NotificationFilter, ToggleableNotificationFilter
 {

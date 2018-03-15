@@ -33,6 +33,7 @@ import org.xwiki.notifications.NotificationFormat;
  *
  * @version $Id$
  * @since 10.2RC1
+ * @since 9.11.
  */
 @Component
 @Singleton

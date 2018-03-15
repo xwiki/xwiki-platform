@@ -947,7 +947,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
     'rowCount'          : 10,
     'description'       : 'This table lists every filter registered for the current user.',
     'translationPrefix' : 'notifications.settings.filters.preferences.table.',
-    'extraParams'       : "eventType=&amp;format=&amp;user=${services.model.serialize($doc.documentReference, 'default')}",
+    'extraParams'       : "eventType=&amp;format=&amp;user=${services.model.serialize($xcontext.userReference, 'default')}",
     'outputOnlyHtml'    : true
   })
 

@@ -345,7 +345,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      */
     protected void saveDocument(Document doc, String comment) throws XWikiException
     {
-        boolean isMinor = "true".equals(uriInfo.getQueryParameters().getFirst("minorRevision"));
+        boolean isMinor = "true".equals(getXWikiContext().getRequest().get("minorRevision"));
         doc.save(comment, isMinor);
     }
 }

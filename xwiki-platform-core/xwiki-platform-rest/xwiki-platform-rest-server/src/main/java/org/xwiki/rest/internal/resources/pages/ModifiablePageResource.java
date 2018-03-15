@@ -44,7 +44,7 @@ public class ModifiablePageResource extends XWikiResource
 
         // Save the document only if there is actually something to do if if the document does not exist
         if (this.factory.toDocument(doc, page) || doc.isNew()) {
-            doc.save(page.getComment());
+            saveDocument(doc, page.getComment());
 
             page =
                 this.factory.toRestPage(uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false, false, false, false,

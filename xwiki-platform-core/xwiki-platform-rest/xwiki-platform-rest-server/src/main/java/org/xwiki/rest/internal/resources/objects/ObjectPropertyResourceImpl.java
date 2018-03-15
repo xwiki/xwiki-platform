@@ -110,7 +110,7 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
 
             baseObject.set(propertyName, property.getValue(), Utils.getXWikiContext(componentManager));
 
-            doc.save();
+            saveDocument(doc);
 
             baseObject = xwikiDocument.getObject(className, objectNumber);
             Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(

@@ -86,7 +86,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
             this.factory.toObject(xwikiObject, restObject);
 
-            doc.save();
+            saveDocument(doc);
 
             BaseObject baseObject = getBaseObject(doc, className, objectNumber);
 

@@ -123,7 +123,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
                 xwikiObject.set(property.getName(), property.getValue(), Utils.getXWikiContext(componentManager));
             }
 
-            doc.save();
+            saveDocument(doc);
 
             return Response
                 .created(

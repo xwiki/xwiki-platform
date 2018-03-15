@@ -120,7 +120,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
 
             xwikiObject.set("tags", tagNames, Utils.getXWikiContext(componentManager));
 
-            doc.save();
+            saveDocument(doc);
 
             return Response.status(Status.ACCEPTED).entity(tags).build();
         } catch (XWikiException e) {

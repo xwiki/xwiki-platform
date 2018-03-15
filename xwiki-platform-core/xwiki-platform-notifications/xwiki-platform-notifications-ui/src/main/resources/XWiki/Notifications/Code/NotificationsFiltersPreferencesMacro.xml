@@ -464,8 +464,8 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
       var filterName = self.domElement.attr('data-filterName');
       var objectNumber = self.domElement.attr('data-objectNumber');
       if (objectNumber == '') {
-        // If the object does not exist yet, create it
-        var restURL = self.userURL + '/objects?media=json';
+        // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default, in notifications)
+        var restURL = self.userURL + '/objects?media=json&amp;minorRevision=true';
         var params = {
           'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
           'property#filterName': filterName,
@@ -480,9 +480,9 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
         });
       } else if (objectNumber != '') {
-        // If the object already exist, just update its value
+        // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
         var restURL = self.userURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
-          + '/properties/isEnabled?media=json';
+          + '/properties/isEnabled?media=json&amp;minorRevision=true';
         $.ajax(restURL, {
           method: 'PUT',
           contentType: 'text/plain',

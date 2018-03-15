@@ -80,7 +80,8 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
     }
 
     @Override
-    public Response setTags(String wikiName, String spaceName, String pageName, Tags tags) throws XWikiRestException
+    public Response setTags(String wikiName, String spaceName, String pageName, Boolean minorRevision, Tags tags)
+            throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -120,7 +121,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
 
             xwikiObject.set("tags", tagNames, Utils.getXWikiContext(componentManager));
 
-            doc.save();
+            doc.save("", Boolean.TRUE.equals(minorRevision));
 
             return Response.status(Status.ACCEPTED).entity(tags).build();
         } catch (XWikiException e) {

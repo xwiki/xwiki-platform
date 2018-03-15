@@ -38,13 +38,13 @@ public class ModifiablePageResource extends XWikiResource
     @Inject
     protected ModelFactory factory;
 
-    public Response putPage(DocumentInfo documentInfo, Page page) throws XWikiException
+    public Response putPage(DocumentInfo documentInfo, Page page, Boolean minorRevision) throws XWikiException
     {
         Document doc = documentInfo.getDocument();
 
         // Save the document only if there is actually something to do if if the document does not exist
         if (this.factory.toDocument(doc, page) || doc.isNew()) {
-            doc.save(page.getComment());
+            doc.save(page.getComment(), Boolean.TRUE.equals(minorRevision));
 
             page =
                 this.factory.toRestPage(uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false, false, false, false,

@@ -23,6 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.rest.XWikiRestException;
@@ -44,6 +45,7 @@ public interface PageTagsResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
+            @QueryParam("minorRevision") Boolean minorRevision,
             Tags tags
     ) throws XWikiRestException;
 }

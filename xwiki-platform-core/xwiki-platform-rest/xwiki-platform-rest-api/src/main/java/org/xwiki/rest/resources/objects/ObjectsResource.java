@@ -50,6 +50,7 @@ public interface ObjectsResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
+            @QueryParam("minorRevision") Boolean minorRevision,
             Object object
     ) throws XWikiRestException;
 }

@@ -89,7 +89,7 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
 
     @Override
     public Response updateObjectProperty(String wikiName, String spaceName, String pageName, String className,
-            Integer objectNumber, String propertyName, Property property) throws XWikiRestException
+            Integer objectNumber, String propertyName, Boolean minorRevision, Property property) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -110,7 +110,7 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
 
             baseObject.set(propertyName, property.getValue(), Utils.getXWikiContext(componentManager));
 
-            doc.save();
+            doc.save("", Boolean.TRUE.equals(minorRevision));
 
             baseObject = xwikiDocument.getObject(className, objectNumber);
             Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(

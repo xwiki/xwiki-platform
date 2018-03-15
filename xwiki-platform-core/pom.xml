@@ -535,6 +535,144 @@
                     "methodName": "saveNotificationPreferences",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, ===org.xwiki.rest.model.jaxb.Property===) throws org.xwiki.rest.XWikiRestException",
+                    "new": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, ===java.lang.Boolean===, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"minorRevision\")",
+                    "package": "org.xwiki.rest.resources.objects",
+                    "classSimpleName": "ObjectPropertyResource",
+                    "methodName": "updateObjectProperty",
+                    "parameterIndex": "6",
+                    "elementKind": "parameter",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException",
+                    "package": "org.xwiki.rest.resources.objects",
+                    "classSimpleName": "ObjectPropertyResource",
+                    "methodName": "updateObjectProperty",
+                    "elementKind": "method",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===org.xwiki.rest.model.jaxb.Object===) throws org.xwiki.rest.XWikiRestException",
+                    "new": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Boolean===, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"minorRevision\")",
+                    "package": "org.xwiki.rest.resources.objects",
+                    "classSimpleName": "ObjectResource",
+                    "methodName": "updateObject",
+                    "parameterIndex": "5",
+                    "elementKind": "parameter",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException",
+                    "package": "org.xwiki.rest.resources.objects",
+                    "classSimpleName": "ObjectResource",
+                    "methodName": "updateObject",
+                    "elementKind": "method",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageResource::putPage(java.lang.String, java.lang.String, java.lang.String, ===org.xwiki.rest.model.jaxb.Page===) throws org.xwiki.rest.XWikiRestException",
+                    "new": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageResource::putPage(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Boolean===, org.xwiki.rest.model.jaxb.Page) throws org.xwiki.rest.XWikiRestException",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"minorRevision\")",
+                    "package": "org.xwiki.rest.resources.pages",
+                    "classSimpleName": "PageResource",
+                    "methodName": "putPage",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageResource::putPage(java.lang.String, java.lang.String, java.lang.String, org.xwiki.rest.model.jaxb.Page) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageResource::putPage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Page) throws org.xwiki.rest.XWikiRestException",
+                    "package": "org.xwiki.rest.resources.pages",
+                    "classSimpleName": "PageResource",
+                    "methodName": "putPage",
+                    "elementKind": "method",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTranslationResource::putPageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===org.xwiki.rest.model.jaxb.Page===) throws org.xwiki.rest.XWikiRestException",
+                    "new": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTranslationResource::putPageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, ===java.lang.Boolean===, org.xwiki.rest.model.jaxb.Page) throws org.xwiki.rest.XWikiRestException",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"minorRevision\")",
+                    "package": "org.xwiki.rest.resources.pages",
+                    "classSimpleName": "PageTranslationResource",
+                    "methodName": "putPageTranslation",
+                    "parameterIndex": "4",
+                    "elementKind": "parameter",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTranslationResource::putPageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.xwiki.rest.model.jaxb.Page) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTranslationResource::putPageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Page) throws org.xwiki.rest.XWikiRestException",
+                    "package": "org.xwiki.rest.resources.pages",
+                    "classSimpleName": "PageTranslationResource",
+                    "methodName": "putPageTranslation",
+                    "elementKind": "method",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTagsResource::setTags(java.lang.String, java.lang.String, java.lang.String, ===org.xwiki.rest.model.jaxb.Tags===) throws org.xwiki.rest.XWikiRestException",
+                    "new": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTagsResource::setTags(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Boolean===, org.xwiki.rest.model.jaxb.Tags) throws org.xwiki.rest.XWikiRestException",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"minorRevision\")",
+                    "package": "org.xwiki.rest.resources.pages",
+                    "classSimpleName": "PageTagsResource",
+                    "methodName": "setTags",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTagsResource::setTags(java.lang.String, java.lang.String, java.lang.String, org.xwiki.rest.model.jaxb.Tags) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.pages.PageTagsResource::setTags(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Tags) throws org.xwiki.rest.XWikiRestException",
+                    "package": "org.xwiki.rest.resources.pages",
+                    "classSimpleName": "PageTagsResource",
+                    "methodName": "setTags",
+                    "elementKind": "method",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, ===org.xwiki.rest.model.jaxb.Object===) throws org.xwiki.rest.XWikiRestException",
+                    "new": "parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Boolean===, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException",
+                    "annotationType": "javax.ws.rs.QueryParam",
+                    "annotation": "@javax.ws.rs.QueryParam(\"minorRevision\")",
+                    "package": "org.xwiki.rest.resources.objects",
+                    "classSimpleName": "ObjectsResource",
+                    "methodName": "addObject",
+                    "parameterIndex": "3",
+                    "elementKind": "parameter",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException",
+                    "package": "org.xwiki.rest.resources.objects",
+                    "classSimpleName": "ObjectsResource",
+                    "methodName": "addObject",
+                    "elementKind": "method",
+                    "justification": "Adding an optional parameter to REST action, not a real breakage"
                   }
                 ]
               }

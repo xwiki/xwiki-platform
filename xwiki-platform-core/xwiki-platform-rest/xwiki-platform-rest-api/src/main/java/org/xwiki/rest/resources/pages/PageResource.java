@@ -51,6 +51,7 @@ public interface PageResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
+            @QueryParam("minorRevision") Boolean minorRevision,
             Page page
     ) throws XWikiRestException;
 

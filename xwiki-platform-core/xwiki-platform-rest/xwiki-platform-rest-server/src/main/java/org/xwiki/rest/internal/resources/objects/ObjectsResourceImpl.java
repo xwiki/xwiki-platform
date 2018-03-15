@@ -82,7 +82,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
     }
 
     @Override
-    public Response addObject(String wikiName, String spaceName, String pageName, Object object)
+    public Response addObject(String wikiName, String spaceName, String pageName, Boolean minorRevision, Object object)
         throws XWikiRestException
     {
         if (object.getClassName() == null) {
@@ -123,7 +123,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
                 xwikiObject.set(property.getName(), property.getValue(), Utils.getXWikiContext(componentManager));
             }
 
-            doc.save();
+            doc.save("", Boolean.TRUE.equals(minorRevision));
 
             return Response
                 .created(

@@ -272,8 +272,9 @@ public class DefaultModelBridge implements ModelBridge
                 }
             }
             if (shouldSave) {
+                // Make this change a minor edit so it's not displayed, by default, in notifications
                 xwiki.saveDocument(doc, String.format("%s filter preference [%s].",
-                        enabled ? "Enable" : "Disable", filterPreferenceName), context);
+                        enabled ? "Enable" : "Disable", filterPreferenceName), true, context);
             }
         } catch (Exception e) {
             throw new NotificationException(
@@ -310,7 +311,8 @@ public class DefaultModelBridge implements ModelBridge
             // Create objects from the remaining filter preferences to save
             createNewObjects(toSave, notificationFilterPreferenceClass, doc, context);
 
-            xwiki.saveDocument(doc, "Save notification filter preferences.", context);
+            // Make this change a minor edit so it's not displayed, by default, in notifications
+            xwiki.saveDocument(doc, "Save notification filter preferences.", true, context);
         } catch (Exception e) {
             throw new NotificationException(
                     String.format("Failed to save the notification preferences scope for the user [%s].", user),

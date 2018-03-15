@@ -200,7 +200,8 @@ public class DefaultModelBridge implements ModelBridge
                 }
             }
 
-            xwiki.saveDocument(document, NOTIFICATION_START_DATE_UPDATE_COMMENT, context);
+            // Make this change a minor edit so it's not displayed, by default, in notifications
+            xwiki.saveDocument(document, NOTIFICATION_START_DATE_UPDATE_COMMENT, true, context);
 
         } catch (Exception e) {
             throw new NotificationException(
@@ -293,7 +294,8 @@ public class DefaultModelBridge implements ModelBridge
                 preferenceObject.set(START_DATE_FIELD, startDate, context);
             }
 
-            xwiki.saveDocument(document, "Update notification preferences.", context);
+            // Make this change a minor edit so it's not displayed, by default, in notifications
+            xwiki.saveDocument(document, "Update notification preferences.", true, context);
 
         } catch (XWikiException e) {
             throw new NotificationException(String.format(

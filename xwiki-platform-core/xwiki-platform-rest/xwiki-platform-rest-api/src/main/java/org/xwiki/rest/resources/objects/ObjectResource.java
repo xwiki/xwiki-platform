@@ -52,6 +52,7 @@ public interface ObjectResource
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber,
+            @QueryParam("minorRevision") Boolean minorRevision,
             Object object
     ) throws XWikiRestException;
 

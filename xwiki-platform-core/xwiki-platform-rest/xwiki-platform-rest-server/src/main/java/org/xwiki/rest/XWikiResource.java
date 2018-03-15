@@ -326,26 +326,4 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     {
         return this.slf4Jlogger;
     }
-
-    /**
-     * @param doc document to save
-     * @since 10.2RC1
-     * @since 9.11.4
-     */
-    protected void saveDocument(Document doc) throws XWikiException
-    {
-       saveDocument(doc, "");
-    }
-
-    /**
-     * @param doc document to save
-     * @param comment comment to save
-     * @since 10.2RC1
-     * @since 9.11.4
-     */
-    protected void saveDocument(Document doc, String comment) throws XWikiException
-    {
-        boolean isMinor = "true".equals(getXWikiContext().getRequest().get("minorRevision"));
-        doc.save(comment, isMinor);
-    }
 }

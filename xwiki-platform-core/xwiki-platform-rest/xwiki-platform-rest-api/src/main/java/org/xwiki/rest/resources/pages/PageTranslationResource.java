@@ -50,6 +50,7 @@ public interface PageTranslationResource
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("language") String language,
+            @QueryParam("minorRevision") Boolean minorRevision,
             Page page
     ) throws XWikiRestException;
 

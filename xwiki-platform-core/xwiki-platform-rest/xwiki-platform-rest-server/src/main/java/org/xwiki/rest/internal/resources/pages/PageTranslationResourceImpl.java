@@ -54,13 +54,14 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
     }
 
     @Override
-    public Response putPageTranslation(String wikiName, String spaceName, String pageName, String language, Page page)
+    public Response putPageTranslation(String wikiName, String spaceName, String pageName, String language,
+            Boolean minorRevision, Page page)
         throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, false, true);
 
-            return putPage(documentInfo, page);
+            return putPage(documentInfo, page, minorRevision);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

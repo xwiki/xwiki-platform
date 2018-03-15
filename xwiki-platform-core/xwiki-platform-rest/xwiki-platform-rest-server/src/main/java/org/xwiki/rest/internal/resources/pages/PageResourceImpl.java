@@ -61,12 +61,13 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
     }
 
     @Override
-    public Response putPage(String wikiName, String spaceName, String pageName, Page page) throws XWikiRestException
+    public Response putPage(String wikiName, String spaceName, String pageName, Boolean minorRevision, Page page)
+            throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, false, true);
 
-            return putPage(documentInfo, page);
+            return putPage(documentInfo, page, minorRevision);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

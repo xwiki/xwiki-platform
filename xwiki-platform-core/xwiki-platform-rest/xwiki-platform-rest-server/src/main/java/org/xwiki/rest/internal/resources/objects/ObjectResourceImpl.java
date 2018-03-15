@@ -68,7 +68,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
     @Override
     public Response updateObject(String wikiName, String spaceName, String pageName, String className,
-        Integer objectNumber, Object restObject) throws XWikiRestException
+        Integer objectNumber, Boolean minorRevision, Object restObject) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -86,7 +86,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
             this.factory.toObject(xwikiObject, restObject);
 
-            saveDocument(doc);
+            doc.save("", Boolean.TRUE.equals(minorRevision));
 
             BaseObject baseObject = getBaseObject(doc, className, objectNumber);
 

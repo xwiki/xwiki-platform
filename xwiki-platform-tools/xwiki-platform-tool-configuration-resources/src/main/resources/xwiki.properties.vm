@@ -517,6 +517,22 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # distribution.automaticStartOnMainWiki=true
 # distribution.automaticStartOnWiki=true
 
+#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
+#-# 
+#-# On the main wiki
+# distribution.job.interactive=true
+#-# On the subwikis
+# distribution.job.interactive.wiki=true
+
+#-# [Since 10.2RC1] Override the default UI indicated in the "environment extension" (usually means the WAR).
+#-# It usually make more sense to set that at the WAR level (since it's usually synchronized with it).
+#-# If this is set it also means the Distribution Wizard will switch to default UI mode in which you cannot choose the flavor.
+#-#
+#-# The id[/version] of the default UI for the main wiki. If the version is not indicated it will be the version of the environment extension.
+# distribution.defaultUI=org.my.groupid:artifactid-mainwiki/1.5
+#-# The id[/version] default UI for the subwikis.  If the version is not indicated it will be the version of the environment extension.
+# distribution.defaultWikiUI=org.my.groupid:artifactid-wiki/1.5
+
 #-------------------------------------------------------------------------------------
 # Solr Search
 #-------------------------------------------------------------------------------------

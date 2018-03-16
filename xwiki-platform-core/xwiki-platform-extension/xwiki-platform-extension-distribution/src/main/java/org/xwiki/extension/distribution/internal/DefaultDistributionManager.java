@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -125,6 +126,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Inject
     private Logger logger;
 
+    @Inject
+    private ConfigurationSource configuration;
+
     private CoreExtension distributionExtension;
 
     private ExtensionId mainUIExtensionId;
@@ -138,30 +142,45 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public void initialize() throws InitializationException
     {
+        // Get default UI from the configuration.
+        this.mainUIExtensionId = this.configuration.getProperty("distribution.defaultUI", ExtensionId.class);
+        this.wikiUIExtensionId = this.configuration.getProperty("distribution.defaultWikiUI", ExtensionId.class);
+
         // Get the current distribution
         this.distributionExtension = this.coreExtensionRepository.getEnvironmentExtension();
 
         // Extract various configuration from the distribution extension
         if (this.distributionExtension != null) {
-            // Distribution UI
-            String mainUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.ui");
+            // Main wiki default UI
+            if (this.mainUIExtensionId == null) {
+                String mainUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.ui");
 
-            if (mainUIId != null) {
-                String mainUIVersion =
-                    this.distributionExtension.getProperty("xwiki.extension.distribution.ui.version");
+                if (mainUIId != null) {
+                    String mainUIVersion =
+                        this.distributionExtension.getProperty("xwiki.extension.distribution.ui.version");
 
-                this.mainUIExtensionId = new ExtensionId(mainUIId, mainUIVersion != null
-                    ? new DefaultVersion(mainUIVersion) : this.distributionExtension.getId().getVersion());
+                    this.mainUIExtensionId = new ExtensionId(mainUIId, mainUIVersion != null
+                        ? new DefaultVersion(mainUIVersion) : this.distributionExtension.getId().getVersion());
+                }
+            } else if (this.mainUIExtensionId.getVersion() == null) {
+                this.mainUIExtensionId =
+                    new ExtensionId(this.mainUIExtensionId.getId(), this.distributionExtension.getId().getVersion());
             }
 
-            String wikiUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
+            // Subwikis defualt UI
+            if (this.wikiUIExtensionId == null) {
+                String wikiUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
 
-            if (wikiUIId != null) {
-                String wikiUIVersion =
-                    this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui.version");
+                if (wikiUIId != null) {
+                    String wikiUIVersion =
+                        this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui.version");
 
-                this.wikiUIExtensionId = new ExtensionId(wikiUIId, wikiUIVersion != null
-                    ? new DefaultVersion(wikiUIVersion) : this.distributionExtension.getId().getVersion());
+                    this.wikiUIExtensionId = new ExtensionId(wikiUIId, wikiUIVersion != null
+                        ? new DefaultVersion(wikiUIVersion) : this.distributionExtension.getId().getVersion());
+                }
+            } else if (this.wikiUIExtensionId.getVersion() == null) {
+                this.wikiUIExtensionId =
+                    new ExtensionId(this.wikiUIExtensionId.getId(), this.distributionExtension.getId().getVersion());
             }
         }
     }
@@ -183,7 +202,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setId(getFarmJobId());
             request.setWiki(xcontext.getMainXWiki());
             request.setUserReference(xcontext.getUserReference());
-            request.setInteractive(true);
+            request.setInteractive(this.configuration.getProperty("distribution.job.interactive", true));
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -235,7 +254,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setId(getWikiJobId(wiki));
             request.setWiki(wiki);
             request.setUserReference(this.xcontextProvider.get().getUserReference());
-            request.setInteractive(true);
+            request.setInteractive(this.configuration.getProperty("distribution.job.interactive.wiki", true));
 
             Thread distributionJobThread = new Thread(new Runnable()
             {

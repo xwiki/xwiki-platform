@@ -86,11 +86,9 @@ public final class FileSystemStoreUtils
                     break;
 
                 case ' ':
-                    // White space at the beginning of a file is forbidden on Windows
-                    if (i == name.length() - 1) {
-                        builder.append("+");
-
-                        continue;
+                    // White space at the beginning and the end of a file is forbidden on Windows
+                    if (i == 0 || i == name.length() - 1) {
+                        encode = true;
                     }
 
                     break;
@@ -126,20 +124,24 @@ public final class FileSystemStoreUtils
 
     private static void encode(char c, StringBuilder builder)
     {
-        byte[] ba = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
+        if (c == ' ') {
+            builder.append("+");
+        } else {
+            byte[] ba = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
 
-        for (int j = 0; j < ba.length; j++) {
-            builder.append('%');
+            for (int j = 0; j < ba.length; j++) {
+                builder.append('%');
 
-            char ch = Character.forDigit((ba[j] >> 4) & 0xF, 16);
-            // Make it upper case
-            ch = Character.toUpperCase(ch);
-            builder.append(ch);
+                char ch = Character.forDigit((ba[j] >> 4) & 0xF, 16);
+                // Make it upper case
+                ch = Character.toUpperCase(ch);
+                builder.append(ch);
 
-            ch = Character.forDigit(ba[j] & 0xF, 16);
-            // Make it upper case
-            ch = Character.toUpperCase(ch);
-            builder.append(ch);
+                ch = Character.forDigit(ba[j] & 0xF, 16);
+                // Make it upper case
+                ch = Character.toUpperCase(ch);
+                builder.append(ch);
+            }
         }
     }
 

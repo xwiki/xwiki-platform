@@ -85,6 +85,12 @@ public class PathStringReferenceTest
     }
 
     @Test
+    public void whiteSpaceAtTheBeginning()
+    {
+        testAttachment(" wiki", " space", " page", " attachment", "+wiki/+space/+page/+attachment");
+    }
+
+    @Test
     public void whiteSpaceAtTheEnd()
     {
         testAttachment("wiki ", "space ", "page ", "attachment ", "wiki+/space+/page+/attachment+");

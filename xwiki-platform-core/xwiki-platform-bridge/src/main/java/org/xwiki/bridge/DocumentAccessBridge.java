@@ -436,8 +436,7 @@ public interface DocumentAccessBridge
      * Returns the content of a document attachment.
      * 
      * @param attachmentReference the name of the attachment to access
-     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
-     *         not exist
+     * @return The content of the attachment as an input stream
      * @throws Exception If the document cannot be accessed.
      * @since 2.2M1
      */

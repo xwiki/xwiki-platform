@@ -19,7 +19,10 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,22 +31,32 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 
 /**
- * This is the default implementation of the role {@link NotificationFilterPreferenceProvider}.
- * It allows retrieving filter preferences from the user XObjects.
+ * This is an of the role {@link NotificationFilterPreferenceProvider}.
+ * It allows retrieving filter preferences from the administration XObjects.
  *
  * @version $Id$
- * @since 9.8RC1
+ * @since 10.3RC1
+ * @since 9.11.5
  */
 @Component
-@Named("userProfile")
+@Named(WikiNotificationFilterPreferenceProvider.HINT)
 @Singleton
-public class UserProfileNotificationFilterPreferenceProvider implements NotificationFilterPreferenceProvider
+public class WikiNotificationFilterPreferenceProvider implements NotificationFilterPreferenceProvider
 {
+    /**
+     * Hint of the provider.
+     */
+    public static final String HINT = "wiki";
+
+    private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
+            Arrays.asList("XWiki", "Notifications", "Code"), "NotificationAdministration");
+
     @Inject
     @Named("cached")
     private ModelBridge modelBridge;
@@ -55,27 +68,40 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
             throws NotificationException
     {
-        return modelBridge.getFilterPreferences(user, "userProfile");
+        return modelBridge.getFilterPreferences(new DocumentReference(GLOBAL_PREFERENCES, user.getWikiReference()),
+                HINT);
     }
 
     @Override
-    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
-            throws NotificationException
+    public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        modelBridge.saveFilterPreferences(documentAccessBridge.getCurrentUserReference(), filterPreferences);
+        List<NotificationFilterPreference> list = filterPreferences.stream().filter(
+            fp -> HINT.equals(fp.getProviderHint())).collect(Collectors.toList());
+        modelBridge.saveFilterPreferences(getCurrentUserWikiPreference(), list);
+    }
+
+    private DocumentReference getCurrentUserWikiPreference()
+    {
+        return new DocumentReference(GLOBAL_PREFERENCES,
+                documentAccessBridge.getCurrentDocumentReference().getWikiReference());
     }
 
     @Override
     public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
     {
-        modelBridge.deleteFilterPreference(documentAccessBridge.getCurrentUserReference(), filterPreferenceName);
+        modelBridge.deleteFilterPreference(getCurrentUserWikiPreference(), filterPreferenceName);
     }
 
     @Override
     public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
             throws NotificationException
     {
-        modelBridge.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
-                filterPreferenceName, enabled);
+        modelBridge.setFilterPreferenceEnabled(getCurrentUserWikiPreference(), filterPreferenceName, enabled);
+    }
+
+    @Override
+    public int getProviderPriority()
+    {
+        return 100;
     }
 }

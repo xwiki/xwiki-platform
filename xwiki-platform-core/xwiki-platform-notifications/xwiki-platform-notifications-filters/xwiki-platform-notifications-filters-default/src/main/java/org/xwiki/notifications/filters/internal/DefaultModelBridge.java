@@ -107,19 +107,19 @@ public class DefaultModelBridge implements ModelBridge
     private ComponentManager componentManager;
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
-            throws NotificationException
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference documentReference,
+            String providerHint) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(documentReference.getWikiReference());
 
         Set<NotificationFilterPreference> preferences = new HashSet<>();
 
         try {
-            XWikiDocument doc = xwiki.getDocument(user, context);
+            XWikiDocument doc = xwiki.getDocument(documentReference, context);
             List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
@@ -140,7 +140,7 @@ public class DefaultModelBridge implements ModelBridge
                                 = new DefaultNotificationFilterPreference(
                                         obj.getStringValue(FILTER_PREFERENCE_NAME));
 
-                        notificationFilterPreference.setProviderHint("userProfile");
+                        notificationFilterPreference.setProviderHint(providerHint);
                         notificationFilterPreference.setFilterName(obj.getStringValue(FIELD_FILTER_NAME));
                         notificationFilterPreference.setEnabled(obj.getIntValue(FIELD_IS_ENABLED, 1) == 1);
                         notificationFilterPreference.setActive(obj.getIntValue(FIELD_IS_ACTIVE, 1) == 1);
@@ -154,8 +154,8 @@ public class DefaultModelBridge implements ModelBridge
             }
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to get the notification preferences scope for the user [%s].",
-                            user), e);
+                    String.format("Failed to get the notification preferences scope for the document [%s].",
+                            documentReference), e);
         }
 
         return preferences;
@@ -216,17 +216,18 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public void deleteFilterPreference(DocumentReference user, String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(DocumentReference documentReference, String filterPreferenceName)
+            throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(documentReference.getWikiReference());
         boolean shouldSave = false;
 
         try {
-            XWikiDocument doc = xwiki.getDocument(user, context);
+            XWikiDocument doc = xwiki.getDocument(documentReference, context);
             List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
@@ -242,24 +243,25 @@ public class DefaultModelBridge implements ModelBridge
             }
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to delete filters [%s] for user [%s].", filterPreferenceName, user), e);
+                    String.format("Failed to delete filters [%s] for document [%s].", filterPreferenceName,
+                            documentReference), e);
         }
 
     }
 
     @Override
-    public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceName, boolean enabled)
-            throws NotificationException
+    public void setFilterPreferenceEnabled(DocumentReference documentReference, String filterPreferenceName,
+            boolean enabled) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(documentReference.getWikiReference());
         boolean shouldSave = false;
 
         try {
-            XWikiDocument doc = xwiki.getDocument(user, context);
+            XWikiDocument doc = xwiki.getDocument(documentReference, context);
             List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
@@ -278,16 +280,16 @@ public class DefaultModelBridge implements ModelBridge
             }
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to update enabled state filters [%s] for user [%s].",
-                            filterPreferenceName, user), e);
+                    String.format("Failed to update enabled state filters [%s] for document [%s].",
+                            filterPreferenceName, documentReference), e);
         }
     }
 
     @Override
-    public void saveFilterPreferences(DocumentReference user,
+    public void saveFilterPreferences(DocumentReference documentReference,
             Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        if (user == null) {
+        if (documentReference == null) {
             return;
         }
 
@@ -301,10 +303,10 @@ public class DefaultModelBridge implements ModelBridge
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
-                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(documentReference.getWikiReference());
 
         try {
-            XWikiDocument doc = xwiki.getDocument(user, context);
+            XWikiDocument doc = xwiki.getDocument(documentReference, context);
 
             // Update existing objects if they match the filter preferences to save
             updateExistingObjects(toSave, notificationFilterPreferenceClass, doc);
@@ -315,7 +317,8 @@ public class DefaultModelBridge implements ModelBridge
             xwiki.saveDocument(doc, "Save notification filter preferences.", true, context);
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Failed to save the notification preferences scope for the user [%s].", user),
+                    String.format("Failed to save the notification preferences scope for the document [%s].",
+                            documentReference),
                     e
             );
         }

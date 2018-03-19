@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -208,5 +210,32 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setNotificationFormats(Set<NotificationFormat> notificationFormats)
     {
         this.notificationFormats = notificationFormats;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || !(o instanceof DefaultNotificationFilterPreference)) {
+            return false;
+        }
+        DefaultNotificationFilterPreference that = (DefaultNotificationFilterPreference) o;
+        EqualsBuilder equalsBuilder = new EqualsBuilder();
+        equalsBuilder.append(this.filterName, that.filterName);
+        //equalsBuilder.append(this.filterPreferenceName, that.filterPreferenceName);
+        equalsBuilder.append(this.filterType, that.filterType);
+        equalsBuilder.append(this.notificationFormats, that.notificationFormats);
+        equalsBuilder.append(this.preferenceProperties, that.preferenceProperties);
+        return equalsBuilder.isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(this.filterName);
+        builder.append(this.filterType);
+        builder.append(this.notificationFormats);
+        builder.append(this.preferenceProperties);
+        return builder.hashCode();
     }
 }

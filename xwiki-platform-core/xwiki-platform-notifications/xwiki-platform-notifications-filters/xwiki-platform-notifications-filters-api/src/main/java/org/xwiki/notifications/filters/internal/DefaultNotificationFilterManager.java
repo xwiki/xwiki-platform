@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,9 +42,9 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterDisplayer;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterDisplayer;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -115,6 +116,13 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         try {
             List<NotificationFilterPreferenceProvider> providers
                     = componentManager.getInstanceList(NotificationFilterPreferenceProvider.class);
+
+            // We handle conflicts between similar preferences by sorting the providers by order. Since
+            // notificationPreferences is a set, only the first occurrence of a preference is stored.
+            Collections.sort(providers, (o1, o2) ->
+                    // The comparison is inverted so the higher priorities are sorted first
+                    o2.getProviderPriority() - o1.getProviderPriority()
+            );
 
             for (NotificationFilterPreferenceProvider provider : providers) {
                 filterPreferences.addAll(provider.getFilterPreferences(user));

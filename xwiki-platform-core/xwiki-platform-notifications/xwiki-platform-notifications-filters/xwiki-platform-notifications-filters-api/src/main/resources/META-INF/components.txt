@@ -15,4 +15,5 @@ org.xwiki.notifications.filters.internal.DefaultNotificationFilterManager
 org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
 org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider
+org.xwiki.notifications.filters.internal.WikiNotificationFilterPreferenceProvider
 org.xwiki.notifications.filters.script.NotificationFiltersScriptService

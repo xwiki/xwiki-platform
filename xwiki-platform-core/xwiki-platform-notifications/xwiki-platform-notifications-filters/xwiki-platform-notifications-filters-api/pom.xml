@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Filters - API</name>
   <description>Handle the filters that can be applied on notifications</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.59</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Filters API</xwiki.extension.name>
   </properties>

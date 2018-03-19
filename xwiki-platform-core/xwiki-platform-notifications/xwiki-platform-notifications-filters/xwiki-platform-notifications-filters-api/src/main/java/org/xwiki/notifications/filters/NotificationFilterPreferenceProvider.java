@@ -69,4 +69,18 @@ public interface NotificationFilterPreferenceProvider
      * @since 9.8RC1
      */
     void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException;
+
+    /**
+     * Get the priority that the preferences given by this provider should have.
+     * This is useful when different notification preferences are in conflict. The higher is the number, the higher
+     * is the priority.
+     *
+     * @return the priority of the provider
+     *
+     * @since 10.3RC1
+     * @since 9.11.5
+     */
+    default int getProviderPriority() {
+        return 1000;
+    }
 }

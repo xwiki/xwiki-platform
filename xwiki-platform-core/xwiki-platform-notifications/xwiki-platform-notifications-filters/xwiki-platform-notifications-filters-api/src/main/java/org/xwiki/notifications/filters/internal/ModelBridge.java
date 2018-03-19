@@ -38,23 +38,30 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 public interface ModelBridge
 {
     /**
-     * Get all the notification preferences that corresponds to the given user.
+     * Get all the notification preferences that corresponds located on the given document.
      *
-     * @param user the user from which we need to extract the preference
+     * @param documentReference the document where to load the preferences.
+     * @param providerHint hint of the provider
      * @return a set of available filter preferences
      * @throws NotificationException if an error happens
+     *
+     * @since 10.3RC1
+     * @since 9.11.5
      */
-    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
+    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference documentReference, String providerHint)
+            throws NotificationException;
 
     /**
-     * For all toggeable notification filters, get if the filter is enabled regarding the user profile.
+     * For all toggeable notification filters, get if the filter is enabled regarding given document.
      *
-     * @param user the user to use
+     * @param documentReference the document
      * @return a map of notification filters with their activation state
      * @throws NotificationException if an error happens
-     * @since 10.1RC1
+     * @since 10.3RC1
+     * @since 9.11.5
      */
-    Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException;
+    Map<String, Boolean> getToggeableFilterActivations(DocumentReference documentReference)
+            throws NotificationException;
 
     /**
      * Delete a filter preference.

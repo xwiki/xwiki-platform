@@ -63,12 +63,13 @@ public class CachedModelBridge implements ModelBridge
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
+    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference documentReference,
+            String providerHint) throws NotificationException
     {
         // We need to store the user reference in the cache's key, otherwise all users of the same context will share
         // the same cache, which can happen when a notification email is triggered.
         final String contextEntry = String.format(CONTEXT_KEY_FORMAT, USER_FILTER_PREFERENCES,
-                serializer.serialize(user));
+                serializer.serialize(documentReference));
 
         ExecutionContext context = execution.getContext();
         Object cachedPreferences = context.getProperty(contextEntry);
@@ -76,7 +77,8 @@ public class CachedModelBridge implements ModelBridge
             return (Set<NotificationFilterPreference>) cachedPreferences;
         }
 
-        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(user);
+        Set<NotificationFilterPreference> preferences = modelBridge.getFilterPreferences(documentReference,
+                providerHint);
         context.setProperty(contextEntry, preferences);
 
         return preferences;

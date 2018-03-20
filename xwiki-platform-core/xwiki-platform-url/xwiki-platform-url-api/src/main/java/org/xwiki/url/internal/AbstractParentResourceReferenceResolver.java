@@ -38,7 +38,7 @@ import org.xwiki.url.ExtendedURL;
  * @version $Id$
  * @since 10.2RC1
  */
-public class AbstractParentResourceReferenceResolver extends AbstractResourceReferenceResolver
+public abstract class AbstractParentResourceReferenceResolver extends AbstractResourceReferenceResolver
 {
     @Override
     public ParentResourceReference resolve(ExtendedURL extendedURL, ResourceType resourceType,

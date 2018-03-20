@@ -42,6 +42,7 @@ public class ParentResourceReference extends AbstractResourceReference
     /**
      * Default constructor.
      * 
+     * @param type see {@link #getType()}
      * @param rootPath the path starting with the child
      * @param child the child handler hint
      * @param pathSegments the rest of the path

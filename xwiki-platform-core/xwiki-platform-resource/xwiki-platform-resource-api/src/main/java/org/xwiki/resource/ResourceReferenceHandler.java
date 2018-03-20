@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Role;
  * @since 6.1M2
  */
 @Role
-public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenceHandler<T>>
+public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenceHandler>
 {
     /**
      * The priority of execution relative to the other Handlers. The lowest values have the highest priorities and

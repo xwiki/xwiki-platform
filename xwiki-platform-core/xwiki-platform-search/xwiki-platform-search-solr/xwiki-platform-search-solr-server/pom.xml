@@ -31,10 +31,6 @@
   <name>XWiki Platform - Search - SOLR - Server</name>
   <packaging>pom</packaging>
   <description>SOLR server configured for XWiki needs</description>
-  <properties>
-    <!-- FIXME: remove when https://github.com/INRIA/spoon/issues/1901 is fixed -->
-    <xwiki.spoon.skip>true</xwiki.spoon.skip>
-  </properties>
   <modules>
     <module>xwiki-platform-search-solr-server-plugin</module>
     <module>xwiki-platform-search-solr-server-data</module>

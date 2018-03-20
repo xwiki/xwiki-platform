@@ -153,9 +153,6 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-
-    <!-- FIXME: remove when https://github.com/INRIA/spoon/issues/1901 is fixed -->
-    <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not

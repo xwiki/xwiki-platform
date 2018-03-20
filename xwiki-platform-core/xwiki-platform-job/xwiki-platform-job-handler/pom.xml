@@ -27,10 +27,10 @@
     <artifactId>xwiki-platform-job</artifactId>
     <version>10.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-job-script</artifactId>
-  <name>XWiki Platform - Job - Script</name>
+  <artifactId>xwiki-platform-job-handler</artifactId>
+  <name>XWiki Platform - Job - Handler</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Job - Script</description>
+  <description>XWiki Platform - Job - Handler</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
@@ -43,6 +43,31 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-template-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-container-servlet</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-csrf</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

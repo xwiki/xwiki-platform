@@ -1,0 +1,9 @@
+###
+### Template used to handle question of type ExtensionBreakingQuestion (display extensions that could be broken by a bad delete or move action).
+### TODO: move that to XAR handler module
+###
+#if ($request.qaction == 'data')
+  #template('job/question/ExtensionBreakingQuestion.data.vm')
+#else
+  #template('job/question/ExtensionBreakingQuestion.form.vm')
+#end

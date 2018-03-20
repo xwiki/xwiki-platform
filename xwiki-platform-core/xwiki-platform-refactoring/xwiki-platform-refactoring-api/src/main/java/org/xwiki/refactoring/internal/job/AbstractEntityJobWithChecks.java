@@ -62,7 +62,6 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
                 getEntities(entityReferences);
 
                 // Send the event
-                // TODO: the event type must be given by an abstract method so we can also support MoveJob
                 DocumentsDeletingEvent event = new DocumentsDeletingEvent();
                 observationManager.notify(event, this, concernedEntities);
 

@@ -31,18 +31,5 @@
 #end
 
 #macro (displayRefactoringJobFinishedMessage $refactoringJobStatus $successKey $errorKey)
-  #set ($refactoringJobState = $refactoringJobStatus.state)
-  #set ($finished = $refactoringJobState == 'FINISHED')
-  #set ($success = $finished && $refactoringJobStatus.log.getLogs('ERROR').isEmpty())
-  #if (!$finished)
-    ## No message.
-  #elseif ($success)
-    <div class="box successmessage">
-      $services.localization.render($successKey)
-    </div>
-  #else
-    <div class="box errormessage">
-      $services.localization.render($errorKey)
-    </div>
-  #end
+  #displayJobFinishedMessage($refactoringJobStatus $successKey $errorKey)
 #end

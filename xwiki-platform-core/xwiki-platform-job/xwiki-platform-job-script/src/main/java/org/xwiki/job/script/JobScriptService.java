@@ -38,6 +38,7 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Provides job-specific scripting APIs.
@@ -82,6 +83,9 @@ public class JobScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    @Inject
+    private WikiDescriptorManager wikis;
 
     /**
      * @param jobId the job id

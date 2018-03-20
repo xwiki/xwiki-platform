@@ -51,6 +51,10 @@ $services.template.execute('logging_macros.vm')
   #printLogs($status.log $loading)
 #end
 
+#macro (displayJobQuestion $jobStatus)
+  <div class="ui-question"/>
+#end
+
 #macro (getJobStatusJSON $status $json)
   #set ($logOffset = $mathtool.toInteger($request.logOffset))
   #if (!$logOffset)
@@ -79,4 +83,28 @@ $services.template.execute('logging_macros.vm')
       'items': $log
     }
   })
+#end
+
+#macro (displayJobFinishedMessage $status $successKey $errorKey)
+  #set ($state = $status.state)
+  #set ($finished = $state == 'FINISHED')
+  #if (!$finished)
+    ## No message.
+  #else
+    #if ($status.error)
+      #if (!$errorKey)
+        #set ($errorKey = 'job.status.error')
+      #end
+      <div class="box errormessage">
+        $services.localization.render($errorKey)
+      </div>
+    #else
+      #if (!$successKey)
+        #set ($successKey = 'job.status.success')
+      #end
+      <div class="box successmessage">
+        $services.localization.render($successKey)
+      </div>
+    #end
+  #end
 #end

@@ -63,6 +63,8 @@
           #set ($discard = $renameRequest.setAutoRedirect($autoRedirect))
           ## Rename operation relies on copy.
           #maybeUpdateTitleAfterCopy($renameRequest $doc.documentReference 'newPageTitle')
+          ## We may be asked a question
+          #set ($discard = $renameRequest.setInteractive(true))
           #set ($renameJob = $services.refactoring.rename($renameRequest))
           #if ($request.async != 'true')
             #try()

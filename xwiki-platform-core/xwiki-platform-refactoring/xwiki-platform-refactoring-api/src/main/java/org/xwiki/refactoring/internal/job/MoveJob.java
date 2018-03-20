@@ -37,6 +37,7 @@ import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -49,7 +50,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
  */
 @Component
 @Named(RefactoringJobs.MOVE)
-public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<MoveRequest>>
+public class MoveJob extends AbstractEntityJobWithChecks<MoveRequest, EntityJobStatus<MoveRequest>>
 {
     /**
      * Specifies whether all entities with the same name are to be overwritten on not. When {@code true} all entities
@@ -158,7 +159,11 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
     {
         // Perform checks that are specific to the document source/destination type.
 
-        if (!this.modelBridge.exists(oldReference)) {
+        EntitySelection entitySelection = this.concernedEntities.get(oldReference);
+        if (entitySelection != null && !entitySelection.isSelected()) {
+            // TODO: handle entitySelection == null which means something is wrong
+            this.logger.info("Skipping [{}] because it has been unselected.", oldReference);
+        } else if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
         } else if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
             // The move operation is implemented as Copy + Delete.

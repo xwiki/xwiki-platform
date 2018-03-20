@@ -932,8 +932,10 @@ public class XWiki implements EventListener
             ResourceType type = typeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
             ResourceReferenceResolver<ExtendedURL> resourceResolver = Utils
                 .getComponent(new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
-            entityResourceReference = (EntityResourceReference) resourceResolver.resolve(extendedURL, type,
-                Collections.<String, Object>emptyMap());
+            ResourceReference reference =
+                resourceResolver.resolve(extendedURL, type, Collections.<String, Object>emptyMap());
+            entityResourceReference =
+                reference instanceof EntityResourceReference ? (EntityResourceReference) reference : null;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
@@ -1874,7 +1876,8 @@ public class XWiki implements EventListener
      * @deprecated sine 9.10RC1, use {@link DocumentRevisionProvider#getRevision(XWikiDocument, String)} instead
      */
     @Deprecated
-    public XWikiDocument getDocument(XWikiDocument document, String revision, XWikiContext context) throws XWikiException
+    public XWikiDocument getDocument(XWikiDocument document, String revision, XWikiContext context)
+        throws XWikiException
     {
         XWikiDocument revisionDocument = getDocumentRevisionProvider().getRevision(document, revision);
 
@@ -5488,7 +5491,7 @@ public class XWiki implements EventListener
             return getVelocityEvaluator().evaluateVelocity(content, namespace, vcontext);
         } catch (XWikiException xe) {
             LOGGER.error("Error while parsing velocity template namespace [{}] with content:\n[{}]", namespace, content,
-                    xe.getCause());
+                xe.getCause());
             return Util.getHTMLExceptionMessage(xe, null);
         }
     }

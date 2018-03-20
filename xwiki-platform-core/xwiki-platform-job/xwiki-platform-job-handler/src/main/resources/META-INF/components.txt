@@ -1,0 +1,3 @@
+org.xwiki.job.handler.internal.JobRootResourceReferenceHandler
+org.xwiki.job.handler.internal.JobRootResourceReferenceResolver
+org.xwiki.job.handler.internal.question.QuestionJobResourceReferenceHandler

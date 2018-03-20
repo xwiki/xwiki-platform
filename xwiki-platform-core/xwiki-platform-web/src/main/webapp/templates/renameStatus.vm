@@ -34,6 +34,10 @@
 
 #macro (displayRenameJobStatus $renameJobStatus)
   #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  ## TODO: allows question templates to inject the web resources they need
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set($discard = $xwiki.jsfx.use("uicomponents/job/question/ExtensionBreakingQuestion${jsExtension}", true))
   #set ($renameJobState = $renameJobStatus.state)
   #set ($finished = $renameJobState == 'FINISHED')
   #set ($renameJobRequest = $renameJobStatus.request)
@@ -49,6 +53,7 @@
     #displayRenameJobRequest($renameJobRequest)
     #if (!$finished)
       #displayJobProgressBar($renameJobStatus)
+      #displayJobQuestion($renameJobStatus)
     #else
       #displayRenameJobFinishedMessage($renameJobStatus)
     #end

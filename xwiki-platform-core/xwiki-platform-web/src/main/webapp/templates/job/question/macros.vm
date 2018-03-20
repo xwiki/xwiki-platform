@@ -1,0 +1,26 @@
+#macro(questionHeader)
+  <form class="form-question" action="#">
+
+    <div class="box form-question-content">
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+#end
+
+
+
+#macro(questionFooter)
+    </div>
+  </form>
+#end
+
+#macro(questionButtons $confirmButtonKey $cancelButtonKey)
+  <p class="buttons-question">
+    #if ($confirmButtonKey)
+      <button class="btn btn-danger btAnswerConfirm">$escapetool.xml($services.localization.render($confirmButtonKey))</button>
+    #else
+      <button class="btn btn-danger btAnswerConfirm">$escapetool.xml($services.localization.render('job.question.answer'))</button>
+    #end
+    #if ($cancelButtonKey)
+      <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render($cancelButtonKey))</button>
+    #end
+  </p>
+#end

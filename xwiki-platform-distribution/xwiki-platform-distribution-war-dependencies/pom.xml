@@ -175,6 +175,19 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Jobs -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-job-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-job-handler</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Extension Manager -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

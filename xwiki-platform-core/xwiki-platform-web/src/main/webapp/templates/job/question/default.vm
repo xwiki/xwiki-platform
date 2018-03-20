@@ -1,0 +1,9 @@
+#template('job/question/macros.vm')
+
+#questionHeader()
+
+## TODO: POJO -> form inputs
+
+#questionButtons('job.question.button.answer')
+
+#questionFooter()

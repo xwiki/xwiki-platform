@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.stability.Unstable;
@@ -53,6 +55,7 @@ public class ExtensionBreakingQuestion
 
     /**
      * Construct an ExtensionBreakingQuestion.
+     * 
      * @param concernedEntities the entities concerned by the refactoring
      */
     public ExtensionBreakingQuestion(Map<EntityReference, EntitySelection> concernedEntities)
@@ -62,8 +65,8 @@ public class ExtensionBreakingQuestion
 
     /**
      * @param entityReference the reference of an entity
-     * @return the EntitySelection corresponding to the entity, or null if the entity is not concerned
-     *   by the refactoring
+     * @return the EntitySelection corresponding to the entity, or null if the entity is not concerned by the
+     *         refactoring
      */
     public EntitySelection get(EntityReference entityReference)
     {
@@ -105,12 +108,37 @@ public class ExtensionBreakingQuestion
     }
 
     /**
+     * Same as {@link #selectAllExtensions()} but compatible with properties system.
+     * 
+     * @param select true if all extensions should be selected
+     * @since 10.2RC1
+     */
+    public void setSelectAllExtensions(boolean select)
+    {
+        if (select) {
+            selectAllExtensions();
+        }
+    }
+
+    /**
      * Select all pages that do not belong to any extension.
      */
     public void selectAllFreePages()
     {
         for (EntitySelection entitySelection : freePages) {
             entitySelection.setSelected(true);
+        }
+    }
+
+    /**
+     * Same as {@link #selectAllFreePages()} but compatible with properties system.
+     * 
+     * @param select true if all free pages should be selected
+     */
+    public void setSelectAllFreePages(boolean select)
+    {
+        if (select) {
+            selectAllFreePages();
         }
     }
 
@@ -124,6 +152,7 @@ public class ExtensionBreakingQuestion
 
     /**
      * Mark an entity selection representing a page that it belongs to an extension.
+     * 
      * @param entitySelection entity selection of the page
      * @param extension extension that contain the page
      */
@@ -140,7 +169,7 @@ public class ExtensionBreakingQuestion
     /**
      * @param extensionId id of the extension
      * @return the ExtensionSelection corresponding to the extension, or null of the extension is not concerned y the
-     *   refactoring action
+     *         refactoring action
      */
     public ExtensionSelection getExtension(String extensionId)
     {
@@ -154,6 +183,32 @@ public class ExtensionBreakingQuestion
     {
         for (EntitySelection entitySelection : concernedEntities.values()) {
             entitySelection.setSelected(false);
+        }
+    }
+
+    /**
+     * @param extensionIds the ids of the extensions to select
+     * @since 10.2RC1
+     */
+    public void setSelectedExtensions(Set<String> extensionIds)
+    {
+        for (String extensionId : extensionIds) {
+            ExtensionSelection extensionSelection = getExtension(extensionId);
+            if (extensionSelection != null) {
+                extensionSelection.selectAllPages();
+            }
+        }
+    }
+
+    /**
+     * @param documents the documents to set as selected
+     * @since 10.2RC1
+     */
+    public void setSelectedDocuments(Set<DocumentReference> documents)
+    {
+        for (DocumentReference document : documents) {
+            EntitySelection entitySelection = concernedEntities.get(document);
+            entitySelection.setSelected(true);
         }
     }
 }

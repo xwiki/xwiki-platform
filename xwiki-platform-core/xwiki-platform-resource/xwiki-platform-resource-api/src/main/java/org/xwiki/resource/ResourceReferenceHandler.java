@@ -26,14 +26,14 @@ import org.xwiki.component.annotation.Role;
 /**
  * Handles a given {@link ResourceReference}.
  *
- * @param <T> the qualifying element to specify what Resource Reference are handled by thus Handler
- *        (e.g. Resource Type, Entity Resource Action)
+ * @param <T> the qualifying element to specify what Resource Reference are handled by thus Handler (e.g. Resource Type,
+ *            Entity Resource Action)
  * @param <T> the type of supported items
  * @version $Id$
  * @since 6.1M2
  */
 @Role
-public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenceHandler>
+public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenceHandler<T>>
 {
     /**
      * The priority of execution relative to the other Handlers. The lowest values have the highest priorities and
@@ -44,8 +44,8 @@ public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenc
     int getPriority();
 
     /**
-     * @return the list of qualifying Resource References elements supported by this Handler (e.g Resource Type,
-     *         Entity Resource Action)
+     * @return the list of qualifying Resource References elements supported by this Handler (e.g Resource Type, Entity
+     *         Resource Action)
      */
     List<T> getSupportedResourceReferences();
 
@@ -54,7 +54,7 @@ public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenc
      *
      * @param reference the Resource Reference to handle
      * @param chain the Handler execution chain, needed to tell the next Handler in the chain to execute (similar to the
-     *        Filter Chain in the Servlet API)
+     *            Filter Chain in the Servlet API)
      * @throws ResourceReferenceHandlerException if an error happens during the Handler execution
      */
     void handle(ResourceReference reference, ResourceReferenceHandlerChain chain)

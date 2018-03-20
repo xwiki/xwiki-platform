@@ -1,0 +1,7 @@
+#template('job_macros.vm')
+
+#macro(answerResponse)
+  #getJobStatusJSON($job.status $json)
+  #set ($json.message = "#displayJobFinishedMessage($job.status)")
+  $jsontool.serialize($json)
+#end

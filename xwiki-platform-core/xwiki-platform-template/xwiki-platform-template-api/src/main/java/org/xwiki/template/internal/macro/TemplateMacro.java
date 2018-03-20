@@ -64,7 +64,7 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
         // The template macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the template before the other macros are executed.
         setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_INTERNAL);
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     @Override

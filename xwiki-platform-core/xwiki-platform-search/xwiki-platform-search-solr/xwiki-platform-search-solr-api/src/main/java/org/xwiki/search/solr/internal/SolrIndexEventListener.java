@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -40,6 +41,8 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.AbstractAttachmentEvent;
@@ -106,8 +109,14 @@ public class SolrIndexEventListener implements EventListener
         try {
             if (event instanceof DocumentUpdatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
-
-                this.solrIndexer.get().index(document.getDocumentReferenceWithLocale(), false);
+                if (Locale.ROOT.equals(document.getLocale())) {
+                    // Index all the translations of a document when its default translation has been updated because
+                    // the default translation holds meta data shared by all translations (attachments, objects).
+                    indexTranslations(document, (XWikiContext) data);
+                } else {
+                    // Index only the updated translation.
+                    this.solrIndexer.get().index(document.getDocumentReferenceWithLocale(), false);
+                }
             } else if (event instanceof DocumentCreatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
@@ -115,7 +124,7 @@ public class SolrIndexEventListener implements EventListener
                     // If a new translation is added to a document reindex the whole document (could be optimized a bit
                     // by reindexing only the parent locales but that would always include objects and attachments
                     // anyway)
-                    this.solrIndexer.get().index(new DocumentReference(document.getDocumentReference(), null), true);
+                    indexTranslations(document, (XWikiContext) data);
                 } else {
                     this.solrIndexer.get().index(document.getDocumentReferenceWithLocale(), false);
                 }
@@ -169,6 +178,33 @@ public class SolrIndexEventListener implements EventListener
             }
         } catch (Exception e) {
             this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
+        }
+    }
+
+    /**
+     * Helper method to index all the translations of a document. We don't rely on the {@code recurse} parameter of the
+     * {@link SolrIndexer#index(org.xwiki.model.reference.EntityReference, boolean)} because we want to update only the
+     * {@code type=DOCUMENT} rows from the Solr index. The attachment and object rows are updated separately when the
+     * corresponding events are fired.
+     * 
+     * @param document the document whose translations need to be indexed
+     * @param xcontext the XWiki context
+     */
+    private void indexTranslations(XWikiDocument document, XWikiContext xcontext)
+    {
+        SolrIndexer indexer = this.solrIndexer.get();
+
+        // Index the default translation.
+        DocumentReference documentReferenceWithoutLocale = document.getDocumentReference();
+        indexer.index(documentReferenceWithoutLocale, false);
+
+        try {
+            // Index the rest of the available translations.
+            document.getTranslationLocales(xcontext).stream()
+                .forEach(locale -> indexer.index(new DocumentReference(documentReferenceWithoutLocale, locale), false));
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to index the translations of [{}]. Root cause is [{}].",
+                documentReferenceWithoutLocale, ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

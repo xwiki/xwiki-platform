@@ -56,8 +56,8 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);
 
-        XWikiDocument document = getDocument(attachmentReference.getDocumentReference());
-        XWikiAttachment attachment = document.getAttachment(attachmentReference.getName());
+        XWikiDocument originalDocument = getDocument(attachmentReference.getDocumentReference());
+        XWikiAttachment attachment = originalDocument.getAttachment(attachmentReference.getName());
         if (attachment == null) {
             return false;
         }

@@ -63,8 +63,8 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         DocumentReference classReference = objectReference.getXClassReference();
         DocumentReference documentReference = new DocumentReference(objectReference.getParent());
 
-        XWikiDocument document = getDocument(documentReference);
-        BaseObject object = document.getXObject(objectReference);
+        XWikiDocument originalDocument = getDocument(documentReference);
+        BaseObject object = originalDocument.getXObject(objectReference);
         if (object == null) {
             return false;
         }

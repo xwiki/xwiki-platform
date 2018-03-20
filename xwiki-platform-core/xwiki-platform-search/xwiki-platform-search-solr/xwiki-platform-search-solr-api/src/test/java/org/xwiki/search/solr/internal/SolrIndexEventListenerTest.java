@@ -19,22 +19,28 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SolrIndexEventListener}.
@@ -44,8 +50,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class SolrIndexEventListenerTest
 {
     @Rule
-    public MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
-        SolrIndexEventListener.class);
+    public MockitoComponentMockingRule<EventListener> mocker =
+        new MockitoComponentMockingRule<EventListener>(SolrIndexEventListener.class);
 
     private SolrIndexer indexer;
 
@@ -67,5 +73,38 @@ public class SolrIndexEventListenerTest
         mocker.getComponentUnderTest().onEvent(new DocumentDeletedEvent(), document, null);
 
         verify(indexer).delete(new DocumentReference(documentReference, Locale.FRENCH), false);
+    }
+
+    @Test
+    public void onDocumentTranslationUpdated() throws Exception
+    {
+        XWikiDocument translation = mock(XWikiDocument.class);
+        DocumentReference translationReference = new DocumentReference("wiki", "Path", "Page", Locale.FRENCH);
+        when(translation.getDocumentReferenceWithLocale()).thenReturn(translationReference);
+
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), translation, null);
+
+        verify(this.indexer).index(translationReference, false);
+        verify(this.indexer, times(1)).index(any(EntityReference.class), any(Boolean.class));
+    }
+
+    @Test
+    public void onDocumentDefaultTranslationUpdated() throws Exception
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getLocale()).thenReturn(Locale.ROOT);
+        when(document.getTranslationLocales(xcontext)).thenReturn(Arrays.asList(Locale.FRENCH, Locale.GERMAN));
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Path", "Page");
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), document, xcontext);
+
+        verify(this.indexer, times(3)).index(any(EntityReference.class), any(Boolean.class));
+        verify(this.indexer).index(documentReference, false);
+        verify(this.indexer).index(new DocumentReference(documentReference, Locale.FRENCH), false);
+        verify(this.indexer).index(new DocumentReference(documentReference, Locale.GERMAN), false);
     }
 }

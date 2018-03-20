@@ -79,7 +79,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -96,21 +95,24 @@ public class DocumentSolrMetadataExtractorTest
     public final MockitoComponentMockingRule<SolrMetadataExtractor> mocker =
         new MockitoComponentMockingRule<SolrMetadataExtractor>(DocumentSolrMetadataExtractor.class);
 
-    private XWikiContext xcontext;
+    private XWikiContext xcontext = mock(XWikiContext.class);
 
     /**
      * The document from which we extract the meta data.
      */
-    private XWikiDocument document;
+    private XWikiDocument document = mock(XWikiDocument.class);
+
+    private XWikiDocument translatedDocument = mock(XWikiDocument.class, Locale.FRENCH.toString());
 
     private DocumentReference documentReference =
         new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
+
+    private DocumentReference frenchDocumentReference = new DocumentReference(this.documentReference, Locale.FRENCH);
 
     @Before
     public void setUp() throws Exception
     {
         this.mocker.registerMockComponent(SolrReferenceResolver.class, "document");
-        this.xcontext = mock(XWikiContext.class);
 
         // XWikiContext Provider
         Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
@@ -127,13 +129,16 @@ public class DocumentSolrMetadataExtractorTest
         when(this.xcontext.getWiki()).thenReturn(wiki);
 
         // XWikiDocument
-        this.document = mock(XWikiDocument.class);
         when(wiki.getDocument(this.documentReference, this.xcontext)).thenReturn(this.document);
         when(this.document.getDocumentReference()).thenReturn(this.documentReference);
         when(this.document.isHidden()).thenReturn(false);
         when(this.document.getLocale()).thenReturn(Locale.ROOT);
         when(this.document.getRealLocale()).thenReturn(Locale.US);
-        when(this.document.getTranslatedDocument((Locale) isNull(), same(this.xcontext))).thenReturn(this.document);
+
+        when(this.document.getTranslatedDocument(Locale.FRENCH, this.xcontext)).thenReturn(this.translatedDocument);
+        when(this.translatedDocument.getRealLocale()).thenReturn(Locale.FRENCH);
+        when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
+        when(this.translatedDocument.getDocumentReference()).thenReturn(this.frenchDocumentReference);
 
         DocumentAccessBridge dab = this.mocker.registerMockComponent(DocumentAccessBridge.class);
         when(dab.getDocument(this.documentReference)).thenReturn(this.document);
@@ -303,16 +308,15 @@ public class DocumentSolrMetadataExtractorTest
     @Test
     public void getDocumentThrowingException() throws Exception
     {
-        DocumentReference frenchDocumentReference = new DocumentReference(this.documentReference, Locale.FRENCH);
         XWikiException thrown = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
             XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Unreadable document");
-        when(this.xcontext.getWiki().getDocument(frenchDocumentReference, this.xcontext)).thenThrow(thrown);
+        when(this.xcontext.getWiki().getDocument(this.documentReference, this.xcontext)).thenThrow(thrown);
 
         try {
-            this.mocker.getComponentUnderTest().getSolrDocument(frenchDocumentReference);
+            this.mocker.getComponentUnderTest().getSolrDocument(this.frenchDocumentReference);
             fail("An exception was expected.");
         } catch (SolrIndexerException ex) {
-            assertEquals("Failed to get input Solr document for entity '" + frenchDocumentReference + "'",
+            assertEquals("Failed to get input Solr document for entity '" + this.frenchDocumentReference + "'",
                 ex.getMessage());
             assertSame(thrown, ex.getCause());
         }
@@ -407,7 +411,8 @@ public class DocumentSolrMetadataExtractorTest
         //
         // Call
         //
-        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+        SolrInputDocument solrDocument =
+            this.mocker.getComponentUnderTest().getSolrDocument(this.frenchDocumentReference);
 
         //
         // Assert and verify
@@ -416,12 +421,12 @@ public class DocumentSolrMetadataExtractorTest
 
         // A TextArea property must be indexed as a localized text.
         assertSame(commentContent,
-            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.comment", Locale.US)));
+            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.comment", Locale.FRENCH)));
         assertNull(solrDocument.getFieldValue("property.space.commentsClass.comment_string"));
 
         // A String property must be indexed both as localized text and as raw (unanalyzed) text.
         assertSame(commentSummary,
-            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.summary", Locale.US)));
+            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.summary", Locale.FRENCH)));
         assertSame(commentSummary, solrDocument.getFieldValue("property.space.commentsClass.summary_string"));
 
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_string"));
@@ -432,8 +437,8 @@ public class DocumentSolrMetadataExtractorTest
 
         // Make sure the password is not indexed (neither as a string nor as a localized text).
         assertNull(solrDocument.getFieldValue("property.space.commentsClass.password_string"));
-        assertNull(
-            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password", Locale.US)));
+        assertNull(solrDocument
+            .getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password", Locale.FRENCH)));
 
         // Check the sort fields.
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_sortString"));
@@ -447,12 +452,13 @@ public class DocumentSolrMetadataExtractorTest
         assertSame(commentContent, solrDocument.getFieldValue("property.space.commentsClass.comment_sortString"));
 
         Collection<Object> objectProperties =
-            solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", Locale.US));
+            solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", Locale.FRENCH));
         MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder(commentContent, commentSummary,
             commentAuthor, commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
         assertEquals(8, objectProperties.size());
 
-        objectProperties = solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.US));
+        objectProperties =
+            solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.FRENCH));
         MatcherAssert.assertThat(objectProperties,
             Matchers.<Object>containsInAnyOrder("comment : " + commentContent, "summary : " + commentSummary,
                 "author : " + commentAuthor, "date : " + commentDate, "list : " + commentList.get(0),
@@ -564,13 +570,14 @@ public class DocumentSolrMetadataExtractorTest
         XWikiAttachment todo = createMockAttachment("todo.txt", "text/plain", todoDate, "bar bar", "Bob", "Angry Bob");
         when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo, todo));
 
-        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+        SolrInputDocument solrDocument =
+            this.mocker.getComponentUnderTest().getSolrDocument(this.frenchDocumentReference);
 
         assertEquals(Arrays.asList("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
         assertEquals(Arrays.asList("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
         assertEquals(Arrays.asList(logoDate, todoDate), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_DATE));
         assertEquals(Arrays.asList(3L, 7L), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
-        assertEquals(Arrays.asList("foo\n", "bar bar\n"), solrDocument.getFieldValues("attcontent_en_US"));
+        assertEquals(Arrays.asList("foo\n", "bar bar\n"), solrDocument.getFieldValues("attcontent_fr"));
         assertEquals(Arrays.asList("wiki:XWiki.Alice", "wiki:XWiki.Bob"),
             solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR));
         assertEquals(Arrays.asList("Shy Alice", "Angry Bob"),

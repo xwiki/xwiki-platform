@@ -167,17 +167,19 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     /**
-     * Utility method.
+     * Utility method to retrieve the default translation of a document using its document reference.
      * 
-     * @param documentReference reference to a document.
-     * @return the {@link XWikiDocument} instance referenced.
-     * @throws XWikiException if problems occur.
+     * @param documentReference reference to a document
+     * @return the original {@link XWikiDocument} instance referenced (the default translation)
+     * @throws XWikiException if problems occur
      */
     protected XWikiDocument getDocument(DocumentReference documentReference) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+        DocumentReference documentReferenceWithoutLocale =
+            documentReference.getLocale() == null ? documentReference : new DocumentReference(documentReference, null);
+        XWikiDocument document = xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
 
         return document;
     }
@@ -192,14 +194,14 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected XWikiDocument getTranslatedDocument(DocumentReference documentReference) throws SolrIndexerException
     {
         try {
-            XWikiDocument document = getDocument(documentReference);
+            XWikiDocument originalDocument = getDocument(documentReference);
             Locale locale = documentReference.getLocale();
 
             if (locale == null || locale.equals(Locale.ROOT)) {
-                return document;
+                return originalDocument;
             }
 
-            XWikiDocument translatedDocument = document.getTranslatedDocument(locale, this.xcontextProvider.get());
+            XWikiDocument translatedDocument = originalDocument.getTranslatedDocument(locale, this.xcontextProvider.get());
 
             // XWikiDocument#getTranslatedDocument returns the default document when the locale does not exist
             if (translatedDocument.getRealLocale().equals(locale)) {
@@ -226,12 +228,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected boolean setDocumentFields(DocumentReference documentReference, SolrInputDocument solrDocument)
         throws Exception
     {
-        XWikiDocument document = getDocument(documentReference);
-        if (document.isNew()) {
+        XWikiDocument originalDocument = getDocument(documentReference);
+        if (originalDocument.isNew()) {
             return false;
         }
 
-        solrDocument.setField(FieldUtils.HIDDEN, document.isHidden());
+        solrDocument.setField(FieldUtils.HIDDEN, originalDocument.isHidden());
 
         solrDocument.setField(FieldUtils.WIKI, documentReference.getWikiReference().getName());
         solrDocument.setField(FieldUtils.NAME, documentReference.getName());

@@ -17,14 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*
 #set ($jsExtension = '.min')
 #if (!$services.debug.minify)
   #set ($jsExtension = '')
 #end
+*/
 
 require.config({
   paths: {
-    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension")"
+    JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner$jsExtension")'
   }
 });
 

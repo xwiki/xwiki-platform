@@ -18,17 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // TODO: move all that to XAR handler module
+/*
 #set ($jsExtension = '.min.js')
 #if (!$services.debug.minify)
   #set ($jsExtension = '.js')
 #end
+*/
 
 require.config({
   paths: {
-    jsTree: "$!services.webjars.url('jstree', "jstree$jsExtension")",
-    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension")",
-    'tree-finder': "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder$jsExtension")",
-    tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree$jsExtension")"
+    jsTree: '$!services.webjars.url("jstree", "jstree$jsExtension")',
+    JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner$jsExtension")',
+    'tree-finder': '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "finder$jsExtension")',
+    tree: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "tree$jsExtension")'
   },
   shim: {
     jsTree: {

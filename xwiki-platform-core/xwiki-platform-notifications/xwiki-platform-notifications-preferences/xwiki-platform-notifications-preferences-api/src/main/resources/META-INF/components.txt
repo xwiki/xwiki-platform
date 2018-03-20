@@ -4,4 +4,5 @@ org.xwiki.notifications.preferences.internal.email.DefaultNotificationEmailUserP
 org.xwiki.notifications.preferences.internal.DefaultTargetableNotificationPreferenceBuilder
 org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider
 org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider
+org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler
 org.xwiki.notifications.preferences.script.NotificationPreferenceScriptService

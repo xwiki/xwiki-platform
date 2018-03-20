@@ -61,6 +61,12 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
 {
     private static final String VM = ".vm";
 
+    private static final String QPROPERTY_PREFIX = "qproperty_";
+
+    private static final String QPROPERTY_ARRAY_SUFFIX = "[]";
+
+    private static final String CANCEL = "cancel";
+
     @Inject
     private JobExecutor executor;
 
@@ -80,8 +86,8 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
 
         String[] templates = new String[6];
 
-        templates[0] = prefix + jobType + "/" + className + VM;
-        templates[1] = prefix + jobType + "/" + classSimpleName + VM;
+        templates[0] = prefix + jobType + '/' + className + VM;
+        templates[1] = prefix + jobType + '/' + classSimpleName + VM;
         templates[2] = prefix + jobType + VM;
         templates[3] = prefix + className + VM;
         templates[4] = prefix + classSimpleName + VM;
@@ -155,40 +161,19 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
     private void answer(HttpServletRequest request, Job job, List<String> jobId, Object question)
         throws ResourceReferenceHandlerException
     {
-        BeanDescriptor descriptor = this.beans.getBeanDescriptor(question.getClass());
-
         // Populate the question
-        Map<String, Object> parameters = new HashMap<>();
-        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            if (entry.getKey().startsWith("qproperty_") && entry.getValue() != null && entry.getValue().length > 0) {
-                String parameterKey = entry.getKey().substring("qproperty_".length());
-                if (parameterKey.endsWith("[]")) {
-                    parameterKey = parameterKey.substring(0, parameterKey.length() - "[]".length());
-                    parameters.put(parameterKey, entry.getValue());
-                } else {
-                    PropertyDescriptor propertyDescriptor = descriptor.getProperty(parameterKey);
-                    if (propertyDescriptor != null) {
-                        if (isIterable(propertyDescriptor)) {
-                            parameters.put(parameterKey, entry.getValue());
-                        } else {
-                            parameters.put(parameterKey, entry.getValue()[0]);
-                        }
-                    }
-                }
-            }
-        }
 
         try {
-            this.beans.populate(question, parameters);
+            this.beans.populate(question, extractParameters(request, question));
         } catch (PropertyException e) {
             throw new ResourceReferenceHandlerException("Failed to populate question object for job with id " + jobId);
         }
 
         // Cancel if supported
-        if (Boolean.getBoolean((String) request.getParameter("cancel"))) {
+        if (Boolean.getBoolean((String) request.getParameter(CANCEL))) {
             // TODO: introduce some dedicated "CancelableJob" interface or, better, do
             // http://jira.xwiki.org/browse/XCOMMONS-882
-            Method cancelMethod = MethodUtils.getAccessibleMethod(job.getStatus().getClass(), "cancel");
+            Method cancelMethod = MethodUtils.getAccessibleMethod(job.getStatus().getClass(), CANCEL);
 
             if (cancelMethod != null) {
                 try {
@@ -201,5 +186,40 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
 
         // Answer question
         job.getStatus().answered();
+    }
+
+    private Map<String, Object> extractParameters(HttpServletRequest request, Object question)
+    {
+        Map<String, Object> parameters = new HashMap<>();
+
+        BeanDescriptor descriptor = this.beans.getBeanDescriptor(question.getClass());
+
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            if (entry.getKey().startsWith(QPROPERTY_PREFIX) && entry.getValue() != null
+                && entry.getValue().length > 0) {
+                String parameterKey = entry.getKey().substring(QPROPERTY_PREFIX.length());
+                if (parameterKey.endsWith(QPROPERTY_ARRAY_SUFFIX)) {
+                    parameterKey = parameterKey.substring(0, parameterKey.length() - QPROPERTY_ARRAY_SUFFIX.length());
+                    parameters.put(parameterKey, entry.getValue());
+                } else {
+                    addValue(descriptor, parameterKey, parameters, entry.getValue());
+                }
+            }
+        }
+
+        return parameters;
+    }
+
+    private void addValue(BeanDescriptor descriptor, String parameterKey, Map<String, Object> parameters,
+        String[] value)
+    {
+        PropertyDescriptor propertyDescriptor = descriptor.getProperty(parameterKey);
+        if (propertyDescriptor != null) {
+            if (isIterable(propertyDescriptor)) {
+                parameters.put(parameterKey, value);
+            } else {
+                parameters.put(parameterKey, value[0]);
+            }
+        }
     }
 }

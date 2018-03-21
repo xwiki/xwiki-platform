@@ -21,6 +21,7 @@ package org.xwiki.annotation.internal.renderer;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.content.AlteredContent;
 import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.rendering.listener.HeaderLevel;
@@ -100,20 +101,22 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
     @Override
     public void onRawText(String text, Syntax syntax)
     {
-        // Similar approach to verbatim FTM. In the future, syntax specific cleaner could be used for various syntaxes
-        // (which would do the great job for HTML, for example)
-        // normalize the protected string before adding it to the plain text version
-        if (Character.isWhitespace(text.charAt(0))) {
-            // if there is a space right at the beginning of the raw text, we need to print a space
-            printSpace();
-        }
+        if (StringUtils.isNotEmpty(text)) {
+            // Similar approach to verbatim FTM. In the future, syntax specific cleaner could be used for various
+            // syntaxes (which would do the great job for HTML, for example) normalize the protected string before
+            // adding it to the plain text version
+            if (Character.isWhitespace(text.charAt(0))) {
+                // if there is a space right at the beginning of the raw text, we need to print a space
+                printSpace();
+            }
 
-        AlteredContent cleanedContent = textCleaner.alter(text);
-        printText(cleanedContent.getContent().toString());
+            AlteredContent cleanedContent = textCleaner.alter(text);
+            printText(cleanedContent.getContent().toString());
 
-        if (Character.isWhitespace(text.charAt(text.length() - 1))) {
-            // if there is a space right at the end of the text, we need to print a space
-            printSpace();
+            if (Character.isWhitespace(text.charAt(text.length() - 1))) {
+                // if there is a space right at the end of the text, we need to print a space
+                printSpace();
+            }
         }
     }
 

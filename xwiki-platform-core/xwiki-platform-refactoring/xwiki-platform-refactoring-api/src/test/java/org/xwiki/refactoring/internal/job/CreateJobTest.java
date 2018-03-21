@@ -51,7 +51,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentFromTemplate() throws Exception
+    public void createDocumentFromTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -72,7 +72,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createSpaceFromTemplate() throws Exception
+    public void createSpaceFromTemplate() throws Throwable
     {
         SpaceReference newSpaceReference = new SpaceReference("wiki", "Space");
         SpaceReference templateSpaceReference = new SpaceReference("wiki", "Code", "Template");
@@ -98,7 +98,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentWithoutTemplate() throws Exception
+    public void createDocumentWithoutTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -113,7 +113,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createSpaceWithoutTemplate() throws Exception
+    public void createSpaceWithoutTemplate() throws Throwable
     {
         SpaceReference spaceReference = new SpaceReference("wiki", "Space");
         DocumentReference spaceHomeReference = new DocumentReference("WebHome", spaceReference);
@@ -129,7 +129,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentDeep() throws Exception
+    public void createDocumentDeep() throws Throwable
     {
         DocumentReference spaceHomeReference = new DocumentReference("wiki", "Space", "WebHome");
         DocumentReference templateHomeReference =
@@ -154,7 +154,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentFromMissingTemplate() throws Exception
+    public void createDocumentFromMissingTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -171,7 +171,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentFromRestrictedTemplate() throws Exception
+    public void createDocumentFromRestrictedTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -192,7 +192,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createRestrictedDocument() throws Exception
+    public void createRestrictedDocument() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -210,7 +210,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createExistingDocument() throws Exception
+    public void createExistingDocument() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -223,7 +223,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void skipDocumentCreation() throws Exception
+    public void skipDocumentCreation() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
 

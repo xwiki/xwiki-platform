@@ -49,7 +49,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void renameMultipleEntities() throws Exception
+    public void renameMultipleEntities() throws Throwable
     {
         DocumentReference blackReference = new DocumentReference("wiki", "Color", "Black");
         DocumentReference whiteReference = new DocumentReference("wiki", "Color", "White");
@@ -64,7 +64,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void changeEntityType() throws Exception
+    public void changeEntityType() throws Throwable
     {
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         SpaceReference bobReference = new SpaceReference("wiki", "Bob");
@@ -77,7 +77,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void convertNotTerminalDocumentToTerminalDocumentPreservingChildren() throws Exception
+    public void convertNotTerminalDocumentToTerminalDocumentPreservingChildren() throws Throwable
     {
         DocumentReference nonTerminalReference = new DocumentReference("wiki", "One", "WebHome");
         DocumentReference terminalReference = new DocumentReference("wiki", "Zero", "One");
@@ -93,7 +93,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void renameSpaceHomeDeep() throws Exception
+    public void renameSpaceHomeDeep() throws Throwable
     {
         DocumentReference aliceReference = new DocumentReference("wiki", "Alice", "WebHome");
         DocumentReference bobReference = new DocumentReference("wiki", "Bob", "WebHome");
@@ -107,7 +107,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void renameSpace() throws Exception
+    public void renameSpace() throws Throwable
     {
         SpaceReference aliceReference = new SpaceReference("wiki", "Alice");
         SpaceReference bobReference = new SpaceReference("wiki", "Bob");
@@ -119,7 +119,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void renameDocument() throws Exception
+    public void renameDocument() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);

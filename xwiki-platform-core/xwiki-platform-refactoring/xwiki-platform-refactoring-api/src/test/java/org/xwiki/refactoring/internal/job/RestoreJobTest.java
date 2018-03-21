@@ -76,7 +76,7 @@ public class RestoreJobTest extends AbstractJobTest
     }
 
     @Test
-    public void restoreSingleDocument() throws Exception
+    public void restoreSingleDocument() throws Throwable
     {
         long deletedDocumentId = 13;
 
@@ -91,7 +91,7 @@ public class RestoreJobTest extends AbstractJobTest
     }
 
     @Test
-    public void restoreBatch() throws Exception
+    public void restoreBatch() throws Throwable
     {
         long deletedDocumentId1 = 13;
         long deletedDocumentId2 = 42;
@@ -112,7 +112,7 @@ public class RestoreJobTest extends AbstractJobTest
     }
 
     @Test
-    public void restoreBatchAndDocuments() throws Exception
+    public void restoreBatchAndDocuments() throws Throwable
     {
         // Batch documents.
         long deletedDocumentId1 = 13;
@@ -154,7 +154,7 @@ public class RestoreJobTest extends AbstractJobTest
     }
 
     @Test
-    public void failToExecuteIfNoWikiSpecified() throws Exception
+    public void failToExecuteIfNoWikiSpecified() throws Throwable
     {
         long deletedDocumentId = 13;
 

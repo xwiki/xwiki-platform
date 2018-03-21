@@ -59,7 +59,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveInsideItsOwnHierarchy() throws Exception
+    public void moveInsideItsOwnHierarchy() throws Throwable
     {
         SpaceReference spaceReference =
             new SpaceReference("Entity", new SpaceReference("Model", new WikiReference("code")));
@@ -72,7 +72,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveUnsupportedEntity() throws Exception
+    public void moveUnsupportedEntity() throws Throwable
     {
         run(createRequest(new WikiReference("from"), new WikiReference("to")));
         verify(this.mocker.getMockedLogger()).error("Unsupported source entity type [{}].", EntityType.WIKI);
@@ -81,7 +81,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveToUnsupportedDestination() throws Exception
+    public void moveToUnsupportedDestination() throws Throwable
     {
         run(createRequest(new DocumentReference("wiki", "Space", "Page"), new WikiReference("test")));
         verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a document.",
@@ -100,7 +100,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveMissingDocument() throws Exception
+    public void moveMissingDocument() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("foo", "A", "Page");
         run(createRequest(sourceReference, new SpaceReference("B", new WikiReference("bar"))));
@@ -110,7 +110,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveDocumentWithoutDeleteRight() throws Exception
+    public void moveDocumentWithoutDeleteRight() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -129,7 +129,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveDocumentToRestrictedDestination() throws Exception
+    public void moveDocumentToRestrictedDestination() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
@@ -151,7 +151,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveDocumentToSpace() throws Exception
+    public void moveDocumentToSpace() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
@@ -184,7 +184,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void updateLinksOnFarm() throws Exception
+    public void updateLinksOnFarm() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("foo", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
@@ -217,7 +217,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveDocumentToSpaceHome() throws Exception
+    public void moveDocumentToSpaceHome() throws Throwable
     {
         DocumentReference source = new DocumentReference("wiki", "A", "B");
         when(this.modelBridge.exists(source)).thenReturn(true);
@@ -231,7 +231,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveSpaceHomeDeep() throws Exception
+    public void moveSpaceHomeDeep() throws Throwable
     {
         DocumentReference spaceHome = new DocumentReference("chess", Arrays.asList("A", "B", "C"), "WebHome");
         DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
@@ -250,7 +250,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveSpaceToSpaceHome() throws Exception
+    public void moveSpaceToSpaceHome() throws Throwable
     {
         SpaceReference sourceSpace = new SpaceReference("wiki", "A", "B");
         DocumentReference sourceDoc = new DocumentReference("X", sourceSpace);
@@ -267,7 +267,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void copyDocument() throws Exception
+    public void copyDocument() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);

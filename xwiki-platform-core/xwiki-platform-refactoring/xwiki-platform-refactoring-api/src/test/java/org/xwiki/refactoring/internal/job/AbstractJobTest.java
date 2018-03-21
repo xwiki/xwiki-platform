@@ -44,11 +44,17 @@ public abstract class AbstractJobTest
 
     protected abstract MockitoComponentMockingRule<Job> getMocker();
 
-    protected Job run(Request request) throws Exception
+    protected Job run(Request request) throws Throwable
     {
         Job job = getMocker().getComponentUnderTest();
         job.initialize(request);
         job.run();
+
+        Throwable error = job.getStatus().getError();
+        if (job.getStatus().getError() != null) {
+            throw error;
+        }
+
         return job;
     }
 }

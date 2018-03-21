@@ -268,13 +268,15 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
 
     private void visitDocumentNodes(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
     {
-        EntityReference nodeReference = node.getReference();
-        EntityType nodeType = nodeReference != null ? nodeReference.getType() : null;
-        if (nodeType == EntityType.SPACE || nodeType == EntityType.WIKI || nodeType == null) {
-            // A node that corresponds to an entity that can contain documents.
-            visitDocumentAncestor(node, visitor);
-        } else if (nodeType == EntityType.DOCUMENT) {
-            visitor.visit((DocumentReference) node.getReference());
+        if (node != null) {
+            EntityReference nodeReference = node.getReference();
+            EntityType nodeType = nodeReference != null ? nodeReference.getType() : null;
+            if (nodeType == EntityType.SPACE || nodeType == EntityType.WIKI || nodeType == null) {
+                // A node that corresponds to an entity that can contain documents.
+                visitDocumentAncestor(node, visitor);
+            } else if (nodeType == EntityType.DOCUMENT) {
+                visitor.visit((DocumentReference) node.getReference());
+            }
         }
     }
 

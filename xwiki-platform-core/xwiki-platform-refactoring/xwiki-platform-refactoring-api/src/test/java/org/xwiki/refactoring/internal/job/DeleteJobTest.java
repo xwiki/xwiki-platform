@@ -72,7 +72,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteDocument() throws Exception
+    public void deleteDocument() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -89,7 +89,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteMissingDocument() throws Exception
+    public void deleteMissingDocument() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         run(createRequest(documentReference));
@@ -98,7 +98,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteDocumentWithoutDeleteRight() throws Exception
+    public void deleteDocumentWithoutDeleteRight() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -116,7 +116,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteSpaceHomeDeep() throws Exception
+    public void deleteSpaceHomeDeep() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "WebHome");
         EntityRequest request = createRequest(documentReference);
@@ -128,7 +128,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteSpace() throws Exception
+    public void deleteSpace() throws Throwable
     {
         SpaceReference spaceReference = new SpaceReference("Space", new WikiReference("wiki"));
         DocumentReference aliceReference = new DocumentReference("wiki", "Space", "Alice");
@@ -144,7 +144,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void deleteUnsupportedEntity() throws Exception
+    public void deleteUnsupportedEntity() throws Throwable
     {
         run(createRequest(new WikiReference("foo")));
         verify(this.mocker.getMockedLogger(), times(2)).error("Unsupported entity type [{}].", EntityType.WIKI);

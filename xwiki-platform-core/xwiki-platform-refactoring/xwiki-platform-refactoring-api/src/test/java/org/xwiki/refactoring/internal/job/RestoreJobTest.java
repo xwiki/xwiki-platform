@@ -161,17 +161,19 @@ public class RestoreJobTest extends AbstractJobTest
         RestoreRequest request = createRequest();
         request.setDeletedDocumentIds(Arrays.asList(deletedDocumentId));
         request.setWikiReference(null);
-        Job job = run(request);
+
+        try {
+            run(request);
+        } catch (IllegalArgumentException actual) {
+            // Verify that the job threw an exception.
+            Throwable expected = new IllegalArgumentException("No wiki reference was specified in the job request");
+
+            assertEquals(expected.getClass(), actual.getClass());
+            assertEquals(expected.getMessage(), actual.getMessage());
+        }
 
         // Verify that the document is not restored.
         verify(this.modelBridge, never()).restoreDeletedDocument(deletedDocumentId, request.isCheckRights());
-
-        // Verify that the job threw an exception.
-        Throwable expected = new IllegalArgumentException("No wiki reference was specified in the job request");
-        Throwable actual = job.getStatus().getError();
-        assertNotNull(actual);
-        assertEquals(expected.getClass(), actual.getClass());
-        assertEquals(expected.getMessage(), actual.getMessage());
     }
 
     private RestoreRequest createRequest()

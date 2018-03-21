@@ -42,6 +42,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -582,8 +583,12 @@ public class InternalTemplateManager
             xdom = this.parser.parse(content.getContent(), content.getSourceSyntax());
         } else {
             String result = evaluateContent(template, content);
-            xdom = new XDOM(Arrays.asList(new RawBlock(result,
-                content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
+            if (StringUtils.isEmpty(result)) {
+                xdom = new XDOM(Collections.emptyList());
+            } else {
+                xdom = new XDOM(Arrays.asList(new RawBlock(result,
+                    content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
+            }
         }
 
         return xdom;

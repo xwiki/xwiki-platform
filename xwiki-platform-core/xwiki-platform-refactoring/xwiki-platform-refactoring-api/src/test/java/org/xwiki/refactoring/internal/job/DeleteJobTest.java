@@ -38,6 +38,7 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -124,7 +125,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
         run(request);
 
         // We only verify if the job fetches the documents from the space. The rest of the test is in #deleteSpace()
-        verify(this.modelBridge).getDocumentReferences(documentReference.getLastSpaceReference());
+        verify(this.modelBridge, atLeastOnce()).getDocumentReferences(documentReference.getLastSpaceReference());
     }
 
     @Test

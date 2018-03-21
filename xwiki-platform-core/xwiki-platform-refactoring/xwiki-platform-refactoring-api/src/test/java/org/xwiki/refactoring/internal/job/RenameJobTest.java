@@ -103,7 +103,7 @@ public class RenameJobTest extends AbstractMoveJobTest
         run(request);
 
         // We verify that job fetches the space children.
-        verify(this.modelBridge).getDocumentReferences(aliceReference.getLastSpaceReference());
+        verify(this.modelBridge, atLeastOnce()).getDocumentReferences(aliceReference.getLastSpaceReference());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class RenameJobTest extends AbstractMoveJobTest
         run(createRequest(aliceReference, bobReference));
 
         // We verify that job fetches the space children.
-        verify(this.modelBridge).getDocumentReferences(aliceReference);
+        verify(this.modelBridge, atLeastOnce()).getDocumentReferences(aliceReference);
     }
 
     @Test

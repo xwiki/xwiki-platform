@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // TODO: move all that to XAR handler module
-/*
+/*!
 #set ($jsExtension = '.min.js')
 #if (!$services.debug.minify)
   #set ($jsExtension = '.js')

@@ -70,8 +70,6 @@
           #set ($renameJob = $services.refactoring.rename($renameRequest))
           #if ($request.async != 'true')
             #try()
-              ## We may be asked a question (we assume that async also imply interactive)
-              #set ($discard = $renameRequest.setInteractive(true))
               #set ($discard = $renameJob.join())
             #end
           #end

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -32,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.slf4j.Logger;
@@ -168,6 +170,16 @@ public class LocalizationScriptService implements ScriptService
     }
 
     /**
+     * @param keys the translations keys to try one by one
+     * @return the rendered translation message
+     * @since 10.2
+     */
+    public String render(Collection<String> keys)
+    {
+        return render(keys, (Collection<?>) null);
+    }
+
+    /**
      * @param key the translation key
      * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
      *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
@@ -182,6 +194,19 @@ public class LocalizationScriptService implements ScriptService
     }
 
     /**
+     * @param keys the translations keys to try one by one
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @return the rendered translation message
+     * @since 10.2
+     */
+    public String render(Collection<String> keys, Locale locale)
+    {
+        return render(keys, (Collection<?>) null, locale);
+    }
+
+    /**
      * @param key the translation key
      * @param parameters the translation parameters
      * @return the rendered translation message
@@ -189,6 +214,16 @@ public class LocalizationScriptService implements ScriptService
     public String render(String key, Collection<?> parameters)
     {
         return render(key, Syntax.PLAIN_1_0, parameters);
+    }
+
+    /**
+     * @param keys the translations keys to try one by one
+     * @param parameters the translation parameters
+     * @return the rendered translation message
+     */
+    public String render(Collection<String> keys, Collection<?> parameters)
+    {
+        return render(keys, Syntax.PLAIN_1_0, parameters);
     }
 
     /**
@@ -207,6 +242,20 @@ public class LocalizationScriptService implements ScriptService
     }
 
     /**
+     * @param keys the translations keys to try one by one
+     * @param parameters the translation parameters
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @return the rendered translation message
+     * @since 10.2
+     */
+    public String render(Collection<String> keys, Collection<?> parameters, Locale locale)
+    {
+        return render(keys, Syntax.PLAIN_1_0, parameters);
+    }
+
+    /**
      * @param key the translation key
      * @param syntax the syntax in which to render the translation message
      * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
@@ -215,6 +264,17 @@ public class LocalizationScriptService implements ScriptService
     public String render(String key, Syntax syntax)
     {
         return render(key, syntax, (Collection<?>) null);
+    }
+
+    /**
+     * @param keys the translations keys to try one by one
+     * @param syntax the syntax in which to render the translation message
+     * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
+     * @since 10.2
+     */
+    public String render(Collection<String> keys, Syntax syntax)
+    {
+        return render(keys, syntax, (Collection<?>) null);
     }
 
     /**
@@ -233,6 +293,20 @@ public class LocalizationScriptService implements ScriptService
     }
 
     /**
+     * @param keys the translations keys to try one by one
+     * @param syntax the syntax in which to render the translation message
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
+     * @since 10.2
+     */
+    public String render(Collection<String> keys, Syntax syntax, Locale locale)
+    {
+        return render(keys, syntax, (Collection<?>) null, locale);
+    }
+
+    /**
      * @param key the translation key
      * @param syntax the syntax in which to render the translation message
      * @param parameters the translation parameters
@@ -241,6 +315,18 @@ public class LocalizationScriptService implements ScriptService
     public String render(String key, Syntax syntax, Collection<?> parameters)
     {
         return render(key, syntax, parameters, this.localizationContext.getCurrentLocale());
+    }
+
+    /**
+     * @param keys the translations keys to try one by one
+     * @param syntax the syntax in which to render the translation message
+     * @param parameters the translation parameters
+     * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
+     * @since 10.2
+     */
+    public String render(Collection<String> keys, Syntax syntax, Collection<?> parameters)
+    {
+        return render(keys, syntax, parameters, this.localizationContext.getCurrentLocale());
     }
 
     /**
@@ -256,7 +342,34 @@ public class LocalizationScriptService implements ScriptService
      */
     public String render(String key, Syntax syntax, Collection<?> parameters, Locale locale)
     {
-        Translation translation = this.localization.getTranslation(key, locale);
+        return render(Collections.singletonList(key), syntax, parameters, locale);
+    }
+
+    /**
+     * @param keys the translations keys to try one by one
+     * @param syntax the syntax in which to render the translation message
+     * @param parameters the translation parameters
+     * @param locale the {@link Locale} for which this translation is searched. The result might me associated to a
+     *            different {@link Locale} (for example getting the {@code fr} translation when asking for the
+     *            {@code fr_FR} one).
+     * @return the rendered translation message, the key if no translation can be found and null if the rendering failed
+     * @since 10.2
+     */
+    public String render(Collection<String> keys, Syntax syntax, Collection<?> parameters, Locale locale)
+    {
+        if (CollectionUtils.isEmpty(keys)) {
+            return null;
+        }
+
+        Translation translation = null;
+
+        for (String key : keys) {
+            translation = this.localization.getTranslation(key, locale);
+
+            if (translation != null) {
+                break;
+            }
+        }
 
         String result;
 
@@ -279,7 +392,7 @@ public class LocalizationScriptService implements ScriptService
                 result = null;
             }
         } else {
-            result = key;
+            result = keys.iterator().next();
         }
 
         return result;

@@ -112,24 +112,32 @@ public class LocalizationScriptServiceTest
     public void render() throws Exception
     {
         assertEquals("print result", localizationScriptService.render("key"));
+        assertEquals("print result",
+            localizationScriptService.render(Arrays.asList("not existing key", "key", "another key")));
     }
 
     @Test
     public void renderWithSyntax() throws Exception
     {
         assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0));
+        assertEquals("print result", localizationScriptService
+            .render(Arrays.asList("not existing key", "key", "another key"), Syntax.PLAIN_1_0));
     }
 
     @Test
     public void renderWithSyntaxAndParameters() throws Exception
     {
         assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0, Arrays.asList()));
+        assertEquals("print result", localizationScriptService
+            .render(Arrays.asList("not existing key", "key", "another key"), Syntax.PLAIN_1_0, Arrays.asList()));
     }
 
     @Test
     public void renderWithParameters() throws Exception
     {
         assertEquals("print result", localizationScriptService.render("key", Arrays.asList()));
+        assertEquals("print result",
+            localizationScriptService.render(Arrays.asList("not existing key", "key", "another key"), Arrays.asList()));
     }
 
     @Test
@@ -142,8 +150,8 @@ public class LocalizationScriptServiceTest
     @Test
     public void getAvailableLocales() throws Exception
     {
-        when(environment.getResourceAsStream(eq("/WEB-INF/xwiki-locales.txt"))).thenReturn(
-                getClass().getResourceAsStream("/xwiki-locales.txt"));
+        when(environment.getResourceAsStream(eq("/WEB-INF/xwiki-locales.txt")))
+            .thenReturn(getClass().getResourceAsStream("/xwiki-locales.txt"));
         Set<Locale> locales = localizationScriptService.getAvailableLocales();
         assertNotNull(locales);
         assertFalse(locales.isEmpty());

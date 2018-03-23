@@ -2,26 +2,26 @@
 
 #questionHeader()
 
-#set($jobStatus = $job.status)
+#set ($jobStatus = $job.status)
 #set ($question = $jobStatus.question)
 
 <div class="warningmessage deleteWarningExtensions">
-  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render('core.delete.warningExtensions.title'))</strong></p>
-  <p>$escapetool.xml($services.localization.render('core.delete.warningExtensions.explanation'))</p>
+  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))</strong></p>
+  <p>$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.explanation"))</p>
   #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=XWiki.Extensions&search=&repo=installed'))
   #set ($link = '<a href="' + $url + '">')
   ## We cannot escape the following line because it contains an HTML link
-  <p>$services.localization.render('core.delete.warningExtensions.help', [$link, '</a>'])</p>
-  <p>$escapetool.xml($services.localization.render('core.delete.warningExtensions.confirm'))</p>
+  <p>$services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.help", [$link, '</a>'])</p>
+  <p>$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.confirm'))</p>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <p class="panel-title">$escapetool.xml($services.localization.render('core.delete.warningExtensions.tree.title'))</p>
+      <p class="panel-title">$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))</p>
     </div>
     <div class="panel-body">
-      <p><a href="#" class="btSelectAllTree">$escapetool.xml($services.localization.render('core.delete.warningExtensions.tree.selectAll'))</a> / <a href="#" class="btUnselectAllTree">$escapetool.xml($services.localization.render('core.delete.warningExtensions.tree.selectNone'))</a></p>
+      <p><a href="#" class="btSelectAllTree">$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.tree.selectAll'))</a> / <a href="#" class="btUnselectAllTree">$escapetool.xml($services.localization.render('job.question.ExtensionBreakingQuestion.tree.selectNone'))</a></p>
       <div class="deleteTree" data-url="$escapetool.xml($xwiki.relativeRequestURL)?qaction=data" />
     </div>
   </div>
-  #questionButtons("job.question.button.${job.type}", 'job.question.button.cancel')
+  #questionButtons($jobStatus)
 </div>
 #questionFooter()

@@ -23,7 +23,14 @@ define(['jquery'], function($) {
     var answerJobQuestion = function(data) {
       // 'this' is the job status.
       var request = config.createAnswerRequest(this.id, data);
-      $.post(request.url, request.data).done(onProgress).fail(onFailure);
+
+      // Create a POST request
+      var promise = $.post(request.url, request.data);
+
+      // Automated progress and failure
+      promise.done(onProgress).fail(onFailure);
+
+      return promise;
     };
 
     var onFailure = $.proxy(promise.reject, promise);

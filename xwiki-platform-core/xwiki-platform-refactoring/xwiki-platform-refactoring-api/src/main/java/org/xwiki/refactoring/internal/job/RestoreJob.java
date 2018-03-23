@@ -66,6 +66,16 @@ public class RestoreJob extends AbstractJob<RestoreRequest, AbstractJobStatus<Re
     }
 
     @Override
+    protected AbstractJobStatus<RestoreRequest> createNewStatus(RestoreRequest request)
+    {
+        AbstractJobStatus<RestoreRequest> status = super.createNewStatus(request);
+
+        status.setCancelable(true);
+
+        return status;
+    }
+
+    @Override
     protected void runInternal() throws Exception
     {
         RestoreRequest request = getRequest();

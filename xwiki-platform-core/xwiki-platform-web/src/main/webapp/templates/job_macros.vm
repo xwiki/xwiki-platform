@@ -33,11 +33,7 @@ $services.template.execute('logging_macros.vm')
         <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
         <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
         #set ($jobType = $status.jobType)
-        #set ($translationKey = "job.log.label.$jobType")
-        #if (!$services.localization.get($translationKey))
-          #set ($translationKey = 'job.log.label')
-        #end
-        $services.localization.render($translationKey)
+        $services.localization.render(["job.log.label.$jobType", 'job.log.label'])
       </label>
     </dt>
     <dd>#printStatusLog($status)</dd>
@@ -52,7 +48,7 @@ $services.template.execute('logging_macros.vm')
 #end
 
 #macro (displayJobQuestion $jobStatus)
-  <div class="ui-question"/>
+  <div class="ui-question"></div>
 #end
 
 #macro (getJobStatusJSON $status $json)
@@ -81,30 +77,39 @@ $services.template.execute('logging_macros.vm')
     'log': {
       'offset': $logOffset,
       'items': $log
-    }
+    },
+    'message' : "#displayJobStatusMessage($job.status)"
   })
 #end
 
-#macro (displayJobFinishedMessage $status $successKey $errorKey)
+#macro(displayJobStatusMessage $status $successKey $errorKey $canceledKey)
+  #set ($state = $status.state)
+  #set ($finished = $state == 'FINISHED')
+  #if (!$finished)
+    ## No message.
+  #else
+    #displayJobFinishedMessage($status $successKey $errorKey $canceledKey)
+  #end
+#end
+
+#macro (displayJobFinishedMessage $status $successKey $errorKey $canceledKey)
   #set ($state = $status.state)
   #set ($finished = $state == 'FINISHED')
   #if (!$finished)
     ## No message.
   #else
     #if ($status.error)
-      #if (!$errorKey)
-        #set ($errorKey = 'job.status.error')
-      #end
-      <div class="box errormessage">
-        $services.localization.render($errorKey)
-      </div>
+      #set($messageKeys = [$errorKey, "job.status.${status.jobType}.error", 'job.status.error'])
+      #set($messageClass = 'errormessage')
+    #elseif ($status.canceled)
+      #set($messageKeys = [$canceledKey, "job.status.${status.jobType}.canceled", 'job.status.canceled'])
+      #set($messageClass = 'warningmessage')
     #else
-      #if (!$successKey)
-        #set ($successKey = 'job.status.success')
-      #end
-      <div class="box successmessage">
-        $services.localization.render($successKey)
-      </div>
+      #set($messageKeys = [$successKey, "job.status.${status.jobType}.success", 'job.status.success'])
+      #set($messageClass = 'successmessage')
     #end
+    <div class="box $messageClass">
+      $services.localization.render($messageKeys)
+    </div>
   #end
 #end

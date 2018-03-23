@@ -144,6 +144,10 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
     var questionForm = button.parents('.form-question');
 
+    // Disable other buttons
+    questionForm.find('btAnswerConfirm').prop('disabled', true);
+    questionForm.find('btAnswerCancel').prop('disabled', true);
+
     if (questionForm.length) {
       var questionUI = questionForm.parents('.ui-question');
 
@@ -158,13 +162,26 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
           } else {
             var properties = createAnswerProperties(questionForm);
 
+            var answeringNotification =
+              "$escapetool.javascript($services.localization.render('job.question.notification.answering'))";
+
             // Set cancel marker if needed
             if (button.hasClass('btAnswerCancel')) {
               properties.cancel = 'true';
+
+              answeringNotification =
+                "$escapetool.javascript($services.localization.render('job.question.notification.canceling'))";
             }
 
+            var notif = new XWiki.widgets.Notification(
+                answeringNotification,
+                'inprogress'
+              );
+
             // Send the answer
-            answerCallback(properties);
+            answerCallback(properties).done(new function() {
+              notif.hide();
+            });
           }
         }
       }

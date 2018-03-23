@@ -19,7 +19,6 @@
  */
 package org.xwiki.job.handler.internal.question;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Request;
@@ -40,6 +38,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.event.status.CancelableJobStatus;
 import org.xwiki.job.handler.internal.AbstractTemplateJobResourceReferenceHandler;
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.BeanManager;
@@ -170,18 +169,8 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
         }
 
         // Cancel if supported
-        if (Boolean.getBoolean((String) request.getParameter(CANCEL))) {
-            // TODO: introduce some dedicated "CancelableJob" interface or, better, do
-            // http://jira.xwiki.org/browse/XCOMMONS-882
-            Method cancelMethod = MethodUtils.getAccessibleMethod(job.getStatus().getClass(), CANCEL);
-
-            if (cancelMethod != null) {
-                try {
-                    cancelMethod.invoke(job.getStatus());
-                } catch (Exception e) {
-                    throw new ResourceReferenceHandlerException("Failed to cancel the job with id " + jobId);
-                }
-            }
+        if (job.getStatus() instanceof CancelableJobStatus && Boolean.parseBoolean((String) request.getParameter(CANCEL))) {
+            ((CancelableJobStatus)job.getStatus()).cancel();
         }
 
         // Answer question

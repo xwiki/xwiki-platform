@@ -30,6 +30,6 @@
   </dt>
 #end
 
-#macro (displayRefactoringJobFinishedMessage $refactoringJobStatus $successKey $errorKey)
-  #displayJobFinishedMessage($refactoringJobStatus $successKey $errorKey)
+#macro (displayRefactoringJobFinishedMessage $refactoringJobStatus $successKey $errorKey $canceledKey)
+  #displayJobFinishedMessage($refactoringJobStatus $successKey $errorKey $canceledKey)
 #end

@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.job;
 
 import org.xwiki.job.DefaultJobStatus;
+import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
@@ -40,11 +41,15 @@ public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T
      * @param observationManager the observation manager
      * @param loggerManager the logger manager
      * @param parentJobStatus the status of the parent job, or {@code null} if this job doesn't have a parent
+     * @deprecated since 9.2RC1, use
+     *             {@link #EntityJobStatus(String, Request, JobStatus, ObservationManager, LoggerManager)} instead
      */
     public EntityJobStatus(T request, ObservationManager observationManager, LoggerManager loggerManager,
         JobStatus parentJobStatus)
     {
         super(request, parentJobStatus, observationManager, loggerManager);
+
+        setCancelable(true);
     }
 
     /**
@@ -60,5 +65,7 @@ public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T
         LoggerManager loggerManager, JobStatus parentJobStatus)
     {
         super(jobType, request, parentJobStatus, observationManager, loggerManager);
+
+        setCancelable(true);
     }
 }

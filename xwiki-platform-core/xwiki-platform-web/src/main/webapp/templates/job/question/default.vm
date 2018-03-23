@@ -4,6 +4,6 @@
 
 ## TODO: POJO -> form inputs
 
-#questionButtons('job.question.button.answer')
+#questionButtons($job.status)
 
 #questionFooter()

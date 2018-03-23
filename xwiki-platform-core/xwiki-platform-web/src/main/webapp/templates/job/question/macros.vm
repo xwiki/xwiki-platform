@@ -12,15 +12,11 @@
   </form>
 #end
 
-#macro(questionButtons $confirmButtonKey $cancelButtonKey)
+#macro(questionButtons $jobStatus $confirmButtonKey $cancelButtonKey)
   <p class="buttons-question">
-    #if ($confirmButtonKey)
-      <button class="btn btn-danger btAnswerConfirm">$escapetool.xml($services.localization.render($confirmButtonKey))</button>
-    #else
-      <button class="btn btn-danger btAnswerConfirm">$escapetool.xml($services.localization.render('job.question.answer'))</button>
-    #end
-    #if ($cancelButtonKey)
-      <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render($cancelButtonKey))</button>
+    <button class="btn btn-danger btAnswerConfirm">$escapetool.xml($services.localization.render([$confirmButtonKey, "job.question.${status.jobType}.answer", 'job.question.button.confirm']))</button>
+    #if ($jobStatus.cancelable)
+      <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render([$cancelButtonKey, "job.question.${status.jobType}.cancel", 'job.question.button.cancel']))</button>
     #end
   </p>
 #end

@@ -364,10 +364,12 @@ public class LocalizationScriptService implements ScriptService
         Translation translation = null;
 
         for (String key : keys) {
-            translation = this.localization.getTranslation(key, locale);
+            if (key != null) {
+                translation = this.localization.getTranslation(key, locale);
 
-            if (translation != null) {
-                break;
+                if (translation != null) {
+                    break;
+                }
             }
         }
 

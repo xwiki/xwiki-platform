@@ -113,7 +113,7 @@ public class LocalizationScriptServiceTest
     {
         assertEquals("print result", localizationScriptService.render("key"));
         assertEquals("print result",
-            localizationScriptService.render(Arrays.asList("not existing key", "key", "another key")));
+            localizationScriptService.render(Arrays.asList(null, "not existing key", "key", "another key")));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class LocalizationScriptServiceTest
     {
         assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0));
         assertEquals("print result", localizationScriptService
-            .render(Arrays.asList("not existing key", "key", "another key"), Syntax.PLAIN_1_0));
+            .render(Arrays.asList(null, "not existing key", "key", "another key"), Syntax.PLAIN_1_0));
     }
 
     @Test
@@ -129,15 +129,15 @@ public class LocalizationScriptServiceTest
     {
         assertEquals("print result", localizationScriptService.render("key", Syntax.PLAIN_1_0, Arrays.asList()));
         assertEquals("print result", localizationScriptService
-            .render(Arrays.asList("not existing key", "key", "another key"), Syntax.PLAIN_1_0, Arrays.asList()));
+            .render(Arrays.asList(null, "not existing key", "key", "another key"), Syntax.PLAIN_1_0, Arrays.asList()));
     }
 
     @Test
     public void renderWithParameters() throws Exception
     {
         assertEquals("print result", localizationScriptService.render("key", Arrays.asList()));
-        assertEquals("print result",
-            localizationScriptService.render(Arrays.asList("not existing key", "key", "another key"), Arrays.asList()));
+        assertEquals("print result", localizationScriptService
+            .render(Arrays.asList(null, "not existing key", "key", "another key"), Arrays.asList()));
     }
 
     @Test

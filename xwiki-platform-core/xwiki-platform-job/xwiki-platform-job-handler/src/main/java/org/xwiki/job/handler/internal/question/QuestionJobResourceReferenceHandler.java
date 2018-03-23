@@ -169,8 +169,9 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
         }
 
         // Cancel if supported
-        if (job.getStatus() instanceof CancelableJobStatus && Boolean.parseBoolean((String) request.getParameter(CANCEL))) {
-            ((CancelableJobStatus)job.getStatus()).cancel();
+        if (job.getStatus() instanceof CancelableJobStatus
+            && Boolean.parseBoolean((String) request.getParameter(CANCEL))) {
+            ((CancelableJobStatus) job.getStatus()).cancel();
         }
 
         // Answer question

@@ -78,7 +78,8 @@ $services.template.execute('logging_macros.vm')
       'offset': $logOffset,
       'items': $log
     },
-    'message' : "#displayJobStatusMessage($job.status)"
+    'message' : "#displayJobStatusMessage($status)",
+    'questionTimeLeft' : $status.getQuestionTimeLeft('NANOSECONDS')
   })
 #end
 

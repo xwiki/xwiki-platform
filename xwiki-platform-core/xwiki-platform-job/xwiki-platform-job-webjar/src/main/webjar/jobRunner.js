@@ -35,10 +35,23 @@ define(['jquery'], function($) {
 
     var onFailure = $.proxy(promise.reject, promise);
 
+    var refresh = function(job) {
+      var request = config.createStatusRequest(job.id);
+      $.get(request.url, request.data).done(onProgress).fail(onFailure);
+    };
+
     var onProgress = function(job) {
       if (job && job.id && job.state && job.progress) {
         if (job.state == 'WAITING') {
           promise.notify(job, $.proxy(answerJobQuestion, job));
+
+          // Restart the progress if the question timeout is reached
+          var timeout = job.questionTimeLeft;
+          if (timeout && timeout > -1) {
+            setTimeout(function() {
+                refresh(job);
+              }, timeout / 1000000); // The JSON contains nanoseconds
+          }
         } else {
           // Even if the job is finished we still need to notify the last progress update.
           promise.notify(job);
@@ -47,8 +60,7 @@ define(['jquery'], function($) {
           } else {
             // The job is still running. Wait before asking for a job status update.
             setTimeout(function() {
-              var request = config.createStatusRequest(job.id);
-              $.get(request.url, request.data).done(onProgress).fail(onFailure);
+              refresh(job);
             }, config.updateInterval || 1000);
           }
         }

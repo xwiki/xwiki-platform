@@ -99,9 +99,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
                 // The user can modify the question so it could disable some EntitySelection.
                 // We add a timeout because when a refactoring job is running, it prevents others to run.
                 // 5 minutes is probably enough for the user to decide if the process should go on.
-                //boolean ack = job.getStatus().ask(question, 5, TimeUnit.MINUTES);
-                job.getStatus().ask(question/*, 5, TimeUnit.MINUTES*/);
-                boolean ack = true;
+                boolean ack = job.getStatus().ask(question, 5, TimeUnit.MINUTES);
                 if (!ack) {
                     // Without any confirmation, we must cancel the operation.
                     String message = "The question has been asked, however no answer has been received.";

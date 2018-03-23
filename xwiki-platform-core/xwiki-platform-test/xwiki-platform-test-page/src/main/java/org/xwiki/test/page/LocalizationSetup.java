@@ -25,7 +25,7 @@ import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.TestComponentManager;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +52,7 @@ public final class LocalizationSetup
     {
         LocalizationScriptService lss = mock(LocalizationScriptService.class);
         tcm.registerComponent(ScriptService.class, "localization", lss);
-        when(lss.render(any())).thenAnswer(
+        when(lss.render(anyString())).thenAnswer(
             new Answer<String>() {
                 @Override
                 public String answer(InvocationOnMock invocationOnMock) throws Throwable

@@ -14,7 +14,7 @@
       #if ($productURL)
         <a href="$services.extension.core.repository.environmentExtension.website">
       #end
-          $services.extension.core.repository.environmentExtension.name $xwiki.getVersion()
+          $!services.extension.core.repository.environmentExtension.name $xwiki.getVersion()
       #if ($productURL)
         </a>
       #end

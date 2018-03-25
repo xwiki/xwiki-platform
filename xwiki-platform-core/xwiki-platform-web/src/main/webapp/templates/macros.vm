@@ -2381,7 +2381,7 @@ Recursive title display detected!##
   $title
 </div>
 <div class="xwikirenderingerrordescription hidden">
-  <pre>$exceptiontool.getStackTrace($exception)</pre>
+  <pre>$escapetool.xml($exceptiontool.getStackTrace($exception))</pre>
 </div>
 #end
 

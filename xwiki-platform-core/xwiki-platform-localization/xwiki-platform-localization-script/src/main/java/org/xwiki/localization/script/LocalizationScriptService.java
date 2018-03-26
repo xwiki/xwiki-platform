@@ -394,7 +394,13 @@ public class LocalizationScriptService implements ScriptService
                 result = null;
             }
         } else {
-            result = keys.iterator().next();
+            result = null;
+
+            for (String key : keys) {
+                if (key != null) {
+                    result = key;
+                }
+            }
         }
 
         return result;

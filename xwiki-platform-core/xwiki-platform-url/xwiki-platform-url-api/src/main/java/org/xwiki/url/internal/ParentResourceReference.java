@@ -29,7 +29,7 @@ import org.xwiki.resource.ResourceType;
  * The reference of a {@link ResourceReferenceHandler} leading to other sub-{@link ResourceReferenceHandler}s.
  * 
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  */
 public class ParentResourceReference extends AbstractResourceReference
 {

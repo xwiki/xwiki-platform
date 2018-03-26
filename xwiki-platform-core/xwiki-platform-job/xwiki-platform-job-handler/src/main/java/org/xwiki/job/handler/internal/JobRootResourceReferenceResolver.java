@@ -29,7 +29,7 @@ import org.xwiki.url.internal.AbstractParentResourceReferenceResolver;
  * Transform Job URL into a typed Resource Reference. The URL format handled is {@code http://server/context/job/}.
  * 
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  */
 @Component
 @Named(JobRootResourceReferenceHandler.HINT)

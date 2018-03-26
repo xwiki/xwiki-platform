@@ -74,7 +74,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
      * Clone this {@link FilesystemAttachmentContent} instance.
      * 
      * @param filesystemAttachmentContent the content to copy
-     * @since 10.2RC1
+     * @since 10.2
      * @since 9.11.4
      */
     public FilesystemAttachmentContent(FilesystemAttachmentContent filesystemAttachmentContent)

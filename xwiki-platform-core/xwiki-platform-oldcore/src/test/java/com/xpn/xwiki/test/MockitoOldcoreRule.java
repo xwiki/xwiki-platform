@@ -46,7 +46,7 @@ public class MockitoOldcoreRule extends MockitoOldcore implements MethodRule
     }
 
     /**
-     * @since 10.2RC1
+     * @since 10.2
      */
     public MockitoOldcoreRule(MockitoComponentManager componentManager)
     {
@@ -54,7 +54,7 @@ public class MockitoOldcoreRule extends MockitoOldcore implements MethodRule
     }
 
     /**
-     * @since 10.2RC1
+     * @since 10.2
      */
     public MockitoOldcoreRule(MockitoComponentManager componentManager, MethodRule parent)
     {

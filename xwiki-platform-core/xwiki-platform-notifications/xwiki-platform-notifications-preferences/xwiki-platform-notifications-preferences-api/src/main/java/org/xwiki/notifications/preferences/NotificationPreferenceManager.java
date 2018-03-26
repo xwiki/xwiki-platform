@@ -56,7 +56,7 @@ public interface NotificationPreferenceManager
      * @throws NotificationException if an error occurs
      *
      * @since 9.11.4
-     * @since 10.2RC1
+     * @since 10.2
      */
     List<NotificationPreference> getAllPreferences(WikiReference wiki) throws NotificationException;
 

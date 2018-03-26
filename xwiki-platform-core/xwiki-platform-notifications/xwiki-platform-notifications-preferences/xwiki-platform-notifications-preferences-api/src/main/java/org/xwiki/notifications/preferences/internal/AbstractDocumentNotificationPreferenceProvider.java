@@ -40,7 +40,7 @@ import org.xwiki.notifications.preferences.TargetableNotificationPreference;
  * document.
  *
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  * @since 9.11.4
  */
 public abstract class AbstractDocumentNotificationPreferenceProvider implements NotificationPreferenceProvider

@@ -27,7 +27,7 @@ import org.xwiki.url.internal.ParentResourceReference;
  * Sub-handlers for the {@link JobRootResourceReferenceHandler}.
  * 
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  */
 @Role
 public interface JobResourceReferenceHandler

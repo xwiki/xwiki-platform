@@ -36,7 +36,7 @@ import org.xwiki.url.ExtendedURL;
  * sub-{@link ResourceReferenceHandler}s.
  * 
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  */
 public abstract class AbstractParentResourceReferenceResolver extends AbstractResourceReferenceResolver
 {

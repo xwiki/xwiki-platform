@@ -35,7 +35,7 @@ public interface TargetableNotificationPreference extends NotificationPreference
     /**
      * @return the wiki, the user or the group that should be targeted by the given preference
      * @since 9.11.4
-     * @since 10.2RC1
+     * @since 10.2
      */
     EntityReference getTarget();
 }

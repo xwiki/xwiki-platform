@@ -94,7 +94,7 @@ import static org.mockito.Mockito.when;
  * Test setup to initialize and manipulate various oldcore APIs.
  * 
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  */
 public class MockitoOldcore
 {

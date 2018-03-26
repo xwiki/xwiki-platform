@@ -46,7 +46,7 @@ import org.xwiki.url.internal.ParentResourceReference;
  * Job root resource handler.
  *
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  */
 @Component
 @Named(JobRootResourceReferenceHandler.HINT)

@@ -111,7 +111,7 @@ public class ExtensionBreakingQuestion
      * Same as {@link #selectAllExtensions()} but compatible with properties system.
      * 
      * @param select true if all extensions should be selected
-     * @since 10.2RC1
+     * @since 10.2
      */
     public void setSelectAllExtensions(boolean select)
     {
@@ -188,7 +188,7 @@ public class ExtensionBreakingQuestion
 
     /**
      * @param extensionIds the ids of the extensions to select
-     * @since 10.2RC1
+     * @since 10.2
      */
     public void setSelectedExtensions(Set<String> extensionIds)
     {
@@ -202,7 +202,7 @@ public class ExtensionBreakingQuestion
 
     /**
      * @param documents the documents to set as selected
-     * @since 10.2RC1
+     * @since 10.2
      */
     public void setSelectedDocuments(Set<DocumentReference> documents)
     {

@@ -32,7 +32,7 @@ import org.xwiki.notifications.NotificationFormat;
  * Filter that hide minor events in the alert menu.
  *
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  * @since 9.11.4
  */
 @Component

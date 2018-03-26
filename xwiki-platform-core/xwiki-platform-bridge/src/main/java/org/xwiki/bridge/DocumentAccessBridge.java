@@ -73,7 +73,7 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document instance to find
      * @return the document instance matching the passed document reference
      * @throws Exception when loading the document failed
-     * @since 10.2RC1
+     * @since 10.2
      * @since 9.11.4
      */
     default DocumentModelBridge getDocumentInstance(DocumentReference documentReference) throws Exception
@@ -89,7 +89,7 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document instance to find
      * @return the document instance matching the passed document reference and context locale
      * @throws Exception when loading the document failed
-     * @since 10.2RC1
+     * @since 10.2
      * @since 9.11.4
      */
     default DocumentModelBridge getTranslatedDocumentInstance(DocumentReference documentReference) throws Exception

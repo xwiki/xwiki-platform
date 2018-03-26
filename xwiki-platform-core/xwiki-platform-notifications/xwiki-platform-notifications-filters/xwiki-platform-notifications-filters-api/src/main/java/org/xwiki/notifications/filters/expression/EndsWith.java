@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Define a LIKE ("%value") operation in a filtering expression.
  *
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  * @since 9.11.4
  */
 @Unstable

@@ -39,7 +39,7 @@ import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
  * provide default preferences for all users of that wiki.
  *
  * @version $Id$
- * @since 10.2RC1
+ * @since 10.2
  * @since 9.11.3
  */
 @Component

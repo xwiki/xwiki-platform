@@ -129,12 +129,12 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
         if (archiveDoc != null) {
             return archiveDoc;
         }
+
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         String db = context.getWikiId();
         try {
@@ -146,7 +146,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             doc.setDocumentArchive(archiveDoc);
         } finally {
             context.setWikiId(db);
+
+            restoreExecutionXContext();
         }
+
         return archiveDoc;
     }
 
@@ -195,56 +198,64 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext inputxcontext)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
-        Version version = new Version(sversion);
+        try {
+            XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
+            Version version = new Version(sversion);
 
-        XWikiDocument doc = archive.loadDocument(version, context);
-        if (doc == null) {
-            Object[] args = { basedoc.getDocumentReferenceWithLocale(), version.toString() };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
-                "Version {1} does not exist while reading document {0}", null, args);
+            XWikiDocument doc = archive.loadDocument(version, context);
+            if (doc == null) {
+                Object[] args = { basedoc.getDocumentReferenceWithLocale(), version.toString() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                    "Version {1} does not exist while reading document {0}", null, args);
+            }
+
+            // Make sure the document has the same name
+            // as the new document (in case there was a name change
+            // FIXME: is this really needed ?
+            doc.setDocumentReference(basedoc.getDocumentReference());
+
+            doc.setStore(basedoc.getStore());
+
+            return doc;
+        } finally {
+            restoreExecutionXContext();
         }
-
-        // Make sure the document has the same name
-        // as the new document (in case there was a name change
-        // FIXME: is this really needed ?
-        doc.setDocumentReference(basedoc.getDocumentReference());
-
-        doc.setStore(basedoc.getStore());
-
-        return doc;
     }
 
     @Override
     public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext inputxcontext)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        executeWrite(context, true, new HibernateCallback<Object>()
-        {
-            @Override
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+        try {
+            executeWrite(context, true, new HibernateCallback<Object>()
             {
-                XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
-                archive.resetArchive();
-                archive.getDeletedNodeInfo().clear();
-                doc.setMinorEdit(false);
-                deleteArchive(doc, false, context);
-                updateXWikiDocArchive(doc, false, context);
-                return null;
-            }
-        });
+                @Override
+                public Object doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+                    archive.resetArchive();
+                    archive.getDeletedNodeInfo().clear();
+                    doc.setMinorEdit(false);
+                    deleteArchive(doc, false, context);
+                    updateXWikiDocArchive(doc, false, context);
+                    return null;
+                }
+            });
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     @Override
     public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext inputxcontext)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
@@ -257,6 +268,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT, "Exception while updating archive {0}", e,
                 args);
+        } finally {
+            restoreExecutionXContext();
         }
     }
 

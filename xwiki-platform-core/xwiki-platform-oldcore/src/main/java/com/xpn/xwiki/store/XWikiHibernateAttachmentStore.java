@@ -109,12 +109,12 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void saveAttachmentContent(XWikiAttachment attachment, boolean parentUpdate, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         XWikiAttachmentContent content = attachment.getAttachment_content();
         // Protect against a corrupted attachment. This can happen if an attachment is listed in the Attachment
         // table but not listed in the Attachment Content table! In this case don't save anything.
         if (content != null) {
+            XWikiContext context = getExecutionXContext(inputxcontext, true);
+
             String currentWiki = context.getWikiId();
 
             try {
@@ -173,6 +173,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
                 // Restore context wiki
                 context.setWikiId(currentWiki);
+
+                restoreExecutionXContext();
             }
         } else {
             this.logger.warn("Failed to save the Attachment content for [{}] at [{}] since no content could be found!",
@@ -184,11 +186,12 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate,
         XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         if (attachments == null) {
             return;
         }
+
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -212,6 +215,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
 
     }
@@ -220,7 +225,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         String currentWiki = context.getWikiId();
 
@@ -265,6 +270,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             // Restore context wiki
             context.setWikiId(currentWiki);
+
+            restoreExecutionXContext();
         }
     }
 
@@ -279,7 +286,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         String currentWiki = context.getWikiId();
 
@@ -351,6 +358,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             // Restore context wiki
             context.setWikiId(currentWiki);
+
+            restoreExecutionXContext();
         }
     }
 

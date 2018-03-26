@@ -104,38 +104,47 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     public void saveToRecycleBin(XWikiAttachment attachment, String deleter, Date date, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        executeWrite(context, new HibernateCallback<Object>()
-        {
-            @Override
-            public Object doInHibernate(Session session) throws XWikiException
+        try {
+            executeWrite(context, new HibernateCallback<Object>()
             {
-                AttachmentRecycleBinContentStore contentStore = getDefaultAttachmentRecycleBinContentStore();
+                @Override
+                public Object doInHibernate(Session session) throws XWikiException
+                {
+                    AttachmentRecycleBinContentStore contentStore = getDefaultAttachmentRecycleBinContentStore();
 
-                DeletedAttachment trashAttachment = createDeletedAttachment(attachment, deleter, date, contentStore);
+                    DeletedAttachment trashAttachment =
+                        createDeletedAttachment(attachment, deleter, date, contentStore);
 
-                // Hibernate store.
-                long index = ((Number) session.save(trashAttachment)).longValue();
+                    // Hibernate store.
+                    long index = ((Number) session.save(trashAttachment)).longValue();
 
-                // External store
-                if (contentStore != null) {
-                    contentStore.save(attachment, date, index, bTransaction);
+                    // External store
+                    if (contentStore != null) {
+                        contentStore.save(attachment, date, index, bTransaction);
+                    }
+
+                    return null;
                 }
-
-                return null;
-            }
-        });
+            });
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     @Override
     public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment, final long index,
         final XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        DeletedAttachment deletedAttachment = getDeletedAttachment(index, context, bTransaction);
-        return deletedAttachment.restoreAttachment();
+        try {
+            DeletedAttachment deletedAttachment = getDeletedAttachment(index, context, bTransaction);
+            return deletedAttachment.restoreAttachment();
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     @Override
@@ -225,28 +234,35 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     }
 
     @Override
-    public void deleteFromRecycleBin(final long index, XWikiContext context, boolean bTransaction) throws XWikiException
+    public void deleteFromRecycleBin(final long index, XWikiContext inputxcontext, boolean bTransaction)
+        throws XWikiException
     {
-        executeWrite(context, new HibernateCallback<Object>()
-        {
-            @Override
-            public Object doInHibernate(Session session) throws XWikiException
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
+        try {
+            executeWrite(context, new HibernateCallback<Object>()
             {
-                DeletedAttachment deletedDocument = loadDeletedAttachment(index, context, false);
+                @Override
+                public Object doInHibernate(Session session) throws XWikiException
+                {
+                    DeletedAttachment deletedDocument = loadDeletedAttachment(index, context, false);
 
-                try {
-                    session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=?")
-                        .setLong(0, index).executeUpdate();
-                } catch (Exception ex) {
-                    // Invalid ID?
+                    try {
+                        session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=?")
+                            .setLong(0, index).executeUpdate();
+                    } catch (Exception ex) {
+                        // Invalid ID?
+                    }
+
+                    // Delete content
+                    deleteDeletedAttachmentContent(deletedDocument, bTransaction);
+
+                    return null;
                 }
-
-                // Delete content
-                deleteDeletedAttachmentContent(deletedDocument, bTransaction);
-
-                return null;
-            }
-        });
+            });
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     private AttachmentRecycleBinContentStore getDefaultAttachmentRecycleBinContentStore()

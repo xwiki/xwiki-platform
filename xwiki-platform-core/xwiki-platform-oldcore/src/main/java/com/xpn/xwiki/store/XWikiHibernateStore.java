@@ -252,7 +252,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public boolean isWikiNameAvailable(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, false);
 
         boolean available;
 
@@ -303,7 +303,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void createWiki(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, false);
 
         boolean bTransaction = true;
         String database = context.getWikiId();
@@ -370,7 +370,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void deleteWiki(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, false);
 
         boolean bTransaction = true;
         String database = context.getWikiId();
@@ -444,252 +444,263 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public boolean exists(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        boolean bTransaction = true;
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
-
-            doc.setStore(this);
-            checkHibernate(context);
-
-            // Start monitoring timer
-            if (monitor != null) {
-                monitor.startTimer(HINT);
-            }
-
-            bTransaction = bTransaction && beginTransaction(null, context);
-            Session session = getSession(context);
-            String fullName = doc.getFullName();
-
-            String sql = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName";
-            if (!doc.getLocale().equals(Locale.ROOT)) {
-                sql += " and doc.language=:language";
-            }
-            if (monitor != null) {
-                monitor.setTimerDesc(HINT, sql);
-            }
-            Query query = session.createQuery(sql);
-            query.setString("fullName", fullName);
-            if (!doc.getLocale().equals(Locale.ROOT)) {
-                query.setString("language", doc.getLocale().toString());
-            }
-            Iterator<String> it = query.list().iterator();
-            while (it.hasNext()) {
-                if (fullName.equals(it.next())) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (Exception e) {
-            Object[] args = { doc.getDocumentReferenceWithLocale() };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC, "Exception while reading document {0}", e,
-                args);
-        } finally {
-            // End monitoring timer
-            if (monitor != null) {
-                monitor.endTimer(HINT);
-            }
-
+            boolean bTransaction = true;
+            MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
-                if (bTransaction) {
-                    endTransaction(context, false);
+
+                doc.setStore(this);
+                checkHibernate(context);
+
+                // Start monitoring timer
+                if (monitor != null) {
+                    monitor.startTimer(HINT);
                 }
+
+                bTransaction = bTransaction && beginTransaction(null, context);
+                Session session = getSession(context);
+                String fullName = doc.getFullName();
+
+                String sql = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName";
+                if (!doc.getLocale().equals(Locale.ROOT)) {
+                    sql += " and doc.language=:language";
+                }
+                if (monitor != null) {
+                    monitor.setTimerDesc(HINT, sql);
+                }
+                Query query = session.createQuery(sql);
+                query.setString("fullName", fullName);
+                if (!doc.getLocale().equals(Locale.ROOT)) {
+                    query.setString("language", doc.getLocale().toString());
+                }
+                Iterator<String> it = query.list().iterator();
+                while (it.hasNext()) {
+                    if (fullName.equals(it.next())) {
+                        return true;
+                    }
+                }
+                return false;
             } catch (Exception e) {
+                Object[] args = { doc.getDocumentReferenceWithLocale() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC, "Exception while reading document {0}",
+                    e, args);
+            } finally {
+                // End monitoring timer
+                if (monitor != null) {
+                    monitor.endTimer(HINT);
+                }
+
+                try {
+                    if (bTransaction) {
+                        endTransaction(context, false);
+                    }
+                } catch (Exception e) {
+                }
             }
+        } finally {
+            restoreExecutionXContext();
         }
     }
 
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
-            // Start monitoring timer
-            if (monitor != null) {
-                monitor.startTimer(HINT);
-            }
-            doc.setStore(this);
-            // Make sure the database name is stored
-            doc.setDatabase(context.getWikiId());
-
-            // If the comment is larger than the max size supported by the Storage, then abbreviate it
-            String comment = doc.getComment();
-            if (comment != null && comment.length() > 1023) {
-                doc.setComment(StringUtils.abbreviate(comment, 1023));
-            }
-
-            if (bTransaction) {
-                checkHibernate(context);
-                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
-                bTransaction = beginTransaction(sfactory, context);
-            }
-            Session session = getSession(context);
-            session.setFlushMode(FlushMode.COMMIT);
-
-            // These informations will allow to not look for attachments and objects on loading
-            doc.setElement(XWikiDocument.HAS_ATTACHMENTS, !doc.getAttachmentList().isEmpty());
-            doc.setElement(XWikiDocument.HAS_OBJECTS, !doc.getXObjects().isEmpty());
-
-            // Let's update the class XML since this is the new way to store it
-            // TODO If all the properties are removed, the old xml stays?
-            BaseClass bclass = doc.getXClass();
-            if (bclass != null) {
-                if (bclass.getFieldList().isEmpty()) {
-                    doc.setXClassXML("");
-                } else {
-                    // Don't format the XML to reduce the size of the stored data as much as possible
-                    doc.setXClassXML(bclass.toXMLString(false));
+            MonitorPlugin monitor = Util.getMonitorPlugin(context);
+            try {
+                // Start monitoring timer
+                if (monitor != null) {
+                    monitor.startTimer(HINT);
                 }
-                bclass.setDirty(false);
-            }
+                doc.setStore(this);
+                // Make sure the database name is stored
+                doc.setDatabase(context.getWikiId());
 
-            if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
-                saveAttachmentList(doc, context);
-            }
-            // Remove attachments planned for removal
-            if (!doc.getAttachmentsToRemove().isEmpty()) {
-                for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
-                    XWikiAttachment attachment = attachmentToRemove.getAttachment();
-                    XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
-                    store.deleteXWikiAttachment(attachment, false, context, false);
-                }
-                doc.clearAttachmentsToRemove();
-            }
-
-            // Handle the latest text file
-            if (doc.isContentDirty() || doc.isMetaDataDirty()) {
-                Date ndate = new Date();
-                doc.setDate(ndate);
-                if (doc.isContentDirty()) {
-                    doc.setContentUpdateDate(ndate);
-                    doc.setContentAuthorReference(doc.getAuthorReference());
-                }
-                doc.incrementVersion();
-                if (context.getWiki().hasVersioning(context)) {
-                    context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                // If the comment is larger than the max size supported by the Storage, then abbreviate it
+                String comment = doc.getComment();
+                if (comment != null && comment.length() > 1023) {
+                    doc.setComment(StringUtils.abbreviate(comment, 1023));
                 }
 
-                doc.setContentDirty(false);
-                doc.setMetaDataDirty(false);
-            } else {
-                if (doc.getDocumentArchive() != null) {
-                    // A custom document archive has been provided, we assume it's right
-                    // (we also assume it's custom but that's another matter...)
-                    // Let's make sure we save the archive if we have one
-                    // This is especially needed if we load a document from XML
-                    if (context.getWiki().hasVersioning(context)) {
-                        context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDocumentArchive(), false,
-                            context);
+                if (bTransaction) {
+                    checkHibernate(context);
+                    SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                    bTransaction = beginTransaction(sfactory, context);
+                }
+                Session session = getSession(context);
+                session.setFlushMode(FlushMode.COMMIT);
 
-                        // If the version does not exist it means it's a new version so add it to the history
-                        if (!containsVersion(doc, doc.getRCSVersion(), context)) {
-                            context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
-                        }
+                // These informations will allow to not look for attachments and objects on loading
+                doc.setElement(XWikiDocument.HAS_ATTACHMENTS, !doc.getAttachmentList().isEmpty());
+                doc.setElement(XWikiDocument.HAS_OBJECTS, !doc.getXObjects().isEmpty());
+
+                // Let's update the class XML since this is the new way to store it
+                // TODO If all the properties are removed, the old xml stays?
+                BaseClass bclass = doc.getXClass();
+                if (bclass != null) {
+                    if (bclass.getFieldList().isEmpty()) {
+                        doc.setXClassXML("");
+                    } else {
+                        // Don't format the XML to reduce the size of the stored data as much as possible
+                        doc.setXClassXML(bclass.toXMLString(false));
                     }
-                } else {
-                    // Make sure the getArchive call has been made once
-                    // with a valid context
-                    try {
-                        if (context.getWiki().hasVersioning(context)) {
-                            doc.getDocumentArchive(context);
+                    bclass.setDirty(false);
+                }
 
-                            // If the version does not exist it means it's a new version so register it in the history
+                if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+                    saveAttachmentList(doc, context);
+                }
+                // Remove attachments planned for removal
+                if (!doc.getAttachmentsToRemove().isEmpty()) {
+                    for (XWikiAttachmentToRemove attachmentToRemove : doc.getAttachmentsToRemove()) {
+                        XWikiAttachment attachment = attachmentToRemove.getAttachment();
+                        XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
+                        store.deleteXWikiAttachment(attachment, false, context, false);
+                    }
+                    doc.clearAttachmentsToRemove();
+                }
+
+                // Handle the latest text file
+                if (doc.isContentDirty() || doc.isMetaDataDirty()) {
+                    Date ndate = new Date();
+                    doc.setDate(ndate);
+                    if (doc.isContentDirty()) {
+                        doc.setContentUpdateDate(ndate);
+                        doc.setContentAuthorReference(doc.getAuthorReference());
+                    }
+                    doc.incrementVersion();
+                    if (context.getWiki().hasVersioning(context)) {
+                        context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                    }
+
+                    doc.setContentDirty(false);
+                    doc.setMetaDataDirty(false);
+                } else {
+                    if (doc.getDocumentArchive() != null) {
+                        // A custom document archive has been provided, we assume it's right
+                        // (we also assume it's custom but that's another matter...)
+                        // Let's make sure we save the archive if we have one
+                        // This is especially needed if we load a document from XML
+                        if (context.getWiki().hasVersioning(context)) {
+                            context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDocumentArchive(), false,
+                                context);
+
+                            // If the version does not exist it means it's a new version so add it to the history
                             if (!containsVersion(doc, doc.getRCSVersion(), context)) {
                                 context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
                             }
                         }
-                    } catch (XWikiException e) {
-                        // this is a non critical error
-                    }
-                }
-            }
+                    } else {
+                        // Make sure the getArchive call has been made once
+                        // with a valid context
+                        try {
+                            if (context.getWiki().hasVersioning(context)) {
+                                doc.getDocumentArchive(context);
 
-            // Verify if the document already exists
-            Query query =
-                session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
-            query.setLong("id", doc.getId());
-            if (query.uniqueResult() == null) {
-                if (doc.isContentDirty() || doc.isMetaDataDirty()) {
-                    // Reset the creationDate to reflect the date of the first save, not the date of the object creation
-                    doc.setCreationDate(new Date());
-                }
-                session.save(doc);
-            } else {
-                session.update(doc);
-                // TODO: this is slower!! How can it be improved?
-                // session.saveOrUpdate(doc);
-            }
-
-            // Remove objects planned for removal
-            if (doc.getXObjectsToRemove().size() > 0) {
-                for (BaseObject removedObject : doc.getXObjectsToRemove()) {
-                    deleteXWikiCollection(removedObject, context, false, false);
-                }
-                doc.setXObjectsToRemove(new ArrayList<BaseObject>());
-            }
-
-            if (bclass != null) {
-                bclass.setDocumentReference(doc.getDocumentReference());
-                // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
-                context.addBaseClass(bclass);
-            }
-
-            if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-                // TODO: Delete all objects for which we don't have a name in the Map
-                for (List<BaseObject> objects : doc.getXObjects().values()) {
-                    for (BaseObject obj : objects) {
-                        if (obj != null) {
-                            obj.setDocumentReference(doc.getDocumentReference());
-                            /* If the object doesn't have a GUID, create it before saving */
-                            if (StringUtils.isEmpty(obj.getGuid())) {
-                                obj.setGuid(null);
+                                // If the version does not exist it means it's a new version so register it in the
+                                // history
+                                if (!containsVersion(doc, doc.getRCSVersion(), context)) {
+                                    context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                                }
                             }
-                            saveXWikiCollection(obj, context, false);
+                        } catch (XWikiException e) {
+                            // this is a non critical error
                         }
                     }
                 }
-            }
 
-            if (context.getWiki().hasBacklinks(context)) {
-                try {
-                    saveLinks(doc, context, true);
-                } catch (Exception e) {
-                    this.logger.error("Failed to save links for document [{}]", doc.getDocumentReferenceWithLocale(),
-                        e);
+                // Verify if the document already exists
+                Query query =
+                    session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
+                query.setLong("id", doc.getId());
+                if (query.uniqueResult() == null) {
+                    if (doc.isContentDirty() || doc.isMetaDataDirty()) {
+                        // Reset the creationDate to reflect the date of the first save, not the date of the object
+                        // creation
+                        doc.setCreationDate(new Date());
+                    }
+                    session.save(doc);
+                } else {
+                    session.update(doc);
+                    // TODO: this is slower!! How can it be improved?
+                    // session.saveOrUpdate(doc);
                 }
-            }
 
-            // Update space table
-            updateXWikiSpaceTable(doc, session);
+                // Remove objects planned for removal
+                if (doc.getXObjectsToRemove().size() > 0) {
+                    for (BaseObject removedObject : doc.getXObjectsToRemove()) {
+                        deleteXWikiCollection(removedObject, context, false, false);
+                    }
+                    doc.setXObjectsToRemove(new ArrayList<BaseObject>());
+                }
 
-            if (bTransaction) {
-                endTransaction(context, true);
-            }
+                if (bclass != null) {
+                    bclass.setDocumentReference(doc.getDocumentReference());
+                    // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
+                    context.addBaseClass(bclass);
+                }
 
-            doc.setNew(false);
+                if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
+                    // TODO: Delete all objects for which we don't have a name in the Map
+                    for (List<BaseObject> objects : doc.getXObjects().values()) {
+                        for (BaseObject obj : objects) {
+                            if (obj != null) {
+                                obj.setDocumentReference(doc.getDocumentReference());
+                                /* If the object doesn't have a GUID, create it before saving */
+                                if (StringUtils.isEmpty(obj.getGuid())) {
+                                    obj.setGuid(null);
+                                }
+                                saveXWikiCollection(obj, context, false);
+                            }
+                        }
+                    }
+                }
 
-            // We need to ensure that the saved document becomes the original document
-            doc.setOriginalDocument(doc.clone());
-        } catch (Exception e) {
-            Object[] args = { this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference()) };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, "Exception while saving document {0}", e, args);
-        } finally {
-            try {
+                if (context.getWiki().hasBacklinks(context)) {
+                    try {
+                        saveLinks(doc, context, true);
+                    } catch (Exception e) {
+                        this.logger.error("Failed to save links for document [{}]",
+                            doc.getDocumentReferenceWithLocale(), e);
+                    }
+                }
+
+                // Update space table
+                updateXWikiSpaceTable(doc, session);
+
                 if (bTransaction) {
-                    endTransaction(context, false);
+                    endTransaction(context, true);
                 }
-            } catch (Exception e) {
-            }
 
-            // End monitoring timer
-            if (monitor != null) {
-                monitor.endTimer(HINT);
+                doc.setNew(false);
+
+                // We need to ensure that the saved document becomes the original document
+                doc.setOriginalDocument(doc.clone());
+            } catch (Exception e) {
+                Object[] args = { this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference()) };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, "Exception while saving document {0}", e,
+                    args);
+            } finally {
+                try {
+                    if (bTransaction) {
+                        endTransaction(context, false);
+                    }
+                } catch (Exception e) {
+                }
+
+                // End monitoring timer
+                if (monitor != null) {
+                    monitor.endTimer(HINT);
+                }
             }
+        } finally {
+            restoreExecutionXContext();
         }
     }
 
@@ -863,252 +874,261 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        // To change body of implemented methods use Options | File Templates.
-        boolean bTransaction = true;
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
-            // Start monitoring timer
-            if (monitor != null) {
-                monitor.startTimer(HINT);
-            }
-            doc.setStore(this);
-            checkHibernate(context);
-
-            SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
-            bTransaction = bTransaction && beginTransaction(sfactory, context);
-            Session session = getSession(context);
-            session.setFlushMode(FlushMode.MANUAL);
-
+            // To change body of implemented methods use Options | File Templates.
+            boolean bTransaction = true;
+            MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
-                session.load(doc, Long.valueOf(doc.getId()));
-                doc.setNew(false);
-                doc.setMostRecent(true);
-                // Fix for XWIKI-1651
-                doc.setDate(new Date(doc.getDate().getTime()));
-                doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
-                doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
-            } catch (ObjectNotFoundException e) { // No document
-                doc.setNew(true);
+                // Start monitoring timer
+                if (monitor != null) {
+                    monitor.startTimer(HINT);
+                }
+                doc.setStore(this);
+                checkHibernate(context);
 
-                // Make sure to always return a document with an original version, even for one that does not exist.
-                // Allow writing more generic code.
-                doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                bTransaction = bTransaction && beginTransaction(sfactory, context);
+                Session session = getSession(context);
+                session.setFlushMode(FlushMode.MANUAL);
 
-                return doc;
-            }
+                try {
+                    session.load(doc, Long.valueOf(doc.getId()));
+                    doc.setNew(false);
+                    doc.setMostRecent(true);
+                    // Fix for XWIKI-1651
+                    doc.setDate(new Date(doc.getDate().getTime()));
+                    doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
+                    doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
+                } catch (ObjectNotFoundException e) { // No document
+                    doc.setNew(true);
 
-            // Loading the attachment list
-            if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
-                loadAttachmentList(doc, context, false);
-            }
+                    // Make sure to always return a document with an original version, even for one that does not exist.
+                    // Allow writing more generic code.
+                    doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
 
-            // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
-            BaseClass bclass = new BaseClass();
-            String cxml = doc.getXClassXML();
-            if (cxml != null) {
-                bclass.fromXML(cxml);
-                doc.setXClass(bclass);
-                bclass.setDirty(false);
-            }
-
-            // Store this XWikiClass in the context so that we can use it in case of recursive usage
-            // of classes
-            context.addBaseClass(bclass);
-
-            if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-                Query query = session
-                    .createQuery("from BaseObject as bobject where bobject.name = :name order by bobject.number");
-                query.setText("name", doc.getFullName());
-                @SuppressWarnings("unchecked")
-                Iterator<BaseObject> it = query.list().iterator();
-
-                EntityReference localGroupEntityReference = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
-                    new EntityReference("XWiki", EntityType.SPACE));
-                DocumentReference groupsDocumentReference = new DocumentReference(context.getWikiId(),
-                    localGroupEntityReference.getParent().getName(), localGroupEntityReference.getName());
-
-                boolean hasGroups = false;
-                while (it.hasNext()) {
-                    BaseObject object = it.next();
-                    DocumentReference classReference = object.getXClassReference();
-
-                    if (classReference == null) {
-                        continue;
-                    }
-
-                    // It seems to search before is case insensitive. And this would break the loading if we get an
-                    // object which doesn't really belong to this document
-                    if (!object.getDocumentReference().equals(doc.getDocumentReference())) {
-                        continue;
-                    }
-
-                    BaseObject newobject;
-                    if (classReference.equals(doc.getDocumentReference())) {
-                        newobject = bclass.newCustomClassInstance(context);
-                    } else {
-                        newobject = BaseClass.newCustomClassInstance(classReference, context);
-                    }
-                    if (newobject != null) {
-                        newobject.setId(object.getId());
-                        newobject.setXClassReference(object.getRelativeXClassReference());
-                        newobject.setDocumentReference(object.getDocumentReference());
-                        newobject.setNumber(object.getNumber());
-                        newobject.setGuid(object.getGuid());
-                        object = newobject;
-                    }
-
-                    if (classReference.equals(groupsDocumentReference)) {
-                        // Groups objects are handled differently.
-                        hasGroups = true;
-                    } else {
-                        loadXWikiCollectionInternal(object, doc, context, false, true);
-                    }
-                    doc.setXObject(object.getNumber(), object);
+                    return doc;
                 }
 
-                // AFAICT this was added as an emergency patch because loading of objects has proven
-                // too slow and the objects which cause the most overhead are the XWikiGroups objects
-                // as each group object (each group member) would otherwise cost 2 database queries.
-                // This will do every group member in a single query.
-                if (hasGroups) {
-                    Query query2 = session.createQuery("select bobject.number, prop.value from StringProperty as prop,"
-                        + "BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' "
-                        + "and bobject.id=prop.id.id and prop.id.name='member' order by bobject.number");
-                    query2.setText("name", doc.getFullName());
+                // Loading the attachment list
+                if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+                    loadAttachmentList(doc, context, false);
+                }
+
+                // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
+                BaseClass bclass = new BaseClass();
+                String cxml = doc.getXClassXML();
+                if (cxml != null) {
+                    bclass.fromXML(cxml);
+                    doc.setXClass(bclass);
+                    bclass.setDirty(false);
+                }
+
+                // Store this XWikiClass in the context so that we can use it in case of recursive usage
+                // of classes
+                context.addBaseClass(bclass);
+
+                if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
+                    Query query = session
+                        .createQuery("from BaseObject as bobject where bobject.name = :name order by bobject.number");
+                    query.setText("name", doc.getFullName());
                     @SuppressWarnings("unchecked")
-                    Iterator<Object[]> it2 = query2.list().iterator();
-                    while (it2.hasNext()) {
-                        Object[] result = it2.next();
-                        Integer number = (Integer) result[0];
-                        String member = (String) result[1];
-                        BaseObject obj = BaseClass.newCustomClassInstance(groupsDocumentReference, context);
-                        obj.setDocumentReference(doc.getDocumentReference());
-                        obj.setXClassReference(localGroupEntityReference);
-                        obj.setNumber(number.intValue());
-                        obj.setStringValue("member", member);
-                        doc.setXObject(obj.getNumber(), obj);
+                    Iterator<BaseObject> it = query.list().iterator();
+
+                    EntityReference localGroupEntityReference = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
+                        new EntityReference("XWiki", EntityType.SPACE));
+                    DocumentReference groupsDocumentReference = new DocumentReference(context.getWikiId(),
+                        localGroupEntityReference.getParent().getName(), localGroupEntityReference.getName());
+
+                    boolean hasGroups = false;
+                    while (it.hasNext()) {
+                        BaseObject object = it.next();
+                        DocumentReference classReference = object.getXClassReference();
+
+                        if (classReference == null) {
+                            continue;
+                        }
+
+                        // It seems to search before is case insensitive. And this would break the loading if we get an
+                        // object which doesn't really belong to this document
+                        if (!object.getDocumentReference().equals(doc.getDocumentReference())) {
+                            continue;
+                        }
+
+                        BaseObject newobject;
+                        if (classReference.equals(doc.getDocumentReference())) {
+                            newobject = bclass.newCustomClassInstance(context);
+                        } else {
+                            newobject = BaseClass.newCustomClassInstance(classReference, context);
+                        }
+                        if (newobject != null) {
+                            newobject.setId(object.getId());
+                            newobject.setXClassReference(object.getRelativeXClassReference());
+                            newobject.setDocumentReference(object.getDocumentReference());
+                            newobject.setNumber(object.getNumber());
+                            newobject.setGuid(object.getGuid());
+                            object = newobject;
+                        }
+
+                        if (classReference.equals(groupsDocumentReference)) {
+                            // Groups objects are handled differently.
+                            hasGroups = true;
+                        } else {
+                            loadXWikiCollectionInternal(object, doc, context, false, true);
+                        }
+                        doc.setXObject(object.getNumber(), object);
+                    }
+
+                    // AFAICT this was added as an emergency patch because loading of objects has proven
+                    // too slow and the objects which cause the most overhead are the XWikiGroups objects
+                    // as each group object (each group member) would otherwise cost 2 database queries.
+                    // This will do every group member in a single query.
+                    if (hasGroups) {
+                        Query query2 =
+                            session.createQuery("select bobject.number, prop.value from StringProperty as prop,"
+                                + "BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' "
+                                + "and bobject.id=prop.id.id and prop.id.name='member' order by bobject.number");
+                        query2.setText("name", doc.getFullName());
+                        @SuppressWarnings("unchecked")
+                        Iterator<Object[]> it2 = query2.list().iterator();
+                        while (it2.hasNext()) {
+                            Object[] result = it2.next();
+                            Integer number = (Integer) result[0];
+                            String member = (String) result[1];
+                            BaseObject obj = BaseClass.newCustomClassInstance(groupsDocumentReference, context);
+                            obj.setDocumentReference(doc.getDocumentReference());
+                            obj.setXClassReference(localGroupEntityReference);
+                            obj.setNumber(number.intValue());
+                            obj.setStringValue("member", member);
+                            doc.setXObject(obj.getNumber(), obj);
+                        }
                     }
                 }
-            }
 
-            doc.setContentDirty(false);
-            doc.setMetaDataDirty(false);
+                doc.setContentDirty(false);
+                doc.setMetaDataDirty(false);
 
-            // We need to ensure that the loaded document becomes the original document
-            doc.setOriginalDocument(doc.clone());
+                // We need to ensure that the loaded document becomes the original document
+                doc.setOriginalDocument(doc.clone());
 
-            if (bTransaction) {
-                endTransaction(context, false);
-            }
-        } catch (Exception e) {
-            Object[] args = { doc.getDocumentReference() };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document [{0}]", e,
-                args);
-        } finally {
-            try {
                 if (bTransaction) {
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+                Object[] args = { doc.getDocumentReference() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document [{0}]", e,
+                    args);
+            } finally {
+                try {
+                    if (bTransaction) {
+                        endTransaction(context, false);
+                    }
+                } catch (Exception e) {
+                }
+
+                // End monitoring timer
+                if (monitor != null) {
+                    monitor.endTimer(HINT);
+                }
             }
 
-            // End monitoring timer
-            if (monitor != null) {
-                monitor.endTimer(HINT);
-            }
+            this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReference());
+
+            return doc;
+        } finally {
+            restoreExecutionXContext();
         }
-
-        this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReference());
-
-        return doc;
     }
 
     @Override
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        boolean bTransaction = true;
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
-            // Start monitoring timer
-            if (monitor != null) {
-                monitor.startTimer(HINT);
-            }
-            checkHibernate(context);
-            SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
-            bTransaction = bTransaction && beginTransaction(sfactory, context);
-            Session session = getSession(context);
-            session.setFlushMode(FlushMode.COMMIT);
-
-            if (doc.getStore() == null) {
-                Object[] args = { doc.getDocumentReference() };
-                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CANNOT_DELETE_UNLOADED_DOC,
-                    "Impossible to delete document {0} if it is not loaded", null, args);
-            }
-
-            // Let's delete any attachment this document might have
-            for (XWikiAttachment attachment : doc.getAttachmentList()) {
-                XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
-                store.deleteXWikiAttachment(attachment, false, context, false);
-            }
-
-            // deleting XWikiLinks
-            if (context.getWiki().hasBacklinks(context)) {
-                deleteLinks(doc.getId(), context, true);
-            }
-
-            // Find the list of classes for which we have an object
-            // Remove properties planned for removal
-            if (!doc.getXObjectsToRemove().isEmpty()) {
-                for (BaseObject bobj : doc.getXObjectsToRemove()) {
-                    if (bobj != null) {
-                        deleteXWikiCollection(bobj, context, false, false);
-                    }
-                }
-                doc.setXObjectsToRemove(new ArrayList<BaseObject>());
-            }
-            for (List<BaseObject> objects : doc.getXObjects().values()) {
-                for (BaseObject obj : objects) {
-                    if (obj != null) {
-                        deleteXWikiCollection(obj, context, false, false);
-                    }
-                }
-            }
-            context.getWiki().getVersioningStore().deleteArchive(doc, false, context);
-
-            session.delete(doc);
-
-            // We need to ensure that the deleted document becomes the original document
-            doc.setOriginalDocument(doc.clone());
-
-            // Update space table if needed
-            maybeDeleteXWikiSpace(doc, session);
-
-            if (bTransaction) {
-                endTransaction(context, true);
-            }
-        } catch (Exception e) {
-            Object[] args = { doc.getDocumentReference() };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC, "Exception while deleting document {0}", e,
-                args);
-        } finally {
+            boolean bTransaction = true;
+            MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
+                // Start monitoring timer
+                if (monitor != null) {
+                    monitor.startTimer(HINT);
+                }
+                checkHibernate(context);
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                bTransaction = bTransaction && beginTransaction(sfactory, context);
+                Session session = getSession(context);
+                session.setFlushMode(FlushMode.COMMIT);
+
+                if (doc.getStore() == null) {
+                    Object[] args = { doc.getDocumentReference() };
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CANNOT_DELETE_UNLOADED_DOC,
+                        "Impossible to delete document {0} if it is not loaded", null, args);
+                }
+
+                // Let's delete any attachment this document might have
+                for (XWikiAttachment attachment : doc.getAttachmentList()) {
+                    XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);
+                    store.deleteXWikiAttachment(attachment, false, context, false);
+                }
+
+                // deleting XWikiLinks
+                if (context.getWiki().hasBacklinks(context)) {
+                    deleteLinks(doc.getId(), context, true);
+                }
+
+                // Find the list of classes for which we have an object
+                // Remove properties planned for removal
+                if (!doc.getXObjectsToRemove().isEmpty()) {
+                    for (BaseObject bobj : doc.getXObjectsToRemove()) {
+                        if (bobj != null) {
+                            deleteXWikiCollection(bobj, context, false, false);
+                        }
+                    }
+                    doc.setXObjectsToRemove(new ArrayList<BaseObject>());
+                }
+                for (List<BaseObject> objects : doc.getXObjects().values()) {
+                    for (BaseObject obj : objects) {
+                        if (obj != null) {
+                            deleteXWikiCollection(obj, context, false, false);
+                        }
+                    }
+                }
+                context.getWiki().getVersioningStore().deleteArchive(doc, false, context);
+
+                session.delete(doc);
+
+                // We need to ensure that the deleted document becomes the original document
+                doc.setOriginalDocument(doc.clone());
+
+                // Update space table if needed
+                maybeDeleteXWikiSpace(doc, session);
+
                 if (bTransaction) {
-                    endTransaction(context, false);
+                    endTransaction(context, true);
                 }
             } catch (Exception e) {
-            }
+                Object[] args = { doc.getDocumentReference() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC, "Exception while deleting document {0}", e,
+                    args);
+            } finally {
+                try {
+                    if (bTransaction) {
+                        endTransaction(context, false);
+                    }
+                } catch (Exception e) {
+                }
 
-            // End monitoring timer
-            if (monitor != null) {
-                monitor.endTimer(HINT);
+                // End monitoring timer
+                if (monitor != null) {
+                    monitor.endTimer(HINT);
+                }
             }
+        } finally {
+            restoreExecutionXContext();
         }
     }
 
@@ -1174,7 +1194,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void saveXWikiCollection(BaseCollection object, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
             if (object == null) {
@@ -1283,6 +1303,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
@@ -1305,7 +1327,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private void loadXWikiCollectionInternal(BaseCollection object1, XWikiDocument doc, XWikiContext inputxcontext,
         boolean bTransaction, boolean alreadyLoaded) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         BaseCollection object = object1;
         try {
@@ -1440,6 +1462,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
 
     }
@@ -1451,11 +1475,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void deleteXWikiCollection(BaseCollection object, XWikiContext inputxcontext, boolean bTransaction,
         boolean evict) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         if (object == null) {
             return;
         }
+
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1527,6 +1552,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
@@ -1776,7 +1803,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public XWikiLock loadLock(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         XWikiLock lock = null;
         try {
@@ -1806,14 +1833,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
+
         return lock;
     }
 
     @Override
     public void saveLock(XWikiLock lock, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
             if (bTransaction) {
@@ -1843,13 +1873,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
     @Override
     public void deleteLock(XWikiLock lock, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
             if (bTransaction) {
@@ -1873,6 +1905,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
@@ -1954,7 +1988,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public List<XWikiLink> loadLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         List<XWikiLink> links = new ArrayList<XWikiLink>();
         try {
@@ -1983,7 +2017,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
+
         return links;
     }
 
@@ -1991,7 +2028,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         // Note: Ideally the method should return a Set but it would break the current API.
 
@@ -2034,7 +2071,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
+
         return new ArrayList<DocumentReference>(backlinkReferences);
     }
 
@@ -2046,11 +2086,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> loadBacklinks(String fullName, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         List<String> backlinkNames = new ArrayList<String>();
         List<DocumentReference> backlinkReferences =
-            loadBacklinks(this.currentMixedDocumentReferenceResolver.resolve(fullName), bTransaction, context);
+            loadBacklinks(this.currentMixedDocumentReferenceResolver.resolve(fullName), bTransaction, inputxcontext);
         for (DocumentReference backlinkReference : backlinkReferences) {
             backlinkNames.add(this.localEntityReferenceSerializer.serialize(backlinkReference));
         }
@@ -2060,7 +2098,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
             if (bTransaction) {
@@ -2113,13 +2151,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
     @Override
     public void deleteLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
             if (bTransaction) {
@@ -2146,6 +2186,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
@@ -2157,7 +2199,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public List<String> getClassList(XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         boolean bTransaction = true;
         try {
@@ -2184,6 +2226,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
     }
 
@@ -2316,13 +2360,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         boolean bTransaction = true;
 
         if (sql == null) {
             return null;
         }
+
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -2372,6 +2416,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
             }
 
+            restoreExecutionXContext();
+
             // End monitoring timer
             if (monitor != null) {
                 monitor.endTimer(HINT);
@@ -2409,13 +2455,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     public List search(Query query, int nb, int start, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
         boolean bTransaction = true;
 
         if (query == null) {
             return null;
         }
+
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -2454,6 +2500,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
 
             // End monitoring timer
             if (monitor != null) {
@@ -2499,29 +2547,35 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private List<DocumentReference> searchDocumentReferencesInternal(String sql, int nb, int start,
         List<?> parameterValues, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
+        try {
+            List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
 
-        // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
-        // name is not stored in the database for document references.
-        WikiReference wikiReference = new WikiReference(context.getWikiId());
-        for (Object result : this.searchGenericInternal(sql, nb, start, parameterValues, context)) {
-            // The select always contains several elements in case of order by so we have to support both Object[] and
-            // String
-            String referenceString;
-            if (result instanceof String) {
-                referenceString = (String) result;
-            } else {
-                referenceString = (String) ((Object[]) result)[0];
+            // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
+            // name is not stored in the database for document references.
+            WikiReference wikiReference = new WikiReference(context.getWikiId());
+            for (Object result : this.searchGenericInternal(sql, nb, start, parameterValues, context)) {
+                // The select always contains several elements in case of order by so we have to support both Object[]
+                // and
+                // String
+                String referenceString;
+                if (result instanceof String) {
+                    referenceString = (String) result;
+                } else {
+                    referenceString = (String) ((Object[]) result)[0];
+                }
+
+                DocumentReference reference =
+                    this.defaultDocumentReferenceResolver.resolve(referenceString, wikiReference);
+
+                documentReferences.add(reference);
             }
 
-            DocumentReference reference = this.defaultDocumentReferenceResolver.resolve(referenceString, wikiReference);
-
-            documentReferences.add(reference);
+            return documentReferences;
+        } finally {
+            restoreExecutionXContext();
         }
-
-        return documentReferences;
     }
 
     /**
@@ -2588,7 +2642,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext inputxcontext)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         // Search documents
         List documentDatas = new ArrayList();
@@ -2641,6 +2695,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
 
             // End monitoring timer
             if (monitor != null) {
@@ -2833,53 +2889,61 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        // If we haven't turned of dynamic custom mappings we should not inject them
-        if (context.getWiki().hasDynamicCustomMappings() == false) {
-            return getSessionFactory();
-        }
-
-        List<XWikiDocument> list;
-        list = searchDocuments(" where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')", true, false,
-            false, 0, 0, context);
-        boolean result = false;
-
-        for (XWikiDocument doc : list) {
-            if (!doc.getXClass().getFieldList().isEmpty()) {
-                result |= injectCustomMapping(doc.getXClass(), context);
+        try {
+            // If we haven't turned of dynamic custom mappings we should not inject them
+            if (context.getWiki().hasDynamicCustomMappings() == false) {
+                return getSessionFactory();
             }
-        }
 
-        if (!result) {
-            return getSessionFactory();
-        }
+            List<XWikiDocument> list;
+            list = searchDocuments(" where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')", true,
+                false, false, 0, 0, context);
+            boolean result = false;
 
-        Configuration config = getConfiguration();
-        return injectInSessionFactory(config);
+            for (XWikiDocument doc : list) {
+                if (!doc.getXClass().getFieldList().isEmpty()) {
+                    result |= injectCustomMapping(doc.getXClass(), context);
+                }
+            }
+
+            if (!result) {
+                return getSessionFactory();
+            }
+
+            Configuration config = getConfiguration();
+            return injectInSessionFactory(config);
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     @Override
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        // If we haven't turned of dynamic custom mappings we should not inject them
-        if (context.getWiki().hasDynamicCustomMappings() == false) {
-            return false;
-        }
+        try {
+            // If we haven't turned of dynamic custom mappings we should not inject them
+            if (context.getWiki().hasDynamicCustomMappings() == false) {
+                return false;
+            }
 
-        boolean result = false;
-        for (List<BaseObject> objectsOfType : doc.getXObjects().values()) {
-            for (BaseObject object : objectsOfType) {
-                if (object != null) {
-                    result |= injectCustomMapping(object.getXClass(context), context);
-                    // Each class must be mapped only once
-                    break;
+            boolean result = false;
+            for (List<BaseObject> objectsOfType : doc.getXObjects().values()) {
+                for (BaseObject object : objectsOfType) {
+                    if (object != null) {
+                        result |= injectCustomMapping(object.getXClass(context), context);
+                        // Each class must be mapped only once
+                        break;
+                    }
                 }
             }
+            return result;
+        } finally {
+            restoreExecutionXContext();
         }
-        return result;
     }
 
     /**
@@ -2894,43 +2958,51 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public boolean injectCustomMapping(String className, String custommapping, XWikiContext inputxcontext)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        // If we haven't turned of dynamic custom mappings we should not inject them
-        if (!context.getWiki().hasDynamicCustomMappings()) {
-            return false;
+        try {
+            // If we haven't turned of dynamic custom mappings we should not inject them
+            if (!context.getWiki().hasDynamicCustomMappings()) {
+                return false;
+            }
+
+            Configuration config = getConfiguration();
+
+            // don't add a mapping that's already there
+            if (config.getClassMapping(className) != null) {
+                return false;
+            }
+
+            config.addXML(makeMapping(className, custommapping));
+            config.buildMappings();
+            return true;
+        } finally {
+            restoreExecutionXContext();
         }
-
-        Configuration config = getConfiguration();
-
-        // don't add a mapping that's already there
-        if (config.getClassMapping(className) != null) {
-            return false;
-        }
-
-        config.addXML(makeMapping(className, custommapping));
-        config.buildMappings();
-        return true;
     }
 
     @Override
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        if (!doc1class.hasExternalCustomMapping()) {
-            return false;
-        }
-
-        if (injectCustomMapping(doc1class.getName(), doc1class.getCustomMapping(), context)) {
-            if (!isValidCustomMapping(doc1class, getConfiguration())) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
+        try {
+            if (!doc1class.hasExternalCustomMapping()) {
+                return false;
             }
-            return true;
-        }
 
-        return false;
+            if (injectCustomMapping(doc1class.getName(), doc1class.getCustomMapping(), context)) {
+                if (!isValidCustomMapping(doc1class, getConfiguration())) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
+                }
+                return true;
+            }
+
+            return false;
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     private boolean isValidCustomMapping(BaseClass bclass, Configuration config)

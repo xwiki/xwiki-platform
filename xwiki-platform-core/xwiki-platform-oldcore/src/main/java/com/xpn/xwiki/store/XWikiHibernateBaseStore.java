@@ -51,6 +51,7 @@ import org.xwiki.logging.LoggerManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.AbstractXWikiStore;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -59,7 +60,7 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
-public class XWikiHibernateBaseStore implements Initializable
+public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initializable
 {
     /**
      * The role hint of this component.
@@ -286,22 +287,26 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public synchronized void updateSchema(XWikiContext inputxcontext, boolean force) throws HibernateException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
-
-        // We don't update the schema if the XWiki hibernate config parameter says not to update
-        if ((!force) && (context.getWiki() != null)
-            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
-            return;
-        }
-
-        LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            String[] sql = getSchemaUpdateScript(this.store.getConfiguration(), context);
-            updateSchema(sql, context);
+            // We don't update the schema if the XWiki hibernate config parameter says not to update
+            if ((!force) && (context.getWiki() != null)
+                && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
+                LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
+                return;
+            }
+
+            LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
+
+            try {
+                String[] sql = getSchemaUpdateScript(this.store.getConfiguration(), context);
+                updateSchema(sql, context);
+            } finally {
+                LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
+            }
         } finally {
-            LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
+            restoreExecutionXContext();
         }
     }
 
@@ -361,7 +366,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext inputxcontext) throws HibernateException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         String[] schemaSQL = null;
 
@@ -414,6 +419,8 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             } catch (Exception e) {
             }
+
+            restoreExecutionXContext();
         }
 
         return schemaSQL;
@@ -483,7 +490,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public void updateSchema(String[] createSQL, XWikiContext inputxcontext) throws HibernateException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         // Updating the schema for custom mappings
         Session session;
@@ -528,6 +535,8 @@ public class XWikiHibernateBaseStore implements Initializable
             } catch (Exception e) {
             }
 
+            restoreExecutionXContext();
+
             // End monitoring timer
             if (monitor != null) {
                 monitor.endTimer("sqlupgrade");
@@ -544,22 +553,26 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public void updateSchema(BaseClass bclass, XWikiContext inputxcontext) throws XWikiException, HibernateException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        String custommapping = bclass.getCustomMapping();
-        if (!bclass.hasExternalCustomMapping()) {
-            return;
+        try {
+            String custommapping = bclass.getCustomMapping();
+            if (!bclass.hasExternalCustomMapping()) {
+                return;
+            }
+
+            Configuration config = getMapping(bclass.getName(), custommapping);
+            /*
+             * if (isValidCustomMapping(bclass.getName(), config, bclass)==false) { throw new XWikiException(
+             * XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Cannot
+             * update schema for class " + bclass.getName() + " because of an invalid mapping"); }
+             */
+
+            String[] sql = getSchemaUpdateScript(config, context);
+            updateSchema(sql, context);
+        } finally {
+            restoreExecutionXContext();
         }
-
-        Configuration config = getMapping(bclass.getName(), custommapping);
-        /*
-         * if (isValidCustomMapping(bclass.getName(), config, bclass)==false) { throw new XWikiException(
-         * XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Cannot update
-         * schema for class " + bclass.getName() + " because of an invalid mapping"); }
-         */
-
-        String[] sql = getSchemaUpdateScript(config, context);
-        updateSchema(sql, context);
     }
 
     /**
@@ -859,22 +872,26 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public <T> T failSafeExecute(XWikiContext inputxcontext, boolean doCommit, HibernateCallback<T> cb)
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        final Session originalSession = this.store.getCurrentSession();
-        final Transaction originalTransaction = getTransaction(context);
-        this.store.setCurrentSession(null);
-        this.store.setCurrentTransaction(null);
-
-        this.loggerManager.pushLogListener(null);
         try {
-            return execute(context, doCommit, cb);
-        } catch (Exception ignored) {
-            return null;
+            final Session originalSession = this.store.getCurrentSession();
+            final Transaction originalTransaction = getTransaction(context);
+            this.store.setCurrentSession(null);
+            this.store.setCurrentTransaction(null);
+
+            this.loggerManager.pushLogListener(null);
+            try {
+                return execute(context, doCommit, cb);
+            } catch (Exception ignored) {
+                return null;
+            } finally {
+                this.loggerManager.popLogListener();
+                this.store.setCurrentSession(originalSession);
+                this.store.setCurrentTransaction(originalTransaction);
+            }
         } finally {
-            this.loggerManager.popLogListener();
-            this.store.setCurrentSession(originalSession);
-            this.store.setCurrentTransaction(originalTransaction);
+            restoreExecutionXContext();
         }
     }
 
@@ -889,7 +906,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public <T> T execute(XWikiContext inputxcontext, boolean doCommit, HibernateCallback<T> cb) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         boolean bTransaction = false;
@@ -922,6 +939,8 @@ public class XWikiHibernateBaseStore implements Initializable
                     LOGGER.error("Exception while close transaction", e);
                 }
             }
+
+            restoreExecutionXContext();
         }
     }
 
@@ -1036,29 +1055,6 @@ public class XWikiHibernateBaseStore implements Initializable
     protected Execution getExecution()
     {
         return this.execution;
-    }
-
-    protected XWikiContext getXWikiContext(XWikiContext inputxcontext)
-    {
-        // If not a component return input context
-        if (this.xcontextProvider == null) {
-            return inputxcontext;
-        }
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        // If no context can be found return input context
-        if (xcontext == null) {
-            return inputxcontext;
-        }
-
-        if (inputxcontext != null && xcontext != inputxcontext) {
-            LOGGER.warn(
-                "ExecutionContext and passed XWikiContext argument mismatched, for data safety, the XWikiContext from the ExecutionContext has been used.",
-                new Exception("Stack trace"));
-        }
-
-        return xcontext;
     }
 
     /**

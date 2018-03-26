@@ -251,28 +251,33 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, String batchId,
         XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        executeWrite(context, new HibernateCallback<Void>()
-        {
-            @Override
-            public Void doInHibernate(Session session) throws HibernateException, XWikiException
+        try {
+            executeWrite(context, new HibernateCallback<Void>()
             {
-                XWikiRecycleBinContentStoreInterface contentStore = getDefaultXWikiRecycleBinContentStore();
+                @Override
+                public Void doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    XWikiRecycleBinContentStoreInterface contentStore = getDefaultXWikiRecycleBinContentStore();
 
-                XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
+                    XWikiDeletedDocument trashdoc =
+                        createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
 
-                // Hibernate store.
-                long index = ((Number) session.save(trashdoc)).longValue();
+                    // Hibernate store.
+                    long index = ((Number) session.save(trashdoc)).longValue();
 
-                // External store
-                if (contentStore != null) {
-                    contentStore.save(doc, index, bTransaction);
+                    // External store
+                    if (contentStore != null) {
+                        contentStore.save(doc, index, bTransaction);
+                    }
+
+                    return null;
                 }
-
-                return null;
-            }
-        });
+            });
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     @Override
@@ -286,10 +291,14 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDocument restoreFromRecycleBin(long index, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
-        XWikiContext context = getXWikiContext(inputxcontext);
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, bTransaction);
-        return deletedDocument.restoreDocument(context);
+        try {
+            XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, bTransaction);
+            return deletedDocument.restoreDocument(context);
+        } finally {
+            restoreExecutionXContext();
+        }
     }
 
     @Override

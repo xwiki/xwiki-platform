@@ -144,6 +144,7 @@ com.xpn.xwiki.pdf.impl.PDFResourceResolver
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.script.parentchild.ParentChildScriptService
+com.xpn.xwiki.store.XWikiCacheStore
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore
 com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore

@@ -76,6 +76,8 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
 
         Provider<XWikiContext> xcontextProvider = getMocker().registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
+        xcontextProvider = getMocker().registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
 
         XWiki wiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(wiki);

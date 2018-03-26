@@ -28,7 +28,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.SimpleExpression;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDeletedDocument;

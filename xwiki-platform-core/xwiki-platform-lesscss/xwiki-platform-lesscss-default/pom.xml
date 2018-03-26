@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-lesscss</artifactId>
-    <version>10.2-SNAPSHOT</version>
+    <version>10.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-lesscss-default</artifactId>
   <name>XWiki Platform - LESS CSS - Default</name>

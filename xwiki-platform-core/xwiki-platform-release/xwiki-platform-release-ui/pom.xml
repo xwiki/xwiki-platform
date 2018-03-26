@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-release</artifactId>
-    <version>10.2-SNAPSHOT</version>
+    <version>10.2</version>
   </parent>
   <artifactId>xwiki-platform-release-ui</artifactId>
   <name>XWiki Platform - Release - UI</name>

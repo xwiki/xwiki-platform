@@ -73,6 +73,11 @@ public class GroovyJob extends AbstractJob
                 // Make the Job execution data available to the Groovy script
                 Binding binding = new Binding(data.getWrappedMap());
 
+                // Set the right instance of XWikiContext
+                binding.setProperty("context", getXWikiContext());
+                binding.setProperty("xcontext", getXWikiContext());
+                data.put("xwiki", new com.xpn.xwiki.api.XWiki(getXWikiContext().getWiki(), getXWikiContext()));
+
                 // Execute the Groovy script
                 GroovyShell shell = new GroovyShell(Thread.currentThread().getContextClassLoader(), binding);
                 shell.evaluate(object.getLargeStringValue("script"));

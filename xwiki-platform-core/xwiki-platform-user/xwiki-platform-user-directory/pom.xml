@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>9.11.4</version>
+    <version>9.11.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-directory</artifactId>
   <name>XWiki Platform - User - Directory - Parent POM</name>

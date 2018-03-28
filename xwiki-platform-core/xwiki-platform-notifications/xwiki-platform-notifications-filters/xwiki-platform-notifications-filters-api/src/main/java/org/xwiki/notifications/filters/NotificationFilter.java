@@ -62,7 +62,7 @@ public interface NotificationFilter extends Comparable
         KEEP,
 
         /**
-         * Value used when the filter has no impact in the given event.
+         * Value used when the filter has no impact on the given event.
          */
         NO_EFFECT
     }

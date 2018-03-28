@@ -37,6 +37,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -195,27 +196,32 @@ public class ScopeNotificationFilterTest
         // Test with wikiA:SpaceE (filtered by β)
         Event event1 = mock(Event.class);
         when(event1.getSpace()).thenReturn(new SpaceReference("SpaceE", wikiReference));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event1, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event1, user, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.DocumentE (kept by γ)
         Event event2 = mock(Event.class);
         when(event2.getDocument()).thenReturn(new DocumentReference("DocumentE", spaceReferenceB));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event2, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event2, user, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.SpaceC.DocumentF (filtered by δ)
         Event event3 = mock(Event.class);
         when(event3.getDocument()).thenReturn(new DocumentReference("DocumentF", spaceReferenceC));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event3, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event3, user, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.SpaceC.SpaceD.DocumentG (kept by ε)
         Event event4 = mock(Event.class);
         when(event4.getDocument()).thenReturn(new DocumentReference("DocumentG", spaceReferenceD));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event4, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event4, user, NotificationFormat.ALERT));
 
         // Test with wikiB:SpaceH.DocumentI - kept because nothing match and there is no top level inclusive filter
         Event event5 = mock(Event.class);
         when(event5.getDocument()).thenReturn(new DocumentReference("wikiB", "SpaceH", "DocumentI"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event5, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event5, user, NotificationFormat.ALERT));
     }
 
     @Test
@@ -259,21 +265,25 @@ public class ScopeNotificationFilterTest
         // Test with wikiA:SpaceE (filtered by γ & ζ)
         Event event1 = mock(Event.class);
         when(event1.getSpace()).thenReturn(new SpaceReference("SpaceE", wikiReference));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event1, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event1, user, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.DocumentJ (kept by γ)
         Event event2 = mock(Event.class);
         when(event2.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceB", "DocumentJ"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event2, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event2, user, NotificationFormat.ALERT));
 
         // Test with wikiB:SpaceK.DocumentL (filtered by γ & ζ)
         Event event3 = mock(Event.class);
         when(event3.getDocument()).thenReturn(new DocumentReference("wikiB", "SpaceK", "DocumentL"));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event3, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event3, user, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceM.DocumentN (kept by ζ)
         Event event4 = mock(Event.class);
         when(event4.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event4, user, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event4, user, NotificationFormat.ALERT));
     }
 }

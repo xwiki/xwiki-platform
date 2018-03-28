@@ -57,4 +57,11 @@ public class EventReadAlertFilter extends AbstractEventReadFilter
     {
         return Collections.singletonList(NotificationFormat.ALERT);
     }
+
+    @Override
+    public int getPriority()
+    {
+        // It's the most important priority
+        return 4000;
+    }
 }

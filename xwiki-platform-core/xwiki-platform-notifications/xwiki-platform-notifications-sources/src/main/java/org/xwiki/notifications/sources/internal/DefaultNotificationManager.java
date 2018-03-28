@@ -252,9 +252,19 @@ public class DefaultNotificationManager implements NotificationManager
             return true;
         }
 
-        for (NotificationFilter filter : notificationFilterManager.getAllFilters(parameters.userReference)) {
-            if (filter.filterEvent(event, parameters.userReference, parameters.format)) {
-                return true;
+        List<NotificationFilter> filters
+                = new ArrayList<>(notificationFilterManager.getAllFilters(parameters.userReference));
+        Collections.sort(filters);
+        for (NotificationFilter filter : filters) {
+            NotificationFilter.FilterPolicy policy = filter.filterEvent(event, parameters.userReference,
+                    parameters.format);
+            switch (policy) {
+                case FILTER:
+                    return true;
+                case KEEP:
+                    return false;
+                default:
+                    // Do nothing
             }
         }
 

@@ -61,9 +61,10 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
     }
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return event.getType().equals(UPDATE_TYPE) && !event.getDocumentVersion().endsWith(VERSION_SCHEME);
+        return event.getType().equals(UPDATE_TYPE) && !event.getDocumentVersion().endsWith(VERSION_SCHEME)
+                ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
     }
 
     @Override
@@ -97,5 +98,12 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
     public String getName()
     {
         return filterName;
+    }
+
+    @Override
+    public int getPriority()
+    {
+        // It's the most important priority
+        return 4000;
     }
 }

@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -32,7 +33,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,9 +55,12 @@ public class MinorEventNotificationFilterTest
         when(event2.getDocumentVersion()).thenReturn("2.12");
         when(event3.getType()).thenReturn("update");
         when(event3.getDocumentVersion()).thenReturn("2.1");
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event1, randomUser, NotificationFormat.ALERT));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event2, randomUser, NotificationFormat.ALERT));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event3, randomUser, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event1, randomUser, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event2, randomUser, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event3, randomUser, NotificationFormat.ALERT));
     }
 
     @Test

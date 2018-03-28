@@ -67,9 +67,10 @@ public class SystemUserNotificationFilter implements NotificationFilter, Togglea
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return event.getUser().getLocalDocumentReference().equals(SYSTEM_USER);
+        return event.getUser().getLocalDocumentReference().equals(SYSTEM_USER)
+                ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
     }
 
     @Override

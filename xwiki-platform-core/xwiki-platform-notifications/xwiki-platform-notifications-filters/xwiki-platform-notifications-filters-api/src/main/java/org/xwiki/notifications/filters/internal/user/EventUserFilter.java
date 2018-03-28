@@ -62,9 +62,16 @@ public class EventUserFilter implements NotificationFilter
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return preferencesGetter.isUserExcluded(serializer.serialize(event.getUser()), user, format);
+        final String eventUserId = serializer.serialize(event.getUser());
+        if (preferencesGetter.isUserExcluded(eventUserId, user, format)) {
+            return FilterPolicy.FILTER;
+        }
+        if (preferencesGetter.isUsedFollowed(eventUserId, user, format)) {
+            return FilterPolicy.KEEP;
+        }
+        return FilterPolicy.NO_EFFECT;
     }
 
     @Override
@@ -90,6 +97,11 @@ public class EventUserFilter implements NotificationFilter
             if (!users.isEmpty()) {
                 return not(value(EventProperty.USER).inStrings(users));
             }
+        } else {
+            Collection<String> users = preferencesGetter.getFollowedUsers(user, format);
+            if (!users.isEmpty()) {
+                return value(EventProperty.USER).inStrings(users);
+            }
         }
 
         return null;
@@ -99,5 +111,13 @@ public class EventUserFilter implements NotificationFilter
     public String getName()
     {
         return FILTER_NAME;
+    }
+
+    @Override
+    public int getPriority()
+    {
+        // Since we want to force some event to be kept when the user is followed, we need a high priority
+        // (default is 1000).
+        return 2000;
     }
 }

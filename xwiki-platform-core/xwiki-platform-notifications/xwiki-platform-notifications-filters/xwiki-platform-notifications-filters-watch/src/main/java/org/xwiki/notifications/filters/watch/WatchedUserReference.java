@@ -65,7 +65,7 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public boolean isWatched(DocumentReference userReference)
     {
-        return !preferencesGetter.isUserExcluded(userId, userReference, null);
+        return preferencesGetter.isUsedFollowed(userId, userReference, null);
     }
 
     @Override
@@ -80,8 +80,24 @@ public class WatchedUserReference implements WatchedEntityReference
     @Override
     public NotificationFilterPreference createInclusiveFilterPreference()
     {
-        // Not handled
-        return null;
+        DefaultNotificationFilterPreference filterPreference
+                = new DefaultNotificationFilterPreference(Long.toString(new Date().getTime()));
+
+        filterPreference.setEnabled(true);
+        filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
+        filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
+        filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
+        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
+        filterPreference.setActive(true);
+
+        // Properties
+        Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
+        filterPreference.setPreferenceProperties(preferenceProperties);
+
+        preferenceProperties.put(NotificationFilterProperty.EVENT_TYPE, Collections.emptyList());
+        preferenceProperties.put(NotificationFilterProperty.USER, Collections.singletonList(userId));
+
+        return filterPreference;
     }
 
     @Override

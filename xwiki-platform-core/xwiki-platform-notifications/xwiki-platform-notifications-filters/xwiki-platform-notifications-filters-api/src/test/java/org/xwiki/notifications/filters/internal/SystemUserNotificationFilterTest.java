@@ -26,6 +26,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -33,7 +34,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -72,9 +72,11 @@ public class SystemUserNotificationFilterTest
     @Test
     public void filterEvent() throws Exception
     {
-        assertFalse(mocker.getComponentUnderTest().filterEvent(nonSystemEvent, randomUser,
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(nonSystemEvent, randomUser,
                 NotificationFormat.ALERT));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(systemEvent, randomUser,
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(systemEvent, randomUser,
                 NotificationFormat.ALERT));
     }
 

@@ -48,6 +48,7 @@ import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
+import com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
@@ -80,6 +81,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ComponentList({
     CompactStringEntityReferenceSerializer.class,
     CompactWikiStringEntityReferenceSerializer.class,
+    CurrentAttachmentReferenceResolver.class,
     CurrentEntityReferenceProvider.class,
     CurrentMixedEntityReferenceProvider.class,
     CurrentMixedReferenceDocumentReferenceResolver.class,

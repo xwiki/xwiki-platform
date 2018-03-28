@@ -701,6 +701,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.slf4j", "log4j-over-slf4j",
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
 
+        // Filesystem store is the default so we want to test it as much as possible
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-store-filesystem-oldcore", getXWikiPlatformVersion(), null, "jar"));
+
         // Add a special JAR used for functional tests to discover if some scripts in some wiki page require Programming
         // Rights.
         if (this.test && !isSkipTests() && this.testProgrammingRights) {

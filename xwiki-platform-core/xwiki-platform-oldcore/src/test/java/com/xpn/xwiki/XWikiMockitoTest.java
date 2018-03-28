@@ -46,32 +46,27 @@ import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor;
-
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -92,7 +87,8 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList({DefaultBatchOperationExecutor.class, DefaultExecution.class})
+@ComponentList({ DefaultBatchOperationExecutor.class, DefaultExecution.class })
+@ReferenceComponentList
 public class XWikiMockitoTest
 {
     /**
@@ -120,26 +116,12 @@ public class XWikiMockitoTest
     @Before
     public void setUp() throws Exception
     {
-        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
-        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
-        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "currentmixed");
-        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
-        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
-        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        this.mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
-        this.mocker.registerMockComponent(EntityReferenceProvider.class);
         this.mocker.registerMockComponent(ResourceReferenceManager.class);
         this.mocker.registerMockComponent(Environment.class);
         this.mocker.registerMockComponent(ObservationManager.class);
         this.mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
+        this.mocker.registerMockComponent(StoreConfiguration.class);
+        this.mocker.registerMockComponent(WikiDescriptorManager.class);
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();
@@ -366,13 +348,9 @@ public class XWikiMockitoTest
 
         DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space.withdot.and\\and:"), "page");
 
-        EntityReferenceSerializer<String> serializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(serializer.serialize(reference.getLastSpaceReference())).thenReturn("somescapedspace");
-
         this.xwiki.getURL(reference, "view", null, null, context);
 
-        verify(urlFactory).createURL("somescapedspace", "page", "view", null, null, "wiki", context);
+        verify(urlFactory).createURL("space\\.withdot\\.and\\\\and\\:", "page", "view", null, null, "wiki", context);
     }
 
     @Test
@@ -382,10 +360,6 @@ public class XWikiMockitoTest
         context.setURLFactory(urlFactory);
 
         DocumentReference reference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
-
-        EntityReferenceSerializer<String> serializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(serializer.serialize(reference.getLastSpaceReference())).thenReturn("Space");
 
         this.xwiki.getURL(reference, "view", null, null, context);
         verify(urlFactory).createURL("Space", "Page", "view", "language=fr", null, "wiki", context);
@@ -403,22 +377,8 @@ public class XWikiMockitoTest
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
         context.setURLFactory(urlFactory);
 
-        EntityReferenceSerializer<String> localSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localSerializer.serialize(documentReference.getLastSpaceReference())).thenReturn("Path.To");
-
-        // Document Entity
-        DocumentReferenceResolver<EntityReference> documentResolver =
-            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
-        when(documentResolver.resolve(documentReference)).thenReturn(documentReference);
-
         this.xwiki.getURL(documentReference, this.context);
         verify(urlFactory).createURL("Path.To", "Success", "view", null, null, "tennis", this.context);
-
-        // Attachment Entity
-        AttachmentReferenceResolver<EntityReference> attachmentResolver =
-            this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_REFERENCE, "current");
-        when(attachmentResolver.resolve(attachmentReference)).thenReturn(attachmentReference);
 
         this.xwiki.getURL(attachmentReference, this.context);
         verify(urlFactory).createAttachmentURL("image.png", "Path.To", "Success", "download", null, "tennis",

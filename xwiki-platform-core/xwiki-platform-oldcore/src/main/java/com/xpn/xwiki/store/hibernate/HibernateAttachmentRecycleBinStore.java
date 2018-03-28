@@ -46,6 +46,7 @@ import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.DeletedAttachmentContent;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateDeletedAttachmentContent;
 import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
@@ -74,6 +75,9 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     @Inject
     @Named("xwikicfg")
     private ConfigurationSource configuration;
+
+    @Inject
+    private StoreConfiguration storeConfiguration;
 
     @Inject
     private ComponentManager componentManager;
@@ -265,11 +269,14 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         }
     }
 
-    private AttachmentRecycleBinContentStore getDefaultAttachmentRecycleBinContentStore()
+    private AttachmentRecycleBinContentStore getDefaultAttachmentRecycleBinContentStore() throws XWikiException
     {
-        String storeType = this.configuration.getProperty("xwiki.store.attachment.recyclebin.content.hint");
-
-        return getAttachmentRecycleBinContentStore(storeType);
+        try {
+            return this.storeConfiguration.getAttachmentRecycleBinContentStore();
+        } catch (ComponentLookupException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to lookup attachment recycle bin content store", e);
+        }
     }
 
     protected AttachmentRecycleBinContentStore getAttachmentRecycleBinContentStore(String storeType)

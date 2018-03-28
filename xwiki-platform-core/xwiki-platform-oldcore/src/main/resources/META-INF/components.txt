@@ -109,6 +109,7 @@ com.xpn.xwiki.internal.skin.InternalSkinManager
 com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.script.DebugInternalScriptService
 com.xpn.xwiki.internal.script.DocumentScriptSafeProvider
+com.xpn.xwiki.internal.store.StoreConfiguration
 com.xpn.xwiki.internal.store.hibernate.HibernateStore
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager

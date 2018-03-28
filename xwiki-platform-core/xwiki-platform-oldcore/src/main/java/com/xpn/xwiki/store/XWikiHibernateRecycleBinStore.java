@@ -45,6 +45,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.XWikiHibernateDeletedDocumentContent;
 
 /**
@@ -146,6 +147,9 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     private ConfigurationSource configuration;
 
     @Inject
+    private StoreConfiguration storeConfiguration;
+
+    @Inject
     private ComponentManager componentManager;
 
     @Inject
@@ -168,11 +172,14 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     {
     }
 
-    private XWikiRecycleBinContentStoreInterface getDefaultXWikiRecycleBinContentStore()
+    private XWikiRecycleBinContentStoreInterface getDefaultXWikiRecycleBinContentStore() throws XWikiException
     {
-        String storeType = this.configuration.getProperty("xwiki.store.recyclebin.content.hint");
-
-        return getXWikiRecycleBinContentStore(storeType);
+        try {
+            return this.storeConfiguration.getXWikiRecycleBinContentStore();
+        } catch (ComponentLookupException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to lookup recycle bin content store", e);
+        }
     }
 
     private XWikiRecycleBinContentStoreInterface getXWikiRecycleBinContentStore(String storeType)

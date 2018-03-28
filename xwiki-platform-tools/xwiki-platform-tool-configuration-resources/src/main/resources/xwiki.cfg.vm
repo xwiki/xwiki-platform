@@ -92,18 +92,22 @@ xwiki.tags=1
 #-# one of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint
 #-# other than 'default') and put its hint here.
 #
-#-# Stores with both "hibernate" and "file" support by default.
+#-# Stores with both "hibernate" and "file" support in XWiki Standard.
 #-# 
-#-# [Since 9.0RC1] The default document content recycle bin storage. Default is hibernate.
+#-# [Since 9.0RC1] The default document content recycle bin storage.
 #-# This property is only taken into account when deleting a document and has no effect on already deleted documents.
-# xwiki.store.recyclebin.content.hint=hibernate
-#-# The attachment storage. [Since 3.4M1] default is hibernate.
-# xwiki.store.attachment.hint=hibernate
-#-# The attachment versioning storage. Use 'void' to disable attachment versioning. [Since 3.4M1] default is hibernate.
-# xwiki.store.attachment.versioning.hint=hibernate
-#-# [Since 9.9RC1] The default attachment content recycle bin storage. Default is hibernate.
+#-# [Since 10.3] default is file.
+# xwiki.store.recyclebin.content.hint=file
+#-# The attachment storage.
+#-# [Since 10.3] default is file.
+# xwiki.store.attachment.hint=file
+#-# The attachment versioning storage. Use 'void' to disable attachment versioning.
+#-# [Since 10.3] default is file.
+# xwiki.store.attachment.versioning.hint=file
+#-# [Since 9.9RC1] The default attachment content recycle bin storage.
 #-# This property is only taken into account when deleting an attachment and has no effect on already deleted documents.
-# xwiki.store.attachment.recyclebin.content.hint=hibernate
+#-# [Since 10.3] default is file.
+# xwiki.store.attachment.recyclebin.content.hint=file
 #-# 
 #-# Stores with only "hibernate" support by default
 #-# 

@@ -193,6 +193,7 @@ import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -211,7 +212,6 @@ import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -400,6 +400,8 @@ public class XWiki implements EventListener
 
     private EditConfiguration editConfiguration;
 
+    private StoreConfiguration storeConfiguration;
+
     private ObservationManager observationManager;
 
     private Provider<XWikiContext> xcontextProvider;
@@ -471,6 +473,15 @@ public class XWiki implements EventListener
         }
 
         return this.editConfiguration;
+    }
+
+    private StoreConfiguration getStoreConfiguration()
+    {
+        if (this.storeConfiguration == null) {
+            this.storeConfiguration = Utils.getComponent(StoreConfiguration.class);
+        }
+
+        return this.storeConfiguration;
     }
 
     private InternalSkinManager getInternalSkinManager()
@@ -1152,45 +1163,15 @@ public class XWiki implements EventListener
                 setConfig(config);
             }
 
-            XWikiStoreInterface mainStore = Utils.getComponent(XWikiStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.main.hint", XWikiHibernateBaseStore.HINT));
-
-            // Check if we need to use the cache store..
-            boolean nocache = "0".equals(getConfiguration().getProperty("xwiki.store.cache", "1"));
-            if (!nocache) {
-                XWikiCacheStoreInterface cachestore =
-                    (XWikiCacheStoreInterface) Utils.getComponent(XWikiStoreInterface.class, "cache");
-                cachestore.setStore(mainStore);
-                setStore(cachestore);
-            } else {
-                setStore(mainStore);
+            try {
+                initializeStores();
+            } catch (ComponentLookupException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to initialize stores", e);
             }
 
             setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
                 "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
-
-            setDefaultAttachmentContentStore(
-                Utils.<XWikiAttachmentStoreInterface>getComponent(XWikiAttachmentStoreInterface.class,
-                    getConfiguration().getProperty("xwiki.store.attachment.hint", XWikiHibernateBaseStore.HINT)));
-
-            setVersioningStore(Utils.<XWikiVersioningStoreInterface>getComponent(XWikiVersioningStoreInterface.class,
-                getConfiguration().getProperty("xwiki.store.versioning.hint", XWikiHibernateBaseStore.HINT)));
-
-            setDefaultAttachmentArchiveStore(Utils.<AttachmentVersioningStore>getComponent(
-                AttachmentVersioningStore.class, hasAttachmentVersioning(context) ? getConfiguration()
-                    .getProperty("xwiki.store.attachment.versioning.hint", XWikiHibernateBaseStore.HINT) : "void"));
-
-            if (hasRecycleBin(context)) {
-                setRecycleBinStore(
-                    Utils.<XWikiRecycleBinStoreInterface>getComponent(XWikiRecycleBinStoreInterface.class,
-                        getConfiguration().getProperty("xwiki.store.recyclebin.hint", XWikiHibernateBaseStore.HINT)));
-            }
-
-            if (hasAttachmentRecycleBin(context)) {
-                setAttachmentRecycleBinStore(
-                    Utils.<AttachmentRecycleBinStore>getComponent(AttachmentRecycleBinStore.class, getConfiguration()
-                        .getProperty("xwiki.store.attachment.recyclebin.hint", XWikiHibernateBaseStore.HINT)));
-            }
 
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
             // potential document changes can use it
@@ -1228,6 +1209,27 @@ public class XWiki implements EventListener
         } finally {
             getProgress().popLevelProgress(this);
         }
+    }
+
+    private void initializeStores() throws ComponentLookupException
+    {
+        XWikiStoreInterface mainStore = getStoreConfiguration().getXWikiStore();
+
+        // Check if we need to use the cache store..
+        if (getStoreConfiguration().isStoreCacheEnabled()) {
+            XWikiCacheStoreInterface cachestore =
+                (XWikiCacheStoreInterface) Utils.getComponent(XWikiStoreInterface.class, "cache");
+            cachestore.setStore(mainStore);
+            setStore(cachestore);
+        } else {
+            setStore(mainStore);
+        }
+
+        setDefaultAttachmentContentStore(getStoreConfiguration().getXWikiAttachmentStore());
+        setVersioningStore(getStoreConfiguration().getXWikiVersioningStore());
+        setDefaultAttachmentArchiveStore(getStoreConfiguration().getAttachmentVersioningStore());
+        setRecycleBinStore(getStoreConfiguration().getXWikiRecycleBinStore());
+        setAttachmentRecycleBinStore(getStoreConfiguration().getAttachmentRecycleBinStore());
     }
 
     /**
@@ -6131,7 +6133,7 @@ public class XWiki implements EventListener
      */
     public boolean hasRecycleBin(XWikiContext context)
     {
-        return "1".equals(getConfiguration().getProperty("xwiki.recyclebin", "1"));
+        return getStoreConfiguration().isRecycleBinEnabled();
     }
 
     /**
@@ -6142,7 +6144,7 @@ public class XWiki implements EventListener
      */
     public boolean hasAttachmentRecycleBin(XWikiContext context)
     {
-        return "1".equals(getConfiguration().getProperty("storage.attachment.recyclebin", "1"));
+        return getStoreConfiguration().isAttachmentRecycleBinEnabled();
     }
 
     /**
@@ -6508,12 +6510,12 @@ public class XWiki implements EventListener
      */
     public boolean hasVersioning(XWikiContext context)
     {
-        return ("1".equals(getConfiguration().getProperty("xwiki.store.versioning", "1")));
+        return getStoreConfiguration().isVersioningEnabled();
     }
 
     public boolean hasAttachmentVersioning(XWikiContext context)
     {
-        return ("1".equals(getConfiguration().getProperty("xwiki.store.attachment.versioning", "1")));
+        return getStoreConfiguration().isAttachmentVersioningEnabled();
     }
 
     public String getExternalAttachmentURL(String fullName, String filename, XWikiContext context)

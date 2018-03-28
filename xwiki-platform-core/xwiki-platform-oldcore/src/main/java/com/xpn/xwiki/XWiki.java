@@ -210,7 +210,6 @@ import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -1159,7 +1158,9 @@ public class XWiki implements EventListener
             // Check if we need to use the cache store..
             boolean nocache = "0".equals(getConfiguration().getProperty("xwiki.store.cache", "1"));
             if (!nocache) {
-                XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
+                XWikiCacheStoreInterface cachestore =
+                    (XWikiCacheStoreInterface) Utils.getComponent(XWikiStoreInterface.class, "cache");
+                cachestore.setStore(mainStore);
                 setStore(cachestore);
             } else {
                 setStore(mainStore);

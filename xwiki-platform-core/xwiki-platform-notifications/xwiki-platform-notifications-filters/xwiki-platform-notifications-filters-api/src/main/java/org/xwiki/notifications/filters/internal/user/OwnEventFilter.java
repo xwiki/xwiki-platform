@@ -57,9 +57,9 @@ public class OwnEventFilter implements NotificationFilter, ToggleableNotificatio
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
-        return user.equals(event.getUser());
+        return user.equals(event.getUser()) ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
     }
 
     @Override

@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-notifications-filters-watch</artifactId>
   <name>XWiki Platform - Notifications - Filters - Watch</name>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.14</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

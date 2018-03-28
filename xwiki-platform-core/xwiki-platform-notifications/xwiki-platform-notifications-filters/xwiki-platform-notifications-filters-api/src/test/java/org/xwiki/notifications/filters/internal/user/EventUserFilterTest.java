@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -40,10 +41,8 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -145,11 +144,16 @@ public class EventUserFilterTest
         when(event5.getUser()).thenReturn(USER_E);
 
         // Test
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event1, CURRENT_USER, NotificationFormat.ALERT));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event2, CURRENT_USER, NotificationFormat.ALERT));
-        assertTrue(mocker.getComponentUnderTest().filterEvent(event3, CURRENT_USER, NotificationFormat.ALERT));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event4, CURRENT_USER, NotificationFormat.ALERT));
-        assertFalse(mocker.getComponentUnderTest().filterEvent(event5, CURRENT_USER, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event1, CURRENT_USER, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event2, CURRENT_USER, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
+                mocker.getComponentUnderTest().filterEvent(event3, CURRENT_USER, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event4, CURRENT_USER, NotificationFormat.ALERT));
+        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+                mocker.getComponentUnderTest().filterEvent(event5, CURRENT_USER, NotificationFormat.ALERT));
     }
 
     @Test

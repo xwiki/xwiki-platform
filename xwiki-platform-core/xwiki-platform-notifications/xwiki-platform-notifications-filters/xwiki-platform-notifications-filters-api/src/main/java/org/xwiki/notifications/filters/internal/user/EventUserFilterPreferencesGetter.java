@@ -59,9 +59,36 @@ public class EventUserFilterPreferencesGetter
      */
     public boolean isUserExcluded(String testUser, DocumentReference user, NotificationFormat format)
     {
-        return getPreferences(user, format).anyMatch(
+        return getPreferences(user, format, NotificationFilterType.EXCLUSIVE).anyMatch(
             pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
         );
+    }
+
+    /**
+     * @param testUser user to test
+     * @param user the user for who we compute the notifications
+     * @param format the notification format (could be null)
+     * @return either or not the user to test is part of the followed users of the given user
+     * @since 10.3RC1
+     * @since 9.11.5
+     */
+    public boolean isUsedFollowed(String testUser, DocumentReference user, NotificationFormat format)
+    {
+        return getPreferences(user, format, NotificationFilterType.INCLUSIVE).anyMatch(
+            pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
+        );
+    }
+
+    /**
+     * @param user the user for who we compute the notifications
+     * @param format the notification format (could be null)
+     * @return the collection of users followed by the given user
+     * @since 10.3RC1
+     * @since 9.11.5
+     */
+    public Collection<String> getFollowedUsers(DocumentReference user, NotificationFormat format)
+    {
+        return collect(getPreferences(user, format, NotificationFilterType.INCLUSIVE));
     }
 
     /**
@@ -71,7 +98,7 @@ public class EventUserFilterPreferencesGetter
      */
     public Collection<String> getExcludedUsers(DocumentReference user, NotificationFormat format)
     {
-        return collect(getPreferences(user, format));
+        return collect(getPreferences(user, format, NotificationFilterType.EXCLUSIVE));
     }
 
     private Collection<String> collect(Stream<NotificationFilterPreference> stream)
@@ -81,13 +108,13 @@ public class EventUserFilterPreferencesGetter
     }
 
     private Stream<NotificationFilterPreference> getPreferences(DocumentReference user,
-            NotificationFormat format)
+            NotificationFormat format, NotificationFilterType filterType)
     {
         try {
             return notificationFilterManager.getFilterPreferences(user).stream().filter(
                 pref -> matchFilter(pref)
                     && matchFormat(pref, format)
-                    && matchFilterType(pref)
+                    && matchFilterType(pref, filterType)
                     && matchAllEvents(pref)
             );
         } catch (Exception e) {
@@ -106,9 +133,9 @@ public class EventUserFilterPreferencesGetter
         return pref.isEnabled() && EventUserFilter.FILTER_NAME.equals(pref.getFilterName());
     }
 
-    private boolean matchFilterType(NotificationFilterPreference pref)
+    private boolean matchFilterType(NotificationFilterPreference pref, NotificationFilterType filterType)
     {
-        return pref.getFilterType() == NotificationFilterType.EXCLUSIVE;
+        return pref.getFilterType() == filterType;
     }
 
     /**
@@ -117,7 +144,8 @@ public class EventUserFilterPreferencesGetter
      */
     private boolean matchAllEvents(NotificationFilterPreference filterPreference)
     {
-        // When the list of event types concerned by the filter is empty, we consider that the filter concerns
+        // When the list of event types concerned by the filter i
+        // s empty, we consider that the filter concerns
         // all events.
         return filterPreference.getProperties(NotificationFilterProperty.EVENT_TYPE).isEmpty();
     }

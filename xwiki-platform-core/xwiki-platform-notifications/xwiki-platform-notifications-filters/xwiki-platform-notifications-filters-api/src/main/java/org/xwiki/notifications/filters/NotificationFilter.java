@@ -42,8 +42,31 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
-public interface NotificationFilter
+public interface NotificationFilter extends Comparable
 {
+    /**
+     * The different behaviours a filter could have regarding an event.
+     * @since 9.11.5
+     * @since 10.3RC1
+     */
+    enum FilterPolicy
+    {
+        /**
+         * Value used when the event must be not returned.
+         */
+        FILTER,
+
+        /**
+         * Value used when the event must be kept.
+         */
+        KEEP,
+
+        /**
+         * Value used when the filter has no impact in the given event.
+         */
+        NO_EFFECT
+    }
+
     /**
      * Enable or disable an event in the notification list (post-filter).
      *
@@ -51,8 +74,10 @@ public interface NotificationFilter
      * @param user the user interested in the notification
      * @param format format of the notification
      * @return true if the event should be dismiss
+     * @since 9.11.5
+     * @since 10.3RC1
      */
-    boolean filterEvent(Event event, DocumentReference user, NotificationFormat format);
+    FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format);
 
     /**
      * Determine if the current filter can be applied to the given preference.
@@ -100,4 +125,25 @@ public interface NotificationFilter
      * @since 9.7RC1
      */
     String getName();
+
+    /**
+     * @return the priority of the filter. The higher it is, the more important the result of
+     * {@link NotificationFilter#filterEvent(Event event, DocumentReference user, NotificationFormat format) is}.
+     *
+     * @since 9.11.5
+     * @since 10.3RC1
+     */
+    default int getPriority() {
+        return 1000;
+    }
+
+    @Override
+    default int compareTo(Object o)
+    {
+        if (o instanceof NotificationFilter) {
+            NotificationFilter other = (NotificationFilter) o;
+            return other.getPriority() - this.getPriority();
+        }
+        return 0;
+    }
 }

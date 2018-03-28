@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.live;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -84,23 +85,38 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
         if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
-            for (NotificationFilter filter : this.notificationFilterManager.getAllFilters(user)) {
-                Iterator<Event> it = resultCompositeEvent.getEvents().iterator();
-                while (it.hasNext()) {
-                    Event event = it.next();
-                    if (filter.filterEvent(event, user, NotificationFormat.EMAIL)) {
-                        it.remove();
-                        if (resultCompositeEvent.getEvents().size() == 0) {
-                            return Collections.emptyList();
-                        }
-                    }
+            List<NotificationFilter> filters
+                    = new ArrayList<>(notificationFilterManager.getAllFilters(user));
+            Collections.sort(filters);
+            Iterator<Event> it = resultCompositeEvent.getEvents().iterator();
+            while (it.hasNext()) {
+                Event event = it.next();
+                if (isEventFiltered(filters, event, user)) {
+                    it.remove();
                 }
+            }
+            if (resultCompositeEvent.getEvents().size() == 0) {
+                return Collections.emptyList();
             }
 
             return Collections.singletonList(resultCompositeEvent);
         }
 
         return Collections.emptyList();
+    }
+
+    public boolean isEventFiltered(List<NotificationFilter> filters, Event event, DocumentReference user)
+    {
+        for (NotificationFilter filter : filters) {
+            NotificationFilter.FilterPolicy policy = filter.filterEvent(event, user, NotificationFormat.EMAIL);
+            switch (policy) {
+                case FILTER:
+                    return true;
+                case KEEP:
+                default:
+                    return false;
+            }
+        }
     }
 
     /**

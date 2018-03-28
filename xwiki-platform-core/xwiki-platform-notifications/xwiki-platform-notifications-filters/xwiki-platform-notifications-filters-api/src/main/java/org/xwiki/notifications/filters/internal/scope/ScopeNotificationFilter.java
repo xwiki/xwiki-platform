@@ -58,16 +58,17 @@ public class ScopeNotificationFilter implements NotificationFilter
     private ScopeNotificationFilterExpressionGenerator expressionGenerator;
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
         final EntityReference eventEntity = getEventEntity(event);
         if (eventEntity == null) {
             // We don't handle events that are not related to a particular location
-            return false;
+            return FilterPolicy.NO_EFFECT;
         }
 
         // We dismiss the event if the location is not watched
-        return !stateComputer.isLocationWatched(user, eventEntity, event.getType(), format);
+        return !stateComputer.isLocationWatched(user, eventEntity, event.getType(), format) ? FilterPolicy.FILTER
+                : FilterPolicy.NO_EFFECT;
     }
 
     @Override

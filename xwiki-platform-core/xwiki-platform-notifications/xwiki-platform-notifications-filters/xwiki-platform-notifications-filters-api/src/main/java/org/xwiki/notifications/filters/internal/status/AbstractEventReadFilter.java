@@ -54,10 +54,10 @@ public abstract class AbstractEventReadFilter implements NotificationFilter, Tog
     }
 
     @Override
-    public boolean filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
     {
         // We only handle it at the expression level to avoid too much accesses to the database
-        return false;
+        return FilterPolicy.NO_EFFECT;
     }
 
     @Override

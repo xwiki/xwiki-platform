@@ -117,6 +117,8 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
                     return false;
             }
         }
+
+        return false;
     }
 
     /**

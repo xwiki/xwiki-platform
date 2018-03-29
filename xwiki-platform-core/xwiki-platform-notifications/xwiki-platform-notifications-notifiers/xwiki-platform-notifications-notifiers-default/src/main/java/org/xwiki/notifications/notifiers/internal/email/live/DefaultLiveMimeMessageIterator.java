@@ -78,6 +78,7 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
      * If, for any reason, one of the events of the original composite event is not meant for the user, we clone
      * the original composite event and remove the incriminated event.
      */
+    @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
         CompositeEvent resultCompositeEvent = new CompositeEvent(this.compositeEvent);
@@ -105,7 +106,7 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
         return Collections.emptyList();
     }
 
-    public boolean isEventFiltered(List<NotificationFilter> filters, Event event, DocumentReference user)
+    private boolean isEventFiltered(List<NotificationFilter> filters, Event event, DocumentReference user)
     {
         for (NotificationFilter filter : filters) {
             NotificationFilter.FilterPolicy policy = filter.filterEvent(event, user, NotificationFormat.EMAIL);

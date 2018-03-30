@@ -65,9 +65,14 @@ public class AllTests
             properties.setProperty("observation.remote.channels", channelName);
             executor.saveXWikiProperties();
 
-            // Force bind_addr since tcp jgroups configuration expect cluster members to listen localhost by default
-            executor.setXWikiOpts("-Djgroups.bind_addr=localhost -Xmx512m -XX:MaxPermSize=128m");
+            setupExecutor(executor);
         }
+    }
+
+    public static void setupExecutor(XWikiExecutor executor)
+    {
+        // Force bind_addr since tcp jgroups configuration expect cluster members to listen localhost by default
+        executor.setXWikiOpts("-Djgroups.bind_addr=localhost -Xmx512m -XX:MaxPermSize=128m");
     }
 
     private void setupRepositories(XWikiExecutor executor) throws Exception

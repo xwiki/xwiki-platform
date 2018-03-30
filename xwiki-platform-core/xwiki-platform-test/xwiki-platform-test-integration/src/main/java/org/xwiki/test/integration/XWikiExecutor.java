@@ -155,7 +155,12 @@ public class XWikiExecutor
         if (this.executionDirectory == null) {
             this.executionDirectory = DEFAULT_EXECUTION_DIRECTORY;
             if (this.executionDirectory == null) {
-                this.executionDirectory = BASEDIR + "/target/xwiki";
+                if (BASEDIR != null) {
+                    this.executionDirectory = BASEDIR + '/';
+                } else {
+                    this.executionDirectory = "";
+                }
+                this.executionDirectory += "target/xwiki";
             }
             if (index > 0) {
                 this.executionDirectory += "-" + index;

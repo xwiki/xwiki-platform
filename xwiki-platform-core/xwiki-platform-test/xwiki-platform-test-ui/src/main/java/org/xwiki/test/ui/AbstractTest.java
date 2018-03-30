@@ -20,6 +20,7 @@
 package org.xwiki.test.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -37,6 +38,7 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -102,17 +104,22 @@ public abstract class AbstractTest
     {
         // This will not be null if we are in the middle of allTests
         if (context == null) {
-            PersistentTestContext persistentTestContext = new PersistentTestContext();
-            initializeSystem(persistentTestContext);
-
-            // Start XWiki
-            persistentTestContext.start();
-
-            // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
-            // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
-            // Note that this requires a running XWiki instance.
-            getUtil().recacheSecretToken();
+            init(Arrays.asList(new XWikiExecutor(0)));
         }
+    }
+
+    public static void init(List<XWikiExecutor> executors) throws Exception
+    {
+        PersistentTestContext persistentTestContext = new PersistentTestContext(executors);
+        initializeSystem(persistentTestContext);
+
+        // Start XWiki
+        persistentTestContext.start();
+
+        // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
+        // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
+        // Note that this requires a running XWiki instance.
+        getUtil().recacheSecretToken();
     }
 
     @AfterClass

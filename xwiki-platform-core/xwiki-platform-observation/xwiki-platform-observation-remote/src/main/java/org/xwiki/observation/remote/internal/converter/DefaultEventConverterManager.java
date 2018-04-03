@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -56,6 +57,9 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
      */
     @Inject
     private List<RemoteEventConverter> remoteEventConverters;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException
@@ -99,8 +103,12 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         RemoteEventData remoteEvent = new RemoteEventData();
 
         for (LocalEventConverter eventConverter : this.localEventConverters) {
-            if (eventConverter.toRemote(localEvent, remoteEvent)) {
-                break;
+            try {
+                if (eventConverter.toRemote(localEvent, remoteEvent)) {
+                    break;
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to convert local event [{}]", localEvent, e);
             }
         }
 
@@ -117,8 +125,12 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
         LocalEventData localEvent = new LocalEventData();
 
         for (RemoteEventConverter eventConverter : this.remoteEventConverters) {
-            if (eventConverter.fromRemote(remoteEvent, localEvent)) {
-                break;
+            try {
+                if (eventConverter.fromRemote(remoteEvent, localEvent)) {
+                    break;
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to convert remote event [{}]", remoteEvent, e);
             }
         }
 

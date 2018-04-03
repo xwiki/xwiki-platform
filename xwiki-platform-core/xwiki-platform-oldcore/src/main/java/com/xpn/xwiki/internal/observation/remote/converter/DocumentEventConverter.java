@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
@@ -117,10 +119,11 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
         DocumentReference docReference = (DocumentReference) remoteDataMap.get(DOC_NAME);
+        Locale locale = LocaleUtils.toLocale((String) remoteDataMap.get(DOC_LANGUAGE));
 
-        XWikiDocument doc = new XWikiDocument(docReference);
+        XWikiDocument doc = new XWikiDocument(docReference, locale);
 
-        XWikiDocument origDoc = new XWikiDocument(docReference);
+        XWikiDocument origDoc = new XWikiDocument(docReference, locale);
 
         // We have to get deleted document from the trash (hoping it is in the trash...)
         XWiki xwiki = xcontext.getWiki();
@@ -128,7 +131,14 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         XWikiDeletedDocument[] deletedDocuments = store.getAllDeletedDocuments(origDoc, xcontext, true);
         if (deletedDocuments != null && deletedDocuments.length > 0) {
             long index = deletedDocuments[0].getId();
-            origDoc = store.restoreFromRecycleBin(index, xcontext, true);
+            try {
+                origDoc = store.restoreFromRecycleBin(index, xcontext, true);
+            } catch (Exception e) {
+                // The deleted document can be found in the database but there is an issue with the content
+                // Better a partial notification than no notification at all (what most listener care about if the
+                // reference of the deleted document)
+                this.logger.error("Failed to restore deleted document [{}]", docReference);
+            }
         }
 
         doc.setOriginalDocument(origDoc);

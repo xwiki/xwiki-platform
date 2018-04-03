@@ -344,6 +344,11 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     public XWikiDocument restoreDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        if (this.content == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Cannot find any content for the deleted document [" + this.fullName + " (" + this.locale + ")]");
+        }
+
         try {
             return this.content.getXWikiDocument(doc);
         } catch (IOException e) {

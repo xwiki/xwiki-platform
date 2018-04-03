@@ -32,6 +32,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -367,47 +368,50 @@ public class HtmlPackager
             "attachment; filename=" + Util.encodeURI(this.name, context) + ".zip");
         context.setFinished(true);
 
-        ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
-
         File dir = this.environment.getTemporaryDirectory();
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         tempdir.mkdirs();
-        File attachmentDir = new File(tempdir, "attachment");
-        attachmentDir.mkdirs();
 
-        // Create and initialize a custom URL factory
-        ExportURLFactory urlf = new ExportURLFactory();
-        Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
-            new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
-        // Note that the following line will set a FilesystemExportContext instance in the Execution Context
-        // and this Execution Context will be cloned for each document rendered below.
-        // TODO: to be cleaner we should set the FilesystemExportContext in the EC used to render each document.
-        // However we also need to initialize the ExportURLFactory.
-        FilesystemExportContext exportContext = exportContextProvider.get();
-        urlf.init(this.pageReferences, tempdir, exportContext, context);
+        try {
+            File attachmentDir = new File(tempdir, "attachment");
+            attachmentDir.mkdirs();
 
-        // Render pages to export
-        renderDocuments(zos, urlf, context);
+            // Create and initialize a custom URL factory
+            ExportURLFactory urlf = new ExportURLFactory();
+            Provider<FilesystemExportContext> exportContextProvider =
+                Utils.getComponent(new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
+            // Note that the following line will set a FilesystemExportContext instance in the Execution Context
+            // and this Execution Context will be cloned for each document rendered below.
+            // TODO: to be cleaner we should set the FilesystemExportContext in the EC used to render each document.
+            // However we also need to initialize the ExportURLFactory.
+            FilesystemExportContext exportContext = exportContextProvider.get();
+            urlf.init(this.pageReferences, tempdir, exportContext, context);
 
-        // Add required skins to ZIP file
-        for (String skinName : urlf.getFilesystemExportContext().getNeededSkins()) {
-            addSkinToZip(skinName, zos, urlf.getFilesystemExportContext().getExportedSkinFiles(), context);
+            ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
+
+            // Render pages to export
+            renderDocuments(zos, urlf, context);
+
+            // Add required skins to ZIP file
+            for (String skinName : urlf.getFilesystemExportContext().getNeededSkins()) {
+                addSkinToZip(skinName, zos, urlf.getFilesystemExportContext().getExportedSkinFiles(), context);
+            }
+
+            // Copy generated files in the ZIP file.
+            addDirToZip(tempdir, TrueFileFilter.TRUE, zos, "", null);
+
+            // Generate an index page
+            generateIndexPage(zos, context);
+
+            zos.setComment(this.description);
+
+            // Finish ZIP file
+            zos.finish();
+            zos.flush();
+        } finally {
+            // Delete temporary directory
+            deleteDirectory(tempdir);
         }
-
-        // Copy generated files in the ZIP file.
-        addDirToZip(tempdir, TrueFileFilter.TRUE, zos, "", null);
-
-        // Generate an index page
-        generateIndexPage(zos, context);
-
-        zos.setComment(this.description);
-
-        // Finish ZIP file
-        zos.finish();
-        zos.flush();
-
-        // Delete temporary directory
-        deleteDirectory(tempdir);
     }
 
     private void generateIndexPage(ZipOutputStream zos, XWikiContext context) throws IOException
@@ -456,22 +460,11 @@ public class HtmlPackager
             return;
         }
 
-        File[] files = directory.listFiles();
-
-        if (files == null) {
-            return;
+        try {
+            FileUtils.deleteDirectory(directory);
+        } catch (IOException e) {
+            LOGGER.error("Failed to delete HTML export temporary directory", e);
         }
-
-        for (File file : files) {
-            if (file.isDirectory()) {
-                deleteDirectory(file);
-                continue;
-            }
-
-            file.delete();
-        }
-
-        directory.delete();
     }
 
     /**
@@ -529,19 +522,13 @@ public class HtmlPackager
                     continue;
                 }
 
-                FileInputStream in = new FileInputStream(file);
+                // Starts a new Zip entry. It automatically closes the previous entry if present.
+                out.putNextEntry(new ZipEntry(path));
 
                 try {
-                    // Starts a new Zip entry. It automatically closes the previous entry if present.
-                    out.putNextEntry(new ZipEntry(path));
-
-                    try {
-                        IOUtils.copy(in, out);
-                    } finally {
-                        out.closeEntry();
-                    }
+                    FileUtils.copyFile(file, out);
                 } finally {
-                    in.close();
+                    out.closeEntry();
                 }
             }
         }

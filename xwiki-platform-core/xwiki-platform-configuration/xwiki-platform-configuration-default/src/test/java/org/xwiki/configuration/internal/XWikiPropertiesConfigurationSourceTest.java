@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
@@ -48,6 +49,9 @@ public class XWikiPropertiesConfigurationSourceTest
     public MockitoComponentMockingRule<ConfigurationSource> mocker =
         new MockitoComponentMockingRule<>(XWikiPropertiesConfigurationSource.class);
 
+    @Rule
+    public TemporaryFolder dummyConfigFolder = new TemporaryFolder();
+
     private Environment environment;
 
     @Before
@@ -59,7 +63,7 @@ public class XWikiPropertiesConfigurationSourceTest
     @Test
     public void testInitializeWhenNoPropertiesFile() throws Exception
     {
-        System.setProperty("xwiki.properties.default.dir", "/does/not/exist");
+        System.setProperty("xwiki.properties.default.dir", dummyConfigFolder.getRoot().getAbsolutePath());
 
         // Verifies that we can get a property from the source (i.e. that it's correctly initialized)
         this.mocker.getComponentUnderTest().getProperty("key");

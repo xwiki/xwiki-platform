@@ -20,12 +20,12 @@
 package com.xpn.xwiki.web;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +68,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * Logging tool.
      */
     protected static final Logger LOGGER = LoggerFactory.getLogger(ExportURLFactory.class);
-
-    /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
-    private static final String ENCODING = "UTF-8";
 
     private static final SkinAction SKINACTION = new SkinAction();
 
@@ -361,30 +358,24 @@ public class ExportURLFactory extends XWikiServletURLFactory
         // TODO: find better way to know it's css file (not sure it's possible, we could also try to find @import
         // whatever the content)
         if (file.getName().endsWith(".css")) {
-            FileInputStream fis = new FileInputStream(file);
+            String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
-            try {
-                String content = IOUtils.toString(fis, ENCODING);
+            // TODO: use real css parser
+            Matcher matcher = CSSIMPORT.matcher(content);
 
-                // TODO: use real css parser
-                Matcher matcher = CSSIMPORT.matcher(content);
+            while (matcher.find()) {
+                String fileName = matcher.group(1);
 
-                while (matcher.find()) {
-                    String fileName = matcher.group(1);
-
-                    // Adjust path for links inside CSS files.
-                    while (fileName.startsWith("../")) {
-                        fileName = StringUtils.removeStart(fileName, "../");
-                    }
-
-                    if (wikiId == null) {
-                        createSkinURL(fileName, spaces, name, context, true);
-                    } else {
-                        createSkinURL(fileName, spaces, name, wikiId, context, true);
-                    }
+                // Adjust path for links inside CSS files.
+                while (fileName.startsWith("../")) {
+                    fileName = StringUtils.removeStart(fileName, "../");
                 }
-            } finally {
-                fis.close();
+
+                if (wikiId == null) {
+                    createSkinURL(fileName, spaces, name, context, true);
+                } else {
+                    createSkinURL(fileName, spaces, name, wikiId, context, true);
+                }
             }
         }
     }
@@ -409,10 +400,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     renderSkinFile("resource/" + filename, "resources", page, context.getDatabase(), targetFile,
                         StringUtils.countMatches(filename, "/") + 1, context);
                 } else {
-                    FileOutputStream fos = new FileOutputStream(targetFile);
-                    InputStream source = context.getEngineContext().getResourceAsStream("/resources/" + filename);
-                    IOUtils.copy(source, fos);
-                    fos.close();
+                    try (
+                        InputStream source = context.getEngineContext().getResourceAsStream("/resources/" + filename)) {
+                        FileUtils.copyInputStreamToFile(source, targetFile);
+                    }
                 }
             }
 
@@ -514,9 +505,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             file.getParentFile().mkdirs();
-            FileOutputStream fos = new FileOutputStream(file);
-            IOUtils.copy(attachment.getContentInputStream(context), fos);
-            fos.close();
+            try (InputStream stream = attachment.getContentInputStream(context)) {
+                FileUtils.copyInputStreamToFile(stream, file);
+            }
         }
 
         StringBuilder newPath = new StringBuilder("file://");

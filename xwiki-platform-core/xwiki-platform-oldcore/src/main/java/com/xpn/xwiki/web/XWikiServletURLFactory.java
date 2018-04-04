@@ -208,8 +208,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: " + surl
-                    + " Ignoring parameter.");
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: {}. Ignoring parameter.", surl);
             }
         }
         return null;
@@ -291,7 +290,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // For how to encode the various parts of the URL, see http://stackoverflow.com/a/29948396/153102
         addAction(path, spaceReference, action, context);
-        addSpaces(path, spaceReference, action, context);
+        addSpaces(path, spaceReference);
         addName(path, name, action, context);
 
         if (!StringUtils.isEmpty(querystring)) {
@@ -301,7 +300,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(anchor)) {
             path.append("#");
-            path.append(encodeWithinQuery(anchor, context));
+            path.append(encodeWithinQuery(anchor));
         }
 
         URL result;
@@ -331,11 +330,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // - Always output the action if it's not "view" or if showViewAction is true
         // - Output "view/<first space name>" when the first space name is an action name and the action is View
         // (and showViewAction = false)
-        if ((!"view".equals(action) || (showViewAction))
-            || (!showViewAction && spaceReference != null && "view".equals(action)
-            && getActionLister().listActions().contains(
-                spaceReference.extractFirstReference(EntityType.SPACE).getName())))
-        {
+        if ((!"view".equals(action) || showViewAction)
+            || (spaceReference != null && "view".equals(action) && getActionLister().listActions()
+                .contains(spaceReference.extractFirstReference(EntityType.SPACE).getName()))) {
             path.append(action).append("/");
         }
     }
@@ -343,16 +340,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     /**
      * Add the spaces to the path.
      */
-    private void addSpaces(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
+    private void addSpaces(StringBuilder path, EntityReference spaceReference)
     {
         for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
-            appendSpacePathSegment(path, reference, context);
+            appendSpacePathSegment(path, reference);
         }
     }
 
-    private void appendSpacePathSegment(StringBuilder path, EntityReference spaceReference, XWikiContext context)
+    private void appendSpacePathSegment(StringBuilder path, EntityReference spaceReference)
     {
-        path.append(encodeWithinPath(spaceReference.getName(), context)).append('/');
+        path.append(encodeWithinPath(spaceReference.getName())).append('/');
     }
 
     /**
@@ -363,7 +360,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
             || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
-            path.append(encodeWithinPath(name, context));
+            path.append(encodeWithinPath(name));
         }
     }
 
@@ -377,7 +374,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         path.append("/");
         if (encode) {
             // Encode the given file name as a single path segment.
-            path.append(encodeWithinPath(fileName, context).replace("+", "%20"));
+            path.append(encodeWithinPath(fileName).replace("+", "%20"));
         } else {
             try {
                 // The given file name is actually a file path and so we need to encode each path segment separately.
@@ -392,12 +389,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * Encode a URL path following the URL specification so that space is encoded as {@code %20} in the path
-     * (and not as {@code +} wnich is not correct). Note that for all other characters we encode them even though some
-     * don't need to be encoded. For example we encode the single quote even though it's not necessary
-     * (see <a href="http://tinyurl.com/j6bjgaq">this explanation</a>). The reason is that otherwise it becomes
-     * dangerous to use a returned URL in the HREF attribute in HTML. Imagine the following {@code <a href='$url'...}
-     * and {@code #set ($url = $doc.getURL(...))}. Now let's assume that {@code $url}'s value is
+     * Encode a URL path following the URL specification so that space is encoded as {@code %20} in the path (and not as
+     * {@code +} wnich is not correct). Note that for all other characters we encode them even though some don't need to
+     * be encoded. For example we encode the single quote even though it's not necessary (see
+     * <a href="http://tinyurl.com/j6bjgaq">this explanation</a>). The reason is that otherwise it becomes dangerous to
+     * use a returned URL in the HREF attribute in HTML. Imagine the following {@code <a href='$url'...} and
+     * {@code #set ($url = $doc.getURL(...))}. Now let's assume that {@code $url}'s value is
      * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
      * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
      * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
@@ -406,20 +403,19 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * specially and encode the rest.
      *
      * @param name the path to encode
-     * @param context see {@link XWikiContext}
      * @return the URL-encoded path segment
      */
-    private String encodeWithinPath(String name, XWikiContext context)
+    private String encodeWithinPath(String name)
     {
         // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
         // mentioned in the javadoc of this method
-        //   String encodedName;
-        //   try {
-        //     encodedName = URIUtil.encodeWithinPath(name, "UTF-8");
-        //   } catch (URIException e) {
-        //     throw new RuntimeException("Missing charset [UTF-8]", e);
-        //   }
-        //   return encodedName;
+        // String encodedName;
+        // try {
+        // encodedName = URIUtil.encodeWithinPath(name, "UTF-8");
+        // } catch (URIException e) {
+        // throw new RuntimeException("Missing charset [UTF-8]", e);
+        // }
+        // return encodedName;
 
         String encodedName;
         try {
@@ -441,22 +437,21 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * implementation for both URL paths and query string).
      *
      * @param name the query string part to encode
-     * @param context see {@link XWikiContext}
      * @return the URL-encoded query string part
      */
-    private String encodeWithinQuery(String name, XWikiContext context)
+    private String encodeWithinQuery(String name)
     {
         // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
         // mentioned in the javadoc of this method
-        //   String encodedName;
-        //   try {
-        //     encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
-        //   } catch (URIException e) {
-        //     throw new RuntimeException("Missing charset [UTF-8]", e);
-        //   }
-        //   return encodedName;
+        // String encodedName;
+        // try {
+        // encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
+        // } catch (URIException e) {
+        // throw new RuntimeException("Missing charset [UTF-8]", e);
+        // }
+        // return encodedName;
 
-        return encodeWithinPath(name, context);
+        return encodeWithinPath(name);
     }
 
     @Override
@@ -491,7 +486,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
 
         addAction(path, null, "skin", context);
-        addSpaces(path, spaceReference, "skin", context);
+        addSpaces(path, spaceReference);
         addName(path, name, "skin", context);
         addFileName(path, filename, false, context);
         try {
@@ -564,7 +559,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
 
         addAction(path, spaceReference, action, context);
-        addSpaces(path, spaceReference, action, context);
+        addSpaces(path, spaceReference);
         addName(path, name, action, context);
         addFileName(path, filename, context);
 
@@ -614,8 +609,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return createAttachmentRevisionURL(filename, spaces, name, revision, -1, querystring, xwikidb, context);
     }
 
-    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
-        long recycleId, String querystring, String xwikidb, XWikiContext context)
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, long recycleId,
+        String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
         StringBuilder path = new StringBuilder(this.contextPath);
@@ -625,7 +620,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
 
         addAction(path, spaceReference, action, context);
-        addSpaces(path, spaceReference, action, context);
+        addSpaces(path, spaceReference);
         addName(path, name, action, context);
         addFileName(path, filename, context);
 
@@ -689,8 +684,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     StringBuilder relativeURLBuilder = new StringBuilder(url.getPath());
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
-                        relativeURLBuilder.append("?").append(
-                            StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                        relativeURLBuilder.append("?")
+                            .append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
                     }
 
                     String anchor = url.getRef();
@@ -746,9 +741,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
             attachment = rdoc.getAttachment(filename);
             if (attachment != null) {
-                List<DeletedAttachment> deleted =
-                    context.getWiki().getAttachmentRecycleBinStore()
-                        .getAllDeletedAttachments(attachment, context, true);
+                List<DeletedAttachment> deleted = context.getWiki().getAttachmentRecycleBinStore()
+                    .getAllDeletedAttachments(attachment, context, true);
                 Collections.reverse(deleted);
                 for (DeletedAttachment entry : deleted) {
                     if (entry.getDate().after(rdoc.getDate())) {
@@ -774,9 +768,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
      * different as they'll get different URLs everytime they call the XWiki server</li>
      * </ul>
-     * See why jsessionid are considered harmful <a
-     * href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and <a
-     * href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     * See why jsessionid are considered harmful
+     * <a href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and
+     * <a href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
      *
      * @param url the URL to encode and normalize
      * @param context the XWiki Context used to get access to the Response for encoding the URL
@@ -801,9 +795,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
      * different as they'll get different URLs everytime they call the XWiki server</li>
      * </ul>
-     * See why jsessionid are considered harmful <a
-     * href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and <a
-     * href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     * See why jsessionid are considered harmful
+     * <a href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and
+     * <a href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
      *
      * @param url the URL to encode and normalize
      * @param context the XWiki Context used to get access to the Response for encoding the URL

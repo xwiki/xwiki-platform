@@ -25,7 +25,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -53,11 +55,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private EntityResourceActionLister actionLister;
 
+    protected String originalURL;
+
     /**
      * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
      * or if xwiki.home parameter is set and we are viewing the main page.
      */
-    protected URL serverURL;
+    protected Map<String, URL> defaultURLs = new HashMap<>();
 
     protected String contextPath;
 
@@ -66,10 +70,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     // Used by tests
-    public XWikiServletURLFactory(URL serverURL, String contextPath, String actionPath)
+    public XWikiServletURLFactory(URL defaultURL, String contextPath, String actionPath)
     {
-        this.serverURL = serverURL;
         this.contextPath = contextPath;
+
+        setDefaultURL(null, defaultURL);
     }
 
     /**
@@ -87,12 +92,49 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public void init(XWikiContext context)
     {
+        this.defaultURLs.clear();
+
         this.contextPath = context.getWiki().getWebAppPath(context);
-        try {
-            this.serverURL = new URL(getProtocol(context) + "://" + getHost(context));
-        } catch (MalformedURLException e) {
-            // This can't happen.
+
+        // Set the configured home URL for the main wiki
+        setDefaultURL(null, getXWikiHomeParameter(context));
+
+        // Only take into account initial request if it's a "real" one
+        XWikiRequest request = context.getRequest();
+        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+            try {
+                this.originalURL = getProtocol(context) + "://" + getHostPort(context);
+                setDefaultURL(context.getOriginalWikiId(), new URL(this.originalURL));
+            } catch (MalformedURLException e) {
+                // This can't happen.
+            }
         }
+    }
+
+    /**
+     * @param wikiId the wiki identifier to associate with this URL
+     * @param baseURL the input URL to take into account, null to disable it
+     * @since 10.3RC1
+     */
+    public void setDefaultURL(String wikiId, URL baseURL)
+    {
+        this.defaultURLs.put(wikiId, baseURL);
+    }
+
+    private URL getDefaultURL(String wikiId, XWikiContext xcontext)
+    {
+        URL url = this.defaultURLs.get(wikiId);
+
+        if (url != null) {
+            return url;
+        }
+
+        // Main wiki can be associated to null
+        if (xcontext.isMainWiki(wikiId)) {
+            return this.defaultURLs.get(null);
+        }
+
+        return null;
     }
 
     /**
@@ -131,7 +173,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * @param context the XWiki context used to access the request object
      * @return the proxy host, if we are behind one, otherwise the host of the URL used to make the current request
      */
-    private String getHost(XWikiContext context)
+    private String getHostPort(XWikiContext context)
     {
         URL url = context.getURL();
 
@@ -191,10 +233,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public URL getServerURL(String wikiId, XWikiContext context) throws MalformedURLException
     {
-        if (wikiId == null || wikiId.equals(context.getOriginalWikiId())) {
+        if (wikiId == null) {
+            wikiId = context.getWikiId();
+        }
+
+        URL inputURL = getDefaultURL(wikiId, context);
+        if (inputURL != null) {
             // This is the case if we are getting a URL for a page which is in
             // the same wiki as the page which is now being displayed.
-            return this.serverURL;
+            return inputURL;
         }
 
         if (context.isMainWiki(wikiId)) {
@@ -207,7 +254,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         URL url = context.getWiki().getServerURL(wikiId, context);
-        return url == null ? this.serverURL : url;
+        if (url != null) {
+            return url;
+        }
+
+        // Fallback on context URL
+        return new URL(getProtocol(context) + "://" + getHostPort(context));
     }
 
     @Override
@@ -630,7 +682,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (url != null) {
                 String surl = url.toString();
 
-                if (!surl.startsWith(this.serverURL.toString())) {
+                if (this.originalURL == null || !surl.startsWith(this.originalURL.toString())) {
                     // External URL: leave it as is.
                     relativeURL = surl;
                 } else {

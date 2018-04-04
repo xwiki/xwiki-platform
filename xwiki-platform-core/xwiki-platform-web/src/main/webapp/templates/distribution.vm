@@ -155,11 +155,6 @@
 #end
 
 #set ($extensionConfig = {})
-## Make sure to skip all right checking for guest user
-#if (!$xcontext.userReference)
-  #set ($discard = $extensionConfig.put('skipCheckRight', true))
-  #set ($discard = $extensionConfig.put('skipCurrentUser', true))
-#end
 ## FIXME: refactor distribution.vm to let steps deal with all request, even extension related requests
 #if ($services.distribution.jobStatus.currentStep.id == 'extension.defaultui' || $services.distribution.jobStatus.currentStep.id == 'extension.flavor')
   ## Install main wiki default UI JARS on root

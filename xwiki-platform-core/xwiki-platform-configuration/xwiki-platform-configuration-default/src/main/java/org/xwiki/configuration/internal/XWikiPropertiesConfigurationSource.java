@@ -85,7 +85,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
             } catch (Exception e) {
                 // Note: if we cannot read the configuration file for any reason we log a warning but continue since
                 // XWiki will use default values for all configurable elements.
-                this.logger.warn("Failed to load configuration file [{}]", file, e.getMessage());
+                this.logger.warn("Failed to load configuration file [{}]: {}", file, e.getMessage());
             }
         }
 
@@ -111,7 +111,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
             // Note: if we cannot read the configuration file for any reason we log a warning but continue since XWiki
             // will use default values for all configurable elements.
             this.logger.warn(
-                "Failed to load configuration file [{}]. Using default configuration values. " + "Internal error [{}]",
+                "Failed to load configuration file [{}]. Using default configuration values. Internal error [{}]",
                 XWIKI_PROPERTIES_WARPATH, e.getMessage());
         }
 

@@ -170,8 +170,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 protocol = "https";
             }
         }
+
         // Detected protocol can be overwritten by configuration.
-        return context.getWiki().Param("xwiki.url.protocol", protocol);
+        protocol = context.getWiki().Param("xwiki.url.protocol", protocol);
+
+        return protocol != null ? protocol : "http";
     }
 
     /**
@@ -678,7 +681,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (url != null) {
                 String surl = url.toString();
 
-                if (this.defaultURL == null || !surl.startsWith(this.defaultURL.toString())) {
+                if (this.defaultURL == null || !surl.startsWith(this.defaultURL)) {
                     // External URL: leave it as is.
                     relativeURL = surl;
                 } else {

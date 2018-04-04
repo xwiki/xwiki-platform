@@ -135,9 +135,9 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
                 origDoc = store.restoreFromRecycleBin(index, xcontext, true);
             } catch (Exception e) {
                 // The deleted document can be found in the database but there is an issue with the content
-                // Better a partial notification than no notification at all (what most listener care about if the
+                // Better a partial notification than no notification at all (what most listeners care about is the
                 // reference of the deleted document)
-                this.logger.error("Failed to restore deleted document [{}]", docReference);
+                this.logger.error("Failed to restore deleted document [{}]", docReference, e);
             }
         }
 

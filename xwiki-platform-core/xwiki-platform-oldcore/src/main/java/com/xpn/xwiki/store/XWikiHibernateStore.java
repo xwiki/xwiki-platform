@@ -1368,13 +1368,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 try {
                     if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                         Session dynamicSession = session.getSession(EntityMode.MAP);
-                        Object map = dynamicSession.load(bclass.getName(), object.getId());
+                        String className = this.localEntityReferenceSerializer.serialize(bclass.getDocumentReference());
+                        @SuppressWarnings("unchecked")
+                        Map<String, ?> map = (Map<String, ?>) dynamicSession.load(className, object.getId());
                         // Let's make sure to look for null fields in the dynamic mapping
-                        bclass.fromValueMap((Map) map, object);
-                        handledProps = bclass.getCustomMappingPropertyList(context);
-                        for (String prop : handledProps) {
-                            if (((Map) map).get(prop) == null) {
-                                handledProps.remove(prop);
+                        bclass.fromValueMap(map, object);
+                        for (String prop : bclass.getCustomMappingPropertyList(context)) {
+                            if (map.get(prop) != null) {
+                                handledProps.add(prop);
                             }
                         }
                     }

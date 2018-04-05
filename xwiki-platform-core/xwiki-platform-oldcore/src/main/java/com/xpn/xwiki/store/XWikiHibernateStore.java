@@ -47,6 +47,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -1346,17 +1347,20 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 try {
                     if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                         Session dynamicSession = session.getSession(EntityMode.MAP);
-                        Object map = dynamicSession.load(bclass.getName(), object.getId());
+                        String className = this.localEntityReferenceSerializer.serialize(bclass.getDocumentReference());
+                        @SuppressWarnings("unchecked")
+                        Map<String, ?> map = (Map<String, ?>) dynamicSession.load(className, object.getId());
                         // Let's make sure to look for null fields in the dynamic mapping
-                        bclass.fromValueMap((Map) map, object);
-                        handledProps = bclass.getCustomMappingPropertyList(context);
-                        for (String prop : handledProps) {
-                            if (((Map) map).get(prop) == null) {
-                                handledProps.remove(prop);
+                        bclass.fromValueMap(map, object);
+                        for (String prop : bclass.getCustomMappingPropertyList(context)) {
+                            if (map.get(prop) != null) {
+                                handledProps.add(prop);
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (HibernateException e) {
+                    this.logger.error("Failed loading custom mapping for doc [{}], class [{}], nb [{}]", 
+                            object.getDocumentReference(), object.getXClassReference(), object.getNumber(), e);
                 }
 
                 // Load strings, integers, dates all at once

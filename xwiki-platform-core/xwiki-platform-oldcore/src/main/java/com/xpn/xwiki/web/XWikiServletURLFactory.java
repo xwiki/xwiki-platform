@@ -63,7 +63,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
      * or if xwiki.home parameter is set and we are viewing the main page.
      */
-    protected Map<String, URL> defaultURLs = new HashMap<>();
+    protected Map<String, URL> defaultURLs;
 
     protected String contextPath;
 
@@ -75,8 +75,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public XWikiServletURLFactory(URL defaultURL, String contextPath, String actionPath)
     {
         this.contextPath = contextPath;
-
-        setDefaultURL(null, defaultURL);
+        this.originalURL = defaultURL;
     }
 
     /**
@@ -94,7 +93,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public void init(XWikiContext context)
     {
-        this.defaultURLs.clear();
+        this.defaultURLs = null;
 
         this.contextPath = context.getWiki().getWebAppPath(context);
 
@@ -123,11 +122,19 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public void setDefaultURL(String wikiId, URL baseURL)
     {
+        if (this.defaultURLs == null) {
+            this.defaultURLs = new HashMap<>();
+        }
+
         this.defaultURLs.put(wikiId, baseURL);
     }
 
-    private URL getDefaultURL(String wikiId, XWikiContext xcontext)
+    protected URL getDefaultURL(String wikiId, XWikiContext xcontext)
     {
+        if (this.defaultURLs == null) {
+            return this.originalURL;
+        }
+
         URL url = this.defaultURLs.get(wikiId);
 
         if (url != null) {

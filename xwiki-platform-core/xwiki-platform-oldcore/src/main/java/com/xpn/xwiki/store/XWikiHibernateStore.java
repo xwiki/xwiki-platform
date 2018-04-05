@@ -47,6 +47,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -1379,7 +1380,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (HibernateException e) {
+                    this.logger.error("Failed loading custom mapping for doc [{}], class [{}], nb [{}]", 
+                            object.getDocumentReference(), object.getXClassReference(), object.getNumber(), e);
                 }
 
                 // Load strings, integers, dates all at once

@@ -618,6 +618,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 Query query =
                     session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
                 query.setLong("id", doc.getId());
+
+                // Note: we don't use session.saveOrUpdate(doc) because it used to be slower in Hibernate than calling
+                // session.save() and session.update() separately.
                 if (query.uniqueResult() == null) {
                     if (doc.isContentDirty() || doc.isMetaDataDirty()) {
                         // Reset the creationDate to reflect the date of the first save, not the date of the object
@@ -627,8 +630,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     session.save(doc);
                 } else {
                     session.update(doc);
-                    // TODO: this is slower!! How can it be improved?
-                    // session.saveOrUpdate(doc);
                 }
 
                 // Remove objects planned for removal

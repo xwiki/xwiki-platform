@@ -574,7 +574,7 @@ public class RepositoryManager implements Initializable, Disposable
     public DocumentReference importExtension(String extensionId, ExtensionRepository repository, Type type)
         throws QueryException, XWikiException, ResolveException
     {
-        TreeMap<Version, String> versions = new TreeMap<Version, String>();
+        TreeMap<Version, String> versions = new TreeMap<>();
 
         Version lastVersion = getVersions(extensionId, repository, type, versions);
 
@@ -661,7 +661,7 @@ public class RepositoryManager implements Initializable, Disposable
 
         // Remove unexisting versions
 
-        Set<String> validVersions = new HashSet<String>();
+        Set<String> validVersions = new HashSet<>();
 
         List<BaseObject> versionObjects = document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
         if (versionObjects != null) {
@@ -808,8 +808,7 @@ public class RepositoryManager implements Initializable, Disposable
         ExtensionScm scm = extension.getScm();
         if (scm != null) {
             if (scm.getUrl() != null) {
-                needSave |=
-                    update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMURL, scm.getUrl().toString());
+                needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMURL, scm.getUrl());
             }
             if (scm.getConnection() != null) {
                 needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION,
@@ -894,7 +893,7 @@ public class RepositoryManager implements Initializable, Disposable
 
     private boolean updateAuthors(BaseObject extensionObject, Collection<ExtensionAuthor> authors)
     {
-        List<String> authorIds = new ArrayList<String>(authors.size());
+        List<String> authorIds = new ArrayList<>(authors.size());
 
         for (ExtensionAuthor author : authors) {
             authorIds.add(resolveAuthorId(author.getName()));
@@ -905,7 +904,7 @@ public class RepositoryManager implements Initializable, Disposable
 
     private boolean updateFeatures(String fieldName, BaseObject extensionObject, Collection<ExtensionId> features)
     {
-        List<String> featureStrings = new ArrayList<String>(features.size());
+        List<String> featureStrings = new ArrayList<>(features.size());
 
         for (ExtensionId feature : features) {
             featureStrings.add(ExtensionIdConverter.toString(feature));
@@ -1132,18 +1131,6 @@ public class RepositoryManager implements Initializable, Disposable
         }
     }
 
-    /**
-     * Call this method only, when it was check that given extension version xobject is PRESENT
-     */
-    private void removeExtensionVersionObjectToDocument(XWikiDocument extensionDocument,
-        BaseObject extensionVersionObject) throws XWikiException
-    {
-        boolean needSave = extensionDocument.removeXObject(extensionVersionObject);
-        if (needSave) {
-            xcontextProvider.get().getWiki().saveDocument(extensionDocument, xcontextProvider.get());
-        }
-    }
-
     private boolean updateExtensionVersion(XWikiDocument document, Extension extension) throws XWikiException
     {
         boolean needSave = false;
@@ -1278,8 +1265,8 @@ public class RepositoryManager implements Initializable, Disposable
             }
         }
 
-        BaseObject extensionVersionObject =
-            extensionDocument.getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
+        BaseObject extensionVersionObject = extensionDocument
+            .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
 
         if (extensionVersionObject == null && allowProxying && isVersionProxyingEnabled(extensionDocument)) {
             // no ExtensionVersionClass object so we need to create such object temporarily and delete it
@@ -1290,7 +1277,7 @@ public class RepositoryManager implements Initializable, Disposable
                 XWikiDocument extensionDocumentClone = extensionDocument.clone();
                 addExtensionVersionObjectToDocument(extensionDocumentClone, version);
                 extensionVersionObject = extensionDocumentClone
-                    .getObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, "version", version, false);
+                    .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
             } catch (XWikiException | ResolveException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }

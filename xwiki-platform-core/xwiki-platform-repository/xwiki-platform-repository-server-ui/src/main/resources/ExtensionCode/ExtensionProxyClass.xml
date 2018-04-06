@@ -115,17 +115,21 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </repositoryType>
     <repositoryURI>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>repositoryURI</name>
       <number>4</number>
       <picker>0</picker>
       <prettyName>Repository URI</prettyName>
-      <size>30</size>
+      <rows>1</rows>
+      <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </repositoryURI>
   </class>
   <object>

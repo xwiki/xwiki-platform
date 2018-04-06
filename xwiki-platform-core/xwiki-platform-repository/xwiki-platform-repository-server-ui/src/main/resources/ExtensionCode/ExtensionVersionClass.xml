@@ -50,17 +50,21 @@
     <nameField/>
     <validationScript/>
     <download>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>download</name>
       <number>2</number>
       <picker>0</picker>
       <prettyName>Download URL</prettyName>
-      <size>50</size>
+      <rows>1</rows>
+      <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </download>
     <features>
       <cache>0</cache>

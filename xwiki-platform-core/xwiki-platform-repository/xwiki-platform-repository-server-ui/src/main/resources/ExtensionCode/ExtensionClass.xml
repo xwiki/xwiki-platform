@@ -261,17 +261,21 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </issueManagementSystem>
     <issueManagementURL>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>issueManagementURL</name>
       <number>27</number>
       <picker>0</picker>
       <prettyName>Issue Management URL</prettyName>
-      <size>30</size>
+      <rows>1</rows>
+      <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </issueManagementURL>
     <lastVersion>
       <customDisplay/>
@@ -385,30 +389,38 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </recommended>
     <scmconnection>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>scmconnection</name>
-      <number>18</number>
+      <number>25</number>
       <picker>0</picker>
       <prettyName>Sources connection</prettyName>
-      <size>30</size>
+      <rows>1</rows>
+      <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </scmconnection>
     <scmdevconnection>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>scmdevconnection</name>
-      <number>19</number>
+      <number>26</number>
       <picker>0</picker>
       <prettyName>Sources dev connection</prettyName>
-      <size>30</size>
+      <rows>1</rows>
+      <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </scmdevconnection>
     <showInstalledCount>
       <customDisplay/>
@@ -497,17 +509,21 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </validExtension>
     <website>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
       <name>website</name>
       <number>6</number>
       <picker>0</picker>
       <prettyName>Website</prettyName>
-      <size>30</size>
+      <rows>1</rows>
+      <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </website>
   </class>
   <object>

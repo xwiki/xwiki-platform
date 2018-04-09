@@ -29,8 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -60,25 +60,26 @@ public class XWikiEventTypesEnabler
     private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
     private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
 
     /**
      * Make sure that notification are enabled for at least one XWiki Event Types (create, update, delete,
      * addComment) for the current user.
+     * @param user user for who we handle notifications
      * @throws NotificationException if an error occurs
+     *
+     * @since 9.11.5
+     * @since 10.3RC1
      */
-    public void ensureXWikiNotificationsAreEnabled() throws NotificationException
+    public void ensureXWikiNotificationsAreEnabled(DocumentReference user) throws NotificationException
     {
-        if (isNotificationDisabled()) {
+        if (isNotificationDisabled(user)) {
             TargetableNotificationPreferenceBuilder builder = targetableNotificationPreferenceBuilderProvider.get();
             List<NotificationPreference> preferencesToCreate = new ArrayList<>();
             Date now = new Date();
             for (String eventType : XWIKI_EVENT_TYPES) {
                 for (NotificationFormat format : NotificationFormat.values()) {
-                    preferencesToCreate.add(createNotificationPreference(builder, eventType, format, now));
+                    preferencesToCreate.add(createNotificationPreference(user, builder, eventType, format, now));
                 }
             }
             notificationPreferenceManager.savePreferences(preferencesToCreate);
@@ -86,19 +87,22 @@ public class XWikiEventTypesEnabler
     }
 
     /**
+     * @param user user for who we handle notifications
      * @return true if there is not a single preference enabled for the default event types.
      * @throws NotificationException if an error occurs
+     *
+     * @since 9.11.5
+     * @since 10.3RC1
      */
-    public boolean isNotificationDisabled() throws NotificationException
+    public boolean isNotificationDisabled(DocumentReference user) throws NotificationException
     {
-        List<NotificationPreference> preferences
-                = notificationPreferenceManager.getAllPreferences(documentAccessBridge.getCurrentUserReference());
+        List<NotificationPreference> preferences = notificationPreferenceManager.getAllPreferences(user);
         // We consider that notifs are disabled if there is not a single preference enabled for the default event types.
         return preferences.stream().noneMatch(pref -> pref.isNotificationEnabled()
                 && XWIKI_EVENT_TYPES.contains(pref.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)));
     }
 
-    private TargetableNotificationPreference createNotificationPreference(
+    private TargetableNotificationPreference createNotificationPreference(DocumentReference user,
             TargetableNotificationPreferenceBuilder builder, String eventType, NotificationFormat format, Date date)
     {
         builder.prepare();
@@ -110,7 +114,7 @@ public class XWikiEventTypesEnabler
         builder.setProperties(properties);
         builder.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         builder.setStartDate(date);
-        builder.setTarget(documentAccessBridge.getCurrentUserReference());
+        builder.setTarget(user);
         return builder.build();
     }
 }

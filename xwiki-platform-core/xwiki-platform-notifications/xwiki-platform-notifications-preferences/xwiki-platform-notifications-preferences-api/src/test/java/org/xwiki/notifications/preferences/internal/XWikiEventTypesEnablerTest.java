@@ -29,7 +29,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -59,7 +58,6 @@ public class XWikiEventTypesEnablerTest
             new MockitoComponentMockingRule<>(XWikiEventTypesEnabler.class);
 
     private NotificationPreferenceManager notificationPreferenceManager;
-    private DocumentAccessBridge documentAccessBridge;
     private Provider<TargetableNotificationPreferenceBuilder> targetableNotificationPreferenceBuilderProvider;
     private DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "UserA");
 
@@ -67,13 +65,11 @@ public class XWikiEventTypesEnablerTest
     public void setUp() throws Exception
     {
         notificationPreferenceManager = mocker.getInstance(NotificationPreferenceManager.class);
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         targetableNotificationPreferenceBuilderProvider = mock(Provider.class);
         when(targetableNotificationPreferenceBuilderProvider.get())
                 .thenReturn(new DefaultTargetableNotificationPreferenceBuilder());
         mocker.registerComponent(new DefaultParameterizedType(null, Provider.class,
                 TargetableNotificationPreferenceBuilder.class), targetableNotificationPreferenceBuilderProvider);
-        when(documentAccessBridge.getCurrentUserReference()).thenReturn(currentUser);
     }
 
     @Test
@@ -87,7 +83,7 @@ public class XWikiEventTypesEnablerTest
             return null;
         }).when(notificationPreferenceManager).savePreferences(anyList());
 
-        mocker.getComponentUnderTest().ensureXWikiNotificationsAreEnabled();
+        mocker.getComponentUnderTest().ensureXWikiNotificationsAreEnabled(currentUser);
         verify(notificationPreferenceManager).savePreferences(anyList());
     }
 
@@ -108,7 +104,7 @@ public class XWikiEventTypesEnablerTest
             return null;
         }).when(notificationPreferenceManager).savePreferences(anyList());
 
-        mocker.getComponentUnderTest().ensureXWikiNotificationsAreEnabled();
+        mocker.getComponentUnderTest().ensureXWikiNotificationsAreEnabled(currentUser);
         verify(notificationPreferenceManager).savePreferences(anyList());
     }
 
@@ -122,7 +118,7 @@ public class XWikiEventTypesEnablerTest
         when(pref.getProperties()).thenReturn(properties);
         when(notificationPreferenceManager.getAllPreferences(eq(currentUser))).thenReturn(Arrays.asList(pref));
 
-        mocker.getComponentUnderTest().ensureXWikiNotificationsAreEnabled();
+        mocker.getComponentUnderTest().ensureXWikiNotificationsAreEnabled(currentUser);
         verify(notificationPreferenceManager, never()).savePreferences(anyList());
     }
 }

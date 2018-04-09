@@ -81,7 +81,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         // Moreover, it makes the notifications feature discoverable. It means that, by default, all pages where the
         // user has made a contribution will generate notifications. That's probably what users expect from a
         // notification area.
-        xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled();
+        xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled(user);
 
         Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
 
@@ -114,7 +114,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             boolean desiredState) throws NotificationException
     {
         // If the notifications are enabled and the entity is already in the desired state, then we have nothing to do
-        return !xwikiEventTypesEnabler.isNotificationDisabled() && entity.isWatched(user) == desiredState;
+        return !xwikiEventTypesEnabler.isNotificationDisabled(user) && entity.isWatched(user) == desiredState;
     }
 
     private void enableOrDeleteFilter(boolean enable,

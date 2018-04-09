@@ -114,8 +114,9 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
                 case FILTER:
                     return true;
                 case KEEP:
-                default:
                     return false;
+                default:
+                    // Do nothing
             }
         }
 

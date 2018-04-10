@@ -28,9 +28,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -46,59 +44,60 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 public class EventUserFilterPreferencesGetter
 {
     @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
     private Logger logger;
 
     /**
      * @param testUser user to test
-     * @param user the user for who we compute the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
      * @return either or not the user to test is part of the excluded users of the given user
      */
-    public boolean isUserExcluded(String testUser, DocumentReference user, NotificationFormat format)
+    public boolean isUserExcluded(String testUser, Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
     {
-        return getPreferences(user, format, NotificationFilterType.EXCLUSIVE).anyMatch(
+        return getPreferences(filterPreferences, format, NotificationFilterType.EXCLUSIVE).anyMatch(
             pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
         );
     }
 
     /**
      * @param testUser user to test
-     * @param user the user for who we compute the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
      * @return either or not the user to test is part of the followed users of the given user
      * @since 10.3RC1
      * @since 9.11.5
      */
-    public boolean isUsedFollowed(String testUser, DocumentReference user, NotificationFormat format)
+    public boolean isUsedFollowed(String testUser, Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
     {
-        return getPreferences(user, format, NotificationFilterType.INCLUSIVE).anyMatch(
+        return getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE).anyMatch(
             pref -> pref.getProperties(NotificationFilterProperty.USER).contains(testUser)
         );
     }
 
     /**
-     * @param user the user for who we compute the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
      * @return the collection of users followed by the given user
      * @since 10.3RC1
      * @since 9.11.5
      */
-    public Collection<String> getFollowedUsers(DocumentReference user, NotificationFormat format)
+    public Collection<String> getFollowedUsers(Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
     {
-        return collect(getPreferences(user, format, NotificationFilterType.INCLUSIVE));
+        return collect(getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE));
     }
 
     /**
-     * @param user the user for who we compute the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
      * @return the collection of excluded users by the given user
      */
-    public Collection<String> getExcludedUsers(DocumentReference user, NotificationFormat format)
+    public Collection<String> getExcludedUsers(Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
     {
-        return collect(getPreferences(user, format, NotificationFilterType.EXCLUSIVE));
+        return collect(getPreferences(filterPreferences, format, NotificationFilterType.EXCLUSIVE));
     }
 
     private Collection<String> collect(Stream<NotificationFilterPreference> stream)
@@ -107,11 +106,12 @@ public class EventUserFilterPreferencesGetter
             .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
     }
 
-    private Stream<NotificationFilterPreference> getPreferences(DocumentReference user,
-            NotificationFormat format, NotificationFilterType filterType)
+    private Stream<NotificationFilterPreference> getPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
+            NotificationFilterType filterType)
     {
         try {
-            return notificationFilterManager.getFilterPreferences(user).stream().filter(
+            return filterPreferences.stream().filter(
                 pref -> matchFilter(pref)
                     && matchFormat(pref, format)
                     && matchFilterType(pref, filterType)

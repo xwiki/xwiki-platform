@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -137,9 +138,8 @@ public class DefaultNotificationFilterManagerTest
         Map<String, Boolean> filterActivations = new HashMap<>();
         filterActivations.put(SystemUserNotificationFilter.FILTER_NAME, false);
 
-        when(modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
-
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getAllFilters(testUser);
+        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getEnabledFilters(
+                mocker.getComponentUnderTest().getAllFilters(testUser), filterActivations).collect(Collectors.toList());
 
         assertEquals(0, filters.size());
     }
@@ -151,13 +151,10 @@ public class DefaultNotificationFilterManagerTest
 
         NotificationPreference preference = mock(NotificationPreference.class);
 
-        when(componentManager.getInstanceMap(NotificationFilter.class))
-                .thenReturn(Collections.singletonMap("1", fakeFilter1));
-
         when(fakeFilter1.matchesPreference(preference)).thenReturn(true);
 
-        Collection<NotificationFilter> filters = mocker.getComponentUnderTest()
-                .getFilters(testUser, preference);
+        Collection<NotificationFilter> filters = mocker.getComponentUnderTest().getFiltersRelatedToNotificationPreference(
+                Arrays.asList(fakeFilter1), preference).collect(Collectors.toList());
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -170,13 +167,10 @@ public class DefaultNotificationFilterManagerTest
 
         NotificationPreference preference = mock(NotificationPreference.class);
 
-        when(componentManager.getInstanceMap(NotificationFilter.class))
-                .thenReturn(Collections.singletonMap("1", fakeFilter1));
-
         when(fakeFilter1.matchesPreference(preference)).thenReturn(false);
 
         Collection<NotificationFilter> filters = mocker.getComponentUnderTest()
-                .getFilters(testUser, preference);
+                .getFiltersRelatedToNotificationPreference(Arrays.asList(fakeFilter1), preference).collect(Collectors.toList());
 
         assertEquals(0, filters.size());
     }
@@ -189,7 +183,7 @@ public class DefaultNotificationFilterManagerTest
 
         when(testProvider.getFilterPreferences(testUser)).thenReturn(Sets.newSet(filterPreference1, filterPreference2));
 
-        Set<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest().getFilterPreferences(testUser);
+        Collection<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest().getFilterPreferences(testUser);
 
         assertTrue(resultSet.contains(filterPreference1));
         assertTrue(resultSet.contains(filterPreference2));
@@ -204,13 +198,14 @@ public class DefaultNotificationFilterManagerTest
         NotificationFilterPreference filterPreference2 = mock(NotificationFilterPreference.class);
         when(filterPreference2.getFilterName()).thenReturn("fakeFilter");
 
-        when(testProvider.getFilterPreferences(testUser)).thenReturn(Sets.newSet(filterPreference1, filterPreference2));
+        Collection<NotificationFilterPreference> filterPreferences =
+                Sets.newSet(filterPreference1, filterPreference2);
 
         NotificationFilter fakeFilter = mock(NotificationFilter.class);
         when(fakeFilter.getName()).thenReturn("fakeFilter");
 
-        Set<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest()
-                .getFilterPreferences(testUser, fakeFilter);
+        Collection<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest()
+                .getFilterPreferences(filterPreferences, fakeFilter).collect(Collectors.toList());
 
         assertTrue(resultSet.contains(filterPreference2));
         assertEquals(1, resultSet.size());
@@ -232,14 +227,15 @@ public class DefaultNotificationFilterManagerTest
         when(filterPreference4.getFilterName()).thenReturn("fakeFilter");
         when(filterPreference4.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
 
-        when(testProvider.getFilterPreferences(testUser)).thenReturn(
-                Sets.newSet(filterPreference1, filterPreference2, filterPreference3, filterPreference4));
+        Collection<NotificationFilterPreference> filterPreferences
+                = Sets.newSet(filterPreference1, filterPreference2, filterPreference3, filterPreference4);
 
         NotificationFilter fakeFilter = mock(NotificationFilter.class);
         when(fakeFilter.getName()).thenReturn("fakeFilter");
 
-        Set<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest()
-                .getFilterPreferences(testUser, fakeFilter, NotificationFilterType.INCLUSIVE);
+        Collection<NotificationFilterPreference> resultSet = mocker.getComponentUnderTest()
+                .getFilterPreferences(filterPreferences, fakeFilter, NotificationFilterType.INCLUSIVE).collect(
+                        Collectors.toList());
 
         assertTrue(resultSet.contains(filterPreference4));
         assertEquals(1, resultSet.size());

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.watch;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.stability.Unstable;
 
@@ -37,7 +38,7 @@ public interface WatchedEntityReference
      * @return if the given user watch the current entity reference
      * @since 9.9RC1
      */
-    boolean isWatched(DocumentReference userReference);
+    boolean isWatched(DocumentReference userReference) throws NotificationException;
 
     /**
      * @param notificationFilterPreference a filter preference

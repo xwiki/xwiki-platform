@@ -19,10 +19,13 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
+import java.util.Collection;
+
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
@@ -54,7 +57,8 @@ public abstract class AbstractEventReadFilter implements NotificationFilter, Tog
     }
 
     @Override
-    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
         // We only handle it at the expression level to avoid too much accesses to the database
         return FilterPolicy.NO_EFFECT;
@@ -67,16 +71,18 @@ public abstract class AbstractEventReadFilter implements NotificationFilter, Tog
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
     {
         return null;
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
             NotificationFormat format)
     {
-        if (type == NotificationFilterType.EXCLUSIVE && format == this.format) {
+        if (user != null && type == NotificationFilterType.EXCLUSIVE && format == this.format) {
             return not(new InListOfReadEventsNode(user));
         }
         return null;

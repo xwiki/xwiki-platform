@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
@@ -62,13 +63,14 @@ public class EventUserFilter implements NotificationFilter
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
         final String eventUserId = serializer.serialize(event.getUser());
-        if (preferencesGetter.isUserExcluded(eventUserId, user, format)) {
+        if (preferencesGetter.isUserExcluded(eventUserId, filterPreferences, format)) {
             return FilterPolicy.FILTER;
         }
-        if (preferencesGetter.isUsedFollowed(eventUserId, user, format)) {
+        if (preferencesGetter.isUsedFollowed(eventUserId, filterPreferences, format)) {
             return FilterPolicy.KEEP;
         }
         return FilterPolicy.NO_EFFECT;
@@ -82,23 +84,25 @@ public class EventUserFilter implements NotificationFilter
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
     {
         // We don't handle this use-case
         return null;
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
-            NotificationFormat format)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFilterType type, NotificationFormat format)
     {
         if (type == NotificationFilterType.EXCLUSIVE) {
-            Collection<String> users = preferencesGetter.getExcludedUsers(user, format);
+            Collection<String> users = preferencesGetter.getExcludedUsers(filterPreferences, format);
             if (!users.isEmpty()) {
                 return not(value(EventProperty.USER).inStrings(users));
             }
         } else {
-            Collection<String> users = preferencesGetter.getFollowedUsers(user, format);
+            Collection<String> users = preferencesGetter.getFollowedUsers(filterPreferences, format);
             if (!users.isEmpty()) {
                 return value(EventProperty.USER).inStrings(users);
             }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collections;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.eventstream.Event;
@@ -56,11 +58,14 @@ public class MinorEventNotificationFilterTest
         when(event3.getType()).thenReturn("update");
         when(event3.getDocumentVersion()).thenReturn("2.1");
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event1, randomUser, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event1, randomUser, Collections.emptyList(),
+                        NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event2, randomUser, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event2, randomUser, Collections.emptyList(),
+                        NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event3, randomUser, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event3, randomUser, Collections.emptyList(),
+                        NotificationFormat.ALERT));
     }
 
     @Test
@@ -69,9 +74,10 @@ public class MinorEventNotificationFilterTest
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
-        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, fakePreference));
+        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(), fakePreference));
         assertEquals("NOT ((TYPE = \"update\" AND NOT (DOCUMENT_VERSION ENDS WITH \".1\")))",
-                mocker.getComponentUnderTest().filterExpression(randomUser, NotificationFilterType.EXCLUSIVE,
+                mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+                        NotificationFilterType.EXCLUSIVE,
                         NotificationFormat.ALERT).toString());
     }
 

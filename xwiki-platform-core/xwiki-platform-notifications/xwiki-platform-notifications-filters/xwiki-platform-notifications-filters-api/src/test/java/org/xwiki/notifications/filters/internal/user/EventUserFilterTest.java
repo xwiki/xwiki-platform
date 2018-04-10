@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.user;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,7 +44,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -86,7 +86,7 @@ public class EventUserFilterTest
         when(serializer.serialize(USER_E)).thenReturn(SERIALIZED_USER_E);
     }
 
-    private void mockPreferences() throws NotificationException
+    private Collection<NotificationFilterPreference> mockPreferences() throws NotificationException
     {
         NotificationFilterPreference p1 = mock(NotificationFilterPreference.class);
         when(p1.isEnabled()).thenReturn(true);
@@ -117,15 +117,14 @@ public class EventUserFilterTest
         when(p4.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(p4.getFilterFormats()).thenReturn(Sets.newSet(NotificationFormat.EMAIL));
 
-        when(notificationFilterManager.getFilterPreferences(eq(CURRENT_USER))).thenReturn(
-                Sets.newSet(p1, p2, p3, p4));
+        return Sets.newSet(p1, p2, p3, p4);
     }
 
     @Test
     public void filterEvent() throws Exception
     {
         // Preferences
-        mockPreferences();
+        Collection<NotificationFilterPreference> filterPreferences = mockPreferences();
 
         // Mock
         Event event1 = mock(Event.class);
@@ -145,38 +144,44 @@ public class EventUserFilterTest
 
         // Test
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event1, CURRENT_USER, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event1, CURRENT_USER, filterPreferences,
+                        NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event2, CURRENT_USER, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event2, CURRENT_USER, filterPreferences,
+                        NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(event3, CURRENT_USER, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event3, CURRENT_USER, filterPreferences,
+                        NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event4, CURRENT_USER, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event4, CURRENT_USER, filterPreferences,
+                        NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(event5, CURRENT_USER, NotificationFormat.ALERT));
+                mocker.getComponentUnderTest().filterEvent(event5, CURRENT_USER, filterPreferences,
+                        NotificationFormat.ALERT));
     }
 
     @Test
     public void generateFilterExpressionWithPreferences() throws Exception
     {
         // Preferences
-        mockPreferences();
+        Collection<NotificationFilterPreference> filterPreferences = mockPreferences();
 
         NotificationPreference notificationPreference = mock(NotificationPreference.class);
         when(notificationPreference.getFormat()).thenReturn(NotificationFormat.ALERT);
 
         // Test
-        assertNull(mocker.getComponentUnderTest().filterExpression(CURRENT_USER, notificationPreference));
+        assertNull(mocker.getComponentUnderTest().filterExpression(CURRENT_USER, filterPreferences,
+                notificationPreference));
     }
 
     @Test
     public void generateFilterExpression() throws Exception
     {
         // Preferences
-        mockPreferences();
+        Collection<NotificationFilterPreference> filterPreferences = mockPreferences();
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().filterExpression(CURRENT_USER,
+        ExpressionNode node = mocker.getComponentUnderTest().filterExpression(CURRENT_USER, filterPreferences,
                 NotificationFilterType.EXCLUSIVE, NotificationFormat.ALERT);
 
         // Verify

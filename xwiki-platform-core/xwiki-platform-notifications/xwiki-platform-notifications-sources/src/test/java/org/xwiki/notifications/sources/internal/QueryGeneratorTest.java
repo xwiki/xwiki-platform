@@ -20,6 +20,7 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
@@ -46,6 +47,7 @@ import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -127,9 +129,11 @@ public class QueryGeneratorTest
     public void generateQueryExpression() throws Exception
     {
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT,null, startDate, null);
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
         assertEquals("((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
@@ -138,10 +142,7 @@ public class QueryGeneratorTest
                 node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT,
-                null, startDate, null);
+        mocker.getComponentUnderTest().generateQuery(parameters);
 
 
         verify(queryManager).createQuery(
@@ -165,10 +166,11 @@ public class QueryGeneratorTest
         when(userPreferencesSource.getProperty("displayHiddenDocuments", 0)).thenReturn(1);
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT,
-                null, startDate, null);
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
         assertEquals("(DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
@@ -176,10 +178,7 @@ public class QueryGeneratorTest
                 "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT,
-                null, startDate, null);
+        mocker.getComponentUnderTest().generateQuery(parameters);
 
 
         verify(queryManager).createQuery(
@@ -199,9 +198,11 @@ public class QueryGeneratorTest
     public void generateQueryWithNotOnlyUnread() throws Exception
     {
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT,null, startDate, null);
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
         assertEquals("((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
@@ -209,10 +210,7 @@ public class QueryGeneratorTest
                 "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT,
-                null, startDate, null);
+        mocker.getComponentUnderTest().generateQuery(parameters);
 
         verify(queryManager).createQuery(
                 "where ((" +
@@ -230,9 +228,11 @@ public class QueryGeneratorTest
         Date untilDate = new Date(1000000000000L);
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT, untilDate, startDate, Collections.emptyList());
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
         assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
@@ -241,9 +241,12 @@ public class QueryGeneratorTest
                 "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        mocker.getComponentUnderTest().generateQuery(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT, untilDate, startDate, Collections.emptyList());
+        NotificationParameters parameters2 = new NotificationParameters();
+        parameters2.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters2.format = NotificationFormat.ALERT;
+        parameters2.fromDate = startDate;
+        parameters2.endDate = untilDate;
+        mocker.getComponentUnderTest().generateQuery(parameters2);
 
 
         verify(queryManager).createQuery(
@@ -267,9 +270,12 @@ public class QueryGeneratorTest
         Date untilDate = new Date(1000000000000L);
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT, untilDate, null, Arrays.asList("event1", "event2"));
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.endDate = untilDate;
+        parameters.blackList = Arrays.asList("event1", "event2");
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
         assertEquals("((((TYPE = \"create\" " +
@@ -287,9 +293,11 @@ public class QueryGeneratorTest
     {
         // Test
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT, null, startDate, null);
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
         assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" "
@@ -306,10 +314,10 @@ public class QueryGeneratorTest
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
-        when(notificationFilterManager.getFilters(any(DocumentReference.class),
-                any(NotificationPreference.class))).thenReturn(Sets.newSet(notificationFilter1, notificationFilter2));
+        Collection<NotificationFilter> filters = Sets.newSet(notificationFilter1, notificationFilter2);
 
-        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
+        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
+                any(NotificationPreference.class)))
                 .thenReturn(
                         new AndNode(
                                 new EqualsNode(
@@ -319,7 +327,8 @@ public class QueryGeneratorTest
                                         new StringValueNode("1"),
                                         new StringValueNode("1"))));
 
-        when(notificationFilter2.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
+        when(notificationFilter2.filterExpression(any(DocumentReference.class), any(Collection.class),
+                any(NotificationPreference.class)))
                 .thenReturn(
                         new AndNode(
                                 new EqualsNode(
@@ -333,9 +342,13 @@ public class QueryGeneratorTest
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT, null, startDate, Arrays.asList("event1", "event2"));
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        parameters.blackList = Arrays.asList("event1", "event2");
+        parameters.filters = filters;
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (((TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\") " +
@@ -352,18 +365,21 @@ public class QueryGeneratorTest
 
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
-        when(notificationFilterManager.getFilters(any(DocumentReference.class),
-                any(NotificationPreference.class))).thenReturn(Collections.singleton(notificationFilter1));
 
-        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(NotificationPreference.class)))
+        when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
+                any(NotificationPreference.class)))
                 .thenReturn(new EmptyNode());
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
 
         // Test
-        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(
-                new DocumentReference("xwiki", "XWiki", "UserA"),
-                NotificationFormat.ALERT, null, startDate, Arrays.asList("event1", "event2"));
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = startDate;
+        parameters.blackList = Arrays.asList("event1", "event2");
+        parameters.filters = Collections.singleton(notificationFilter1);
+        ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
                 "AND (TYPE = \"create\" AND DATE >= \"Fri Jan 02 04:46:40 CET 1970\")) " +

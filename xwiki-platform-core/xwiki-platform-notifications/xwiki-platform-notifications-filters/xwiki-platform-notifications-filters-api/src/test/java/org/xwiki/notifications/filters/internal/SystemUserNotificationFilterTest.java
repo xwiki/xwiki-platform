@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,10 +75,10 @@ public class SystemUserNotificationFilterTest
     public void filterEvent() throws Exception
     {
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
-                mocker.getComponentUnderTest().filterEvent(nonSystemEvent, randomUser,
+                mocker.getComponentUnderTest().filterEvent(nonSystemEvent, randomUser, Collections.emptyList(),
                 NotificationFormat.ALERT));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
-                mocker.getComponentUnderTest().filterEvent(systemEvent, randomUser,
+                mocker.getComponentUnderTest().filterEvent(systemEvent, randomUser, Collections.emptyList(),
                 NotificationFormat.ALERT));
     }
 
@@ -85,9 +87,10 @@ public class SystemUserNotificationFilterTest
     {
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
-        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, fakePreference));
+        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(), fakePreference));
         assertEquals("USER <> \"serializedSystemUser\"",
-                mocker.getComponentUnderTest().filterExpression(randomUser, NotificationFilterType.EXCLUSIVE,
+                mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+                        NotificationFilterType.EXCLUSIVE,
                         null).toString());
     }
 

@@ -34,11 +34,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.internal.SimilarityCalculator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -50,8 +50,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -90,8 +88,7 @@ public class DefaultNotificationManagerTest
 
         when(documentReferenceResolver.resolve("xwiki:XWiki.UserA")).thenReturn(userReference);
         query = mock(Query.class);
-        when(queryGenerator.generateQuery(any(DocumentReference.class), any(NotificationFormat.class),
-                nullable(Date.class), nullable(Date.class), nullable(List.class))).thenReturn(query);
+        when(queryGenerator.generateQuery(any(NotificationParameters.class))).thenReturn(query);
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
         when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
@@ -170,8 +167,7 @@ public class DefaultNotificationManagerTest
     {
         // Mocks
         NotificationException exception = new NotificationException("Error");
-        when(queryGenerator.generateQuery(eq(userReference), any(NotificationFormat.class),
-                isNull(), isNull(), any(List.class))).thenThrow(exception);
+        when(queryGenerator.generateQuery(any(NotificationParameters.class))).thenThrow(exception);
 
         // Test
         NotificationException caughtException = null;

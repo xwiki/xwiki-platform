@@ -20,21 +20,17 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 
@@ -49,44 +45,32 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 public class ScopeNotificationFilterPreferencesGetter
 {
     @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
-
-    @Inject
-    private Logger logger;
 
     /**
      * Get all "ScopeNotificationFilterPreference(s)" and transform them to LocationFilter(s).
-     * @param user the user for who we compute the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param eventType the event type (could be null)
      * @param format the notification format (could be null)
      * @return a hierarchy of scope notification filter preferences
+     *
+     * @since 10.3RC1
      */
-    public ScopeNotificationFilterPreferencesHierarchy getScopeFilterPreferences(DocumentReference user,
-            String eventType, NotificationFormat format)
+    public ScopeNotificationFilterPreferencesHierarchy getScopeFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, String eventType, NotificationFormat format)
     {
         List<ScopeNotificationFilterPreference> results = new ArrayList<>();
 
-        try {
-            // Get every filterPreference linked to the current user
-            Set<NotificationFilterPreference> filterPreferences = notificationFilterManager.getFilterPreferences(user);
+        // Filter them according to the event type and the filter name
+        Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
+            pref -> matchFilter(pref)
+                    && matchFormat(pref, format)
+                    && (matchAllEvents(pref) || matchEventType(pref, eventType))
+        );
 
-            // Filter them according to the event type and the filter name
-            Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
-                pref -> matchFilter(pref)
-                        && matchFormat(pref, format)
-                        && (matchAllEvents(pref) || matchEventType(pref, eventType))
-            );
-
-            Iterator<NotificationFilterPreference> iterator = filterPreferenceStream.iterator();
-            while (iterator.hasNext()) {
-                results.add(new ScopeNotificationFilterPreference(iterator.next(), entityReferenceResolver));
-            }
-
-        } catch (NotificationException e) {
-            logger.warn("Failed to compute the list of location filters", e);
+        Iterator<NotificationFilterPreference> iterator = filterPreferenceStream.iterator();
+        while (iterator.hasNext()) {
+            results.add(new ScopeNotificationFilterPreference(iterator.next(), entityReferenceResolver));
         }
 
         return new ScopeNotificationFilterPreferencesHierarchy(results);

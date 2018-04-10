@@ -19,12 +19,16 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
@@ -40,81 +44,57 @@ import org.xwiki.stability.Unstable;
 public interface NotificationFilterManager
 {
     /**
-     * Get all notifications filters, from all wikis if the user is global.
+     * Get all notifications filters.
      *
-     * @param user the user interested in notifications
+     * @param allWikis include filters from all wikis or only the current one
      * @return a collection of notification filters
      * @throws NotificationException if error happens
+     * @since 10.3RC1
      */
-    Set<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
+    Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException;
+
+    Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
+
+    Stream<NotificationFilter> getFiltersRelatedToNotificationPreference(Collection<NotificationFilter> filters,
+            NotificationPreference preference);
+
+    Collection<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
+
+    Stream<NotificationFilterPreference> getFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter);
+
+    Stream<NotificationFilterPreference> getFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
+            NotificationFilterType filterType);
+
+    Stream<NotificationFilterPreference> getFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
+            NotificationFilterType filterType, NotificationFormat format);
+
+    Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters);
 
     /**
-     * Get all the notification filters for the given user that matches the given notification preference.
+     * For all toggeable notification filters, get if the filter is enabled regarding the user profile.
      *
-     * @param user the user to get filters from
-     * @param preference the preference that filters should match
-     * @return a collection of notification filters
-     * @throws NotificationException if error happens
+     * @param user the user to use
+     * @return a map of notification filters with their activation state
+     * @throws NotificationException if an error happens
+     * @since 10.3RC1
      */
-    Set<NotificationFilter> getFilters(DocumentReference user, NotificationPreference preference)
-            throws NotificationException;
+    Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException;
 
     /**
-     * Get a set of every {@link NotificationFilterPreference} that are available for the current user.
-     *
-     * @param user the user to get preferences from
-     * @return a set of notification filters
-     * @throws NotificationException if error happens
-     */
-    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
+     * Goes through every given {@link NotificationFilter}. One of the filters implements
+     * {@link ToggleableNotificationFilter}, checks if the given user has disabled this filter. If so, remove the
+     * filter from the set.
 
-    /**
-     * Get a set of {@link NotificationFilterPreference} that matches the given filter for the given user.
+     * @param filters the filters that should be examined
+     * @return a set of filters that are not marked as disabled by the user
      *
-     * @param user the user to get preferences from
-     * @param filter the filter that should match the preferences
-     * @return a set of notification filter preferences that corresponds to the given filter and the given user
-     * @throws NotificationException if error happens
+     * @since 10.3RC1
      */
-    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
-            throws NotificationException;
-
-    /**
-     * Get a set of {@link NotificationFilterPreference} that matches the given filter for the given user and
-     * the given filter type.
-     *
-     * @param user the user to get preferences from
-     * @param filter the filter that should match the preferences
-     * @param filterType the type of the filter
-     * @return a set of notification filter preferences that corresponds to the given filter, the user and the filter
-     * type
-     * @throws NotificationException if error happens
-     */
-    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
-            NotificationFilterType filterType) throws NotificationException;
-
-    /**
-     * Get a set of {@link NotificationFilterPreference} that matches the given user and also the given filter,
-     * filter type and format.
-     *
-     * @param user the user to get preferences from
-     * @param filter the filter that should match the preferences
-     * @param filterType the type of the filter
-     * @param format the format of the notification that should correspond to the filter
-     * @return a set of notification filter preferences
-     * @throws NotificationException if error happens
-     */
-    Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
-            NotificationFilterType filterType, NotificationFormat format) throws NotificationException;
-
-    /**
-     * Get a set of filters that are toggleable for the given user.
-     *
-     * @param user the user to get filters from
-     * @return a set of toggleable filters
-     * @throws NotificationException if error happens
-     */
-    Set<NotificationFilter> getToggleableFilters(DocumentReference user) throws NotificationException;
+    Stream<NotificationFilter> getEnabledFilters(Collection<NotificationFilter> filters,
+            Map<String, Boolean> filterActivation);
 
     /**
      * Save the given set of {@link NotificationFilterPreference} against their respective

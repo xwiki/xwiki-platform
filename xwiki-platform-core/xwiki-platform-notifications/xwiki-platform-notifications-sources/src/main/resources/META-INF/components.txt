@@ -1,3 +1,4 @@
+org.xwiki.notifications.sources.internal.DefaultNewNotificationManager
 org.xwiki.notifications.sources.internal.DefaultNotificationManager
 org.xwiki.notifications.sources.internal.ExpressionNodeToHQLConverter
 org.xwiki.notifications.sources.internal.QueryGenerator

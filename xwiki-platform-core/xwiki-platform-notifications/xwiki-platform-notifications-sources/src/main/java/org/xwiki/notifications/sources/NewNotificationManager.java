@@ -21,6 +21,7 @@ package org.xwiki.notifications.sources;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 
@@ -28,6 +29,7 @@ import org.xwiki.notifications.NotificationException;
  * @version $Id$
  * @since
  */
+@Role
 public interface NewNotificationManager
 {
     List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException;

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -36,13 +37,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
 /**
  * Default implementation for {@link LiveMimeMessageIterator}.
@@ -107,9 +109,13 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
     }
 
     private boolean isEventFiltered(List<NotificationFilter> filters, Event event, DocumentReference user)
+            throws NotificationException
     {
+        Collection<NotificationFilterPreference> filterPreferences
+                = notificationFilterManager.getFilterPreferences(user);
         for (NotificationFilter filter : filters) {
-            NotificationFilter.FilterPolicy policy = filter.filterEvent(event, user, NotificationFormat.EMAIL);
+            NotificationFilter.FilterPolicy policy = filter.filterEvent(event, user, filterPreferences,
+                    NotificationFormat.EMAIL);
             switch (policy) {
                 case FILTER:
                     return true;

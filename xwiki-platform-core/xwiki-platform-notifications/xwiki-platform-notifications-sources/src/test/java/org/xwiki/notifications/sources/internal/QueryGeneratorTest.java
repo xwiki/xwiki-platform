@@ -45,7 +45,6 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
@@ -56,6 +55,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -77,7 +77,6 @@ public class QueryGeneratorTest
             new MockitoComponentMockingRule<>(QueryGenerator.class);
 
     private QueryManager queryManager;
-    private NotificationPreferenceManager notificationPreferenceManager;
     private EntityReferenceSerializer<String> serializer;
     private ConfigurationSource userPreferencesSource;
     private WikiDescriptorManager wikiDescriptorManager;
@@ -87,12 +86,13 @@ public class QueryGeneratorTest
     private Query query;
     private Date startDate;
     private Date pref1StartDate;
+    private NotificationFilterPreference fakeFilterPreference;
+    private NotificationPreference pref1;
 
     @Before
     public void setUp() throws Exception
     {
         queryManager = mocker.getInstance(QueryManager.class);
-        notificationPreferenceManager = mocker.getInstance(NotificationPreferenceManager.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         userPreferencesSource = mocker.getInstance(ConfigurationSource.class, "user");
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
@@ -105,17 +105,14 @@ public class QueryGeneratorTest
 
         pref1StartDate = new Date(100000000);
 
-        NotificationPreference pref1 = mock(NotificationPreference.class);
+        pref1 = mock(NotificationPreference.class);
         when(pref1.getProperties()).thenReturn(Collections.singletonMap(
                 NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.getFormat()).thenReturn(NotificationFormat.ALERT);
         when(pref1.getStartDate()).thenReturn(pref1StartDate);
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
-        when(notificationPreferenceManager.getPreferences(userReference, true,
-                NotificationFormat.ALERT)).thenReturn(Arrays.asList(pref1));
-
-        NotificationFilterPreference fakeFilterPreference = mock(NotificationFilterPreference.class);
+        fakeFilterPreference = mock(NotificationFilterPreference.class);
         when(fakeFilterPreference.isActive()).thenReturn(true);
         when(notificationFilterManager.getFilterPreferences(any(DocumentReference.class)))
                 .thenReturn(Sets.newSet(fakeFilterPreference));
@@ -130,9 +127,11 @@ public class QueryGeneratorTest
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
@@ -167,9 +166,11 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
@@ -199,9 +200,11 @@ public class QueryGeneratorTest
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
@@ -229,9 +232,12 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
+        parameters.endDate = untilDate;
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
@@ -241,12 +247,7 @@ public class QueryGeneratorTest
                 "ORDER BY DATE DESC", node.toString());
 
         // Test 2
-        NotificationParameters parameters2 = new NotificationParameters();
-        parameters2.user = new DocumentReference("xwiki", "XWiki", "UserA");
-        parameters2.format = NotificationFormat.ALERT;
-        parameters2.fromDate = startDate;
-        parameters2.endDate = untilDate;
-        mocker.getComponentUnderTest().generateQuery(parameters2);
+        mocker.getComponentUnderTest().generateQuery(parameters);
 
 
         verify(queryManager).createQuery(
@@ -271,10 +272,12 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.endDate = untilDate;
         parameters.blackList = Arrays.asList("event1", "event2");
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
@@ -294,9 +297,11 @@ public class QueryGeneratorTest
         // Test
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         // Verify
@@ -314,7 +319,6 @@ public class QueryGeneratorTest
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
         NotificationFilter notificationFilter2 = mock(NotificationFilter.class);
-        Collection<NotificationFilter> filters = Sets.newSet(notificationFilter1, notificationFilter2);
 
         when(notificationFilter1.filterExpression(any(DocumentReference.class), any(Collection.class),
                 any(NotificationPreference.class)))
@@ -340,14 +344,19 @@ public class QueryGeneratorTest
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
+        when(notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
+                any(NotificationPreference.class))).thenAnswer(
+                        invocationOnMock -> ((Collection)invocationOnMock.getArgument(0)).stream());
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.blackList = Arrays.asList("event1", "event2");
-        parameters.filters = filters;
+        parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +
@@ -374,11 +383,13 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.user = userReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.blackList = Arrays.asList("event1", "event2");
         parameters.filters = Collections.singleton(notificationFilter1);
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
         ExpressionNode node = mocker.getComponentUnderTest().generateQueryExpression(parameters);
 
         assertEquals("(((DATE >= \"Thu Jan 01 01:00:00 CET 1970\" " +

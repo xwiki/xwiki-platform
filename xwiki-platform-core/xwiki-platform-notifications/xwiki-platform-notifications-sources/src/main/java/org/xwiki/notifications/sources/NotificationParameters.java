@@ -21,6 +21,7 @@ package org.xwiki.notifications.sources;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -42,8 +43,8 @@ public class NotificationParameters
     public Date endDate;
     public Date fromDate;
     public Collection<String> blackList = new ArrayList<>();
-    public Collection<NotificationPreference> preferences;
-    public Collection<NotificationFilterPreference> filterPreferences;
-    public Collection<NotificationFilter> filters;
+    public Collection<NotificationPreference> preferences = Collections.emptyList();
+    public Collection<NotificationFilterPreference> filterPreferences = Collections.emptyList();
+    public Collection<NotificationFilter> filters= Collections.emptyList();
     public Map<String, Boolean> filterActivations;
 }

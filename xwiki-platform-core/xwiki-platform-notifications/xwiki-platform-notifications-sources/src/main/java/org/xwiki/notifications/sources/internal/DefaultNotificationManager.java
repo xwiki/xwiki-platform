@@ -20,7 +20,9 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,6 +33,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
@@ -130,10 +133,17 @@ public class DefaultNotificationManager implements NotificationManager
     {
         parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
                 parameters.format);
-        parameters.filters = notificationFilterManager.getAllFilters(
-                parameters.user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
+        parameters.filters = notificationFilterManager.getAllFilters(parameters.user);
         parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
-        parameters.filterActivations = notificationFilterManager.getToggeableFilterActivations(parameters.user);
+        Map<String, Boolean> filterActivations = notificationFilterManager.getToggeableFilterActivations(parameters.user);
+        Iterator<NotificationFilter> it = parameters.filters.iterator();
+        while (it.hasNext()) {
+            NotificationFilter filter = it.next();
+            Boolean filterActivation = filterActivations.get(filter.getName());
+            if (filterActivation != null && filterActivation.booleanValue() == false) {
+                it.remove();
+            }
+        }
 
         return newNotificationManager.getEvents(parameters);
     }

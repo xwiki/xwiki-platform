@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +116,18 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     @Override
     public Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException
     {
-        return getAllFilters(user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
+        Collection<NotificationFilter> filters = getAllFilters(
+                user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
+        Map<String, Boolean> filterActivations = getToggeableFilterActivations(user);
+        Iterator<NotificationFilter> it = filters.iterator();
+        while (it.hasNext()) {
+            NotificationFilter filter = it.next();
+            Boolean filterActivation = filterActivations.get(filter.getName());
+            if (filterActivation != null && filterActivation.booleanValue() == false) {
+                it.remove();
+            }
+        }
+        return filters;
     }
 
 

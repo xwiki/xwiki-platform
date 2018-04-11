@@ -234,7 +234,7 @@ public class XWikiAttachment implements Cloneable
             }
 
             // Reset listeners
-            this.listeners = new CopyOnWriteArrayList<>();
+            attachment.listeners = new CopyOnWriteArrayList<>();
         } catch (CloneNotSupportedException e) {
             // This should not happen
             LOGGER.error("exception while attach.clone", e);

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
@@ -46,5 +45,4 @@ public class NotificationParameters
     public Collection<NotificationPreference> preferences = Collections.emptyList();
     public Collection<NotificationFilterPreference> filterPreferences = Collections.emptyList();
     public Collection<NotificationFilter> filters= Collections.emptyList();
-    public Map<String, Boolean> filterActivations;
 }

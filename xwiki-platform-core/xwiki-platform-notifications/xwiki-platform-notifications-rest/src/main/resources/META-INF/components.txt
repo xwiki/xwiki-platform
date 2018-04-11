@@ -1,0 +1,1 @@
+org.xwiki.notifications.rest.internal.DefaultNotificationsResource

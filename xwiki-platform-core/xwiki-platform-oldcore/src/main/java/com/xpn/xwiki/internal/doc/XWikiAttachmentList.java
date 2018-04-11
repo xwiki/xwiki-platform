@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * AttachmentList that holds elements in order of filename.
  * 
  * @version $Id$
- * @since 11.0RC1
+ * @since 10.1RC1
  */
 public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> implements AttachmentNameChanged
 {

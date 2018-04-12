@@ -1,3 +1,5 @@
+#template('documentTree_macros.vm')
+
 #**
  * Add export modal
  *#

@@ -3,6 +3,7 @@ org.xwiki.extension.xar.internal.doc.XarDocumentRevisionProvider
 org.xwiki.extension.xar.internal.handler.XarExtensionHandler
 org.xwiki.extension.xar.internal.handler.WikiEventListener
 org.xwiki.extension.xar.internal.handler.XarExtensionJobFinishedListener
+org.xwiki.extension.xar.internal.handler.packager.DefaultXWikiDocumentMerger
 org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter
 org.xwiki.extension.xar.internal.handler.packager.Packager
 org.xwiki.extension.xar.internal.job.diff.AttachmentUnifiedDiffBuilder

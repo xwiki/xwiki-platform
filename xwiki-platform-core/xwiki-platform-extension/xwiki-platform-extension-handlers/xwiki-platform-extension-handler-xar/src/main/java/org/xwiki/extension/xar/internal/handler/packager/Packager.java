@@ -34,7 +34,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -69,7 +68,6 @@ import org.xwiki.xar.internal.model.XarModel;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
@@ -151,22 +149,20 @@ public class Packager
         }
     }
 
-    private XarMergeResult importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
+    private void importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
         PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
-            return importXARToWiki(comment, fis, wikiReference, configuration);
+            importXARToWiki(comment, fis, wikiReference, configuration);
         } finally {
             fis.close();
         }
     }
 
-    private XarMergeResult importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
+    private void importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
         PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
-        XarMergeResult mergeResult = new XarMergeResult();
-
         ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
 
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -178,15 +174,18 @@ public class Packager
             this.observation.notify(new XARImportingEvent(), null, xcontext);
 
             for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (!entry.isDirectory()) {
-                    // Only import what should be imported
-                    if (!entry.getName().equals(XarModel.PATH_PACKAGE) && (configuration.getEntriesToImport() == null
-                        || configuration.getEntriesToImport().contains(entry.getName()))) {
-                        XarEntryMergeResult entityMergeResult =
+                // Only import what should be imported
+                if (!entry.isDirectory() && !entry.getName().equals(XarModel.PATH_PACKAGE)) {
+                    if (configuration.getEntriesToImport() != null) {
+                        XarEntry xarEntry = configuration.getEntriesToImport().get(entry.getName());
+                        if (xarEntry != null) {
+                            configuration.setXarEntry(xarEntry);
+
                             importDocumentToWiki(comment, wikiReference, zis, configuration);
-                        if (entityMergeResult != null) {
-                            mergeResult.addMergeResult(entityMergeResult);
                         }
+                    } else {
+                        configuration.setXarEntry(null);
+                        importDocumentToWiki(comment, wikiReference, zis, configuration);
                     }
                 }
             }
@@ -195,12 +194,10 @@ public class Packager
 
             xcontext.setWikiId(currentWiki);
         }
-
-        return mergeResult;
     }
 
-    private XarEntryMergeResult importDocumentToWiki(String comment, WikiReference wikiReference,
-        InputStream inputStream, PackageConfiguration configuration) throws XWikiException, XarException, IOException
+    private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
+        PackageConfiguration configuration) throws XWikiException, XarException, IOException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -210,7 +207,7 @@ public class Packager
         } catch (Exception e) {
             this.logger.error("Failed to parse document", e);
 
-            return null;
+            return;
         }
 
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
@@ -230,23 +227,18 @@ public class Packager
         }
 
         try {
-            XarEntryMergeResult entityMergeResult =
-                this.importer.saveDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
+            this.importer.importDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
 
             if (configuration.isVerbose()) {
                 this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]",
                     nextDocument.getDocumentReferenceWithLocale());
             }
-
-            return entityMergeResult;
         } catch (Exception e) {
             if (configuration.isVerbose()) {
                 this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]",
                     nextDocument.getDocumentReferenceWithLocale(), e);
             }
         }
-
-        return null;
     }
 
     public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration)
@@ -270,7 +262,7 @@ public class Packager
         for (XarEntry xarEntry : entries) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
-                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
+                || configuration.getEntriesToImport().containsKey(xarEntry.getEntryName())) {
                 DocumentReference documentReference =
                     new DocumentReference(this.resolver.resolve(xarEntry, wikiReference), xarEntry.getLocale());
 
@@ -478,7 +470,7 @@ public class Packager
         for (XarEntry xarEntry : pages) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
-                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
+                || configuration.getEntriesToImport().containsKey(xarEntry.getEntryName())) {
                 DocumentReference documentReference = new DocumentReference(xarEntry, wikiReference);
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {

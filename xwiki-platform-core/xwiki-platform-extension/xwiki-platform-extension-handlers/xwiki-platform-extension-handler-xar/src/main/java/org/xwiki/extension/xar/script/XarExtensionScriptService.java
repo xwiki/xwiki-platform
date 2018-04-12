@@ -309,4 +309,24 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
                 "Failed to get standard version of document [%s] from extension [%s]", reference, extension), e);
         }
     }
+
+    /**
+     * @param documentReference the reference of the document
+     * @return true if edit is allowed on the passed document
+     * @since 10.3RC1
+     */
+    public boolean isEditAllowed(DocumentReference documentReference)
+    {
+        return getXarInstalledExtensionRepository().isAllowed(documentReference, Right.EDIT);
+    }
+
+    /**
+     * @param documentReference the reference of the document
+     * @return true if edit is allowed on the passed document
+     * @since 10.3RC1
+     */
+    public boolean isDeleteAllowed(DocumentReference documentReference)
+    {
+        return getXarInstalledExtensionRepository().isAllowed(documentReference, Right.DELETE);
+    }
 }

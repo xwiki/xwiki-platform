@@ -140,7 +140,7 @@
                 **/XarInstalledExtensionRepository.java,
                 **/DocumentScriptSafeProvider.java,
                 **/SafeConflictQuestion.java,
-                **/DocumentMergeImporter.java,
+                **/DefaultXWikiDocumentMerger.java,
                 **/WikiEventListener.java,
                 **/XarExtensionPlan.java
               </excludes>

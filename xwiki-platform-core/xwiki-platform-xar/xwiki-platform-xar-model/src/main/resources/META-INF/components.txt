@@ -1,4 +1,9 @@
+org.xwiki.xar.internal.DefaultXarEntryTypeResolver
 org.xwiki.xar.internal.XarObjectPropertySerializerManager
 org.xwiki.xar.internal.property.DateXarObjectPropertySerializer
 org.xwiki.xar.internal.property.DefaultXarObjectPropertySerializer
 org.xwiki.xar.internal.property.ListXarObjectPropertySerializer
+org.xwiki.xar.internal.type.ConfigurationXarEntryType
+org.xwiki.xar.internal.type.DefaultXarEntryType
+org.xwiki.xar.internal.type.DemoXarEntryType
+org.xwiki.xar.internal.type.HomeXarEntryType

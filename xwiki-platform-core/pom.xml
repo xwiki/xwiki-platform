@@ -163,6 +163,17 @@
                     "methodName": "filterEvent",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.exception.checkedRemoved",
+                    "old": "method void org.xwiki.xar.XarPackage::write(java.io.OutputStream, java.lang.String) throws org.xwiki.xar.XarException, java.io.IOException",
+                    "new": "method void org.xwiki.xar.XarPackage::write(java.io.OutputStream, java.lang.String) throws org.xwiki.xar.XarException",
+                    "exception": "java.io.IOException",
+                    "package": "org.xwiki.xar",
+                    "classSimpleName": "XarPackage",
+                    "methodName": "write",
+                    "elementKind": "method",
+                    "justification": "Not a runtime breackage. This exeception was useless"
                   }
                 ]
               }

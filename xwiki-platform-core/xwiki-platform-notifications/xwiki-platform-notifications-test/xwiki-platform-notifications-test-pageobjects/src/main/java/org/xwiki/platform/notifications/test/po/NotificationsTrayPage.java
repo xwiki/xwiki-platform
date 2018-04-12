@@ -48,7 +48,7 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(css = "li#tmNotifications")
     private WebElement notificationsButton;
 
-    @FindBy(css = "li#tmNotifications span.notifications-count")
+    @FindBy(css = "span.notifications-count")
     private WebElement countBadge;
 
     @FindBy(className = "notification-event-clean")
@@ -88,9 +88,11 @@ public class NotificationsTrayPage extends ViewPage
      */
     public int getNotificationsCount()
     {
+        // This part is async
         if (!this.areNotificationsAvailable()) {
             return 0;
-        } else if (this.countBadge.getText().equals("20+")) {
+        }
+        if (this.countBadge.getText().equals("20+")) {
             return Integer.MAX_VALUE;
         } else {
             return Integer.parseInt(this.countBadge.getText());

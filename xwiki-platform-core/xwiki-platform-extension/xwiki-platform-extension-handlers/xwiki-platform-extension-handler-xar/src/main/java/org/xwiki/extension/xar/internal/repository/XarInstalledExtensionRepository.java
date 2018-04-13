@@ -54,10 +54,7 @@ import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.xar.XarEntry;
-import org.xwiki.xar.XarEntryType;
-import org.xwiki.xar.XarEntryTypeResolver;
 import org.xwiki.xar.XarException;
 
 /**
@@ -76,10 +73,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private transient XarEntryTypeResolver typeResolver;
-
-    @Inject
-    private transient Logger logger;
+    private Logger logger;
 
     /**
      * Index used to find extensions owners of a document installed on a specific wiki.
@@ -261,40 +255,6 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         }
 
         return allExtensions;
-    }
-
-    /**
-     * @param documentReference the reference of the document
-     * @param right the right to check on the passed document
-     * @return true if the passed right is allowed on the passed document. True unless explicitly indicated otherwise by
-     *         a {@link XarEntryType}.
-     */
-    public boolean isAllowed(DocumentReference documentReference, Right right)
-    {
-        Collection<XarInstalledExtension> extensions = getXarInstalledExtensions(documentReference);
-
-        LocalDocumentReference localDocumentReference = documentReference.getLocalDocumentReference();
-
-        for (XarInstalledExtension extension : extensions) {
-            XarEntry entry = extension.getXarPackage().getEntry(localDocumentReference);
-
-            XarEntryType type = this.typeResolver.resolve(entry, true);
-
-            boolean allowed;
-            if (Right.EDIT.equals(right)) {
-                allowed = type.isEditAllowed();
-            } else if (Right.DELETE.equals(right)) {
-                allowed = type.isDeleteAllowed();
-            } else {
-                allowed = true;
-            }
-
-            if (!allowed) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     // InstalledExtensionRepository

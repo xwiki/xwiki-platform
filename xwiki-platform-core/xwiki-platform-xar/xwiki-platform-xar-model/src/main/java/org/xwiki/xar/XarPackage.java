@@ -565,9 +565,9 @@ public class XarPackage
         this.packageLicense = getElementText(infos, XarModel.ELEMENT_INFOS_LICENSE, false);
         this.packageAuthor = getElementText(infos, XarModel.ELEMENT_INFOS_AUTHOR, false);
         this.packageBackupPack =
-            Boolean.parseBoolean(getElementText(infos, XarModel.ELEMENT_INFOS_ISBACKUPPACK, false));
+            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISBACKUPPACK, false)).booleanValue();
         this.packagePreserveVersion =
-            Boolean.parseBoolean(getElementText(infos, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, false));
+            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, false)).booleanValue();
     }
 
     private void readDescriptorFiles(Element files)
@@ -580,7 +580,6 @@ public class XarPackage
                 if (element.getTagName().equals(XarModel.ELEMENT_FILES_FILE)) {
                     String localeString = element.getAttribute(XarModel.ATTRIBUTE_LOCALE);
                     String defaultActionString = element.getAttribute(XarModel.ATTRIBUTE_DEFAULTACTION);
-                    String entryType = element.getAttribute(XarModel.ATTRIBUTE_TYPE);
                     String referenceString = element.getTextContent();
 
                     // Parse reference
@@ -589,13 +588,13 @@ public class XarPackage
                             LocaleUtils.toLocale(localeString));
 
                     // Parse default action
-                    int defaultAction = Integer.parseInt(defaultActionString);
+                    int defaultAction = Integer.valueOf(defaultActionString);
 
                     // Get entry name associated to the document
                     String entryName = getEntryName(reference);
 
                     // Create entry
-                    XarEntry packageFile = new XarEntry(reference, entryName, defaultAction, entryType);
+                    XarEntry packageFile = new XarEntry(reference, entryName, defaultAction);
 
                     // Register package file entry
                     this.packageFiles.put(packageFile, packageFile);
@@ -684,8 +683,9 @@ public class XarPackage
      * @param stream the stream to the resulting XML file
      * @param encoding the encoding to use to write the descriptor
      * @throws XarException when failing to parse the descriptor
+     * @throws IOException when failing to read the file
      */
-    public void write(OutputStream stream, String encoding) throws XarException
+    public void write(OutputStream stream, String encoding) throws XarException, IOException
     {
         XMLStreamWriter writer;
         try {
@@ -738,15 +738,9 @@ public class XarPackage
         writer.writeStartElement(XarModel.ELEMENT_FILES);
         for (XarEntry entry : this.entries.values()) {
             writer.writeStartElement(XarModel.ELEMENT_FILES_FILE);
-
             writer.writeAttribute(XarModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
             writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, Objects.toString(entry.getLocale(), ""));
-            if (entry.getEntryType() != null) {
-                writer.writeAttribute(XarModel.ATTRIBUTE_TYPE, entry.getEntryType());
-            }
-
             writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry));
-
             writer.writeEndElement();
         }
         writer.writeEndElement();

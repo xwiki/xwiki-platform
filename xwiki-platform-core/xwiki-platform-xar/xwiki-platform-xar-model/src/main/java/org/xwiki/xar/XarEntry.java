@@ -47,11 +47,6 @@ public class XarEntry extends LocalDocumentReference
     private int defaultAction;
 
     /**
-     * @see #getEntryType()
-     */
-    private String entryType;
-
-    /**
      * @param reference the reference of the document
      */
     public XarEntry(LocalDocumentReference reference)
@@ -70,34 +65,12 @@ public class XarEntry extends LocalDocumentReference
 
     /**
      * @param reference the reference of the document
-     * @param name the name of the entry (ZIP style)
-     * @param entryType the type of the entry
-     * @since 10.3RC1
-     */
-    public XarEntry(LocalDocumentReference reference, String name, String entryType)
-    {
-        this(reference, name, XarModel.ACTION_OVERWRITE, entryType);
-    }
-
-    /**
-     * @param reference the reference of the document
      * @param defaultAction the default action associated to a XAR entry
      * @since 7.2M1
      */
     public XarEntry(LocalDocumentReference reference, int defaultAction)
     {
-        this(reference, defaultAction, null);
-    }
-
-    /**
-     * @param reference the reference of the document
-     * @param defaultAction the default action associated to a XAR entry
-     * @param entryType the type of the entry
-     * @since 10.3RC1
-     */
-    public XarEntry(LocalDocumentReference reference, int defaultAction, String entryType)
-    {
-        this(reference, null, defaultAction, entryType);
+        this(reference, null, defaultAction);
     }
 
     /**
@@ -107,23 +80,9 @@ public class XarEntry extends LocalDocumentReference
      */
     public XarEntry(LocalDocumentReference reference, String name, int defaultAction)
     {
-        this(reference, name, defaultAction, null);
-    }
-
-    /**
-     * @param reference the reference of the document
-     * @param name the name of the entry (ZIP style)
-     * @param defaultAction the default action associated to a XAR entry (not used at the moment)
-     * @param entryType the type of the entry
-     * @since 10.3RC1
-     */
-    public XarEntry(LocalDocumentReference reference, String name, int defaultAction, String entryType)
-    {
         super(reference);
 
         this.entryName = name;
-        this.defaultAction = defaultAction;
-        this.entryType = entryType;
     }
 
     /**
@@ -135,12 +94,22 @@ public class XarEntry extends LocalDocumentReference
     }
 
     /**
-     * @return the type of the entry
-     * @since 10.3RC1
+     * @return the default action associated to the entry
      */
-    public String getEntryType()
+    public int getDefaultAction()
     {
-        return this.entryType;
+        return this.defaultAction;
+    }
+
+    /**
+     * @return the space of the document
+     * @deprecated since 7.2M1, does not make much sense anymore with nested space
+     */
+    @Deprecated
+    @Transient
+    public String getSpaceName()
+    {
+        return TOSTRING_SERIALIZER.serialize(extractReference(EntityType.SPACE));
     }
 
     /**
@@ -165,30 +134,5 @@ public class XarEntry extends LocalDocumentReference
         }
 
         return str.toString();
-    }
-
-    // Deprecated
-
-    /**
-     * @return the default action associated to the entry
-     * @deprecated kept for retro compatibility reason (since this used to exist in XAR format) but this method never
-     *             really been used in XWiki Standard. Similar concept (among other things) are exposed through
-     *             {@link #getEntryType()}.
-     */
-    @Deprecated
-    public int getDefaultAction()
-    {
-        return this.defaultAction;
-    }
-
-    /**
-     * @return the space of the document
-     * @deprecated since 7.2M1, does not make much sense anymore with nested space
-     */
-    @Deprecated
-    @Transient
-    public String getSpaceName()
-    {
-        return TOSTRING_SERIALIZER.serialize(extractReference(EntityType.SPACE));
     }
 }

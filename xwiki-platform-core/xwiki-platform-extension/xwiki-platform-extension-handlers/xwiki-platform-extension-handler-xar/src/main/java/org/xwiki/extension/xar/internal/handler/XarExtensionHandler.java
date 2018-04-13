@@ -22,8 +22,9 @@ package org.xwiki.extension.xar.internal.handler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -346,13 +347,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             Map<String, Map<XarEntry, LocalExtension>> nextXAREntries =
                 configuration.getXarExtensionPlan().nextXAREntries;
 
-            Map<String, XarEntry> entriesToImport = new HashMap<>();
+            Set<String> entriesToImport = new HashSet<>();
 
             Map<XarEntry, LocalExtension> nextXAREntriesOnRoot = nextXAREntries.get(null);
             if (nextXAREntriesOnRoot != null) {
                 for (Map.Entry<XarEntry, LocalExtension> entry : nextXAREntriesOnRoot.entrySet()) {
                     if (entry.getValue() == extension) {
-                        entriesToImport.put(entry.getKey().getEntryName(), entry.getKey());
+                        entriesToImport.add(entry.getKey().getEntryName());
                     }
                 }
             }
@@ -360,7 +361,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (nextXAREntriesOnWiki != null) {
                 for (Map.Entry<XarEntry, LocalExtension> entry : nextXAREntriesOnWiki.entrySet()) {
                     if (entry.getValue() == extension) {
-                        entriesToImport.put(entry.getKey().getEntryName(), entry.getKey());
+                        entriesToImport.add(entry.getKey().getEntryName());
                     }
                 }
             }

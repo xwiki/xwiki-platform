@@ -33,29 +33,29 @@ public class XarPackageTest
 {
     private static final LocalDocumentReference SPACE_PAGE = new LocalDocumentReference("Space", "Page", Locale.ROOT);
 
-    private static final LocalDocumentReference SPACE_TRANSLATIONS =
-        new LocalDocumentReference("Space", "Translations", Locale.ROOT);
+    private static final LocalDocumentReference SPACE_TRANSLATIONS = new LocalDocumentReference("Space",
+        "Translations", Locale.ROOT);
 
-    private static final LocalDocumentReference SPACE_TRANSLATIONS_FR =
-        new LocalDocumentReference(SPACE_TRANSLATIONS, Locale.FRENCH);
+    private static final LocalDocumentReference SPACE_TRANSLATIONS_FR = new LocalDocumentReference(SPACE_TRANSLATIONS,
+        Locale.FRENCH);
 
-    private static final LocalDocumentReference SPACE_SKIPPEDPAGE =
-        new LocalDocumentReference("Space", "SkippedPage", Locale.ROOT);
+    private static final LocalDocumentReference SPACE_SKIPPEDPAGE = new LocalDocumentReference("Space", "SkippedPage",
+        Locale.ROOT);
 
-    private static final LocalDocumentReference SPACE_SKIPPEDTRANSLATIONS =
-        new LocalDocumentReference("Space", "SkippedTranslations", Locale.ROOT);
+    private static final LocalDocumentReference SPACE_SKIPPEDTRANSLATIONS = new LocalDocumentReference("Space",
+        "SkippedTranslations", Locale.ROOT);
 
-    private static final LocalDocumentReference SPACE_SKIPPEDTRANSLATIONS_FR =
-        new LocalDocumentReference(SPACE_SKIPPEDTRANSLATIONS, Locale.FRENCH);
+    private static final LocalDocumentReference SPACE_SKIPPEDTRANSLATIONS_FR = new LocalDocumentReference(
+        SPACE_SKIPPEDTRANSLATIONS, Locale.FRENCH);
 
-    private static final LocalDocumentReference SPACE_MERGEDPAGE =
-        new LocalDocumentReference("Space", "MergedPage", Locale.ROOT);
+    private static final LocalDocumentReference SPACE_MERGEDPAGE = new LocalDocumentReference("Space", "MergedPage",
+        Locale.ROOT);
 
-    private static final LocalDocumentReference SPACE_MERGEDTRANSLATIONS =
-        new LocalDocumentReference("Space", "MergedTranslations", Locale.ROOT);
+    private static final LocalDocumentReference SPACE_MERGEDTRANSLATIONS = new LocalDocumentReference("Space",
+        "MergedTranslations", Locale.ROOT);
 
-    private static final LocalDocumentReference SPACE_MERGEDTRANSLATIONS_FR =
-        new LocalDocumentReference(SPACE_MERGEDTRANSLATIONS, Locale.FRENCH);
+    private static final LocalDocumentReference SPACE_MERGEDTRANSLATIONS_FR = new LocalDocumentReference(
+        SPACE_MERGEDTRANSLATIONS, Locale.FRENCH);
 
     @Test
     public void readDescriptor() throws Exception
@@ -77,9 +77,9 @@ public class XarPackageTest
 
         Iterator<XarEntry> iterator = files.iterator();
 
-        assertEqualsEntry(new XarEntry(SPACE_PAGE, XarModel.ACTION_OVERWRITE, "type0"), iterator.next());
-        assertEqualsEntry(new XarEntry(SPACE_TRANSLATIONS, XarModel.ACTION_OVERWRITE, "type1"), iterator.next());
-        assertEqualsEntry(new XarEntry(SPACE_TRANSLATIONS_FR, XarModel.ACTION_OVERWRITE, "type2"), iterator.next());
+        assertEqualsEntry(new XarEntry(SPACE_PAGE, XarModel.ACTION_OVERWRITE), iterator.next());
+        assertEqualsEntry(new XarEntry(SPACE_TRANSLATIONS, XarModel.ACTION_OVERWRITE), iterator.next());
+        assertEqualsEntry(new XarEntry(SPACE_TRANSLATIONS_FR, XarModel.ACTION_OVERWRITE), iterator.next());
         assertEqualsEntry(new XarEntry(SPACE_SKIPPEDPAGE, XarModel.ACTION_SKIP), iterator.next());
         assertEqualsEntry(new XarEntry(SPACE_MERGEDPAGE, XarModel.ACTION_MERGE), iterator.next());
         assertEqualsEntry(new XarEntry(SPACE_SKIPPEDTRANSLATIONS, XarModel.ACTION_SKIP), iterator.next());
@@ -87,7 +87,7 @@ public class XarPackageTest
         assertEqualsEntry(new XarEntry(SPACE_MERGEDTRANSLATIONS, XarModel.ACTION_MERGE), iterator.next());
         assertEqualsEntry(new XarEntry(SPACE_MERGEDTRANSLATIONS_FR, XarModel.ACTION_MERGE), iterator.next());
     }
-
+    
     @Test
     public void readDescriptorWithEmptyId() throws Exception
     {
@@ -95,7 +95,7 @@ public class XarPackageTest
 
         xarPackage.readDescriptor(getClass().getResourceAsStream("/packagewithemptyid.xml"));
 
-        assertEquals(null, xarPackage.getPackageExtensionId());
+        assertEquals(null, xarPackage.getPackageExtensionId());        
     }
 
     private void assertEqualsEntry(XarEntry expected, XarEntry actual)

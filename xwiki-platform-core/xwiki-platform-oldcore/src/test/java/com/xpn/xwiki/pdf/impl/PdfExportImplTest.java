@@ -106,7 +106,9 @@ public class PdfExportImplTest
         String modifiedHTML = pdfExport.applyCSS(html, css, xcontext);
 
         // Verify that the SPAN's style attribute gets updated
-        assertTrue(modifiedHTML.contains("<span style=\"color: red; background: white; \">Hello</span>"));
+        String expected = "<span style=\"color: red; background: white; \">Hello</span>";
+        assertTrue(String.format("Result [%s] doesn't contain [%s]", modifiedHTML, expected),
+            modifiedHTML.contains(expected));
         // Also verify that the CSS is applied only to the span
         assertEquals(1, StringUtils.countMatches(modifiedHTML, "color: red"));
     }

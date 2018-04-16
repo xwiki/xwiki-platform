@@ -76,7 +76,6 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param docName the reference of the document this attachment belonged to
      * @param filename the name of the attachment
      * @param storeType the way to store the document
-     * @param attachment Deleted attachment.
      * @param deleter User which deleted the attachment.
      * @param deleteDate Date of delete action.
      */

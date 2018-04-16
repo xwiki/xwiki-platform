@@ -33,7 +33,7 @@ import org.xwiki.notifications.internal.SimilarityCalculator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.notifications.sources.NewNotificationManager;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.query.Query;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -56,7 +56,7 @@ public class DefaultNotificationManagerTest
     private DocumentReferenceResolver<String> documentReferenceResolver;
     private NotificationPreferenceManager notificationPreferenceManager;
     private NotificationFilterManager notificationFilterManager;
-    private NewNotificationManager newNotificationManager;
+    private ParametrizedNotificationManager newNotificationManager;
     private WikiDescriptorManager wikiDescriptorManager;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
@@ -70,7 +70,7 @@ public class DefaultNotificationManagerTest
         documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
         notificationPreferenceManager = mocker.getInstance(NotificationPreferenceManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
-        newNotificationManager = mocker.getInstance(NewNotificationManager.class);
+        newNotificationManager = mocker.getInstance(ParametrizedNotificationManager.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         startDate = new Date(10);
 

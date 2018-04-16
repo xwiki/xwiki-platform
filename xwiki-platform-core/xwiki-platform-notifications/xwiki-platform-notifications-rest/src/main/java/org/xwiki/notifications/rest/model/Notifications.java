@@ -22,25 +22,29 @@ package org.xwiki.notifications.rest.model;
 import java.util.Collection;
 
 /**
+ * Represent a serializable version of a notification list, retro-compatible with the old notification services.
+ *
  * @version $Id$
- * @since
+ * @since 10.4RC1
  */
 public class Notifications
 {
     private Collection<Notification> notifications;
 
+    /**
+     * Construct a Notifications.
+     * @param notifications list of notifications
+     */
     public Notifications(Collection<Notification> notifications)
     {
         this.notifications = notifications;
     }
 
+    /**
+     * @return the list of the notifications
+     */
     public Collection<Notification> getNotifications()
     {
         return notifications;
-    }
-
-    public void setNotifications(Collection<Notification> notifications)
-    {
-        this.notifications = notifications;
     }
 }

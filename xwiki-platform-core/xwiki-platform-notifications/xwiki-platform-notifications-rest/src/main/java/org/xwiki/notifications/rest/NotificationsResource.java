@@ -21,21 +21,21 @@ package org.xwiki.notifications.rest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.notifications.rest.model.Notifications;
 
 /**
+ * Retrieve notifications.
+ *
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.4RC1
  */
 @Path("/notifications")
 public interface NotificationsResource
 {
     /**
      * Get notifications for the given wiki.
-     * @param wikiId id of a wiki
      * @return notifications
      * @throws Exception if an error occurs
      */
@@ -48,6 +48,7 @@ public interface NotificationsResource
             @QueryParam("pages") String pages,
             @QueryParam("spaces") String spaces,
             @QueryParam("wikis") String wikis,
-            @QueryParam("filters") String filters
+            @QueryParam("filters") String filters,
+            @QueryParam("count") String count
             ) throws Exception;
 }

@@ -123,7 +123,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
             Boolean filterActivation = filterActivations.get(filter.getName());
-            if (filterActivation != null && filterActivation.booleanValue() == false) {
+            if (filterActivation != null && !filterActivation.booleanValue()) {
                 it.remove();
             }
         }
@@ -172,7 +172,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
             NotificationFilterType filterType)
     {
         return getFilterPreferences(filterPreferences, filter).filter(
-                preference -> preference.getFilterType() == filterType);
+            preference -> preference.getFilterType() == filterType);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
             NotificationFilterType filterType, NotificationFormat format)
     {
         return getFilterPreferences(filterPreferences, filter, filterType).filter(
-                preference -> preference.getFilterFormats().contains(format));
+            preference -> preference.getFilterFormats().contains(format));
     }
 
     @Override
@@ -202,13 +202,13 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
             Map<String, Boolean> filterActivations)
     {
         return filters.stream().filter(
-                filter -> {
-                    if (filter instanceof ToggleableNotificationFilter
-                            && filterActivations.containsKey(filter.getName())) {
-                        return filterActivations.get(filter.getName());
-                    }
-                    return true;
+            filter -> {
+                if (filter instanceof ToggleableNotificationFilter
+                        && filterActivations.containsKey(filter.getName())) {
+                    return filterActivations.get(filter.getName());
                 }
+                return true;
+            }
         );
     }
 

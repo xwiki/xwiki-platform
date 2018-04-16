@@ -31,18 +31,55 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
 /**
+ * Parameters to fill to retrieve notifications using {@link ParametrizedNotificationManager}.
+ *
  * @version $Id$
- * @since
+ * @since 10.4
  */
 public class NotificationParameters
 {
+    /**
+     * The user for who we should get the notifications.
+     */
     public DocumentReference user;
+
+    /**
+     * The format of the notifications to get.
+     */
     public NotificationFormat format;
+
+    /**
+     * The maximum number of notifications to return.
+     */
     public int expectedCount;
+
+    /**
+     * Don't get notifications that have been triggered after the following date.
+     */
     public Date endDate;
+
+    /**
+     * Don't get notification that have been triggered before the following date.
+     */
     public Date fromDate;
+
+    /**
+     * List of event IDs not to return.
+     */
     public Collection<String> blackList = new ArrayList<>();
+
+    /**
+     * List of preferences to apply.
+     */
     public Collection<NotificationPreference> preferences = Collections.emptyList();
+
+    /**
+     * List of filter preferences to apply.
+     */
     public Collection<NotificationFilterPreference> filterPreferences = Collections.emptyList();
-    public Collection<NotificationFilter> filters= Collections.emptyList();
+
+    /**
+     * List of filters to apply.
+     */
+    public Collection<NotificationFilter> filters = Collections.emptyList();
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.rest.model;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
@@ -26,10 +27,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 
 /**
+ * Represent a serializable version of a notification, retro-compatible with the old notification services.
+ *
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.4RC1
  */
-public class Notification
+public class Notification implements Serializable
 {
     private CompositeEvent compositeEvent;
 
@@ -41,6 +44,14 @@ public class Notification
 
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    /**
+     * Construct a Notification.
+     * @param compositeEvent composite event that this notification is handling
+     * @param read either or not the current usr has already read this notification
+     * @param html html version of the notification
+     * @param exception stacktrace of an exception if an error has occurred while rendering this notification
+     * @param entityReferenceSerializer serializer to use for document references
+     */
     public Notification(CompositeEvent compositeEvent, boolean read, String html, String exception,
             EntityReferenceSerializer<String> entityReferenceSerializer)
     {
@@ -51,31 +62,41 @@ public class Notification
         this.entityReferenceSerializer = entityReferenceSerializer;
     }
 
+    /**
+     * @return the list of the ids of the events that compose the inner composite event
+     */
     public Collection<String> getIds()
     {
         return compositeEvent.getEventIds();
     }
 
+    /**
+     * @return the type of the inner composite event
+     */
     public String getType()
     {
         return compositeEvent.getType();
     }
 
+    /**
+     * @return either or not the current usr has already read this notification
+     */
     public boolean isRead()
     {
         return read;
     }
 
-    public void setRead(boolean read)
-    {
-        this.read = read;
-    }
-
+    /**
+     * @return the dates of the inner events, sorted by descending order
+     */
     public Collection<Date> getDates()
     {
         return compositeEvent.getDates();
     }
 
+    /**
+     * @return the serialized document reference if the notification concerns a document, null otherwise
+     */
     public String getDocument()
     {
         return compositeEvent.getDocument() != null
@@ -83,23 +104,19 @@ public class Notification
                 : null;
     }
 
+    /**
+     * @return html version of the notification
+     */
     public String getHtml()
     {
         return html;
     }
 
-    public void setHtml(String html)
-    {
-        this.html = html;
-    }
-
+    /**
+     * @return the stacktrace of an exception if an error has occurred while rendering this notification, null otherwise
+     */
     public String getException()
     {
         return exception;
-    }
-
-    public void setException(String exception)
-    {
-        this.exception = exception;
     }
 }

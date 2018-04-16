@@ -32,6 +32,8 @@ import org.xwiki.eventstream.EventStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.internal.SimilarityCalculator;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
@@ -47,6 +49,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -56,11 +59,11 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentList(SimilarityCalculator.class)
-public class DefaultNewNotificationManagerTest
+public class DefaultParametrizedNotificationManagerTest
 {
     @Rule
-    public final MockitoComponentMockingRule<DefaultNewNotificationManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultNewNotificationManager.class);
+    public final MockitoComponentMockingRule<DefaultParametrizedNotificationManager> mocker =
+            new MockitoComponentMockingRule<>(DefaultParametrizedNotificationManager.class);
 
     private EventStream eventStream;
     private QueryGenerator queryGenerator;
@@ -665,6 +668,49 @@ public class DefaultNewNotificationManagerTest
         List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
 
         assertEquals(1, results.size());
+
+    }
+
+    @Test
+    public void getEventsXWIKI15151() throws Exception
+    {
+        DocumentReference userA = new DocumentReference("xwiki", "XWiki", "UserA");
+
+        // Example taken from a real case
+        Event event1 = createMockedEvent("update", userA, userA, new Date(1510567729000L), "id1");
+        Event event2 = createMockedEvent("update", userA, userA, new Date(1510567729000L), "id2");
+
+        when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
+                .thenReturn(true);
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Collections.emptyList());
+
+        // Test
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = userA;
+        parameters.expectedCount = 5;
+        parameters.format = NotificationFormat.ALERT;
+
+        // Filter 1
+        NotificationFilter filter1 = mock(NotificationFilter.class);
+        when(filter1.getPriority()).thenReturn(1);
+        when(filter1.filterEvent(eq(event1), any(DocumentReference.class), anyCollection(),
+                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
+        when(filter1.filterEvent(eq(event2), any(DocumentReference.class), anyCollection(),
+                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
+        NotificationFilter filter2 = mock(NotificationFilter.class);
+        when(filter2.getPriority()).thenReturn(2);
+        when(filter2.filterEvent(eq(event1), any(DocumentReference.class), anyCollection(),
+                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.KEEP);
+        when(filter2.filterEvent(eq(event2), any(DocumentReference.class), anyCollection(),
+                any(NotificationFormat.class))).thenReturn(NotificationFilter.FilterPolicy.FILTER);
+        parameters.filters = Arrays.asList(filter1, filter2);
+        when(filter1.compareTo(filter2)).thenReturn(1);
+        when(filter2.compareTo(filter1)).thenReturn(-1);
+
+        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+
+        assertEquals(1, results.size());
+        assertEquals(event1, results.get(0).getEvents().get(0));
 
     }
 }

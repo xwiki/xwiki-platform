@@ -26,11 +26,20 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 
 /**
+ * A notification manager that work only with the parameters given to it (it will not look at the current user
+ * preferences, and so on) but that still search the events where they are stored.
+ *
  * @version $Id$
- * @since
+ * @since 10.4RC1
  */
 @Role
-public interface NewNotificationManager
+public interface ParametrizedNotificationManager
 {
+    /**
+     * Get the events matching the given parameters.
+     * @param parameters parameters to take care of
+     * @return a list of the corresponding composite events
+     * @throws NotificationException if an error occurs
+     */
     List<CompositeEvent> getEvents(NotificationParameters parameters) throws NotificationException;
 }

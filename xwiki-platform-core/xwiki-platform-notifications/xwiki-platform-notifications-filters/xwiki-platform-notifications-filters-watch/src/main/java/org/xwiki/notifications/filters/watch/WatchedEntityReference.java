@@ -36,6 +36,7 @@ public interface WatchedEntityReference
     /**
      * @param userReference a user
      * @return if the given user watch the current entity reference
+     * @throws NotificationException if an error happens
      * @since 9.9RC1
      */
     boolean isWatched(DocumentReference userReference) throws NotificationException;

@@ -37,7 +37,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
-import org.xwiki.notifications.sources.NewNotificationManager;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -65,7 +65,7 @@ public class DefaultNotificationManager implements NotificationManager
     private NotificationFilterManager notificationFilterManager;
 
     @Inject
-    private NewNotificationManager newNotificationManager;
+    private ParametrizedNotificationManager newNotificationManager;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -135,12 +135,13 @@ public class DefaultNotificationManager implements NotificationManager
                 parameters.format);
         parameters.filters = notificationFilterManager.getAllFilters(parameters.user);
         parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
-        Map<String, Boolean> filterActivations = notificationFilterManager.getToggeableFilterActivations(parameters.user);
+        Map<String, Boolean> filterActivations = notificationFilterManager.getToggeableFilterActivations(
+                parameters.user);
         Iterator<NotificationFilter> it = parameters.filters.iterator();
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
             Boolean filterActivation = filterActivations.get(filter.getName());
-            if (filterActivation != null && filterActivation.booleanValue() == false) {
+            if (filterActivation != null && !filterActivation.booleanValue()) {
                 it.remove();
             }
         }

@@ -36,19 +36,21 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.internal.SimilarityCalculator;
-import org.xwiki.notifications.sources.NewNotificationManager;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
+ * Default implementation of {@link ParametrizedNotificationManager}.
+ *
  * @version $Id$
- * @since
+ * @since 10.4RC1
  */
 @Component
 @Singleton
-public class DefaultNewNotificationManager implements NewNotificationManager
+public class DefaultParametrizedNotificationManager implements ParametrizedNotificationManager
 {
     @Inject
     private EventStream eventStream;
@@ -125,9 +127,9 @@ public class DefaultNewNotificationManager implements NewNotificationManager
     private boolean filterEvent(Event event, NotificationParameters parameters)
     {
         // Don't record events that have a target that don't include the current user
-        if (!event.getTarget().isEmpty() &&
-            (parameters.user == null || !event.getTarget().contains(serializer.serialize(parameters.user)))) {
-                return true;
+        if (!event.getTarget().isEmpty()
+            && (parameters.user == null || !event.getTarget().contains(serializer.serialize(parameters.user)))) {
+            return true;
         }
 
         List<NotificationFilter> filters = new ArrayList<>(parameters.filters);

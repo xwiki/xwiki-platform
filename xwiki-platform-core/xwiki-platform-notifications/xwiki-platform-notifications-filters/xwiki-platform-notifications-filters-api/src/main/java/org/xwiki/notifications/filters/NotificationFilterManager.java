@@ -45,32 +45,82 @@ public interface NotificationFilterManager
 {
     /**
      * Get all notifications filters.
-     *
      * @param allWikis include filters from all wikis or only the current one
      * @return a collection of notification filters
      * @throws NotificationException if error happens
-     * @since 10.3RC1
+     * @since 10.4RC1
      */
     Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException;
 
+    /**
+     * Get all notifications filters that are enabled to the given user.
+     * @param user reference to the user
+     * @return the collection of notification filters enabled to the user.
+     * @throws NotificationException if an error happens
+     * @since 10.4RC1
+     */
     Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException;
 
+    /**
+     * Get from the filters the one that match the given notification preference.
+     * @param filters a collection of notification filters
+     * @param preference a notification preference
+     * @return a stream returning the filters that match the given notification preference.
+     * @since 10.4RC1
+     */
     Stream<NotificationFilter> getFiltersRelatedToNotificationPreference(Collection<NotificationFilter> filters,
             NotificationPreference preference);
 
+    /**
+     * Get the notification filter preferences of the given user.
+     * @param user a reference of the user
+     * @return the list of the notification filter preferences of the given user.
+     * @throws NotificationException if an error occurs
+     * @since 10.4RC1
+     */
     Collection<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException;
 
+    /**
+     * Get from the given filter preferences the ones that match the given filter.
+     * @param filterPreferences a list of filter preferences
+     * @param filter a notification filter
+     * @return a stream returning the filter preferences that match the given filter
+     * @since 10.4RC1
+     */
     Stream<NotificationFilterPreference> getFilterPreferences(
             Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter);
 
+    /**
+     * Get from the given filter preferences the ones that match the given filter and the given filter type.
+     * @param filterPreferences a list of filter preferences
+     * @param filter a notification filter
+     * @param filterType a filter type
+     * @return a stream returning the filter preferences that match the given filter and filter type
+     * @since 10.4RC1
+     */
     Stream<NotificationFilterPreference> getFilterPreferences(
             Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
             NotificationFilterType filterType);
 
+    /**
+     * Get from the given filter preferences the ones that match the given filter, filter type and format.
+     * @param filterPreferences a list of filter preferences
+     * @param filter a notification filter
+     * @param filterType a filter type
+     * @param format a notification format
+     * @return a stream returning the filter preferences that match the given filter, filter type and format
+     * @since 10.4RC1
+     */
     Stream<NotificationFilterPreference> getFilterPreferences(
             Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
             NotificationFilterType filterType, NotificationFormat format);
 
+    /**
+     * Get from the given filter the one that are toggleable.
+     * @param filters a list of notification filters
+     * @return a stream returning the toggeable filters that was on the given collection
+     * @since 10.4RC1
+     */
     Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters);
 
     /**
@@ -79,7 +129,7 @@ public interface NotificationFilterManager
      * @param user the user to use
      * @return a map of notification filters with their activation state
      * @throws NotificationException if an error happens
-     * @since 10.3RC1
+     * @since 10.4RC1
      */
     Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException;
 
@@ -89,9 +139,10 @@ public interface NotificationFilterManager
      * filter from the set.
 
      * @param filters the filters that should be examined
+     * @param filterActivation the map of filters associated to their active status
      * @return a set of filters that are not marked as disabled by the user
      *
-     * @since 10.3RC1
+     * @since 10.4RC1
      */
     Stream<NotificationFilter> getEnabledFilters(Collection<NotificationFilter> filters,
             Map<String, Boolean> filterActivation);

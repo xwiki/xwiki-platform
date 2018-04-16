@@ -58,6 +58,7 @@ public class WatchedUserReference implements WatchedEntityReference
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
      * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
+     * @param notificationFilterManager the notification filter manager
      * @since 9.10RC1
      */
     public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter,

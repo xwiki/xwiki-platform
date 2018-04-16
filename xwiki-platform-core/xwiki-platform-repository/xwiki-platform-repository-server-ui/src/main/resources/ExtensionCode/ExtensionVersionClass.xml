@@ -123,14 +123,14 @@
       <cache>0</cache>
       <customDisplay/>
       <disabled>0</disabled>
-      <displayType>input</displayType>
+      <displayType>select</displayType>
       <hint/>
-      <multiSelect>0</multiSelect>
+      <multiSelect>1</multiSelect>
       <name>repositories</name>
       <number>6</number>
       <picker>0</picker>
       <prettyName>Repositories</prettyName>
-      <relationalStorage>0</relationalStorage>
+      <relationalStorage>1</relationalStorage>
       <separator> </separator>
       <separators>|, </separators>
       <size>1</size>

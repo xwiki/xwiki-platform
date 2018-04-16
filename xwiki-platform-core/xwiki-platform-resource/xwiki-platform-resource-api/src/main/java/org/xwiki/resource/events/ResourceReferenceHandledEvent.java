@@ -45,7 +45,7 @@ public class ResourceReferenceHandledEvent extends AbstractResourceReferenceHand
      */
     public ResourceReferenceHandledEvent()
     {
-
+        // Empty voluntarily, just here to offer a default constructor
     }
 
     /**

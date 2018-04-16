@@ -43,7 +43,7 @@ public abstract class AbstractResourceReferenceHandlerEvent implements ResourceR
      */
     public AbstractResourceReferenceHandlerEvent()
     {
-
+        // Empty voluntarily, just here to offer a default constructor
     }
 
     /**

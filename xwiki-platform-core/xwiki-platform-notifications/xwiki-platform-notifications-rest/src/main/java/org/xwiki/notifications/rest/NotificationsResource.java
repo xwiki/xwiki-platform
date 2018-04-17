@@ -48,7 +48,11 @@ public interface NotificationsResource
             @QueryParam("pages") String pages,
             @QueryParam("spaces") String spaces,
             @QueryParam("wikis") String wikis,
-            @QueryParam("filters") String filters,
-            @QueryParam("count") String count
+            @QueryParam("count") String count,
+            @QueryParam("displayOwnEvents") String displayOwnEvents,
+            @QueryParam("displayMinorEvents") String displayMinorEvents,
+            @QueryParam("displaySystemEvents") String displaySystemEvents,
+            @QueryParam("displayReadEvents") String displayReadEvents,
+            @QueryParam("displayReadStatus") String displayReadStatus
             ) throws Exception;
 }

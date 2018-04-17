@@ -36,6 +36,7 @@ import org.xwiki.notifications.rest.model.Notification;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.text.StringUtils;
 
 /**
  * Internal component to render notifications.
@@ -64,27 +65,39 @@ public class InternalNotificationsRenderer
      *
      * @param compositeEvents list of composite events to render
      * @param userId id of the current user
+     * @param showReadStatus either or not include the "read" status of the events
      * @return the list of notifications
      * @throws Exception if an error occurs
      */
-    public List<Notification> renderNotifications(List<CompositeEvent> compositeEvents, String userId) throws Exception
+    public List<Notification> renderNotifications(List<CompositeEvent> compositeEvents, String userId,
+        boolean showReadStatus) throws Exception
     {
         List<Notification> notifications = new ArrayList<>();
 
-        for (CompositeEventStatus status
-                : compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId)) {
-            String html = null;
-            String exception = null;
-            try {
-                html = render(status.getCompositeEvent());
-            } catch (Exception e) {
-                exception = e.toString();
+        if (showReadStatus && StringUtils.isNotBlank(userId)) {
+            for (CompositeEventStatus status
+                    : compositeEventStatusManager.getCompositeEventStatuses(compositeEvents, userId)) {
+                notifications.add(toNotification(status.getCompositeEvent(), status.getStatus()));
             }
-
-            notifications.add(new Notification(status.getCompositeEvent(), status.getStatus(),
-                    html, exception, entityReferenceSerializer));
+        } else {
+            for (CompositeEvent event : compositeEvents) {
+                notifications.add(toNotification(event, null));
+            }
         }
         return notifications;
+    }
+
+    private Notification toNotification(CompositeEvent event, Boolean status)
+    {
+        String html = null;
+        String exception = null;
+        try {
+            html = render(event);
+        } catch (Exception e) {
+            exception = e.toString();
+        }
+
+        return new Notification(event, status, html, exception, entityReferenceSerializer);
     }
 
     private String render(CompositeEvent compositeEvent) throws Exception

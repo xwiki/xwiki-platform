@@ -19,12 +19,13 @@
  */
 package org.xwiki.notifications.rest.internal;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,14 +43,18 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.SystemUserNotificationFilter;
+import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.status.EventReadAlertFilter;
+import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.rest.NotificationsResource;
 import org.xwiki.notifications.rest.model.Notification;
 import org.xwiki.notifications.rest.model.Notifications;
-import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.text.StringUtils;
 
@@ -65,6 +70,8 @@ import com.google.common.collect.Sets;
 public class DefaultNotificationsResource extends XWikiResource implements NotificationsResource
 {
     private static final String FIELD_SEPARATOR = ",";
+
+    private static final String TRUE = "true";
 
     @Inject
     private ParametrizedNotificationManager newNotificationManager;
@@ -96,8 +103,12 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String pages,
             String spaces,
             String wikis,
-            String filters,
-            String count
+            String count,
+            String displayOwnEvents,
+            String displayMinorEvents,
+            String displaySystemEvents,
+            String displayReadEvents,
+            String displayReadStatus
     ) throws Exception
     {
         NotificationParameters parameters = new NotificationParameters();
@@ -114,21 +125,39 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             parameters.blackList.addAll(Arrays.asList(blackList.split(FIELD_SEPARATOR)));
         }
         if (StringUtils.isNotBlank(untilDate)) {
-            parameters.endDate = DateFormat.getDateInstance().parse(untilDate);
+            parameters.endDate = new Date(Long.parseLong(untilDate));
         }
-        if ("true".equals(useUserPreferences)) {
+        if (TRUE.equals(useUserPreferences)) {
             useUserPreferences(parameters);
         } else {
-            dontUseUserPreferences(pages, spaces, wikis, parameters);
+            dontUseUserPreferences(pages, spaces, wikis, parameters, displayOwnEvents, displayMinorEvents,
+                    displaySystemEvents, displayReadEvents);
         }
 
-        return new Notifications(getAndRenderNotifications(userId, parameters));
+        return new Notifications(getAndRenderNotifications(userId, parameters, TRUE.equals(displayReadStatus)));
     }
 
-    private void dontUseUserPreferences(String pages, String spaces, String wikis, NotificationParameters parameters)
+    private void dontUseUserPreferences(String pages, String spaces, String wikis, NotificationParameters parameters,
+            String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents)
             throws NotificationException, EventStreamException
     {
-        parameters.filters = notificationFilterManager.getAllFilters(true);
+        List<String> excludedFilters = new ArrayList<>();
+        if (TRUE.equals(displayOwnEvents)) {
+            excludedFilters.add(OwnEventFilter.FILTER_NAME);
+        }
+        if (TRUE.equals(displayMinorEvents)) {
+            excludedFilters.add(MinorEventAlertNotificationFilter.FILTER_NAME);
+        }
+        if (TRUE.equals(displaySystemEvents)) {
+            excludedFilters.add(SystemUserNotificationFilter.FILTER_NAME);
+        }
+        if (TRUE.equals(displayReadEvents)) {
+            excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
+        }
+        parameters.filters = notificationFilterManager.getAllFilters(true).stream().filter(
+                filter -> !excludedFilters.contains(filter.getName())
+        ).collect(Collectors.toList());
+
         parameters.filterPreferences = new ArrayList<>(parameters.filterPreferences);
         enableAllEventTypes(parameters);
         handlePagesParameter(pages, parameters);
@@ -144,11 +173,11 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
     }
 
-    private List<Notification> getAndRenderNotifications(String userId, NotificationParameters parameters)
-        throws Exception
+    private List<Notification> getAndRenderNotifications(String userId, NotificationParameters
+        parameters, boolean showReadStatus) throws Exception
     {
         List<CompositeEvent> compositeEvents = newNotificationManager.getEvents(parameters);
-        return notificationsRenderer.renderNotifications(compositeEvents, userId);
+        return notificationsRenderer.renderNotifications(compositeEvents, userId, showReadStatus);
     }
 
     private void handlePagesParameter(String pages, NotificationParameters parameters)
@@ -173,8 +202,10 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             String[] locationArray = locations.split(FIELD_SEPARATOR);
             for (int i = 0; i < locationArray.length; ++i) {
                 DefaultNotificationFilterPreference pref
-                        = new DefaultNotificationFilterPreference(ScopeNotificationFilter.FILTER_NAME);
+                        = new DefaultNotificationFilterPreference(String.format("%s_%s_%s",
+                        ScopeNotificationFilter.FILTER_NAME, property, i));
                 pref.setEnabled(true);
+                pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
                 pref.setNotificationFormats(Sets.newHashSet(NotificationFormat.ALERT));
                 Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();

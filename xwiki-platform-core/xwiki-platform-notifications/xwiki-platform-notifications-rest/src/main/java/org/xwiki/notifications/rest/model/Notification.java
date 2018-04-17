@@ -36,7 +36,7 @@ public class Notification implements Serializable
 {
     private CompositeEvent compositeEvent;
 
-    private boolean read;
+    private Boolean read;
 
     private String html;
 
@@ -52,7 +52,7 @@ public class Notification implements Serializable
      * @param exception stacktrace of an exception if an error has occurred while rendering this notification
      * @param entityReferenceSerializer serializer to use for document references
      */
-    public Notification(CompositeEvent compositeEvent, boolean read, String html, String exception,
+    public Notification(CompositeEvent compositeEvent, Boolean read, String html, String exception,
             EntityReferenceSerializer<String> entityReferenceSerializer)
     {
         this.compositeEvent = compositeEvent;
@@ -81,7 +81,7 @@ public class Notification implements Serializable
     /**
      * @return either or not the current usr has already read this notification
      */
-    public boolean isRead()
+    public Boolean isRead()
     {
         return read;
     }

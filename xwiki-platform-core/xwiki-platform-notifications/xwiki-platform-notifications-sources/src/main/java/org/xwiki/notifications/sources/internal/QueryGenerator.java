@@ -324,7 +324,8 @@ public class QueryGenerator
     private AbstractOperatorNode handleWiki(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
         // If the user is a local user
-        if (!parameters.user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
+        if (parameters.user != null
+                && !parameters.user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
             return topNode.and(
                     new EqualsNode(
                             new PropertyValueNode(EventProperty.WIKI),

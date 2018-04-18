@@ -28,16 +28,17 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1523956287000</creationDate>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1523973364000</date>
+  <date>1524039715000</date>
   <contentUpdateDate>1523956287000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content/>
   <object>
     <name>XWiki.Notifications.Code.NotificationsMacro</name>
@@ -125,8 +126,8 @@
 require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMacro) {
   $(document).ready(function() {
     $('.notifications-macro').each(function () {
-      var macro = new XWikiNotificationsMacro($(this));
-      macro.init();
+      var macro = new XWikiNotificationsMacro(this);
+      macro.load();
     });
   });
 });
@@ -225,35 +226,56 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <code>define('XWikiNotificationsMacro', ['jquery', 'xwiki-meta'], function($, xm) {
-  return function(macro) {
+  /**
+   * Construct a XWikiNotificationsMacro.
+   *
+   * Except the first ine, all the parameters are optional in the constructor. If they are not provided, the macro will
+   * load them from the DOM element, where they should be present with the "data-" attributes.
+   *
+   * @param macro DOM element that will be uses as container for the notifications.
+   * @param userId (optional) full serialization of the current user for who we are loading the notifications-macro
+   * @param count (optional) maximum number of notifications to load for each batch
+   * @param displayReadStatus (optional) either or not to display if the notifications have been read or notifications
+   * @param blackList (optional) the list of the ids of events that have already been displayed and that we don't want
+       to get again in next batches.
+   * @param useUserPreferences (optional) either or not to use the preferences of the user instead of handling the
+   *   following parameters
+   * @param displayOwnEvents (optional) either or not to display the events of the current user
+   * @param displayMinorEvents (optional) either or not to display minor update events on documents
+   * @param displaySystemEvents (optional) either or not to display events triggered by the system
+   * @param displayReadEvents (optional) either or not to display events that have been marked as read by the user
+   * @param wikis (optional) list of wikis, comma-separated, to include in the notifications
+   * @param spaces (optional) list of spaces, comma-separated, to include in the notifications
+   * @param pages (optional) list of pages, comma-separated, to include in the notifications
+   */
+  return function(macro, userId, count, displayReadStatus, blackList, useUserPreferences,
+      displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, wikis, spaces, pages) {
     var self = this;
-    self.macro = macro;
-    self.blackList = [];
-    self.notificationsLimit = self.macro.attr('data-count');
-    self.useUserPreferences = self.macro.attr('data-useuserpreferences');
-    self.userId = self.macro.attr('data-userId');
-    self.displayOwnEvents = self.macro.attr('data-displayOwnEvents');
-    self.displayMinorEvents = self.macro.attr('data-displayMinorEvents');
-    self.displaySystemEvents = self.macro.attr('data-displaySystemEvents');
-    self.displayReadEvents = self.macro.attr('data-displayReadEvents');
-    self.wikis = self.macro.attr('data-wikis');
-    self.spaces = self.macro.attr('data-spaces');
-    self.pages = self.macro.attr('data-pages');
-    self.displayReadStatus = self.macro.attr('data-displayReadStatus').toLowerCase() == 'true' &amp;&amp; self.userId != '';
-
-    /**
-     * Initialize the macro.
-     */
-    self.init = function() {
-      self.load();
-    };
+    self.macro = $(macro);
+    self.userId = userId ? userId : self.macro.attr('data-userId');
+    self.notificationsLimit = count ? count : self.macro.attr('data-count');
+    self.displayReadStatus = displayReadStatus != undefined
+      ? displayReadStatus : self.macro.attr('data-displayReadStatus').toLowerCase() == 'true' &amp;&amp; self.userId != '';
+    self.blackList = blackList ? blackList : [];
+    self.useUserPreferences = useUserPreferences != undefined
+      ? useUserPreferences : self.macro.attr('data-useuserpreferences');
+    self.displayOwnEvents = displayOwnEvents != undefined ? displayOwnEvents : self.macro.attr('data-displayOwnEvents');
+    self.displayMinorEvents = displayMinorEvents != undefined ? displayMinorEvents
+      : self.macro.attr('data-displayMinorEvents');
+    self.displaySystemEvents = displaySystemEvents != undefined ? displaySystemEvents
+      : self.macro.attr('data-displaySystemEvents');
+    self.displayReadEvents = displayReadEvents != undefined ? displayReadEvents
+      : self.macro.attr('data-displayReadEvents');
+    self.wikis = wikis != undefined ? wikis : self.macro.attr('data-wikis');
+    self.spaces = spaces != undefined ? spaces : self.macro.attr('data-spaces');
+    self.pages = pages != undefined ? pages : self.macro.attr('data-pages');
 
     /**
      * Function that load notifications.
      *
      * The parameter `untilDate` is used as an "offset" to get events in a paginate mode.
-     * We cannot rely on an integer offset because new events could have been stored recently and we want to display older
-     * ones only.
+     * We cannot rely on an integer offset because new events could have been stored recently and we want to display
+     * older ones only.
      */
     self.load = function(untilDate) {
       var params = {
@@ -273,6 +295,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         params.untilDate = untilDate;
         params.blackList = self.blackList.join(',');
       }
+      var promise = $.Deferred();
       var restURL = xm.restURL.substring(0, xm.restURL.indexOf('/rest/')) + '/rest/notifications?media=json';
       $.getJSON(restURL, params).done(function (data) {
         // Remove loading items
@@ -302,7 +325,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
             self.load(lastEventDate);
           });
         }
+        promise.resolve(data.notifications);
       });
+      return promise;
     };
 
     /**
@@ -368,7 +393,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
      * Display a message saying there is no content
      */
     self.displayNoNotification = function () {
-      self.macro.removeClass('loading').html($('&lt;p&gt;').addClass('text-center noitems').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
+      self.macro.removeClass('loading').html($('&lt;p&gt;').addClass('text-center noitems')
+        .text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
     };
   };
 });
@@ -482,9 +508,123 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <cache>long</cache>
     </property>
     <property>
-      <code>.notifications-macro {
+      <code>#template('colorThemeInit.vm')
+/***********************************************
+ * Notification Container
+ ***********************************************/
+.notifications-macro {
   max-width: 500px;
   min-height: 50px;
+}
+
+/***********************************************
+ * Notification Event
+ ***********************************************/
+.notification-event {
+  border: 1px dashed $theme.borderColor;
+  padding: 1em;
+}
+
+.notification-event-unread {
+  background-color: $theme.panelBackgroundColor;
+}
+
+/***********************************************
+ * Notification Icons
+ ***********************************************/
+.notification-icon {
+  padding-right: 0;
+  position: relative;
+}
+
+.notification-icon .img-thumbnail {
+  background-color: $theme.pageContentBackgroundColor;
+  font-size: 2em;
+  height: 2em;
+  text-align: center;
+  width: 2em;
+}
+
+.notification-icon .img-thumbnail.small{
+  font-size: 1em;
+  height: 2em;
+  left: 0.5em;
+  padding: 0.1em;
+  position: absolute;
+  bottom: -0.8em;
+  width: 2em;
+}
+
+/***********************************************
+ * Notification Content
+ ***********************************************/
+.notification-content {
+  padding: 0 2.6em 0 0.5em;
+}
+
+.notification-event-user &gt; img {
+  height: 16px;
+  width: 16px;
+  /* Don't work for Internet Explorer nor Edge 15 */
+  object-fit: cover;
+  object-position: center;
+}
+
+/***********************************************
+ * Notification Buttons
+ ***********************************************/
+.notification-event-read-button, .toggle-notification-event-details {
+  background-color: $theme.pageContentBackgroundColor;
+  border: 1px solid #ddd;
+  position: absolute;
+  right: 10px;
+  width: 2em;
+  z-index: 1;
+}
+
+.notification-event-read-button {
+  top: -6px;
+}
+
+.toggle-notification-event-details {
+  bottom: -6px;
+}
+
+/***********************************************
+ * Notification Details
+ ***********************************************/
+.notification-event-details {
+  font-size: 0.8em;
+  margin: 1em 0 0 0;
+}
+
+.notification-event-details td {
+  border: 0;
+  overflow: hidden;
+  padding: 2px;
+  text-overflow: ellipsis;
+  width: 33%;
+}
+
+.notification-event-details td.description {
+  width: 45%;
+}
+
+/***********************************************
+ * Notifications Footer
+ ***********************************************/
+.notifications-load-more {
+  cursor: pointer;
+  min-height: 2em;
+}
+
+.notifications-load-more:hover {
+  background-color: $theme.highlightColor;
+}
+
+.notifications-load-more p {
+  margin: 0;
+  padding: 0.7em;
 }</code>
     </property>
     <property>
@@ -494,7 +634,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <name>CSS</name>
     </property>
     <property>
-      <parse/>
+      <parse>1</parse>
     </property>
     <property>
       <use>currentPage</use>

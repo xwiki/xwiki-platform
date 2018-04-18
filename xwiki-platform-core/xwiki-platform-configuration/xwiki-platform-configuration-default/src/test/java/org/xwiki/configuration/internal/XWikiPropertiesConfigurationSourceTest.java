@@ -19,15 +19,12 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Properties;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
@@ -49,9 +46,6 @@ public class XWikiPropertiesConfigurationSourceTest
     public MockitoComponentMockingRule<ConfigurationSource> mocker =
         new MockitoComponentMockingRule<>(XWikiPropertiesConfigurationSource.class);
 
-    @Rule
-    public TemporaryFolder dummyConfigFolder = new TemporaryFolder();
-
     private Environment environment;
 
     @Before
@@ -63,8 +57,6 @@ public class XWikiPropertiesConfigurationSourceTest
     @Test
     public void testInitializeWhenNoPropertiesFile() throws Exception
     {
-        System.setProperty("xwiki.properties.default.dir", dummyConfigFolder.getRoot().getAbsolutePath());
-
         // Verifies that we can get a property from the source (i.e. that it's correctly initialized)
         this.mocker.getComponentUnderTest().getProperty("key");
 
@@ -84,33 +76,4 @@ public class XWikiPropertiesConfigurationSourceTest
         Properties properties = this.mocker.getComponentUnderTest().getProperty("propertiesProperty", Properties.class);
         assertEquals("value1", properties.get("prop1"));
     }
-
-    private Properties systemPropertiesBackup;
-
-    @Before
-    public void saveSystemProperties()
-    {
-        systemPropertiesBackup = new Properties(System.getProperties());
-    }
-
-    @After
-    public void restoreSystemProperties()
-    {
-        System.setProperties(systemPropertiesBackup);
-    }
-
-    @Test
-    public void testListParsingDefaultProperties() throws ComponentLookupException
-    {
-        String propertyFile = getClass().getResource("/xwiki.properties").getFile();
-        String propertyDir = new File(propertyFile).getParent();
-        System.setProperty("xwiki.properties.default.dir", propertyDir);
-
-        assertEquals(Arrays.asList("value1", "value2"),
-            this.mocker.getComponentUnderTest().getProperty("listProperty"));
-
-        Properties properties = this.mocker.getComponentUnderTest().getProperty("propertiesProperty", Properties.class);
-        assertEquals("value1", properties.get("prop1"));
-    }
-
 }

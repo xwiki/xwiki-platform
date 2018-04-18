@@ -413,20 +413,33 @@ public abstract class XWikiAction extends Action
                 // Call the new Entity Resource Reference Handler.
                 ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
                     new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
-                ResourceReference resourceReference =
-                    Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+                EntityResourceReference entityResourceReference =
+                    (EntityResourceReference) Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+
+                // We save the current action set since:
+                // - by default the action is set to "view" for Extensions not installed as root and contributing some
+                //   new Entity Action (see https://jira.xwiki.org/browse/XWIKI-15182).
+                // - we want to set back the action in case no ResourceReferenceHandler was found to handle the URL
+                // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-15182 is fixed
+                String originalAction = context.getAction();
                 try {
-                    entityResourceReferenceHandler.handle(resourceReference,
+                    // Force the action in the context because of https://jira.xwiki.org/browse/XWIKI-15182.
+                    // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-15182 is fixed
+                    context.setAction(entityResourceReference.getAction().getActionName());
+                    entityResourceReferenceHandler.handle(entityResourceReference,
                         DefaultResourceReferenceHandlerChain.EMPTY);
                     // Don't let the old actions kick in!
                     return null;
                 } catch (NotFoundResourceHandlerException e) {
                     // No Entity Resource Action has been found. Don't do anything and let it go through
                     // so that the old Action system kicks in...
+                    // Put back the action, because of https://jira.xwiki.org/browse/XWIKI-15182
+                    // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-15182 is fixed
+                    context.setAction(originalAction);
                 } catch (Throwable e) {
                     // Some real failure, log it since it's a problem but still allow the old Action system a chance
                     // to do something...
-                    LOGGER.error("Failed to handle Action for Resource [{}]", resourceReference, e);
+                    LOGGER.error("Failed to handle Action for Resource [{}]", entityResourceReference, e);
                 }
 
                 getProgress().startStep(this, "Execute action render");

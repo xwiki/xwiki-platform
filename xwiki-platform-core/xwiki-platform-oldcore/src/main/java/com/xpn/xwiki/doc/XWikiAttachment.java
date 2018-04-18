@@ -232,6 +232,9 @@ public class XWikiAttachment implements Cloneable
                 attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
                 attachment.getAttachment_archive().setAttachment(attachment);
             }
+
+            // Reset listeners
+            this.listeners = new CopyOnWriteArrayList<>();
         } catch (CloneNotSupportedException e) {
             // This should not happen
             LOGGER.error("exception while attach.clone", e);
@@ -1352,17 +1355,23 @@ public class XWikiAttachment implements Cloneable
         return this.archiveStoreInstance;
     }
 
+    /**
+     * @since 10.1RC1
+     */
     public void addNameModifiedListener(AttachmentNameChanged listener)
     {
         this.listeners.add(listener);
     }
 
+    /**
+     * @since 10.1RC1
+     */
     public void removeNameModifiedListener(AttachmentNameChanged listener)
     {
         this.listeners.remove(listener);
     }
 
-    public void notificateNameModifed(String previousAttachmentName, XWikiAttachment attachment)
+    private void notificateNameModifed(String previousAttachmentName, XWikiAttachment attachment)
     {
         for (AttachmentNameChanged listener : this.listeners) {
             listener.onAttachmentNameModified(previousAttachmentName, attachment);

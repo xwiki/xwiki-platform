@@ -50,6 +50,9 @@ public class NotificationsUserProfilePage extends ViewPage
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
 
+    @FindBy(className = "notificationAutoWatchMode")
+    private WebElement notificationAutoWatchModeSelect;
+
     private Map<String, ApplicationPreferences> applicationPreferences = new HashMap<>();
 
     /**
@@ -208,6 +211,8 @@ public class NotificationsUserProfilePage extends ViewPage
      */
     public void disableAllParameters()
     {
+        WebElement never = notificationAutoWatchModeSelect.findElement(By.xpath("option[@value='NONE']"));
+        never.click();
         try {
             for (ApplicationPreferences app : applicationPreferences.values()) {
                 if (app.getAlertState() != BootstrapSwitch.State.OFF) {

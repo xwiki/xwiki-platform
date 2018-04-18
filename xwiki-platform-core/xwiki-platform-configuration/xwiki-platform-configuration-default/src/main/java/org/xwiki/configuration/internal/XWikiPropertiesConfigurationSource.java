@@ -53,8 +53,6 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
 
     private static final String XWIKI_PROPERTIES_WARPATH = "/WEB-INF/" + XWIKI_PROPERTIES_FILE;
 
-    private static final String XWIKI_PROPERTIES_DEFAULT_DIR_SYSTEM_PROPERTY = "xwiki.properties.default.dir";
-
     /**
      * the Environment from where to get the XWiki properties file.
      */
@@ -75,9 +73,8 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
 
     private Configuration loadConfiguration()
     {
-        String defaultDir = System.getProperty(XWIKI_PROPERTIES_DEFAULT_DIR_SYSTEM_PROPERTY, "/etc/xwiki");
         // Looking for /etc/xwiki/xwiki.properties first
-        File file = new File(defaultDir, XWIKI_PROPERTIES_FILE);
+        File file = new File("/etc/xwiki/" + XWIKI_PROPERTIES_FILE);
         if (file.exists()) {
             try {
                 this.logger.info("loading {} from default location {}", XWIKI_PROPERTIES_FILE, file.getCanonicalPath());

@@ -20,9 +20,7 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,14 +31,12 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
-import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 
 /**
  * Default implementation of {@link NotificationManager}.
@@ -65,10 +61,7 @@ public class DefaultNotificationManager implements NotificationManager
     private NotificationFilterManager notificationFilterManager;
 
     @Inject
-    private ParametrizedNotificationManager newNotificationManager;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private ParametrizedNotificationManager parametrizedNotificationManager;
 
     @Override
     public List<CompositeEvent> getEvents(String userId, int expectedCount)
@@ -125,7 +118,12 @@ public class DefaultNotificationManager implements NotificationManager
     @Override
     public long getEventsCount(String userId, int maxCount) throws NotificationException
     {
-        return getEvents(userId, maxCount).size();
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = documentReferenceResolver.resolve(userId);
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = maxCount;
+        parameters.onlyUnread = true;
+        return getEvents(parameters).size();
     }
 
     private List<CompositeEvent> getEvents(NotificationParameters parameters)
@@ -135,18 +133,7 @@ public class DefaultNotificationManager implements NotificationManager
                 parameters.format);
         parameters.filters = notificationFilterManager.getAllFilters(parameters.user);
         parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
-        Map<String, Boolean> filterActivations = notificationFilterManager.getToggeableFilterActivations(
-                parameters.user);
-        Iterator<NotificationFilter> it = parameters.filters.iterator();
-        while (it.hasNext()) {
-            NotificationFilter filter = it.next();
-            Boolean filterActivation = filterActivations.get(filter.getName());
-            if (filterActivation != null && !filterActivation.booleanValue()) {
-                it.remove();
-            }
-        }
-
-        return newNotificationManager.getEvents(parameters);
+        return parametrizedNotificationManager.getEvents(parameters);
     }
 
     @Override

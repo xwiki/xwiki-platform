@@ -19,15 +19,15 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
 import org.xwiki.extension.xar.question.ConflictQuestion.ConflictType;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.xar.XarEntry;
 
 /**
  * @version $Id$
@@ -47,11 +47,13 @@ public class PackageConfiguration implements Cloneable
 
     private XarExtensionPlan xarExtensionPlan;
 
-    private Set<String> entriesToImport;
+    private Map<String, XarEntry> entriesToImport;
 
     private boolean skipMandatorytDocuments = true;
 
-    private final Map<ConflictType, GlobalAction> conflictActions = new HashMap<>();
+    private final Map<ConflictType, GlobalAction> conflictActions = new EnumMap<>(ConflictType.class);
+
+    private XarEntry xarEntry;
 
     public PackageConfiguration()
     {
@@ -121,12 +123,12 @@ public class PackageConfiguration implements Cloneable
         this.verbose = verbose;
     }
 
-    public Set<String> getEntriesToImport()
+    public Map<String, XarEntry> getEntriesToImport()
     {
         return this.entriesToImport;
     }
 
-    public void setEntriesToImport(Set<String> entriesToImport)
+    public void setEntriesToImport(Map<String, XarEntry> entriesToImport)
     {
         this.entriesToImport = entriesToImport;
     }
@@ -181,5 +183,21 @@ public class PackageConfiguration implements Cloneable
     public Map<ConflictType, GlobalAction> getConflictActions()
     {
         return this.conflictActions;
+    }
+
+    /**
+     * @since 10.3RC1
+     */
+    public void setXarEntry(XarEntry xarEntry)
+    {
+        this.xarEntry = xarEntry;
+    }
+
+    /**
+     * @since 10.3RC1
+     */
+    public XarEntry getXarEntry()
+    {
+        return xarEntry;
     }
 }

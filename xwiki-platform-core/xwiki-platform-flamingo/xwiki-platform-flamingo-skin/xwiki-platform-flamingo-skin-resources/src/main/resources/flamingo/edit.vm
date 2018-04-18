@@ -23,6 +23,29 @@
    </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
+#elseif ($services.extension.xar.isEditAllowed($tdoc.documentReferenceWithLocale) == false && "$!request.get('force')" == '')
+  #template("startpage.vm")
+  <div class="main">
+   <div id="mainContentArea">
+    ##
+    $response.setStatus(423)
+    #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
+                         + '&amp;force=1')
+    #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
+    #set($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
+    #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('extension.xar.editwarning.list')")
+    <ul>
+      #foreach($extension in $extensions)
+        <li>$extension.name ($extension.id.version)</li>
+      #end
+    </ul>
+    <p>$services.localization.render('extension.xar.editwarning.explanation')</p>
+    <p><a href="$forceEditURL">$services.localization.render('forcelock')</a><p>
+    #xwikimessageboxend()
+    ##
+   </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
 #else
   ##
   ## Determine what editor to show

@@ -11,9 +11,9 @@
     <backupPack>false</backupPack>
   </infos>
   <files>
-    <file language="" defaultAction="0">Space.Page</file>
-    <file language="" defaultAction="0">Space.Translations</file>
-    <file language="fr" defaultAction="0">Space.Translations</file>
+    <file language="" defaultAction="0" type="type0">Space.Page</file>
+    <file language="" defaultAction="0" type="type1">Space.Translations</file>
+    <file language="fr" defaultAction="0" type="type2">Space.Translations</file>
     <file language="" defaultAction="1">Space.SkippedPage</file>
     <file language="" defaultAction="2">Space.MergedPage</file>
     <file language="" defaultAction="1">Space.SkippedTranslations</file>

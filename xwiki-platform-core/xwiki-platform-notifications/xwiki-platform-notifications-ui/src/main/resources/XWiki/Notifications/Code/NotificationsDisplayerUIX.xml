@@ -297,8 +297,12 @@
    */
   $(document).ready(function () {
 
-    macro = new XWikiNotificationsMacro($('.notifications-area'), xm.userId, notificationsLimit, true, [], true);
+    var container = $('.notifications-area');
+    macro = new XWikiNotificationsMacro(container, xm.userId, notificationsLimit, true, [], true);
     getUnreadNotificationsCount();
+    container.on('eventMarkedAsRead', function (notif) {
+      updateNotificationCount(notificationCount - 1);
+    });
 
     /**
      * Prevent the dropdown menu for being closed when the user clicks on the notifications menu.

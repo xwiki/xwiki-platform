@@ -2,6 +2,26 @@
 ##
 ## Preamble: which versions are being compared
 ##
+
+#if ("$!previousOrigdocVersion" != '')
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev2}")})
+  #set ($previousOrigdocLink = "<a class='changes-arrow' href='$changesLink'>&lt;</a>")
+  #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
+#end
+#if ("$!nextOrigdocVersion" != '')
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev2}")})
+  #set ($nextOrigdocLink = "<a class='changes-arrow' href='$changesLink'>&gt;</a>")
+#end
+#if ("$!previousNewdocVersion" != '')
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${previousNewdocVersion}")})
+  #set ($previousNewdocLink = "<a class='changes-arrow' href='$changesLink'>&lt;</a>")
+#end
+#if ("$!nextNewdocVersion" != '')
+  #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${nextNewdocVersion}")})
+  #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink'>&gt;</a>")
+  #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
+#end
+
 <div id="changes-info">
   <div id="changes-info-boxes">
     <div id="changes-info-box-from" class="changes-info-box">
@@ -10,7 +30,8 @@
       #else
         #set ($fromVersionURL = $origdoc.getURL('view', "rev=$rev1"))
         #set ($fromVersionLink = "<a href='$fromVersionURL'>$rev1</a>")
-        <div class="changes-info-title">$services.localization.render('core.viewers.diff.from', [$fromVersionLink])</div>
+        #set ($fromVersionSpan = "<span class='changes-version'>$!previousOrigdocLink $fromVersionLink $!nextOrigdocLink</span>")
+        <div class="changes-info-title">$services.localization.render('core.viewers.diff.from', [$fromVersionSpan])</div>
         <div class="changes-info-content">
         #if($origdoc)
           $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
@@ -23,7 +44,8 @@
     <div id="changes-info-box-to" class="changes-info-box">
       #set ($toVersionURL = $newdoc.getURL('view', "rev=$rev2"))
       #set ($toVersionLink = "<a href='$toVersionURL'>$rev2</a>")
-      <div class="changes-info-title">$services.localization.render('core.viewers.diff.to', [$toVersionLink])</div>
+      #set ($toVersionSpan = "<span class='changes-version'>$!previousNewdocLink $toVersionLink $!nextNewdocLink</span>")
+      <div class="changes-info-title">$services.localization.render('core.viewers.diff.to', [$toVersionSpan])</div>
       <div class="changes-info-content">
       #if($newdoc)
         $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($newdoc.author)])
@@ -32,6 +54,12 @@
       #end
       </div> ## changes-info-content
     </div> ## changes-info-box-to
+    #if ("$!previousLink" != '')
+      <a href="$previousLink" class="changes-arrow-left">&lt;</a>
+    #end
+    #if ("$!nextLink" != '')
+      <a href="$nextLink" class="changes-arrow-right">&gt;</a>
+    #end
     <div class="clearfloats"></div>
   </div> ## changes-info-boxes
   <div class="clearfloats"></div>

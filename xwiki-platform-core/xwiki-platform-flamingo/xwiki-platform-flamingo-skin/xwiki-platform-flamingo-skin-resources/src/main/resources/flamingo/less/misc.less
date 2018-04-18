@@ -324,6 +324,33 @@
   }
 }
 
+.changes-version {
+  white-space: nowrap;
+}
+
+.changes-arrow, .changes-arrow-left, .changes-arrow-right {
+  &, &:hover, &:active, &:visited, &:focus {
+    color: @xwiki-page-content-bg;
+    text-decoration: none;
+    font-weight: 700;
+  }
+}
+
+.changes-arrow-left, .changes-arrow-right {
+  position: absolute;
+  font-size: 7em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.changes-arrow-left {
+  left: 30px;
+}
+
+.changes-arrow-right {
+  right: 30px;
+}
+
 // Panels Layout --------------------------------------------------------------
 /* Content Panels are defined in macros.vm in #displayPanelLayout and used in applications like Statistics */
 

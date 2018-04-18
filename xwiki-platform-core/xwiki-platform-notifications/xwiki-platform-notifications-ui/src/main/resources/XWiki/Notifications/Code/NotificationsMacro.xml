@@ -31,7 +31,7 @@
   <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1524039715000</date>
+  <date>1524044032000</date>
   <contentUpdateDate>1523956287000</contentUpdateDate>
   <version>1.1</version>
   <title/>
@@ -377,6 +377,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
             read: true
           });
           $(this).remove();
+          self.macro.trigger('eventMarkedAsRead', notif);
         });
       }
       // Details

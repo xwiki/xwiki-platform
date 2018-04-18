@@ -72,7 +72,7 @@ public class XarEntry extends LocalDocumentReference
      * @param reference the reference of the document
      * @param name the name of the entry (ZIP style)
      * @param entryType the type of the entry
-     * @since 10.3RC1
+     * @since 10.3
      */
     public XarEntry(LocalDocumentReference reference, String name, String entryType)
     {
@@ -93,7 +93,7 @@ public class XarEntry extends LocalDocumentReference
      * @param reference the reference of the document
      * @param defaultAction the default action associated to a XAR entry
      * @param entryType the type of the entry
-     * @since 10.3RC1
+     * @since 10.3
      */
     public XarEntry(LocalDocumentReference reference, int defaultAction, String entryType)
     {
@@ -115,7 +115,7 @@ public class XarEntry extends LocalDocumentReference
      * @param name the name of the entry (ZIP style)
      * @param defaultAction the default action associated to a XAR entry (not used at the moment)
      * @param entryType the type of the entry
-     * @since 10.3RC1
+     * @since 10.3
      */
     public XarEntry(LocalDocumentReference reference, String name, int defaultAction, String entryType)
     {
@@ -136,7 +136,7 @@ public class XarEntry extends LocalDocumentReference
 
     /**
      * @return the type of the entry
-     * @since 10.3RC1
+     * @since 10.3
      */
     public String getEntryType()
     {

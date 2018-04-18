@@ -29,7 +29,7 @@ import org.xwiki.xar.type.AbstractXarEntryType;
  * Pre-configured type for wiki home page use case.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Component(hints = { HomeXarEntryType.HINT, XarEntryTypeResolver.DOCUMENT_PREFIX + "Main.WebHome" })
 @Singleton

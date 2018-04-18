@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiContext;
  * A base class to help old stores to deal with unsynchronized XWikiContext (passed and {@link ExecutionContext}).
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 public abstract class AbstractXWikiStore
 {

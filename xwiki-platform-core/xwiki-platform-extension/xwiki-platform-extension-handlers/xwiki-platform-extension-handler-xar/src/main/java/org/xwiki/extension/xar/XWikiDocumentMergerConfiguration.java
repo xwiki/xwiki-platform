@@ -30,7 +30,7 @@ import org.xwiki.xar.XarEntryType.UpgradeType;
 
 /**
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Unstable
 public class XWikiDocumentMergerConfiguration

@@ -44,7 +44,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
  * Various store related configuration.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Component(roles = StoreConfiguration.class)
 @Singleton

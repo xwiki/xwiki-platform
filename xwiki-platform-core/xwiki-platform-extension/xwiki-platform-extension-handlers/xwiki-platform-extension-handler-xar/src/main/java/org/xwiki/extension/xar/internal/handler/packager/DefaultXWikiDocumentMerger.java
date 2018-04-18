@@ -49,7 +49,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
  * Default implementation of {@link XWikiDocumentMerger};
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Component
 @Singleton

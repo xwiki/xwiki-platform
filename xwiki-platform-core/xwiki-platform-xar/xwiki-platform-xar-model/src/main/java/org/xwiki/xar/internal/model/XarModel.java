@@ -59,7 +59,7 @@ public class XarModel
     public static final String ATTRIBUTE_LOCALE = "language";
 
     /**
-     * @since 10.3RC1
+     * @since 10.3
      */
     public static final String ATTRIBUTE_TYPE = "type";
 

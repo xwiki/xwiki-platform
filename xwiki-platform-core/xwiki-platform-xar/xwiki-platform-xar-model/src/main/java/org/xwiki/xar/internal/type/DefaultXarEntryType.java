@@ -28,7 +28,7 @@ import org.xwiki.xar.type.AbstractXarEntryType;
  * Default implementation of {@link org.xwiki.xar.XarEntryType}.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Component
 @Singleton

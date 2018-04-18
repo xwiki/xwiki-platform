@@ -26,7 +26,7 @@ import org.xwiki.xar.XarEntryType;
  * Base class helper to implement {@link XarEntryType}.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Unstable
 public abstract class AbstractXarEntryType implements XarEntryType

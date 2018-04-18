@@ -313,7 +313,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     /**
      * @param documentReference the reference of the document
      * @return true if edit is allowed on the passed document
-     * @since 10.3RC1
+     * @since 10.3
      */
     public boolean isEditAllowed(DocumentReference documentReference)
     {
@@ -323,7 +323,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     /**
      * @param documentReference the reference of the document
      * @return true if edit is allowed on the passed document
-     * @since 10.3RC1
+     * @since 10.3
      */
     public boolean isDeleteAllowed(DocumentReference documentReference)
     {

@@ -35,7 +35,7 @@ import org.xwiki.xar.XarEntryTypeResolver;
  * Default implementation of {@link XarEntryTypeResolver}.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 public class DefaultXarEntryTypeResolver implements XarEntryTypeResolver
 {

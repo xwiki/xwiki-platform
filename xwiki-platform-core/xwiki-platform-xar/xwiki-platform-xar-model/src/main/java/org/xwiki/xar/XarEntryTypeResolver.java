@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * Resolve proper {@link XarEntryType} instance depending on the name and the context.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Component
 @Role

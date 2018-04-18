@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Return an instance of {@link XWikiDocument} which is the result of a merge based on the provided input.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Role
 @Unstable

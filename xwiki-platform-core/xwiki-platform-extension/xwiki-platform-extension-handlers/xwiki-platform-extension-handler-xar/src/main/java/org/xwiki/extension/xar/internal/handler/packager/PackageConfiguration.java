@@ -186,7 +186,7 @@ public class PackageConfiguration implements Cloneable
     }
 
     /**
-     * @since 10.3RC1
+     * @since 10.3
      */
     public void setXarEntry(XarEntry xarEntry)
     {
@@ -194,7 +194,7 @@ public class PackageConfiguration implements Cloneable
     }
 
     /**
-     * @since 10.3RC1
+     * @since 10.3
      */
     public XarEntry getXarEntry()
     {

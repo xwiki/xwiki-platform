@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * The type of the {@link XarEntry} which control the behavior to adopt while upgrading, editing, etc.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Role
 @Unstable

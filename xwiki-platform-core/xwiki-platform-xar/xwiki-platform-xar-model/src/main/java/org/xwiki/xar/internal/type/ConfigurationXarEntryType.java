@@ -29,7 +29,7 @@ import org.xwiki.xar.type.AbstractXarEntryType;
  * Pre-configured type for wiki a page containing configuration.
  * 
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  */
 @Component(hints = { ConfigurationXarEntryType.HINT, XarEntryTypeResolver.DOCUMENT_PREFIX + "XWiki.XWikiPreferences" })
 @Singleton

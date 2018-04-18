@@ -118,7 +118,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     /**
      * @param wikiId the wiki identifier to associate with this URL
      * @param baseURL the input URL to take into account, null to disable it
-     * @since 10.3RC1
+     * @since 10.3
      */
     public void setDefaultURL(String wikiId, URL baseURL)
     {

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -35,9 +36,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.internal.status.EventReadAlertFilter;
+import org.xwiki.notifications.filters.internal.status.EventReadEmailFilter;
 import org.xwiki.notifications.internal.SimilarityCalculator;
-import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -67,10 +70,24 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
+    @Inject
+    @Named(EventReadAlertFilter.FILTER_NAME)
+    private NotificationFilter eventReadAlertFilter;
+
+    @Inject
+    @Named(EventReadEmailFilter.FILTER_NAME)
+    private NotificationFilter eventReadEmailFilter;
+
     @Override
     public List<CompositeEvent> getEvents(NotificationParameters parameters)
             throws NotificationException
     {
+        if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadAlertFilter)) {
+            parameters.filters.add(eventReadAlertFilter);
+        }
+        if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadEmailFilter)) {
+            parameters.filters.add(eventReadEmailFilter);
+        }
         return getEvents(new ArrayList<>(), parameters);
     }
 

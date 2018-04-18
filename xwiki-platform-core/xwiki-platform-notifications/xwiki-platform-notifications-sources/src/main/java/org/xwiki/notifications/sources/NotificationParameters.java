@@ -64,6 +64,11 @@ public class NotificationParameters
     public Date fromDate;
 
     /**
+     * Display only unread notifications.
+     */
+    public Boolean onlyUnread;
+
+    /**
      * List of event IDs not to return.
      */
     public Collection<String> blackList = new ArrayList<>();

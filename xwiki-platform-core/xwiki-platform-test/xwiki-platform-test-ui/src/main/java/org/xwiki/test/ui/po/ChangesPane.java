@@ -36,6 +36,13 @@ import org.xwiki.test.ui.po.diff.EntityDiff;
  */
 public class ChangesPane extends BaseElement
 {
+    private final static String previousChangeSelector = "#changes-info-boxes > a.changes-arrow-left";
+    private final static String nextChangeSelector = "#changes-info-boxes > a.changes-arrow-right";
+    private final static String previousFromVersionSelector = "#changes-info-box-from .changes-arrow:first-child";
+    private final static String nextFromVersionSelector = "#changes-info-box-from .changes-arrow:last-child";
+    private final static String previousToVersionSelector = "#changes-info-box-to .changes-arrow:first-child";
+    private final static String nextToVersionSelector = "#changes-info-box-to .changes-arrow:last-child";
+
     /**
      * The element that wraps all the changes.
      */
@@ -62,6 +69,30 @@ public class ChangesPane extends BaseElement
 
     @FindBy(className = "diff-summary")
     private WebElement diffSummary;
+
+    @FindBy(css = "#changes-info-box-to .changes-version a:not(.changes-arrow)")
+    private WebElement toVersionElement;
+
+    @FindBy(css = "#changes-info-box-from .changes-version a:not(.changes-arrow)")
+    private WebElement fromVersionElement;
+
+    @FindBy(css = previousChangeSelector)
+    private WebElement previousChangeElement;
+
+    @FindBy(css = nextChangeSelector)
+    private WebElement nextChangeElement;
+
+    @FindBy(css = previousFromVersionSelector)
+    private WebElement previousFromVersionElement;
+
+    @FindBy(css = nextFromVersionSelector)
+    private WebElement nextFromVersionElement;
+
+    @FindBy(css = previousToVersionSelector)
+    private WebElement previousToVersionElement;
+
+    @FindBy(css = nextToVersionSelector)
+    private WebElement nextToVersionElement;
 
     /**
      * @return the summary of the from version
@@ -128,5 +159,118 @@ public class ChangesPane extends BaseElement
         return new EntityDiff(this.container.findElement(By
             .xpath("//dd[parent::dl[@class = 'diff-group'] and preceding-sibling::dt[normalize-space(.) = '" + label
                 + "']]")));
+    }
+
+    /**
+     * Click the previous change button
+     */
+    public void clickPreviousChange()
+    {
+        previousChangeElement.click();
+    }
+
+    /**
+     * Click the next change button
+     */
+    public void clickNextChange()
+    {
+        nextChangeElement.click();
+    }
+
+    /**
+     * Click the previous change button of the original document
+     */
+    public void clickPreviousFromVersion()
+    {
+        previousFromVersionElement.click();
+    }
+
+    /**
+     * Click the next change button of the original document
+     */
+    public void clickNextFromVersion()
+    {
+        nextFromVersionElement.click();
+    }
+
+    /**
+     * Click the previous change button of the new document
+     */
+    public void clickPreviousToVersion()
+    {
+        previousToVersionElement.click();
+    }
+
+    /**
+     * Click the next change button of the new document
+     */
+    public void clickNextToVersion()
+    {
+        nextToVersionElement.click();
+    }
+
+    /**
+     * @return the presence of the previous change button
+     */
+    public boolean hasPreviousChange()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(previousChangeSelector));
+    }
+
+    /**
+     * @return the presence of the next change button
+     */
+    public boolean hasNextChange()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(nextChangeSelector));
+    }
+
+    /**
+     * @return the presence of the previous change button of the original document
+     */
+    public boolean hasPreviousFromVersion()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(previousFromVersionSelector));
+    }
+
+    /**
+     * @return the presence of the next change button of the original document
+     */
+    public boolean hasNextFromVersion()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(nextFromVersionSelector));
+    }
+
+    /**
+     * @return the presence of the previous change button of the new document
+     */
+    public boolean hasPreviousToVersion()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(previousToVersionSelector));
+    }
+
+    /**
+     * @return the presence of the next change button of the new document
+     */
+    public boolean hasNextToVersion()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(nextToVersionSelector));
+    }
+
+    /**
+     * @return the original document version
+     */
+
+    public String getFromVersion()
+    {
+        return fromVersionElement.getText();
+    }
+
+    /**
+     * @return the new document version
+     */
+    public String getToVersion()
+    {
+        return toVersionElement.getText();
     }
 }

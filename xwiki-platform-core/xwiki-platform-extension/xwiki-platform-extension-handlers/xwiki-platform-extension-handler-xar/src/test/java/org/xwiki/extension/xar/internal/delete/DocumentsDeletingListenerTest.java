@@ -40,6 +40,7 @@ import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.EntitySelection;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -89,18 +90,25 @@ public class DocumentsDeletingListenerTest
         DocumentReference doc1 = new DocumentReference("a", "b", "c1");
         DocumentReference doc2 = new DocumentReference("a", "b", "c2");
         DocumentReference doc3 = new DocumentReference("a", "b", "c3");
+        DocumentReference doc4 = new DocumentReference("a", "b", "c4");
 
         concernedEntities.put(doc1, new EntitySelection(doc1));
         concernedEntities.put(doc2, new EntitySelection(doc2));
         concernedEntities.put(doc3, new EntitySelection(doc3));
+        concernedEntities.put(doc4, new EntitySelection(doc4));
 
         XarInstalledExtension ext1 = mock(XarInstalledExtension.class);
         XarInstalledExtension ext2 = mock(XarInstalledExtension.class);
         when(ext1.getId()).thenReturn(new ExtensionId("ext1"));
         when(ext2.getId()).thenReturn(new ExtensionId("ext2"));
         when(repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1, ext2));
+        when(repository.isAllowed(doc1, Right.DELETE)).thenReturn(false);
         when(repository.getXarInstalledExtensions(doc2)).thenReturn(Collections.emptyList());
+        when(repository.isAllowed(doc2, Right.DELETE)).thenReturn(true);
         when(repository.getXarInstalledExtensions(doc3)).thenReturn(Arrays.asList(ext2));
+        when(repository.isAllowed(doc3, Right.DELETE)).thenReturn(false);
+        when(repository.getXarInstalledExtensions(doc4)).thenReturn(Arrays.asList(ext1));
+        when(repository.isAllowed(doc4, Right.DELETE)).thenReturn(true);
 
         doAnswer(invocationOnMock -> {
             ExtensionBreakingQuestion question = invocationOnMock.getArgument(0);
@@ -121,8 +129,9 @@ public class DocumentsDeletingListenerTest
             ));
 
             // Free pages
-            assertEquals(1, question.getFreePages().size());
+            assertEquals(2, question.getFreePages().size());
             assertTrue(question.getFreePages().contains(concernedEntities.get(doc2)));
+            assertTrue(question.getFreePages().contains(concernedEntities.get(doc4)));
 
             // Assert nothing is select by default
             for (EntitySelection selection : question.getConcernedEntities().values()) {

@@ -268,6 +268,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
      * @param right the right to check on the passed document
      * @return true if the passed right is allowed on the passed document. True unless explicitly indicated otherwise by
      *         a {@link XarEntryType}.
+     * @since 10.3
      */
     public boolean isAllowed(DocumentReference documentReference, Right right)
     {

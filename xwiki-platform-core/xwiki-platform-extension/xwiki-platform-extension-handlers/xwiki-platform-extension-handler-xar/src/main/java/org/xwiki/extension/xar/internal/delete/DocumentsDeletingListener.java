@@ -43,6 +43,7 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.job.question.EntitySelection;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Listener that check if pages which are going to be deleted belong to extensions, and maybe ask the user what to do.
@@ -77,8 +78,8 @@ public class DocumentsDeletingListener extends AbstractEventListener
     {
         Job job = (Job) source;
         if (!job.getRequest().isInteractive()) {
-            logger.warn(
-                    "XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
+            logger
+                .warn("XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
             return;
         }
 
@@ -87,7 +88,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
         ExtensionBreakingQuestion question = new ExtensionBreakingQuestion(concernedEntities);
         for (EntitySelection entitySelection : concernedEntities.values()) {
             if (entitySelection.getEntityReference() instanceof DocumentReference) {
-                checkIfPageBelongToExtensions(entitySelection, question);
+                checkIfDeleteIsAllowed(entitySelection, question);
             }
         }
 
@@ -115,16 +116,18 @@ public class DocumentsDeletingListener extends AbstractEventListener
         }
     }
 
-    private void checkIfPageBelongToExtensions(EntitySelection entitySelection, ExtensionBreakingQuestion question)
+    private void checkIfDeleteIsAllowed(EntitySelection entitySelection, ExtensionBreakingQuestion question)
     {
-        XarInstalledExtensionRepository repository   = (XarInstalledExtensionRepository) installedExtensionRepository;
-        DocumentReference documentReference          = (DocumentReference) entitySelection.getEntityReference();
-        Collection<XarInstalledExtension> extensions = repository.getXarInstalledExtensions(documentReference);
+        XarInstalledExtensionRepository repository = (XarInstalledExtensionRepository) installedExtensionRepository;
+        DocumentReference documentReference = (DocumentReference) entitySelection.getEntityReference();
 
-        if (extensions.isEmpty()) {
+        if (repository.isAllowed(documentReference, Right.DELETE)) {
             question.markAsFreePage(entitySelection);
+
             return;
         }
+
+        Collection<XarInstalledExtension> extensions = repository.getXarInstalledExtensions(documentReference);
 
         for (XarInstalledExtension extension : extensions) {
             question.pageBelongsToExtension(entitySelection, extension);

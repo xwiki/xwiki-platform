@@ -47,7 +47,7 @@ import static java.util.Arrays.asList;
  * addComment). This is or internal usage.
  *
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  * @since 9.11.4
  */
 @Component(roles = XWikiEventTypesEnabler.class)
@@ -69,7 +69,7 @@ public class XWikiEventTypesEnabler
      * @throws NotificationException if an error occurs
      *
      * @since 9.11.5
-     * @since 10.3RC1
+     * @since 10.3
      */
     public void ensureXWikiNotificationsAreEnabled(DocumentReference user) throws NotificationException
     {
@@ -92,7 +92,7 @@ public class XWikiEventTypesEnabler
      * @throws NotificationException if an error occurs
      *
      * @since 9.11.5
-     * @since 10.3RC1
+     * @since 10.3
      */
     public boolean isNotificationDisabled(DocumentReference user) throws NotificationException
     {

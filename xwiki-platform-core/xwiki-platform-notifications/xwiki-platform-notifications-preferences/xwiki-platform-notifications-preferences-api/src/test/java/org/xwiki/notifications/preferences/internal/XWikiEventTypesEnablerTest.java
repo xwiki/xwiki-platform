@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
- * @since 10.3RC1
+ * @since 10.3
  * @since 9.11.4
  */
 public class XWikiEventTypesEnablerTest

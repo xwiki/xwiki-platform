@@ -65,7 +65,7 @@ public class EventUserFilterPreferencesGetter
      * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
      * @return either or not the user to test is part of the followed users of the given user
-     * @since 10.3RC1
+     * @since 10.3
      * @since 9.11.5
      */
     public boolean isUsedFollowed(String testUser, Collection<NotificationFilterPreference> filterPreferences,
@@ -80,7 +80,7 @@ public class EventUserFilterPreferencesGetter
      * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
      * @return the collection of users followed by the given user
-     * @since 10.3RC1
+     * @since 10.3
      * @since 9.11.5
      */
     public Collection<String> getFollowedUsers(Collection<NotificationFilterPreference> filterPreferences,

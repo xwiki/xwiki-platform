@@ -52,7 +52,7 @@ import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment.AttachmentNameChanged;
+import com.xpn.xwiki.doc.XWikiAttachment.AttachmentContainer;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -179,8 +179,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
                 will(returnValue(true));
                 allowing(mockDirtyContent).isContentDirty();
                 will(returnValue(true));
-                allowing(mockAttach).addNameModifiedListener(with(any(AttachmentNameChanged.class)));
-                allowing(mockAttach).removeNameModifiedListener(with(any(AttachmentNameChanged.class)));
+                allowing(mockAttach).setAttachmentContainer(with(any(AttachmentContainer.class)));
             }
         });
 

@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -75,7 +74,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class XWikiAttachment implements Cloneable
 {
-    public static interface AttachmentNameChanged
+    public static interface AttachmentContainer
     {
         void onAttachmentNameModified(String previousAttachmentName, XWikiAttachment attachment);
     }
@@ -149,7 +148,7 @@ public class XWikiAttachment implements Cloneable
 
     private boolean forceSetFilesize;
 
-    private List<AttachmentNameChanged> listeners = new CopyOnWriteArrayList<>();
+    private AttachmentContainer container;
 
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
@@ -233,8 +232,8 @@ public class XWikiAttachment implements Cloneable
                 attachment.getAttachment_archive().setAttachment(attachment);
             }
 
-            // Reset listeners
-            attachment.listeners = new CopyOnWriteArrayList<>();
+            // Reset container since this new instance is not yet stored anywhere
+            attachment.container = null;
         } catch (CloneNotSupportedException e) {
             // This should not happen
             LOGGER.error("exception while attach.clone", e);
@@ -1356,25 +1355,17 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @since 10.1RC1
+     * @since 10.3
      */
-    public void addNameModifiedListener(AttachmentNameChanged listener)
+    public void setAttachmentContainer(AttachmentContainer container)
     {
-        this.listeners.add(listener);
-    }
-
-    /**
-     * @since 10.1RC1
-     */
-    public void removeNameModifiedListener(AttachmentNameChanged listener)
-    {
-        this.listeners.remove(listener);
+        this.container = container;
     }
 
     private void notificateNameModifed(String previousAttachmentName, XWikiAttachment attachment)
     {
-        for (AttachmentNameChanged listener : this.listeners) {
-            listener.onAttachmentNameModified(previousAttachmentName, attachment);
+        if (this.container != null) {
+            this.container.onAttachmentNameModified(previousAttachmentName, attachment);
         }
     }
 }

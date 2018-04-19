@@ -29,7 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.collections4.list.AbstractListDecorator;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment.AttachmentNameChanged;
+import com.xpn.xwiki.doc.XWikiAttachment.AttachmentContainer;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 10.1RC1
  */
-public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> implements AttachmentNameChanged
+public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> implements AttachmentContainer
 {
     private final Map<String, XWikiAttachment> map = new ConcurrentSkipListMap<>();
 
@@ -273,12 +273,12 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> 
     protected void added(XWikiAttachment element)
     {
         element.setDoc(this.document);
-        element.addNameModifiedListener(this);
+        element.setAttachmentContainer(this);
     }
 
     protected void removed(XWikiAttachment element)
     {
-        element.removeNameModifiedListener(this);
+        element.setAttachmentContainer(null);
     }
 
     @Override

@@ -49,7 +49,7 @@ public interface NotificationFilter extends Comparable
     /**
      * The different behaviours a filter could have regarding an event.
      * @since 9.11.5
-     * @since 10.3RC1
+     * @since 10.3
      */
     enum FilterPolicy
     {
@@ -78,7 +78,7 @@ public interface NotificationFilter extends Comparable
      * @param format format of the notification
      * @return true if the event should be dismiss
      * @since 9.11.5
-     * @since 10.3RC1
+     * @since 10.3
      */
     FilterPolicy filterEvent(Event event, DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format);
@@ -139,7 +139,7 @@ public interface NotificationFilter extends Comparable
      * Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format) is}.
      *
      * @since 9.11.5
-     * @since 10.3RC1
+     * @since 10.3
      */
     default int getPriority() {
         return 1000;

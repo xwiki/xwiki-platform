@@ -74,28 +74,66 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
     public XWikiDocument merge(XWikiDocument currentDocument, XWikiDocument previousDocument,
         XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration) throws XarExtensionExtension
     {
-        if (currentDocument != null || previousDocument != null) {
-            UpgradeType type = configuration.getType();
-            if (type != null) {
-                switch (type) {
-                    case THREEWAYS:
-                        return THREEWAYS(currentDocument, previousDocument, nextDocument, configuration);
-                    case OVERWRITE:
-                        return OVERWRITE(currentDocument, previousDocument, nextDocument, configuration);
-                    case SKIP:
-                        return SKIP(currentDocument, previousDocument, nextDocument, configuration);
-                    case SKIP_ALLWAYS:
-                        return SKIP_ALLWAYS(currentDocument, previousDocument, nextDocument, configuration);
+        //////////
+        // Upgrade
+        //////////
 
-                    default:
-                        break;
-                }
+        if (previousDocument != null) {
+            return upgrade(currentDocument, previousDocument, nextDocument, configuration);
+        }
 
+        //////////
+        // Install
+        //////////
+
+        return install(currentDocument, nextDocument, configuration);
+    }
+
+    private XWikiDocument upgrade(XWikiDocument currentDocument, XWikiDocument previousDocument,
+        XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration)
+    {
+        UpgradeType type = configuration.getType();
+        if (type != null) {
+            switch (type) {
+                case OVERWRITE:
+                    return OVERWRITE(currentDocument, previousDocument, nextDocument, configuration);
+                case SKIP:
+                    return SKIP(currentDocument, previousDocument, nextDocument, configuration);
+                case SKIP_ALLWAYS:
+                    return SKIP_ALLWAYS(currentDocument, previousDocument, nextDocument, configuration);
+
+                default:
+                    break;
             }
         }
 
-        // Fallback on 3 ways merge logic
         return THREEWAYS(currentDocument, previousDocument, nextDocument, configuration);
+    }
+
+    private XWikiDocument install(XWikiDocument currentDocument, XWikiDocument nextDocument,
+        XWikiDocumentMergerConfiguration configuration)
+    {
+        XWikiDocument result = currentDocument;
+
+        if (currentDocument != null) {
+            // Check if a mandatory document initializer exists for the current document
+            XWikiDocument mandatoryDocument = getMandatoryDocument(nextDocument.getDocumentReference());
+
+            if (mandatoryDocument != null) {
+                // 3 ways merge
+                result = merge3(currentDocument, mandatoryDocument, nextDocument, configuration);
+            } else {
+                // Already existing document in database but without previous version
+                if (!currentDocument.equalsData(nextDocument)) {
+                    result = askDocumentToSave(currentDocument, null, nextDocument, null, configuration, null);
+                }
+            }
+        } else {
+            // Simple install (the document does not exist in previous version or in the database)
+            result = nextDocument;
+        }
+
+        return result;
     }
 
     private XWikiDocument THREEWAYS(XWikiDocument currentDocument, XWikiDocument previousDocument,
@@ -104,29 +142,11 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         XWikiDocument result = null;
 
         if (currentDocument != null) {
-            if (previousDocument != null) {
-                // 3 ways merge
-                result = merge3(currentDocument, previousDocument, nextDocument, configuration);
-            } else {
-                // Check if a mandatory document initializer exists for the current document
-                XWikiDocument mandatoryDocument = getMandatoryDocument(nextDocument.getDocumentReference());
-
-                if (mandatoryDocument != null) {
-                    // 3 ways merge
-                    result = merge3(currentDocument, mandatoryDocument, nextDocument, configuration);
-                } else {
-                    // Already existing document in database but without previous version
-                    if (!currentDocument.equalsData(nextDocument)) {
-                        result = askDocumentToSave(currentDocument, null, nextDocument, null, configuration, null);
-                    }
-                }
-            }
-        } else if (previousDocument != null) {
+            // 3 ways merge
+            result = merge3(currentDocument, previousDocument, nextDocument, configuration);
+        } else {
             // Document have been deleted in the database
             result = askDocumentToSave(null, previousDocument, nextDocument, null, configuration, null);
-        } else {
-            // Simple install (the document does not exist in previous version or in the database)
-            result = nextDocument;
         }
 
         return result;

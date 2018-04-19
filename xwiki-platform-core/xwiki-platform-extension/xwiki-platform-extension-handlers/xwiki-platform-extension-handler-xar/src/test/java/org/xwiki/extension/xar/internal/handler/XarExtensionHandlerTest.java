@@ -70,6 +70,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -249,6 +250,15 @@ public class XarExtensionHandlerTest
         mandatoryDocument.setContent("modified content");
         this.oldcore.getSpyXWiki().saveDocument(mandatoryDocument, "", true, getXWikiContext());
 
+        MandatoryDocumentInitializer mandatoryconfigurationInitializer = this.componentManager
+            .registerMockComponent(MandatoryDocumentInitializer.class, "space.mandatoryconfiguration");
+        when(mandatoryconfigurationInitializer.updateDocument(any(XWikiDocument.class))).thenReturn(true);
+        XWikiDocument mandatoryconfigurationDocument =
+            new XWikiDocument(new DocumentReference("wiki", "space", "mandatoryconfiguration"));
+        mandatoryconfigurationDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
+        mandatoryconfigurationDocument.setSyntax(Syntax.PLAIN_1_0);
+        this.oldcore.getSpyXWiki().saveDocument(mandatoryconfigurationDocument, "", true, getXWikiContext());
+
         // install
 
         XarInstalledExtension xarInstalledExtension = install(this.localXarExtensiontId1, "wiki", this.contextUser);
@@ -384,6 +394,19 @@ public class XarExtensionHandlerTest
             .getDocument(new DocumentReference("wiki", "space", "mandatory"), getXWikiContext());
 
         Assert.assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
+
+        // space.mandatoryconfiguration
+
+        XWikiDocument mandatoryconfigurationpage = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "mandatoryconfiguration"), getXWikiContext());
+
+        assertEquals("Document wiki:space.mandatoryconfiguration has not been overwritten", "2.1",
+            mandatoryconfigurationpage.getVersion());
+
+        assertTrue(
+            this.installedExtensionRepository.isAllowed(mandatoryconfigurationpage.getDocumentReference(), Right.EDIT));
+        assertFalse(this.installedExtensionRepository.isAllowed(mandatoryconfigurationpage.getDocumentReference(),
+            Right.DELETE));
     }
 
     @Test

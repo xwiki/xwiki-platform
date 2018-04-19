@@ -276,6 +276,11 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
 
         LocalDocumentReference localDocumentReference = documentReference.getLocalDocumentReference();
 
+        // Make sure there is a locale
+        if (localDocumentReference.getLocale() == null) {
+            localDocumentReference = new LocalDocumentReference(localDocumentReference, Locale.ROOT);
+        }
+
         for (XarInstalledExtension extension : extensions) {
             XarEntry entry = extension.getXarPackage().getEntry(localDocumentReference);
 

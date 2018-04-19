@@ -103,5 +103,6 @@ public class XarPackageTest
         assertEquals(expected, actual);
         assertEquals(expected.getEntryName(), actual.getEntryName());
         assertEquals(expected.getDefaultAction(), actual.getDefaultAction());
+        assertEquals(expected.getEntryType(), actual.getEntryType());
     }
 }

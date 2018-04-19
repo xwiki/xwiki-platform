@@ -7,5 +7,9 @@
 <author>XWiki</author>
 <version>1.0.0</version>
 <backupPack>false</backupPack>
-<preserveVersion>false</preserveVersion><files>
-<file defaultAction="0" language="">space.page</file></files></package>
+<preserveVersion>false</preserveVersion>
+<files>
+  <file defaultAction="0" language="">space.page</file>
+  <file defaultAction="0" language="" type="configuration">space.mandatoryconfiguration</file>
+</files>
+</package>

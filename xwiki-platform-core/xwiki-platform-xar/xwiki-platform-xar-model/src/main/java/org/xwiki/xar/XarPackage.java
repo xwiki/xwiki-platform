@@ -44,6 +44,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -270,15 +271,17 @@ public class XarPackage
 
             // Get current action associated to the document
             int defaultAction = getDefaultAction(reference);
+            // Get current type associated to the document
+            String entryType = getEntryType(reference);
 
             // Create entry
-            XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction);
+            XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction, entryType);
 
             // Register entry
             this.entries.put(xarEntry, xarEntry);
 
             // Update existing package file entry name
-            updatePackageFileEntryName(xarEntry);
+            updatePackageFile(xarEntry);
         }
     }
 
@@ -579,8 +582,8 @@ public class XarPackage
                 Element element = (Element) node;
                 if (element.getTagName().equals(XarModel.ELEMENT_FILES_FILE)) {
                     String localeString = element.getAttribute(XarModel.ATTRIBUTE_LOCALE);
-                    String defaultActionString = element.getAttribute(XarModel.ATTRIBUTE_DEFAULTACTION);
-                    String entryType = element.getAttribute(XarModel.ATTRIBUTE_TYPE);
+                    String defaultActionString = getAttribute(element, XarModel.ATTRIBUTE_DEFAULTACTION);
+                    String entryType = getAttribute(element, XarModel.ATTRIBUTE_TYPE);
                     String referenceString = element.getTextContent();
 
                     // Parse reference
@@ -589,7 +592,8 @@ public class XarPackage
                             LocaleUtils.toLocale(localeString));
 
                     // Parse default action
-                    int defaultAction = Integer.parseInt(defaultActionString);
+                    int defaultAction =
+                        defaultActionString != null ? Integer.parseInt(defaultActionString) : XarModel.ACTION_OVERWRITE;
 
                     // Get entry name associated to the document
                     String entryName = getEntryName(reference);
@@ -601,10 +605,17 @@ public class XarPackage
                     this.packageFiles.put(packageFile, packageFile);
 
                     // Update existing entry default action
-                    updateEntryDefaultAction(packageFile);
+                    updateEntry(packageFile);
                 }
             }
         }
+    }
+
+    private String getAttribute(Element element, String attributeName)
+    {
+        Attr attrribute = element.getAttributeNode(attributeName);
+
+        return attrribute != null ? attrribute.getValue() : null;
     }
 
     private String getEntryName(LocalDocumentReference reference)
@@ -631,14 +642,26 @@ public class XarPackage
         return defaultAction;
     }
 
-    private void updateEntryDefaultAction(XarEntry packageFile)
+    private String getEntryType(LocalDocumentReference reference)
+    {
+        String entryType = null;
+
+        XarEntry packageFile = this.packageFiles.get(reference);
+        if (packageFile != null) {
+            entryType = packageFile.getEntryType();
+        }
+
+        return entryType;
+    }
+
+    private void updateEntry(XarEntry packageFile)
     {
         if (this.entries.containsKey(packageFile)) {
             this.entries.put(packageFile, packageFile);
         }
     }
 
-    private void updatePackageFileEntryName(XarEntry xarEntry)
+    private void updatePackageFile(XarEntry xarEntry)
     {
         if (this.packageFiles.containsKey(xarEntry)) {
             this.packageFiles.put(xarEntry, xarEntry);

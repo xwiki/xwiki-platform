@@ -112,7 +112,7 @@
       <number>4</number>
       <picker>0</picker>
       <prettyName>Repositories</prettyName>
-      <relationalStorage>1</relationalStorage>
+      <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators>|, </separators>
       <size>1</size>

@@ -84,10 +84,9 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
             throw new MacroExecutionException("Failed to execute template [" + parameters.getName() + "]", e);
         }
 
-        if (parameters.isOutput()) {
+        if (result != null && parameters.isOutput()) {
             return result.getChildren();
         } else {
-
             return Collections.emptyList();
         }
     }

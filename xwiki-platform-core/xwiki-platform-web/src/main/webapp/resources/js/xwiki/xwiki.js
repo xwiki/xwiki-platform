@@ -1024,7 +1024,7 @@ shortcut = new Object({
                 listener.register_combo(shortcut_descriptor);
             } else {
                 if ('type' in opt) {
-                    console.warn('The parameter [' + opt['type'] + '] for the shortcut [' + combination
+                    console.warn('The parameter [' + opt['type'] + '] for the shortcut [' + shortcut_combination
                         + '] type deprecated.');
                 }
 
@@ -1036,7 +1036,8 @@ shortcut = new Object({
             var allowedOptParameters = ['target', 'disable_in_input', 'type'];
             Object.keys(opt).forEach(function (key) {
                 if (allowedOptParameters.indexOf(key) === -1) {
-                    console.warn('The parameter [' + key + '] for the shortcut [' + combination + '] is deprecated.');
+                    console.warn('The parameter [' + key + '] for the shortcut [' + shortcut_combination
+                        + '] is deprecated.');
                 }
             });
         });
@@ -1092,12 +1093,12 @@ shortcut = new Object({
             return function(args) {
                 shortcut._is_sequence_shortcut_triggered = true;
                 setTimeout(function(){ shortcut._is_sequence_shortcut_triggered = false; }, 500);
-                callback.apply(this, args);
+                callback.apply(this, [args]);
             };
         } else {
             return function(args) {
                 if (!shortcut._is_sequence_shortcut_triggered) {
-                    callback.apply(this, args);
+                    callback.apply(this, [args]);
                 }
             };
         }

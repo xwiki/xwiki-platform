@@ -35,5 +35,30 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Admin User Application</xwiki.extension.name>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <entries>
+            <entry>
+              <document>XWiki.Admin</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>XWiki.XWikiAdminGroup</document>
+              <type>configuration</type>
+            </entry>
+            <entry>
+              <document>XWiki.XWikiAllGroup</document>
+              <type>configuration</type>
+            </entry>
+          </entries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 

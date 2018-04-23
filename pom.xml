@@ -81,7 +81,7 @@
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
     <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>HEAD</tag>
+    <tag>stable-10.3.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

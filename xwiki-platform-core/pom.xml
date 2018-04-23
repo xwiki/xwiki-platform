@@ -152,29 +152,6 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
-                    "oldType": "boolean",
-                    "newType": "org.xwiki.notifications.filters.NotificationFilter.FilterPolicy",
-                    "package": "org.xwiki.notifications.filters",
-                    "classSimpleName": "NotificationFilter",
-                    "methodName": "filterEvent",
-                    "elementKind": "method",
-                    "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedRemoved",
-                    "old": "method void org.xwiki.xar.XarPackage::write(java.io.OutputStream, java.lang.String) throws org.xwiki.xar.XarException, java.io.IOException",
-                    "new": "method void org.xwiki.xar.XarPackage::write(java.io.OutputStream, java.lang.String) throws org.xwiki.xar.XarException",
-                    "exception": "java.io.IOException",
-                    "package": "org.xwiki.xar",
-                    "classSimpleName": "XarPackage",
-                    "methodName": "write",
-                    "elementKind": "method",
-                    "justification": "Not a runtime breackage. This exeception was useless"
-                  }
                 ]
               }
             }

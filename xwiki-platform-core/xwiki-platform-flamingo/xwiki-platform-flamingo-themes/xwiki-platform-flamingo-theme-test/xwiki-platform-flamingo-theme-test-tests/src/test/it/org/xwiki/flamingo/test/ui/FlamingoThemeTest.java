@@ -54,14 +54,22 @@ public class FlamingoThemeTest extends AbstractTest
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         ThemesAdministrationSectionPage presentationAdministrationSectionPage =
                 administrationPage.clickThemesSection();
+        // Click on "manage color theme"
+        presentationAdministrationSectionPage.manageColorThemes();
+        ThemeApplicationWebHomePage themeApplicationWebHomePage = new ThemeApplicationWebHomePage();
+        EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(getTestMethodName());
+        editThemePage.clickSaveAndView();
+
+        administrationPage = AdministrationPage.gotoPage();
+        presentationAdministrationSectionPage = administrationPage.clickThemesSection();
 
         // Select the 'Charcoal' color theme
-        presentationAdministrationSectionPage.setColorTheme("Charcoal");
-        assertEquals("Charcoal", presentationAdministrationSectionPage.getCurrentColorTheme());
+        presentationAdministrationSectionPage.setColorTheme(getTestMethodName());
+        assertEquals(getTestMethodName(), presentationAdministrationSectionPage.getCurrentColorTheme());
 
         // Click on the 'customize' button
         presentationAdministrationSectionPage.clickOnCustomize();
-        EditThemePage editThemePage = new EditThemePage();
+        editThemePage = new EditThemePage();
 
         // Wait for the preview to be fully loaded
         assertTrue(editThemePage.isPreviewBoxLoading());
@@ -77,6 +85,9 @@ public class FlamingoThemeTest extends AbstractTest
         // We do not have a way top clear the browser's cache with selenium
         // (see http://stackoverflow.com/questions/19310888/clear-browser-cache-using-selenium-webdriver).
         // So we cannot ensure that saving an existing theme works.
+
+        // Delete the test page
+        getUtil().rest().deletePage("FlamingoThemes", getTestMethodName());
     }
 
     private void verifyAllVariablesCategoriesArePresent(EditThemePage editThemePage) throws Exception

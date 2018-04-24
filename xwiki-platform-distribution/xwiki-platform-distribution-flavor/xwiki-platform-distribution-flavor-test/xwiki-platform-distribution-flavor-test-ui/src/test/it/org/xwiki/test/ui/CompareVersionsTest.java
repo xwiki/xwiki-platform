@@ -30,7 +30,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.xwiki.tag.test.po.AddTagsPane;
 import org.xwiki.tag.test.po.TaggablePage;
 import org.xwiki.test.ui.po.AttachmentsPane;
@@ -46,6 +45,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -300,9 +300,9 @@ public class CompareVersionsTest extends AbstractTest
         changesPane = new ChangesPane();
         assertEquals(changesPane.getFromVersion(), "1.1");
         assertEquals(changesPane.getToVersion(), "1.2");
-        assertTrue(!changesPane.hasPreviousChange());
+        assertFalse(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
-        assertTrue(!changesPane.hasPreviousFromVersion());
+        assertFalse(changesPane.hasPreviousFromVersion());
         assertTrue(changesPane.hasNextFromVersion());
         assertTrue(changesPane.hasPreviousToVersion());
         assertTrue(changesPane.hasNextToVersion());
@@ -322,9 +322,9 @@ public class CompareVersionsTest extends AbstractTest
         changesPane = new ChangesPane();
         assertEquals(changesPane.getFromVersion(), "1.1");
         assertEquals(changesPane.getToVersion(), "1.3");
-        assertTrue(!changesPane.hasPreviousChange());
+        assertFalse(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
-        assertTrue(!changesPane.hasPreviousFromVersion());
+        assertFalse(changesPane.hasPreviousFromVersion());
         assertTrue(changesPane.hasNextFromVersion());
         assertTrue(changesPane.hasPreviousToVersion());
         assertTrue(changesPane.hasNextToVersion());
@@ -342,6 +342,28 @@ public class CompareVersionsTest extends AbstractTest
         assertTrue(changesPane.hasPreviousToVersion());
         assertTrue(changesPane.hasNextToVersion());
 
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertEquals(changesPane.getFromVersion(), "2.1");
+        assertEquals(changesPane.getToVersion(), "1.3");
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickPreviousChange();
+        changesPane = new ChangesPane();
+        assertEquals(changesPane.getFromVersion(), "1.3");
+        assertEquals(changesPane.getToVersion(), "2.1");
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
         queryString = "viewer=changes&rev1=1.2&rev2=6.4";
         getUtil().gotoPage(getTestClassName(), testPage.getMetaDataValue("page"), "view", queryString);
         changesPane.clickNextToVersion();
@@ -349,11 +371,11 @@ public class CompareVersionsTest extends AbstractTest
         assertEquals(changesPane.getFromVersion(), "1.2");
         assertEquals(changesPane.getToVersion(), "6.5");
         assertTrue(changesPane.hasPreviousChange());
-        assertTrue(!changesPane.hasNextChange());
+        assertFalse(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
         assertTrue(changesPane.hasNextFromVersion());
         assertTrue(changesPane.hasPreviousToVersion());
-        assertTrue(!changesPane.hasNextToVersion());
+        assertFalse(changesPane.hasNextToVersion());
 
         changesPane.clickPreviousToVersion();
         changesPane = new ChangesPane();

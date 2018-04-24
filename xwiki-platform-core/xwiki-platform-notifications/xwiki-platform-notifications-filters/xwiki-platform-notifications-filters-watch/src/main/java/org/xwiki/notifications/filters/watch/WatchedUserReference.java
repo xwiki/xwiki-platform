@@ -27,7 +27,9 @@ import java.util.Map;
 
 import org.apache.commons.compress.utils.Sets;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -48,24 +50,30 @@ public class WatchedUserReference implements WatchedEntityReference
 {
     private String userId;
 
+    private NotificationFilterManager notificationFilterManager;
+
     private EventUserFilterPreferencesGetter preferencesGetter;
 
     /**
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
      * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
+     * @param notificationFilterManager the notification filter manager
      * @since 9.10RC1
      */
-    public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter)
+    public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter,
+            NotificationFilterManager notificationFilterManager)
     {
         this.userId = userId;
         this.preferencesGetter = preferencesGetter;
+        this.notificationFilterManager = notificationFilterManager;
     }
 
     @Override
-    public boolean isWatched(DocumentReference userReference)
+    public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return preferencesGetter.isUsedFollowed(userId, userReference, null);
+        return preferencesGetter.isUsedFollowed(userId, notificationFilterManager.getFilterPreferences(userReference),
+                null);
     }
 
     @Override

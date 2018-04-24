@@ -42,7 +42,10 @@ define(['jquery'], function($) {
       'page':              documentReference.getName(),
       'version':           html.data('xwiki-version'),
       'restURL':           html.data('xwiki-rest-url'),
-      'form_token':        html.data('xwiki-form-token')
+      'form_token':        html.data('xwiki-form-token'),
+      // Since 10.4RC1
+      'userId':            html.data('xwiki-user-id'),
+      'userReference':     XWiki.Model.resolve(html.data('xwiki-user-id'), XWiki.EntityType.DOCUMENT)
     };
   }
   // Case 2: meta information are stored in deprecated <meta> tags

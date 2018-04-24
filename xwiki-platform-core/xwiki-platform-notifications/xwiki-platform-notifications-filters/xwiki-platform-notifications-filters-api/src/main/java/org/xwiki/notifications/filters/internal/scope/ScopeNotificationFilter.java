@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -58,7 +61,9 @@ public class ScopeNotificationFilter implements NotificationFilter
     private ScopeNotificationFilterExpressionGenerator expressionGenerator;
 
     @Override
-    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
     {
         final EntityReference eventEntity = getEventEntity(event);
         if (eventEntity == null) {
@@ -67,8 +72,8 @@ public class ScopeNotificationFilter implements NotificationFilter
         }
 
         // We dismiss the event if the location is not watched
-        return !stateComputer.isLocationWatched(user, eventEntity, event.getType(), format) ? FilterPolicy.FILTER
-                : FilterPolicy.NO_EFFECT;
+        return !stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format)
+                ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
     }
 
     @Override
@@ -79,16 +84,19 @@ public class ScopeNotificationFilter implements NotificationFilter
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationPreference preference)
     {
-        return expressionGenerator.filterExpression(user,
+        return expressionGenerator.filterExpression(filterPreferences,
                 (String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE),
                 preference.getFormat());
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
-            NotificationFormat format)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFilterType type, NotificationFormat format)
     {
         // We don't handle this use-case anymore
         return null;

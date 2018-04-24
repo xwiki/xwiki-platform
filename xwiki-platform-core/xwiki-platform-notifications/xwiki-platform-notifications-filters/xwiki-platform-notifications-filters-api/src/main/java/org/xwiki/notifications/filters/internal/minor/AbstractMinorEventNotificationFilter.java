@@ -19,10 +19,13 @@
  */
 package org.xwiki.notifications.filters.internal.minor;
 
+import java.util.Collection;
+
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
@@ -61,7 +64,9 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
     }
 
     @Override
-    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
     {
         return event.getType().equals(UPDATE_TYPE) && !event.getDocumentVersion().endsWith(VERSION_SCHEME)
                 ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
@@ -75,14 +80,17 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationPreference preference)
     {
         return null;
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
-            NotificationFormat format)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFilterType type, NotificationFormat format)
     {
         if (type == NotificationFilterType.EXCLUSIVE && format == this.format) {
             return not(

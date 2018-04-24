@@ -19,15 +19,16 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 /**
  * Helper to know if a given location is "watched" according to the ScopeNotificationFilter.
@@ -49,29 +50,30 @@ public class ScopeNotificationFilterLocationStateComputer
     }
 
     /**
-     * @param user user for who we display notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param location a location
      * @return if the location is watched by the user, for the given event type and format
      */
-    public boolean isLocationWatched(DocumentReference user, EntityReference location)
+    public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
+            EntityReference location)
     {
-        return isLocationWatched(user, location, null, null);
+        return isLocationWatched(filterPreferences, location, null, null);
     }
 
     /**
-     * @param user user for who we display notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param location a location
      * @param eventType an event type (could be null)
      * @param format the notification format (could be null)
      * @return if the location is watched by the user, for the given event type and format
      */
-    public boolean isLocationWatched(DocumentReference user, EntityReference location,
-            String eventType, NotificationFormat format)
+    public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
+            EntityReference location, String eventType, NotificationFormat format)
     {
         // TODO: write a unit test with a complex set of preferences
 
         ScopeNotificationFilterPreferencesHierarchy preferences
-                = preferencesGetter.getScopeFilterPreferences(user, eventType, format);
+                = preferencesGetter.getScopeFilterPreferences(filterPreferences, eventType, format);
 
         if (preferences.isEmpty()) {
             // If there is no filter preference, then the location is watched (no filter = we get everything)

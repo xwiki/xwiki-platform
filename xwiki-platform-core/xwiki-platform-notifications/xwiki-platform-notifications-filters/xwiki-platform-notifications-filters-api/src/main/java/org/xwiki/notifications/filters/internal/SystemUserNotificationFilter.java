@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,6 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
@@ -67,7 +70,8 @@ public class SystemUserNotificationFilter implements NotificationFilter, Togglea
     private EntityReferenceSerializer<String> serializer;
 
     @Override
-    public FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format)
+    public FilterPolicy filterEvent(Event event, DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
         return event.getUser().getLocalDocumentReference().equals(SYSTEM_USER)
                 ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
@@ -81,14 +85,16 @@ public class SystemUserNotificationFilter implements NotificationFilter, Togglea
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
     {
         return null;
     }
 
     @Override
-    public ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type,
-            NotificationFormat format)
+    public ExpressionNode filterExpression(DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFilterType type, NotificationFormat format)
     {
         if (type == NotificationFilterType.EXCLUSIVE) {
             return value(EventProperty.USER).notEq(value(serializer.serialize(SYSTEM_USER)));

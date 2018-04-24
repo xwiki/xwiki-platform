@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Collection;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
@@ -72,12 +74,14 @@ public interface NotificationFilter extends Comparable
      *
      * @param event an event
      * @param user the user interested in the notification
+     * @param filterPreferences the collection of all preferences to take into account
      * @param format format of the notification
      * @return true if the event should be dismiss
      * @since 9.11.5
      * @since 10.3
      */
-    FilterPolicy filterEvent(Event event, DocumentReference user, NotificationFormat format);
+    FilterPolicy filterEvent(Event event, DocumentReference user,
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format);
 
     /**
      * Determine if the current filter can be applied to the given preference.
@@ -95,25 +99,28 @@ public interface NotificationFilter extends Comparable
      * Filtering expression to use when retrieving notifications.
      *
      * @param user the user interested in the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param preference the notification preference associated with the filter
      * @return the updated query
      *
      * @since 9.7RC1
      */
-    ExpressionNode filterExpression(DocumentReference user, NotificationPreference preference);
+    ExpressionNode filterExpression(DocumentReference user, Collection<NotificationFilterPreference> filterPreferences,
+            NotificationPreference preference);
 
     /**
      * Filtering expression to use when retrieving notifications.
      * Note that this filtering expression will not be bound to any notification preference.
-
      * @param user the user interested in the notifications
+     * @param filterPreferences the collection of all preferences to take into account
      * @param type of the expected notification filter
      * @param format format of the notification
      * @return a filtering expression or null
      *
      * @since 9.10RC1
      */
-    ExpressionNode filterExpression(DocumentReference user, NotificationFilterType type, NotificationFormat format);
+    ExpressionNode filterExpression(DocumentReference user, Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFilterType type, NotificationFormat format);
 
     /**
      * Get the name of the filter. This is useful as {@link NotificationFilterPreference} will be able to be linked to
@@ -128,7 +135,8 @@ public interface NotificationFilter extends Comparable
 
     /**
      * @return the priority of the filter. The higher it is, the more important the result of
-     * {@link NotificationFilter#filterEvent(Event event, DocumentReference user, NotificationFormat format) is}.
+     * {@link NotificationFilter#filterEvent(Event event, DocumentReference user,
+     * Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format) is}.
      *
      * @since 9.11.5
      * @since 10.3

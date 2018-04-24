@@ -41,43 +41,9 @@
   <hidden>true</hidden>
   <content>{{velocity wiki="false"}}
 #********************************************************
-    List the notifications of the current user as JSON
-********************************************************#
-#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; '' == "$!request.action")
-  #set ($batchSize = 10)
-  #set ($notifications = [])
-  #if ("$!request.untilDate" != '' &amp;&amp; "$!request.blackList" != '')
-    #set ($untilDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.untilDate).longValue()).toDate())
-    #set ($blackList = $request.blackList.split(','))
-    #set ($events = $services.notification.sources.getEvents($batchSize, $untilDate, $blackList))
-  #else
-    #set ($events = $services.notification.sources.getEvents($batchSize))
-  #end
-  #foreach ($status in $services.notification.getCompositeEventStatuses($events))
-    #set ($event = $status.compositeEvent)
-    #set ($notification = {
-      'ids'         : $event.eventIds,
-      'type'        : $event.type,
-      'read'        : $status.status,
-      'dates'       : $event.dates
-    })
-    #if ($event.document)
-      #set ($discard = $notification.put('document', $services.model.serialize($event.document, 'default')))
-    #end
-    #try("notificationException")
-      #set ($discard = $notification.put('html', $services.rendering.render($services.notification.notifiers.render($event), 'html/5.0')))
-    #end
-    #if ("$!notificationException" != '')
-      #set ($discard = $notification.put('exception', $notificationException.toString()))
-    #end
-    #set ($discard = $notifications.add($notification))
-  #end
-  #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'notifications': $notifications})
-#********************************************************
     Get the number of unread notifications as JSON
 ********************************************************#
-#elseif ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
+#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
   $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
 #********************************************************
              Mark a notification as read
@@ -213,7 +179,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function ($) {
+      <code>require(['jquery', 'XWikiNotificationsMacro', 'xwiki-meta'], function ($, XWikiNotificationsMacro, xm) {
   'use strict';
 
   /**
@@ -232,15 +198,15 @@
   var notificationCount = 0;
 
   /**
-   * The list of the ids of events that have already been displayed and that we don't want to get again in next batches.
-   */
-  var blackList = [];
-
-  /**
    * URL to the service that return the notifications to display
    */
   var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
     XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+
+  /**
+   * Will contain the Notifications Macro object.
+   */
+  var macro = 0;
 
   /**
    * Update notification counter
@@ -271,6 +237,11 @@
    * Add a button to clear all the notifications (which actually only change the start date of the user).
    */
   var createCleanButton = function (startDate) {
+    var notificationsHeader = $('.notifications-header-uix');
+    // If the clean button is already here, don't do anything
+    if (notificationsHeader.find('a.notification-event-clean').length &gt; 0) {
+      return;
+    }
     var markAllReadButton = $('&lt;a href="#"&gt;')
       .addClass('notification-event-clean')
       .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
@@ -309,73 +280,6 @@
   };
 
   /**
-   * Display a notification entry
-   */
-  var displayEntry = function (entry) {
-    // Add the id of the entry to the blacklist
-    for (var i = 0; i &lt; entry.ids.length; ++i) {
-      blackList.push(entry.ids[i]);
-    }
-    // Create the container
-    var notif = $('&lt;div&gt;').addClass('notification-event');
-    notif.attr('data-eventtype', entry.type);
-    // Put the content
-    notif.append(entry.html);
-    // Create the "read" button
-    var readButton = $('&lt;button&gt;');
-    if (!entry.read) {
-      notif.addClass('notification-event-unread');
-      // Add the "mark as read" button
-      notif.find('.notification-content').prepend(readButton);
-    }
-    if (entry.exception) {
-      var exceptionBox = $('&lt;div&gt;').addClass('box errormessage');
-      exceptionBox.text(entry.exception);
-      notif.append(exceptionBox);
-    }
-    // Store the data in the DOM element so that any javascript code can retrieve it
-    notif.data('notif', entry);
-    // Add the notification entry
-    $('.notifications-area').append(notif);
-    // Add the "mark as read" button if the notif is not already read
-    if (!entry.read) {
-      // Style the read button
-      readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-      // Insert the cross icon
-      readButton.html('$services.icon.renderHTML("check")');
-      // On click
-      readButton.click(function() {
-        var notif = $(this).parents('div.notification-event');
-        notif.removeClass('notification-event-unread');
-        $.post(url, {
-          action: 'read',
-          eventIds: notif.data('notif').ids.join(','),
-          read: true
-        });
-        $(this).remove();
-        if (notificationCount &lt;= maxCountNumber) {
-          updateNotificationCount(notificationCount - 1);
-        }
-      });
-    }
-    // Details
-    var details = notif.find('.notification-event-details');
-    details.hide();
-    var arrow = notif.find('.notification-event-arrow');
-    notif.find('.toggle-notification-event-details').click(function() {
-      details.toggle();
-      arrow.text(arrow.text() == '▸' ? '▾' : '▸');
-    });
-  };
-  
-  /**
-   * Display a "no notification" message.
-   */
-  var displayNoNotification = function () {
-    $('.notifications-area').removeClass('loading').html($('&lt;p&gt;').addClass('text-center noitems').text("$escapetool.javascript($services.localization.render('notifications.menu.nothing'))"));
-  };
-  
-  /**
    * Get the number of unread notifications.
    */
   var getUnreadNotificationsCount = function () {
@@ -383,56 +287,7 @@
       updateNotificationCount(data.unread);
       // Display the "nothing!" message if there is no notification
       if (data.unread == 0) {
-         displayNoNotification();
-      }
-    });
-  };
-
-  /**
-   * Load the notifications.
-   *
-   * The parameter `untilDate` is used as an "offset" to get events in a paginate mode.
-   * We cannot rely on an integer offset because new events could have been stored recently and we want to display older
-   * ones only.
-   */
-  var loadNotifications = function (untilDate) {
-    var params = {};
-    if (untilDate) {
-      params.untilDate = untilDate;
-      params.blackList = blackList.join(',');
-    }
-    $.getJSON(url, params).done(function (data) {
-      // Display notifications
-      var area = $('.notifications-area');
-      // Remove loading items
-      area.removeClass('loading');
-      $('.notifications-load-more').remove();
-      // Display the "nothing!" message if there is no notification
-      if (data.notifications.length == 0 &amp;&amp; !untilDate) {
-        displayNoNotification();
-      } else if (untilDate == 0) {
-        // Display the clean button if there is some notification, but only the first time (not when clicking on
-        // "load more notification") otherwise we would have several clean buttons which would be useless and painful.
-        // Note: we use the date of the more recent notification that we have displayed to avoid cleaning
-        // notifications that may have been created in the meantime.
-        createCleanButton(data.notifications[0].date);
-      }
-      // Display each entry
-      for (var i = 0; i &lt; data.notifications.length; ++i) {
-        displayEntry(data.notifications[i]);
-      }
-      // If there is other notifications to load
-      if (data.notifications.length == notificationsLimit) {
-        var loadMore = $('&lt;div&gt;').addClass('text-center').addClass('notifications-load-more');
-        loadMore.append($('&lt;p&gt;').text("$escapetool.javascript($services.localization.render('notifications.menu.more'))"))
-        area.append(loadMore);
-        loadMore.click(function(event) {
-          loadMore.text('').addClass('loading');
-          // We use the date of the last displayed event as an offset to display those that come next
-          var lastCompositeEvent = data.notifications[data.notifications.length - 1];
-          var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
-          loadNotifications(lastEventDate);
-        });
+         macro.displayNoNotification();
       }
     });
   };
@@ -441,7 +296,13 @@
    * Initialize the widget.
    */
   $(document).ready(function () {
+
+    var container = $('.notifications-area');
+    macro = new XWikiNotificationsMacro(container, xm.userId, notificationsLimit, true, [], true);
     getUnreadNotificationsCount();
+    container.on('eventMarkedAsRead', function (notif) {
+      updateNotificationCount(notificationCount - 1);
+    });
 
     /**
      * Prevent the dropdown menu for being closed when the user clicks on the notifications menu.
@@ -456,7 +317,9 @@
     var notificationsMenusHasBeenOpened = false;
     $('#tmNotifications').on('show.bs.dropdown', function () {
       if (!notificationsMenusHasBeenOpened &amp;&amp; notificationCount &gt; 0) {
-        loadNotifications(0);
+        macro.load(0).done(function (notifications) {
+          createCleanButton(notifications[0].date);
+        });
       }
       notificationsMenusHasBeenOpened = true;
     });
@@ -840,113 +703,6 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
   overflow-y: scroll;
   /* 320px is the width of the smallest smartphones right now, so we don't use a larger width */
   width: 320px;
-}
-
-.notification-event {
-  border: 1px dashed $theme.borderColor;
-  padding: 1em;
-}
-
-.notification-event-unread {
-  background-color: $theme.panelBackgroundColor;
-}
-
-/***********************************************
- * Notification Icons
- ***********************************************/
-.notification-icon {
-  padding-right: 0;
-  position: relative;
-}
-
-.notification-icon .img-thumbnail {
-  background-color: $theme.pageContentBackgroundColor;
-  font-size: 2em;
-  height: 2em;
-  text-align: center;
-  width: 2em;
-}
-
-.notification-icon .img-thumbnail.small{
-  font-size: 1em;
-  height: 2em;
-  left: 0.5em;
-  padding: 0.1em;
-  position: absolute;
-  bottom: -0.8em;
-  width: 2em;
-}
-
-/***********************************************
- * Notification Content
- ***********************************************/
-.notification-content {
-  padding: 0 2.6em 0 0.5em;
-}
-
-.notification-event-user &gt; img {
-  height: 16px;
-  width: 16px;
-  /* Don't work for Internet Explorer nor Edge 15 */
-  object-fit: cover;
-  object-position: center;
-}
-
-/***********************************************
- * Notification Buttons
- ***********************************************/
-.notification-event-read-button, .toggle-notification-event-details {
-  background-color: $theme.pageContentBackgroundColor;
-  border: 1px solid #ddd;
-  position: absolute;
-  right: 10px;
-  width: 2em;
-  z-index: 1;
-}
-
-.notification-event-read-button {
-  top: -6px;
-}
-
-.toggle-notification-event-details {
-  bottom: -6px;
-}
-
-/***********************************************
- * Notification Details
- ***********************************************/
-.notification-event-details {
-  font-size: 0.8em;
-  margin: 1em 0 0 0;
-}
-
-.notification-event-details td {
-  border: 0;
-  overflow: hidden;
-  padding: 2px;
-  text-overflow: ellipsis;
-  width: 33%;
-}
-
-.notification-event-details td.description {
-  width: 45%;
-}
-
-/***********************************************
- * Notifications Footer
- ***********************************************/
-.notifications-load-more {
-  cursor: pointer;
-  min-height: 2em;
-}
-
-.notifications-load-more:hover {
-  background-color: $theme.highlightColor;
-}
-
-.notifications-load-more p {
-  margin: 0;
-  padding: 0.7em;
 }</code>
     </property>
     <property>
@@ -1038,7 +794,9 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))

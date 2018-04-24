@@ -19,14 +19,15 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
@@ -53,19 +54,21 @@ public class ScopeNotificationFilterExpressionGenerator
     /**
      * Generate a filter expression for the given user and event type according to the scope notification filter
      * preferences.
-     * @param user user for who we display notifications
+     * @param filterPreferences the collection of all preferences
      * @param eventType type of the event on which we are filtering
      * @param format the format of the notification
      * @return the expression node corresponding to the filter
      */
-    public AbstractOperatorNode filterExpression(DocumentReference user, String eventType, NotificationFormat format)
+    public AbstractOperatorNode filterExpression(Collection<NotificationFilterPreference> filterPreferences,
+            String eventType, NotificationFormat format)
     {
         // The node we construct
         AbstractOperatorNode topNode = null;
 
         // Get the filters to handle
         ScopeNotificationFilterPreferencesHierarchy preferences
-                = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(user, eventType, format);
+                = scopeNotificationFilterPreferencesGetter.getScopeFilterPreferences(filterPreferences,
+                    eventType, format);
 
         // The aim is to generate a black list with exceptions (handleExclusiveFilters) and a white
         // list (handleTopLevelInclusiveFilters).

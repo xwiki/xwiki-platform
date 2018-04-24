@@ -19,7 +19,9 @@
  */
 package org.xwiki.notifications.filters.script;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -59,22 +61,24 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public Set<NotificationFilter> getToggleableNotificationFilters() throws NotificationException
     {
-        return notificationFilterManager.getToggleableFilters(documentAccessBridge.getCurrentUserReference());
+        return notificationFilterManager.getToggleableFilters(
+                notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference())).collect(
+                Collectors.toSet());
     }
 
     /**
-     * @return a set of every {@link NotificationFilter} available to the current user.
+     * @return a collection of every {@link NotificationFilter} available to the current user.
      * @throws NotificationException if an error happens
      *
      * @since 9.8RC1
      */
-    public Set<NotificationFilter> getFilters() throws NotificationException
+    public Collection<NotificationFilter> getFilters() throws NotificationException
     {
         return notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference());
     }
 
     /**
-     * Get a set of notification filters preferences that are available for the current user and that corresponds
+     * Get a collection of notification filters preferences that are available for the current user and that corresponds
      * to the given filter.
      *
      * @param filter the filter associated to the preferences
@@ -86,7 +90,10 @@ public class NotificationFiltersScriptService implements ScriptService
     public Set<NotificationFilterPreference> getFilterPreferences(NotificationFilter filter)
             throws NotificationException
     {
-        return notificationFilterManager.getFilterPreferences(documentAccessBridge.getCurrentUserReference(), filter);
+        return notificationFilterManager.getFilterPreferences(
+                notificationFilterManager.getFilterPreferences(documentAccessBridge.getCurrentUserReference()),
+                filter
+        ).collect(Collectors.toSet());
     }
 
     /**

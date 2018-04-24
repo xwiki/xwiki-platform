@@ -31,7 +31,9 @@ import java.util.Set;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -62,28 +64,34 @@ public class WatchedLocationReference implements WatchedEntityReference
 
     private ScopeNotificationFilterLocationStateComputer stateComputer;
 
+    private NotificationFilterManager notificationFilterManager;
+
     /**
      * Construct a WatchedLocationReference.
      * @param entityReference the reference of the location to watch
      * @param serializedReference the serialized reference of the location to watch
      * @param resolver the default entity reference resolver
      * @param stateComputer the default ScopeNotificationFilterLocationStateComputer
+     * @param notificationFilterManager the notification filter manager
      * @since 9.9RC1
      */
     public WatchedLocationReference(EntityReference entityReference, String serializedReference,
             EntityReferenceResolver<String> resolver,
-            ScopeNotificationFilterLocationStateComputer stateComputer)
+            ScopeNotificationFilterLocationStateComputer stateComputer,
+            NotificationFilterManager notificationFilterManager)
     {
         this.entityReference = entityReference;
         this.serializedReference = serializedReference;
         this.resolver = resolver;
         this.stateComputer = stateComputer;
+        this.notificationFilterManager = notificationFilterManager;
     }
 
     @Override
-    public boolean isWatched(DocumentReference userReference)
+    public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return stateComputer.isLocationWatched(userReference, this.entityReference);
+        return stateComputer.isLocationWatched(notificationFilterManager.getFilterPreferences(userReference),
+                this.entityReference);
     }
 
     @Override

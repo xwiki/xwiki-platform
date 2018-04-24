@@ -21,10 +21,10 @@ package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,9 +32,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -56,8 +53,8 @@ import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -79,9 +76,6 @@ public class QueryGenerator
     private QueryManager queryManager;
 
     @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
     private ExpressionNodeToHQLConverter hqlConverter;
 
     @Inject
@@ -97,23 +91,13 @@ public class QueryGenerator
     /**
      * Generate the query.
      *
-     * @param user user interested in the notifications
-     * @param format only match notifications enabled for that format
-     * @param endDate do not return events happened after this date
-     * @param startDate do not return events happened before this date. Note that since 9.7RC1, this start date is
-     * completely optional, {@link NotificationPreference#getStartDate()} should be used for more granular control on
-     * notifications
-     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
+     * @param parameters parameters to use
      * @return the query to execute
-     * @throws NotificationException if error happens
      * @throws QueryException if error happens
      */
-    public Query generateQuery(DocumentReference user, NotificationFormat format, Date endDate, Date startDate,
-            List<String> blackList) throws NotificationException, QueryException
+    public Query generateQuery(NotificationParameters parameters) throws QueryException
     {
-        ExpressionNodeToHQLConverter.HQLQuery result = hqlConverter.parse(
-                generateQueryExpression(user, format, endDate, startDate, blackList)
-        );
+        ExpressionNodeToHQLConverter.HQLQuery result = hqlConverter.parse(generateQueryExpression(parameters));
         if (result.getQuery().isEmpty()) {
             return null;
         }
@@ -129,30 +113,18 @@ public class QueryGenerator
     /**
      * Generate the query.
      *
-     * @param user user interested in the notifications
-     * @param format only match notifications enabled for that format
-     * @param endDate do not return events happened after this date
-     * @param startDate do not return events happened before this date. Note that since 9.7RC1, this start date is
-     * completely optional, {@link NotificationPreference#getStartDate()} should be used for more granular control on
-     * notifications
-     * @param blackList list of ids of blacklisted events to not return (to not get already known events again)
+     * @param parameters parameters to use
      * @return the query to execute
      *
-     * @throws NotificationException if error happens
-     * @throws QueryException if error happens
-     *
-     * @since 9.8RC1
+     * @since 9.8RC12x
      */
-    public ExpressionNode generateQueryExpression(DocumentReference user, NotificationFormat format, Date endDate,
-            Date startDate, List<String> blackList) throws NotificationException, QueryException
+    public ExpressionNode generateQueryExpression(NotificationParameters parameters)
     {
         // First: get the active preferences of the given user
-        List<NotificationPreference> preferences = notificationPreferenceManager.getPreferences(user, true,
-                format);
+        Collection<NotificationPreference> preferences = parameters.preferences;
 
         // Ensure that we have at least one filter preference that is active
-        if (preferences.isEmpty()
-            && notificationFilterManager.getFilterPreferences(user).stream().noneMatch(
+        if (preferences.isEmpty() && parameters.filterPreferences.stream().noneMatch(
                 NotificationFilterPreference::isActive)) {
             return null;
         }
@@ -160,18 +132,18 @@ public class QueryGenerator
         AbstractOperatorNode topNode = null;
 
         // Condition 1: (maybe) events have happened after the given start date
-        if (startDate != null) {
+        if (parameters.fromDate != null) {
             topNode = new GreaterThanNode(
                             new PropertyValueNode(EventProperty.DATE),
-                            new DateValueNode(startDate)
+                            new DateValueNode(parameters.fromDate)
             );
         }
 
         // Condition 2: handle other preferences
-        AbstractOperatorNode preferencesNode = handleEventPreferences(user, preferences);
+        AbstractOperatorNode preferencesNode = handleEventPreferences(parameters);
 
         // Condition 3: handle exclusive global notification filters
-        AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(user, format);
+        AbstractOperatorNode globalExclusiveFiltersNode = handleExclusiveGlobalFilters(parameters);
         if (globalExclusiveFiltersNode != null) {
             if (preferencesNode == null) {
                 preferencesNode = globalExclusiveFiltersNode;
@@ -181,7 +153,7 @@ public class QueryGenerator
         }
 
         // Condition 4: handle inclusive global notification filters
-        AbstractOperatorNode globalInclusiveFiltersNode = handleInclusiveGlobalFilters(user, format);
+        AbstractOperatorNode globalInclusiveFiltersNode = handleInclusiveGlobalFilters(parameters);
         if (globalInclusiveFiltersNode != null) {
             if (preferencesNode == null) {
                 preferencesNode = globalInclusiveFiltersNode;
@@ -200,10 +172,10 @@ public class QueryGenerator
         }
 
         // Other basic filters
-        topNode = handleBlackList(blackList, topNode);
-        topNode = handleEndDate(endDate, topNode);
+        topNode = handleBlackList(parameters, topNode);
+        topNode = handleEndDate(parameters, topNode);
         topNode = handleHiddenEvents(topNode);
-        topNode = handleWiki(user, topNode);
+        topNode = handleWiki(parameters, topNode);
         topNode = handleOrder(topNode);
 
         return topNode;
@@ -215,18 +187,15 @@ public class QueryGenerator
      * - have a date superior to the start date corresponding to this type;
      * - match the custom defined user filters.
      *
-     * @param user the current user
-     * @param preferences a list of the user preferences
+     * @param parameters parameters
      * @return a list of maps that contains query parameters
-     * @throws NotificationException if an error occurred
      */
-    private AbstractOperatorNode handleEventPreferences(DocumentReference user,
-            List<NotificationPreference> preferences) throws NotificationException
+    private AbstractOperatorNode handleEventPreferences(NotificationParameters parameters)
     {
         AbstractOperatorNode preferencesNode = null;
 
         // Filter the notification preferences that are not bound to a specific EVENT_TYPE
-        Iterator<NotificationPreference> it = preferences.stream()
+        Iterator<NotificationPreference> it = parameters.preferences.stream()
                 .filter(pref -> pref.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)).iterator();
 
         while (it.hasNext()) {
@@ -244,9 +213,12 @@ public class QueryGenerator
             );
 
             // Get the notification filters that can be applied to the current preference
-            Collection<NotificationFilter> filters = notificationFilterManager.getFilters(user, preference);
-            for (NotificationFilter filter : filters) {
-                ExpressionNode node = filter.filterExpression(user, preference);
+            Stream<NotificationFilter> filters
+                    = notificationFilterManager.getFiltersRelatedToNotificationPreference(parameters.filters,
+                        preference);
+            for (NotificationFilter filter : filters.collect(Collectors.toList())) {
+                ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
+                        preference);
                 if (node != null && node instanceof AbstractOperatorNode) {
                     preferenceTypeNode = preferenceTypeNode.and(
                             (AbstractOperatorNode) node
@@ -271,18 +243,16 @@ public class QueryGenerator
      * {@link NotificationFilterManager}. Each {@link NotificationFilter} is called without any associated
      * {@link NotificationPreference}.
      *
-     * @param user the user used to retrieve the {@link NotificationFilter}
-     * @param format format of the notification
+     * @param parameters parameters
      * @return a list of maps of parameters that should be used for the query
-     * @throws NotificationException
      */
-    private AbstractOperatorNode handleExclusiveGlobalFilters(DocumentReference user, NotificationFormat format)
-            throws NotificationException
+    private AbstractOperatorNode handleExclusiveGlobalFilters(NotificationParameters parameters)
     {
         AbstractOperatorNode globalFiltersNode = null;
 
-        for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
-            ExpressionNode node = filter.filterExpression(user, NotificationFilterType.EXCLUSIVE, format);
+        for (NotificationFilter filter : parameters.filters) {
+            ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
+                    NotificationFilterType.EXCLUSIVE, parameters.format);
             if (node != null && node instanceof AbstractOperatorNode) {
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;
@@ -297,13 +267,13 @@ public class QueryGenerator
         return globalFiltersNode;
     }
 
-    private AbstractOperatorNode handleInclusiveGlobalFilters(DocumentReference user, NotificationFormat format)
-            throws NotificationException
+    private AbstractOperatorNode handleInclusiveGlobalFilters(NotificationParameters parameters)
     {
         AbstractOperatorNode globalFiltersNode = null;
 
-        for (NotificationFilter filter : notificationFilterManager.getAllFilters(user)) {
-            ExpressionNode node = filter.filterExpression(user, NotificationFilterType.INCLUSIVE, format);
+        for (NotificationFilter filter : parameters.filters) {
+            ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
+                    NotificationFilterType.INCLUSIVE, parameters.format);
             if (node != null && node instanceof AbstractOperatorNode) {
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;
@@ -318,24 +288,24 @@ public class QueryGenerator
         return globalFiltersNode;
     }
 
-    private AbstractOperatorNode handleEndDate(Date endDate, AbstractOperatorNode topNode)
+    private AbstractOperatorNode handleEndDate(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
-        if (endDate != null) {
+        if (parameters.endDate != null) {
             return topNode.and(
                     new LesserThanNode(
                         new PropertyValueNode(EventProperty.DATE),
-                        new DateValueNode(endDate)
+                        new DateValueNode(parameters.endDate)
                     )
             );
         }
         return topNode;
     }
 
-    private AbstractOperatorNode handleBlackList(List<String> blackList, AbstractOperatorNode topNode)
+    private AbstractOperatorNode handleBlackList(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
-        if (blackList != null && !blackList.isEmpty()) {
+        if (parameters.blackList != null && !parameters.blackList.isEmpty()) {
             Collection<AbstractValueNode> values = new ArrayList<>();
-            for (String value : blackList) {
+            for (String value : parameters.blackList) {
                 values.add(new StringValueNode(value));
             }
 
@@ -351,14 +321,15 @@ public class QueryGenerator
         return topNode;
     }
 
-    private AbstractOperatorNode handleWiki(DocumentReference user, AbstractOperatorNode topNode)
+    private AbstractOperatorNode handleWiki(NotificationParameters parameters, AbstractOperatorNode topNode)
     {
         // If the user is a local user
-        if (!user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
+        if (parameters.user != null
+                && !parameters.user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
             return topNode.and(
                     new EqualsNode(
                             new PropertyValueNode(EventProperty.WIKI),
-                            new EntityReferenceNode(user.getWikiReference())
+                            new EntityReferenceNode(parameters.user.getWikiReference())
                     )
             );
         }

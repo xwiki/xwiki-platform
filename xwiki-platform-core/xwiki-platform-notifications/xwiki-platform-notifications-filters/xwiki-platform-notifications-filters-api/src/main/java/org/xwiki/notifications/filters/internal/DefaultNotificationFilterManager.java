@@ -19,12 +19,14 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,9 +43,9 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
+import org.xwiki.notifications.filters.NotificationFilterDisplayer;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterDisplayer;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -82,33 +84,63 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     private Logger logger;
 
     @Override
-    public Set<NotificationFilter> getAllFilters(DocumentReference user)
-            throws NotificationException
+    public Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException
     {
-        return removeDisabledFilters(user, fetchAllFilters(user));
+        if (allWikis) {
+            String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
+
+            Map<String, NotificationFilter> filters = new HashMap<>();
+            try {
+                for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
+
+                    filters.putAll(componentManager.getInstanceMap(NotificationFilter.class));
+                }
+            } catch (Exception e) {
+                throw new NotificationException(ERROR_MESSAGE, e);
+            } finally {
+                modelContext.setCurrentEntityReference(new WikiReference(currentWikiId));
+            }
+
+            return new HashSet<>(filters.values());
+        } else {
+            // Get filters from the current wiki only
+            try {
+                return new HashSet<>(componentManager.getInstanceList(NotificationFilter.class));
+            }  catch (Exception e) {
+                throw new NotificationException(ERROR_MESSAGE, e);
+            }
+        }
     }
 
     @Override
-    public Set<NotificationFilter> getFilters(DocumentReference user,
-            NotificationPreference preference) throws NotificationException
+    public Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException
     {
-        Set<NotificationFilter> filters = getAllFilters(user);
-
+        Collection<NotificationFilter> filters = getAllFilters(
+                user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
+        Map<String, Boolean> filterActivations = getToggeableFilterActivations(user);
         Iterator<NotificationFilter> it = filters.iterator();
-
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
-
-            if (!filter.matchesPreference(preference)) {
+            Boolean filterActivation = filterActivations.get(filter.getName());
+            if (filterActivation != null && !filterActivation.booleanValue()) {
                 it.remove();
             }
         }
-
         return filters;
     }
 
+
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
+    public Stream<NotificationFilter> getFiltersRelatedToNotificationPreference(Collection<NotificationFilter> filters,
+            NotificationPreference preference)
+    {
+        return filters.stream().filter(filter -> filter.matchesPreference(preference));
+    }
+
+    @Override
+    public Collection<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
+            throws NotificationException
     {
         Set<NotificationFilterPreference> filterPreferences = new HashSet<>();
 
@@ -128,77 +160,56 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter)
+    public Stream<NotificationFilterPreference> getFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter)
+    {
+        return filterPreferences.stream().filter(preference -> filter.getName().equals(preference.getFilterName()));
+    }
+
+    @Override
+    public Stream<NotificationFilterPreference> getFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
+            NotificationFilterType filterType)
+    {
+        return getFilterPreferences(filterPreferences, filter).filter(
+            preference -> preference.getFilterType() == filterType);
+    }
+
+    @Override
+    public Stream<NotificationFilterPreference> getFilterPreferences(
+            Collection<NotificationFilterPreference> filterPreferences, NotificationFilter filter,
+            NotificationFilterType filterType, NotificationFormat format)
+    {
+        return getFilterPreferences(filterPreferences, filter, filterType).filter(
+            preference -> preference.getFilterFormats().contains(format));
+    }
+
+    @Override
+    public Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters)
+    {
+        return filters.stream().filter(filter -> filter instanceof ToggleableNotificationFilter);
+    }
+
+    @Override
+    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user)
             throws NotificationException
     {
-        Set<NotificationFilterPreference> preferences = getFilterPreferences(user);
-
-        Iterator<NotificationFilterPreference> it = preferences.iterator();
-        while (it.hasNext()) {
-            NotificationFilterPreference preference = it.next();
-
-            if (!filter.getName().equals(preference.getFilterName())) {
-                it.remove();
-            }
-        }
-
-        return preferences;
+        return modelBridge.getToggeableFilterActivations(user);
     }
 
     @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
-            NotificationFilterType filterType) throws NotificationException
+    public Stream<NotificationFilter> getEnabledFilters(Collection<NotificationFilter> filters,
+            Map<String, Boolean> filterActivations)
     {
-        Set<NotificationFilterPreference> preferences = getFilterPreferences(user);
-
-        Iterator<NotificationFilterPreference> it = preferences.iterator();
-        while (it.hasNext()) {
-            NotificationFilterPreference preference = it.next();
-
-            if (!(filter.getName().equals(preference.getFilterName())
-                    && preference.getFilterType().equals(filterType))) {
-                it.remove();
+        return filters.stream().filter(
+            filter -> {
+                if (filter instanceof ToggleableNotificationFilter
+                        && filterActivations.containsKey(filter.getName())) {
+                    return filterActivations.get(filter.getName());
+                }
+                return true;
             }
-        }
-
-        return preferences;
-    }
-
-    @Override
-    public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user, NotificationFilter filter,
-            NotificationFilterType filterType, NotificationFormat format) throws NotificationException
-    {
-        Set<NotificationFilterPreference> preferences = getFilterPreferences(user, filter);
-
-        Iterator<NotificationFilterPreference> it = preferences.iterator();
-
-        while (it.hasNext()) {
-            NotificationFilterPreference preference = it.next();
-
-            if (!preference.getFilterFormats().contains(format) || !preference.getFilterType().equals(filterType)) {
-                it.remove();
-            }
-        }
-
-        return preferences;
-    }
-
-    @Override
-    public Set<NotificationFilter> getToggleableFilters(DocumentReference user) throws NotificationException
-    {
-        Set<NotificationFilter> userFilters = fetchAllFilters(user);
-
-        Iterator<NotificationFilter> it = userFilters.iterator();
-
-        while (it.hasNext()) {
-            NotificationFilter filter = it.next();
-
-            if (!(filter instanceof ToggleableNotificationFilter)) {
-                it.remove();
-            }
-        }
-
-        return userFilters;
+        );
     }
 
     @Override
@@ -292,73 +303,4 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         }
     }
 
-    /**
-     * Goes through every given {@link NotificationFilter}. One of the filters implements
-     * {@link ToggleableNotificationFilter}, checks if the given user has disabled this filter. If so, remove the
-     * filter from the set.
-     *
-     * @param user the user to use
-     * @param filters the filters that should be examined
-     * @return a set of filters that are not marked as disabled by the user
-     * @throws NotificationException if an error occurs
-     *
-     * @since 9.7RC1
-     */
-    private Set<NotificationFilter> removeDisabledFilters(DocumentReference user, Set<NotificationFilter> filters)
-            throws NotificationException
-    {
-        Iterator<NotificationFilter> it = filters.iterator();
-
-        Map<String, Boolean> filterActivations = modelBridge.getToggeableFilterActivations(user);
-
-        while (it.hasNext()) {
-            NotificationFilter filter = it.next();
-
-            if (filter instanceof ToggleableNotificationFilter && filterActivations.containsKey(filter.getName())
-                    && !filterActivations.get(filter.getName())) {
-                it.remove();
-            }
-        }
-
-        return filters;
-    }
-
-    /**
-     * Fetches every filter available to the user, without taking care of whether the filter is disabled by the user
-     * or not.
-     *
-     * @param user the user to use
-     * @return a set of filters
-     * @throws NotificationException if an error occurs
-     */
-    private Set<NotificationFilter> fetchAllFilters(DocumentReference user) throws NotificationException
-    {
-        // If the user is from the main wiki, get filters from all wikis
-        if (user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId())) {
-
-            String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
-
-            Map<String, NotificationFilter> filters = new HashMap<>();
-            try {
-                for (String wikiId : wikiDescriptorManager.getAllIds()) {
-                    modelContext.setCurrentEntityReference(new WikiReference(wikiId));
-
-                    filters.putAll(componentManager.getInstanceMap(NotificationFilter.class));
-                }
-            } catch (Exception e) {
-                throw new NotificationException(ERROR_MESSAGE, e);
-            } finally {
-                modelContext.setCurrentEntityReference(new WikiReference(currentWikiId));
-            }
-
-            return new HashSet<>(filters.values());
-        } else {
-            // If the user is local, get filters from the current wiki only (we assume it's the wiki of the user).
-            try {
-                return new HashSet<>(componentManager.getInstanceList(NotificationFilter.class));
-            }  catch (Exception e) {
-                throw new NotificationException(ERROR_MESSAGE, e);
-            }
-        }
-    }
 }

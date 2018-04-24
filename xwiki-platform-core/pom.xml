@@ -483,6 +483,16 @@
                     "methodName": "getToggeableFilterActivations",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
+                    "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, java.util.Collection<org.xwiki.notifications.filters.NotificationFilterPreference>, org.xwiki.notifications.NotificationFormat)",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilter",
+                    "methodName": "filterEvent",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

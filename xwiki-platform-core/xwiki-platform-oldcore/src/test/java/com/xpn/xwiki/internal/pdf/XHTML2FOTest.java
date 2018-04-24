@@ -49,6 +49,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xwiki.rendering.internal.parser.xhtml.wikimodel.XWikiXMLReaderFactory;
 import org.xwiki.test.AllLogRule;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.xml.EntityResolver;
 import org.xwiki.xml.XMLReaderFactory;
@@ -74,7 +75,7 @@ import static org.junit.Assert.*;
 public class XHTML2FOTest
 {
     @Rule
-    public AllLogRule logRule = new AllLogRule();
+    public AllLogRule logRule = new AllLogRule(LogLevel.WARN);
 
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
@@ -114,6 +115,11 @@ public class XHTML2FOTest
         XMLUnit.setIgnoreWhitespace(true);
         Diff diff = new Diff(expectedXML, transformedXML);
         assertTrue("XML is not similar [" + diff.toString() + "]", diff.identical());
+
+        // FOUserAgent may output a warning such as
+        // [Font "14px Courier,normal,400" not found. Substituting with "any,normal,400".]. We're ignoring it and
+        // considering it normal.
+        this.logRule.ignoreMessage(0);
     }
 
     @Test

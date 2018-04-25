@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.minor;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,6 +32,7 @@ import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
@@ -75,7 +77,16 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
     @Override
     public boolean matchesPreference(NotificationPreference preference)
     {
-        // As the filter is applied globally, it’s not bound to any preference
+        if (!preference.isNotificationEnabled()) {
+            return false;
+        }
+
+        Map<NotificationPreferenceProperty, Object> properties = preference.getProperties();
+        Object eventType = properties.get(NotificationPreferenceProperty.EVENT_TYPE);
+        if (eventType != null && eventType instanceof String) {
+            return UPDATE_TYPE.equals(eventType);
+        }
+
         return false;
     }
 
@@ -84,7 +95,7 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationPreference preference)
     {
-        return null;
+        return not(value(EventProperty.DOCUMENT_VERSION).endsWith(value(VERSION_SCHEME)));
     }
 
     @Override
@@ -92,13 +103,6 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationFilterType type, NotificationFormat format)
     {
-        if (type == NotificationFilterType.EXCLUSIVE && format == this.format) {
-            return not(
-                    value(EventProperty.TYPE).eq(value(UPDATE_TYPE)).and(
-                        not(value(EventProperty.DOCUMENT_VERSION).endsWith(value(VERSION_SCHEME)))
-                    )
-            );
-        }
         return null;
     }
 

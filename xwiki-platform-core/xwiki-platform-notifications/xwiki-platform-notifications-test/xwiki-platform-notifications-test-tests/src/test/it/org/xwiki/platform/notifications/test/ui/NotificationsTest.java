@@ -423,7 +423,10 @@ public class NotificationsTest extends AbstractTest
         page.edit();
         WikiEditPage edit = new WikiEditPage();
         edit.setContent("Linux is a part of GNU/Linux");
-        edit.clickSaveAndContinue(true);
+        edit.clickSaveAndView(true);
+        page = new ViewPage();
+        page.edit();
+        edit = new WikiEditPage();
         edit.setContent("Linux is a part of GNU/Linux - it's the kernel");
         edit.clickSaveAndView(true);
         page = getUtil().gotoPage(getTestClassName(), "Linux");

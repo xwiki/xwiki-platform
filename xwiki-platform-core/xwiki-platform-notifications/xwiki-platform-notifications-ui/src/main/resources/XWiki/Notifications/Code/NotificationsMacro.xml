@@ -768,6 +768,10 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+#set ($users = $xcontext.macro.params.users)
+#if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
+  #set ($users = $stringtool.join($services.notification.watch.watchedUsers, ','))
+#end
 {{html clean="false"}}
 &lt;div class="notifications-macro loading" 
   data-userId="$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))"
@@ -780,7 +784,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
   data-wikis="$!escapetool.xml($xcontext.macro.params.wikis)"
   data-spaces="$!escapetool.xml($xcontext.macro.params.spaces)"
   data-pages="$!escapetool.xml($xcontext.macro.params.pages)"
-  data-users="$!escapetool.xml($xcontext.macro.params.users)"
+  data-users="$!escapetool.xml($users)"
   data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)"
 &gt;
 &lt;/div&gt;
@@ -1532,10 +1536,76 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <description/>
     </property>
     <property>
-      <mandatory/>
+      <mandatory>0</mandatory>
     </property>
     <property>
       <name>users</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsMacro</name>
+    <number>12</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>981511b5-e10d-4691-a81a-849b35ad191f</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description/>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>displayWatchedUsersOnly</name>
     </property>
   </object>
 </xwikidoc>

@@ -34,8 +34,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.factory.AbstractMimeBodyPartFactory;
@@ -67,6 +69,9 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
 
     @Inject
     private MimeBodyPartFactory<String> defaultPartFactory;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException
@@ -115,11 +120,18 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
         return resultBodyPart;
     }
 
-    private void handleAttachments(MimeMultipart multipart, List<Attachment> attachments) throws MessagingException
+    private void handleAttachments(MimeMultipart multipart, List<Attachment> attachments)
     {
         for (Attachment attachment : attachments) {
-            multipart.addBodyPart(
-                this.attachmentPartFactory.create(attachment, Collections.<String, Object>emptyMap()));
+            try {
+                multipart.addBodyPart(
+                    this.attachmentPartFactory.create(attachment, Collections.<String, Object>emptyMap()));
+            } catch (MessagingException e) {
+                // There is no reason to fail the whole mail for a broken attachment
+                this.logger.warn("Failed to add attachment [{}@{}] to the mail: {}",
+                    attachment.getDocument().getDocumentReference(), attachment.getFilename(),
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
         }
     }
 

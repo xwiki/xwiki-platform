@@ -131,7 +131,7 @@ public class DefaultNotificationManager implements NotificationManager
     {
         parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
                 parameters.format);
-        parameters.filters = notificationFilterManager.getAllFilters(parameters.user);
+        parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
         parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
         return parametrizedNotificationManager.getEvents(parameters);
     }

@@ -502,6 +502,28 @@
                     "methodName": "getWatchedUsers",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference, boolean) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "getAllFilters",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method java.util.Set<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "new": "method java.util.Collection<org.xwiki.notifications.filters.NotificationFilter> org.xwiki.notifications.filters.NotificationFilterManager::getAllFilters(org.xwiki.model.reference.DocumentReference, boolean) throws org.xwiki.notifications.NotificationException",
+                    "oldType": "java.util.Set<org.xwiki.notifications.filters.NotificationFilter>",
+                    "newType": "java.util.Collection<org.xwiki.notifications.filters.NotificationFilter>",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "getAllFilters",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

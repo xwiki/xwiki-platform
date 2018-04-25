@@ -176,7 +176,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         parameters.preferences = notificationPreferenceManager.getPreferences(parameters.user, true,
                 parameters.format);
-        parameters.filters = notificationFilterManager.getAllFilters(parameters.user);
+        parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
         parameters.filterPreferences = notificationFilterManager.getFilterPreferences(parameters.user);
     }
 

@@ -89,7 +89,7 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
             List<NotificationFilter> filters
-                    = new ArrayList<>(notificationFilterManager.getAllFilters(user));
+                    = new ArrayList<>(notificationFilterManager.getAllFilters(user, true));
             Collections.sort(filters);
             Iterator<Event> it = resultCompositeEvent.getEvents().iterator();
             while (it.hasNext()) {

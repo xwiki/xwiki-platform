@@ -24,6 +24,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.notifications.rest.model.Notifications;
+import org.xwiki.stability.Unstable;
 
 /**
  * Retrieve notifications.
@@ -32,6 +33,7 @@ import org.xwiki.notifications.rest.model.Notifications;
  * @since 10.4RC1
  */
 @Path("/notifications")
+@Unstable
 public interface NotificationsResource
 {
     /**

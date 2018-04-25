@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.watch;
 
+import java.util.Collection;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
@@ -52,4 +54,12 @@ public interface WatchedEntitiesManager
      * @throws NotificationException if an error happens
      */
     void unwatchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
+
+    /**
+     * @param user user for who we want to know the watched users
+     * @return the users watched by the given user
+     * @throws NotificationException if an error happens
+     * @since 10.4RC1
+     */
+    Collection<String> getWatchedUsers(DocumentReference user) throws NotificationException;
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.watch.script;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -159,5 +161,15 @@ public class NotificationWatchScriptService implements ScriptService
     public AutomaticWatchMode getAutomaticWatchMode()
     {
         return configuration.getAutomaticWatchMode(documentAccessBridge.getCurrentUserReference());
+    }
+
+    /**
+     * @return the user watched by the current user
+     * @throws NotificationException if an error occurs
+     * @since 10.4RC1
+     */
+    public Collection<String> getWatchedUsers() throws NotificationException
+    {
+        return watchedEntitiesManager.getWatchedUsers(documentAccessBridge.getCurrentUserReference());
     }
 }

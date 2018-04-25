@@ -479,6 +479,15 @@
                     "methodName": "filterEvent",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.util.Collection<java.lang.String> org.xwiki.notifications.filters.watch.WatchedEntitiesManager::getWatchedUsers(org.xwiki.model.reference.DocumentReference) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters.watch",
+                    "classSimpleName": "WatchedEntitiesManager",
+                    "methodName": "getWatchedUsers",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

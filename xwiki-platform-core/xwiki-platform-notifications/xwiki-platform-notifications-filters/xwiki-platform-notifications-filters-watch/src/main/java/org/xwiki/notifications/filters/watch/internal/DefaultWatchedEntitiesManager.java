@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
@@ -34,6 +36,7 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler;
@@ -65,6 +68,23 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             throws NotificationException
     {
         handleEntity(entity, user, false);
+    }
+
+    @Override
+    public Collection<String> getWatchedUsers(DocumentReference user) throws NotificationException
+    {
+        Collection<NotificationFilterPreference> filterPreferences
+            = notificationFilterManager.getFilterPreferences(user);
+
+        return filterPreferences.stream().filter(
+            pref -> !pref.getProperties(NotificationFilterProperty.USER).isEmpty()
+                    && pref.isEnabled()
+                    && pref.isActive())
+            .filter(pref -> pref.getFilterName().equals(EventUserFilter.FILTER_NAME)
+                    && pref.getFilterType() == NotificationFilterType.INCLUSIVE)
+            .map(pref -> new HashSet(pref.getProperties(NotificationFilterProperty.USER)))
+            .reduce((a1, a2) -> { a1.addAll(a2); return a1; })
+            .get();
     }
 
     private void handleEntity(WatchedEntityReference entity, DocumentReference user, boolean shouldBeWatched)

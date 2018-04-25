@@ -123,7 +123,8 @@ public class BooleanClass extends PropertyClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         IntegerProperty prop = (IntegerProperty) object.safeget(name);
         if (prop == null) {
@@ -137,8 +138,22 @@ public class BooleanClass extends PropertyClass
         }
     }
 
+    private int getValue(String name, BaseCollection object)
+    {
+        IntegerProperty prop = (IntegerProperty) object.safeget(name);
+        if (prop != null) {
+            Integer ivalue = (Integer) prop.getValue();
+            if (ivalue != null) {
+                return ivalue.intValue();
+            }
+        }
+
+        return getDefaultValue();
+    }
+
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         String displayFormType = getDisplayFormType();
 
@@ -188,30 +203,15 @@ public class BooleanClass extends PropertyClass
             option.setAttributeFilter(new XMLAttributeValueFilter());
         }
 
-        try {
-            IntegerProperty prop = (IntegerProperty) object.safeget(name);
-            Integer ivalue = (prop == null) ? null : (Integer) prop.getValue();
-            if (ivalue != null) {
-                int value = ivalue.intValue();
-                if (value == 1) {
-                    options[nb1].setSelected(true);
-                } else if (value == 0) {
-                    options[nb2].setSelected(true);
-                }
-            } else {
-                int value = getDefaultValue();
-                if (value == 1) {
-                    options[nb1].setSelected(true);
-                } else if (value == 0) {
-                    options[nb2].setSelected(true);
-                } else if (value == -1) {
-                    options[0].setSelected(true);
-                }
-            }
-        } catch (Exception e) {
-            // This should not happen
-            e.printStackTrace();
+        int value = getValue(name, object);
+        if (value == 1) {
+            options[nb1].setSelected(true);
+        } else if (value == 0) {
+            options[nb2].setSelected(true);
+        } else {
+            options[0].setSelected(true);
         }
+
         select.addElement(options);
         buffer.append(select.toString());
     }
@@ -264,29 +264,13 @@ public class BooleanClass extends PropertyClass
             inputs = new div[] { divTrue, divFalse };
         }
 
-        try {
-            IntegerProperty prop = (IntegerProperty) object.safeget(name);
-            Integer ivalue = (prop == null) ? null : (Integer) prop.getValue();
-            if (ivalue != null) {
-                int value = ivalue.intValue();
-                if (value == 1) {
-                    radioTrue.setChecked(true);
-                } else if (value == 0) {
-                    radioFalse.setChecked(true);
-                }
-            } else {
-                int value = getDefaultValue();
-                if (value == 1) {
-                    radioTrue.setChecked(true);
-                } else if (value == 0) {
-                    radioFalse.setChecked(true);
-                } else if (value == -1) {
-                    radioNone.setChecked(true);
-                }
-            }
-        } catch (Exception e) {
-            // This should not happen
-            e.printStackTrace();
+        int value = getValue(name, object);
+        if (value == 1) {
+            radioTrue.setChecked(true);
+        } else if (value == 0) {
+            radioFalse.setChecked(true);
+        } else {
+            radioNone.setChecked(true);
         }
 
         for (div input : inputs) {
@@ -306,30 +290,8 @@ public class BooleanClass extends PropertyClass
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
         checkNo.setAttributeFilter(new XMLAttributeValueFilter());
 
-        try {
-            IntegerProperty prop = (IntegerProperty) object.safeget(name);
-            if (prop != null) {
-                Integer ivalue = (Integer) prop.getValue();
-                if (ivalue != null) {
-                    int value = ivalue.intValue();
-                    if (value == 1) {
-                        check.setChecked(true);
-                    } else if (value == 0) {
-                        check.setChecked(false);
-                    }
-                } else {
-                    int value = getDefaultValue();
-                    if (value == 1) {
-                        check.setChecked(true);
-                    } else {
-                        check.setChecked(false);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // This should not happen
-            e.printStackTrace();
-        }
+        check.setChecked(getValue(name, object) == 1);
+
         buffer.append(check.toString());
         buffer.append(checkNo.toString());
     }

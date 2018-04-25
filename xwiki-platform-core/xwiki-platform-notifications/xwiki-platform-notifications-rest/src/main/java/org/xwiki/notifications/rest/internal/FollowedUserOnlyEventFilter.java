@@ -35,7 +35,8 @@ import org.xwiki.notifications.preferences.NotificationPreference;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
 
 /**
- * bla.
+ * Notification filter that remove all events that have not been triggered by one of the given users.
+ *
  * @version $Id$
  * @since 10.4RC1
  */

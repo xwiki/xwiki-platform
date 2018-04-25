@@ -30,15 +30,12 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -65,6 +62,7 @@ import com.google.common.collect.Sets;
 
 /**
  * Default implementation of {@link NotificationsResource}.
+ *
  * @version $Id$
  * @since 10.4RC1
  */
@@ -83,10 +81,6 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
 
     @Inject
@@ -102,10 +96,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
 
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private UsersParameterHandler usersParameterHandler;
 
     @Override
     public Notifications getNotifications(
@@ -178,28 +169,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         handlePagesParameter(pages, parameters);
         handleSpacesParameter(spaces, parameters);
         handleWikisParameter(wikis, parameters);
-        handleUsersParameter(users, parameters);
-    }
-
-    private void handleUsersParameter(String users, NotificationParameters parameters)
-    {
-        if (StringUtils.isNotBlank(users)) {
-            String[] userArray = users.split(FIELD_SEPARATOR);
-            List<String> userList = new ArrayList<>();
-            for (int i = 0; i < userArray.length; ++i) {
-                String user = userArray[i].trim();
-                if (!user.contains(".")) {
-                    user = "XWiki." + user;
-                }
-                DocumentReference userReference = currentDocumentReferenceResolver.resolve(user);
-                if (documentAccessBridge.exists(userReference)) {
-                    userList.add(entityReferenceSerializer.serialize(userReference));
-                } else {
-                    userList.add(entityReferenceSerializer.serialize(documentReferenceResolver.resolve(user)));
-                }
-            }
-            parameters.filters.add(new FollowedUserOnlyEventFilter(entityReferenceSerializer, userList));
-        }
+        usersParameterHandler.handleUsersParameter(users, parameters);
     }
 
     private void useUserPreferences(NotificationParameters parameters) throws NotificationException

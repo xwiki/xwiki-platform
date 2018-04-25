@@ -48,7 +48,11 @@
 #else
   $doc.use($obj)
   #set($isMyProfile = ($xcontext.user == $doc.fullName))
-  #if ($isMyProfile &amp;&amp; $hasWatch)
+  #if ($isMyProfile &amp;&amp; "$!services.notification.watch" != '')
+  
+    {{notifications displayWatchedUsersOnly="true"}}
+  
+  #elseif ($isMyProfile &amp;&amp; $hasWatch)
     #set($followedUsers = $services.watchlist.getWatchedElements("USER"))
     ## FIXME: This is an ugly workaround for an even uglier bug in the watchlist
     ##        plugin: the first item in the list is an empty string

@@ -48,6 +48,7 @@ public interface NotificationsResource
             @QueryParam("pages") String pages,
             @QueryParam("spaces") String spaces,
             @QueryParam("wikis") String wikis,
+            @QueryParam("users") String users,
             @QueryParam("count") String count,
             @QueryParam("displayOwnEvents") String displayOwnEvents,
             @QueryParam("displayMinorEvents") String displayMinorEvents,

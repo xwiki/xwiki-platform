@@ -213,10 +213,11 @@ public class QueryGenerator
             );
 
             // Get the notification filters that can be applied to the current preference
-            Stream<NotificationFilter> filters
+            Iterator<NotificationFilter> filterIterator
                     = notificationFilterManager.getFiltersRelatedToNotificationPreference(parameters.filters,
-                        preference);
-            for (NotificationFilter filter : filters.collect(Collectors.toList())) {
+                    preference).iterator();
+            while (filterIterator.hasNext()) {
+                NotificationFilter filter = filterIterator.next();
                 ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
                         preference);
                 if (node != null && node instanceof AbstractOperatorNode) {

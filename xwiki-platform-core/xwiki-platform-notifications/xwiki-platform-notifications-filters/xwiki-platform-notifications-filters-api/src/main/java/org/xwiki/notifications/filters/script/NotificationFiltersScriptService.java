@@ -62,7 +62,7 @@ public class NotificationFiltersScriptService implements ScriptService
     public Set<NotificationFilter> getToggleableNotificationFilters() throws NotificationException
     {
         return notificationFilterManager.getToggleableFilters(
-                notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference())).collect(
+                notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference(), false)).collect(
                 Collectors.toSet());
     }
 
@@ -74,7 +74,7 @@ public class NotificationFiltersScriptService implements ScriptService
      */
     public Collection<NotificationFilter> getFilters() throws NotificationException
     {
-        return notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference());
+        return notificationFilterManager.getAllFilters(documentAccessBridge.getCurrentUserReference(), false);
     }
 
     /**

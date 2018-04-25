@@ -114,7 +114,8 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     @Override
-    public Collection<NotificationFilter> getAllFilters(DocumentReference user) throws NotificationException
+    public Collection<NotificationFilter> getAllFilters(DocumentReference user, boolean onlyEnabled)
+        throws NotificationException
     {
         Collection<NotificationFilter> filters = getAllFilters(
                 user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
@@ -123,7 +124,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
             Boolean filterActivation = filterActivations.get(filter.getName());
-            if (filterActivation != null && !filterActivation.booleanValue()) {
+            if (onlyEnabled && filterActivation != null && !filterActivation.booleanValue()) {
                 it.remove();
             }
         }

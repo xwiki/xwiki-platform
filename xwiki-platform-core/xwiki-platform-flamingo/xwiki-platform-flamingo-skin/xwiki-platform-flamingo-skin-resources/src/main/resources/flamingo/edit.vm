@@ -3,11 +3,20 @@
 ###
 ### General wrapper for edit actions
 ###
+## Check if edit is forced
+##
+#set ($session = $request.session)
+#set ($sessionAttributeName = 'force_edit_' + $doc.prefixedFullName)
+#set ($editForced = $session.getAttribute($sessionAttributeName))
+#if (!$editForced && "$!request.get('force')" != '')
+  #set($editForced = true)
+  #set($void = $session.setAttribute($sessionAttributeName, $editForced))
+#end
 ##
 ## Is the document being edited by another user?
 ## If yes, warn about it and show a forcing link:
 ##
-#if($tdoc.getLocked() && "$!request.get('force')" == '')
+#if($tdoc.getLocked() && !$editForced)
   #template("startpage.vm")
   <div class="main">
    <div id="mainContentArea">
@@ -23,7 +32,11 @@
    </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
-#elseif ($services.extension.xar.isEditAllowed($tdoc.documentReferenceWithLocale) == false && "$!request.get('force')" == '')
+##
+## Is the document protected?
+## If yes, warn about it and show a forcing link:
+##
+#elseif ($services.extension.xar.isEditAllowed($tdoc.documentReferenceWithLocale) == false && !$editForced)
   #template("startpage.vm")
   <div class="main">
    <div id="mainContentArea">

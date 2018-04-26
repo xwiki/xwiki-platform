@@ -765,13 +765,33 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </class>
     <property>
       <code>{{velocity}}
+#set ($displayMacro = true)
+#if ($xcontext.action != 'view')
+  {{info}}
+    {{translation key="notifications.macro.whenNotView" /}}
+  {{/info}}
+  
+  #set ($displayMacro = false)
+#else 
+  #set ($users = $xcontext.macro.params.users)
+  #if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
+    #set ($watchedUsers = $services.notification.watch.watchedUsers)
+    #if ($watchedUsers.isEmpty())
+    
+      {{warning}}
+        {{translation key="notifications.macro.noWatchedUsers" /}}
+      {{/warning}}
+      
+      #set ($displayMacro = false)
+    #else
+      #set ($users = $stringtool.join($services.notification.watch.watchedUsers, ','))
+    #end
+  #end
+#end
+#if ($displayMacro)
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-#set ($users = $xcontext.macro.params.users)
-#if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
-  #set ($users = $stringtool.join($services.notification.watch.watchedUsers, ','))
-#end
 {{html clean="false"}}
 &lt;div class="notifications-macro loading" 
   data-userId="$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))"
@@ -789,6 +809,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
 &gt;
 &lt;/div&gt;
 {{/html}}
+#end
 {{/velocity}}</code>
     </property>
     <property>
@@ -1266,7 +1287,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       </name>
     </class>
     <property>
-      <defaultValue/>
+      <defaultValue>true</defaultValue>
     </property>
     <property>
       <description/>
@@ -1275,7 +1296,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>wikis</name>
+      <name>displayReadStatus</name>
     </property>
   </object>
   <object>
@@ -1341,7 +1362,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>spaces</name>
+      <name>wikis</name>
     </property>
   </object>
   <object>
@@ -1407,7 +1428,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>pages</name>
+      <name>spaces</name>
     </property>
   </object>
   <object>
@@ -1464,7 +1485,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       </name>
     </class>
     <property>
-      <defaultValue>true</defaultValue>
+      <defaultValue/>
     </property>
     <property>
       <description/>
@@ -1473,7 +1494,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>displayReadStatus</name>
+      <name>pages</name>
     </property>
   </object>
   <object>

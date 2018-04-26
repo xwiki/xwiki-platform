@@ -2057,6 +2057,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if ((this.archive == null || this.archive.get() == null)) {
             XWikiDocumentArchive arch;
+            // A document not comming from the database cannot have an archive stored in the database
             if (this.isNew()) {
                 arch = new XWikiDocumentArchive();
             } else {

@@ -58,7 +58,7 @@
     #set ($output = $services.rendering.render($xdom, $doc.syntax.toIdString()))
   #end
   #if ("$!output" != '' || $output == '')
-    $output
+    $output##
   #else
     ## The output is null so an exception must have been thrown.
     $response.sendError(500)

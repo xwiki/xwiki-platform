@@ -92,16 +92,7 @@ public class DefaultImageProcessor implements ImageProcessor
     public RenderedImage scaleImage(Image image, int width, int height)
     {
         // Draw the given image to a buffered image object and scale it to the new size on-the-fly.
-        int imageType = BufferedImage.TYPE_4BYTE_ABGR;
-        if (image instanceof BufferedImage) {
-            imageType = ((BufferedImage) image).getType();
-            if (imageType == BufferedImage.TYPE_BYTE_INDEXED || imageType == BufferedImage.TYPE_BYTE_BINARY
-                || imageType == BufferedImage.TYPE_CUSTOM) {
-                // INDEXED and BINARY: GIFs or indexed PNGs may lose their transparent bits, for safety revert to ABGR.
-                // CUSTOM: Unknown image type, fall back on ABGR.
-                imageType = BufferedImage.TYPE_4BYTE_ABGR;
-            }
-        }
+        int imageType = getBestImageTypeFor(image);
         BufferedImage bufferedImage = new BufferedImage(width, height, imageType);
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -122,5 +113,20 @@ public class DefaultImageProcessor implements ImageProcessor
             // Happens on certain systems where the javax.imageio package is not available.
             return false;
         }
+    }
+
+    protected int getBestImageTypeFor(Image image)
+    {
+        int imageType = BufferedImage.TYPE_4BYTE_ABGR;
+        if (image instanceof BufferedImage) {
+            imageType = ((BufferedImage) image).getType();
+            if (imageType == BufferedImage.TYPE_BYTE_INDEXED || imageType == BufferedImage.TYPE_BYTE_BINARY
+                || imageType == BufferedImage.TYPE_CUSTOM) {
+                // INDEXED and BINARY: GIFs or indexed PNGs may lose their transparent bits, for safety revert to ABGR.
+                // CUSTOM: Unknown image type, fall back on ABGR.
+                imageType = BufferedImage.TYPE_4BYTE_ABGR;
+            }
+        }
+        return imageType;
     }
 }

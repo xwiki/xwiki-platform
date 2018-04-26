@@ -63,7 +63,8 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
     {
         if (image instanceof BufferedImage) {
             try {
-                return Thumbnails.of((BufferedImage) image).size(width, height).asBufferedImage();
+                return Thumbnails.of((BufferedImage) image).size(width, height).imageType(getBestImageTypeFor(image))
+                    .asBufferedImage();
             } catch (IOException e) {
             }
         }

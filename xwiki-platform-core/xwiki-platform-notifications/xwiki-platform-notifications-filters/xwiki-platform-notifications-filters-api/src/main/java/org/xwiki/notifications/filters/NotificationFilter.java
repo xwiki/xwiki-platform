@@ -135,8 +135,7 @@ public interface NotificationFilter extends Comparable
 
     /**
      * @return the priority of the filter. The higher it is, the more important the result of
-     * {@see NotificationFilter#filterEvent(Event event, DocumentReference user,
-     * Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format) is}.
+     * {@link NotificationFilter#filterEvent(Event, DocumentReference, Collection, NotificationFormat)} is.
      *
      * @since 9.11.5
      * @since 10.3

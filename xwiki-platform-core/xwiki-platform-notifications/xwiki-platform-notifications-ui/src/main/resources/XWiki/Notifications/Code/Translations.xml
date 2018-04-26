@@ -199,6 +199,37 @@ rendering.macro.notificationsApplicationsPreferences.name=Notifications Applicat
 rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+rendering.macro.notifications.name=Notifications
+rendering.macro.notifications.description=Display notifications about events happened on the wiki.
+rendering.macro.notifications.parameter.count.name=Count
+rendering.macro.notifications.parameter.count.description=Maximum number of events to display by default
+rendering.macro.notifications.parameter.useUserPreferences.name=Use the preferences of the user
+rendering.macro.notifications.parameter.useUserPreferences.description=If true, the preferences of the user about notifications are used
+rendering.macro.notifications.parameter.displayOwnEvents.name=Display own events
+rendering.macro.notifications.parameter.displayOwnEvents.description=If true, the events of the current user are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.displayMinorEvents.name=Display minor events
+rendering.macro.notifications.parameter.displayMinorEvents.description=If true, the events concerning minor revisions of pages are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.displaySystemEvents.name=Display system events
+rendering.macro.notifications.parameter.displaySystemEvents.description=If true, the events triggered by the XWiki software are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.displayReadEvents.name=Display read events
+rendering.macro.notifications.parameter.displayReadEvents.description=If true, the events that the user have already marked as read are displayed like the others. They are hidden otherwise.
+rendering.macro.notifications.parameter.wikis.name=Wikis
+rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.spaces.name=Spaces
+rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.pages.name=Pages
+rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.displayReadStatus.name=Display "read" status
+rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
+rendering.macro.notifications.parameter.users.name=Users
+rendering.macro.notifications.parameter.users.description=List of users (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Either or not to display only the events done by the given list of users (if empty, the list of followed users of the current user is used)
+
+## Notifications Macro
+notifications.macro.noWatchedUsers=You are not following anybody.
+notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
 </content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>

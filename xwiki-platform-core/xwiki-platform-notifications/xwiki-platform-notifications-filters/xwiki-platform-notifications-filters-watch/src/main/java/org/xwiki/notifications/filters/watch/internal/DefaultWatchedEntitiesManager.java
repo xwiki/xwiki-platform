@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.watch.internal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -76,15 +77,17 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         Collection<NotificationFilterPreference> filterPreferences
             = notificationFilterManager.getFilterPreferences(user);
 
-        return filterPreferences.stream().filter(
-            pref -> !pref.getProperties(NotificationFilterProperty.USER).isEmpty()
-                    && pref.isEnabled()
-                    && pref.isActive())
-            .filter(pref -> pref.getFilterName().equals(EventUserFilter.FILTER_NAME)
-                    && pref.getFilterType() == NotificationFilterType.INCLUSIVE)
-            .map(pref -> new HashSet(pref.getProperties(NotificationFilterProperty.USER)))
-            .reduce((a1, a2) -> { a1.addAll(a2); return a1; })
-            .get();
+        Set<String> results = new HashSet<>();
+        Iterator<NotificationFilterPreference> iterator =
+            filterPreferences.stream().filter(
+                pref -> pref.isEnabled() && pref.getFilterName().equals(EventUserFilter.FILTER_NAME)
+                        && pref.getFilterType() == NotificationFilterType.INCLUSIVE
+            ).iterator();
+        while (iterator.hasNext()) {
+            NotificationFilterPreference preference = iterator.next();
+            results.addAll(preference.getProperties(NotificationFilterProperty.USER));
+        }
+        return results;
     }
 
     private void handleEntity(WatchedEntityReference entity, DocumentReference user, boolean shouldBeWatched)

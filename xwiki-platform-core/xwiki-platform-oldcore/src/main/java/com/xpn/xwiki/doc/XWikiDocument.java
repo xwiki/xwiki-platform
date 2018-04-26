@@ -2055,8 +2055,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void loadArchive(XWikiContext context) throws XWikiException
     {
-        if (this.archive == null || this.archive.get() == null) {
-            XWikiDocumentArchive arch = getVersioningStore(context).getXWikiDocumentArchive(this, context);
+        if ((this.archive == null || this.archive.get() == null)) {
+            XWikiDocumentArchive arch;
+            // A document not comming from the database cannot have an archive stored in the database
+            if (this.isNew()) {
+                arch = new XWikiDocumentArchive();
+            } else {
+                arch = getVersioningStore(context).getXWikiDocumentArchive(this, context);
+            }
             // We are using a SoftReference which will allow the archive to be
             // discarded by the Garbage collector as long as the context is closed (usually during
             // the request)
@@ -2085,6 +2091,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         XWikiDocumentArchive arch = getDocumentArchive();
         if (arch != null) {
+            return arch;
+        }
+
+        // A document not comming from the database cannot have an archive stored in the database
+        if (this.isNew()) {
+            arch = new XWikiDocumentArchive();
+            setDocumentArchive(arch);
             return arch;
         }
 

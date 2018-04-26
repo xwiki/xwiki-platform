@@ -315,9 +315,12 @@ require(['jquery'], function ($) {
           &lt;/dt&gt;
           &lt;dd&gt;
             #set ($interval = 'daily')
-            #set ($objInterval = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
-            #if ("$!objInterval" != '')
-              #set ($interval = $objInterval.getValue('interval'))
+            #set ($objPref = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+            #if ("$!objPref" != '')
+              #set ($objInterval = $objPref.getValue('interval'))
+              #if ("$!objInterval" != '')
+                #set ($interval = $objInterval)
+              #end
             #end
             &lt;select class="notificationEmailInterval"&gt;
               &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
@@ -336,7 +339,10 @@ require(['jquery'], function ($) {
             #set ($diffType = $services.notification.preferences.getDiffType())
             #set ($objPref = $doc.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
             #if ("$!objPref" != '')
-              #set ($diffType = $objPref.getValue('diffType'))
+              #set ($objDiffType = $objPref.getValue('diffType'))
+              #if ("$!objDiffType" != '')
+                #set ($diffType = $objDiffType)
+              #end
             #end
             &lt;select class="notificationEmailDiffType"&gt;
               &lt;option value="NOTHING" #if($diffType == 'NOTHING')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING'))&lt;/option&gt;

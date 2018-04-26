@@ -5,20 +5,24 @@
 
 #if ("$!previousOrigdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev2}")})
-  #set ($previousOrigdocLink = "<a class='changes-arrow' href='$changesLink'>&lt;</a>")
+  #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion'))
+  #set ($previousOrigdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&lt;</a>")
   #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
 #end
 #if ("$!nextOrigdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev2}")})
-  #set ($nextOrigdocLink = "<a class='changes-arrow' href='$changesLink'>&gt;</a>")
+  #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion'))
+  #set ($nextOrigdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
 #end
 #if ("$!previousNewdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${previousNewdocVersion}")})
-  #set ($previousNewdocLink = "<a class='changes-arrow' href='$changesLink'>&lt;</a>")
+  #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion'))
+  #set ($previousNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&lt;</a>")
 #end
 #if ("$!nextNewdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${nextNewdocVersion}")})
-  #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink'>&gt;</a>")
+  #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion'))
+  #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
   #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
 #end
 
@@ -55,10 +59,10 @@
       </div> ## changes-info-content
     </div> ## changes-info-box-to
     #if ("$!previousLink" != '')
-      <a href="$previousLink" class="changes-arrow-left">&lt;</a>
+      <a href="$previousLink" class="changes-arrow-left" title="$services.localization.render('core.viewers.diff.previousChange')">&lt;</a>
     #end
     #if ("$!nextLink" != '')
-      <a href="$nextLink" class="changes-arrow-right">&gt;</a>
+      <a href="$nextLink" class="changes-arrow-right" title="$services.localization.render('core.viewers.diff.nextChange')">&gt;</a>
     #end
     <div class="clearfloats"></div>
   </div> ## changes-info-boxes

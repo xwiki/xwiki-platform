@@ -41,8 +41,8 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #set ($supportedLocales = $xwiki.getXWikiPreference('languages').split('\s*[|, ]\s*'))
-{{/velocity}}    
-    
+{{/velocity}}
+
 {{velocity output="false"}}
 #set ($__defaultSolrConfig = {
   'queryFields': {
@@ -219,6 +219,5 @@
     ${fieldName}_${locale}${fieldBoost} ##
   #end
 #end
-    
 {{/velocity}}</content>
 </xwikidoc>

@@ -64,5 +64,9 @@
     #end
   #end
 #end
+#set ($previousOrigdocVersion = $origdoc.previousVersion)
+#set ($previousNewdocVersion = $newdoc.previousVersion)
+#set ($nextOrigdocVersion = $origdoc.documentArchive.getNextVersion($origdoc.RCSVersion))
+#set ($nextNewdocVersion = $newdoc.documentArchive.getNextVersion($newdoc.RCSVersion))
 #template('changesdoc.vm')
 </div>

@@ -61,4 +61,21 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <entries>
+            <entry>
+              <document>XWiki.DefaultSkin</document>
+              <type>demo</type>
+            </entry>
+          </entries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

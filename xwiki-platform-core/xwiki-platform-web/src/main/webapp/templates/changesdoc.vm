@@ -23,15 +23,19 @@
   #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion'))
   #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
 #end
+## Display the previous change arrow only if there is a previous version of the original document and there is no extension version
 #if ("$!previousOrigdocVersion" != '' && "$!previousNewdocVersion" != '')
-  #if ($origdoc.RCSVersion.isLessThan($newdoc.RCSVersion))
+  ## Keep the reverse navigation order in case the original document version is greater than the version of the new document
+  #if ($origdoc.RCSVersion.isLessOrEqualThan($newdoc.RCSVersion))
     #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
   #else
     #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${previousNewdocVersion}")})
   #end
 #end
+## Display the next change arrow only if there is a next version of the new document and there is no extension version
 #if ("$!nextOrigdocVersion" != '' && "$!nextNewdocVersion" != '')
-  #if ($origdoc.RCSVersion.isLessThan($newdoc.RCSVersion))
+  ## Keep the reverse navigation order in case the original document version is greater than the version of the new document
+  #if ($origdoc.RCSVersion.isLessOrEqualThan($newdoc.RCSVersion))
     #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
   #else
     #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev1}")})

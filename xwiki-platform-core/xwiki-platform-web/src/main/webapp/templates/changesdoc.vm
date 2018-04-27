@@ -24,10 +24,18 @@
   #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
 #end
 #if ("$!previousOrigdocVersion" != '' && "$!previousNewdocVersion" != '')
-  #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
+  #if ($origdoc.RCSVersion.isLessThan($newdoc.RCSVersion))
+    #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
+  #else
+    #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${previousNewdocVersion}")})
+  #end
 #end
 #if ("$!nextOrigdocVersion" != '' && "$!nextNewdocVersion" != '')
-  #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
+  #if ($origdoc.RCSVersion.isLessThan($newdoc.RCSVersion))
+    #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
+  #else
+    #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev1}")})
+  #end
 #end
 
 <div id="changes-info">

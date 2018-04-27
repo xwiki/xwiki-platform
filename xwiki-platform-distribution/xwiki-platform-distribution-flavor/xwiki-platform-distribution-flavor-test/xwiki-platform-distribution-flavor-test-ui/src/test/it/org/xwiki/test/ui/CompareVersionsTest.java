@@ -356,7 +356,18 @@ public class CompareVersionsTest extends AbstractTest
         changesPane.clickPreviousChange();
         changesPane = new ChangesPane();
         assertEquals(changesPane.getFromVersion(), "1.3");
-        assertEquals(changesPane.getToVersion(), "2.1");
+        assertEquals(changesPane.getToVersion(), "1.2");
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickNextChange();
+        changesPane = new ChangesPane();
+        assertEquals(changesPane.getFromVersion(), "2.1");
+        assertEquals(changesPane.getToVersion(), "1.3");
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());

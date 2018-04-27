@@ -19,13 +19,11 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.concurrent.locks.ReadWriteLock;
-
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 
 /**
@@ -39,26 +37,25 @@ import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesInvalidator
 {
     /**
-     * The role hint.
-     */
-    public static final String NAME = "org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator";
-
-    /**
      * Fair read-write lock to suspend the delivery of cache updates while there are loads in progress.
      */
     @Inject
-    @Named(NAME)
-    private ReadWriteLock readWriteLock;
+    private SecurityCache securityCache;
+
+    private org.xwiki.security.authorization.cache.internal.SecurityCache getSecurityCache()
+    {
+        return (org.xwiki.security.authorization.cache.internal.SecurityCache) this.securityCache;
+    }
 
     @Override
     public void suspend()
     {
-        readWriteLock.readLock().lock();
+        getSecurityCache().suspendInvalidation();
     }
 
     @Override
     public void resume()
     {
-        readWriteLock.readLock().unlock();
+        getSecurityCache().resumeInvalidation();
     }
 }

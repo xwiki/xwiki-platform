@@ -7,7 +7,6 @@
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev2}")})
   #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion'))
   #set ($previousOrigdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&lt;</a>")
-  #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
 #end
 #if ("$!nextOrigdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev2}")})
@@ -23,6 +22,11 @@
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${nextNewdocVersion}")})
   #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion'))
   #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
+#end
+#if ("$!previousOrigdocVersion" != '' && "$!previousNewdocVersion" != '')
+  #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
+#end
+#if ("$!nextOrigdocVersion" != '' && "$!nextNewdocVersion" != '')
   #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
 #end
 

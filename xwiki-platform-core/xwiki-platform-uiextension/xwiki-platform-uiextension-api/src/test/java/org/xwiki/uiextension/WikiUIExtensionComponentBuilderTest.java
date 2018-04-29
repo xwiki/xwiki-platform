@@ -25,15 +25,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
-import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -41,7 +38,9 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.velocity.VelocityEngine;
@@ -50,23 +49,22 @@ import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@OldcoreTest
 public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
-    public MockitoComponentMockingRule<WikiBaseObjectComponentBuilder> mocker =
-        new MockitoComponentMockingRule<WikiBaseObjectComponentBuilder>(WikiUIExtensionComponentBuilder.class);
-
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(mocker);
+    @InjectMockComponents
+    private WikiUIExtensionComponentBuilder builder;
 
     private static final DocumentReference DOC_REF =
         new DocumentReference("xwiki", "XWiki", "MyUIExtension", Locale.ROOT);
@@ -75,30 +73,30 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
 
     private XWikiDocument componentDoc;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeComponent
+    public void configure(MockitoComponentManager componentManager, MockitoOldcore oldcore) throws Exception
     {
         // Required by BaseObjectReference
         DocumentReferenceResolver<String> resolver =
-            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
+            componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
         when(resolver.resolve("XWiki.UIExtension"))
             .thenReturn(new DocumentReference("xwiki", "XWiki", "UIExtensionClass"));
 
         DelegateComponentManager wikiComponentManager = new DelegateComponentManager();
-        wikiComponentManager.setComponentManager(this.mocker);
-        this.mocker.registerComponent(ComponentManager.class, "wiki", wikiComponentManager);
+        wikiComponentManager.setComponentManager(componentManager);
+        componentManager.registerComponent(ComponentManager.class, "wiki", wikiComponentManager);
 
         // Components accessed through dynamic lookup.
-        VelocityManager velocityManager = this.mocker.registerMockComponent(VelocityManager.class);
+        VelocityManager velocityManager = componentManager.registerMockComponent(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
         when(velocityManager.getVelocityContext()).thenReturn(mock(VelocityContext.class));
 
-        ModelContext modelContext = this.mocker.registerMockComponent(ModelContext.class);
+        ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);
         when(modelContext.getCurrentEntityReference()).thenReturn(DOC_REF);
 
-        this.mocker.registerMockComponent(RenderingContext.class);
-        this.mocker.registerMockComponent(Transformation.class, "macro");
-        this.mocker.registerMockComponent(ContentParser.class);
+        componentManager.registerMockComponent(RenderingContext.class);
+        componentManager.registerMockComponent(Transformation.class, "macro");
+        componentManager.registerMockComponent(ContentParser.class);
 
         // The document holding the UI extension object.
         this.componentDoc = mock(XWikiDocument.class, "xwiki:XWiki.MyUIExtension");
@@ -106,46 +104,40 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
         when(this.componentDoc.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
         when(this.componentDoc.getContentAuthorReference()).thenReturn(AUTHOR_REFERENCE);
         when(this.componentDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
-        this.oldcore.getDocuments().put(DOC_REF, componentDoc);
+        oldcore.getDocuments().put(DOC_REF, componentDoc);
     }
 
     @Test
-    public void buildGlobalComponentsWithoutPR() throws Exception
+    public void buildGlobalComponentsWithoutPR()
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "global");
-
-        try {
-            this.mocker.getComponentUnderTest().buildComponents(extensionObject);
-            fail("You shouldn't be able to register global UI extensions without PR.");
-        } catch (WikiComponentException expected) {
-            assertEquals("Registering global UI extensions requires programming rights", expected.getMessage());
-        }
+        Throwable exception = assertThrows(WikiComponentException.class, () -> {
+            this.builder.buildComponents(extensionObject);
+        });
+        assertEquals("Registering global UI extensions requires programming rights", exception.getMessage());
     }
 
     @Test
-    public void buildWikiLevelComponentsWithoutAdminRights() throws Exception
+    public void buildWikiLevelComponentsWithoutAdminRights()
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "wiki");
-
-        try {
-            this.mocker.getComponentUnderTest().buildComponents(extensionObject);
-            fail("You shouldn't be able to register UI extensions at wiki level without wiki admin rights.");
-        } catch (WikiComponentException expected) {
-            assertEquals("Registering UI extensions at wiki level requires wiki administration rights",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(WikiComponentException.class, () -> {
+            this.builder.buildComponents(extensionObject);
+        });
+        assertEquals("Registering UI extensions at wiki level requires wiki administration rights",
+            exception.getMessage());
     }
 
     @Test
-    public void buildComponents() throws Exception
+    public void buildComponents(ComponentManager componentManager) throws Exception
     {
         BaseObject extensionObject = createExtensionObject("name", "extensionPointId", "content",
             "key=value=foo\nkey2=value2\ninvalid=\n\n=invalid", "user");
 
-        ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
-        VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
+        ContentParser contentParser = componentManager.getInstance(ContentParser.class);
+        VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
 
-        List<WikiComponent> components = this.mocker.getComponentUnderTest().buildComponents(extensionObject);
+        List<WikiComponent> components = this.builder.buildComponents(extensionObject);
 
         assertEquals(1, components.size());
         verify(contentParser).parse("content", Syntax.XWIKI_2_1, DOC_REF);

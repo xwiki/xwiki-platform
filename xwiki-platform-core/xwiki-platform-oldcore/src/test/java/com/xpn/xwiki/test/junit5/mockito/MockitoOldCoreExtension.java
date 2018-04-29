@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.test.junit5.mockito;
 
+import java.lang.reflect.Field;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.test.junit5.mockito.MockitoComponentManagerExtension;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -52,6 +55,9 @@ import com.xpn.xwiki.test.MockitoOldcore;
  *     &#64;InjectMockComponents
  *     private Component4Impl component4;
  *
+ *     &#64;InjectMockitoOldcore
+ *     private MockitoOldcore mockitoOldcore;
+ *
  *     &#64;BeforeEach
  *     public void before(MockitoComponentManager componentManager, MockitoOldcore oldcore)
  *     {
@@ -81,6 +87,19 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
 {
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(MockitoOldCoreExtension.class);
+
+    @Override
+    public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception
+    {
+        super.postProcessTestInstance(testInstance, context);
+
+        // Inject the MockitoOldcore instance in all fields annotated with @InjectMockitoOldcore
+        for (Field field : testInstance.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(InjectMockitoOldcore.class)) {
+                ReflectionUtils.setFieldValue(testInstance, field.getName(), loadMockitoOldcore(context));
+            }
+        }
+    }
 
     @Override
     protected void initializeMockitoComponentManager(Object testInstance, MockitoComponentManager mcm,

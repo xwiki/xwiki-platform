@@ -26,10 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.xwiki.cache.Cache;
@@ -39,17 +37,22 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequest;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Unit tests for the {@link ImagePlugin} class.
  * 
  * @version $Id$
  */
+@OldcoreTest
 public class ImagePluginTest
 {
-    private static final byte[] testPngImageContent =
+    private static final byte[] IMAGE_CONTENT =
         Base64.decodeBase64("iVBORw0KGgoAAAANSUhEUgAAAJYAAAA8CAMAAACzWLNYAAACZFBMVEXUVQD////+"
             + "/fz//v7UVgLVWQbUVgH+/PvWXg3XXw/XYBD+/PrcdC7WXQz89fD78Oj44tT77+fi"
             + "jlXWXg799vHpqn/XYBHdejfWWwn77uXefj3ZaB3ccy3abSTVVwP89O/++/nqrIPW"
@@ -86,14 +89,14 @@ public class ImagePluginTest
             + "eyl/ej2wRnfoItr8l/3WeLn4PXSq3EbDXz2j/DTy9z++V3ViJlSzrGa9K5M1tdpX"
             + "bwl+otAu7U4p4/Hv5kPqQhwJx0cWWWSRRRZZZNH4DzmZwO7NW2cKAAAAAElFTkSu" + "QmCC");
 
-    @Rule
-    public MockitoOldcoreRule oldCore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldCore;
 
     private ImagePlugin plugin;
 
     private ImageProcessor imageProcessor;
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
         XWiki xwiki = this.oldCore.getSpyXWiki();
@@ -114,7 +117,7 @@ public class ImagePluginTest
     {
         XWikiAttachment attachment = Mockito.mock(XWikiAttachment.class);
         Mockito.when(attachment.getMimeType()).thenReturn("image/notsupported");
-        Assert.assertSame(attachment, plugin.downloadAttachment(attachment, new XWikiContext()));
+        assertSame(attachment, plugin.downloadAttachment(attachment, new XWikiContext()));
     }
 
     @Test
@@ -124,7 +127,7 @@ public class ImagePluginTest
 
         XWikiAttachment attachment = Mockito.mock(XWikiAttachment.class);
         Mockito.when(attachment.getMimeType(xcontext)).thenReturn("image/png");
-        InputStream attachmentInputStream = new ByteArrayInputStream(testPngImageContent);
+        InputStream attachmentInputStream = new ByteArrayInputStream(IMAGE_CONTENT);
         Mockito.when(attachment.getContentInputStream(xcontext)).thenReturn(attachmentInputStream);
         Mockito.when(attachment.clone()).thenReturn(attachment);
 
@@ -156,10 +159,10 @@ public class ImagePluginTest
         Mockito.when(imageCache.get(cacheKey)).thenReturn(scaled);
 
         // Load again, this time from cache.
-        Assert.assertSame(scaled, plugin.downloadAttachment(attachment, xcontext));
+        assertSame(scaled, plugin.downloadAttachment(attachment, xcontext));
 
         Mockito.verify(imageProcessor, Mockito.times(1)).writeImage(renderedImage,
-                "image/png", .5F, attachmentOutputStream);
+            "image/png", .5F, attachmentOutputStream);
         Mockito.verify(imageCache, Mockito.times(1)).set(cacheKey, attachment);
     }
 }

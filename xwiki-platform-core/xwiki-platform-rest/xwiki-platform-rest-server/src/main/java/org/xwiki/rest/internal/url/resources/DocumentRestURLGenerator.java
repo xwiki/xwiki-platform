@@ -59,6 +59,10 @@ public class DocumentRestURLGenerator extends AbstractEntityRestURLGenerator<Doc
             }
             return url;
         } catch (MalformedURLException e) {
+            // Note: The method getBaseURI() always return a valid URL (because it uses XWikiURLFactory#getServerURL()
+            // which is a URL). Thus calling Utils.createURI().toURL() should always return a valid URL normally.
+            // Thus getBaseURI() should probably be named getBaseURL() and Utils.createURI() should probaby be named
+            // Utils.createURL()...
             throw new XWikiRestException(
                 String.format("Failed to generate a REST URL for the document [%s].", reference), e);
         }

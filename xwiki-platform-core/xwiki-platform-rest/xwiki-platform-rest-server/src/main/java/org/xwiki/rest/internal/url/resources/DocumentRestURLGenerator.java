@@ -47,14 +47,17 @@ public class DocumentRestURLGenerator extends AbstractEntityRestURLGenerator<Doc
         // So it is consistent.
         try {
             Locale locale = reference.getLocale();
-            // Get the URL of the translated document if possible
+            URL url;
+            // Get the URL of the translated document if the passed reference defines a Locale
             if (locale != null && !locale.toString().isEmpty()) {
-                return Utils.createURI(getBaseURI(), PageTranslationResource.class,
+                url =  Utils.createURI(getBaseURI(), PageTranslationResource.class,
                     reference.getWikiReference().getName(), getSpaceList(reference.getLastSpaceReference()),
                     reference.getName(), reference.getLocale()).toURL();
+            } else {
+                url = Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),
+                        getSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
             }
-            return Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),
-                getSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
+            return url;
         } catch (MalformedURLException e) {
             throw new XWikiRestException(
                 String.format("Failed to generate a REST URL for the document [%s].", reference), e);

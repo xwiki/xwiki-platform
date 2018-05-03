@@ -22,8 +22,7 @@
   #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
   #xwikiDataAttribute('user-id', $!services.model.serialize($xcontext.userReference, 'default'))
-  #xwikiDataAttribute('locale', $tdoc.locale)
-  #xwikiDataAttribute('locale-real', $tdoc.realLocale)>
+  #xwikiDataAttribute('locale', $tdoc.locale)>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.

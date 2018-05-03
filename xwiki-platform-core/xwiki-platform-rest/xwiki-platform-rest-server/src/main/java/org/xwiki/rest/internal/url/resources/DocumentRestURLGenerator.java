@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.url.resources;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import javax.inject.Singleton;
 
@@ -29,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTranslationResource;
 
 /**
  * @version $Id$
@@ -44,6 +46,13 @@ public class DocumentRestURLGenerator extends AbstractEntityRestURLGenerator<Doc
         // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
         // So it is consistent.
         try {
+            Locale locale = reference.getLocale();
+            // Get the URL of the translated document if possible
+            if (locale != null && !locale.toString().isEmpty()) {
+                return Utils.createURI(getBaseURI(), PageTranslationResource.class,
+                    reference.getWikiReference().getName(), getSpaceList(reference.getLastSpaceReference()),
+                    reference.getName(), reference.getLocale()).toURL();
+            }
             return Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),
                 getSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
         } catch (MalformedURLException e) {

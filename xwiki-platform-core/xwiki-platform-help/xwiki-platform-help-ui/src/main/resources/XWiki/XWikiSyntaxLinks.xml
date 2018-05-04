@@ -187,7 +187,7 @@ The part in ##( )## is required, while the parts in ##[ ]## are optional.
 
 The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 
-* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Example: ##My Page##
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Example: ##My Page##
 * **##resource##**: A required string with the link reference in one of the following forms
 ** **URL**: Any URL in the form of **##[url:] (protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** An optional string identifying the resource as an URL.
@@ -202,7 +202,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 *** **##spaceNameList##**: A required list of dot-separated wiki Space names pointing to the final linked wiki Space (or non-terminal page). Examples: ##Main##, ##A.B##, ##A.B.C##
 ** **InterWiki page** reference in the form **##interwiki: (interWikiAlias: ) (pageName)##**. Example: ##interwiki:wikipedia:XWiki##
 *** **##interwiki:##** A required string identifying the resource as an InterWiki link.
-*** **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Example: ##wikipedia##
+*** **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Example: ##wikipedia##
 *** **##pageName##**: A required string containing the name of the linked page. Example: ##XWiki##
 ** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##, ##attach~:mywiki:Main@img.png##
 *** **##attach~:##** A required string identifying the resource as attachment.

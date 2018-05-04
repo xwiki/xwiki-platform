@@ -265,7 +265,7 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 # xwiki.servletpath=
 #-# The fallback servlet mapping name to use in the generated URLs. Unlike xwiki.servletpath, this is the value used
 #-# when the correct setting could not be determined from the request URL. A good way to use this setting is to achieve
-#-# short URLs, see http://platform.xwiki.org/xwiki/bin/Main/ShortURLs
+#-# short URLs, see https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/ShortURLs/
 # xwiki.defaultservletpath=bin/
 
 #-# Whether the /view/ part of the URL should be included if the target action is 'view'.

@@ -63,7 +63,7 @@
   #end
 #end
 {{/velocity}}
-This tool allows to define structured data types (classes) in your wiki. Please consult the [[developer's guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/DevGuide/]] to get familiar with the XWiki data model and the public APIs.
+This tool allows to define structured data types (classes) in your wiki. Please consult the [[developer's guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/]] to get familiar with the XWiki data model and the public APIs.
 
 = Templates for new data types =
 

@@ -91,7 +91,7 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 **** **##pageName##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
-* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
+* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
 * **##target##**: An optional string corresponding to the HTML ##target## attribute for a HTML ##A## link element. This element is used when rendering the link. It defaults to opening the link in the current window. Examples: ##_self##, ##_blank##
 
 === 2.0 Links ===
@@ -128,7 +128,7 @@ The part in ##( )## is required, while the parts in ##[ ]## are optional.
 
 The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [||parameters]##**
 
-* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Example: ##My Page##
+* **##label##**: An optional string which will be displayed to the user as the link name when rendered. The label may contain XWiki Syntax. If no label is specified a default label will be generated. The generation pattern can be changed, see the [[Admin Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Example: ##My Page##
 * **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
 ** **##reference##**: The link reference in one of the following forms:
 *** **URL**: Any URL in the form of **##protocol:~/~/path##**. Examples: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
@@ -145,7 +145,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 **** **##emailAddress##**: Targeted email address. Example: "##john@smith.com##"
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
-* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
+* **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
 * **##parameters##**: An optional list of parameters passed to the link. Example: ##target="~_blank"## (open in new window)
 
 === 2.1 Links ===

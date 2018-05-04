@@ -81,6 +81,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /** Fair write lock. */
     private final Lock writeLock = readWriteLock.writeLock();
 
+    private final ReadWriteLock invalidationReadWriteLock = new ReentrantReadWriteLock(true);
+
+    private final Lock invalidationReadLock = invalidationReadWriteLock.readLock();
+
+    private final Lock invalidationWriteLock = invalidationReadWriteLock.writeLock();
+
     /** The keys in the cache are generated from instances of {@link org.xwiki.model.reference.EntityReference}. */
     @Inject
     private EntityReferenceSerializer<String> keySerializer;
@@ -773,66 +779,90 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     @Override
     public SecurityAccessEntry get(UserSecurityReference user, SecurityReference entity)
     {
-        SecurityCacheEntry entry = getEntry(user, entity);
-        if (entry == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Miss read access entry for [{}].", getEntryKey(user, entity));
+        this.invalidationReadLock.lock();
+
+        try {
+            SecurityCacheEntry entry = getEntry(user, entity);
+            if (entry == null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Miss read access entry for [{}].", getEntryKey(user, entity));
+                }
+                return null;
             }
-            return null;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Success read access entry for [{}].", getEntryKey(user, entity));
+            }
+            return (SecurityAccessEntry) entry.getEntry();
+        } finally {
+            this.invalidationReadLock.unlock();
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Success read access entry for [{}].", getEntryKey(user, entity));
-        }
-        return (SecurityAccessEntry) entry.getEntry();
     }
 
     @Override
     public SecurityRuleEntry get(SecurityReference entity)
     {
-        SecurityCacheEntry entry = getEntry(entity);
-        if (entry == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Miss read rule entry for [{}].", getEntryKey(entity));
+        this.invalidationReadLock.lock();
+
+        try {
+            SecurityCacheEntry entry = getEntry(entity);
+            if (entry == null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Miss read rule entry for [{}].", getEntryKey(entity));
+                }
+                return null;
             }
-            return null;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Success read rule entry for [{}].", getEntryKey(entity));
+            }
+            return (SecurityRuleEntry) entry.getEntry();
+        } finally {
+            this.invalidationReadLock.unlock();
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Success read rule entry for [{}].", getEntryKey(entity));
-        }
-        return (SecurityRuleEntry) entry.getEntry();
     }
 
     @Override
     public void remove(UserSecurityReference user, SecurityReference entity)
     {
-        writeLock.lock();
+        this.invalidationWriteLock.lock();
+
         try {
-            SecurityCacheEntry entry = getEntry(user, entity);
-            if (entry != null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
+            writeLock.lock();
+            try {
+                SecurityCacheEntry entry = getEntry(user, entity);
+                if (entry != null) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
+                    }
+                    this.cache.remove(entry.getKey());
                 }
-                this.cache.remove(entry.getKey());
+            } finally {
+                writeLock.unlock();
             }
         } finally {
-            writeLock.unlock();
+            this.invalidationWriteLock.unlock();
         }
     }
 
     @Override
     public void remove(SecurityReference entity)
     {
-        writeLock.lock();
+        this.invalidationWriteLock.lock();
+
         try {
-            SecurityCacheEntry entry = getEntry(entity);
-            if (entry != null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
+            writeLock.lock();
+            try {
+                SecurityCacheEntry entry = getEntry(entity);
+                if (entry != null) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
+                    }
+                    this.cache.remove(entry.getKey());
                 }
-                this.cache.remove(entry.getKey());
+            } finally {
+                writeLock.unlock();
             }
         } finally {
-            writeLock.unlock();
+            this.invalidationWriteLock.unlock();
         }
     }
 
@@ -963,5 +993,15 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         }
     }
 
-    
+    @Override
+    public void suspendInvalidation()
+    {
+        this.invalidationReadLock.lock();
+    }
+
+    @Override
+    public void resumeInvalidation()
+    {
+        this.invalidationReadLock.unlock();
+    }
 }

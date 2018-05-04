@@ -359,17 +359,17 @@ public class PdfExportImpl implements PdfExport
      */
     private void applyInlineStyle(Element element)
     {
-        for (int i = 0; i < element.nodeCount(); i++) {
+        int nodeCount = element.nodeCount();
+        for (int i = 0; i < nodeCount; i++) {
             org.dom4j.Node node = element.node(i);
-            if (node instanceof CSSStylableElement) {
+            if (node.getNodeType() == org.dom4j.Node.ELEMENT_NODE) {
+                // Element node are always also CSSStylableElement elements
                 CSSStylableElement styleElement = (CSSStylableElement) node;
                 CSSStyleDeclaration style = styleElement.getComputedStyle();
-                if (style != null && StringUtils.isNotEmpty(style.getCssText())) {
+                if (style.getLength() != 0) {
                     styleElement.addAttribute("style", style.getCssText());
                 }
-            }
-            if (node instanceof Element) {
-                applyInlineStyle((Element) node);
+                applyInlineStyle(styleElement);
             }
         }
     }

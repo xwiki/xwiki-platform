@@ -146,4 +146,18 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      * @since 7.0RC1
      */
     Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki);
+
+    /**
+     * Suspend delivery of invalidation events.
+     * 
+     * @since 10.4RC1
+     */
+    void suspendInvalidation();
+
+    /**
+     * Resume delivery of invalidation events.
+     * 
+     * @since 10.4RC1
+     */
+    void resumeInvalidation();
 }

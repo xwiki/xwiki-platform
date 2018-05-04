@@ -22,7 +22,6 @@ package org.xwiki.security.authorization.internal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,6 +43,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.cache.SecurityCache;
+import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
@@ -59,19 +59,18 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
  * @since 4.0M2
  */
 @Component
-@Named(DefaultSecurityCacheRulesInvalidator.NAME)
+@Named(DefaultSecurityCacheRulesInvalidatorListener.NAME)
 @Singleton
 public class DefaultSecurityCacheRulesInvalidatorListener implements EventListener
 {
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentCreatedEvent(),
-        new DocumentUpdatedEvent(), new DocumentDeletedEvent());
-
     /**
-     * Fair read-write lock to suspend the delivery of cache updates while there are loads in progress.
+     * The name of the listener. 
      */
-    @Inject
-    @Named(DefaultSecurityCacheRulesInvalidator.NAME)
-    private ReadWriteLock readWriteLock;
+    public static final String NAME =
+        "org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidatorListener";
+
+    private static final List<Event> EVENTS =
+        Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
 
     /** Logger. **/
     @Inject
@@ -84,6 +83,9 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
     /** The security reference factory. */
     @Inject
     private SecurityReferenceFactory securityReferenceFactory;
+
+    @Inject
+    private SecurityCacheRulesInvalidator invalidator;
 
     /** Document reference resolver. */
     @Inject
@@ -105,7 +107,7 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
     @Override
     public String getName()
     {
-        return DefaultSecurityCacheRulesInvalidator.NAME;
+        return NAME;
     }
 
     @Override
@@ -183,7 +185,7 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
     public void onEvent(Event event, Object source, Object data)
     {
         DocumentReference ref = getDocumentReference(source);
-        readWriteLock.writeLock().lock();
+        this.invalidator.suspend();
         try {
             deliverUpdateEvent(ref);
             if (isGroupDocument(source)) {
@@ -196,7 +198,7 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
         } catch (AuthorizationException e) {
             this.logger.error("Failed to invalidate group members on the document: {}", ref, e);
         } finally {
-            readWriteLock.writeLock().unlock();
+            this.invalidator.resume();
         }
     }
 
@@ -222,8 +224,8 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
                 && XWikiConstants.XWIKI_SPACE_REFERENCE.equals(ref.getLastSpaceReference(), EntityType.SPACE)
                 && ref.getWikiReference().getName().equals(this.xcontextProvider.get().getMainXWiki())) {
                 // For xwiki:XWiki.XWikiServer... documents, also remove the whole corresponding wiki.
-                securityCache.remove(securityReferenceFactory.newEntityReference(new WikiReference(ref.getName()
-                    .substring(XWikiConstants.WIKI_DESCRIPTOR_PREFIX.length()).toLowerCase())));
+                securityCache.remove(securityReferenceFactory.newEntityReference(new WikiReference(
+                    ref.getName().substring(XWikiConstants.WIKI_DESCRIPTOR_PREFIX.length()).toLowerCase())));
             }
         }
     }

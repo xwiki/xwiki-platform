@@ -221,30 +221,6 @@
 ## Generate reference to background image
 #macro(attImgURL $name) url($doc.getAttachmentURL("${name}.png")) #end
 
-/* Menu */
-.actionmenu #tmAnnotations {
-  background-image: #imgURL('note') !important;
-  /* Padding, margin and bg-position are adjusted in order to give this element
-     the 'tab' look when active and the settings panel is displayed */
-  background-position: 5px 1px;
-  border-radius: 4px 4px 0 0;
-  padding-left: 6px !important;
-  padding-right: 5px !important;
-  padding-top: 0 !important;
-  margin-right: 5px !important;
-  margin-top: 2px !important;
-}
-.actionmenu #tmAnnotations a {
-  padding-top: 0 !important;
-}
-.actionmenu .active {
-  background-color: $theme.pageContentBackgroundColor; ##$theme.backgroundSecondaryColor;
-  box-shadow: 0 -1px 1px $theme.buttonSecondaryBackgroundColor;
-}
-.actionmenu .active a {
-  color: $theme.menuSelectedEntryLinkColor !important;
-}
-
 /* Settings panel */
 .annotationsettings {
   background: $theme.pageContentBackgroundColor; ## $theme.backgroundSecondaryColor;

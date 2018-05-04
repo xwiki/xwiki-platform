@@ -905,10 +905,10 @@
       <btn-warning-color/>
     </property>
     <property>
-      <component-active-bg/>
+      <component-active-bg>@list-group-hover-bg</component-active-bg>
     </property>
     <property>
-      <component-active-color/>
+      <component-active-color>@list-group-link-hover-color</component-active-color>
     </property>
     <property>
       <dropdown-bg/>
@@ -968,14 +968,18 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>@list-group-active-bg: @list-group-hover-bg;
-@list-group-active-color: @list-group-link-hover-color;
+      <lessCode>/* Administration: Vertical Menus */
 @list-group-active-border: @list-group-border;
 
+/* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
 
-@well-bg: #fafafa;</lessCode>
+/* Other */
+@well-bg: @body-bg;
+
+
+</lessCode>
     </property>
     <property>
       <link-color>#3173b5</link-color>

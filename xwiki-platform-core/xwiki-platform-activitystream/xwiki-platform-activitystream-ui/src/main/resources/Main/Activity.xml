@@ -857,7 +857,8 @@ $xwiki.ssx.use('Main.Activity')##
   'publicMessage':    'icons/silk/user_comment.png',
   'personalMessage':  'icons/silk/user_comment.png',
   'directMessage':    'icons/silk/user_go.png',
-  'groupMessage':     'icons/silk/group_go.png'
+  'groupMessage':     'icons/silk/group_go.png',
+  'BlogPostPublishedEvent':     'icons/silk/world.png'
 })
 #macro (initDateVariables)
 ##

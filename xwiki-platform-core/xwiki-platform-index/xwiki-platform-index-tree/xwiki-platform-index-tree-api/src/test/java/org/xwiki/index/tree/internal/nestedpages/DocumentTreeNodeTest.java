@@ -22,11 +22,12 @@ package org.xwiki.index.tree.internal.nestedpages;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
@@ -40,12 +41,18 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.tree.TreeNode;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentTreeNode}.
@@ -53,45 +60,62 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.11RC1
  */
+@ComponentTest
 public class DocumentTreeNodeTest
 {
-    @Rule
-    public MockitoComponentMockingRule<TreeNode> mocker = new MockitoComponentMockingRule<>(DocumentTreeNode.class);
+    @InjectMockComponents
+    DocumentTreeNode documentTreeNode;
 
+    @MockComponent
+    @Named("current")
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
+    @MockComponent
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
+    @MockComponent
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
+    @MockComponent
     private ContextualAuthorizationManager authorization;
 
-    private Provider<ComponentManager> contextComponentManagerProvider;
-
+    @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
+    @Named("translations")
+    private TreeNode translationsTreeNode;
+
+    @MockComponent
+    @Named("attachments")
+    private TreeNode attachmentsTreeNode;
+
+    @MockComponent
+    @Named("classProperties")
+    private TreeNode classPropertiesTreeNode;
+
+    @MockComponent
+    @Named("objects")
+    private TreeNode objectsTreeNode;
+
+    @Mock
+    @Named("nestedPagesOrderedByName")
+    private Query nestedPagesOrderedByName;
 
     private DocumentReference documentReference =
         new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
 
-    private TreeNode translationsTreeNode;
-
-    private TreeNode attachmentsTreeNode;
-
-    private TreeNode classPropertiesTreeNode;
-
-    private TreeNode objectsTreeNode;
-
-    private Query nestedPagesOrderedByName = mock(Query.class, "nestedPagesOrderedByName");
-
-    @Before
-    public void configure() throws Exception
+    @BeforeComponent
+    public void configure(MockitoComponentManager componentManager) throws Exception
     {
-        this.currentEntityReferenceResolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "current");
-        this.defaultEntityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.defaultEntityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
-        this.queryManager = this.mocker.getInstance(QueryManager.class);
+        Provider<ComponentManager> contextComponentManagerProvider = componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(contextComponentManagerProvider.get()).thenReturn(componentManager);
+    }
 
+    @BeforeEach
+    public void before(MockitoComponentManager componentManager) throws Exception
+    {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
         when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.WebHome", EntityType.DOCUMENT))
@@ -100,15 +124,6 @@ public class DocumentTreeNodeTest
             .thenReturn("wiki:Path.To.Page.WebHome");
         when(this.queryManager.getNamedQuery("nestedPagesOrderedByName")).thenReturn(this.nestedPagesOrderedByName);
         when(this.nestedPagesOrderedByName.addFilter(any(QueryFilter.class))).thenReturn(this.nestedPagesOrderedByName);
-
-        this.contextComponentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(this.contextComponentManagerProvider.get()).thenReturn(this.mocker);
-
-        this.translationsTreeNode = this.mocker.registerMockComponent(TreeNode.class, "translations");
-        this.attachmentsTreeNode = this.mocker.registerMockComponent(TreeNode.class, "attachments");
-        this.classPropertiesTreeNode = this.mocker.registerMockComponent(TreeNode.class, "classProperties");
-        this.objectsTreeNode = this.mocker.registerMockComponent(TreeNode.class, "objects");
     }
 
     /**
@@ -117,13 +132,12 @@ public class DocumentTreeNodeTest
     @Test
     public void pagination() throws Exception
     {
-        TreeNode documentTreeNode = this.mocker.getComponentUnderTest();
-        documentTreeNode.getProperties().put("hierarchyMode", "reference");
-        documentTreeNode.getProperties().put("showTranslations", true);
-        documentTreeNode.getProperties().put("showAttachments", true);
-        documentTreeNode.getProperties().put("showClassProperties", true);
-        documentTreeNode.getProperties().put("showObjects", true);
-        documentTreeNode.getProperties().put("showAddDocument", true);
+        this.documentTreeNode.getProperties().put("hierarchyMode", "reference");
+        this.documentTreeNode.getProperties().put("showTranslations", true);
+        this.documentTreeNode.getProperties().put("showAttachments", true);
+        this.documentTreeNode.getProperties().put("showClassProperties", true);
+        this.documentTreeNode.getProperties().put("showObjects", true);
+        this.documentTreeNode.getProperties().put("showAddDocument", true);
 
         when(this.authorization.hasAccess(Right.EDIT, documentReference.getParent())).thenReturn(true);
         when(this.translationsTreeNode.getChildCount("translations:wiki:Path.To.Page.WebHome")).thenReturn(1);
@@ -134,7 +148,7 @@ public class DocumentTreeNodeTest
         assertEquals(
             Arrays.asList("translations:wiki:Path.To.Page.WebHome", "attachments:wiki:Path.To.Page.WebHome",
                 "classProperties:wiki:Path.To.Page.WebHome"),
-            documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 0, 3));
+            this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 0, 3));
 
         verify(this.nestedPagesOrderedByName, never()).execute();
 
@@ -145,7 +159,7 @@ public class DocumentTreeNodeTest
         assertEquals(
             Arrays.asList("objects:wiki:Path.To.Page.WebHome", "addDocument:wiki:Path.To.Page.WebHome",
                 "document:wiki:Path.To.Page.Alice"),
-            documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 3, 3));
+            this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 3, 3));
 
         verify(this.nestedPagesOrderedByName).setOffset(0);
         verify(this.nestedPagesOrderedByName).setLimit(1);
@@ -157,7 +171,7 @@ public class DocumentTreeNodeTest
         when(this.defaultEntityReferenceSerializer.serialize(carol)).thenReturn("wiki:Path.To.Page.Carol");
 
         assertEquals(Arrays.asList("document:wiki:Path.To.Page.Bob", "document:wiki:Path.To.Page.Carol"),
-            documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 6, 3));
+            this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 6, 3));
 
         verify(this.nestedPagesOrderedByName).setOffset(1);
         verify(this.nestedPagesOrderedByName).setLimit(3);

@@ -21,8 +21,10 @@ package org.xwiki.tree;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -69,6 +71,16 @@ public abstract class AbstractTreeNode implements TreeNode
     protected String getOrderBy()
     {
         return (String) getProperties().get(PROPERTY_ORDER_BY);
+    }
+
+    protected Set<String> getExclusions()
+    {
+        @SuppressWarnings("unchecked")
+        Set<String> exclusions = (Set<String>) getProperties().get(PROPERTY_EXCLUSIONS);
+        if (exclusions == null) {
+            exclusions = new HashSet<>();
+        }
+        return exclusions;
     }
 
     protected <E> List<E> subList(List<E> list, int offset, int limit)

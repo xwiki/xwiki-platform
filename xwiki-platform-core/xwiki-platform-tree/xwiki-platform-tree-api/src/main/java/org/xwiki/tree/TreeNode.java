@@ -40,6 +40,11 @@ public interface TreeNode
     String PROPERTY_ORDER_BY = "orderBy";
 
     /**
+     * The property that specifies the nodes to exclude.
+     */
+    String PROPERTY_EXCLUSIONS = "exclusions";
+
+    /**
      * Retrieve the children of the specified node.
      * 
      * @param nodeId the node id

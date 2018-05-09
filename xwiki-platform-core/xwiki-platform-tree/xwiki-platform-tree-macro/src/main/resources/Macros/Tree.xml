@@ -224,6 +224,7 @@
 #foreach ($parameterName in $xcontext.macro.params.parameterNames)
   #set ($discard = $options.put($parameterName, $xcontext.macro.params.get($parameterName)))
 #end
+#prepareTreeOptions($options)
 #set ($content = $xcontext.macro.content)
 #if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit' &amp;&amp; $editor == 'wysiwyg')
   #set ($content = "$services.icon.render('chart_organisation') $services.localization.render('tree.macro.editModeWarning')")
@@ -1114,6 +1115,72 @@
     </property>
     <property>
       <name>limit</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>13</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>73a55bc6-b99d-40e3-ac41-b9876cad31c9</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma. This has no effect on static trees.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>exclusions</name>
     </property>
   </object>
 </xwikidoc>

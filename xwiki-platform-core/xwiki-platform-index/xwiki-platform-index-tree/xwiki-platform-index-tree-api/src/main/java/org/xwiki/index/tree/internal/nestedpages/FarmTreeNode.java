@@ -22,7 +22,9 @@ package org.xwiki.index.tree.internal.nestedpages;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +33,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.tree.AbstractTreeNode;
+import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -45,7 +47,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named("farm")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class FarmTreeNode extends AbstractTreeNode
+public class FarmTreeNode extends AbstractEntityTreeNode
 {
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -70,7 +72,9 @@ public class FarmTreeNode extends AbstractTreeNode
     private Collection<String> getWikiIds()
     {
         try {
-            return this.wikiDescriptorManager.getAllIds();
+            Set<String> wikiIds = new LinkedHashSet<>(this.wikiDescriptorManager.getAllIds());
+            wikiIds.removeAll(getExcludedWikis());
+            return wikiIds;
         } catch (WikiManagerException e) {
             this.logger.warn("Failed to retrieve the list of wikis. Root cause [{}].",
                 ExceptionUtils.getRootCauseMessage(e));

@@ -41,12 +41,12 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 admin.wiki=Wiki
-admin.wiki.description=Décrivez votre wiki (pretty name et description) et définissez son propriétaire et sa page d'accueil
+admin.wiki.description=Décrivez votre wiki (pretty name et description) et définissez son propriétaire et sa page d'accueil.
 admin.wikis=Wikis
 admin.wikis.descriptor=Description
 platform.wiki.admin.wiki.csrfInvalidError=Clé de sécurité invalide (CSRF). Veuillez rafraîchir la page et essayer à nouveau.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Le nouvel utilisateur propriétaire n'existe pas ou peut provenir d'un autre wiki. Êtes-vous certain de vouloir continue en sauvegardant cette opération ?
-platform.wiki.admin.wiki.ownerWarning=Attention \: une fois que vous changerez ceci, le précédent propriétaire perdra ses droits de propriétaire. Assurez-vous de ne pas vous bloquer vous-même sur le wiki. Si cela se produit par erreur, vous devrez contacter les administrateurs du wiki principal ou utiliser le compte superadmin.
+platform.wiki.admin.wiki.ownerWarning=Attention : une fois que vous changerez ceci, le précédent propriétaire perdra ses droits de propriétaire. Assurez-vous de ne pas vous bloquer vous-même sur le wiki. Si cela se produit par erreur, vous devrez contacter les administrateurs du wiki principal ou utiliser le compte superadmin.
 platform.wiki.admin.wiki.requiredFieldsError=Propriétaire et page d'accueil sont des champs requis.
 </content>
 </xwikidoc>

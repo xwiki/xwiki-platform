@@ -190,8 +190,8 @@
 #foreach ($parameterName in $xcontext.macro.params.parameterNames)
   #set ($discard = $options.put($parameterName, $xcontext.macro.params.get($parameterName)))
 #end
-#prepareTreeOptions($options)
 {{html clean="false"}}
+#prepareTreeOptions($options)
 #documentTree($options)
 {{/html}}
 {{/velocity}}</code>

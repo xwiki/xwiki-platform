@@ -101,8 +101,21 @@ public interface WikiDescriptorManager
 
     /**
      * Save the given descriptor and all its property groups.
+     * 
      * @param descriptor descriptor to save
      * @throws WikiManagerException if problem occurs
      */
     void saveDescriptor(WikiDescriptor descriptor) throws WikiManagerException;
+
+    /**
+     * @param wikiId the identifier of the wiki
+     * @return true if the passed wiki reference is the main wiki
+     * @since 10.4RC1
+     */
+    default boolean isMainWiki(String wikiId)
+    {
+        // At least that way it will behave correctly in a single wiki setup. This default probably won't really be
+        // needed anyway.
+        return true;
+    }
 }

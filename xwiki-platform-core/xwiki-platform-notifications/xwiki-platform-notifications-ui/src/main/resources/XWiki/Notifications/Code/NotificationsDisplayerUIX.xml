@@ -298,7 +298,7 @@
   $(document).ready(function () {
 
     var container = $('.notifications-area');
-    macro = new XWikiNotificationsMacro(container, xm.userId, notificationsLimit, true, [], true);
+    macro = new XWikiNotificationsMacro(container, XWiki.Model.serialize(xm.userReference), notificationsLimit, true, [], true);
     getUnreadNotificationsCount();
     container.on('eventMarkedAsRead', function (notif) {
       updateNotificationCount(notificationCount - 1);

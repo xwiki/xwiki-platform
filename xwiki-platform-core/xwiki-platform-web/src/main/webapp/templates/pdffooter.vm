@@ -1,1 +1,1 @@
-$msg.Page <span class="page-number"></span> of <span class="page-total"></span> - $services.localization.render('lastmodifiedby') $xwiki.getUserName($tdoc.author, false) $services.localization.render('lastmodifiedon') $!xwiki.formatDate($tdoc.date)
+$msg.Page <span class="page-number"></span> / <span class="page-total"></span> - $services.localization.render('lastmodifiedby') $xwiki.getUserName($tdoc.author, false) $services.localization.render('lastmodifiedon') $!xwiki.formatDate($tdoc.date)

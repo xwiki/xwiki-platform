@@ -49,10 +49,9 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 ##
 ##
     #set ($formname = 'historyform')
-    <form id="$formname" action="$doc.getURL('view', "viewer=changes&amp;$docvariant")" method="post">
+    <form id="$formname" action="$doc.getURL('view', "viewer=changes&amp;$docvariant")" method="get">
       <div id="_history">
       ## CSRF prevention
-      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="language" value="$!xcontext.locale" />
       <table class="table table-striped table-hover responsive-table">
         <caption class="sr-only">$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])</caption>

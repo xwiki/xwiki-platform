@@ -108,7 +108,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result,
                 getXWikiContext());
         return (getRatingsConfiguration().getConfigurationParameter(documentRef,
-            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result) == "1");
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result).equals("1"));
     }
 
     /**

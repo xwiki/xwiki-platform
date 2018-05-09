@@ -12,16 +12,17 @@
 #end
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale"
   ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
-  ## http://platform.xwiki.org/xwiki/bin/view/DevGuide/JavaScriptAPI#HGetsomeinformationaboutthecurrentdocument
+  ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
   #xwikiDataAttribute('reference', $services.model.serialize($doc.documentReference, 'default'))
   #xwikiDataAttribute('document', $doc.fullName)##deprecated, use 'reference' instead
   #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'reference' instead
   #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
   #xwikiDataAttribute('page', $doc.name)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('version', $doc.version)
-  #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference))
+  #xwikiDataAttribute('version', $tdoc.version)
+  #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
-  #xwikiDataAttribute('user-id', $!services.model.serialize($xcontext.userReference, 'default'))>
+  #xwikiDataAttribute('user-id', $!services.model.serialize($xcontext.userReference, 'default'))
+  #xwikiDataAttribute('locale', $tdoc.locale)>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.

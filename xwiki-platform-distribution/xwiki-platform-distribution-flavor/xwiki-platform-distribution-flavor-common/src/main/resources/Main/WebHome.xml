@@ -70,7 +70,7 @@ Use the {{velocity}}$services.icon.render('home'){{/velocity}} breadcrumbs locat
 
 You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content and generally a place to experiment with your wiki's features. 
 
- {{box}}Learn more on how to use XWiki with the {{velocity}}[[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+ {{box}}Learn more on how to use XWiki with the {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
 
 |(((
 = Extend your wiki =

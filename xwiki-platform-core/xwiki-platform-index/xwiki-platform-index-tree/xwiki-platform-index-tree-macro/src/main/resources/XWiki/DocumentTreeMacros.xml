@@ -50,6 +50,11 @@
     #if ("$!valueFromRequest" != '')
       #if ($entry.value.getClass().getName() == 'java.lang.Boolean')
         #set ($entry.value = $valueFromRequest == 'true')
+      #elseif ($entry.value.iterator())
+        #set ($valuesFromRequest = $request.getParameterValues($entry.key))
+        #set ($discard = $entry.value.clear())
+        ## We need to convert the String[] to List&lt;String&gt; before calling addAll (which expects a collection).
+        #set ($discard = $entry.value.addAll($valuesFromRequest.subList(0, $valuesFromRequest.size())))
       #else
         #set ($entry.value = $valueFromRequest)
       #end

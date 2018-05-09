@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.url.resources;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import javax.inject.Singleton;
 
@@ -29,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTranslationResource;
 
 /**
  * @version $Id$
@@ -44,9 +46,23 @@ public class DocumentRestURLGenerator extends AbstractEntityRestURLGenerator<Doc
         // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
         // So it is consistent.
         try {
-            return Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),
-                getSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
+            Locale locale = reference.getLocale();
+            URL url;
+            // Get the URL of the translated document if the passed reference defines a Locale
+            if (locale != null && !locale.toString().isEmpty()) {
+                url =  Utils.createURI(getBaseURI(), PageTranslationResource.class,
+                    reference.getWikiReference().getName(), getSpaceList(reference.getLastSpaceReference()),
+                    reference.getName(), reference.getLocale()).toURL();
+            } else {
+                url = Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),
+                        getSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
+            }
+            return url;
         } catch (MalformedURLException e) {
+            // Note: The method getBaseURI() always return a valid URL (because it uses XWikiURLFactory#getServerURL()
+            // which is a URL). Thus calling Utils.createURI().toURL() should always return a valid URL normally.
+            // Thus getBaseURI() should probably be named getBaseURL() and Utils.createURI() should probaby be named
+            // Utils.createURL()...
             throw new XWikiRestException(
                 String.format("Failed to generate a REST URL for the document [%s].", reference), e);
         }

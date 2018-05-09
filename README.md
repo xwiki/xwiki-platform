@@ -1,19 +1,19 @@
 # XWiki Platform
 
-[XWiki Platform](http://platform.xwiki.org/xwiki/bin/view/Main/) is a generic wiki platform offering runtime services for applications built on top of it.
+[XWiki Platform](http://www.xwiki.org/xwiki/bin/view/Documentation/) is a generic wiki platform offering runtime services for applications built on top of it.
 
-XWiki Platform, XWiki Enterprise, XWiki Commons and XWiki Rendering are part of the [XWiki.org](http://www.xwiki.org/) software forge. They are released together and share the same version.
+XWiki Commons, XWiki Rendering and XWiki Platform are part of the [XWiki.org](http://www.xwiki.org/) software forge. They are released together and share the same version.
 
 ## Documentation
-* [API](http://platform.xwiki.org/xwiki/bin/view/DevGuide/API)
+* [API](http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/API/)
 * [Development Zone](http://dev.xwiki.org/xwiki/bin/view/Community/)
 * Guides:
-  * [Developer Guide](http://platform.xwiki.org/xwiki/bin/view/DevGuide/)
-  * [Administrator Guide](http://platform.xwiki.org/xwiki/bin/view/AdminGuide/)
-  * [User Guide](http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/)
+  * [Developer Guide](http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/)
+  * [Administrator Guide](http://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/)
+  * [User Guide](http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/)
 
 ## Download
-Read our [Download and Installation](http://enterprise.xwiki.org/xwiki/bin/view/Main/Download) instructions.
+Read our [Download and Installation](http://www.xwiki.org/xwiki/bin/view/Download/) instructions.
 
 ## Release Notes
 Read our [Release Notes](http://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).

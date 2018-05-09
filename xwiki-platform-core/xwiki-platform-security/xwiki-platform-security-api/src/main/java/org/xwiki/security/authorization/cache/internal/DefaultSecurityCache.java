@@ -779,45 +779,33 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     @Override
     public SecurityAccessEntry get(UserSecurityReference user, SecurityReference entity)
     {
-        this.invalidationReadLock.lock();
-
-        try {
-            SecurityCacheEntry entry = getEntry(user, entity);
-            if (entry == null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Miss read access entry for [{}].", getEntryKey(user, entity));
-                }
-                return null;
-            }
+        SecurityCacheEntry entry = getEntry(user, entity);
+        if (entry == null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Success read access entry for [{}].", getEntryKey(user, entity));
+                logger.debug("Miss read access entry for [{}].", getEntryKey(user, entity));
             }
-            return (SecurityAccessEntry) entry.getEntry();
-        } finally {
-            this.invalidationReadLock.unlock();
+            return null;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Success read access entry for [{}].", getEntryKey(user, entity));
+        }
+        return (SecurityAccessEntry) entry.getEntry();
     }
 
     @Override
     public SecurityRuleEntry get(SecurityReference entity)
     {
-        this.invalidationReadLock.lock();
-
-        try {
-            SecurityCacheEntry entry = getEntry(entity);
-            if (entry == null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Miss read rule entry for [{}].", getEntryKey(entity));
-                }
-                return null;
-            }
+        SecurityCacheEntry entry = getEntry(entity);
+        if (entry == null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Success read rule entry for [{}].", getEntryKey(entity));
+                logger.debug("Miss read rule entry for [{}].", getEntryKey(entity));
             }
-            return (SecurityRuleEntry) entry.getEntry();
-        } finally {
-            this.invalidationReadLock.unlock();
+            return null;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Success read rule entry for [{}].", getEntryKey(entity));
+        }
+        return (SecurityRuleEntry) entry.getEntry();
     }
 
     @Override

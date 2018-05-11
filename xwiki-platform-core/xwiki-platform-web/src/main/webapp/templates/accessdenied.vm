@@ -13,7 +13,7 @@ $services.localization.render('notallowed')
 <div class="main layoutsubsection">
 <div id="mainContentArea">
 #if ($xwiki.exists("XWiki.AccessDenied"))
-  $xwiki.includeForm("XWiki.AccessDenied",false)
+  $xwiki.includeForm("XWiki.AccessDenied", false)
 #else
   #if ($xwiki.isReadOnly())
     #xwikimessageboxstart($services.localization.render('error') $services.localization.render('readonly'))

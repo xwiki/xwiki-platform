@@ -99,6 +99,7 @@ public class DefaultWikiDescriptorManagerTest
         xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(xcontext.getMainXWiki()).thenReturn("xwiki");
+        when(xcontext.isMainWiki("xwiki")).thenReturn(true);
     }
 
     @Test
@@ -257,6 +258,13 @@ public class DefaultWikiDescriptorManagerTest
     public void getMainWikiId() throws Exception
     {
         assertEquals("xwiki", this.mocker.getComponentUnderTest().getMainWikiId());
+    }
+
+    @Test
+    public void isMainWiki() throws Exception
+    {
+        assertTrue(this.mocker.getComponentUnderTest().isMainWiki("xwiki"));
+        assertFalse(this.mocker.getComponentUnderTest().isMainWiki("notmainwiki"));
     }
 
     @Test

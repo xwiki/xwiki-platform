@@ -90,9 +90,10 @@ public class WikiTreeNode extends AbstractEntityTreeNode
             query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
         } else {
             // Query only the spaces table.
-            query = this.queryManager.createQuery(
-                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
+            query = this.queryManager.createQuery("select reference, 0 as terminal from XWikiSpace page "
+                + "where reference not in (:excludedSpaces) order by lower(name), name", Query.HQL);
         }
+        query.bindValue("excludedSpaces", this.getExcludedSpaces(wikiReference));
         query.setWiki(wikiReference.getName());
         query.setOffset(offset);
         query.setLimit(limit);

@@ -83,6 +83,8 @@ rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden 
 rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
 rendering.macro.documentTree.parameter.limit.name=Limit
 rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
+rendering.macro.documentTree.parameter.exclusions.name=Exclusions
+rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
 
 index.documentTree.empty=No pages found
 index.documentTree.more={0} more ...

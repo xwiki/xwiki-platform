@@ -4,6 +4,7 @@
   'contextMenu': false,
   'dragAndDrop': false,
   'edges': true,
+  'exclusions': $collectionstool.set,
   'finder': false,
   'icons': true,
   'limit': 15,
@@ -51,16 +52,12 @@
   #set ($discard = $attributes.put('class', $stringtool.join($classes, ' ')))
   #set ($discard = $attributes.put('data-responsive', true))
   #if ("$!macro.options.reference" != '')
-    #set ($defaultResourceParams = {
-      'limit': 15,
-      'root': '',
-      'showRoot': false
-    })
     #set ($resourceParams = {})
-    #foreach ($entry in $defaultResourceParams.entrySet())
-      #set ($value = $macro.options.get($entry.key))
-      #if ("$!value" != '' && $value != "$!entry.value")
-        #set ($discard = $resourceParams.put($entry.key, $value))
+    #foreach ($resourceParameterName in ['exclusions', 'limit', 'root', 'showRoot'])
+      #set ($value = $macro.options.get($resourceParameterName))
+      #set ($defaultValue = $defaultTreeOptions.get($resourceParameterName))
+      #if ("$!value" != '' && $value != "$!defaultValue")
+        #set ($discard = $resourceParams.put($resourceParameterName, $value))
       #end
     #end
     #set ($reference = $macro.options.reference)
@@ -91,4 +88,14 @@
   #set ($discard = $attributes.put('data-openTo', $macro.options.openTo))
   #set ($finder = $macro.options.finder == 'true')
   #set ($discard = $attributes.put('data-finder', $finder))
+#end
+
+#macro (prepareTreeOptions $options)
+  ## TODO: Add support for escaping the comma in the node id.
+  #set ($exclusions = $stringtool.split($options.exclusions, ','))
+  #if ($exclusions && $exclusions.size() > 0)
+    #set ($options.exclusions = $collectionstool.set)
+    ## We need to convert the String[] to a List<String> before calling addAll (which expects a collection).
+    #set ($discard = $options.exclusions.addAll($exclusions.subList(0, $exclusions.size())))
+  #end
 #end

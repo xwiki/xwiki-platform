@@ -151,6 +151,119 @@
                   }
                 },
                 "ignore" : [
+                  // Revapi bug, see https://github.com/revapi/revapi/issues/129
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.servlet.AsyncContext javax.servlet.ServletRequest::getAsyncContext() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getAsyncContext",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.servlet.ServletRequest::getAttributeNames() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "new": "method java.util.Enumeration javax.servlet.ServletRequest::getAttributeNames() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getAttributeNames",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.servlet.DispatcherType javax.servlet.ServletRequest::getDispatcherType() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getDispatcherType",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.util.Locale> javax.servlet.ServletRequest::getLocales() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "new": "method java.util.Enumeration javax.servlet.ServletRequest::getLocales() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "oldType": "java.util.Enumeration<java.util.Locale>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getLocales",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Map<java.lang.String, java.lang.String[]> javax.servlet.ServletRequest::getParameterMap() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "new": "method java.util.Map javax.servlet.ServletRequest::getParameterMap() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "oldType": "java.util.Map<java.lang.String, java.lang.String[]>",
+                    "newType": "java.util.Map",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getParameterMap",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.returnTypeTypeParametersChanged",
+                    "old": "method java.util.Enumeration<java.lang.String> javax.servlet.ServletRequest::getParameterNames() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "new": "method java.util.Enumeration javax.servlet.ServletRequest::getParameterNames() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "oldType": "java.util.Enumeration<java.lang.String>",
+                    "newType": "java.util.Enumeration",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getParameterNames",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.servlet.ServletContext javax.servlet.ServletRequest::getServletContext() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "getServletContext",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method boolean javax.servlet.ServletRequest::isAsyncStarted() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "isAsyncStarted",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method boolean javax.servlet.ServletRequest::isAsyncSupported() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "isAsyncSupported",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.servlet.AsyncContext javax.servlet.ServletRequest::startAsync() throws java.lang.IllegalStateException @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "startAsync",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method javax.servlet.AsyncContext javax.servlet.ServletRequest::startAsync(javax.servlet.ServletRequest, javax.servlet.ServletResponse) throws java.lang.IllegalStateException @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "package": "org.xwiki.wysiwyg.filter",
+                    "classSimpleName": "MutableServletRequest",
+                    "methodName": "startAsync",
+                    "elementKind": "method",
+                    "justification": "revapi bug"
+                  },
+
                   // Add more ignores below...
                   {
                     "code": "java.method.returnTypeChanged",

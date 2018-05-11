@@ -34,6 +34,9 @@
   <properties>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
+         runtime code -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
   <modules>
     <!-- Sorted Alphabetically -->

@@ -4,6 +4,7 @@
 
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
+  'exclusions': $collectionstool.set,
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
@@ -44,7 +45,7 @@
   })
   #foreach ($entry in $docTreeConfig.entrySet())
     #set ($value = $macro.options.get($entry.key))
-    #if ("$!value" != '' && $value != "$!entry.value")
+    #if ("$!value" != '' && $value != "$!entry.value" && !$defaultTreeOptions.containsKey($entry.key))
       #set ($discard = $resourceParams.put($entry.key, $value))
     #end
   #end

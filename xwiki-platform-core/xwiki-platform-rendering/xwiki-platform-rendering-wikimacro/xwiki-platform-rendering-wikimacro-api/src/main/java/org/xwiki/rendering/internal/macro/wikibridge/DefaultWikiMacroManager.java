@@ -42,6 +42,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default implementation of {@link WikiMacroManager}.
@@ -83,6 +84,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      */
     @Inject
     private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private WikiDescriptorManager wikis;
 
     /**
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
@@ -144,8 +148,16 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     {
         WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) wikiMacro.getDescriptor();
 
+        WikiMacroVisibility visibility = macroDescriptor.getVisibility();
+
+        // GLOBAL means WIKI on subwikis (only macro stored on main wiki are allowed to affect the whole farm)
+        if (visibility == WikiMacroVisibility.GLOBAL
+            && !this.wikis.isMainWiki(documentReference.getWikiReference().getName())) {
+            visibility = WikiMacroVisibility.WIKI;
+        }
+
         // Verify that the user has the right to register this wiki macro the chosen visibility
-        if (this.wikiMacroFactory.isAllowed(documentReference, macroDescriptor.getVisibility())) {
+        if (this.wikiMacroFactory.isAllowed(documentReference, visibility)) {
             DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<>();
             componentDescriptor.setRoleType(Macro.class);
             componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
@@ -156,17 +168,17 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             try {
                 // Put the proper context information to let components manager use the proper keys to find
                 // components to unregister
-                this.bridge.setCurrentUser(this.serializer.serialize(wikiMacro.getAuthorReference() != null ? wikiMacro
-                    .getAuthorReference() : this.bridge.getCurrentUserReference()));
+                this.bridge.setCurrentUser(this.serializer.serialize(wikiMacro.getAuthorReference() != null
+                    ? wikiMacro.getAuthorReference() : this.bridge.getCurrentUserReference()));
                 this.modelContext.setCurrentEntityReference(documentReference);
 
                 // Register the macro against the right Component Manager, depending on the defined macro visibility.
-                findComponentManager(macroDescriptor.getVisibility()).registerComponent(componentDescriptor, wikiMacro);
+                findComponentManager(visibility).registerComponent(componentDescriptor, wikiMacro);
                 this.wikiMacroMap.put(documentReference,
                     new WikiMacroData(componentDescriptor.getRoleHint(), wikiMacro));
             } catch (Exception e) {
                 throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
-                    wikiMacro.getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()), e);
+                    wikiMacro.getDescriptor().getId().getId(), documentReference, visibility), e);
             } finally {
                 // Restore previous context informations
                 this.bridge.setCurrentUser(currentUser);
@@ -174,8 +186,8 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             }
         } else {
             throw new InsufficientPrivilegesException(String.format(
-                "Unable to register macro [%s] in [%s] for visibility [%s] due to insufficient privileges", wikiMacro
-                    .getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()));
+                "Unable to register macro [%s] in [%s] for visibility [%s] due to insufficient privileges",
+                wikiMacro.getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()));
         }
     }
 
@@ -186,8 +198,16 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         if (macroData != null) {
             WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) macroData.getWikiMacro().getDescriptor();
 
+            WikiMacroVisibility visibility = macroDescriptor.getVisibility();
+
+            // GLOBAL means WIKI on subwikis (only macro stored on main wiki are allowed to affect the whole farm)
+            if (visibility == WikiMacroVisibility.GLOBAL
+                && !this.wikis.isMainWiki(documentReference.getWikiReference().getName())) {
+                visibility = WikiMacroVisibility.WIKI;
+            }
+
             // Verify that the user has the right to unregister this wiki macro for the chosen visibility
-            if (this.wikiMacroFactory.isAllowed(documentReference, macroDescriptor.getVisibility())) {
+            if (this.wikiMacroFactory.isAllowed(documentReference, visibility)) {
                 String currentUser = this.bridge.getCurrentUser();
                 EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
                 try {
@@ -197,21 +217,22 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                         .setCurrentUser(this.serializer.serialize(macroData.getWikiMacro().getAuthorReference()));
                     this.modelContext.setCurrentEntityReference(documentReference);
 
-                    findComponentManager(macroDescriptor.getVisibility()).unregisterComponent(Macro.class,
-                        macroData.getHint());
+                    findComponentManager(visibility).unregisterComponent(Macro.class, macroData.getHint());
                     this.wikiMacroMap.remove(documentReference);
                 } catch (Exception e) {
-                    throw new WikiMacroException(String.format("Failed to unregister macro [%s] in [%s] for "
-                        + "visibility [%s]", macroData.getHint(), documentReference, macroDescriptor.getVisibility()),
+                    throw new WikiMacroException(
+                        String.format("Failed to unregister macro [%s] in [%s] for " + "visibility [%s]",
+                            macroData.getHint(), documentReference, visibility),
                         e);
                 } finally {
                     this.bridge.setCurrentUser(currentUser);
                     this.modelContext.setCurrentEntityReference(currentEntityReference);
                 }
             } else {
-                throw new WikiMacroException(String.format("Unable to unregister macro [%s] in [%s] for visibility "
-                    + "[%s] due to insufficient privileges", macroData.getWikiMacro().getDescriptor().getId().getId(),
-                    documentReference, macroDescriptor.getVisibility()));
+                throw new WikiMacroException(String.format(
+                    "Unable to unregister macro [%s] in [%s] for visibility " + "[%s] due to insufficient privileges",
+                    macroData.getWikiMacro().getDescriptor().getId().getId(), documentReference,
+                    macroDescriptor.getVisibility()));
             }
         } else {
             throw new WikiMacroException(String.format("Macro in [%s] isn't registered", documentReference));

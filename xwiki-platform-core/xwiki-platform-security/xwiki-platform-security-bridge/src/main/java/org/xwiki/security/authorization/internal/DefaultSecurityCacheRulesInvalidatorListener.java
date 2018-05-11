@@ -43,7 +43,6 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.cache.SecurityCache;
-import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
@@ -83,9 +82,6 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
     /** The security reference factory. */
     @Inject
     private SecurityReferenceFactory securityReferenceFactory;
-
-    @Inject
-    private SecurityCacheRulesInvalidator invalidator;
 
     /** Document reference resolver. */
     @Inject
@@ -185,7 +181,6 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
     public void onEvent(Event event, Object source, Object data)
     {
         DocumentReference ref = getDocumentReference(source);
-        this.invalidator.suspend();
         try {
             deliverUpdateEvent(ref);
             if (isGroupDocument(source)) {
@@ -197,8 +192,6 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
             }
         } catch (AuthorizationException e) {
             this.logger.error("Failed to invalidate group members on the document: {}", ref, e);
-        } finally {
-            this.invalidator.resume();
         }
     }
 

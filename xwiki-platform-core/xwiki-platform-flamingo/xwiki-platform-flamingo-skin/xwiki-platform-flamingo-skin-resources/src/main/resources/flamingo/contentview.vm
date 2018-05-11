@@ -4,7 +4,7 @@ $services.progress.pushLevel(4)
 ### Display document contents in "view" mode.
 ###
 ## -------------------------------
-## Compute the content to display 
+## Compute the content to display
 ## -------------------------------
 $services.progress.startStep('Compute the content to display')
 #template("contentvars.vm")
@@ -23,9 +23,6 @@ $services.progress.endStep()
 $services.progress.startStep('Display the title and content')
 <div class="xcontent">
   #template('contentheader.vm')
-  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.after'))
-    $services.rendering.render($uix.execute(), 'xhtml/1.0')
-  #end
   ## --------------------------------------------------------------------------
   ## Drop permissions as they are no longer needed. This allows us not to have
   ## to review the code below for security holes since nothing bad can happen.

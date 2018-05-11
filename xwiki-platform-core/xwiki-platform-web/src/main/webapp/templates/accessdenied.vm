@@ -12,13 +12,17 @@ $services.localization.render('notallowed')
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-#if ($xwiki.isReadOnly())
-#xwikimessageboxstart($services.localization.render('error') $services.localization.render('readonly'))
+#if($xwiki.exists("XWiki.AccessDenied"))
+  $xwiki.includeForm("XWiki.AccessDenied",false)
 #else
-#xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
+  #if ($xwiki.isReadOnly())
+  #xwikimessageboxstart($services.localization.render('error') $services.localization.render('readonly'))
+  #else
+  #xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
+  #end
+  $!exception
+  #xwikimessageboxend()
 #end
-$!exception
-#xwikimessageboxend()
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main

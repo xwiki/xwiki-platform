@@ -4,7 +4,7 @@ $services.progress.pushLevel(4)
 ### Display document contents in "view" mode.
 ###
 ## -------------------------------
-## Compute the content to display 
+## Compute the content to display
 ## -------------------------------
 $services.progress.startStep('Compute the content to display')
 #template("contentvars.vm")

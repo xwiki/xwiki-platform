@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.script;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -136,5 +137,20 @@ public class NotificationFiltersScriptService implements ScriptService
     public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException
     {
         notificationFilterManager.setFilterPreferenceEnabled(filterPreferenceName, enabled);
+    }
+
+    /**
+     * Update the start date for every filter preference that current user has.
+     *
+     * @param startDate the new start date
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
+     */
+    public void setStartDate(Date startDate) throws NotificationException
+    {
+        notificationFilterManager.setStartDateForUser(documentAccessBridge.getCurrentUserReference(), startDate);
     }
 }

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -186,6 +187,12 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public Set<NotificationFormat> getFilterFormats()
     {
         return filterPreference.getFilterFormats();
+    }
+
+    @Override
+    public Date getStartingDate()
+    {
+        return filterPreference.getStartingDate();
     }
 
     @Override

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -304,4 +305,19 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         }
     }
 
+    @Override
+    public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
+    {
+        try {
+            List<NotificationFilterPreferenceProvider> providers
+                    = componentManager.getInstanceList(NotificationFilterPreferenceProvider.class);
+
+            for (NotificationFilterPreferenceProvider provider : providers) {
+                provider.setStartDateForUser(user, startDate);
+            }
+        } catch (ComponentLookupException e) {
+            throw new NotificationException(String.format("Unable to set the starting date for filter preferences"
+                    + " with user [%s].", user));
+        }
+    }
 }

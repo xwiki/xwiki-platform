@@ -19,7 +19,9 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -124,10 +126,17 @@ public class CachedModelBridge implements ModelBridge
         clearCache();
     }
 
+    @Override
+    public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
+    {
+        modelBridge.setStartDateForUser(user, startDate);
+        clearCache();
+    }
+
     private void clearCache()
     {
         ExecutionContext context = execution.getContext();
-        for (String key: context.getProperties().keySet()) {
+        for (String key: new ArrayList<>(context.getProperties().keySet())) {
             if (key.startsWith(USER_FILTER_PREFERENCES) || key.startsWith(USER_TOGGLEABLE_FILTER_PREFERENCES)) {
                 context.removeProperty(key);
             }

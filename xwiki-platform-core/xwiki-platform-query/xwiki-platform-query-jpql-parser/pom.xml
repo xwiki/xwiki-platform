@@ -66,10 +66,10 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/query/jpql/analysis/*.java,
-                org/xwiki/query/jpql/lexer/*.java,
-                org/xwiki/query/jpql/node/*.java,
-                org/xwiki/query/jpql/parser/*.java
+                org/xwiki/query/internal/jpql/analysis/*.java,
+                org/xwiki/query/internal/jpql/lexer/*.java,
+                org/xwiki/query/internal/jpql/node/*.java,
+                org/xwiki/query/internal/jpql/parser/*.java
               </excludes>
             </configuration>
           </execution>

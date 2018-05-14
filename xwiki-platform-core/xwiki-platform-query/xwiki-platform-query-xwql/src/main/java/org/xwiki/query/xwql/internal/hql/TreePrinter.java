@@ -19,8 +19,20 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
-import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
-import org.xwiki.query.jpql.node.*;
+import org.xwiki.query.internal.jpql.analysis.DepthFirstAdapter;
+import org.xwiki.query.internal.jpql.node.ABrConditionalPrimary;
+import org.xwiki.query.internal.jpql.node.ACollectionMemberExpression;
+import org.xwiki.query.internal.jpql.node.AConditionalFactor;
+import org.xwiki.query.internal.jpql.node.AFromClause;
+import org.xwiki.query.internal.jpql.node.ARangeVariableDeclaration;
+import org.xwiki.query.internal.jpql.node.ASelectStatement;
+import org.xwiki.query.internal.jpql.node.ASingleConditionalExpression;
+import org.xwiki.query.internal.jpql.node.ASingleConditionalTerm;
+import org.xwiki.query.internal.jpql.node.AWhereClause;
+import org.xwiki.query.internal.jpql.node.Node;
+import org.xwiki.query.internal.jpql.node.TLbr;
+import org.xwiki.query.internal.jpql.node.TRbr;
+import org.xwiki.query.internal.jpql.node.Token;
 import org.xwiki.query.xwql.internal.QueryContext;
 
 public class TreePrinter extends DepthFirstAdapter

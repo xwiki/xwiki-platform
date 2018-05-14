@@ -263,6 +263,12 @@
                     "elementKind": "method",
                     "justification": "revapi bug"
                   },
+                  {
+                    "regex": true,
+                    "code": "java\.class\.removed",
+                    "package": "org\.xwiki\.query\.jpql\..*",
+                    "justification": "Classes moved to the internal package as they were not supposed to be public"
+                  },
 
                   // Add more ignores below...
                   {

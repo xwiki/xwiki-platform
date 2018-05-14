@@ -20,6 +20,8 @@
 package org.xwiki.notifications.filters.internal.user;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,9 +34,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
@@ -102,9 +106,24 @@ public class EventUserFilter implements NotificationFilter
                 return not(value(EventProperty.USER).inStrings(users));
             }
         } else {
-            Collection<String> users = preferencesGetter.getFollowedUsers(filterPreferences, format);
-            if (!users.isEmpty()) {
-                return value(EventProperty.USER).inStrings(users);
+            Iterator<NotificationFilterPreference>
+                    iterator = preferencesGetter.getFollowedUsersPreferences(filterPreferences, format).iterator();
+            AbstractOperatorNode node = null;
+            while (iterator.hasNext()) {
+                NotificationFilterPreference pref = iterator.next();
+                List<String> users = pref.getProperties(NotificationFilterProperty.USER);
+                if (!users.isEmpty()) {
+                    AbstractOperatorNode thisNode = value(EventProperty.USER).inStrings(users).and(
+                            value(EventProperty.DATE).greaterThan(value(pref.getStartingDate())));
+                    if (node == null) {
+                        node = thisNode;
+                    } else {
+                        node = node.or(thisNode);
+                    }
+                }
+            }
+            if (node != null) {
+                return node;
             }
         }
 

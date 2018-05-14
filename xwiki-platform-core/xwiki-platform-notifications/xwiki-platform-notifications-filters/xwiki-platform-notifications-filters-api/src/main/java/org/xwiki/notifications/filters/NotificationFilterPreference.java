@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -90,4 +91,14 @@ public interface NotificationFilterPreference
      * @return a set of {@link NotificationFormat} for which the filter should be applied.
      */
     Set<NotificationFormat> getFilterFormats();
+
+    /**
+     * @return the date from which the filter preference is enabled.
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
+     */
+    default Date getStartingDate() {
+        return null;
+    };
 }

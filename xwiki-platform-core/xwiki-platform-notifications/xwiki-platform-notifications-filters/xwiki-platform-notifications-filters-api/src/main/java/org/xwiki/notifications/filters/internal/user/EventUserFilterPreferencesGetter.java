@@ -92,6 +92,21 @@ public class EventUserFilterPreferencesGetter
     /**
      * @param filterPreferences the collection of all preferences to take into account
      * @param format the notification format (could be null)
+     * @return the stream of preferences concerning users followed by the given user
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
+     */
+    public Stream<NotificationFilterPreference> getFollowedUsersPreferences(
+            Collection<NotificationFilterPreference> filterPreferences,
+            NotificationFormat format)
+    {
+        return getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE);
+    }
+
+    /**
+     * @param filterPreferences the collection of all preferences to take into account
+     * @param format the notification format (could be null)
      * @return the collection of excluded users by the given user
      */
     public Collection<String> getExcludedUsers(Collection<NotificationFilterPreference> filterPreferences,

@@ -165,7 +165,7 @@ if [ "$JAVA_VERSION" -lt 8 ]; then
   exit 0
 fi
 if [ "$JAVA_VERSION" -gt 8 ]; then
-  read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue? " -n 1 -r
+  read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
   fi

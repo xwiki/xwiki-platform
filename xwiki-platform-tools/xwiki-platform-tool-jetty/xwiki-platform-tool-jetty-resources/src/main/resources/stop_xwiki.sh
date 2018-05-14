@@ -124,10 +124,51 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
 # Check version of Java
-JAVA_VERSION=$(java -version 2>&1 | grep -i version | sed 's/.*version ".*\.\(.*\)\..*"/\1/; 1q')
+
+# Returns the Java version.
+# 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
+java_version() {
+  local result
+  local java_cmd
+  if [[ -n $(type -p java) ]]; then
+    java_cmd=java
+  elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
+    java_cmd="$JAVA_HOME/bin/java"
+  fi
+  local IFS=$'\n'
+  # remove \r for Cygwin
+  local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
+  if [[ -z $java_cmd ]]; then
+    result=no_java
+  else
+    for line in $lines; do
+      if [[ (-z $result) && ($line = *"version \""*) ]]; then
+        local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
+        # on macOS, sed doesn't support '?'
+        if [[ $ver = "1."* ]]; then
+          result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+        else
+          result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+        fi
+      fi
+    done
+  fi
+  echo "$result"
+}
+JAVA_VERSION="$(java_version)"
+if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
+  echo "No Java found. You need Java installed for XWiki to work."
+  exit 0
+fi
 if [ "$JAVA_VERSION" -lt 8 ]; then
   echo This version of XWiki requires Java 8 or greater.
   exit 0
+fi
+if [ "$JAVA_VERSION" -gt 8 ]; then
+  read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue? " -n 1 -r
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 0
+  fi
 fi
 
 [ ! -e $XWIKI_LOCK_FILE ] && echo "Lock file [${XWIKI_LOCK_FILE}] is missing. Aborting stop." && exit 0

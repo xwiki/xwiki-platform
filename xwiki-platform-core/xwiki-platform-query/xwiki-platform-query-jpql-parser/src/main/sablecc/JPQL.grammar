@@ -218,7 +218,8 @@ comparable_item =
     {path} path |
     {funcnum} functions_returning_numerics |
     {functime} functions_returning_datetime |
-    {funcstr} functions_returning_strings ;
+    {funcstr} functions_returning_strings |
+    {integer} integer_literal;
 
 subquery =
     simple_select_clause subquery_from_clause where_clause? groupby_clause? having_clause?;

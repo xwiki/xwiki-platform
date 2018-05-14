@@ -44,6 +44,11 @@ public class JPQLParserTest
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number");
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc");
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number asc");
+        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by 1 asc");
+
+        // group by
+        parser.parse("select doc.XWD_FULLNAME from Document doc group by doc.XWD_FULLNAME");
+        parser.parse("select doc.XWD_FULLNAME from Document doc group by 1");
 
         // member of
         parser.parse("select a from A as a where :param member of a.prop");

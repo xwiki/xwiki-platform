@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +54,8 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private Map<NotificationFilterProperty, List<String>> preferenceProperties;
 
+    private Date startingDate;
+
     /**
      * Constructs a new {@link DefaultNotificationFilterPreference} using the given filter preference name.
      *
@@ -79,6 +82,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.filterType = source.filterType;
         this.notificationFormats = source.notificationFormats;
         this.preferenceProperties = source.preferenceProperties;
+        this.startingDate = source.startingDate;
     }
 
     @Override
@@ -198,6 +202,20 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public Set<NotificationFormat> getFilterFormats()
     {
         return notificationFormats;
+    }
+
+    @Override
+    public Date getStartingDate()
+    {
+        return startingDate;
+    }
+
+    /**
+     * @param startingDate the date from which the filter preference is enabled
+     */
+    public void setStartingDate(Date startingDate)
+    {
+        this.startingDate = startingDate;
     }
 
     /**

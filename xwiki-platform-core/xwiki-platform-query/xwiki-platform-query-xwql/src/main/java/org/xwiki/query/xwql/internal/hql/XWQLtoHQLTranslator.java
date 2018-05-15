@@ -23,8 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.query.internal.jpql.node.Start;
 import org.xwiki.query.jpql.internal.JPQLParser;
-import org.xwiki.query.jpql.node.Start;
 import org.xwiki.query.xwql.internal.QueryAnalyzer;
 import org.xwiki.query.xwql.internal.QueryContext;
 import org.xwiki.query.xwql.internal.QueryTranslator;

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>10.4-SNAPSHOT</version>
+    <version>10.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -153,6 +153,9 @@
     <!-- The child modules don't provide APIs (those should be in xwiki-platform-core) so we don't need to check for
       backward compatibility breakages. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't cloverify distribution code since there should be no code and we don't want to include any test or
+         tools used to build the distributions in the global TPC we computed. We want only runtime code -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not
@@ -163,28 +166,28 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -195,29 +198,29 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -229,13 +232,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>10.4-SNAPSHOT</version>
+        <version>10.5-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>

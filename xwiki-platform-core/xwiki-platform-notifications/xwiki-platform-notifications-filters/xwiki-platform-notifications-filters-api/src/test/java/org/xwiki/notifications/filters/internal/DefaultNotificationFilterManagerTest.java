@@ -22,6 +22,7 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -277,5 +278,24 @@ public class DefaultNotificationFilterManagerTest
                 eq("myFilter1"), eq(true));
         verify(testProvider, times(1)).setFilterPreferenceEnabled(
                 eq("myFilter2"), eq(false));
+    }
+
+    @Test
+    public void setStartDateForUser() throws Exception
+    {
+        NotificationFilterPreferenceProvider provider1 = mock(NotificationFilterPreferenceProvider.class);
+        NotificationFilterPreferenceProvider provider2 = mock(NotificationFilterPreferenceProvider.class);
+        when(componentManager.getInstanceList(NotificationFilterPreferenceProvider.class))
+                .thenReturn(Arrays.asList(provider1, provider2));
+
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        Date date = new Date();
+
+        // Test
+        mocker.getComponentUnderTest().setStartDateForUser(user, date);
+
+        // Checks
+        verify(provider1).setStartDateForUser(eq(user), eq(date));
+        verify(provider2).setStartDateForUser(eq(user), eq(date));
     }
 }

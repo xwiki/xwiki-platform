@@ -97,6 +97,7 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(true);
+        filterPreference.setStartingDate(new Date());
 
         // Properties
         Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
@@ -120,6 +121,7 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
+        filterPreference.setStartingDate(new Date());
 
         // Properties
         Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();

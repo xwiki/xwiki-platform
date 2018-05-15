@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
@@ -69,4 +70,17 @@ public interface NotificationFilterPreferenceProvider
      * @since 9.8RC1
      */
     void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException;
+
+    /**
+     * Update the start date for every notification preference that the user has.
+     *
+     * @param user the user to use
+     * @param startDate the new start date
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
+     */
+    void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
 }

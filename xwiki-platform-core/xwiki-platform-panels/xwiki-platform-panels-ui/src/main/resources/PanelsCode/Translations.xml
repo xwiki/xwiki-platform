@@ -49,7 +49,17 @@ platform.panels.applications.ajax.csrf=CSRF validation failed. Try reloading the
 platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.error=Failed to save your change(s).
 admin.panels.applications=Applications Panel
-admin.panels.applications.description=Manage what applications are displayed in the Applications Panel.</content>
+admin.panels.applications.description=Manage what applications are displayed in the Applications Panel.
+
+admin.panels.navigation=Navigation Panel
+admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
+PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
+PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
+PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
   <object>
     <name>PanelsCode.Translations</name>
     <number>0</number>

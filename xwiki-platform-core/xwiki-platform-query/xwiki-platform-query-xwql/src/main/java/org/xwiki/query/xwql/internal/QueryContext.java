@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.query.jpql.node.PPath;
-import org.xwiki.query.jpql.node.PXObjectDecl;
-import org.xwiki.query.jpql.node.Start;
+import org.xwiki.query.internal.jpql.node.PPath;
+import org.xwiki.query.internal.jpql.node.PXObjectDecl;
+import org.xwiki.query.internal.jpql.node.Start;
 
 /**
  * Contains information retrieved from query.

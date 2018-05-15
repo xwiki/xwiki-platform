@@ -63,7 +63,7 @@ public class FlamingoThemeTest extends AbstractTest
         administrationPage = AdministrationPage.gotoPage();
         presentationAdministrationSectionPage = administrationPage.clickThemesSection();
 
-        // Select the 'Charcoal' color theme
+        // Select a color theme
         presentationAdministrationSectionPage.setColorTheme(getTestMethodName());
         assertEquals(getTestMethodName(), presentationAdministrationSectionPage.getCurrentColorTheme());
 

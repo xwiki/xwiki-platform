@@ -661,14 +661,14 @@ public class InternalTemplateManager
         renderFromSkin(templateName, null, writer);
     }
 
-    public void renderFromSkin(final String templateName, ResourceRepository reposirory, final Writer writer)
+    public void renderFromSkin(final String templateName, ResourceRepository repository, final Writer writer)
         throws Exception
     {
         this.progress.startStep(templateName, "template.render.message", "Render template [{}]", templateName);
 
         try {
             final Template template =
-                reposirory != null ? getTemplate(templateName, reposirory) : getTemplate(templateName);
+                repository != null ? getTemplate(templateName, repository) : getTemplate(templateName);
 
             if (template != null) {
                 if (template.getContent().isAuthorProvided()) {

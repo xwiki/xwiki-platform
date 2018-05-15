@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -100,6 +101,8 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String FIELD_FILTER_FORMATS = "filterFormats";
 
+    private static final String FIELD_STARTING_DATE = "startingDate";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -147,6 +150,7 @@ public class DefaultModelBridge implements ModelBridge
                         notificationFilterPreference.setFilterType(filterType);
                         notificationFilterPreference.setNotificationFormats(filterFormats);
                         notificationFilterPreference.setPreferenceProperties(filterPreferenceProperties);
+                        notificationFilterPreference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));
 
                         preferences.add(notificationFilterPreference);
                     }
@@ -321,6 +325,44 @@ public class DefaultModelBridge implements ModelBridge
         }
     }
 
+    @Override
+    public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
+    {
+        // Usual XWiki objects
+        XWikiContext context = contextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        final DocumentReference notificationFilterPreferenceClass
+                = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
+
+        try {
+            XWikiDocument doc = xwiki.getDocument(user, context);
+
+            List<BaseObject> preferencesObj = doc.getXObjects(notificationFilterPreferenceClass);
+            if (preferencesObj == null) {
+                return;
+            }
+            boolean needSave = false;
+            for (BaseObject object : preferencesObj) {
+                if (object == null) {
+                    continue;
+                }
+                object.setDateValue(FIELD_STARTING_DATE, startDate);
+                needSave = true;
+            }
+            if (needSave) {
+                // Make this change a minor edit so it's not displayed, by default, in notifications
+                xwiki.saveDocument(doc, "Save notification filter preferences starting date.", true,
+                        context);
+            }
+        } catch (Exception e) {
+            throw new NotificationException(
+                    String.format("Failed to save the notification preferences starting date for the user [%s].", user),
+                    e
+            );
+        }
+    }
+
     /**
      * Update existing XObjects with the values contained in the map of filter preferences.
      *
@@ -405,6 +447,7 @@ public class DefaultModelBridge implements ModelBridge
                 filterPreference.getProperties(NotificationFilterProperty.WIKI));
         obj.setDBStringListValue(FIELD_USERS,
                 filterPreference.getProperties(NotificationFilterProperty.USER));
+        obj.setDateValue(FIELD_STARTING_DATE, filterPreference.getStartingDate());
     }
 
     private List<String> toCollectionOfStrings(Collection<NotificationFormat> formats)

@@ -35,10 +35,11 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MinorEventNotificationFilterTest
+public class MinorEventAlertNotificationFilterTest
 {
     @Rule
     public final MockitoComponentMockingRule<MinorEventAlertNotificationFilter> mocker =
@@ -82,6 +83,16 @@ public class MinorEventNotificationFilterTest
     }
 
     @Test
+    public void filterExpressionWithWrongParameters() throws Exception
+    {
+        DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
+        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+                        NotificationFilterType.INCLUSIVE, NotificationFormat.ALERT));
+        assertNull(mocker.getComponentUnderTest().filterExpression(randomUser, Collections.emptyList(),
+                NotificationFilterType.EXCLUSIVE, NotificationFormat.EMAIL));
+    }
+
+    @Test
     public void matchesPreference() throws Exception
     {
         assertFalse(mocker.getComponentUnderTest().matchesPreference(mock(NotificationPreference.class)));
@@ -91,5 +102,12 @@ public class MinorEventNotificationFilterTest
     public void getName() throws Exception
     {
         assertEquals(MinorEventAlertNotificationFilter.FILTER_NAME, mocker.getComponentUnderTest().getName());
+    }
+
+    @Test
+    public void getFormats() throws Exception
+    {
+        assertEquals(1, mocker.getComponentUnderTest().getFormats().size());
+        assertTrue(mocker.getComponentUnderTest().getFormats().contains(NotificationFormat.ALERT));
     }
 }

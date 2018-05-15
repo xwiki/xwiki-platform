@@ -19,10 +19,10 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
-import org.xwiki.query.jpql.node.APath;
-import org.xwiki.query.jpql.node.PPath;
-import org.xwiki.query.jpql.node.PSelectExpression;
-import org.xwiki.query.jpql.node.TId;
+import org.xwiki.query.internal.jpql.node.APath;
+import org.xwiki.query.internal.jpql.node.PPath;
+import org.xwiki.query.internal.jpql.node.PSelectExpression;
+import org.xwiki.query.internal.jpql.node.TId;
 import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
 
 public class PropertyPrinter

@@ -40,6 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+administration.templateProvider.creationRestrictions=Restrictions de création
 administration.templateProvider.creationRestrictions.none=Ce modèle peut créer des pages partout
 administration.templateProvider.description=Description
 administration.templateProvider.icon=icône

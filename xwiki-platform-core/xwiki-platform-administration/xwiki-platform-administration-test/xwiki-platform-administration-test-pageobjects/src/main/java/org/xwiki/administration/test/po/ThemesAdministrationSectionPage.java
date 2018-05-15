@@ -25,6 +25,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.text.StringUtils;
 
 /**
  * Represents the actions possible on the Themes administration section.
@@ -92,6 +93,8 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
                 break;
             }
         }
+        // Waiting to be sure the change is effective
+        getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
     }
 
     /**

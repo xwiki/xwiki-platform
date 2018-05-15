@@ -1,10 +1,10 @@
 ###############################################################
 ## Contains various standard Velocity macros automatically
 ## loaded and usable everywhere (in Velocity).
-## 
+##
 ## It actually extends the macros.vm defined in the templates
 ## directory by redefining or adding new macros.
-## 
+##
 ## Note that if you modify that file you will need to restart.
 ###############################################################
 
@@ -489,6 +489,14 @@ $displayName##
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table) {
+   ## Make sure the "doc.location" property output is HTML in case the collist contains "doc.location"
+   #if($collist != $NULL && $collist.indexOf("doc.location") >=0)
+     #if (!$colprops["doc.location"])#set ($colprops["doc.location"] = {})#end
+     #if ($colprops["doc.location"].html == $NULL)
+       #set ($colprops["doc.location"].html = true)
+     #end
+   #end
+
   // This callback method has been generated from Velocity.
   ## Translate the column descriptor.
   #foreach ($entry in $colprops.entrySet())

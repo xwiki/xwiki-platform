@@ -489,11 +489,17 @@ $displayName##
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table) {
-   ## Make sure the "doc.location" property output is HTML in case the collist contains "doc.location"
-   #if($collist != $NULL && $collist.indexOf("doc.location") >=0)
-     #if (!$colprops["doc.location"])#set ($colprops["doc.location"] = {})#end
-     #if ($colprops["doc.location"].html == $NULL)
-       #set ($colprops["doc.location"].html = true)
+   ## Make sure the columns containing HTML are formatted in HTML indeed
+   #set ($htmlColumnKeys = ['doc.location'])
+   #foreach($htmlColumnKey in $htmlColumnKeys)
+     console.log("Col keys: $collist")
+     #if ($collist.contains($htmlColumnKey))
+       #if (!$colprops[$htmlColumnKey])
+         #set ($colprops[$htmlColumnKey] = {})
+       #end
+       #if ($colprops[$htmlColumnKey].html == $NULL)
+         #set ($colprops[$htmlColumnKey].html = true)
+       #end
      #end
    #end
 

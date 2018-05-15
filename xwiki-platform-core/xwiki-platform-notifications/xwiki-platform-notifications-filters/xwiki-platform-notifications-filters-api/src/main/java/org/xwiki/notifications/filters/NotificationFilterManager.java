@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -186,4 +187,17 @@ public interface NotificationFilterManager
      * @since 9.8RC1
      */
     void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled) throws NotificationException;
+
+    /**
+     * Update the start date for every filter preference that the user has.
+     *
+     * @param user the user to use
+     * @param startDate the new start date
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
+     */
+    void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
 }

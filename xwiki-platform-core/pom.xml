@@ -643,6 +643,24 @@
                     "methodName": "getAllFilters",
                     "elementKind": "method",
                     "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterManager::setStartDateForUser(org.xwiki.model.reference.DocumentReference, java.util.Date) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterManager",
+                    "methodName": "setStartDateForUser",
+                    "elementKind": "method",
+                    "justification": "Young API"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.notifications.filters.NotificationFilterPreferenceProvider::setStartDateForUser(org.xwiki.model.reference.DocumentReference, java.util.Date) throws org.xwiki.notifications.NotificationException",
+                    "package": "org.xwiki.notifications.filters",
+                    "classSimpleName": "NotificationFilterPreferenceProvider",
+                    "methodName": "setStartDateForUser",
+                    "elementKind": "method",
+                    "justification": "Young API"
                   }
                 ]
               }

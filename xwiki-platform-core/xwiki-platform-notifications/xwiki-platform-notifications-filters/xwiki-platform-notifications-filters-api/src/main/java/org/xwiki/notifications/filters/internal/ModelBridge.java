@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,4 +89,17 @@ public interface ModelBridge
      */
     void saveFilterPreferences(DocumentReference user, Collection<NotificationFilterPreference> filterPreferences)
         throws NotificationException;
+
+    /**
+     * Update the start date for every notification preference that the user has.
+     *
+     * @param user the user to use
+     * @param startDate the new start date
+     * @throws NotificationException if an error occurs
+     *
+     * @since 10.5RC1
+     * @since 10.4
+     * @since 9.11.5
+     */
+    void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException;
 }

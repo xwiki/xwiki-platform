@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -77,5 +78,11 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
     {
         modelBridge.setFilterPreferenceEnabled(documentAccessBridge.getCurrentUserReference(),
                 filterPreferenceName, enabled);
+    }
+
+    @Override
+    public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
+    {
+        modelBridge.setStartDateForUser(user, startDate);
     }
 }

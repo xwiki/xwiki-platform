@@ -90,5 +90,6 @@ public class NotificationFilterPreferenceDocumentInitializer extends AbstractMan
                 true, StringUtils.EMPTY, INPUT, SEPARATORS);
         xclass.addStaticListField("wikis", "Wikis", 64, true,
                 true, StringUtils.EMPTY, INPUT, SEPARATORS);
+        xclass.addDateField("startingDate", "Starting date");
     }
 }

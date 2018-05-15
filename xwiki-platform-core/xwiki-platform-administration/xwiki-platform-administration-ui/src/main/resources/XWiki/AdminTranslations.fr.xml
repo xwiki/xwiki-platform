@@ -104,5 +104,7 @@ admin.themes.description=Personnaliser les thèmes de couleurs et d'icônes ains
 XWiki.XWikiPreferences_meta.hint=Définit les méta données ajoutées à chaque page et contenant la description de la page, l'auteur, les mots-clefs, etc.
 administration.section.export.backupPack.hint=Définit si le package est une sauvegarde. Cette option n'influe pas sur le contenu des pages mais pré-sélectionne l'option "Importer le package comme une sauvegarde" lors de l'import. Lors de l'import d'un package de sauvegarde, l'auteur est conservé. Au contraire lors de l'import d'un package normal l'utilisateur effectuant l'import devient automatiquement le dernier auteur des pages importées.
 XWiki.Registration_liveValidation_enabled.hint=Définir à Faux pour désactiver la validation temps-réel en code JavaScript (les champs seront toujours validés côté serveur).
+# Import Section
+administration.section.import.hint=Commencez par télécharger un nouveau package ou par sélectionner un package dans la liste. Le contenu du package sélectionné sera affiché sur la droite avec les options d'import.
 </content>
 </xwikidoc>

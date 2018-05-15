@@ -40,8 +40,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-XWiki.Registration_defaultRedirect.hint=URL vers laquelle l'utilisateur sera redirigé après avoir cliqué sur le bouton de Connexion et si le paramètre xredirect n'est pas renseigné. Vous pouvez indiquer du code Velocity.
-XWiki.Registration_registrationSuccessMessage.hint=Affiché à l'utilisateur en fin de procédure d'enregistrement. Vous pouvez indiquer du code Velocity.
+XWiki.Registration_defaultRedirect.hint=URL vers laquelle l'utilisateur sera redirigé après avoir cliqué sur le bouton de Connexion si le paramètre xredirect n'est pas renseigné. Vous pouvez indiquer du code Velocity.
+XWiki.Registration_registrationSuccessMessage.hint=Affiché à l'utilisateur en fin de procédure d'inscription. Vous pouvez indiquer du code Velocity.
 XWiki.Registration_requireCaptcha.hint=Activer pour exiger de l'utilisateur la saisie d'un CAPTCHA lors de son enregistrement.
 XWiki.XWikiPreferences_colorTheme.hint=Indique le thème de couleurs à utiliser par défaut.
 XWiki.XWikiPreferences_confirmation_email_content.hint=Modèle de mail envoyé aux utilisateurs après validation de leur adresse email grâce au lien présent dans le premier mail reçu.
@@ -51,7 +51,7 @@ XWiki.XWikiPreferences_editcomment.hint=Permet de saisir un message lors de la c
 XWiki.XWikiPreferences_editcomment_mandatory.hint=Avant l'enregistrement d'une page modifiée, un résumé de la version sera demandé.
 XWiki.XWikiPreferences_editor.hint=Sélectionnez l'éditeur à utiliser par défaut lors de la modification d'une page.
 XWiki.XWikiPreferences_iconTheme.hint=Indique le thème d'icônes à utiliser par défaut.
-XWiki.XWikiPreferences_invitation_email_content.hint=Modèle de message envoyé aux utilisateurs invités à s'enregistrer.
+XWiki.XWikiPreferences_invitation_email_content.hint=Modèle de message envoyé aux utilisateurs invités à s'inscrire.
 XWiki.XWikiPreferences_languages.hint=Sélectionnez les langues qui seront disponibles pour les utilisateurs, ils seront capable d'afficher les articles du wiki dans ces langues (si le mode 'multilingue' est activé).
 XWiki.XWikiPreferences_minoredit.hint=Autorise la gestion des versions majeures (X.1) et mineures (1.Y) des pages. Les versions mineures sont visibles grâce au bouton "Afficher les modifications mineures" dans l'historique de la page.
 XWiki.XWikiPreferences_multilingual.hint=Active le mode multi-langues si le contenu de votre wiki est multi-langues. Cela permettra aux utilisateurs de traduire les pages du wiki et d'utiliser l'interface dans la langue de leur choix.
@@ -80,17 +80,18 @@ administration.menu.search.noResults=Aucun résultat.
 administration.section.analytics.status=Status
 administration.section.export.author.hint=Auteur du package.
 administration.section.export.description.hint=Description du package affiché lors de l'import
-administration.section.export.licence.hint=Licence du contenu. Par exemple \: LGPL, GPLV2, etc.
+administration.section.export.licence.hint=Licence du contenu. Par exemple : LGPL, GPLV2, etc.
 administration.section.export.packageName.hint=Nom du fichier d'archive généré avec le contenu exporté.
 administration.section.export.version.hint=Version du package.
 administration.section.export.withHistory.hint=Inclure l'historique de la page dans l'export. Sinon seule la dernière version est exportée.
-administration.sectionTitle=Administration \: {0}
-administration.sectionTitle.global=Administration globale \: {0} 
-administration.sectionTitle.page=Administration de la page \: {0}
-administration.sectionTitle.wiki=Administration du wiki \: {0}
+administration.sectionTitle=Administration : {0}
+administration.sectionTitle.global=Administration globale : {0} 
+administration.sectionTitle.page=Administration de la page : {0}
+administration.sectionTitle.wiki=Administration du wiki : {0}
 administration.title=Administration
 administration.title.global=Administration globale
 administration.title.page=Administration de la page
 administration.title.wiki=Administration du wiki
+XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par mail pour se connecter.
 </content>
 </xwikidoc>

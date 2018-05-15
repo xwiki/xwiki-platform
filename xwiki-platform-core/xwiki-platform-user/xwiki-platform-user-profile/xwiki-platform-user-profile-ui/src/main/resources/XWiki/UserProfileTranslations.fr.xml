@@ -45,5 +45,6 @@ XWiki.XWikiUsers_editor.hint=Choisissez l'éditeur par défaut, celui-ci remplac
 XWiki.XWikiUsers_timezone.hint=Indiquez un fuseau horaire afin que les dates et heures soient adaptées à votre position géographique.
 XWiki.XWikiUsers_usertype.hint=Choisissez quel type d'utilisateur sera celui par défaut. Les utilisateurs avancés auront accès à plusieurs fonctionnalités d'édition, de création de page terminal, etc.
 userprofile.default=Par défaut
+XWiki.XWikiUsers_accessibility.hint=L'accessibilité apportera diverses améliorations comme : caractères plus gros, liens soulignés, etc.
 </content>
 </xwikidoc>

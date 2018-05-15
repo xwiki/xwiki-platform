@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 dashboard.gadgetEditor.changeGadget.label=Changer de gadget
-dashboard.gadgetEditor.gadgetTitle.hint=Le titre du gadget apparaît en haut du panneau gadget sur le tableau de bord (il peut contenir du code velocity).
+dashboard.gadgetEditor.gadgetTitle.hint=Le titre de ce gadget apparaît en haut du panneau gadget sur le tableau de bord (il peut contenir du code velocity).
 dashboard.gadgetEditor.gadgetTitle.label=Titre du gadget
 dashboard.gadgetEditor.title=Modifier le gadget
 dashboard.gadgetSelector.title=Sélectionnez le gadget

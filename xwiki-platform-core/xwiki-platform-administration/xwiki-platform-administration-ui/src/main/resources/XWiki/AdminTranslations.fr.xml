@@ -106,7 +106,7 @@ administration.section.export.backupPack.hint=Définit si le package est une sau
 XWiki.Registration_liveValidation_enabled.hint=Définir à Faux pour désactiver la validation temps-réel en code JavaScript (les champs seront toujours validés côté serveur).
 # Import Section
 administration.section.import.hint=Commencez par télécharger un nouveau package ou par sélectionner un package dans la liste. Le contenu du package sélectionné sera affiché sur la droite avec les options d'import.
-XWiki.Registration_loginButton_autoLogin_enabled.hint=Si le bouton de connexion est actif, vous pouvez ajouter un bout de code JavaScript pour exécuter le bouton à la place de l'utilisateur.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Si le bouton de connexion est actif, vous pouvez ajouter un bout de code JavaScript pour exécuter ce bouton à la place de l'utilisateur.
 XWiki.XWikiPreferences_skin.hint=Définit le thème utilisé par défaut : un thème du système de fichiers (par exemple "flamingo") ou un thème personnalisé (par exemple "XWiki.DefaultSkin")
 </content>
 </xwikidoc>

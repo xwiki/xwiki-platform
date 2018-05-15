@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="TourCode.TourTranslations" locale="hr">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1432625750000</creationDate>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1455789494000</date>
+  <contentUpdateDate>1455789494000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language hr generated from http://www.l10n.xwiki.org
+TourCode.StepClass_action=Odredišna akcija
+TourCode.StepClass_backdrop=Kulisa
+TourCode.StepClass_content=Sadržaj
+TourCode.StepClass_element=Element (CSS odabirač koji identificira element)
+TourCode.StepClass_order=Poredak
+TourCode.StepClass_placement=Smještaj
+TourCode.StepClass_queryString=Niz znakova za upit
+TourCode.StepClass_targetPage=Odredišna stranica
+TourCode.StepClass_title=Naslov
+TourCode.TourClass_description=Opis
+TourCode.TourClass_isActive=Aktivno
+TourCode.TourClass_targetPage=Odredišna stranica
+tour.app.name=Obilazak
+tour.livetable._actions=Akcije
+tour.livetable._actions.delete=Obriši
+tour.livetable._actions.edit=Uredi
+tour.livetable._actions.launch=Pokreni
+tour.livetable.description=Opis
+tour.livetable.doc.title=Ime obilaska
+tour.livetable.emptyvalue=-
+tour.livetable.isActive=Aktivno
+tour.livetable.targetClass=Odredišna klasa
+tour.livetable.targetPage=Odredišna stranica
+tour.popover.end=Završi obilazak
+tour.popover.next=Sljedeće »
+tour.popover.previous=« Prethodno
+tour.popover.show=Prikaži obilazak
+tour.popover.show.hint=U bilo kojem trenutku možete klikanjem na ovaj gumb ponovo pokrenuti obilazak
+tour.steps=Koraci
+tour.steps.add_step=Dodaj korak
+tour.steps.delete=Obriši
+tour.steps.delete_confirm=Jeste li sigurni da želite obrisati korak?
+tour.steps.delete_done=Brisanje koraka obavljeno\!
+tour.steps.deleting=Brisanje koraka...
+tour.steps.edit=Uredi
+tour.steps.edit_step=Uredi korak
+tour.steps.new_step=Novi korak
+tour.steps.no=Ne
+tour.steps.save_step=Spremi
+tour.steps.yes=Da
+tour.template.description=Obilazak korak po korak
+tour.template.name=Obilazak
+tour.upgrade.successList=Uspješno su pretvorene sljedeće stranice\:
+tour.upgrade.successNothing=Nema ničega za nadograditi\!
+tour.upgrade.title=Nadogradnja
+</content>
+</xwikidoc>

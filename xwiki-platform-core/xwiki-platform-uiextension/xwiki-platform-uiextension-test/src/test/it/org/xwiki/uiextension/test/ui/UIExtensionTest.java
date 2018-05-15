@@ -77,7 +77,8 @@ public class UIExtensionTest extends AbstractTest
 
         // Test Wiki UI extension
 
-        Page extensionsPage = getUtil().rest().page(new LocalDocumentReference(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE));
+        Page extensionsPage =
+            getUtil().rest().page(new LocalDocumentReference(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE));
         Objects objects = new Objects();
         extensionsPage.setObjects(objects);
         Object object = RestTestUtils.object(WikiUIExtensionConstants.CLASS_REFERENCE_STRING);

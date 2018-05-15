@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-query</artifactId>
-    <version>10.4-SNAPSHOT</version>
+    <version>10.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query-jpql-parser</artifactId>
   <name>XWiki Platform - Query - JPQL Parser</name>
@@ -66,10 +66,10 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/query/jpql/analysis/*.java,
-                org/xwiki/query/jpql/lexer/*.java,
-                org/xwiki/query/jpql/node/*.java,
-                org/xwiki/query/jpql/parser/*.java
+                org/xwiki/query/internal/jpql/analysis/*.java,
+                org/xwiki/query/internal/jpql/lexer/*.java,
+                org/xwiki/query/internal/jpql/node/*.java,
+                org/xwiki/query/internal/jpql/parser/*.java
               </excludes>
             </configuration>
           </execution>

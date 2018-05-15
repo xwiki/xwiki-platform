@@ -123,6 +123,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
             {
                 allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki"));
+                allowing(mockWikiDescriptorManager).isMainWiki("wiki");
+                will(returnValue(true));
                 allowing(mockCurrentDocumentReferenceProvider).get();
                 will(returnValue(new DocumentReference("wiki", "space", "document")));
                 allowing(mockCurrentSpaceReferenceProvider).get();

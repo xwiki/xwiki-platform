@@ -126,12 +126,38 @@
 #panelheader($services.localization.render('xe.panels.navigation'))
 ## Escape special characters in macro parameter values.
 #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
-{{documentTree showTranslations="false" showAttachments="false" compact="true" openTo="document:$openToDoc" /}}
+## Apply the configured page exclusions.
+#set ($config = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
+#set ($exclusions = $collectionstool.set)
+#if ($config.getValue('excludeTopLevelExtensionPages') == 1)
+  #set ($query = $services.query.hql('select space.name from XWikiSpace space where space.parent is null'))
+  #set ($discard = $query.addFilter('hidden/space'))
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #foreach ($result in $query.execute())
+    #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
+    #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
+    #if ($installedExtensions &amp;&amp; $installedExtensions.size() &gt; 0
+        &amp;&amp; !$services.extension.xar.isEditAllowed($documentReference))
+      #set ($discard = $exclusions.add("document:$documentReference"))
+    #end
+  #end
+  #foreach ($inclusion in $config.getValue('inclusions'))
+    #set ($documentReference = $services.model.resolveDocument($inclusion))
+    #set ($discard = $exclusions.remove("document:$documentReference"))
+  #end
+#end
+#foreach ($exclusion in $config.getValue('exclusions'))
+  #set ($documentReference = $services.model.resolveDocument($exclusion))
+  #set ($discard = $exclusions.add("document:$documentReference"))
+#end
+#set ($exclusions = $stringtool.join($exclusions, ','))
+{{documentTree showTranslations="false" showAttachments="false" compact="true" openTo="document:$openToDoc"
+  exclusions="$exclusions" /}}
 #panelfooter()
 {{/velocity}}</content>
     </property>
     <property>
-      <description>Lists all spaces and all documents in the spaces. Note that administration spaces and pages are only displayed for Administrators. This Panel provides a default automated navigation. However when your wiki grows you'll usually want to replace it with your own fixed navigation for which you'll create another Panel.</description>
+      <description>Displays the page tree, taking into account the page access rights, the "show hidden pages" user preference and the configured page exclusions.</description>
     </property>
     <property>
       <name>Navigation</name>

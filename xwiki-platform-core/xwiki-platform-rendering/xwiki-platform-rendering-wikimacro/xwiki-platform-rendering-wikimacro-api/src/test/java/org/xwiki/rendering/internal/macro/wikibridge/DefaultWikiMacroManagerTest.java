@@ -45,6 +45,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -65,8 +66,8 @@ public class DefaultWikiMacroManagerTest
     public MockitoComponentMockingRule<DefaultWikiMacroManager> mocker =
         new MockitoComponentMockingRule<>(DefaultWikiMacroManager.class);
 
-    private DocumentReference authorReference = new DocumentReference("authorwiki", Arrays.asList("authorspace"),
-        "authorpage");
+    private DocumentReference authorReference =
+        new DocumentReference("authorwiki", Arrays.asList("authorspace"), "authorpage");
 
     @Test
     public void registerAndUnregisterWikiMacroWhenGlobalVisibilityAndAllowed() throws Exception
@@ -82,6 +83,11 @@ public class DefaultWikiMacroManagerTest
 
         EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         when(serializer.serialize(this.authorReference)).thenReturn("authorwiki:authorspace.authorpage");
+
+        // Indicate current wiki is the main one (otherwise it won't be registered at root level)
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.isMainWiki(wikiMacro.getDocumentReference().getWikiReference().getName()))
+            .thenReturn(true);
 
         // Test registration
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
@@ -112,6 +118,38 @@ public class DefaultWikiMacroManagerTest
         // Simulate a user who's allowed for the WIKI visibility
         WikiMacroFactory wikiMacroFactory = this.mocker.getInstance(WikiMacroFactory.class);
         when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI)).thenReturn(true);
+
+        ComponentManager wikiComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "wiki");
+
+        // Test registration
+        WikiMacroManager wikiMacroManager = this.mocker.getComponentUnderTest();
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
+        assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
+
+        // Verify that the WikiMacroManager has registered the macro against the wiki CM
+        verify(wikiComponentManager).registerComponent(any(DefaultComponentDescriptor.class), eq(wikiMacro));
+
+        // Test unregistration
+        wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
+        assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
+
+        // Verify that the WikiMacroManager has unregistered the macro against the wiki CM
+        verify(wikiComponentManager).unregisterComponent(Macro.class, "testwikimacro");
+    }
+
+    @Test
+    public void registerWikiMacroWhenGlocalVisibilityOnSubWiki() throws Exception
+    {
+        DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
+
+        // Simulate a user who's allowed for the WIKI visibility
+        WikiMacroFactory wikiMacroFactory = this.mocker.getInstance(WikiMacroFactory.class);
+        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI)).thenReturn(true);
+
+        // Indicate current wiki is a subwiki (so that it's not registered at root level)
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.isMainWiki(wikiMacro.getDocumentReference().getWikiReference().getName()))
+            .thenReturn(false);
 
         ComponentManager wikiComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "wiki");
 
@@ -165,8 +203,8 @@ public class DefaultWikiMacroManagerTest
 
         // Simulate a user who's not allowed for the GLOBAL visibility
         WikiMacroFactory wikiMacroFactory = this.mocker.getInstance(WikiMacroFactory.class);
-        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL)).thenReturn(
-            false);
+        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL))
+            .thenReturn(false);
 
         this.mocker.getComponentUnderTest().registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
@@ -178,8 +216,7 @@ public class DefaultWikiMacroManagerTest
 
         // Simulate a user who's not allowed for the WIKI visibility
         WikiMacroFactory wikiMacroFactory = this.mocker.getInstance(WikiMacroFactory.class);
-        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI)).thenReturn(
-            false);
+        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.WIKI)).thenReturn(false);
 
         this.mocker.getComponentUnderTest().registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
@@ -191,16 +228,14 @@ public class DefaultWikiMacroManagerTest
 
         // Simulate a user who's not allowed for the USER visibility
         WikiMacroFactory wikiMacroFactory = this.mocker.getInstance(WikiMacroFactory.class);
-        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER)).thenReturn(
-            false);
+        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.USER)).thenReturn(false);
 
         this.mocker.getComponentUnderTest().registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
 
     private DefaultWikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception
     {
-        DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"),
-            "space");
+        DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"), "space");
         WikiMacroDescriptor descriptor =
             new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", "Test", visibility,
                 new DefaultContentDescriptor(), Collections.<WikiMacroParameterDescriptor>emptyList());

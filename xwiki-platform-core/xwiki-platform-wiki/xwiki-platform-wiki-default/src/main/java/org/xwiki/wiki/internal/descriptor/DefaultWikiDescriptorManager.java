@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -213,6 +214,18 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         XWikiContext xcontext = this.xcontextProvider.get();
 
         return xcontext != null ? xcontext.getMainXWiki() : "xwiki";
+    }
+
+    @Override
+    public boolean isMainWiki(String wikiId)
+    {
+        if (StringUtils.isEmpty(wikiId)) {
+            return true;
+        }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext != null ? xcontext.isMainWiki(wikiId) : true;
     }
 
     @Override

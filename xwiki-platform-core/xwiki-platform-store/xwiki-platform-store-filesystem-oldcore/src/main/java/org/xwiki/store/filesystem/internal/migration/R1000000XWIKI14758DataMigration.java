@@ -83,7 +83,7 @@ public class R1000000XWIKI14758DataMigration extends AbstractHibernateDataMigrat
         // Move back metadata of deleted attachments located in the filesystem store
         getStore().executeWrite(getXWikiContext(), session -> {
             try {
-                migrateDocument(this.fstools.getStorageLocationFile());
+                migrateDocument(this.fstools.getWikiDir(getXWikiContext().getWikiId()));
             } catch (Exception e) {
                 throw new HibernateException("Failed to refactor filesystem store paths", e);
             }

@@ -120,7 +120,7 @@ public class DocumentTreeNodeTest
     }
 
     @BeforeEach
-    public void before(MockitoComponentManager componentManager) throws Exception
+    public void before() throws Exception
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls-test</artifactId>
-    <version>10.4-SNAPSHOT</version>
+    <version>10.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls-test-tests</artifactId>
   <name>XWiki Platform - Active Installs - Tests - Functional Tests</name>
@@ -127,6 +127,11 @@
   <profiles>
     <profile>
       <id>clover</id>
+      <properties>
+        <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
+             runtime code -->
+        <xwiki.clover.skip>true</xwiki.clover.skip>
+      </properties>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.
            It's needed because instrumented jars in the WAR will call Clover APIs at runtime when they execute. -->
       <dependencies>

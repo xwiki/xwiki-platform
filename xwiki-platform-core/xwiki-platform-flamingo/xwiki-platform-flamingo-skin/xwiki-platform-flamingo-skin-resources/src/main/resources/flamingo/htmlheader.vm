@@ -21,7 +21,7 @@
   #xwikiDataAttribute('version', $tdoc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
-  #xwikiDataAttribute('user-id', $!services.model.serialize($xcontext.userReference, 'default'))
+  #xwikiDataAttribute('user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
   #xwikiDataAttribute('locale', $tdoc.locale)>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.watchlistbridge;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -240,5 +241,11 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
             throws NotificationException
     {
         // Watchlist preferences are always enabled
+    }
+
+    @Override
+    public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
+    {
+        // Unavailable
     }
 }

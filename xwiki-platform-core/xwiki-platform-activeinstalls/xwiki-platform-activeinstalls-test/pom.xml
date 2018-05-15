@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls</artifactId>
-    <version>10.4-SNAPSHOT</version>
+    <version>10.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls-test</artifactId>
   <name>XWiki Platform - Active Installs - Tests - Parent POM</name>
@@ -36,6 +36,9 @@
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Don't cloverify test since we don't want our global TPC to include test TPC. We want to include only
+         runtime code -->
+    <xwiki.clover.skip>true</xwiki.clover.skip>
   </properties>
   <modules>
     <module>xwiki-platform-activeinstalls-test-pageobjects</module>

@@ -22,9 +22,9 @@ package org.xwiki.query.jpql.internal;
 import java.io.PushbackReader;
 import java.io.StringReader;
 
-import org.xwiki.query.jpql.lexer.Lexer;
-import org.xwiki.query.jpql.node.Start;
-import org.xwiki.query.jpql.parser.Parser;
+import org.xwiki.query.internal.jpql.lexer.Lexer;
+import org.xwiki.query.internal.jpql.node.Start;
+import org.xwiki.query.internal.jpql.parser.Parser;
 
 /**
  * JPQL Parser.

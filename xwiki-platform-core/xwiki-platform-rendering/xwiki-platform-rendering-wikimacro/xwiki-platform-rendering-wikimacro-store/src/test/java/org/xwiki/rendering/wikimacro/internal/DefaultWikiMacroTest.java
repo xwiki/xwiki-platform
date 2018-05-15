@@ -112,6 +112,16 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
                         return getContext().getWikiId();
                     }
                 });
+
+                allowing(mockWikiDescriptorManager).isMainWiki(with(any(String.class)));
+                will(new CustomAction("WikiDescriptorManager#isMainWiki")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        return getContext().isMainWiki((String) invocation.getParameter(0));
+                    }
+                });
             }
         });
 

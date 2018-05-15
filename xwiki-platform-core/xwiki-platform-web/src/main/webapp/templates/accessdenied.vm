@@ -6,19 +6,23 @@
   $response.setStatus(403)
   ## Otherwise, unauthenticated user with Basic authentication, a 401 status has been set in Java.
 #end
-#if("$!request.ajax" != '')
+#if ("$!request.ajax" != '')
 $services.localization.render('notallowed')
 #else
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-#if ($xwiki.isReadOnly())
-#xwikimessageboxstart($services.localization.render('error') $services.localization.render('readonly'))
+#if ($xwiki.exists("XWiki.AccessDenied"))
+  $xwiki.includeForm("XWiki.AccessDenied", false)
 #else
-#xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
+  #if ($xwiki.isReadOnly())
+    #xwikimessageboxstart($services.localization.render('error') $services.localization.render('readonly'))
+  #else
+    #xwikimessageboxstart($services.localization.render('error') $services.localization.render('notallowed'))
+  #end
+  $!exception
+  #xwikimessageboxend()
 #end
-$!exception
-#xwikimessageboxend()
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main

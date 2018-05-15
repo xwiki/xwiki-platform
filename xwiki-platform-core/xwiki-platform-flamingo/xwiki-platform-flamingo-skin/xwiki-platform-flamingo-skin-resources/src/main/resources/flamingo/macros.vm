@@ -493,12 +493,14 @@ function (row, i, table) {
    #set ($htmlColumnKeys = ['doc.location'])
    #foreach($htmlColumnKey in $htmlColumnKeys)
      #if ($collist.contains($htmlColumnKey))
-       #if (!$colprops[$htmlColumnKey])
-         #set ($colprops[$htmlColumnKey] = {})
+       #set ($htmlColumnProps = $colprops[$htmlColumnKey])
+       #if (!$htmlColumnProps)
+         #set ($htmlColumnProps = {})
        #end
-       #if ($colprops[$htmlColumnKey].html == $NULL)
-         #set ($colprops[$htmlColumnKey].html = true)
+       #if ($htmlColumnProps.html == $NULL)
+         #set ($htmlColumnProps.html = true)
        #end
+       #set ($colprops[$htmlColumnKey] = $htmlColumnProps)
      #end
    #end
 

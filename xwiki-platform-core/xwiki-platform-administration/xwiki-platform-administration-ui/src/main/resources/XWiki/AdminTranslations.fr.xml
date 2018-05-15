@@ -61,11 +61,11 @@ XWiki.XWikiPreferences_showcomments.hint=Afficher la section Commentaires dans l
 XWiki.XWikiPreferences_showhistory.hint=Afficher la section Historique dans la page.
 XWiki.XWikiPreferences_showinformation.hint=Afficher la section Informations dans la page.
 XWiki.XWikiPreferences_timezone.hint=Définir globalement le fuseau horaire des dates
-XWiki.XWikiPreferences_title.hint=Définissez le format du titre de la page qui sera affiché dans les navigateurs.
+XWiki.XWikiPreferences_title.hint=Définit le format du titre de la page qui sera affiché dans les navigateurs web.
 XWiki.XWikiPreferences_use_email_verification.hint=Si défini à "Oui", un mail sera envoyé à l'adresse renseignée dans le formulaire d'enregistrement.
 XWiki.XWikiPreferences_validation_email_content.hint=Modèle de mail envoyé aux utilisateurs pour validation de leur adresse email.
-XWiki.XWikiPreferences_version.hint=Définir les informations affichées dans la section Version du pied de page.
-XWiki.XWikiPreferences_webcopyright.hint=Définir les informations affichées dans la section Copyright du pied de page.
+XWiki.XWikiPreferences_version.hint=Défini les informations affichées dans la section Version du pied de page.
+XWiki.XWikiPreferences_webcopyright.hint=Définit les informations affichées dans la section Copyright du pied de page.
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Empêcher les utilisateurs de créer des pages wiki sans titre.
 admin.colorthemes.global=Global
 admin.colorthemes.local=Local
@@ -93,5 +93,7 @@ administration.title.global=Administration globale
 administration.title.page=Administration de la page
 administration.title.wiki=Administration du wiki
 XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par mail pour se connecter.
+XWiki.Registration_heading.hint=Texte affiché en haut de page lorsque les utilisateurs souhaitent s'inscrire ou lorsqu'ils viennent de s'inscrire. Vous pouvez indiquer du code Velocity.
+XWiki.Registration_welcomeMessage.hint=Affiché uniquement lorsque les utilisateurs renseignent le formulaire. Vous pouvez utiliser du code Velocity et de la syntaxe wiki.
 </content>
 </xwikidoc>

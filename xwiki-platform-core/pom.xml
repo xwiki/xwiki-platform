@@ -643,15 +643,6 @@
                     "methodName": "getAllFilters",
                     "elementKind": "method",
                     "justification": "Young API"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.query.jpql.analysis.Analysis::caseAIntegerComparableItem(org.xwiki.query.jpql.node.AIntegerComparableItem)",
-                    "package": "org.xwiki.query.jpql.analysis",
-                    "classSimpleName": "Analysis",
-                    "methodName": "caseAIntegerComparableItem",
-                    "elementKind": "method",
-                    "justification": "Support for queries of type 'GROUP BY 1' and 'ORDER BY 1'"
                   }
                 ]
               }

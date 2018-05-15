@@ -21,7 +21,7 @@
   #xwikiDataAttribute('version', $doc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
-  #xwikiDataAttribute('user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
+  #xwikiDataAttribute('user-reference', $!services.model.serialize($xcontext.userReference, 'default'))>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.

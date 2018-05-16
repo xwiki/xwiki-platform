@@ -86,7 +86,8 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     /**
      * @return the current {@code XWikiContext}
      */
-    private XWikiContext getXWikiContext() {
+    private XWikiContext getXWikiContext()
+    {
         return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
     }
 
@@ -135,8 +136,8 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      *
      * @param entity Any entity reference that is either a WIKI or a SPACE, or an entity containing a DOCUMENT entity.
      * @return the access rules that could be loaded into the cache.
-     * @throws org.xwiki.security.authorization.AuthorizationException if an issue arise while reading these rules
-     *         from the wiki.
+     * @throws org.xwiki.security.authorization.AuthorizationException if an issue arise while reading these rules from
+     *             the wiki.
      */
     @Override
     public SecurityRuleEntry read(SecurityReference entity) throws AuthorizationException
@@ -178,12 +179,20 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                 throw new EntityTypeNotSupportedException(entity.getType(), this);
         }
 
-        return new InternalSecurityRuleEntry(entity,
-            getSecurityRules(documentReference, classReference, wikiReference));
+        // Get standard rules
+        Collection<SecurityRule> rules = getSecurityRules(documentReference, classReference, wikiReference);
+
+        // Add extras
+        for (SecurityEntryReaderExtra extra : this.extras) {
+            rules.addAll(extra.read(entity));
+        }
+
+        return new InternalSecurityRuleEntry(entity, rules);
     }
 
     /**
      * Get the document.
+     * 
      * @param documentReference reference to the document to be loaded.
      * @return a list of matching base objects, or null if none where found.
      * @throws AuthorizationException if an unexpected error occurs during retrieval.
@@ -216,8 +225,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         try {
             wikiOwner = context.getWiki().getWikiOwner(wikiReference.getName(), context);
         } catch (XWikiException e) {
-            throw new AuthorizationException(wikiReference,
-                "Could not retrieve the owner of this wiki", e);
+            throw new AuthorizationException(wikiReference, "Could not retrieve the owner of this wiki", e);
         }
 
         if (wikiOwner == null) {
@@ -229,6 +237,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
     /**
      * Read right objects from an XWikiDocument and return them as XWikiSecurityRule.
+     * 
      * @param documentReference reference to document to read
      * @param classReference reference to the right class to read
      * @param wikiReference reference to the wiki of the document
@@ -275,6 +284,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
     /**
      * Get rules implied by wiki owners, document creators, and global rights documents.
+     * 
      * @param documentReference reference to the document requested.
      * @param document the document requested.
      * @param isGlobalRightsReference true when the document is a document which host global rights.
@@ -285,22 +295,11 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     private List<SecurityRule> getImpliedRules(DocumentReference documentReference, XWikiDocument document,
         boolean isGlobalRightsReference, boolean isGlobalRightRequested) throws AuthorizationException
     {
-        List<SecurityRule> rules = new ArrayList<SecurityRule>();
+        List<SecurityRule> rules = new ArrayList<>();
 
         if (isGlobalRightsReference) {
             if (isGlobalRightRequested) {
-                WikiReference documentWiki = documentReference.getWikiReference();
-                DocumentReference owner = getWikiOwner(documentWiki);
-                if (owner != null) {
-                    XWikiContext context = getXWikiContext();
-
-                    // Allow global rights to wiki owner
-                    if (context.isMainWiki(documentWiki.getName())) {
-                        rules.add(new XWikiSecurityRule(MAINWIKIOWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
-                    } else {
-                        rules.add(new XWikiSecurityRule(OWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
-                    }
-                }
+                addImpliedGlobalRule(documentReference, rules);
             } else {
                 // Deny local edit right on documents hosting global rights for anyone but admins.
                 rules.add(DENY_EDIT);
@@ -319,17 +318,35 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         return rules;
     }
 
+    private void addImpliedGlobalRule(DocumentReference documentReference, List<SecurityRule> rules)
+        throws AuthorizationException
+    {
+        WikiReference documentWiki = documentReference.getWikiReference();
+        DocumentReference owner = getWikiOwner(documentWiki);
+        if (owner != null) {
+            XWikiContext context = getXWikiContext();
+
+            // Allow global rights to wiki owner
+            if (context.isMainWiki(documentWiki.getName())) {
+                rules.add(
+                    new XWikiSecurityRule(MAINWIKIOWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+            } else {
+                rules.add(new XWikiSecurityRule(OWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+            }
+        }
+    }
+
     /**
-     * Check if the entity reference refers to a document that may contain global rights objects.  In other words
+     * Check if the entity reference refers to a document that may contain global rights objects. In other words
      * '*:XWiki.XWikiPreferences' or '*:*.WebPreferences'.
      *
      * @param documentReference the document reference to check.
      * @return true if the document is scanned for global rights objects during authorization.
      */
-    private boolean isGlobalRightsReference(DocumentReference documentReference) {
+    private boolean isGlobalRightsReference(DocumentReference documentReference)
+    {
         return (XWikiConstants.SPACE_DOC.equals(documentReference.getName())
             || (XWikiConstants.WIKI_DOC.equals(documentReference.getName())
-            && XWikiConstants.XWIKI_SPACE.equals(documentReference.getParent().getName())));
+                && XWikiConstants.XWIKI_SPACE.equals(documentReference.getParent().getName())));
     }
 }
-

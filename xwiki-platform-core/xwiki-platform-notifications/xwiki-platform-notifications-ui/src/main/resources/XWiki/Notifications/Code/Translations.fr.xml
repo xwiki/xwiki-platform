@@ -192,5 +192,6 @@ rendering.macro.notificationsApplicationsPreferences.description=Affiche les pr�
 rendering.macro.notificationsApplicationsPreferences.name=Préférences de notification
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cible de la macro ("user" pour l’utilisateur courant ou "wiki" pour le wiki courant)
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cible
+rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, les évènement de l'utilisateur connecté sont affichés parmi les autres sinon ils sont masqués.
 </content>
 </xwikidoc>

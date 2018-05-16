@@ -70,7 +70,7 @@ tour.popover.show.hint=Vous pouvez relancer la visite guidée à tout moment en 
 tour.steps=Étapes
 tour.steps.add_step=Ajouter l'étape
 tour.steps.delete=Supprimer
-tour.steps.delete_confirm=Êtes-vous sûr de vouloir supprimer l'étape
+tour.steps.delete_confirm=Êtes-vous sûr de vouloir supprimer l'étape ?
 tour.steps.delete_done=Suppression de l'étape terminée
 tour.steps.deleting=Suppression de l'étape
 tour.steps.edit=Modifier
@@ -81,8 +81,8 @@ tour.steps.save_step=Enregistrer
 tour.steps.yes=Oui
 tour.template.description=Visite pas à pas
 tour.template.name=Visite guidée
-tour.upgrade.successList=Les pages suivantes ont été converties avec succès \:
-tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour \!
+tour.upgrade.successList=Les pages suivantes ont été converties avec succès :
+tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour !
 tour.upgrade.title=Mise à jour
 </content>
 </xwikidoc>

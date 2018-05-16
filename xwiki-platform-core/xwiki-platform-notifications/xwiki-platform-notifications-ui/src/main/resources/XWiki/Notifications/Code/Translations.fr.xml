@@ -192,6 +192,9 @@ rendering.macro.notificationsApplicationsPreferences.description=Affiche les pr�
 rendering.macro.notificationsApplicationsPreferences.name=Préférences de notification
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Cible de la macro ("user" pour l’utilisateur courant ou "wiki" pour le wiki courant)
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Cible
-rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, les évènement de l'utilisateur connecté sont affichés parmi les autres sinon ils sont masqués.
+rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, les évènements de l'utilisateur connecté sont affichés parmi les autres sinon ils sont masqués.
+rendering.macro.notifications.parameter.displayMinorEvents.description=Si vrai, les évènements concernant les révisions mineures sont affichés parmi les autres sinon ils sont masqués.
+rendering.macro.notifications.parameter.displaySystemEvents.description=Si vrai, les évènements déclenchés par le logiciel XWiki sont affichés parmi les autres sinon ils sont masqués.
+rendering.macro.notifications.parameter.displayReadEvents.description=Si vrai, les évènements marqués par l'utilisateur comme lus sont affichés parmi les autres sinon ils sont masqués.
 </content>
 </xwikidoc>

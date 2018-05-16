@@ -89,7 +89,7 @@
                 tdoc.XWD_FULLNAME = doc.XWD_FULLNAME and
                 tdoc.XWD_LANGUAGE = :locale)
             where doc.XWD_TRANSLATION = 0 and doc.XWD_NAME &lt;&gt; 'WebHome'
-                and XWD_FULLNAME not in (:excludedDocuments))
+                and doc.XWD_FULLNAME not in (:excludedDocuments))
 
     ) xwikiPage
 

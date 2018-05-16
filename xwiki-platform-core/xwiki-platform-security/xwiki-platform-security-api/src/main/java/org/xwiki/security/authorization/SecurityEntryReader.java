@@ -24,7 +24,7 @@ import org.xwiki.security.SecurityReference;
 
 /**
  * A security rules reader reads rules attached to a given entity.
- *
+ * <p>
  * This interface decouple the rules storage from the security cache loader.
  *
  * @version $Id$

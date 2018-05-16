@@ -196,5 +196,6 @@ rendering.macro.notifications.parameter.displayOwnEvents.description=Si vrai, le
 rendering.macro.notifications.parameter.displayMinorEvents.description=Si vrai, les évènements concernant les révisions mineures sont affichés parmi les autres sinon ils sont masqués.
 rendering.macro.notifications.parameter.displaySystemEvents.description=Si vrai, les évènements déclenchés par le logiciel XWiki sont affichés parmi les autres sinon ils sont masqués.
 rendering.macro.notifications.parameter.displayReadEvents.description=Si vrai, les évènements marqués par l'utilisateur comme lus sont affichés parmi les autres sinon ils sont masqués.
+rendering.macro.notifications.parameter.displayReadStatus.description=Définit si l'état lu ou non lu doit être affiché pour les évènements
 </content>
 </xwikidoc>

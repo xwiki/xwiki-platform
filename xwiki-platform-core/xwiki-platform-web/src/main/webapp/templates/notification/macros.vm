@@ -37,7 +37,7 @@
           #displayNotificationEventUsers($compositeEvent.users, true, true)
         </div>
       #end
-      <div><small class="text-muted">$escapetool.xml($datetool.whenIs($compositeEvent.dates.get(0)))</small></div>
+      <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
     </div>
   #end
   ###

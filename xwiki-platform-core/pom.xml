@@ -572,6 +572,7 @@
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-dashboard</module>
+    <module>xwiki-platform-date</module>
     <module>xwiki-platform-diffplugin</module>
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-edit</module>

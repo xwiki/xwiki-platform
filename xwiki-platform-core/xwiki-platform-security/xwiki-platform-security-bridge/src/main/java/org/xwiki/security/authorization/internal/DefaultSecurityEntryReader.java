@@ -182,11 +182,6 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         // Get standard rules
         Collection<SecurityRule> rules = getSecurityRules(documentReference, classReference, wikiReference);
 
-        // Add extras
-        for (SecurityEntryReaderExtra extra : this.extras) {
-            rules.addAll(extra.read(entity));
-        }
-
         return new InternalSecurityRuleEntry(entity, rules);
     }
 

@@ -46,6 +46,8 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -116,15 +118,14 @@ public class WikiTreeNodeTest
         assertEquals(0, this.wikiTreeNode.getChildCount("something"));
         assertEquals(0, this.wikiTreeNode.getChildCount("some:thing"));
 
-        when(this.queryManager.createQuery(
-            "select count(*) from XWikiSpace where parent is null " + "and reference not in (:excludedSpaces)",
-            Query.HQL)).thenReturn(this.query);
+        when(this.queryManager.createQuery("select count(*) from XWikiSpace where parent is null", Query.HQL))
+            .thenReturn(this.query);
         when(query.execute()).thenReturn(Collections.singletonList(2L));
 
         assertEquals(2L, this.wikiTreeNode.getChildCount("wiki:foo"));
 
         verify(this.query).setWiki("foo");
-        verify(this.query).bindValue("excludedSpaces", Collections.singleton(""));
+        verify(this.query, never()).bindValue(anyString(), any());
     }
 
     @Test

@@ -21,9 +21,11 @@ package org.xwiki.index.tree.internal.nestedpages;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -92,6 +94,14 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
     @Inject
     @Named("hiddenPage/nestedPages")
     private QueryFilter hiddenPageFilter;
+
+    @Inject
+    @Named("excludedSpace/nestedPages")
+    private QueryFilter excludedSpaceFilter;
+
+    @Inject
+    @Named("excludedDocument/nestedPages")
+    private QueryFilter excludedDocumentFilter;
 
     @Inject
     @Named("documentReferenceResolver/nestedPages")
@@ -186,19 +196,22 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
             } else {
                 query = this.queryManager.getNamedQuery("nestedPagesOrderedByName");
             }
-            query.bindValue(PARAMETER_EXCLUDED_DOCUMENTS, getExcludedDocuments(documentReference.getParent()));
+            Set<String> excludedDocuments = getExcludedDocuments(documentReference.getParent());
+            if (!excludedDocuments.isEmpty()) {
+                query.bindValue(PARAMETER_EXCLUDED_DOCUMENTS, excludedDocuments);
+                query.addFilter(this.excludedDocumentFilter);
+            }
         } else {
             if (FIELD_TITLE.equals(orderBy)) {
                 query = this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle");
                 query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
             } else {
                 // Query only the spaces table.
-                query = this.queryManager.createQuery("select reference, 0 as terminal from XWikiSpace page "
-                    + "where reference not in (:excludedSpaces) order by lower(name), name", Query.HQL);
+                query = this.queryManager.createQuery(
+                    "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
             }
         }
 
-        query.bindValue("excludedSpaces", getExcludedSpaces(documentReference.getParent()));
         query.setWiki(documentReference.getWikiReference().getName());
         query.setOffset(offset);
         query.setLimit(limit);
@@ -208,6 +221,12 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
 
         if (!areHiddenEntitiesShown()) {
             query.addFilter(this.hiddenPageFilter);
+        }
+
+        Set<String> excludedSpaces = getExcludedSpaces(documentReference.getParent());
+        if (!excludedSpaces.isEmpty()) {
+            query.bindValue("excludedSpaces", excludedSpaces);
+            query.addFilter(this.excludedSpaceFilter);
         }
 
         return query.addFilter(this.documentReferenceResolverFilter).execute();
@@ -250,16 +269,38 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
 
     private int getChildTerminalPagesCount(DocumentReference documentReference) throws QueryException
     {
-        Query query = this.queryManager.createQuery("where doc.translation = 0 and doc.space = :space and "
-            + "doc.name <> :defaultDocName and doc.fullName not in (:excludedDocuments)", Query.HQL);
+        List<String> constraints = new ArrayList<String>();
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        // Exclude page translations.
+        constraints.add("doc.translation = 0");
+
+        // Include only the child pages.
+        constraints.add("doc.space = :space");
+        parameters.put("space", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
+
+        // Include only the terminal pages.
+        constraints.add("doc.name <> :defaultDocName");
+        parameters.put("defaultDocName", getDefaultDocumentName());
+
+        // Check for page exclusions.
+        Set<String> excludedDocuments = getExcludedDocuments(documentReference.getParent());
+        if (!excludedDocuments.isEmpty()) {
+            constraints.add("doc.fullName not in (:excludedDocuments)");
+            parameters.put(PARAMETER_EXCLUDED_DOCUMENTS, excludedDocuments);
+        }
+
+        Query query = this.queryManager.createQuery(whereClause(constraints), Query.HQL);
+        query.setWiki(documentReference.getWikiReference().getName());
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            query.bindValue(entry.getKey(), entry.getValue());
+        }
+
         query.addFilter(this.countQueryFilter);
         if (Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"))) {
             query.addFilter(this.hiddenDocumentQueryFilter);
         }
-        query.setWiki(documentReference.getWikiReference().getName());
-        query.bindValue("space", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
-        query.bindValue("defaultDocName", getDefaultDocumentName());
-        query.bindValue(PARAMETER_EXCLUDED_DOCUMENTS, getExcludedDocuments(documentReference.getParent()));
+
         return ((Long) query.execute().get(0)).intValue();
     }
 

@@ -21,6 +21,7 @@ package org.xwiki.index.tree.internal.nestedpages;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -62,6 +63,10 @@ public class WikiTreeNode extends AbstractEntityTreeNode
     private QueryFilter hiddenPageFilter;
 
     @Inject
+    @Named("excludedSpace/nestedPages")
+    private QueryFilter excludedSpaceFilter;
+
+    @Inject
     @Named("documentReferenceResolver/nestedPages")
     private QueryFilter documentReferenceResolverFilter;
 
@@ -90,13 +95,19 @@ public class WikiTreeNode extends AbstractEntityTreeNode
             query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
         } else {
             // Query only the spaces table.
-            query = this.queryManager.createQuery("select reference, 0 as terminal from XWikiSpace page "
-                + "where reference not in (:excludedSpaces) order by lower(name), name", Query.HQL);
+            query = this.queryManager.createQuery(
+                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
         }
-        query.bindValue("excludedSpaces", this.getExcludedSpaces(wikiReference));
+
         query.setWiki(wikiReference.getName());
         query.setOffset(offset);
         query.setLimit(limit);
+
+        Set<String> excludedSpaces = getExcludedSpaces(wikiReference);
+        if (!excludedSpaces.isEmpty()) {
+            query.bindValue("excludedSpaces", excludedSpaces);
+            query.addFilter(this.excludedSpaceFilter);
+        }
 
         query.addFilter(this.topLevelPageFilter);
 

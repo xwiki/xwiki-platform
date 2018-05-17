@@ -47,6 +47,7 @@ public class FlamingoThemeTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
     @Test
     public void editFlamingoTheme() throws Exception
     {

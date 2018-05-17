@@ -87,14 +87,21 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      */
     public void setColorTheme(String colorThemeName)
     {
+        boolean exist = false;
         for (WebElement option : getColorThemeOptions()) {
             if (colorThemeName.equals(option.getText())) {
                 option.click();
+                exist = true;
                 break;
             }
         }
-        // Waiting to be sure the change is effective
-        getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
+
+        if (exist) {
+            // Waiting to be sure the change is effective
+            getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
+        } else {
+            throw new RuntimeException(String.format("Couldn't find color theme [%s] in the select", colorThemeName));
+        }
     }
 
     /**

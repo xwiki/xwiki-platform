@@ -628,7 +628,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     {
         boolean validDocumentType = this.html5Document.childNodes().stream()
             .filter(node -> node instanceof DocumentType)
-            .allMatch(documentType -> "html".equalsIgnoreCase(documentType.attr("name")) && StringUtils
+            .anyMatch(documentType -> "html".equalsIgnoreCase(documentType.attr("name")) && StringUtils
                 .isAllEmpty(documentType.attr("publicId"), documentType.attr("systemId")));
 
         assertTrue(Type.ERROR, "rpd6s1.doctype", validDocumentType);

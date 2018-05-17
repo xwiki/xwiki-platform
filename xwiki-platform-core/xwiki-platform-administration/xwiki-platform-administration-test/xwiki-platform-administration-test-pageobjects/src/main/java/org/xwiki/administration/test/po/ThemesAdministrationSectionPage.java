@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -87,21 +89,36 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      */
     public void setColorTheme(String colorThemeName)
     {
-        boolean exist = false;
+        // Make sure the color theme that we want to set is available from the list first
+        try {
+            getDriver().waitUntilCondition(driver -> getColorThemeOptionElement(colorThemeName) != null);
+        } catch (TimeoutException e) {
+            // Collect all available options to display a nice message
+            List<String> options = new ArrayList<>();
+            for (WebElement option : getColorThemeOptions()) {
+                options.add(option.getText());
+            }
+            throw new TimeoutException(String.format("Color theme [%s] wasn't found among [%s]", colorThemeName,
+                StringUtils.join(options, ',')), e);
+        }
+
+        // Click on it to set the theme
+        getColorThemeOptionElement(colorThemeName).click();
+
+        // Waiting to be sure the change is effective
+        getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
+    }
+
+    private WebElement getColorThemeOptionElement(String colorThemeName)
+    {
+        WebElement element = null;
         for (WebElement option : getColorThemeOptions()) {
             if (colorThemeName.equals(option.getText())) {
-                option.click();
-                exist = true;
+                element = option;
                 break;
             }
         }
-
-        if (exist) {
-            // Waiting to be sure the change is effective
-            getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
-        } else {
-            throw new RuntimeException(String.format("Couldn't find color theme [%s] in the select", colorThemeName));
-        }
+        return element;
     }
 
     /**

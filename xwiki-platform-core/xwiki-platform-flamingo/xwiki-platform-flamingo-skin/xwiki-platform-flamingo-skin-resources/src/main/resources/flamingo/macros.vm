@@ -496,11 +496,11 @@ function (row, i, table) {
        #set ($htmlColumnProps = $colprops[$htmlColumnKey])
        #if (!$htmlColumnProps)
          #set ($htmlColumnProps = {})
+         #set ($colprops[$htmlColumnKey] = $htmlColumnProps)
        #end
        #if ($htmlColumnProps.html == $NULL)
          #set ($htmlColumnProps.html = true)
        #end
-       #set ($colprops[$htmlColumnKey] = $htmlColumnProps)
      #end
    #end
 

@@ -76,8 +76,7 @@
             left outer join xwikidoc tdoc on (
                 tdoc.XWD_WEB = XWS_REFERENCE and
                 tdoc.XWD_NAME = 'WebHome' and
-                tdoc.XWD_LANGUAGE = :locale)
-            where XWS_REFERENCE not in (:excludedSpaces))
+                tdoc.XWD_LANGUAGE = :locale))
 
         union all
 
@@ -88,8 +87,7 @@
             left outer join xwikidoc tdoc on (
                 tdoc.XWD_FULLNAME = doc.XWD_FULLNAME and
                 tdoc.XWD_LANGUAGE = :locale)
-            where doc.XWD_TRANSLATION = 0 and doc.XWD_NAME &lt;&gt; 'WebHome'
-                and doc.XWD_FULLNAME not in (:excludedDocuments))
+            where doc.XWD_TRANSLATION = 0 and doc.XWD_NAME &lt;&gt; 'WebHome')
 
     ) xwikiPage
 
@@ -108,8 +106,7 @@
         (select XWS_REFERENCE reference,
                 0 terminal,
                 XWS_NAME pageName
-            from xwikispace
-            where XWS_REFERENCE not in (:excludedSpaces))
+            from xwikispace)
 
         union all
 
@@ -117,8 +114,7 @@
                 1 terminal,
                 XWD_NAME pageName
             from xwikidoc doc
-            where XWD_TRANSLATION = 0 and XWD_NAME &lt;&gt; 'WebHome'
-                and XWD_FULLNAME not in (:excludedDocuments))
+            where XWD_TRANSLATION = 0 and XWD_NAME &lt;&gt; 'WebHome')
 
     ) xwikiPage
 
@@ -143,7 +139,6 @@
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and
             tdoc.XWD_LANGUAGE = :locale)
-        where XWS_REFERENCE not in (:excludedSpaces)
         order by lower(coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)),
             coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)
   </sql-query>

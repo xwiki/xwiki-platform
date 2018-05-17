@@ -1,5 +1,7 @@
 org.xwiki.index.tree.internal.nestedpages.query.ChildPageFilter
 org.xwiki.index.tree.internal.nestedpages.query.DocumentReferenceResolverFilter
+org.xwiki.index.tree.internal.nestedpages.query.ExcludedDocumentFilter
+org.xwiki.index.tree.internal.nestedpages.query.ExcludedSpaceFilter
 org.xwiki.index.tree.internal.nestedpages.query.HiddenPageFilter
 org.xwiki.index.tree.internal.nestedpages.query.QueryRegistrationHandler
 org.xwiki.index.tree.internal.nestedpages.query.TopLevelPageFilter

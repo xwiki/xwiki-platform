@@ -149,8 +149,10 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
         EntityReference wikiReference = parentReference.extractReference(EntityType.WIKI);
         Set<String> excludedSpaces =
             getExcludedSpaces(parentSpaceReference != null ? parentSpaceReference : wikiReference);
-        constraints.add("reference not in (:excludedSpaces)");
-        parameters.put("excludedSpaces", excludedSpaces);
+        if (!excludedSpaces.isEmpty()) {
+            constraints.add("reference not in (:excludedSpaces)");
+            parameters.put("excludedSpaces", excludedSpaces);
+        }
 
         String statement = "select count(*) from XWikiSpace " + whereClause(constraints);
         Query query = this.queryManager.createQuery(statement, Query.HQL);
@@ -186,33 +188,21 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
 
     protected Set<String> getExcludedSpaces(EntityReference parentReference)
     {
-        return this.getNonEmptySet(getExcludedEntities().stream()
+        return getExcludedEntities().stream()
             .filter(entityReference -> this.isSpace(entityReference) || this.isNestedDocument(entityReference))
             .filter(entityReference -> entityReference.hasParent(parentReference))
             .map(entityReference -> this.localEntityReferenceSerializer
                 .serialize(entityReference.extractReference(EntityType.SPACE)))
-            .collect(Collectors.toSet()));
+            .collect(Collectors.toSet());
     }
 
     protected Set<String> getExcludedDocuments(EntityReference parentReference)
     {
-        return this.getNonEmptySet(
-            getExcludedEntities().stream().filter(entityReference -> this.isTerminalDocument(entityReference))
-                .filter(entityReference -> entityReference.hasParent(parentReference))
-                .map(entityReference -> this.localEntityReferenceSerializer.serialize(entityReference))
-                .collect(Collectors.toSet()));
+        return getExcludedEntities().stream().filter(entityReference -> this.isTerminalDocument(entityReference))
+            .filter(entityReference -> entityReference.hasParent(parentReference))
+            .map(entityReference -> this.localEntityReferenceSerializer.serialize(entityReference))
+            .collect(Collectors.toSet());
 
-    }
-
-    private Set<String> getNonEmptySet(Set<String> exclusions)
-    {
-        // The exclusions are applied using the "not in ()" SQL operator which doesn't accept an empty set. Checking if
-        // the set is empty when building the query is not possible with named queries so we make sure the set is never
-        // empty by adding a value that is not allowed (a value that can't affect the results).
-        if (exclusions.isEmpty()) {
-            exclusions.add("");
-        }
-        return exclusions;
     }
 
     private static boolean isWiki(EntityReference entityReference)

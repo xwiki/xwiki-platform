@@ -99,7 +99,7 @@
 #macro(displayNotificationDate $event)
   <div>
     <small style="color: #777777; font-size: 0.8em;">
-      $escapetool.xml($datetool.whenIs($event.dates.get(0)))
+      $escapetool.xml($services.date.displayTimeAgo($event.dates.get(0)))
     </small>
   </div>
 #end

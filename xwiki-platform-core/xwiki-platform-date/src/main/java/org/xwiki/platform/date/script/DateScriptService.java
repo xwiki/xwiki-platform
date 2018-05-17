@@ -24,14 +24,13 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.ocpsoft.prettytime.PrettyTime;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.script.service.ScriptService;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script service to display dates in a pretty way.
@@ -43,10 +42,11 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Singleton
 @Named("date")
+@Unstable
 public class DateScriptService implements ScriptService
 {
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private LocalizationContext localizationContext;
 
     /**
      * Display a date relatively to the current date and using the locale of the current user.
@@ -55,12 +55,7 @@ public class DateScriptService implements ScriptService
      */
     public String displayTimeAgo(Date dateToDisplay)
     {
-        XWikiContext context = contextProvider.get();
-        Locale locale = context.getInterfaceLocale();
-        if (locale == null) {
-            locale = context.getLocale();
-        }
-        return displayTimeAgo(dateToDisplay, locale);
+        return displayTimeAgo(dateToDisplay, localizationContext.getCurrentLocale());
     }
 
     /**

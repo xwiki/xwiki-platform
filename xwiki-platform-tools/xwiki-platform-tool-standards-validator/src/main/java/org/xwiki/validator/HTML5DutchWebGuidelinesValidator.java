@@ -623,6 +623,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 
     /**
      * Each HTML or HTML5 document must begin with a valid doctype declaration.
+     * Is considered valid a doctype with "html" name and no attribute.
      */
     public void validateRpd6s1()
     {

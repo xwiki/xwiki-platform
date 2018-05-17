@@ -29,7 +29,6 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
 import org.xwiki.validator.ValidationError.Type;
@@ -627,18 +626,10 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd6s1()
     {
-        boolean validDocumentType = false;
-
-        for (Node node : this.html5Document.childNodes()) {
-            if (node instanceof DocumentType) {
-                DocumentType documentType = (DocumentType) node;
-
-                validDocumentType = "html".equalsIgnoreCase(documentType.attr("name")) && StringUtils
-                    .isAllEmpty(documentType.attr("publicId"), documentType.attr("systemId"));
-
-                break;
-            }
-        }
+        boolean validDocumentType = this.html5Document.childNodes().stream()
+            .filter(node -> node instanceof DocumentType)
+            .allMatch(documentType -> "html".equalsIgnoreCase(documentType.attr("name")) && StringUtils
+                .isAllEmpty(documentType.attr("publicId"), documentType.attr("systemId")));
 
         assertTrue(Type.ERROR, "rpd6s1.doctype", validDocumentType);
     }

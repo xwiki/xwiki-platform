@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test class for {@link org.xwiki.validator.HTML5Validator}.
+ * Unit tests for {@link org.xwiki.validator.HTML5Validator}.
  *
  * @since 6.0RC1
  * @version $Id$
@@ -38,13 +38,13 @@ public class HTML5ValidatorTest
     private HTML5Validator validator;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         validator = new HTML5Validator();
     }
 
     @Test
-    public void testValid() throws Exception
+    public void testValid()
     {
         validator.setDocument(getClass().getResourceAsStream("/html5-valid.html"));
         List<ValidationError> errors = validator.validate();
@@ -52,7 +52,7 @@ public class HTML5ValidatorTest
     }
 
     @Test
-    public void testInvalid() throws Exception
+    public void testInvalid()
     {
         validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         List<ValidationError> errors = validator.validate();
@@ -63,7 +63,7 @@ public class HTML5ValidatorTest
     }
 
     @Test
-    public void testWhenException() throws Exception
+    public void testWhenException()
     {
         validator.setDocument(null);
         boolean exceptionCaught = false;
@@ -76,7 +76,7 @@ public class HTML5ValidatorTest
     }
 
     @Test
-    public void testName() throws Exception
+    public void testName()
     {
         assertEquals("HTML5", validator.getName());
     }

@@ -266,6 +266,15 @@
 
                   // Add more ignores below...
                   {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.notifications.filters.watchlistbridge.WatchlistBridgeProvider",
+                    "package": "org.xwiki.notifications.filters.watchlistbridge",
+                    "classQualifiedName": "org.xwiki.notifications.filters.watchlistbridge.WatchlistBridgeProvider",
+                    "classSimpleName": "WatchlistBridgeProvider",
+                    "elementKind": "class",
+                    "justification": "Class wrongly made public in previous releases! See "
+                  },
+                  {
                     "code": "java.method.returnTypeChanged",
                     "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
                     "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",

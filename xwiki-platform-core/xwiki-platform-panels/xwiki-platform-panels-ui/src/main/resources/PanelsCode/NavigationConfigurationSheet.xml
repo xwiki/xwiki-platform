@@ -39,22 +39,645 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output="false"}}
+#macro (displayView $configDoc $configObj)
+  #foreach ($propertyName in $configObj.propertyNames)
+    ; $configDoc.displayPrettyName($propertyName)
+      (% class="xHint" %)$services.localization.render("PanelsCode.NavigationConfigurationClass_${propertyName}.hint")(%%)
+    : $configDoc.display($propertyName)
+  #end
+#end
+
+#macro (displayEdit $configObj)
+  #set ($discard = $xwiki.ssx.use('PanelsCode.NavigationConfigurationSheet'))
+  #set ($discard = $xwiki.jsx.use('PanelsCode.NavigationConfigurationSheet'))
+  (% class="row" %)(((
+    (% class="col-sm-6" %)(((
+      #displayNavigationPanel
+    )))
+    (% class="col-sm-6" %)(((
+      #displayExcludedPages($configObj)
+    )))
+  )))
+#end
+
+#macro (displayNavigationPanel)
+  #set ($navigationPanel = $xwiki.getDocument('Panels.Navigation'))
+  $navigationPanel.display('content', 'view').replace('data-dragAndDrop = "false"', 'data-dragAndDrop = "true"'
+    ).replace('class = "xtree"', 'class = "xtree jstree-no-links"')
+#end
+
+#macro (displayExcludedPages $configObj)
+  {{html clean="false"}}
+  &lt;div class="panel panel-info"&gt;
+    &lt;div class="panel-heading"&gt;
+      &lt;h3 class="panel-title"&gt;
+        $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages'))
+      &lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;div class="panel-body"&gt;
+      &lt;p class="xHint"&gt;
+        $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.hint'))
+      &lt;/p&gt;
+      &lt;div class="exclusion-filter topLevelExtensionPages"&gt;
+        #set ($excludeTopLevelExtensionPages = $configObj.getValue('excludeTopLevelExtensionPages') == 1)
+        &lt;p class="exclusion-filter-label"&gt;
+          &lt;label title="$escapetool.xml($services.localization.render("PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint"))"&gt;
+            &lt;input type="checkbox" name="PanelsCode.NavigationConfigurationClass_0_excludeTopLevelExtensionPages"
+              value="1"#if ($excludeTopLevelExtensionPages) checked="checked"#end /&gt;
+            &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_excludeTopLevelExtensionPages" value="0" /&gt;
+            $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.topLevelExtensionPages'))
+          &lt;/label&gt;
+        &lt;/p&gt;
+        &lt;ul class="exclusion-filter-pages#if (!$excludeTopLevelExtensionPages) hidden#end"&gt;
+          #set ($inclusions = {})
+          #foreach ($inclusion in $configObj.getValue('inclusions'))
+            #set ($discard = $inclusions.put($services.model.resolveDocument($inclusion), $inclusion))
+          #end
+          #set ($query = $services.query.hql('select space.name from XWikiSpace space where space.parent is null'))
+          #set ($discard = $query.addFilter('hidden/space'))
+          #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+          #foreach ($result in $query.execute())
+            #set ($documentReference = $services.model.createDocumentReference($NULL, $result, $defaultDocumentName))
+            #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
+            #if ($installedExtensions &amp;&amp; $installedExtensions.size() &gt; 0
+                &amp;&amp; !$services.extension.xar.isEditAllowed($documentReference))
+              #set ($excludedDoc = $xwiki.getDocument($documentReference))
+              #set ($included = $inclusions.containsKey($documentReference))
+              &lt;li class="page#if ($included) included#end"
+                  data-reference="$escapetool.xml($services.model.serialize($documentReference, 'default'))"&gt;
+                &lt;a href="$excludedDoc.getURL()"&gt;$escapetool.xml($excludedDoc.plainTitle)&lt;/a&gt;
+                #if ($included)
+                  &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_inclusions"
+                    value="$escapetool.xml($inclusions.get($documentReference))" /&gt;
+                #end
+              &lt;/li&gt;##
+            #end
+          #end
+          &lt;li class="empty"&gt;
+            $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.empty'))
+            &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_inclusions" value="" /&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div class="exclusion-filter otherPages"&gt;
+        &lt;p class="exclusion-filter-label"&gt;
+          $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.otherPages'))
+        &lt;/p&gt;
+        &lt;ul class="exclusion-filter-pages"&gt;
+          #foreach ($exclusion in $configObj.getValue('exclusions'))
+            #set ($documentReference = $services.model.resolveDocument($exclusion))
+            #set ($excludedDoc = $xwiki.getDocument($documentReference))
+            &lt;li class="page" data-reference="$escapetool.xml($services.model.serialize($documentReference, 'default'))"&gt;
+              &lt;a href="$excludedDoc.getURL()"&gt;$escapetool.xml($excludedDoc.plainTitle)&lt;/a&gt;
+              &lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_exclusions"
+                value="$escapetool.xml($exclusion)" /&gt;
+            &lt;/li&gt;##
+          #end
+          &lt;li class="empty"&gt;
+            $escapetool.xml($services.localization.render('platform.panels.navigation.configuration.excludedPages.empty'))
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  {{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
 #set ($configDoc = $doc)
 #if ($doc.fullName == 'XWiki.XWikiPreferences')
   #set ($configDoc = $xwiki.getDocument('PanelsCode.NavigationConfiguration'))
 #end
 #set ($configObj = $configDoc.getObject('PanelsCode.NavigationConfigurationClass', true))
 (% class="xform navigationPanelConfiguration" %)(((
-  #set ($mode = 'view')
-  #if ($xcontext.action == 'edit' || $xcontext.action == 'admin')
-    #set ($mode = 'edit')
-  #end
-  #foreach ($propertyName in $configObj.propertyNames)
-    ; $configDoc.displayPrettyName($propertyName)
-      (% class="xHint" %)$services.localization.render("PanelsCode.NavigationConfigurationClass_${propertyName}.hint")(%%)
-    : $configDoc.display($propertyName, $mode)
+  #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'admin')
+    #displayView($configDoc $configObj)
+  #else
+    #displayEdit($configObj)
   #end
 )))
 {{/velocity}}</content>
+  <object>
+    <name>PanelsCode.NavigationConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>78efe7d5-5da5-49d0-b83d-ab4309b14f03</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require.config({
+  paths: {
+    'jquery-ui' : "$!services.webjars.url('jquery-ui', 'jquery-ui.min')",
+    // The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
+    // specify the library version when computing the WebJar resource URL.
+    'jquery-ui-touch-punch' : "$!services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min')"
+  },
+  shim: {
+    'jquery-ui' : ['jquery'],
+    'jquery-ui-touch-punch': ['jquery-ui']
+  }
+});
+require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
+  let getLocalDocumentReference = function(absoluteDocumentReference) {
+    let documentReference = XWiki.Model.resolve(absoluteDocumentReference, XWiki.EntityType.DOCUMENT);
+    let localDocumentReference = documentReference.relativeTo(new XWiki.WikiReference(XWiki.currentWiki));
+    return XWiki.Model.serialize(localDocumentReference);
+  };
+
+  //
+  // Drag from the Excluded Pages and drop over the Navigation Panel.
+  //
+
+  $('.navigationPanelConfiguration').on('click', '.exclusion-filter-pages a', function(event) {
+    event.preventDefault();
+  }).on('click', '.exclusion-filter-pages .page', function(event) {
+    let page = $(this);
+    if (page.hasClass('included')) {
+      page.removeClass('selected');
+    } else {
+      page.toggleClass('selected');
+    }
+  });
+
+  let getExcludedPageDragHelper = function() {
+    let draggedPage = $(this);
+    let selectedPages = $('.navigationPanelConfiguration .page.selected');
+    if (draggedPage.hasClass('selected') &amp;&amp; selectedPages.length &gt; 1) {
+      return $('&lt;span/&gt;').text(selectedPages.length + ' pages')[0];
+    } else {
+      selectedPages.removeClass('selected');
+      let isTopLevelExtensionPage = draggedPage.closest('.topLevelExtensionPages').size() &gt; 0;
+      return (isTopLevelExtensionPage ? draggedPage.clone() : draggedPage)[0];
+    }
+  };
+
+  let makeExcludedPageDraggable = function() {
+    let page = $(this);
+    page.draggable({
+      disabled: page.hasClass('included'),
+      helper: getExcludedPageDragHelper,
+      revert: 'invalid',
+      revertDuration: 200
+    });
+  };
+
+  $('.navigationPanelConfiguration .exclusion-filter-pages .page').each(makeExcludedPageDraggable);
+
+  let getNodeData = function(exclusion) {
+    let documentReference = exclusion.data('reference');
+    return {
+      id: 'document:' + documentReference,
+      text: exclusion.text(),
+      children: exclusion.data('children') !== false,
+      data: {
+        id: documentReference,
+        type: 'document',
+        validChildren: ['document', 'pagination'],
+        draggable: true,
+        canDelete: true,
+        canMove: true
+      },
+      a_attr: {
+        href: exclusion.find('a').attr('href')
+      }
+    };
+  };
+
+  let includeTopLevelExtensionPage = function(reference) {
+    $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
+      let page = $(this);
+      // Verify that the page is a draggable instance in order to avoid processing the drag helper (when the helper is a
+      // clone of the page element).
+      if (page.draggable('instance') &amp;&amp; page.data('reference') === reference) {
+        let input = $('&lt;input type="hidden"/&gt;').attr({
+          name: 'PanelsCode.NavigationConfigurationClass_0_inclusions',
+          value: getLocalDocumentReference(reference)
+        });
+        page.addClass('included').draggable('disable').append(input);
+      }
+    });
+  };
+
+  let includeOtherPage = function(reference) {
+    $('.exclusion-filter.otherPages .page').each(function() {
+      let page = $(this);
+      // Verify that the page is a draggable instance in order to avoid processing the drag helper (when the helper is a
+      // clone of the page element).
+      if (page.draggable('instance') &amp;&amp; page.data('reference') === reference) {
+        page.draggable('destroy').remove();
+      }
+    });
+  };
+
+  let createNode = function(tree, page) {
+    let index = Math.max(0, parseInt(page.data('index')));
+    if (!isFinite(index)) {
+      index = 'last';
+    }
+    tree.create_node(null, getNodeData(page), index);
+  };
+
+  let onDropPage = function(tree) {
+    let page = $(this);
+    let reference = page.data('reference');
+    // We don't act directly on the given page element because the corresponding page might be excluded by multiple
+    // filters.
+    includeTopLevelExtensionPage(reference);
+    includeOtherPage(reference);
+    // Add the corresponding node to the navigation tree.
+    tree &amp;&amp; createNode(tree, page);
+  };
+
+  // Drop excluded page over the Navigation Panel.
+  $('.navigationPanelConfiguration .panel.expanded').droppable({
+    accept: '.page',
+    activeClass: 'ui-droppable-active',
+    hoverClass: 'ui-droppable-hover',
+    drop: function(event, ui) {
+      let tree = $(this).find('.jstree').jstree(true);
+      let selectedPages = $('.navigationPanelConfiguration .page.selected');
+      let droppedPages = selectedPages.length &gt; 0 ? selectedPages : ui.draggable;
+      droppedPages.each(function() {
+        onDropPage.call(this, tree);
+      });
+      selectedPages.removeClass('selected');
+    }
+  });
+
+  //
+  // Toggle top level extension pages filter
+  //
+
+  let excludeTopLevelExtensionPages = function() {
+    let tree = $('.navigationPanelConfiguration .jstree').jstree(true);
+    tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
+      let page = $(this);
+      let node = tree.get_node('document:' + page.data('reference'));
+      if (node) {
+        page.attr(getPageDataAttributes(tree, node));
+        scheduleDeleteNode(tree, node);
+      }
+    });
+  };
+
+  let includeTopLevelExtensionPages = function() {
+    let tree = $('.navigationPanelConfiguration .jstree').jstree(true);
+    tree &amp;&amp; $('.exclusion-filter.topLevelExtensionPages .page').not('.included').each(function() {
+      let page = $(this);
+      let otherExclusionsForThisPage = $('.exclusion-filter.otherPages .page').filter(function() {
+        return $(this).data('reference') === page.data('reference');
+      });
+      if (otherExclusionsForThisPage.length === 0) {
+        createNode(tree, page);
+      }
+    });
+  };
+
+  let topLevelExtensionPagesFilterToggle = $('.exclusion-filter.topLevelExtensionPages input[type="checkbox"]');
+  topLevelExtensionPagesFilterToggle.click(function() {
+    $('.exclusion-filter.topLevelExtensionPages .exclusion-filter-pages').toggleClass('hidden');
+    if ($(this).prop('checked')) {
+      excludeTopLevelExtensionPages();
+    } else {
+      includeTopLevelExtensionPages();
+    }
+  });
+
+  //
+  // Drag from the Navigation Panel and drop over the Excluded Pages.
+  //
+
+  let getPageDataAttributes = function(tree, node) {
+    return {
+      'data-reference': node.data.id,
+      'data-index': $.inArray(node.id, tree.get_node(node.parent).children),
+      'data-children': !node.state.loaded || node.children.length &gt; 0
+    };
+  };
+
+  let excludeTopLevelExtensionPage = function(tree, node) {
+    let excluded = false;
+    if (topLevelExtensionPagesFilterToggle.prop('checked')) {
+      $('.exclusion-filter.topLevelExtensionPages .page.included').each(function() {
+        let page = $(this);
+        if (page.data('reference') === node.data.id) {
+          page.removeClass('included').attr(getPageDataAttributes(tree, node))
+            .draggable('enable').find('input').remove();
+          excluded = true;
+        }
+      });
+    }
+    return excluded;
+  };
+
+  let excludeOtherPage = function(tree, node) {
+    let page = $('&lt;li class="page"/&gt;').attr(getPageDataAttributes(tree, node))
+      .append($('&lt;a/&gt;').attr('href', node.a_attr.href).text(node.text))
+      .append($('&lt;input type="hidden" name="PanelsCode.NavigationConfigurationClass_0_exclusions"/&gt;')
+        .val(getLocalDocumentReference(node.data.id)));
+    $('.exclusion-filter.otherPages .exclusion-filter-pages .empty').before(page);
+    makeExcludedPageDraggable.call(page);
+  };
+
+  let excludeNode = function(tree, nodeId) {
+    let node = tree.get_node(nodeId);
+    if (node &amp;&amp; node.data &amp;&amp; node.data.type === 'document') {
+      excludeTopLevelExtensionPage(tree, node) || excludeOtherPage(tree, node);
+      scheduleDeleteNode(tree, node);
+    }
+  };
+
+  let deleteNode = function(tree, node) {
+    // Make sure the tree doesn't attempt to delete the page on the server.
+    delete node.data.id;
+    tree.delete_node(node.id);
+  };
+
+  // Delete the node after we process all the excluded pages, in order to save the right node index.
+  let scheduleDeleteNode = function(tree, node) {
+    setTimeout(function() {
+      deleteNode(tree, node);
+    }, 0);
+  };
+
+  let excludedPagesPane = $('.navigationPanelConfiguration .panel.panel-info').first();
+
+  $(document).on('dnd_start.vakata', function(event, data) {
+    excludedPagesPane.addClass('dropTarget');
+  });
+
+  // Drop tree node over the Excluded Pages pane.
+  $(document).on('dnd_stop.vakata', function(event, data) {
+    if ($.contains(excludedPagesPane[0], data.event.target)) {
+      data.data.nodes.forEach(function(nodeId) {
+        excludeNode(data.data.origin, nodeId);
+      });
+    }
+    excludedPagesPane.removeClass('dropTarget');
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.NavigationConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>be287aa7-0c91-49f5-839d-09984846b074</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.exclusion-filter {
+  margin-bottom: .5em;
+}
+
+.exclusion-filter:last-child {
+  margin-bottom: 0;
+}
+
+.exclusion-filter-label label {
+  font-weight: inherit;
+}
+
+.exclusion-filter-label label &gt; input[type="checkbox"] {
+  margin: 0 .3em 0 0;
+  vertical-align: middle !important;
+}
+
+ul.exclusion-filter-pages {
+  margin-bottom: 0;
+}
+
+ul.exclusion-filter-pages li {
+  border: 1px solid @xwiki-border-color;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: .5em;
+  margin-right: .5em;
+  padding: .5em;
+}
+
+ul.exclusion-filter-pages li.page.ui-draggable {
+  cursor: pointer;
+}
+
+.exclusion-filter-pages .page.selected {
+  background-color: @panel-info-heading-bg;
+  border: 1px solid @panel-info-border;
+}
+
+ul.exclusion-filter-pages li.page.included,
+ul.exclusion-filter-pages li.empty {
+  border-style: dashed;
+  color: @input-color-placeholder;
+  font-weight: 100;
+}
+
+ul.exclusion-filter-pages li + li.empty {
+  display: none;
+}
+
+ul.exclusion-filter-pages a {
+  text-decoration: none;
+}
+
+.panel.expanded.ui-droppable-active {
+  border: 1px dashed @xwiki-border-color;
+}
+
+.panel.expanded.ui-droppable-hover {
+  border-color: @brand-info;
+}
+
+.navigationPanelConfiguration .panel.dropTarget {
+  border: 1px dashed darken(@panel-info-border, 20%);
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

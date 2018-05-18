@@ -59,6 +59,11 @@ PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
 PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
 PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
 PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+platform.panels.navigation.configuration.excludedPages=Excluded Pages
+platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
+platform.panels.navigation.configuration.excludedPages.empty=None
+platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+platform.panels.navigation.configuration.otherPages=Other Pages
 platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
   <object>
     <name>PanelsCode.Translations</name>

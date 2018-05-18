@@ -153,6 +153,12 @@
                 "ignore" : [
                   // Add more ignores below...
                   {
+                    "regex": true,
+                    "code": "java\.class\.removed",
+                    "package": "org\.xwiki\.query\.jpql\..*",
+                    "justification": "Classes moved to the internal package as they were not supposed to be public"
+                  },
+                  {
                     "code": "java.method.returnTypeChanged",
                     "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
                     "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",

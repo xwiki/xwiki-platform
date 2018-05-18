@@ -1,3 +1,4 @@
+org.xwiki.extension.xar.internal.DefaultXarExtensionConfiguration
 org.xwiki.extension.xar.internal.delete.DocumentsDeletingListener
 org.xwiki.extension.xar.internal.doc.XarDocumentRevisionProvider
 org.xwiki.extension.xar.internal.handler.XarExtensionHandler
@@ -15,6 +16,8 @@ org.xwiki.extension.xar.internal.question.ConflictQuestionRecorder
 org.xwiki.extension.xar.internal.repository.InstalledExtensionSynchronizer
 org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository
 org.xwiki.extension.xar.internal.script.ConflictQuestionScriptSafeProvider
+org.xwiki.extension.xar.internal.security.XarSecurityEntryReaderExtra
+org.xwiki.extension.xar.internal.security.XarSecurityTool
 org.xwiki.extension.xar.internal.validator.XarExtensionValidator
 org.xwiki.extension.xar.internal.script.DiffXarJobStatusScriptSafeProvider
 org.xwiki.extension.xar.script.DeprecatedXarExtensionScriptService

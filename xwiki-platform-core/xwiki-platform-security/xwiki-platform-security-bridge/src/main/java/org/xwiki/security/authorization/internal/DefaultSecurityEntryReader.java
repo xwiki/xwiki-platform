@@ -43,6 +43,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityEntryReader;
+import org.xwiki.security.authorization.SecurityEntryReaderExtra;
 import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.internal.XWikiConstants;
@@ -82,6 +83,9 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     /** Execution object. */
     @Inject
     private Execution execution;
+
+    @Inject
+    private List<SecurityEntryReaderExtra> extras;
 
     /**
      * @return the current {@code XWikiContext}
@@ -181,6 +185,14 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
         // Get standard rules
         Collection<SecurityRule> rules = getSecurityRules(documentReference, classReference, wikiReference);
+
+        // Add extras
+        for (SecurityEntryReaderExtra extra : this.extras) {
+            Collection<SecurityRule> extraRules = extra.read(entity);
+            if (extraRules != null) {
+                rules.addAll(extraRules);
+            }
+        }
 
         return new InternalSecurityRuleEntry(entity, rules);
     }

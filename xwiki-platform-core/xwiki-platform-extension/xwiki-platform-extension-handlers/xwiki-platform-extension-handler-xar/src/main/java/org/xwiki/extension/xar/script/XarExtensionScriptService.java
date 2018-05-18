@@ -43,9 +43,11 @@ import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.security.XarSecurityTool;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.extension.xar.security.ProtectionLevel;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
@@ -81,6 +83,9 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     @Inject
     @Named(XarExtensionHandler.TYPE)
     private InstalledExtensionRepository installedXARs;
+
+    @Inject
+    private XarSecurityTool securityTool;
 
     private XarInstalledExtensionRepository getXarInstalledExtensionRepository()
     {
@@ -328,5 +333,27 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     public boolean isDeleteAllowed(DocumentReference documentReference)
     {
         return getXarInstalledExtensionRepository().isAllowed(documentReference, Right.DELETE);
+    }
+
+    /**
+     * @param userReference the reference of the user
+     * @param documentReference the reference of the document
+     * @return the protection level
+     * @since 10.5RC1
+     */
+    public ProtectionLevel getEditSecurityLevel(DocumentReference userReference, DocumentReference documentReference)
+    {
+        return this.securityTool.getProtectionLevel(Right.EDIT, userReference, documentReference);
+    }
+
+    /**
+     * @param userReference the reference of the user
+     * @param documentReference the reference of the document
+     * @return the protection level
+     * @since 10.5RC1
+     */
+    public ProtectionLevel getDeleteSecurityLevel(DocumentReference userReference, DocumentReference documentReference)
+    {
+        return this.securityTool.getProtectionLevel(Right.DELETE, userReference, documentReference);
     }
 }

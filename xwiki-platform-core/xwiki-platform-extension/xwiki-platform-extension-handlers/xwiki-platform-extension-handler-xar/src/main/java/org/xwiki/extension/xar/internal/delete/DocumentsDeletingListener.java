@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.xar.XarExtensionConfiguration;
+import org.xwiki.extension.xar.XarExtensionConfiguration.DocumentProtection;
 import org.xwiki.extension.xar.internal.delete.question.ExtensionBreakingQuestion;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
@@ -60,7 +62,10 @@ public class DocumentsDeletingListener extends AbstractEventListener
 
     @Inject
     @Named("xar")
-    protected InstalledExtensionRepository installedExtensionRepository;
+    private InstalledExtensionRepository installedExtensionRepository;
+
+    @Inject
+    private XarExtensionConfiguration configuration;
 
     @Inject
     private Logger logger;
@@ -76,6 +81,10 @@ public class DocumentsDeletingListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        if (this.configuration.getDocumentProtection() == DocumentProtection.NONE) {
+            return;
+        }
+
         Job job = (Job) source;
         if (!job.getRequest().isInteractive()) {
             logger

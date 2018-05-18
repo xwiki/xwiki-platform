@@ -502,10 +502,22 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # extension.versioncheck.environment.interval=3600
 #-#
-#-# Indiicate a pattern that will be used to filter which version should be considered as a new version.
+#-# Indicate a pattern that will be used to filter which version should be considered as a new version.
 #-# By default, no pattern is given an the pattern is not applied.
 #-# Example:
 # extension.versioncheck.environment.allowedVersions=9.*
+
+#-# [Since 10.5RC1]
+#-# Indicate how extension documents are protected.
+#-#
+#-# The possible choices are:
+#-# * none: no protection at all
+#-# * warning (the default): everyone get a warning when trying to edit a protected document
+#-# * deny = EDIT/DELETE right is denied for everyone except for admins who just get a warning
+#-# * forcedDeny = EDIT/DELETE right is denied for everyone, admins can't force edit/delete
+#-# * denySimple = EDIT/DELETE right is denied for simple users except for simple admins who just get a warning
+#-# * forcedDenySimple = EDIT/DELETE right is denied for all simple users, simple admins can't force edit/delete
+# extension.xar.protection=warning
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard

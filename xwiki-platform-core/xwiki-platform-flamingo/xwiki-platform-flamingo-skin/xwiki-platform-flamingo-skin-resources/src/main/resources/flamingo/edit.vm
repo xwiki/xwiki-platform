@@ -13,10 +13,47 @@
   #set($void = $session.setAttribute($sessionAttributeName, $editForced))
 #end
 ##
+## Is the document protected?
+## If yes, warn about it and show a forcing link:
+##
+#set($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference, $tdoc.documentReferenceWithLocale))
+#if ($protectionLevel.name() == 'DENY' || ($protectionLevel.name() != 'NONE' && !$editForced))
+  #template("startpage.vm")
+  <div class="main">
+   <div id="mainContentArea">
+    ##
+    $response.setStatus(423)
+    #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
+                         + '&amp;force=1')
+    #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
+    #set($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
+    #if ($protectionLevel.name() != 'DENY')
+      #set($boxTitle = 'notice')
+    #else
+      #set($boxTitle = 'error')
+    #end
+    #xwikimessageboxstart($services.localization.render('notice') $services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
+    <ul>
+      #foreach($extension in $extensions)
+        <li>$extension.name ($extension.id.version)</li>
+      #end
+    </ul>
+    <p>$services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation")</p>
+    #if ($protectionLevel.name() != 'DENY')
+      <p><a href="$forceEditURL">$services.localization.render('forcelock')</a><p>
+    #else
+      $response.setStatus(403) ## forbidden
+    #end
+    #xwikimessageboxend()
+    ##
+   </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+##
 ## Is the document being edited by another user?
 ## If yes, warn about it and show a forcing link:
 ##
-#if($tdoc.getLocked() && !$editForced)
+#elseif($tdoc.getLocked() && !$editForced)
   #template("startpage.vm")
   <div class="main">
    <div id="mainContentArea">
@@ -27,33 +64,6 @@
     #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
     #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
     <a href="$forceEditURL">$services.localization.render('forcelock')</a>
-    #xwikimessageboxend()
-    ##
-   </div>## mainContentArea
-  </div>## main
-  #template("endpage.vm")
-##
-## Is the document protected?
-## If yes, warn about it and show a forcing link:
-##
-#elseif ($services.extension.xar.isEditAllowed($tdoc.documentReferenceWithLocale) == false && !$editForced)
-  #template("startpage.vm")
-  <div class="main">
-   <div id="mainContentArea">
-    ##
-    $response.setStatus(423)
-    #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
-                         + '&amp;force=1')
-    #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
-    #set($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
-    #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('extension.xar.editwarning.list')")
-    <ul>
-      #foreach($extension in $extensions)
-        <li>$extension.name ($extension.id.version)</li>
-      #end
-    </ul>
-    <p>$services.localization.render('extension.xar.editwarning.explanation')</p>
-    <p><a href="$forceEditURL">$services.localization.render('forcelock')</a><p>
     #xwikimessageboxend()
     ##
    </div>## mainContentArea

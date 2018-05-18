@@ -21,6 +21,7 @@ package org.xwiki.extension.xar.internal.handler;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -49,8 +50,15 @@ import org.xwiki.job.Job;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.JobFinishingEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.security.SecurityReference;
+import org.xwiki.security.SecurityReferenceFactory;
+import org.xwiki.security.authorization.cache.SecurityCache;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xar.XarEntry;
 
 import com.xpn.xwiki.XWikiContext;
@@ -89,6 +97,15 @@ public class XarExtensionJobFinishedListener implements EventListener
     @Named(XarExtensionHandler.TYPE)
     private InstalledExtensionRepository xarRepository;
 
+    @Inject
+    private WikiDescriptorManager wikiManager;
+
+    @Inject
+    private SecurityCache security;
+
+    @Inject
+    private SecurityReferenceFactory securityFactory;
+
     @Override
     public String getName()
     {
@@ -114,23 +131,31 @@ public class XarExtensionJobFinishedListener implements EventListener
                     (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
 
                 if (xarExtensionPlan != null) {
+                    Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries =
+                        xarExtensionPlan.previousXAREntries;
+                    Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = xarExtensionPlan.nextXAREntries;
+
+                    Map<XarEntry, XarExtensionPlanEntry> rootPreviousPages = previousXAREntries.get(null);
+                    if (rootPreviousPages == null) {
+                        rootPreviousPages = Collections.emptyMap();
+                    }
+                    Map<XarEntry, LocalExtension> rootNextPages = nextXAREntries.get(null);
+                    if (rootNextPages == null) {
+                        rootNextPages = Collections.emptyMap();
+                    }
+
+                    ////////////////////
+                    // Delete pages
+                    ////////////////////
+
                     try {
-                        Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries =
-                            xarExtensionPlan.previousXAREntries;
-                        Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = xarExtensionPlan.nextXAREntries;
-
-                        Map<XarEntry, LocalExtension> rootNextPages = nextXAREntries.get(null);
-                        if (rootNextPages == null) {
-                            rootNextPages = Collections.emptyMap();
-                        }
-
                         XWikiContext xcontext = this.xcontextProvider.get();
 
                         Packager packager = this.packagerProvider.get();
 
                         // Get pages to delete
 
-                        Set<DocumentReference> pagesToDelete = new HashSet<DocumentReference>();
+                        Set<DocumentReference> pagesToDelete = new HashSet<>();
 
                         for (Map.Entry<String, Map<XarEntry, XarExtensionPlanEntry>> previousWikiEntry : previousXAREntries
                             .entrySet()) {
@@ -247,9 +272,112 @@ public class XarExtensionJobFinishedListener implements EventListener
                         }
                         context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN, null);
                     }
+
+                    ////////////////////////////////////////
+                    // Invalidate security cache
+                    ////////////////////////////////////////
+
+                    invalidateSecurityCache(previousXAREntries, rootPreviousPages, nextXAREntries, rootNextPages);
                 }
             }
         }
+    }
+
+    private void invalidateSecurityCache(Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries,
+        Map<XarEntry, XarExtensionPlanEntry> previousRoot, Map<String, Map<XarEntry, LocalExtension>> nextXAREntries,
+        Map<XarEntry, LocalExtension> nextRoot)
+    {
+        // Extension installed on root
+        Collection<String> wikis;
+
+        try {
+            wikis = this.wikiManager.getAllIds();
+        } catch (WikiManagerException e) {
+            this.logger.error("Failed to get wikis. Security cache won't be properly invalidated.", e);
+
+            wikis = Collections.emptyList();
+        }
+
+        for (String wiki : wikis) {
+            invalidateWikiSecurityCache(wiki, previousXAREntries.get(wiki), previousRoot, nextXAREntries.get(wiki),
+                nextRoot);
+        }
+    }
+
+    private void invalidateWikiSecurityCache(String wikiId, Map<XarEntry, XarExtensionPlanEntry> previous,
+        Map<XarEntry, XarExtensionPlanEntry> previousRoot, Map<XarEntry, LocalExtension> next,
+        Map<XarEntry, LocalExtension> nextRoot)
+    {
+        WikiReference wikiReference = new WikiReference(wikiId);
+
+        if (previous != null) {
+            invalidateNextSecurityCache(wikiReference, previous, previousRoot, nextRoot);
+        }
+        if (previousRoot != null) {
+            invalidateNextSecurityCache(wikiReference, previousRoot, previousRoot, nextRoot);
+        }
+
+        if (previous != null) {
+            invalidatePreviousSecurityCache(wikiReference, previous, next, nextRoot);
+        }
+        if (previousRoot != null) {
+            invalidatePreviousSecurityCache(wikiReference, previousRoot, next, nextRoot);
+        }
+    }
+
+    private void invalidateNextSecurityCache(WikiReference wikiReference, Map<XarEntry, XarExtensionPlanEntry> previous,
+        Map<XarEntry, XarExtensionPlanEntry> previousRoot, Map<XarEntry, LocalExtension> next)
+    {
+        if (previous == null) {
+            previous = previousRoot;
+        }
+
+        for (XarEntry nextXarEntry : next.keySet()) {
+            if (previous != null) {
+                XarExtensionPlanEntry previousPlanEntry = previous.get(nextXarEntry);
+                if (previousPlanEntry == null) {
+                    previousPlanEntry = previousRoot.get(nextXarEntry);
+                }
+
+                if (previousPlanEntry != null) {
+                    XarEntry previousXarEntry = previousPlanEntry.extension.getXarPackage().getEntry(nextXarEntry);
+
+                    if (previousXarEntry.getType() != nextXarEntry.getType()) {
+                        // Different type
+                        invalidateSecurityCache(nextXarEntry, wikiReference);
+                    }
+                } else {
+                    // New document
+                    invalidateSecurityCache(nextXarEntry, wikiReference);
+                }
+            } else {
+                // New document
+                invalidateSecurityCache(nextXarEntry, wikiReference);
+            }
+        }
+    }
+
+    private void invalidatePreviousSecurityCache(WikiReference wikiReference,
+        Map<XarEntry, XarExtensionPlanEntry> previous, Map<XarEntry, LocalExtension> next,
+        Map<XarEntry, LocalExtension> nextRoot)
+    {
+        if (next == null) {
+            next = nextRoot;
+        }
+
+        for (XarEntry nextXarEntry : previous.keySet()) {
+            if (next == null || (!next.containsKey(nextXarEntry) && !nextRoot.containsKey(nextXarEntry))) {
+                // Deleted document
+                invalidateSecurityCache(nextXarEntry, wikiReference);
+            }
+        }
+    }
+
+    private void invalidateSecurityCache(LocalDocumentReference documentReference, WikiReference wikiReference)
+    {
+        SecurityReference securityReference =
+            this.securityFactory.newEntityReference(new DocumentReference(documentReference, wikiReference));
+        this.security.remove(securityReference);
     }
 
     private PackageConfiguration createPackageConfiguration(Request request)

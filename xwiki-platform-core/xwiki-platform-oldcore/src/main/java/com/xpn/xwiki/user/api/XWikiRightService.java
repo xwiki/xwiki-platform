@@ -78,8 +78,8 @@ public interface XWikiRightService
      */
     static boolean isGuest(EntityReference userReference)
     {
-        return userReference != null
-            && StringUtils.equalsIgnoreCase(userReference.getName(), XWikiRightService.GUEST_USER);
+        return userReference == null
+            || StringUtils.equalsIgnoreCase(userReference.getName(), XWikiRightService.GUEST_USER);
     }
 
     /**

@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
@@ -73,7 +72,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     public static final String PROVIDER_HINT = "watchlistbridge";
 
     private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki",
-            "WatchListClass");
+        "WatchListClass");
 
     private static final String FIELD_WIKIS = "wikis";
 
@@ -94,7 +93,6 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user)
-            throws NotificationException
     {
         if (!configuration.isEnabled()) {
             return Collections.emptySet();
@@ -119,7 +117,6 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
                 getValues(obj, FIELD_SPACES, NotificationFilterProperty.SPACE, results);
                 getValues(obj, FIELD_DOCUMENTS, NotificationFilterProperty.PAGE, results);
             }
-
         } catch (XWikiException e) {
             logger.error("Failed to read the preferences of the watchlist for the user {}.", user, e);
         }
@@ -128,13 +125,13 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     }
 
     private void getValues(BaseObject obj, String fieldName, NotificationFilterProperty property,
-            Set<NotificationFilterPreference> results)
+        Set<NotificationFilterPreference> results)
     {
         List<String> values = obj.getListValue(fieldName);
         if (values != null && !values.isEmpty()) {
             for (String value : values) {
                 DefaultNotificationFilterPreference pref = createDefaultNotificationFilterPreference(
-                        String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
+                    String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
                 Map<NotificationFilterProperty, List<String>> preferenceProperties = new HashMap<>();
                 preferenceProperties.put(property, Collections.singletonList(value));
                 pref.setPreferenceProperties(preferenceProperties);
@@ -157,14 +154,13 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
 
     @Override
     public void saveFilterPreferences(Set<NotificationFilterPreference> filterPreferences)
-            throws NotificationException
     {
         // We do not want to create any new preference for the watchlist application, since we want to migrate
         // smoothly to the new notification mechanism
     }
 
     @Override
-    public void deleteFilterPreference(String filterPreferenceName) throws NotificationException
+    public void deleteFilterPreference(String filterPreferenceName)
     {
         if (!configuration.isEnabled()) {
             return;
@@ -184,7 +180,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
         try {
             XWikiDocument document = xwiki.getDocument(user, context);
             List<BaseObject> objects = document.getXObjects(
-                    CLASS_REFERENCE.appendParent(context.getUserReference().getWikiReference()));
+                CLASS_REFERENCE.appendParent(context.getUserReference().getWikiReference()));
             if (objects == null) {
                 return;
             }
@@ -200,7 +196,6 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
             if (found) {
                 xwiki.saveDocument(document, "Remove a watchlist preference.", context);
             }
-
         } catch (XWikiException e) {
             logger.error("Failed to delete a preference of the watchlist for the user {}.", user, e);
         }
@@ -215,7 +210,7 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
             while (iterator.hasNext()) {
                 String currentValue = iterator.next();
                 String currentFilterPreferenceName = String.format(WATCHLIST_FILTER_PREFERENCES_NAME,
-                        type, sha256Hex(currentValue));
+                    type, sha256Hex(currentValue));
                 if (currentFilterPreferenceName.equals(filterPreferenceName)) {
                     iterator.remove();
                     found = true;
@@ -233,18 +228,17 @@ public class WatchlistBridgeProvider implements NotificationFilterPreferenceProv
     private String extractFieldName(String type)
     {
         return NotificationFilterProperty.WIKI.name().equals(type) ? FIELD_WIKIS
-                    : NotificationFilterProperty.SPACE.name().equals(type) ? FIELD_SPACES : FIELD_DOCUMENTS;
+            : NotificationFilterProperty.SPACE.name().equals(type) ? FIELD_SPACES : FIELD_DOCUMENTS;
     }
 
     @Override
     public void setFilterPreferenceEnabled(String filterPreferenceName, boolean enabled)
-            throws NotificationException
     {
         // Watchlist preferences are always enabled
     }
 
     @Override
-    public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
+    public void setStartDateForUser(DocumentReference user, Date startDate)
     {
         // Unavailable
     }

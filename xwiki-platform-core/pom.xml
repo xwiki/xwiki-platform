@@ -159,6 +159,11 @@
                     "justification": "Classes moved to the internal package as they were not supposed to be public"
                   },
                   {
+                    "regex": true,
+                    "code": "java\.method\.finalMethodAddedToNonFinalClass",
+                    "justification": "Revapi bug: Temporarily ignoring till https://github.com/revapi/revapi/issues/131 is fixed"
+                  },
+                  {
                     "code": "java.method.returnTypeChanged",
                     "old": "method boolean org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",
                     "new": "method org.xwiki.notifications.filters.NotificationFilter.FilterPolicy org.xwiki.notifications.filters.NotificationFilter::filterEvent(org.xwiki.eventstream.Event, org.xwiki.model.reference.DocumentReference, org.xwiki.notifications.NotificationFormat)",

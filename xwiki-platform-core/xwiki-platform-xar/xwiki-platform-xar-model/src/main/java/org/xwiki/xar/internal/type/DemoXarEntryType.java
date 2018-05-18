@@ -19,10 +19,10 @@
  */
 package org.xwiki.xar.internal.type;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.xar.XarEntryTypeResolver;
 import org.xwiki.xar.type.AbstractXarEntryType;
 
 /**
@@ -31,8 +31,7 @@ import org.xwiki.xar.type.AbstractXarEntryType;
  * @version $Id$
  * @since 10.3
  */
-@Component
-@Named(DemoXarEntryType.HINT)
+@Component(hints = { DemoXarEntryType.HINT, XarEntryTypeResolver.DOCUMENT_PREFIX + "Main.WebHome" })
 @Singleton
 public class DemoXarEntryType extends AbstractXarEntryType
 {

@@ -7,4 +7,3 @@ org.xwiki.xar.internal.type.ConfigurationXarEntryType
 org.xwiki.xar.internal.type.CustomizableXarEntryType
 org.xwiki.xar.internal.type.DefaultXarEntryType
 org.xwiki.xar.internal.type.DemoXarEntryType
-org.xwiki.xar.internal.type.HomeXarEntryType

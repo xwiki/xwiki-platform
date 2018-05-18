@@ -31,7 +31,6 @@ import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
 import org.xwiki.flamingo.test.po.ViewThemePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.ConfirmationPage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,26 +48,83 @@ public class FlamingoThemeTest extends AbstractTest
     public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
-    public void editFlamingoTheme() throws Exception
+    public void validateColorThemeFeatures() throws Exception
     {
-        // Go to the presentation section of the administration
+        // First make sure the theme we'll create doesn't exist
+        getUtil().deletePage("FlamingoThemes", getTestMethodName());
+
+        // Note: we don't reset the color theme before we start even though the test below could fail and thus have
+        // our test theme set. We don't do that since we want to test that the default CT is Charcoal by default.
+        // The reason why it's ok is because we have only a single UI test in this module and thus there's no risk
+        // that another test would fail because it's expecting to have Charcoal defined.
+        // Only caveat is that if you run this test several times and it fails the first time then it may fail the
+        // second time when we test that the default CT is Charcoal...
+
+        // Go to the Theme section of the administration
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         ThemesAdministrationSectionPage presentationAdministrationSectionPage =
-                administrationPage.clickThemesSection();
+            administrationPage.clickThemesSection();
+
         // Click on "manage color theme"
         presentationAdministrationSectionPage.manageColorThemes();
         ThemeApplicationWebHomePage themeApplicationWebHomePage = new ThemeApplicationWebHomePage();
+
+        // Ensure the current theme is correct (default is "Charcoal")
+        assertEquals("Charcoal", themeApplicationWebHomePage.getCurrentTheme());
+
+        // Ensure the other themes listed are the expected ones
+        List<String> otherThemes = themeApplicationWebHomePage.getOtherThemes();
+        assertTrue(otherThemes.contains("Marina"));
+        assertTrue(otherThemes.contains("Garden"));
+        assertTrue(otherThemes.contains("Kitty"));
+        assertFalse(otherThemes.contains("Charcoal"));
+
+        // Create a new theme
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(getTestMethodName());
+        editThemePage.waitUntilPreviewIsLoaded();
+
+        // First, disable auto refresh because it slows down the test
+        // (and can even make it fails if the computer is slow)
+        editThemePage.setAutoRefresh(false);
+
+        verifyAllVariablesCategoriesArePresent(editThemePage);
+        verifyVariablesCategoriesDoesNotDisappear(editThemePage);
+        verifyThatPreviewWorks(editThemePage);
+
         editThemePage.clickSaveAndView();
 
+        // Go back to the theme application
+        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+
+        // Set the new theme as current, from the Theme Home page
+        themeApplicationWebHomePage.useTheme(getTestMethodName());
+        // Verify that the new theme is used
+        assertEquals(getTestMethodName(), themeApplicationWebHomePage.getCurrentTheme());
+        // Look at the values
+        assertEquals("rgba(255, 0, 0, 1)", themeApplicationWebHomePage.getPageBackgroundColor());
+        assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
+        // Test 'lessCode' is correctly handled
+        assertEquals("rgba(0, 0, 255, 1)", themeApplicationWebHomePage.getTextColor());
+
+        // Verify we can select a theme by clicking the "use this theme" link, and view it
+        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        ViewThemePage themePage = themeApplicationWebHomePage.seeTheme(getTestMethodName());
+        themePage.waitUntilPreviewIsLoaded();
+
+        // Switch back to Charcoal
+        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        themeApplicationWebHomePage.useTheme("Charcoal");
+
+        // Go back to the Theme Admin UI to verify we can set the new theme from there too (using the select control)
         administrationPage = AdministrationPage.gotoPage();
         presentationAdministrationSectionPage = administrationPage.clickThemesSection();
 
-        // Select a color theme
+        // Set the newly created color theme as the active theme
         presentationAdministrationSectionPage.setColorTheme(getTestMethodName());
         assertEquals(getTestMethodName(), presentationAdministrationSectionPage.getCurrentColorTheme());
+        presentationAdministrationSectionPage.clickSave();
 
-        // Click on the 'customize' button
+        // Click on the 'customize' button to edit the theme to verify it works
         presentationAdministrationSectionPage.clickOnCustomize();
         editThemePage = new EditThemePage();
 
@@ -78,17 +134,11 @@ public class FlamingoThemeTest extends AbstractTest
         // First, disable auto refresh because it slows down the test
         // (and can even make it fails if the computer is slow)
         editThemePage.setAutoRefresh(false);
+        editThemePage.clickSaveAndView();
 
-        verifyAllVariablesCategoriesArePresent(editThemePage);
-        verifyVariablesCategoriesDoesNotDisappear(editThemePage);
-        verifyThatPreviewWorks(editThemePage);
-
-        // We do not have a way top clear the browser's cache with selenium
-        // (see http://stackoverflow.com/questions/19310888/clear-browser-cache-using-selenium-webdriver).
-        // So we cannot ensure that saving an existing theme works.
-
-        // Delete the test page
-        getUtil().rest().deletePage("FlamingoThemes", getTestMethodName());
+        // Switch back to Charcoal (just to set the default back if you need to execute the test again)
+        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
+        themeApplicationWebHomePage.useTheme("Charcoal");
     }
 
     private void verifyAllVariablesCategoriesArePresent(EditThemePage editThemePage) throws Exception
@@ -121,9 +171,6 @@ public class FlamingoThemeTest extends AbstractTest
         assertEquals(11, editThemePage.getVariableCategories().size());
     }
 
-    /**
-     * @since 6.3M2
-     */
     private void verifyThatPreviewWorks(EditThemePage editThemePage) throws Exception
     {
         // Verify that the preview is working with the current values
@@ -148,70 +195,4 @@ public class FlamingoThemeTest extends AbstractTest
         // Test 'lessCode' is correctly handled (since 7.3M1)
         assertEquals("rgba(0, 0, 255, 1)", previewBox.getTextColor());
     }
-
-    /**
-     * @since 6.3RC1
-     */
-    @Test
-    public void createNewTheme() throws Exception
-    {
-        // Go to the presentation section of the administration
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        ThemesAdministrationSectionPage presentationAdministrationSectionPage =
-                administrationPage.clickThemesSection();
-
-        // Click on "manage color theme"
-        presentationAdministrationSectionPage.manageColorThemes();
-        ThemeApplicationWebHomePage themeApplicationWebHomePage = new ThemeApplicationWebHomePage();
-
-        // Ensure the current theme is correct
-        assertEquals("Charcoal", themeApplicationWebHomePage.getCurrentTheme());
-        // Ensure the other themes are correct
-        List<String> otherThemes = themeApplicationWebHomePage.getOtherThemes();
-        assertTrue(otherThemes.contains("Marina"));
-        assertTrue(otherThemes.contains("Garden"));
-        assertTrue(otherThemes.contains("Kitty"));
-        assertFalse(otherThemes.contains("Charcoal"));
-
-        // Create a new theme
-        EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme("Test");
-        editThemePage.waitUntilPreviewIsLoaded();
-
-        // First, disable auto refresh because it slows down the test
-        // (and can even make it fails if the computer is slow)
-        editThemePage.setAutoRefresh(false);
-
-        // Set variables
-        editThemePage.selectVariableCategory("Base colors");
-        editThemePage.setVariableValue("xwiki-page-content-bg", "#ff0000");
-        editThemePage.selectVariableCategory("Typography");
-        editThemePage.setVariableValue("font-family-base", "Monospace");
-        editThemePage.selectVariableCategory("Advanced");
-        // Insert lessCode too
-        editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
-        // Save the theme
-        editThemePage.clickSaveAndView();
-
-        // Go back to the theme application
-        themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
-        // Set the new theme as current
-        themeApplicationWebHomePage.useTheme("Test");
-        // Verify that the new theme is used
-        assertEquals("Test", themeApplicationWebHomePage.getCurrentTheme());
-        // Look at the values
-        assertEquals("rgba(255, 0, 0, 1)", themeApplicationWebHomePage.getPageBackgroundColor());
-        assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
-        // Test 'lessCode' is correctly handled
-        assertEquals("rgba(0, 0, 255, 1)", themeApplicationWebHomePage.getTextColor());
-
-        // Switch back to Charcoal
-        themeApplicationWebHomePage.useTheme("Charcoal");
-
-        // Remove the theme
-        ViewThemePage themePage = themeApplicationWebHomePage.seeTheme("Test");
-        themePage.waitUntilPreviewIsLoaded();
-        ConfirmationPage confirmationPage = themePage.delete();
-        confirmationPage.confirmDeletePage().waitUntilIsTerminated();
-    }
-
 }
